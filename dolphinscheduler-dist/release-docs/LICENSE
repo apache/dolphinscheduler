@@ -287,10 +287,10 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     httpclient 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient/4.4.1, Apache 2.0
     httpcore 4.4.1: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore/4.4.1, Apache 2.0
     httpmime 4.5.7: https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime/4.5.7, Apache 2.0
-    jackson-annotations 2.9.8: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.9.8, Apache 2.0
-    jackson-core 2.9.8: https://github.com/FasterXML/jackson-core, Apache 2.0
+    jackson-annotations 2.9.10: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations/2.9.10, Apache 2.0
+    jackson-core 2.9.10: https://github.com/FasterXML/jackson-core, Apache 2.0
     jackson-core-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl/1.9.13, Apache 2.0
-    jackson-databind 2.9.8: https://github.com/FasterXML/jackson-databind, Apache 2.0
+    jackson-databind 2.9.10: https://github.com/FasterXML/jackson-databind, Apache 2.0
     jackson-datatype-jdk8 2.9.8: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.9.8, Apache 2.0
     jackson-datatype-jsr310 2.9.8: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.9.8, Apache 2.0
     jackson-jaxrs 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-jaxrs/1.9.13, Apache 2.0 and LGPL 2.1
@@ -343,8 +343,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
     parquet-hadoop-bundle 1.8.1: https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop-bundle/1.8.1, Apache 2.0
     poi 3.17: https://mvnrepository.com/artifact/org.apache.poi/poi/3.17, Apache 2.0
-    quartz 2.2.3: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz/2.2.3, Apache 2.0
-    quartz-jobs 2.2.3: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz-jobs/2.2.3, Apache 2.0
+    quartz 2.3.0: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz/2.3.0, Apache 2.0
+    quartz-jobs 2.3.0: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz-jobs/2.3.0, Apache 2.0
     snakeyaml 1.23: https://mvnrepository.com/artifact/org.yaml/snakeyaml/1.23, Apache 2.0
     snappy 0.2: https://mvnrepository.com/artifact/org.iq80.snappy/snappy/0.2, Apache 2.0
     snappy-java 1.0.4.1: https://github.com/xerial/snappy-java, Apache 2.0
@@ -384,7 +384,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     xercesImpl 2.9.1: https://mvnrepository.com/artifact/xerces/xercesImpl/2.9.1, Apache 2.0
     xml-apis 1.4.01: https://mvnrepository.com/artifact/xml-apis/xml-apis/1.4.01, Apache 2.0 and W3C
     zookeeper 3.4.14: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper/3.4.14, Apache 2.0
-
 
 ========================================================================
 BSD licenses

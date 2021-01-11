@@ -16,7 +16,7 @@ Official Website: https://dolphinscheduler.apache.org
 #### You can start a dolphinscheduler instance
 ```
 $ docker run -dit --name dolphinscheduler \ 
--e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -e POSTGRESQL_DATABASE=dolphinscheduler \
+-e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -25,14 +25,14 @@ The default postgres user `root`, postgres password `root` and database `dolphin
 
 The default zookeeper is created in the `startup.sh`.
 
-#### Or via Environment Variables **`POSTGRESQL_HOST`** **`POSTGRESQL_PORT`** **`POSTGRESQL_DATABASE`** **`ZOOKEEPER_QUORUM`**
+#### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
 
 You can specify **existing postgres service**. Example:
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -42,7 +42,7 @@ You can specify **existing zookeeper service**. Example:
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" -e POSTGRESQL_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -56,8 +56,8 @@ You can start a standalone dolphinscheduler server.
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler master-server
 ```
 
@@ -66,8 +66,8 @@ dolphinscheduler master-server
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler worker-server
 ```
 
@@ -75,8 +75,8 @@ dolphinscheduler worker-server
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
 dolphinscheduler api-server
 ```
@@ -85,8 +85,8 @@ dolphinscheduler api-server
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler alert-server
 ```
 
@@ -99,7 +99,7 @@ $ docker run -dit --name dolphinscheduler \
 dolphinscheduler frontend
 ```
 
-**Note**: You must be specify `POSTGRESQL_HOST` `POSTGRESQL_PORT` `POSTGRESQL_DATABASE` `POSTGRESQL_USERNAME` `POSTGRESQL_PASSWORD` `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
+**Note**: You must be specify `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
 
 ## How to build a docker image
 
@@ -124,33 +124,51 @@ Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script
 
 The Dolphin Scheduler image uses several environment variables which are easy to miss. While none of the variables are required, they may significantly aid you in using the image.
 
-**`POSTGRESQL_HOST`**
+**`DATABASE_TYPE`**
 
-This environment variable sets the host for PostgreSQL. The default value is `127.0.0.1`.
-
-**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
-
-**`POSTGRESQL_PORT`**
-
-This environment variable sets the port for PostgreSQL. The default value is `5432`.
-
-**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`. 
-
-**`POSTGRESQL_USERNAME`**
-
-This environment variable sets the username for PostgreSQL. The default value is `root`.
+This environment variable sets the type for database. The default value is `postgresql`.
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 
-**`POSTGRESQL_PASSWORD`**
+**`DATABASE_DRIVER`**
 
-This environment variable sets the password for PostgreSQL. The default value is `root`.
+This environment variable sets the type for database. The default value is `org.postgresql.Driver`.
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 
-**`POSTGRESQL_DATABASE`**
+**`DATABASE_HOST`**
 
-This environment variable sets the database for PostgreSQL. The default value is `dolphinscheduler`.
+This environment variable sets the host for database. The default value is `127.0.0.1`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
+
+**`DATABASE_PORT`**
+
+This environment variable sets the port for database. The default value is `5432`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
+
+**`DATABASE_USERNAME`**
+
+This environment variable sets the username for database. The default value is `root`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
+
+**`DATABASE_PASSWORD`**
+
+This environment variable sets the password for database. The default value is `root`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
+
+**`DATABASE_DATABASE`**
+
+This environment variable sets the database for database. The default value is `dolphinscheduler`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
+
+**`DATABASE_PARAMS`**
+
+This environment variable sets the database for database. The default value is `characterEncoding=utf8`.
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 

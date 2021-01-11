@@ -19,10 +19,7 @@ package org.apache.dolphinscheduler.server.master.consumer;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -51,6 +48,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,7 +67,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue taskPriorityQueue;
+    private TaskPriorityQueue<String> taskPriorityQueue;
 
     /**
      * processService
@@ -116,8 +114,15 @@ public class TaskPriorityQueueConsumer extends Thread{
                         failedDispatchTasks.add(taskPriorityInfo);
                     }
                 }
-                for(String dispatchFailedTask : failedDispatchTasks){
-                    taskPriorityQueue.put(dispatchFailedTask);
+                if (!failedDispatchTasks.isEmpty()) {
+                    for (String dispatchFailedTask : failedDispatchTasks) {
+                        taskPriorityQueue.put(dispatchFailedTask);
+                    }
+                    // If there are tasks in a cycle that cannot find the worker group,
+                    // sleep for 1 second
+                    if (taskPriorityQueue.size() <= failedDispatchTasks.size()) {
+                        TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                    }
                 }
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
@@ -132,7 +137,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskInstanceId taskInstanceId
      * @return result
      */
-    private boolean dispatch(int taskInstanceId){
+    protected boolean dispatch(int taskInstanceId) {
         boolean result = false;
         try {
             TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
@@ -253,8 +258,8 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
      * @param taskNode taskNode
      */
-    private void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
-        DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
+    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
+        DataxParameters dataxParameters = JSONUtils.parseObject(taskNode.getParams(), DataxParameters.class);
 
         DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
         DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
@@ -275,29 +280,32 @@ public class TaskPriorityQueueConsumer extends Thread{
 
 
     /**
-     * set datax task relation
+     * set sqoop task relation
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
      * @param taskNode taskNode
      */
     private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskNode taskNode) {
         SqoopParameters sqoopParameters = JSONObject.parseObject(taskNode.getParams(), SqoopParameters.class);
 
-        SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
-        TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
+        // sqoop job type is template set task relation
+        if (sqoopParameters.getJobType().equals(SqoopJobType.TEMPLATE.getDescp())) {
+            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
 
-        DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
-        DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
+            DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
+            DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
 
-        if (dataSource != null){
-            sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
-            sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-            sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
-        }
+            if (dataSource != null){
+                sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
+                sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+                sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+            }
 
-        if (dataTarget != null){
-            sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
-            sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-            sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            if (dataTarget != null){
+                sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
+                sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+                sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            }
         }
     }
 
@@ -366,8 +374,8 @@ public class TaskPriorityQueueConsumer extends Thread{
     /**
      * get resource map key is full name and value is tenantCode
      */
-    private Map<String,String> getResourceFullNames(TaskNode taskNode) {
-        Map<String,String> resourceMap = new HashMap<>();
+    protected Map<String, String> getResourceFullNames(TaskNode taskNode) {
+        Map<String, String> resourceMap = new HashMap<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {

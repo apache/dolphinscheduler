@@ -14,63 +14,73 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
-import org.slf4j.Logger;
+
 import java.util.Map;
+
+import org.slf4j.Logger;
 
 /**
  * sqoop task extends the shell task
  */
 public class SqoopTask extends AbstractYarnTask {
 
+    /**
+     * sqoop task params
+     */
     private SqoopParameters sqoopParameters;
 
     /**
      * taskExecutionContext
      */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext sqoopTaskExecutionContext;
 
-    public SqoopTask(TaskExecutionContext taskExecutionContext, Logger logger){
-        super(taskExecutionContext,logger);
-        this.taskExecutionContext = taskExecutionContext;
+    public SqoopTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.sqoopTaskExecutionContext = taskExecutionContext;
     }
 
     @Override
-    public void init() throws Exception {
-        logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
+    public void init() {
+        logger.info("sqoop task params {}", sqoopTaskExecutionContext.getTaskParams());
         sqoopParameters =
-                JSON.parseObject(taskExecutionContext.getTaskParams(),SqoopParameters.class);
-        if (!sqoopParameters.checkParameters()) {
-            throw new RuntimeException("sqoop task params is not valid");
+            JSONUtils.parseObject(sqoopTaskExecutionContext.getTaskParams(), SqoopParameters.class);
+        //check sqoop task params
+        if (null == sqoopParameters) {
+            throw new IllegalArgumentException("Sqoop Task params is null");
         }
 
+        if (!sqoopParameters.checkParameters()) {
+            throw new IllegalArgumentException("Sqoop Task params check fail");
+        }
     }
 
     @Override
-    protected String buildCommand() throws Exception {
+    protected String buildCommand() {
         //get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters,taskExecutionContext);
+        String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                taskExecutionContext.getDefinedParams(),
-                sqoopParameters.getLocalParametersMap(),
-                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                taskExecutionContext.getScheduleTime());
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(sqoopTaskExecutionContext.getDefinedParams()),
+            sqoopTaskExecutionContext.getDefinedParams(),
+            sqoopParameters.getLocalParametersMap(),
+            CommandType.of(sqoopTaskExecutionContext.getCmdTypeIfComplement()),
+            sqoopTaskExecutionContext.getScheduleTime());
 
-        if(paramsMap != null){
-            String resultScripts = ParameterUtils.convertParameterPlaceholders(script,  ParamUtils.convert(paramsMap));
+        if (paramsMap != null) {
+            String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
             logger.info("sqoop script: {}", resultScripts);
             return resultScripts;
         }

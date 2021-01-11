@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.shell;
 
+import static java.util.Calendar.DAY_OF_MONTH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -40,6 +41,8 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -131,25 +134,26 @@ public class ShellTask extends AbstractTask {
      *  combining local and global parameters
      */
     Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-            taskExecutionContext.getDefinedParams(),
-            shellParameters.getLocalParametersMap(),
-            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-            taskExecutionContext.getScheduleTime());
-    if (paramsMap != null){
-      script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
-    // new
+        taskExecutionContext.getDefinedParams(),
+        shellParameters.getLocalParametersMap(),
+        CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+        taskExecutionContext.getScheduleTime());
     // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-    if (paramsMap != null) {
-      if (taskExecutionContext.getScheduleTime() != null) {
-        String dateTime = DateUtils.format(taskExecutionContext.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
-        Property p = new Property();
-        p.setValue(dateTime);
-        p.setProp(Constants.PARAMETER_SHECDULE_TIME);
-        paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+    if (taskExecutionContext.getScheduleTime() != null) {
+      if (paramsMap == null) {
+        paramsMap = new HashMap<>();
       }
-      script = ParameterUtils.convertParameterPlaceholders2(script, ParamUtils.convert(paramsMap));
+      Date date = taskExecutionContext.getScheduleTime();
+      if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+        date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
+      }
+      String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
+      Property p = new Property();
+      p.setValue(dateTime);
+      p.setProp(Constants.PARAMETER_DATETIME);
+      paramsMap.put(Constants.PARAMETER_DATETIME, p);
     }
+    script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
 
     shellParameters.setRawScript(script);
 

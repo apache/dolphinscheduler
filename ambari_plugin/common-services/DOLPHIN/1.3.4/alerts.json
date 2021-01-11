@@ -1,0 +1,158 @@
+{
+  "DOLPHIN": {
+    "service": [],
+    "DOLPHIN_API": [
+      {
+        "name": "dolphin_api_port_check",
+        "label": "dolphin_api_port_check",
+        "description": "dolphin_api_port_check.",
+        "interval": 10,
+        "scope": "ANY",
+        "source": {
+          "type": "PORT",
+          "uri": "{{dolphin-application-api/server.port}}",
+          "default_port": 12345,
+          "reporting": {
+            "ok": {
+              "text": "TCP OK - {0:.3f}s response on port {1}"
+            },
+            "warning": {
+              "text": "TCP OK - {0:.3f}s response on port {1}",
+              "value": 1.5
+            },
+            "critical": {
+              "text": "Connection failed: {0} to {1}:{2}",
+              "value": 5.0
+            }
+          }
+        }
+      }
+    ],
+    "DOLPHIN_LOGGER": [
+      {
+        "name": "dolphin_logger_port_check",
+        "label": "dolphin_logger_port_check",
+        "description": "dolphin_logger_port_check.",
+        "interval": 10,
+        "scope": "ANY",
+        "source": {
+          "type": "PORT",
+          "uri": "{{dolphin-common/loggerserver.rpc.port}}",
+          "default_port": 50051,
+          "reporting": {
+            "ok": {
+              "text": "TCP OK - {0:.3f}s response on port {1}"
+            },
+            "warning": {
+              "text": "TCP OK - {0:.3f}s response on port {1}",
+              "value": 1.5
+            },
+            "critical": {
+              "text": "Connection failed: {0} to {1}:{2}",
+              "value": 5.0
+            }
+          }
+        }
+      }
+    ],
+    "DOLPHIN_MASTER": [
+      {
+        "name": "DOLPHIN_MASTER_CHECK",
+        "label": "check dolphin scheduler master status",
+        "description": "",
+        "interval":10,
+        "scope": "HOST",
+        "enabled": true,
+        "source": {
+          "type": "SCRIPT",
+          "path": "DOLPHIN/1.3.4/package/alerts/alert_dolphin_scheduler_status.py",
+          "parameters": [
+
+            {
+              "name": "connection.timeout",
+              "display_name": "Connection Timeout",
+              "value": 5.0,
+              "type": "NUMERIC",
+              "description": "The maximum time before this alert is considered to be CRITICAL",
+              "units": "seconds",
+              "threshold": "CRITICAL"
+            },
+            {
+              "name": "alertName",
+              "display_name": "alertName",
+              "value": "DOLPHIN_MASTER",
+              "type": "STRING",
+              "description": "alert name"
+            }
+          ]
+        }
+      }
+    ],
+    "DOLPHIN_WORKER": [
+      {
+        "name": "DOLPHIN_WORKER_CHECK",
+        "label": "check dolphin scheduler worker status",
+        "description": "",
+        "interval":10,
+        "scope": "HOST",
+        "enabled": true,
+        "source": {
+          "type": "SCRIPT",
+          "path": "DOLPHIN/1.3.4/package/alerts/alert_dolphin_scheduler_status.py",
+          "parameters": [
+
+            {
+              "name": "connection.timeout",
+              "display_name": "Connection Timeout",
+              "value": 5.0,
+              "type": "NUMERIC",
+              "description": "The maximum time before this alert is considered to be CRITICAL",
+              "units": "seconds",
+              "threshold": "CRITICAL"
+            },
+            {
+              "name": "alertName",
+              "display_name": "alertName",
+              "value": "DOLPHIN_WORKER",
+              "type": "STRING",
+              "description": "alert name"
+            }
+          ]
+        }
+      }
+    ],
+    "DOLPHIN_ALERT": [
+      {
+        "name": "DOLPHIN_DOLPHIN_ALERT_CHECK",
+        "label": "check dolphin scheduler alert status",
+        "description": "",
+        "interval":10,
+        "scope": "HOST",
+        "enabled": true,
+        "source": {
+          "type": "SCRIPT",
+          "path": "DOLPHIN/1.3.4/package/alerts/alert_dolphin_scheduler_status.py",
+          "parameters": [
+
+            {
+              "name": "connection.timeout",
+              "display_name": "Connection Timeout",
+              "value": 5.0,
+              "type": "NUMERIC",
+              "description": "The maximum time before this alert is considered to be CRITICAL",
+              "units": "seconds",
+              "threshold": "CRITICAL"
+            },
+            {
+              "name": "alertName",
+              "display_name": "alertName",
+              "value": "DOLPHIN_ALERT",
+              "type": "STRING",
+              "description": "alert name"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
