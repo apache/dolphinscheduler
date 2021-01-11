@@ -21,7 +21,7 @@
       <a href="javascript:" class="tog-open" @click="_toggleMenu" v-if="isTogHide"></a>
     </div>
     <div class="leven-1" v-for="(item,$index) in menuList" :key="$index">
-      <div v-if="item.disabled">
+      <div v-if="item.enabled">
         <template v-if="item.path">
           <router-link :to="{ name: item.path}">
             <div class="name" @click="_toggleSubMenu(item)">
@@ -44,7 +44,7 @@
         </template>
         <ul v-if="item.isOpen && item.children.length">
           <template v-for="(el,index) in item.children">
-            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.disabled" :key="index">
+            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.enabled" :key="index">
               <span>{{el.name}}</span>
             </router-link>
           </template>
