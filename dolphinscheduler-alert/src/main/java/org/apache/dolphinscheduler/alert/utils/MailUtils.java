@@ -26,11 +26,24 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,7 +274,7 @@ public class MailUtils {
      * @param msg the message
      */
     private static void attachContent(Collection<String> receiversCc, String title, String content, String partContent, MimeMessage msg) throws MessagingException, IOException {
-        /**
+        /*
          * set receiverCc
          */
         if (CollectionUtils.isNotEmpty(receiversCc)) {
@@ -310,11 +323,11 @@ public class MailUtils {
      */
     private static Map<String, Object> getStringObjectMap(String title, String content, String showType, Map<String, Object> retMap, HtmlEmail email) throws EmailException {
 
-        /**
+        /*
          * the subject of the message to be sent
          */
         email.setSubject(title);
-        /**
+        /*
          * to send information, you can use HTML tags in mail content because of the use of HtmlEmail
          */
         if (showType.equals(ShowType.TABLE.getDescp())) {

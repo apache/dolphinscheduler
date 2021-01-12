@@ -17,14 +17,20 @@
 
 package org.apache.dolphinscheduler.alert.template.impl;
 
-import static org.apache.dolphinscheduler.common.utils.Preconditions.*;
+import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.common.enums.ShowType;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,9 +81,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             String title = "";
             for (LinkedHashMap mapItems : mapItemsList) {
 
-                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
+                Set<Entry<String, Object>> entries = mapItems.entrySet();
 
-                Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+                Iterator<Entry<String, Object>> iterator = entries.iterator();
 
                 StringBuilder t = new StringBuilder(Constants.TR);
                 StringBuilder cs = new StringBuilder(Constants.TR);
