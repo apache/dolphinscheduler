@@ -49,10 +49,10 @@ public interface AlertPluginInstanceService {
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param id id
      * @return result
      */
-    Map<String, Object> delete(User loginUser, AlertPluginInstance alertPluginInstance);
+    Map<String, Object> delete(User loginUser, int id);
 
     /**
      * get alert plugin instance
@@ -65,7 +65,23 @@ public interface AlertPluginInstanceService {
 
     /**
      * queryAll
+     *
      * @return alert plugins
      */
     Map<String, Object> queryAll();
+
+    /**
+     * checkExistPluginInstanceName
+     * @param pluginName plugin name
+     * @return isExist
+     */
+    boolean checkExistPluginInstanceName(String pluginName);
+
+    /**
+     * queryPluginPage
+     * @param pageIndex page index
+     * @param pageSize  page size
+     * @return plugins
+     */
+    Map<String, Object> queryPluginPage(int pageIndex,int pageSize);
 }

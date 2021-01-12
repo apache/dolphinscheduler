@@ -41,4 +41,7 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      * @return AlertPluginInstance list
      */
     List<AlertPluginInstance> queryByIds(@Param("ids") List<Integer> ids);
+
+    List<AlertPluginInstance> queryByInstanceName(@Param("instanceName")String instanceName);
+
 }

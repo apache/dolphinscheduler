@@ -201,6 +201,8 @@ public enum Status {
     GET_ALERT_PLUGIN_INSTANCE_ERROR(10167, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
     CREATE_ALERT_PLUGIN_INSTANCE_ERROR(10168, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
     QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(10169, "query all alert plugin instance error", "查询所有告警实例失败"),
+    PLUGIN_INSTANCE_ALREADY_EXIT(10170,"plugin instance already exit","该告警插件实例已存在"),
+    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(10171,"query plugin instance page error","分页查询告警实例失败"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),

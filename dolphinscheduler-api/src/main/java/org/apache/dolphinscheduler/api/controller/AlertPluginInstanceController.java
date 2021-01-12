@@ -20,13 +20,17 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_ALERT_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -73,11 +77,6 @@ public class AlertPluginInstanceController extends BaseController {
      * @return create result code
      */
     @ApiOperation(value = "createAlertPluginInstance", notes = "CREATE_ALERT_PLUGIN_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "groupType", value = "GROUP_TYPE", required = true, dataType = "AlertType"),
-            @ApiImplicitParam(name = "description", value = "DESC", dataType = "String")
-    })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
@@ -112,18 +111,21 @@ public class AlertPluginInstanceController extends BaseController {
      * deleteAlertPluginInstance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alertPluginInstance
+     * @param id id
      * @return result
      */
     @ApiOperation(value = "delete", notes = "DELETE_ALERT_PLUGIN_INSTANCE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "ALERT_PLUGIN_ID", required = true, dataType = "Int", example = "100")
+    })
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result deleteAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestBody AlertPluginInstance alertPluginInstance) {
-        logger.info("login  user {}, delete alert plugin instance id {}", loginUser.getUserName(), alertPluginInstance.getId());
+                                            @RequestParam(value = "id") int id) {
+        logger.info("login  user {}, delete alert plugin instance id {}", loginUser.getUserName(), id);
 
-        Map<String, Object> result = alertPluginInstanceService.delete(loginUser, alertPluginInstance);
+        Map<String, Object> result = alertPluginInstanceService.delete(loginUser, id);
         return returnDataListPaging(result);
     }
 
@@ -161,6 +163,66 @@ public class AlertPluginInstanceController extends BaseController {
             loginUser.getUserName());
         Map<String, Object> result = alertPluginInstanceService.queryAll();
         return returnDataList(result);
+    }
+
+    /**
+     * check alert group exist
+     *
+     * @param loginUser login user
+     * @param alertInstanceName alert instance name
+     * @return check result code
+     */
+    @ApiOperation(value = "verifyAlertInstanceName", notes = "VERIFY_ALERT_INSTANCE_NAME_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+    })
+    @GetMapping(value = "/verify-alert-instance-name")
+    @ResponseStatus(HttpStatus.OK)
+    public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                  @RequestParam(value = "alertInstanceName") String alertInstanceName) {
+        logger.info("login user {}, verify alert instance name: {}", loginUser.getUserName(), alertInstanceName);
+
+        boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(alertInstanceName);
+        Result result = new Result();
+        if (exist) {
+            logger.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
+            result.setCode(Status.PLUGIN_INSTANCE_ALREADY_EXIT.getCode());
+            result.setMsg(Status.PLUGIN_INSTANCE_ALREADY_EXIT.getMsg());
+        } else {
+            result.setCode(Status.SUCCESS.getCode());
+            result.setMsg(Status.SUCCESS.getMsg());
+        }
+        return result;
+    }
+
+    /**
+     * paging query alert plugin instance group list
+     *
+     * @param loginUser login user
+     * @param pageNo    page number
+     * @param pageSize  page size
+     * @return alert plugin instance list page
+     */
+    @ApiOperation(value = "queryAlertPluginInstanceListPaging", notes = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+    })
+    @GetMapping(value = "/list-paging")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR)
+    public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @RequestParam("pageNo") Integer pageNo,
+                             @RequestParam("pageSize") Integer pageSize) {
+        logger.info("login  user {}, list paging, pageNo: {}, pageSize: {}",
+            loginUser.getUserName(), pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
+
+        result = alertPluginInstanceService.queryPluginPage(pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
 }

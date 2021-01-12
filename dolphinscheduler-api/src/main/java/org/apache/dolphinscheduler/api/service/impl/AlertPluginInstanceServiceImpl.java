@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.service.BaseService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -32,6 +34,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * alert plugin instance service impl
@@ -54,6 +59,11 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     public Map<String, Object> create(User loginUser, AlertPluginInstance alertPluginInstance) {
 
         Map<String, Object> result = new HashMap<>();
+
+        if (CollectionUtils.isNotEmpty(alertPluginInstanceMapper.queryByInstanceName(alertPluginInstance.getInstanceName()))) {
+            putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
+            return result;
+        }
 
         int i = alertPluginInstanceMapper.insert(alertPluginInstance);
 
@@ -87,13 +97,13 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param id id
      * @return result
      */
     @Override
-    public Map<String, Object> delete(User loginUser, AlertPluginInstance alertPluginInstance) {
+    public Map<String, Object> delete(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        int i = alertPluginInstanceMapper.deleteById(alertPluginInstance.getId());
+        int i = alertPluginInstanceMapper.deleteById(id);
         if (i > 0) {
             putMsg(result, Status.SUCCESS);
         }
@@ -130,6 +140,25 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, alertPluginInstances);
         }
+        return result;
+    }
+
+    @Override
+    public boolean checkExistPluginInstanceName(String pluginInstanceName) {
+        return CollectionUtils.isNotEmpty(alertPluginInstanceMapper.queryByInstanceName(pluginInstanceName));
+    }
+
+    @Override
+    public Map<String, Object> queryPluginPage(int pageIndex, int pageSize) {
+        IPage<AlertPluginInstance> pluginInstanceIPage = new Page<>(pageIndex, pageSize);
+        pluginInstanceIPage = alertPluginInstanceMapper.selectPage(pluginInstanceIPage, null);
+
+        PageInfo<AlertPluginInstance> pageInfo = new PageInfo<>(pageIndex, pageSize);
+        pageInfo.setTotalCount((int) pluginInstanceIPage.getTotal());
+        pageInfo.setLists(pluginInstanceIPage.getRecords());
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.DATA_LIST, pageInfo);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 }
