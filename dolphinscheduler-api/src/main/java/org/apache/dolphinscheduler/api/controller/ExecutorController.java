@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -123,7 +122,7 @@ public class ExecutorController extends BaseController {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
         Map<String, String> startParamMap = null;
-        if (StringUtils.isNotEmpty(startParams)) {
+        if (startParams != null) {
             startParamMap = JSONUtils.toMap(startParams);
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
