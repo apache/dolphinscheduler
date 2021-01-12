@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -107,21 +108,26 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                       @RequestParam(value = "timeout", required = false) Integer timeout) throws ParseException {
+                                       @RequestParam(value = "timeout", required = false) Integer timeout,
+                                       @RequestParam(value = "startParams", required = false) String startParams) throws ParseException {
         logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                         + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                        + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
+                        + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}, "
+                        + "startParams: {}",
                 loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
                 failureStrategy, startNodeList, taskDependType, warningType, workerGroup, receivers, receiversCc, runMode, processInstancePriority,
-                workerGroup, timeout);
+                workerGroup, timeout, startParams);
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
-
+        Map<String, String> startParamMap = null;
+        if (startParams != null) {
+            startParamMap = JSONUtils.toMap(startParams);
+        }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
-                warningGroupId, receivers, receiversCc, runMode, processInstancePriority, workerGroup, timeout);
+                warningGroupId, receivers, receiversCc, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
         return returnDataList(result);
     }
 
