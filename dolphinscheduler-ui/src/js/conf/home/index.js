@@ -46,7 +46,9 @@ const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}
 i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
 // Vue.use(ans)
-Vue.use(useOpt, formCreate)
+Vue.use(useOpt)
+Vue.use(formCreate)
+
 sync(store, router)
 
 Vue.config.devtools = true

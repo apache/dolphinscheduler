@@ -24,7 +24,7 @@
     <template slot="content">
       <div class="create-warning-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Alarm instance name')}}</template>
           <template slot="content">
             <el-input
                     type="input"
@@ -36,29 +36,23 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Alarm plugin instance')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Select plugin')}}</template>
           <template slot="content">
-            <el-select v-model="groupType" size="small">
+            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin">
               <el-option
-                      v-for="city in options"
-                      :key="city.id"
-                      :value="city.id"
-                      :label="city.code">
+                      v-for="items in pulginInstance"
+                      :key="items.id"
+                      :value="items.id"
+                      :label="items.pluginName">
               </el-option>
             </el-select>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name">{{$t('Remarks')}}</template>
-          <template slot="content">
-            <el-input
-                type="textarea"
-                v-model="description"
-                size="small"
-                :placeholder="$t('Please enter description')">
-            </el-input>
+        <div>
+          <template>
+            <div class="alertForm"><form-create v-model="$f" :rule="rule" :option="{submitBtn:false}" size="mini"></form-create></div>
           </template>
-        </m-list-box-f>
+        </div>
       </div>
     </template>
   </m-popup>
@@ -75,14 +69,38 @@
       return {
         store,
         groupName: '',
-        groupType: 'EMAIL',
+        pluginDefineId: null,
         description: '',
-        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
+        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }],
+        $f: {},
+        rule: [
+          {
+            type: 'input',
+            field: 'dingTalkWebHook',
+            className: 'user-name-dom',
+            title: 'dingtalk.webhook',
+            value: null,
+            props: {
+              placeholder: '请输入用户名称！',
+              size: 'small',
+              disabled: false,
+              readonly: false,
+              clearable: true
+            },
+            validate: [
+              {
+                trigger: 'blur',
+                required: true,
+                message: '用户名称不能为空！'
+              }
+            ]
+          }
+        ]
       }
     },
     props: {
       item: Object,
-      allAlertPluginInstance: Array
+      pulginInstance: Array
     },
     methods: {
       _ok () {
@@ -111,6 +129,17 @@
           return false
         }
         return true
+      },
+      changePlugin () {
+        console.log(this.rule)
+        console.log(this.pluginDefineId)
+        this.store.dispatch('security/getUiPluginsByID', {
+          pluginId: this.pluginDefineId
+        }).then(res => {
+          console.log(res)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       },
       _submit () {
         let param = {
@@ -150,3 +179,14 @@
     components: { mPopup, mListBoxF }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss">
+  .alertForm {
+    .el-form-item__label {
+      width: 144px!important;
+    }
+    .el-form-item__content {
+      margin-left: 144px!important;
+      width: calc(100% - 162px);
+    }
+  }
+</style>

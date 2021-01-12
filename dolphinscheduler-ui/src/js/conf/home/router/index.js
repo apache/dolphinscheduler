@@ -399,6 +399,14 @@ const router = new Router({
           }
         },
         {
+          path: '/security/warning-Instance',
+          name: 'warning-instance-manage',
+          component: resolve => require(['../pages/security/pages/warningInstance/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Warning instance manage')}`
+          }
+        },
+        {
           path: '/security/queue',
           name: 'queue-manage',
           component: resolve => require(['../pages/security/pages/queue/index'], resolve),

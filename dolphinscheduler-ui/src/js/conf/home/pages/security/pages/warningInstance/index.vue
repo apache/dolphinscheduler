@@ -23,7 +23,7 @@
           <el-dialog
             :visible.sync="createWarningDialog"
             width="auto">
-            <m-create-warning :item="item" :allAlertPluginInstance="allAlertPluginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning>
+            <m-create-warning :item="item" :pulginInstance="pulginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning>
           </el-dialog>
         </template>
       </m-conditions>
@@ -84,13 +84,13 @@
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
         createWarningDialog: false,
         item: {},
-        allAlertPluginInstance: []
+        pulginInstance: []
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getAlertgroupP', 'queryAllAlertPluginInstance']),
+      ...mapActions('security', ['getAlertgroupP', 'getPlugins']),
       /**
        * Inquire
        */
@@ -111,8 +111,8 @@
         this._create(item)
       },
       _create (item) {
-        this.queryAllAlertPluginInstance().then(res => {
-          this.allAlertPluginInstance = res.data
+        this.getPlugins({ pluginType: 'ALERT' }).then(res => {
+          this.pulginInstance = res
         }).catch(e => {
           this.$message.error(e.msg)
         })
