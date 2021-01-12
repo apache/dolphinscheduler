@@ -458,6 +458,8 @@ public final class Constants {
 
     public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
 
+    public static final String CMD_PARAM_START_PARAMS = "StartParams";
+
     /**
      * complement data start date
      */
