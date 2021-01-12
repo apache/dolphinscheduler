@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +118,18 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
             result.put(Constants.DATA_LIST, alertPluginInstance);
         }
 
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> queryAll() {
+        Map<String, Object> result = new HashMap<>();
+        List<AlertPluginInstance> alertPluginInstances = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
+
+        if (null != alertPluginInstances) {
+            putMsg(result, Status.SUCCESS);
+            result.put(Constants.DATA_LIST, alertPluginInstances);
+        }
         return result;
     }
 }

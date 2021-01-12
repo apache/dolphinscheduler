@@ -70,7 +70,7 @@ public class AlertSender {
 
     public void run() {
         for (Alert alert : alertList) {
-            //get alert group from alert
+            //get alert group from alert fixme
             int alertGroupId = alert.getAlertGroupId();
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
 

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -33,8 +34,10 @@ import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +79,8 @@ public class AlertDao extends AbstractBaseDao {
      * update alert
      *
      * @param alertStatus alertStatus
-     * @param log         log
-     * @param id          id
+     * @param log log
+     * @param id id
      * @return update alert result
      */
     public int updateAlert(AlertStatus alertStatus, String log, int id) {
@@ -92,8 +95,8 @@ public class AlertDao extends AbstractBaseDao {
      * MasterServer or WorkerServer stoped
      *
      * @param alertGroupId alertGroupId
-     * @param host         host
-     * @param serverType   serverType
+     * @param host host
+     * @param serverType serverType
      */
     public void sendServerStopedAlert(int alertGroupId, String host, String serverType) {
         Alert alert = new Alert();
@@ -110,7 +113,7 @@ public class AlertDao extends AbstractBaseDao {
     /**
      * process time out alert
      *
-     * @param processInstance   processInstance
+     * @param processInstance processInstance
      * @param processDefinition processDefinition
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
@@ -118,7 +121,7 @@ public class AlertDao extends AbstractBaseDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                .processId(processInstance.getId())
+            .processId(processInstance.getId())
             .processName(processInstance.getName())
             .event(AlertEvent.TIME_OUT)
             .warningLevel(AlertWarnLevel.MIDDLE)
@@ -140,11 +143,11 @@ public class AlertDao extends AbstractBaseDao {
     /**
      * task timeout warn
      *
-     * @param alertGroupId        alertGroupId
-     * @param processInstanceId   processInstanceId
+     * @param alertGroupId alertGroupId
+     * @param processInstanceId processInstanceId
      * @param processInstanceName processInstanceName
-     * @param taskId              taskId
-     * @param taskName            taskName
+     * @param taskId taskId
+     * @param taskName taskName
      */
     public void sendTaskTimeoutAlert(int alertGroupId, int processInstanceId,
                                      String processInstanceName, int taskId, String taskName) {
@@ -157,7 +160,7 @@ public class AlertDao extends AbstractBaseDao {
             .taskName(taskName)
             .event(AlertEvent.TIME_OUT)
             .warningLevel(AlertWarnLevel.MIDDLE)
-                .build();
+            .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
@@ -189,7 +192,15 @@ public class AlertDao extends AbstractBaseDao {
      * @return AlertPluginInstance list
      */
     public List<AlertPluginInstance> listInstanceByAlertGroupId(int alertGroupId) {
-        return alertPluginInstanceMapper.queryByAlertGroupId(alertGroupId);
+        String alertInstanceIdsParam = alertGroupMapper.queryAlertGroupInstanceIdsById(alertGroupId);
+        if (StringUtils.isNotBlank(alertInstanceIdsParam)) {
+            String[] idsArray = alertInstanceIdsParam.split(",");
+            List<Integer> ids = Arrays.stream(idsArray)
+                .map(s->Integer.parseInt(s.trim()))
+                .collect(Collectors.toList());
+            return alertPluginInstanceMapper.queryByIds(ids);
+        }
+        return null;
     }
 
     public AlertPluginInstanceMapper getAlertPluginInstanceMapper() {

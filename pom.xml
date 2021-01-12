@@ -355,7 +355,6 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -1146,7 +1145,6 @@
 
     <modules>
         <module>dolphinscheduler-alert-plugin</module>
-        <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>

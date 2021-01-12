@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper">
     <sql id="baseSql">
         id
-        , group_name, description, create_user_id,create_time, update_time
+        , group_name, description,alert_instance_ids, create_user_id,create_time, update_time
     </sql>
     <select id="queryAlertGroupPage" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
@@ -50,5 +50,10 @@
         <include refid="baseSql"/>
         from t_ds_alertgroup
         order by update_time desc
+    </select>
+
+    <select id="queryAlertGroupInstanceIdsById" resultType="String">
+        select alert_instance_ids  from t_ds_alertgroup
+        where id = #{alertGroupId}
     </select>
 </mapper>

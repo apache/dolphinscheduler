@@ -62,4 +62,10 @@ public interface AlertPluginInstanceService {
      * @return alert plugin
      */
     Map<String, Object> get(User loginUser, int id);
+
+    /**
+     * queryAll
+     * @return alert plugins
+     */
+    Map<String, Object> queryAll();
 }

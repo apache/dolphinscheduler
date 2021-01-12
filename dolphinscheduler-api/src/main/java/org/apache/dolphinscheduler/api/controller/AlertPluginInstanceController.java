@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_ALERT_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -144,4 +145,22 @@ public class AlertPluginInstanceController extends BaseController {
         Map<String, Object> result = alertPluginInstanceService.get(loginUser, id);
         return returnDataList(result);
     }
+
+    /**
+     * getAlertPluginInstance
+     *
+     * @param loginUser login user
+     * @return result
+     */
+    @ApiOperation(value = "/queryAll", notes = "QUERY_ALL_ALERT_PLUGIN_INSTANCE_NOTES")
+    @PostMapping(value = "/queryAll")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR)
+    public Result getAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        logger.info("login  user {}, query all alert plugin instance",
+            loginUser.getUserName());
+        Map<String, Object> result = alertPluginInstanceService.queryAll();
+        return returnDataList(result);
+    }
+
 }

@@ -194,13 +194,13 @@ public enum Status {
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR(10162, "query authorized and user created project error error", "查询授权的和用户创建的项目错误"),
-    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163, "delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
     CHECK_TENANT_CODE_ERROR(10164, "Please enter the English tenant code", "请输入英文租户编码"),
     UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(10165, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR(10166, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
     GET_ALERT_PLUGIN_INSTANCE_ERROR(10167, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
     CREATE_ALERT_PLUGIN_INSTANCE_ERROR(10168, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
-
+    QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(10169, "query all alert plugin instance error", "查询所有告警实例失败"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
