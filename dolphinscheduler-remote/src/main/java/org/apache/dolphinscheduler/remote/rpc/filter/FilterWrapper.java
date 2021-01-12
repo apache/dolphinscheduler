@@ -3,6 +3,7 @@ package org.apache.dolphinscheduler.remote.rpc.filter;
 import org.apache.dolphinscheduler.remote.rpc.Invoker;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
+import org.apache.dolphinscheduler.remote.utils.Host;
 
 /**
  * @author jiangli
