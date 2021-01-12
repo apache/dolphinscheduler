@@ -409,8 +409,8 @@ CREATE TABLE `t_ds_process_definition` (
   `receivers_cc` text COMMENT 'cc',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
   UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -439,9 +439,9 @@ CREATE TABLE `t_ds_process_definition_log` (
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` timestamp DEFAULT NULL COMMENT 'operate time',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -466,8 +466,8 @@ CREATE TABLE `t_ds_task_definition` (
   `timeout_flag` tinyint(1) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
   `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
   `timeout_duration` int(11) DEFAULT '0' COMMENT 'timeout length',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
   UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -494,9 +494,9 @@ CREATE TABLE `t_ds_task_definition_log` (
   `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
   `timeout_duration` int(11) DEFAULT '0' COMMENT 'timeout length',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` timestamp DEFAULT NULL COMMENT 'operate time',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -515,8 +515,8 @@ CREATE TABLE `t_ds_process_task_relation` (
   `condition_params` text COMMENT 'condition params(json)',
   `post_project_code` bigint(20) NOT NULL COMMENT 'post process code',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -536,9 +536,9 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   `post_project_code` bigint(20) NOT NULL COMMENT 'post process code',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
-  `operate_time` timestamp DEFAULT NULL COMMENT 'operate time',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -623,8 +623,8 @@ CREATE TABLE `t_ds_project` (
   `description` varchar(200) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'creation time',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'modification time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
