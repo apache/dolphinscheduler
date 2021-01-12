@@ -149,7 +149,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         } catch (Exception e) {
@@ -169,7 +169,7 @@ public class ExecutorService2Test {
                     null, "n1,n2",
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         } catch (Exception e) {
@@ -190,7 +190,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
             Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
             verify(processService, times(0)).createCommand(any(Command.class));
         } catch (Exception e) {
@@ -210,7 +210,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         } catch (Exception e) {
@@ -230,7 +230,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_PARALLEL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(31)).createCommand(any(Command.class));
         } catch (Exception e) {
@@ -250,7 +250,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_PARALLEL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(15)).createCommand(any(Command.class));
         } catch (Exception e) {
@@ -260,14 +260,14 @@ public class ExecutorService2Test {
 
     @Test
     public void testNoMsterServers() throws ParseException {
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(new ArrayList<Server>());
+        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(new ArrayList<>());
 
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
                 processDefinitionId, cronTime, CommandType.COMPLEMENT_DATA,
                 null, null,
                 null, null, 0,
                 "", "", RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
         Assert.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
 
     }
