@@ -61,7 +61,7 @@ public class ExcelUtilsTest {
 
         //Define dest file path
         String xlsFilePath = rootPath + System.getProperty("file.separator");
-        logger.info("xlsFilePath: "+xlsFilePath);
+        logger.info("XLS_FILE_PATH: "+xlsFilePath);
 
         //Define correctContent
         String correctContent = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";

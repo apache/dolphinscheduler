@@ -14,23 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.template.AlertTemplateFactory;
 import org.apache.dolphinscheduler.common.enums.ShowType;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+
 import java.io.*;
 import java.util.*;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mail utils
@@ -55,7 +58,7 @@ public class MailUtils {
 
     public static final Boolean MAIL_USE_SSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
-    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH,"/tmp/xls");
+    public static final String XLS_FILE_PATH = PropertyUtils.getString(Constants.XLS_FILE_PATH, "/tmp/xls");
 
     public static final String STARTTLS_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
@@ -67,23 +70,29 @@ public class MailUtils {
 
     //Solve the problem of messy Chinese name in excel attachment
     static {
-        System.setProperty("mail.mime.splitlongparameters","false");
+        System.setProperty("mail.mime.splitlongparameters", "false");
+    }
+
+    private MailUtils() {
+        throw new IllegalStateException(MailUtils.class.getName());
     }
 
     /**
      * send mail to receivers
+     *
      * @param receivers the receiver list
      * @param title the title
      * @param content the content
      * @param showType the show type
      * @return the result map
      */
-    public static Map<String,Object> sendMails(Collection<String> receivers, String title, String content,String showType) {
+    public static Map<String, Object> sendMails(Collection<String> receivers, String title, String content, String showType) {
         return sendMails(receivers, null, title, content, showType);
     }
 
     /**
      * send mail
+     *
      * @param receivers the receiver list
      * @param receiversCc cc list
      * @param title the title
@@ -91,8 +100,8 @@ public class MailUtils {
      * @param showType the show type
      * @return the send result
      */
-    public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType) {
-        Map<String,Object> retMap = new HashMap<>();
+    public static Map<String, Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType) {
+        Map<String, Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
 
         // if there is no receivers && no receiversCc, no need to process
@@ -111,14 +120,14 @@ public class MailUtils {
                 email.setMailSession(session);
                 email.setFrom(MAIL_SENDER);
                 email.setCharset(Constants.UTF_8);
-                if (CollectionUtils.isNotEmpty(receivers)){
+                if (CollectionUtils.isNotEmpty(receivers)) {
                     // receivers mail
                     for (String receiver : receivers) {
                         email.addTo(receiver);
                     }
                 }
 
-                if (CollectionUtils.isNotEmpty(receiversCc)){
+                if (CollectionUtils.isNotEmpty(receiversCc)) {
                     //cc
                     for (String receiverCc : receiversCc) {
                         email.addCc(receiverCc);
@@ -129,16 +138,16 @@ public class MailUtils {
             } catch (Exception e) {
                 handleException(receivers, retMap, e);
             }
-        }else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
+        } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content, false));
 
-                attachment(receivers,receiversCc,title,content,partContent);
+                attachment(receivers, receiversCc, title, content, partContent);
 
                 retMap.put(Constants.STATUS, true);
                 return retMap;
-            }catch (Exception e){
+            } catch (Exception e) {
                 handleException(receivers, retMap, e);
                 return retMap;
             }
@@ -149,49 +158,52 @@ public class MailUtils {
 
     /**
      * html table content
+     *
      * @param content the content
      * @param showAll if show the whole content
      * @return the html table form
      */
-    private static String htmlTable(String content, boolean showAll){
-        return alertTemplate.getMessageFromTemplate(content,ShowType.TABLE,showAll);
+    private static String htmlTable(String content, boolean showAll) {
+        return alertTemplate.getMessageFromTemplate(content, ShowType.TABLE, showAll);
     }
 
     /**
      * html table content
+     *
      * @param content the content
      * @return the html table form
      */
-    private static String htmlTable(String content){
-        return htmlTable(content,true);
+    private static String htmlTable(String content) {
+        return htmlTable(content, true);
     }
 
     /**
      * html text content
+     *
      * @param content the content
      * @return text in html form
      */
-    private static String htmlText(String content){
-        return alertTemplate.getMessageFromTemplate(content,ShowType.TEXT);
+    private static String htmlText(String content) {
+        return alertTemplate.getMessageFromTemplate(content, ShowType.TEXT);
     }
 
     /**
      * send mail as Excel attachment
+     *
      * @param receivers the receiver list
      * @param title the title
-     * @throws Exception
      */
-    private static void attachment(Collection<String> receivers,Collection<String> receiversCc,String title,String content,String partContent)throws Exception{
+    private static void attachment(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String partContent) throws Exception {
         MimeMessage msg = getMimeMessage(receivers);
 
-        attachContent(receiversCc, title, content,partContent, msg);
+        attachContent(receiversCc, title, content, partContent, msg);
     }
 
     /**
      * get MimeMessage
+     *
      * @param receivers receivers
      * @return the MimeMessage
-     * @throws MessagingException
      */
     private static MimeMessage getMimeMessage(Collection<String> receivers) throws MessagingException {
 
@@ -223,7 +235,7 @@ public class MailUtils {
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, MAIL_PROTOCOL);
         props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, STARTTLS_ENABLE);
-        if (SSL_ENABLE) {
+        if (Boolean.TRUE.equals(SSL_ENABLE)) {
             props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, "true");
             props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, SSL_TRUST);
         }
@@ -241,20 +253,19 @@ public class MailUtils {
 
     /**
      * attach content
+     *
      * @param receiversCc the cc list
      * @param title the title
      * @param content the content
      * @param partContent the partContent
      * @param msg the message
-     * @throws MessagingException
-     * @throws IOException
      */
-    private static void attachContent(Collection<String> receiversCc, String title, String content, String partContent,MimeMessage msg) throws MessagingException, IOException {
+    private static void attachContent(Collection<String> receiversCc, String title, String content, String partContent, MimeMessage msg) throws MessagingException, IOException {
         /**
          * set receiverCc
          */
-        if(CollectionUtils.isNotEmpty(receiversCc)){
-            for (String receiverCc : receiversCc){
+        if (CollectionUtils.isNotEmpty(receiversCc)) {
+            for (String receiverCc : receiversCc) {
                 msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(receiverCc));
             }
         }
@@ -267,16 +278,16 @@ public class MailUtils {
         part1.setContent(partContent, Constants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        File file = new File(XLS_FILE_PATH + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         // make excel file
 
-        ExcelUtils.genExcelFile(content,title,xlsFilePath);
+        ExcelUtils.genExcelFile(content, title, XLS_FILE_PATH);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
+        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS, Constants.UTF_8, "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
@@ -289,13 +300,13 @@ public class MailUtils {
 
     /**
      * the string object map
+     *
      * @param title the title
      * @param content the content
      * @param showType the showType
      * @param retMap the result map
      * @param email the email
      * @return the result map
-     * @throws EmailException
      */
     private static Map<String, Object> getStringObjectMap(String title, String content, String showType, Map<String, Object> retMap, HtmlEmail email) throws EmailException {
 
@@ -322,23 +333,24 @@ public class MailUtils {
 
     /**
      * file delete
+     *
      * @param file the file to delete
      */
-    public static void deleteFile(File file){
-        if(file.exists()){
-            if(file.delete()){
-                logger.info("delete success: {}",file.getAbsolutePath() + file.getName());
-            }else{
+    public static void deleteFile(File file) {
+        if (file.exists()) {
+            if (file.delete()) {
+                logger.info("delete success: {}", file.getAbsolutePath() + file.getName());
+            } else {
                 logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
             }
-        }else{
+        } else {
             logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
     }
 
-
     /**
      * handle exception
+     *
      * @param receivers the receiver list
      * @param retMap the result map
      * @param e the exception
@@ -347,6 +359,4 @@ public class MailUtils {
         logger.error("Send email to {} failed", receivers, e);
         retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
-
-
 }
