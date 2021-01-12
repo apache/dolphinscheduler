@@ -30,7 +30,7 @@
                     :disabled="item ? true : false"
                     v-model="tenantCode"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')">
+                    :placeholder="$t('Please enter tenant code')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -41,7 +41,7 @@
                     type="input"
                     v-model="tenantName"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
+                    :placeholder="$t('Please enter tenant Name')"
                     autocomplete="off">
             </x-input>
           </template>
@@ -88,7 +88,7 @@
         store,
         queueList: [],
         queueId: '',
-        tenantCode: '',
+        tenantCode: null,
         tenantName: '',
         description: '',
       }
@@ -138,12 +138,14 @@
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
+
         if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
+
         if (!this.tenantName.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('Please enter name')}`)
+          this.$message.warning(`${i18n.$t('Please enter tenant Name')}`)
           return false
         }
         return true

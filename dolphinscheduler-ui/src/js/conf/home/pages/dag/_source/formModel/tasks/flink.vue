@@ -47,9 +47,9 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Main jar package')}}</div>
+      <div slot="text">{{$t('Main package')}}</div>
       <div slot="content">
-        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
+        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -276,7 +276,7 @@
 
 
         if (!this.mainJar) {
-          this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
+          this.$message.warning(`${i18n.$t('Please enter main package')}`)
           return false
         }
 
@@ -404,7 +404,6 @@
             id: -1,
             name: $t('No resources exist'),
             fullName: '/'+$t('No resources exist'),
-            isDisabled: true,
             children: []
           }]
           if(optionsCmp.length>0) {

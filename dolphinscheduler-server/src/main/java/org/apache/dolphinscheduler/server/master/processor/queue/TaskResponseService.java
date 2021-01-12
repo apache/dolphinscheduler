@@ -17,7 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.enums.Event;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
+import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,23 +127,48 @@ public class TaskResponseService {
      * @param taskResponseEvent taskResponseEvent
      */
     private void persist(TaskResponseEvent taskResponseEvent){
-        TaskResponseEvent.Event event = taskResponseEvent.getEvent();
+        Event event = taskResponseEvent.getEvent();
+        Channel channel = taskResponseEvent.getChannel();
 
         switch (event){
             case ACK:
-                processService.changeTaskState(taskResponseEvent.getState(),
-                        taskResponseEvent.getStartTime(),
-                        taskResponseEvent.getWorkerAddress(),
-                        taskResponseEvent.getExecutePath(),
-                        taskResponseEvent.getLogPath(),
-                        taskResponseEvent.getTaskInstanceId());
+                try {
+                    TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
+                    if (taskInstance != null){
+                        processService.changeTaskState(taskResponseEvent.getState(),
+                                taskResponseEvent.getStartTime(),
+                                taskResponseEvent.getWorkerAddress(),
+                                taskResponseEvent.getExecutePath(),
+                                taskResponseEvent.getLogPath(),
+                                taskResponseEvent.getTaskInstanceId());
+                    }
+                    // if taskInstance is null (maybe deleted) . retry will be meaningless . so ack success
+                    DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(),taskResponseEvent.getTaskInstanceId());
+                    channel.writeAndFlush(taskAckCommand.convert2Command());
+                }catch (Exception e){
+                    logger.error("worker ack master error",e);
+                    DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.FAILURE.getCode(),-1);
+                    channel.writeAndFlush(taskAckCommand.convert2Command());
+                }
                 break;
             case RESULT:
-                processService.changeTaskState(taskResponseEvent.getState(),
-                        taskResponseEvent.getEndTime(),
-                        taskResponseEvent.getProcessId(),
-                        taskResponseEvent.getAppIds(),
-                        taskResponseEvent.getTaskInstanceId());
+                try {
+                    TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
+                    if (taskInstance != null){
+                        processService.changeTaskState(taskResponseEvent.getState(),
+                                taskResponseEvent.getEndTime(),
+                                taskResponseEvent.getProcessId(),
+                                taskResponseEvent.getAppIds(),
+                                taskResponseEvent.getTaskInstanceId());
+                    }
+                    // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
+                    DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(),taskResponseEvent.getTaskInstanceId());
+                    channel.writeAndFlush(taskResponseCommand.convert2Command());
+                }catch (Exception e){
+                    logger.error("worker response master error",e);
+                    DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.FAILURE.getCode(),-1);
+                    channel.writeAndFlush(taskResponseCommand.convert2Command());
+                }
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);

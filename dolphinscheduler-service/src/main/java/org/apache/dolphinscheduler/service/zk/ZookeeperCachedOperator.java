@@ -39,14 +39,6 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
      */
     @Override
     protected void registerListener() {
-        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot() + "/nodes");
-        logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
-        try {
-            treeCache.start();
-        } catch (Exception e) {
-            logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
-            throw new RuntimeException(e);
-        }
 
         treeCache.getListenable().addListener((client, event) -> {
             String path = null == event.getData() ? "" : event.getData().getPath();
@@ -55,7 +47,18 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
             }
             dataChanged(client, event, path);
         });
+    }
 
+    @Override
+    protected void treeCacheStart() {
+        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot() + "/nodes");
+        logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
+        try {
+            treeCache.start();
+        } catch (Exception e) {
+            logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
+            throw new RuntimeException(e);
+        }
     }
 
     //for sub class

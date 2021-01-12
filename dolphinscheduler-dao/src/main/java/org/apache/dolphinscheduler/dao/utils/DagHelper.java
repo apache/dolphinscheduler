@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -238,52 +239,6 @@ public class DagHelper {
         return null;
     }
 
-
-    /**
-     * get start vertex in one dag
-     * it would find the post node if the start vertex is forbidden running
-     * @param parentNodeName previous node
-     * @param dag dag
-     * @param completeTaskList completeTaskList
-     * @return start Vertex list
-     */
-    public static Collection<String> getStartVertex(String parentNodeName, DAG<String, TaskNode, TaskNodeRelation> dag,
-                                                    Map<String, TaskInstance> completeTaskList){
-
-        if(completeTaskList == null){
-            completeTaskList = new HashMap<>();
-        }
-        Collection<String> startVertexs = null;
-        if(StringUtils.isNotEmpty(parentNodeName)){
-            startVertexs = dag.getSubsequentNodes(parentNodeName);
-        }else{
-            startVertexs = dag.getBeginNode();
-        }
-
-        List<String> tmpStartVertexs = new ArrayList<>();
-        if(startVertexs!= null){
-            tmpStartVertexs.addAll(startVertexs);
-        }
-
-        for(String start : startVertexs){
-            TaskNode startNode = dag.getNode(start);
-            if(!startNode.isForbidden() && !completeTaskList.containsKey(start)){
-                // the start can be submit if not forbidden and not in complete tasks
-                continue;
-            }
-            // then submit the post nodes
-            Collection<String> postNodes = getStartVertex(start, dag, completeTaskList);
-            for(String post : postNodes){
-                TaskNode postNode = dag.getNode(post);
-                if(taskNodeCanSubmit(postNode, dag, completeTaskList)){
-                    tmpStartVertexs.add(post);
-                }
-            }
-            tmpStartVertexs.remove(start);
-        }
-        return tmpStartVertexs;
-    }
-
     /**
      * the task can be submit when  all the depends nodes are forbidden or complete
      * @param taskNode taskNode
@@ -291,23 +246,144 @@ public class DagHelper {
      * @param completeTaskList completeTaskList
      * @return can submit
      */
-    public static boolean taskNodeCanSubmit(TaskNode taskNode,
-                                            DAG<String, TaskNode, TaskNodeRelation> dag,
-                                            Map<String, TaskInstance> completeTaskList) {
-
+    public static boolean allDependsForbiddenOrEnd(TaskNode taskNode,
+                                                   DAG<String, TaskNode, TaskNodeRelation> dag,
+                                                   Map<String, TaskNode> skipTaskNodeList,
+                                                   Map<String, TaskInstance> completeTaskList) {
         List<String> dependList = taskNode.getDepList();
-        if(dependList == null){
+        if (dependList == null) {
             return true;
         }
-
-        for(String dependNodeName : dependList){
+        for (String dependNodeName : dependList) {
             TaskNode dependNode = dag.getNode(dependNodeName);
-            if(!dependNode.isForbidden() && !completeTaskList.containsKey(dependNodeName)){
+            if (completeTaskList.containsKey(dependNodeName)
+                    || dependNode.isForbidden()
+                    || skipTaskNodeList.containsKey(dependNodeName)) {
+                continue;
+            } else {
                 return false;
             }
         }
         return true;
     }
+
+    /**
+     * parse the successor nodes of previous node.
+     * this function parse the condition node to find the right branch.
+     * also check all the depends nodes forbidden or complete
+     * @param preNodeName
+     * @return successor nodes
+     */
+    public static Set<String> parsePostNodes(String preNodeName,
+                                       Map<String, TaskNode> skipTaskNodeList,
+                                       DAG<String, TaskNode, TaskNodeRelation> dag,
+                                       Map<String, TaskInstance> completeTaskList) {
+        Set<String> postNodeList = new HashSet<>();
+        Collection<String> startVertexes = new ArrayList<>();
+        if (preNodeName == null) {
+            startVertexes = dag.getBeginNode();
+        } else if (dag.getNode(preNodeName).isConditionsTask()) {
+            List<String> conditionTaskList = parseConditionTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
+            startVertexes.addAll(conditionTaskList);
+        } else {
+            startVertexes = dag.getSubsequentNodes(preNodeName);
+        }
+        for (String subsequent : startVertexes) {
+            TaskNode taskNode = dag.getNode(subsequent);
+            if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList)) {
+                setTaskNodeSkip(subsequent, dag, completeTaskList, skipTaskNodeList );
+                continue;
+            }
+            if (!DagHelper.allDependsForbiddenOrEnd(taskNode, dag, skipTaskNodeList, completeTaskList)) {
+                continue;
+            }
+            if (taskNode.isForbidden() || completeTaskList.containsKey(subsequent)) {
+                postNodeList.addAll(parsePostNodes(subsequent, skipTaskNodeList, dag, completeTaskList));
+                continue;
+            }
+            postNodeList.add(subsequent);
+        }
+        return postNodeList;
+    }
+
+    /**
+     * if all of the task dependence are skipped, skip it too.
+     * @param taskNode
+     * @return
+     */
+    private static boolean isTaskNodeNeedSkip(TaskNode taskNode,
+                                       Map<String, TaskNode> skipTaskNodeList
+                                       ){
+        if(CollectionUtils.isEmpty(taskNode.getDepList())){
+            return false;
+        }
+        for(String depNode : taskNode.getDepList()){
+            if(!skipTaskNodeList.containsKey(depNode)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     *  parse condition task find the branch process
+     *  set skip flag for another one.
+     * @param nodeName
+     * @return
+     */
+    public static List<String> parseConditionTask(String nodeName,
+                                            Map<String, TaskNode> skipTaskNodeList,
+                                            DAG<String, TaskNode, TaskNodeRelation> dag,
+                                            Map<String, TaskInstance> completeTaskList){
+        List<String> conditionTaskList = new ArrayList<>();
+        TaskNode taskNode = dag.getNode(nodeName);
+        if (!taskNode.isConditionsTask()){
+            return conditionTaskList;
+        }
+        if (!completeTaskList.containsKey(nodeName)){
+            return conditionTaskList;
+        }
+        TaskInstance taskInstance = completeTaskList.get(nodeName);
+        ConditionsParameters conditionsParameters =
+                JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
+        List<String> skipNodeList = new ArrayList<>();
+        if(taskInstance.getState().typeIsSuccess()){
+            conditionTaskList = conditionsParameters.getSuccessNode();
+            skipNodeList = conditionsParameters.getFailedNode();
+        }else if(taskInstance.getState().typeIsFailure()){
+            conditionTaskList = conditionsParameters.getFailedNode();
+            skipNodeList = conditionsParameters.getSuccessNode();
+        }else{
+            conditionTaskList.add(nodeName);
+        }
+        for(String failedNode : skipNodeList){
+            setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
+        }
+        return conditionTaskList;
+    }
+
+    /**
+     * set task node and the post nodes skip flag
+     * @param skipNodeName
+     * @param dag
+     * @param completeTaskList
+     * @param skipTaskNodeList
+     */
+    private static void setTaskNodeSkip(String skipNodeName,
+                                 DAG<String, TaskNode, TaskNodeRelation> dag,
+                                 Map<String, TaskInstance> completeTaskList,
+                                 Map<String, TaskNode> skipTaskNodeList){
+        skipTaskNodeList.putIfAbsent(skipNodeName, dag.getNode(skipNodeName));
+        Collection<String> postNodeList = dag.getSubsequentNodes(skipNodeName);
+        for(String post : postNodeList){
+            TaskNode postNode = dag.getNode(post);
+            if(isTaskNodeNeedSkip(postNode, skipTaskNodeList)){
+                setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList);
+            }
+        }
+    }
+
 
 
     /***

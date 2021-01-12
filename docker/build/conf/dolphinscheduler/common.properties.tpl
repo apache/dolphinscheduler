@@ -25,7 +25,7 @@ dolphinscheduler.env.path=${DOLPHINSCHEDULER_ENV_PATH}
 data.basedir.path=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH}
 
 # resource upload startup type : HDFS,S3,NONE
-resource.storage.type=NONE
+resource.storage.type=${DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE}
 
 #============================================================================
 # HDFS
@@ -58,7 +58,7 @@ kerberos.expire.time=7
 # S3
 #============================================================================
 # if resource.storage.type=S3，the value like: s3a://dolphinscheduler ; if resource.storage.type=HDFS, When namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
-fs.defaultFS=hdfs://mycluster:8020
+fs.defaultFS=${DOLPHINSCHEDULER_FS_DEFAULTFS}
 
 # if resource.storage.type=S3，s3 endpoint
 #fs.s3a.endpoint=http://192.168.199.91:9010

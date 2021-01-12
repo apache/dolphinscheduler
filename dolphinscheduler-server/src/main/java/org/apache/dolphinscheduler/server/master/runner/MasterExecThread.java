@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -39,6 +38,7 @@ import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,9 +163,6 @@ public class MasterExecThread implements Runnable {
         this.nettyRemotingClient = nettyRemotingClient;
     }
 
-
-
-
     @Override
     public void run() {
 
@@ -174,13 +171,11 @@ public class MasterExecThread implements Runnable {
             logger.info("process instance is not exists");
             return;
         }
-
         // check to see if it's done
         if (processInstance.getState().typeIsFinished()){
             logger.info("process instance is done : {}",processInstance.getId());
             return;
         }
-
         try {
             if (processInstance.isComplementData() &&  Flag.NO == processInstance.getIsSubProcess()){
                 // sub process complement data
@@ -317,11 +312,12 @@ public class MasterExecThread implements Runnable {
      * @throws Exception exception
      */
     private void prepareProcess() throws Exception {
-        // init task queue
-        initTaskQueue();
 
         // gen process dag
         buildFlowDag();
+
+        // init task queue
+        initTaskQueue();
         logger.info("prepare process :{} end", processInstance.getId());
     }
 
@@ -375,6 +371,9 @@ public class MasterExecThread implements Runnable {
         for(TaskInstance task : taskInstanceList){
             if(task.isTaskComplete()){
                 completeTaskList.put(task.getName(), task);
+            }
+            if(task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getName(), dag)){
+                continue;
             }
             if(task.getState().typeIsFailure() && !task.taskCanRetry()){
                 errorTaskList.put(task.getName(), task);
@@ -468,7 +467,7 @@ public class MasterExecThread implements Runnable {
             taskInstance.setAlertFlag(Flag.NO);
 
             // task instance start time
-            taskInstance.setStartTime(new Date());
+            taskInstance.setStartTime(null);
 
             // task instance flag
             taskInstance.setFlag(Flag.YES);
@@ -502,144 +501,22 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
-
-
-    /**
-     * if all of the task dependence are skip, skip it too.
-     * @param taskNode
-     * @return
-     */
-    private boolean isTaskNodeNeedSkip(TaskNode taskNode){
-        if(CollectionUtils.isEmpty(taskNode.getDepList())){
-            return false;
-        }
-        for(String depNode : taskNode.getDepList()){
-            if(!skipTaskNodeList.containsKey(depNode)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * set task node skip if dependence all skip
-     * @param taskNodesSkipList
-     */
-    private void setTaskNodeSkip(List<String> taskNodesSkipList){
-        for(String skipNode : taskNodesSkipList){
-            skipTaskNodeList.putIfAbsent(skipNode, dag.getNode(skipNode));
-            Collection<String> postNodeList = DagHelper.getStartVertex(skipNode, dag, completeTaskList);
-            List<String> postSkipList = new ArrayList<>();
-            for(String post : postNodeList){
-                TaskNode postNode = dag.getNode(post);
-                if(isTaskNodeNeedSkip(postNode)){
-                    postSkipList.add(post);
-                }
-            }
-            setTaskNodeSkip(postSkipList);
-        }
-    }
-
-
-    /**
-     *  parse condition task find the branch process
-     *  set skip flag for another one.
-     * @param nodeName
-     * @return
-     */
-    private List<String> parseConditionTask(String nodeName){
-        List<String> conditionTaskList = new ArrayList<>();
-        TaskNode taskNode = dag.getNode(nodeName);
-        if(!taskNode.isConditionsTask()){
-            return conditionTaskList;
-        }
-        ConditionsParameters conditionsParameters =
-                JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
-
-        TaskInstance taskInstance = completeTaskList.get(nodeName);
-        if(taskInstance == null){
-            logger.error("task instance {} cannot find, please check it!", nodeName);
-            return conditionTaskList;
-        }
-
-        if(taskInstance.getState().typeIsSuccess()){
-            conditionTaskList = conditionsParameters.getSuccessNode();
-            setTaskNodeSkip(conditionsParameters.getFailedNode());
-        }else if(taskInstance.getState().typeIsFailure()){
-            conditionTaskList = conditionsParameters.getFailedNode();
-            setTaskNodeSkip(conditionsParameters.getSuccessNode());
-        }else{
-            conditionTaskList.add(nodeName);
-        }
-        return conditionTaskList;
-    }
-
-    /**
-     * parse post node list of previous node
-     * if condition node: return process according to the settings
-     * if post node completed, return post nodes of the completed node
-     * @param previousNodeName
-     * @return
-     */
-    private List<String> parsePostNodeList(String previousNodeName){
-        List<String> postNodeList = new ArrayList<>();
-
-        TaskNode taskNode = dag.getNode(previousNodeName);
-        if(taskNode != null  && taskNode.isConditionsTask()){
-            return parseConditionTask(previousNodeName);
-        }
-        Collection<String> postNodeCollection = DagHelper.getStartVertex(previousNodeName, dag, completeTaskList);
-        List<String> postSkipList = new ArrayList<>();
-        // delete success node, parse the past nodes
-        // if conditions node,
-        //  1. parse the branch process according the conditions setting
-        //  2. set skip flag on anther branch process
-        for(String postNode : postNodeCollection){
-            if(completeTaskList.containsKey(postNode)){
-                TaskInstance postTaskInstance = completeTaskList.get(postNode);
-                if(dag.getNode(postNode).isConditionsTask()){
-                    List<String> conditionTaskNodeList = parseConditionTask(postNode);
-                    for(String conditions : conditionTaskNodeList){
-                        postNodeList.addAll(parsePostNodeList(conditions));
-                    }
-                }else if(postTaskInstance.getState().typeIsSuccess()){
-                    postNodeList.addAll(parsePostNodeList(postNode));
-                }else{
-                    postNodeList.add(postNode);
-                }
-
-            }else if(isTaskNodeNeedSkip(dag.getNode(postNode))){
-                postSkipList.add(postNode);
-                setTaskNodeSkip(postSkipList);
-                postSkipList.clear();
-            }else{
-                postNodeList.add(postNode);
-            }
-        }
-        return postNodeList;
-    }
-
     /**
      * submit post node
      * @param parentNodeName parent node name
      */
     private void submitPostNode(String parentNodeName){
-
-        List<String> submitTaskNodeList = parsePostNodeList(parentNodeName);
-
+        Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
         List<TaskInstance> taskInstances = new ArrayList<>();
         for(String taskNode : submitTaskNodeList){
             taskInstances.add(createTaskInstance(processInstance, taskNode,
                     dag.getNode(taskNode)));
         }
-
         // if previous node success , post node submit
         for(TaskInstance task : taskInstances){
-
             if(readyToSubmitTaskList.containsKey(task.getName())){
                 continue;
             }
-
             if(completeTaskList.containsKey(task.getName())){
                 logger.info("task {} has already run success", task.getName());
                 continue;
@@ -700,7 +577,7 @@ public class MasterExecThread implements Runnable {
     private boolean dependTaskSuccess(String dependNodeName, String nextNodeName){
         if(dag.getNode(dependNodeName).isConditionsTask()){
             //condition task need check the branch to run
-            List<String> nextTaskList = parseConditionTask(dependNodeName);
+            List<String> nextTaskList = DagHelper.parseConditionTask(dependNodeName, skipTaskNodeList, dag, completeTaskList);
             if(!nextTaskList.contains(nextNodeName)){
                 return false;
             }
@@ -712,7 +589,6 @@ public class MasterExecThread implements Runnable {
         }
         return true;
     }
-
 
     /**
      * query task instance by complete state
@@ -973,7 +849,7 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.isProcessInstanceStop()){
+        while(!processInstance.isProcessInstanceStop() && Stopper.isRunning()){
 
             // send warning email if process time out.
             if(!sendTimeWarning && checkProcessTimeOut(processInstance) ){

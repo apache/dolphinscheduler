@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -23,11 +24,21 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.*;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,18 +47,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletResponse;
-import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * process definition controller test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProcessDefinitionControllerTest{
+public class ProcessDefinitionControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
 
@@ -60,7 +65,7 @@ public class ProcessDefinitionControllerTest{
     protected User user;
 
     @Before
-    public void before(){
+    public void before() {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -71,7 +76,13 @@ public class ProcessDefinitionControllerTest{
 
     @Test
     public void testCreateProcessDefinition() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "{\"globalParams\":[],"
+                + "\"tasks\":["
+                + "{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],"
+                + "\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},"
+                + "\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}]"
+                + ",\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         String projectName = "test";
@@ -103,21 +114,27 @@ public class ProcessDefinitionControllerTest{
     public void testVerifyProcessDefinitionName() throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
-        putMsg(result, Status.PROCESS_INSTANCE_EXIST);
+        putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR);
         String projectName = "test";
         String name = "dag_test";
 
         Mockito.when(processDefinitionService.verifyProcessDefinitionName(user,projectName,name)).thenReturn(result);
 
         Result response = processDefinitionController.verifyProcessDefinitionName(user,projectName,name);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_EXIST.getCode(),response.getCode().intValue());
+        Assert.assertEquals(Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR.getCode(), response.getCode().intValue());
 
     }
 
     @Test
     public void updateProcessDefinition() throws Exception {
 
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "{\"globalParams\":[],"
+                + "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\","
+                + "\"params\":{\"resourceList\":[],\"localParams\":[],"
+                + "\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},"
+                + "\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\","
+                + "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
         String projectName = "test";
         String name = "dag_test";
@@ -151,7 +168,13 @@ public class ProcessDefinitionControllerTest{
     @Test
     public void testQueryProcessDefinitionById() throws Exception {
 
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "{\"globalParams\":[],"
+                + "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\","
+                + "\"name\":\"ssh_test1\","
+                + "\"params\":{\"resourceList\":[],\"localParams\":[],"
+                + "\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},"
+                + "\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
         String projectName = "test";
         String name = "dag_test";
@@ -193,7 +216,6 @@ public class ProcessDefinitionControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
 
-
     @Test
     public void testQueryProcessDefinitionList() throws Exception {
 
@@ -204,18 +226,24 @@ public class ProcessDefinitionControllerTest{
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, resourceList);
 
-
         Mockito.when(processDefinitionService.queryProcessDefinitionList(user, projectName)).thenReturn(result);
         Result response = processDefinitionController.queryProcessDefinitionList(user, projectName);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
 
-    public List<ProcessDefinition> getDefinitionList(){
+    public List<ProcessDefinition> getDefinitionList() {
 
         List<ProcessDefinition> resourceList = new ArrayList<>();
 
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "{\"globalParams\":[],"
+                + "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\","
+                + "\"name\":\"ssh_test1\","
+                + "\"params\":{\"resourceList\":[],\"localParams\":[],"
+                + "\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},"
+                + "\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\""
+                + "preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
         String projectName = "test";
         String name = "dag_test";
@@ -264,7 +292,7 @@ public class ProcessDefinitionControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
 
-        @Test
+    @Test
     public void testGetNodeListByDefinitionId() throws Exception {
         String projectName = "test";
         int id = 1;
@@ -293,7 +321,7 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void testQueryProcessDefinitionAllByProjectId() throws Exception{
+    public void testQueryProcessDefinitionAllByProjectId() throws Exception {
         int projectId = 1;
         Map<String,Object> result = new HashMap<>();
         putMsg(result,Status.SUCCESS);
@@ -305,7 +333,7 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void testViewTree() throws Exception{
+    public void testViewTree() throws Exception {
         String projectName = "test";
         int processId = 1;
         int limit = 2;
@@ -319,7 +347,7 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void testQueryProcessDefinitionListPaging() throws Exception{
+    public void testQueryProcessDefinitionListPaging() throws Exception {
         String projectName = "test";
         int pageNo = 1;
         int pageSize = 10;
@@ -337,7 +365,7 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void testBatchExportProcessDefinitionByIds() throws Exception{
+    public void testBatchExportProcessDefinitionByIds() throws Exception {
 
         String processDefinitionIds = "1,2";
         String projectName = "test";

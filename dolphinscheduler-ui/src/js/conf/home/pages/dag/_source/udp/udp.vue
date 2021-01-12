@@ -82,7 +82,7 @@
           </div>
         </template>
         <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" @click="ok()">{{$t('Add')}}</x-button>
+        <x-button type="primary" shape="circle" :disabled="isDetails" @click="ok()">{{$t('Add')}}</x-button>
       </div>
     </div>
   </div>
@@ -169,16 +169,14 @@
           this.$emit('onUdp')
         }
 
-        // Edit => direct storage
-        if (this.store.state.dag.name) {
-          _verif()
-        } else {
-          // New First verify that the name exists
+        if (this.store.state.dag.name !== this.name) {
           this.store.dispatch('dag/verifDAGName', this.name).then(res => {
             _verif()
           }).catch(e => {
             this.$message.error(e.msg || '')
           })
+        } else {
+          _verif()
         }
       },
       /**

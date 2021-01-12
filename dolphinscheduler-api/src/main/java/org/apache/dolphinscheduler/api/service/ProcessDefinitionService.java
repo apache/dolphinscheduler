@@ -14,14 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID;
+
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
@@ -32,7 +29,14 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.exportprocess.ProcessAddTaskParam;
 import org.apache.dolphinscheduler.api.utils.exportprocess.TaskNodeParamFactory;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -41,12 +45,46 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,16 +93,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * process definition service
@@ -74,6 +108,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionService.class);
 
+    private static final String PROCESSDEFINITIONID = "processDefinitionId";
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -161,7 +196,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setFlag(Flag.YES);
         processDefineMapper.insert(processDefine);
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId",processDefine.getId());
+        result.put(PROCESSDEFINITIONID,processDefine.getId());
         return result;
     }
 
@@ -173,17 +208,17 @@ public class ProcessDefinitionService extends BaseDAGService {
     private String getResourceIds(ProcessData processData) {
         List<TaskNode> tasks = processData.getTasks();
         Set<Integer> resourceIds = new HashSet<>();
-        for(TaskNode taskNode : tasks){
+        for (TaskNode taskNode : tasks) {
             String taskParameter = taskNode.getParams();
-            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(),taskParameter);
+            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
             if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-                Set<Integer> tempSet = params.getResourceFilesList().stream().filter(t->t.getId()!=0).map(ResourceInfo::getId).collect(Collectors.toSet());
+                Set<Integer> tempSet = params.getResourceFilesList().stream().filter(t -> t.getId() != 0).map(ResourceInfo::getId).collect(Collectors.toSet());
                 resourceIds.addAll(tempSet);
             }
         }
 
         StringBuilder sb = new StringBuilder();
-        for(int i : resourceIds) {
+        for (int i : resourceIds) {
             if (sb.length() > 0) {
                 sb.append(",");
             }
@@ -191,7 +226,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
         return sb.toString();
     }
-
 
     /**
      * query process definition list
@@ -217,7 +251,6 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         return result;
     }
-
 
     /**
      * query process definition list paging
@@ -264,7 +297,6 @@ public class ProcessDefinitionService extends BaseDAGService {
      */
     public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
 
-
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
@@ -292,7 +324,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processId process definition id
      * @return copy result code
      */
-    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException{
+    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException {
 
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -311,7 +343,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             return createProcessDefinition(
                     loginUser,
                     projectName,
-                    processDefinition.getName()+"_copy_"+System.currentTimeMillis(),
+                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
                     processDefinition.getProcessDefinitionJson(),
                     processDefinition.getDescription(),
                     processDefinition.getLocations(),
@@ -350,16 +382,25 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkProcessJson;
         }
         ProcessDefinition processDefine = processService.findProcessDefineById(id);
+        // check process definition exists
         if (processDefine == null) {
-            // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
             return result;
-        } else if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
+        }
+
+        if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
             // online can not permit edit
             putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefine.getName());
             return result;
-        } else {
-            putMsg(result, Status.SUCCESS);
+        }
+
+        if (!name.equals(processDefine.getName())) {
+            // check whether the new process define name exist
+            ProcessDefinition definition = processDefineMapper.verifyByDefineName(project.getId(), name);
+            if (definition != null) {
+                putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+                return result;
+            }
         }
 
         Date now = new Date();
@@ -413,11 +454,11 @@ public class ProcessDefinitionService extends BaseDAGService {
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.PROCESS_INSTANCE_EXIST, name);
+            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
         }
         return result;
     }
@@ -464,15 +505,15 @@ public class ProcessDefinitionService extends BaseDAGService {
         // get the timing according to the process definition
         List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
         if (!schedules.isEmpty() && schedules.size() > 1) {
-            logger.warn("scheduler num is {},Greater than 1",schedules.size());
+            logger.warn("scheduler num is {},Greater than 1", schedules.size());
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
             return result;
-        }else if(schedules.size() == 1){
+        } else if (schedules.size() == 1) {
             Schedule schedule = schedules.get(0);
-            if(schedule.getReleaseState() == ReleaseState.OFFLINE){
+            if (schedule.getReleaseState() == ReleaseState.OFFLINE) {
                 scheduleMapper.deleteById(schedule.getId());
-            }else if(schedule.getReleaseState() == ReleaseState.ONLINE){
-                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
+            } else if (schedule.getReleaseState() == ReleaseState.ONLINE) {
+                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE, schedule.getId());
                 return result;
             }
         }
@@ -543,7 +584,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                         new int[]{processDefinition.getId()}
                 );
 
-                for(Schedule schedule:scheduleList){
+                for (Schedule schedule:scheduleList) {
                     logger.info("set schedule offline, project id: {}, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
@@ -567,9 +608,9 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionIds
      * @param response
      */
-    public void batchExportProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds, HttpServletResponse response){
+    public void batchExportProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds, HttpServletResponse response) {
 
-        if(StringUtils.isEmpty(processDefinitionIds)){
+        if (StringUtils.isEmpty(processDefinitionIds)) {
             return;
         }
 
@@ -580,14 +621,14 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
 
-        if(resultStatus != Status.SUCCESS){
+        if (resultStatus != Status.SUCCESS) {
             return;
         }
 
         List<ProcessMeta> processDefinitionList =
                 getProcessDefinitionList(processDefinitionIds);
 
-        if(CollectionUtils.isNotEmpty(processDefinitionList)){
+        if (CollectionUtils.isNotEmpty(processDefinitionList)) {
             downloadProcessDefinitionFile(response, processDefinitionList);
         }
     }
@@ -597,7 +638,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionIds
      * @return
      */
-    private List<ProcessMeta> getProcessDefinitionList(String processDefinitionIds){
+    private List<ProcessMeta> getProcessDefinitionList(String processDefinitionIds) {
         List<ProcessMeta> processDefinitionList = new ArrayList<>();
         String[] processDefinitionIdArray = processDefinitionIds.split(",");
         for (String strProcessDefinitionId : processDefinitionIdArray) {
@@ -629,7 +670,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             buff.close();
         } catch (IOException e) {
             logger.warn("export process fail", e);
-        }finally {
+        } finally {
             if (null != buff) {
                 try {
                     buff.close();
@@ -747,9 +788,9 @@ public class ProcessDefinitionService extends BaseDAGService {
             return result;
         }
 
-        for(ProcessMeta processMeta:processMetaList){
+        for (ProcessMeta processMeta:processMetaList) {
 
-            if (!checkAndImportProcessDefinition(loginUser, currentProjectName, result, processMeta)){
+            if (!checkAndImportProcessDefinition(loginUser, currentProjectName, result, processMeta)) {
                 return result;
             }
         }
@@ -767,7 +808,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      */
     private boolean checkAndImportProcessDefinition(User loginUser, String currentProjectName, Map<String, Object> result, ProcessMeta processMeta) {
 
-        if(!checkImportanceParams(processMeta,result)){
+        if (!checkImportanceParams(processMeta,result)) {
             return false;
         }
 
@@ -775,7 +816,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         String processDefinitionName = processMeta.getProcessDefinitionName();
         //use currentProjectName to query
         Project targetProject = projectMapper.queryByName(currentProjectName);
-        if(null != targetProject){
+        if (null != targetProject) {
             processDefinitionName = recursionProcessDefinitionName(targetProject.getId(),
                     processDefinitionName, 1);
         }
@@ -799,14 +840,13 @@ public class ProcessDefinitionService extends BaseDAGService {
                         processDefinitionName,
                         addImportTaskNodeParam(loginUser, processMeta.getProcessDefinitionJson(), targetProject));
 
-        if(createProcessResult == null){
+        if (createProcessResult == null) {
             return false;
         }
 
         //create process definition
         Integer processDefinitionId =
-                Objects.isNull(createProcessResult.get("processDefinitionId"))?
-                        null:Integer.parseInt(createProcessResult.get("processDefinitionId").toString());
+                Objects.isNull(createProcessResult.get(PROCESSDEFINITIONID)) ? null : Integer.parseInt(createProcessResult.get(PROCESSDEFINITIONID).toString());
 
         //scheduler param
         return getImportProcessScheduleResult(loginUser,
@@ -833,12 +873,12 @@ public class ProcessDefinitionService extends BaseDAGService {
                                                        Map<String, Object> result,
                                                        ProcessMeta processMeta,
                                                        String processDefinitionName,
-                                                       String importProcessParam){
+                                                       String importProcessParam) {
         Map<String, Object> createProcessResult = null;
         try {
             createProcessResult = createProcessDefinition(loginUser
                     ,currentProjectName,
-                    processDefinitionName+"_import_"+System.currentTimeMillis(),
+                    processDefinitionName + "_import_" + System.currentTimeMillis(),
                     importProcessParam,
                     processMeta.getProcessDefinitionDescription(),
                     processMeta.getProcessDefinitionLocations(),
@@ -889,7 +929,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param result
      * @return
      */
-    private boolean checkImportanceParams(ProcessMeta processMeta,Map<String, Object> result){
+    private boolean checkImportanceParams(ProcessMeta processMeta,Map<String, Object> result) {
         if (StringUtils.isEmpty(processMeta.getProjectName())) {
             putMsg(result, Status.DATA_IS_NULL, "projectName");
             return false;
@@ -1009,7 +1049,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             if (checkTaskHasSubProcess(taskType)) {
                 //get sub process info
                 JSONObject subParams = JSONUtils.parseObject(taskNode.getString("params"));
-                Integer subProcessId = subParams.getInteger("processDefinitionId");
+                Integer subProcessId = subParams.getInteger(PROCESSDEFINITIONID);
                 ProcessDefinition subProcess = processDefineMapper.queryByDefineId(subProcessId);
                 //check is sub process exist in db
                 if (null != subProcess) {
@@ -1069,7 +1109,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
                         if (null != newSubProcessDefine) {
                             subProcessIdMap.put(subProcessId, newSubProcessDefine.getId());
-                            subParams.put("processDefinitionId", newSubProcessDefine.getId());
+                            subParams.put(PROCESSDEFINITIONID, newSubProcessDefine.getId());
                             taskNode.put("params", subParams);
                         }
                     }
@@ -1077,7 +1117,6 @@ public class ProcessDefinitionService extends BaseDAGService {
             }
         }
     }
-
 
     /**
      * check the process definition node meets the specifications
@@ -1148,7 +1187,6 @@ public class ProcessDefinitionService extends BaseDAGService {
             return result;
         }
 
-
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
@@ -1182,7 +1220,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         String[] idList = defineIdList.split(",");
         List<Integer> idIntList = new ArrayList<>();
-        for(String definitionId : idList) {
+        for (String definitionId : idList) {
             idIntList.add(Integer.parseInt(definitionId));
         }
         Integer[] idArray = idIntList.toArray(new Integer[idIntList.size()]);
@@ -1193,7 +1231,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             return result;
         }
 
-        for(ProcessDefinition processDefinition : processDefinitionList){
+        for (ProcessDefinition processDefinition : processDefinitionList) {
             String processDefinitionJson = processDefinition.getProcessDefinitionJson();
             ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
             List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
@@ -1206,7 +1244,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         return result;
 
     }
-
 
     /**
      * query process definition all by project id
@@ -1258,7 +1295,7 @@ public class ProcessDefinitionService extends BaseDAGService {
          */
         List<ProcessInstance> processInstanceList = processInstanceMapper.queryByProcessDefineId(processId, limit);
 
-        for(ProcessInstance processInstance:processInstanceList){
+        for (ProcessInstance processInstance:processInstanceList) {
             processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
         }
 
@@ -1298,7 +1335,6 @@ public class ProcessDefinitionService extends BaseDAGService {
                 treeViewDto.setName(nodeName);
                 TaskNode taskNode = dag.getNode(nodeName);
                 treeViewDto.setType(taskNode.getType());
-
 
                 //set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
@@ -1356,7 +1392,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         return result;
     }
 
-
     /**
      * Generate the DAG Graph based on the process definition id
      *
@@ -1382,9 +1417,6 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         return new DAG<>();
     }
-
-
-
 
     /**
      * whether the graph has a ring
@@ -1416,16 +1448,16 @@ public class ProcessDefinitionService extends BaseDAGService {
         return graph.hasCycle();
     }
 
-    private String recursionProcessDefinitionName(Integer projectId,String processDefinitionName,int num){
+    private String recursionProcessDefinitionName(Integer projectId,String processDefinitionName,int num) {
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(projectId, processDefinitionName);
         if (processDefinition != null) {
-            if(num > 1){
+            if (num > 1) {
                 String str = processDefinitionName.substring(0,processDefinitionName.length() - 3);
-                processDefinitionName = str + "("+num+")";
-            }else{
-                processDefinitionName = processDefinition.getName() + "("+num+")";
+                processDefinitionName = str + "(" + num + ")";
+            } else {
+                processDefinitionName = processDefinition.getName() + "(" + num + ")";
             }
-        }else{
+        } else {
             return processDefinitionName;
         }
         return recursionProcessDefinitionName(projectId,processDefinitionName,num + 1);

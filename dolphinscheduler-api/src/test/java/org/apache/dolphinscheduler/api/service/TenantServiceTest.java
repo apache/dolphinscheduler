@@ -16,8 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -41,10 +44,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TenantServiceTest {
@@ -61,8 +64,8 @@ public class TenantServiceTest {
     @Mock
     private UserMapper userMapper;
 
-    private String tenantCode ="TenantServiceTest";
-    private String tenantName ="TenantServiceTest";
+    private String tenantCode = "TenantServiceTest";
+    private String tenantName = "TenantServiceTest";
 
 
     @Test
@@ -85,6 +88,7 @@ public class TenantServiceTest {
             result = tenantService.createTenant(loginUser, "test", "test", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+            
         } catch (Exception e) {
           logger.error("create tenant error",e);
           Assert.assertTrue(false);
@@ -192,11 +196,17 @@ public class TenantServiceTest {
         // tenantCode not exist
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         // tenantCode  exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
+        String resultString;
+        if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
+            resultString = "租户编码[TenantServiceTest]已存在";
+        } else {
+            resultString = "tenant code TenantServiceTest already exists";
+        }
         logger.info(result.toString());
-        Assert.assertEquals(Status.TENANT_NAME_EXIST.getMsg(),result.getMsg());
+        Assert.assertEquals(resultString, result.getMsg());
     }
 
 

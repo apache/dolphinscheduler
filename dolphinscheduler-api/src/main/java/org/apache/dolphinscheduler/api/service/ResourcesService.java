@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,6 +138,10 @@ public class ResourcesService extends BaseService {
                 }
             }
             result.setData(resultMap);
+        } catch (DuplicateKeyException e) {
+            logger.error("resource directory {} has exist, can't recreate", fullName);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
         } catch (Exception e) {
             logger.error("resource already exists, can't recreate ", e);
             throw new RuntimeException("resource already exists, can't recreate");
@@ -313,7 +318,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        if (name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
+        if (file == null && name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -955,6 +960,19 @@ public class ResourcesService extends BaseService {
         result = verifyResourceName(fullName,type,loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
+        }
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
         }
 
         // save data

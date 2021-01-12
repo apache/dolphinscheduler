@@ -19,7 +19,7 @@
     <div v-show="!msg">
       <div class="data-area" v-spin="isSpin" style="height: 430px;">
         <div class="col-md-7">
-          <div id="task-status-pie" style="height:260px;margin-top: 100px;"></div>
+          <div id="task-status-pie" style="width:100%;height:260px;margin-top: 100px;"></div>
         </div>
         <div class="col-md-5">
           <div class="table-small-model">
@@ -54,6 +54,8 @@
   import { mapActions } from 'vuex'
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
+  import echarts from 'echarts'
+  import store from '@/conf/home/store'
   import mNoData from '@/module/components/noData/noData'
   import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
 
@@ -117,6 +119,9 @@
             this.isSpin = false
           })
         }
+      },
+      '$store.state.projects.sideBar': function() {
+        echarts.init(document.getElementById('task-status-pie')).resize()
       }
     },
     beforeCreate () {

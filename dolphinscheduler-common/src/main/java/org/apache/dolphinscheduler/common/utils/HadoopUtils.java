@@ -195,7 +195,7 @@ public class HadoopUtils implements Closeable {
          */
         String appUrl = "";
 
-        if (StringUtils.isEmpty(rmHaIds)){
+        if (StringUtils.isEmpty(rmHaIds)) {
             //single resourcemanager enabled
             appUrl = appAddress;
             yarnEnabled = true;
@@ -206,7 +206,7 @@ public class HadoopUtils implements Closeable {
             logger.info("application url : {}", appUrl);
         }
 
-        if(StringUtils.isBlank(appUrl)){
+        if (StringUtils.isBlank(appUrl)) {
             throw new Exception("application url is blank");
         }
         return String.format(appUrl, applicationId);
@@ -226,10 +226,10 @@ public class HadoopUtils implements Closeable {
             return new byte[0];
         }
 
-        FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath));
-        return IOUtils.toByteArray(fsDataInputStream);
+        try (FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath))) {
+            return IOUtils.toByteArray(fsDataInputStream);
+        }
     }
-
 
     /**
      * cat file on hdfs
@@ -493,20 +493,19 @@ public class HadoopUtils implements Closeable {
         return String.format("%s/udfs", getHdfsTenantDir(tenantCode));
     }
 
-
     /**
      * get hdfs file name
      *
-     * @param resourceType  resource type
-     * @param tenantCode    tenant code
-     * @param fileName      file name
+     * @param resourceType resource type
+     * @param tenantCode   tenant code
+     * @param fileName     file name
      * @return hdfs file name
      */
     public static String getHdfsFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith("/")) {
-            fileName = fileName.replaceFirst("/","");
+            fileName = fileName.replaceFirst("/", "");
         }
-        return String.format("%s/%s", getHdfsDir(resourceType,tenantCode), fileName);
+        return String.format("%s/%s", getHdfsDir(resourceType, tenantCode), fileName);
     }
 
     /**
@@ -518,7 +517,7 @@ public class HadoopUtils implements Closeable {
      */
     public static String getHdfsResourceFileName(String tenantCode, String fileName) {
         if (fileName.startsWith("/")) {
-            fileName = fileName.replaceFirst("/","");
+            fileName = fileName.replaceFirst("/", "");
         }
         return String.format("%s/%s", getHdfsResDir(tenantCode), fileName);
     }
@@ -532,7 +531,7 @@ public class HadoopUtils implements Closeable {
      */
     public static String getHdfsUdfFileName(String tenantCode, String fileName) {
         if (fileName.startsWith("/")) {
-            fileName = fileName.replaceFirst("/","");
+            fileName = fileName.replaceFirst("/", "");
         }
         return String.format("%s/%s", getHdfsUdfDir(tenantCode), fileName);
     }
@@ -544,7 +543,6 @@ public class HadoopUtils implements Closeable {
     public static String getHdfsTenantDir(String tenantCode) {
         return String.format("%s/%s", getHdfsDataBasePath(), tenantCode);
     }
-
 
     /**
      * getAppAddress

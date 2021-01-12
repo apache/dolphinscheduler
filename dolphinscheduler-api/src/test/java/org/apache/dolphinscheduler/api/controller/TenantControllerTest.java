@@ -120,7 +120,23 @@ public class TenantControllerTest extends AbstractControllerTest{
 
     }
 
+    @Test
+    public void testVerifyTenantCodeExists() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("tenantCode", "tenantCode");
 
+        MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.TENANT_NAME_EXIST.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+
+    }
 
     @Test
     public void testQueryTenantlist() throws Exception {
