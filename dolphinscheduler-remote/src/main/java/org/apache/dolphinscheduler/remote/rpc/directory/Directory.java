@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.remote.rpc.filter.directory;
+package org.apache.dolphinscheduler.remote.rpc.directory;
 
 import org.apache.dolphinscheduler.remote.rpc.filter.SelectorFilter;
 

@@ -1,6 +1,5 @@
 package org.apache.dolphinscheduler.remote.rpc;
 
-import org.apache.dolphinscheduler.remote.rpc.client.IRpcClient;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcClient;
 
 /**
