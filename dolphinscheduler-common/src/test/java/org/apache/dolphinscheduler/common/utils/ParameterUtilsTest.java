@@ -132,6 +132,26 @@ public class ParameterUtilsTest {
 
         String result5 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
         Assert.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
+
+        Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
+        globalParamList.add(testStartParamProperty);
+        Property testStartParam2Property = new Property("testStartParam2", Direct.IN, DataType.VARCHAR, "$[yyyy-MM-dd+1]");
+        globalParamList.add(testStartParam2Property);
+        globalParamMap.put("testStartParam", "");
+        globalParamMap.put("testStartParam2", "$[yyyy-MM-dd+1]");
+
+        Map<String, String> startParamMap = new HashMap<>(2);
+        startParamMap.put("testStartParam", "$[yyyyMMdd]");
+
+        for (Map.Entry<String, String> param : globalParamMap.entrySet()) {
+            String val = startParamMap.get(param.getKey());
+            if (val != null) {
+                param.setValue(val);
+            }
+        }
+
+        String result6 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        Assert.assertTrue(result6.contains("20191220"));
     }
 
     /**
