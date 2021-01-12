@@ -352,6 +352,42 @@ export default {
     })
   },
   /**
+   * queryUiPlugins
+   */
+  getPlugins ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('ui-plugins/queryUiPluginsByType', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * queryUiPluginsByID
+   */
+  getUiPluginsByID ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('ui-plugins/queryUiPluginsByID', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * queryAll alert-plugin-instance
+   */
+  queryAllAlertPluginInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('alert-plugin-instance/queryAll', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Alarm group list
    */
   getAlertgroup ({ state }, payload) {
