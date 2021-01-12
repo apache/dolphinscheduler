@@ -52,13 +52,9 @@ public class SnowFlakeUtils {
 
     private static SnowFlakeUtils instance = null;
 
-    public static SnowFlakeUtils getInstance() throws UnknownHostException {
+    public synchronized static SnowFlakeUtils getInstance() throws UnknownHostException {
         if (instance == null) {
-            synchronized (SnowFlakeUtils.class) {
-                if (instance == null) {
-                    instance = new SnowFlakeUtils();
-                }
-            }
+            instance = new SnowFlakeUtils();
         }
         return instance;
     }
