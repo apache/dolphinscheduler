@@ -55,6 +55,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 /**
  * alert plugin instance controller
  */
@@ -73,18 +75,28 @@ public class AlertPluginInstanceController extends BaseController {
      * create alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alertPluginInstance
-     * @return create result code
+     * @param pluginDefineId alert plugin define id
+     * @param instanceName instance name
+     * @param pluginInstanceParams instance params
+     * @return result
      */
     @ApiOperation(value = "createAlertPluginInstance", notes = "CREATE_ALERT_PLUGIN_INSTANCE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "pluginDefineId", value = "ALERT_PLUGIN_DEFINE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "instanceName", value = "ALERT_PLUGIN_INSTANCE_NAME", required = true, dataType = "String", example = "DING TALK"),
+        @ApiImplicitParam(name = "pluginInstanceParams", value = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, dataType = "String", example = "ALERT_PLUGIN_INSTANCE_PARAMS")
+    })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result createAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestBody AlertPluginInstance alertPluginInstance) {
+                                            @RequestParam(value = "pluginDefineId") int pluginDefineId,
+                                            @RequestParam(value = "instanceName") String instanceName,
+                                            @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
+
         logger.info("loginUser user {}, create alert plugin instance, groupName: "
-                , loginUser.getUserName());
-        Map<String, Object> result = alertPluginInstanceService.create(loginUser, alertPluginInstance);
+            , loginUser.getUserName());
+        Map<String, Object> result = alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -92,18 +104,27 @@ public class AlertPluginInstanceController extends BaseController {
      * updateAlertPluginInstance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alertPluginInstance
+     * @param alertPluginInstanceId alert plugin instance id
+     * @param instanceName instance name
+     * @param pluginInstanceParams instance params
      * @return result
      */
     @ApiOperation(value = "update", notes = "UPDATE_ALERT_PLUGIN_INSTANCE_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "alertPluginInstanceId", value = "ALERT_PLUGIN_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "instanceName", value = "ALERT_PLUGIN_INSTANCE_NAME", required = true, dataType = "String", example = "DING TALK"),
+        @ApiImplicitParam(name = "pluginInstanceParams", value = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, dataType = "String", example = "ALERT_PLUGIN_INSTANCE_PARAMS")
+    })
     @GetMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result updateAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestBody AlertPluginInstance alertPluginInstance) {
+                                            @RequestParam(value = "alertPluginInstanceId") int alertPluginInstanceId,
+                                            @RequestParam(value = "instanceName") String instanceName,
+                                            @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
         logger.info("login  user {}, update alert plugin instance id {}",
-                loginUser.getUserName(), alertPluginInstance.getId());
-        Map<String, Object> result = alertPluginInstanceService.update(loginUser, alertPluginInstance);
+            loginUser.getUserName(), alertPluginInstanceId);
+        Map<String, Object> result = alertPluginInstanceService.update(loginUser, alertPluginInstanceId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -126,7 +147,7 @@ public class AlertPluginInstanceController extends BaseController {
         logger.info("login  user {}, delete alert plugin instance id {}", loginUser.getUserName(), id);
 
         Map<String, Object> result = alertPluginInstanceService.delete(loginUser, id);
-        return returnDataListPaging(result);
+        return returnDataList(result);
     }
 
     /**
@@ -143,7 +164,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result getAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "id") int id) {
         logger.info("login  user {}, get alert plugin instance, id {}",
-                loginUser.getUserName(), id);
+            loginUser.getUserName(), id);
         Map<String, Object> result = alertPluginInstanceService.get(loginUser, id);
         return returnDataList(result);
     }
@@ -199,8 +220,8 @@ public class AlertPluginInstanceController extends BaseController {
      * paging query alert plugin instance group list
      *
      * @param loginUser login user
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return alert plugin instance list page
      */
     @ApiOperation(value = "queryAlertPluginInstanceListPaging", notes = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")

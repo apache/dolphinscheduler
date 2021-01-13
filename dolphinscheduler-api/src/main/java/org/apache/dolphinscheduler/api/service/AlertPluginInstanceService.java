@@ -31,19 +31,22 @@ public interface AlertPluginInstanceService {
      * creat alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param pluginDefineId plugin define id
+     * @param instanceName instance name
+     * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> create(User loginUser, AlertPluginInstance alertPluginInstance);
+    Map<String, Object> create(User loginUser,int pluginDefineId,String instanceName,String pluginInstanceParams);
 
     /**
-     * update alert plugin instance
-     *
+     * update
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param alertPluginInstanceId plugin instance id
+     * @param instanceName instance name
+     * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> update(User loginUser, AlertPluginInstance alertPluginInstance);
+    Map<String, Object> update(User loginUser, int alertPluginInstanceId,String instanceName,String pluginInstanceParams);
 
     /**
      * delete alert plugin instance

@@ -17,19 +17,26 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -48,15 +55,23 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     @Autowired
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
 
+    @Autowired
+    private PluginDefineMapper pluginDefineMapper;
+
     /**
      * creat alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
-     * @return result
+     * @param pluginDefineId plugin define id
+     * @param instanceName instance name
+     * @param pluginInstanceParams plugin instance params
      */
     @Override
-    public Map<String, Object> create(User loginUser, AlertPluginInstance alertPluginInstance) {
+    public Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams) {
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
+        alertPluginInstance.setPluginInstanceParams(pluginInstanceParams);
+        alertPluginInstance.setInstanceName(instanceName);
+        alertPluginInstance.setPluginDefineId(pluginDefineId);
 
         Map<String, Object> result = new HashMap<>();
 
@@ -77,12 +92,17 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
      * update alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
-     * @return result
+     * @param pluginInstanceId plugin instance id
+     * @param instanceName instance name
+     * @param pluginInstanceParams plugin instance params
      */
     @Override
-    public Map<String, Object> update(User loginUser, AlertPluginInstance alertPluginInstance) {
+    public Map<String, Object> update(User loginUser, int pluginInstanceId, String instanceName, String pluginInstanceParams) {
 
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
+        alertPluginInstance.setPluginInstanceParams(pluginInstanceParams);
+        alertPluginInstance.setInstanceName(instanceName);
+        alertPluginInstance.setId(pluginInstanceId);
         Map<String, Object> result = new HashMap<>();
         int i = alertPluginInstanceMapper.updateById(alertPluginInstance);
 
@@ -135,10 +155,10 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     public Map<String, Object> queryAll() {
         Map<String, Object> result = new HashMap<>();
         List<AlertPluginInstance> alertPluginInstances = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
-
+        List<AlertPluginInstanceVO> alertPluginInstanceVOS = buildPluginInstanceVOList(alertPluginInstances);
         if (null != alertPluginInstances) {
             putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, alertPluginInstances);
+            result.put(Constants.DATA_LIST, alertPluginInstanceVOS);
         }
         return result;
     }
@@ -153,12 +173,38 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
         IPage<AlertPluginInstance> pluginInstanceIPage = new Page<>(pageIndex, pageSize);
         pluginInstanceIPage = alertPluginInstanceMapper.selectPage(pluginInstanceIPage, null);
 
-        PageInfo<AlertPluginInstance> pageInfo = new PageInfo<>(pageIndex, pageSize);
+        PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageIndex, pageSize);
         pageInfo.setTotalCount((int) pluginInstanceIPage.getTotal());
-        pageInfo.setLists(pluginInstanceIPage.getRecords());
+        pageInfo.setLists(buildPluginInstanceVOList(pluginInstanceIPage.getRecords()));
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private List<AlertPluginInstanceVO> buildPluginInstanceVOList(List<AlertPluginInstance> alertPluginInstances) {
+        if (CollectionUtils.isEmpty(alertPluginInstances)) {
+            return null;
+        }
+        List<PluginDefine> pluginDefineList = pluginDefineMapper.queryAllPluginDefineList();
+        if (CollectionUtils.isEmpty(pluginDefineList)) {
+            return null;
+        }
+        Map<Integer, String> pluginDefineMap = pluginDefineList.stream().collect(Collectors.toMap(PluginDefine::getId, PluginDefine::getPluginName));
+        List<AlertPluginInstanceVO> alertPluginInstanceVOS = new ArrayList<>();
+        alertPluginInstances.forEach(alertPluginInstance -> {
+            AlertPluginInstanceVO alertPluginInstanceVO = new AlertPluginInstanceVO();
+            alertPluginInstanceVO.setAlertPluginName(pluginDefineMap.get(alertPluginInstance.getPluginDefineId()));
+            alertPluginInstanceVO.setCreateTime(alertPluginInstance.getCreateTime());
+            alertPluginInstanceVO.setUpdateTime(alertPluginInstance.getUpdateTime());
+            alertPluginInstanceVO.setPluginDefineId(alertPluginInstance.getPluginDefineId());
+            alertPluginInstanceVO.setInstanceName(alertPluginInstance.getInstanceName());
+            alertPluginInstanceVO.setId(alertPluginInstance.getId());
+            //todo List pages do not recommend returning this parameter
+            alertPluginInstanceVO.setPluginInstanceParams(alertPluginInstance.getPluginInstanceParams());
+            alertPluginInstanceVOS.add(alertPluginInstanceVO);
+        });
+        return alertPluginInstanceVOS;
+
     }
 }
