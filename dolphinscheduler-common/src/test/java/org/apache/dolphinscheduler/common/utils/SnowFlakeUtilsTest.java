@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class SnowFlakeUtilsTest {
     @Test
-    public void nextId() {
+    public void testNextId() {
         try {
             for (int i = 0; i < 5; i++) {
                 System.out.println(SnowFlakeUtils.getInstance().nextId());

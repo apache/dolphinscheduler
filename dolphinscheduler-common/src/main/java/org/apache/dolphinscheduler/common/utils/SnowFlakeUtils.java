@@ -56,17 +56,17 @@ public class SnowFlakeUtils {
 
     private static SnowFlakeUtils instance = null;
 
-    public static synchronized SnowFlakeUtils getInstance() throws Exception {
+    public static synchronized SnowFlakeUtils getInstance() throws SnowFlakeException {
         if (instance == null) {
             instance = new SnowFlakeUtils();
         }
         return instance;
     }
 
-    public synchronized long nextId() {
+    public synchronized long nextId() throws SnowFlakeException {
         long currStmp = nowTimestamp();
         if (currStmp < lastTimestamp) {
-            throw new RuntimeException("Clock moved backwards. Refusing to generate id");
+            throw new SnowFlakeException("Clock moved backwards. Refusing to generate id");
         }
         if (currStmp == lastTimestamp) {
             sequence = (sequence + 1) & MAX_SEQUENCE;
