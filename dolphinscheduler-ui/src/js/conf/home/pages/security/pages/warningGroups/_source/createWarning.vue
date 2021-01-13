@@ -76,8 +76,7 @@
         store,
         groupName: '',
         alertInstanceIds: null,
-        description: '',
-        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
+        description: ''
       }
     },
     props: {
