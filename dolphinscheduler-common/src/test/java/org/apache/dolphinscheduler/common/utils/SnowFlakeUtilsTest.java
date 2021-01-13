@@ -19,11 +19,9 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.junit.Test;
 
-import java.net.UnknownHostException;
-
 public class SnowFlakeUtilsTest {
     @Test
-    public void nextId() throws UnknownHostException {
+    public void nextId() throws Exception {
         for (int i = 0; i < 5; i++) {
             System.out.println(SnowFlakeUtils.getInstance().nextId());
         }
