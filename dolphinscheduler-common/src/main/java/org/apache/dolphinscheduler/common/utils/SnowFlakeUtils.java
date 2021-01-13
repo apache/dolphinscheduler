@@ -25,18 +25,18 @@ import java.util.Objects;
 
 public class SnowFlakeUtils {
     // start timestamp
-    private final static long startTimestamp = 1609430400000L; //2021-01-01
+    private static final long startTimestamp = 1609430400000L; //2021-01-01
     // Number of digits
-    private final static long sequenceBit = 12;
-    private final static long machineBit = 5;
-    private final static long dataCenterBit = 5;
+    private static final long sequenceBit = 12;
+    private static final long machineBit = 5;
+    private static final long dataCenterBit = 5;
     // Maximum value
-    private final static long maxDataCenterNum = ~(-1L << dataCenterBit);
-    private final static long maxSequence = ~(-1L << sequenceBit);
+    private static final long maxDataCenterNum = ~(-1L << dataCenterBit);
+    private static final long maxSequence = ~(-1L << sequenceBit);
     // The displacement to the left
-    private final static long machineLeft = sequenceBit;
-    private final static long dataCenterLeft = sequenceBit + machineBit;
-    private final static long timestampLeft = dataCenterLeft + dataCenterBit;
+    private static final long machineLeft = sequenceBit;
+    private static final long dataCenterLeft = sequenceBit + machineBit;
+    private static final long timestampLeft = dataCenterLeft + dataCenterBit;
     private final int dataCenterId;
     private final int machineId;
     private long sequence = 0L;
@@ -52,7 +52,7 @@ public class SnowFlakeUtils {
 
     private static SnowFlakeUtils instance = null;
 
-    public synchronized static SnowFlakeUtils getInstance() throws UnknownHostException {
+    public static synchronized SnowFlakeUtils getInstance() throws UnknownHostException {
         if (instance == null) {
             instance = new SnowFlakeUtils();
         }
