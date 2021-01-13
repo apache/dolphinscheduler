@@ -210,6 +210,8 @@ export default {
   'Edit alarm group': 'Edit alarm group',
   'Create alarm group': 'Create alarm group',
   'Group Name': 'Group Name',
+  'Create Alarm Instance': 'Create Alarm Instance',
+  'Edit Alarm Instance': 'Edit Alarm Instance',
   'Alarm instance name': 'Alarm instance name',
   'Select plugin': 'Select plugin',
   'Please enter group name': 'Please enter group name',

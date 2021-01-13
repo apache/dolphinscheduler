@@ -19,19 +19,13 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="groupName" :label="$t('Group Name')"></el-table-column>
-        <el-table-column :label="$t('Group Type')" width="100">
-          <template slot-scope="scope">
-            {{scope.row.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}
-          </template>
-        </el-table-column>
-        <el-table-column prop="description" :label="$t('Remarks')" width="200"></el-table-column>
-        <el-table-column :label="$t('Create Time')" width="140">
+        <el-table-column prop="instanceName" :label="$t('Alarm instance name')"></el-table-column>
+        <el-table-column :label="$t('Create Time')">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" width="140">
+        <el-table-column :label="$t('Update Time')">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
@@ -50,7 +44,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" :disabled="scope.row.id==1?true: false"></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -77,9 +71,9 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization']),
+      ...mapActions('security', ['deletAelertPluginInstance']),
       _delete (item, i) {
-        this.deleteAlertgrou({
+        this.deletAelertPluginInstance({
           id: item.id
         }).then(res => {
           this.$emit('on-update')
@@ -91,26 +85,8 @@
       _edit (item) {
         this.$emit('on-edit', item)
       },
-      onUpdate (userIds) {
-        this._grantAuthorization('alert-group/grant-user', {
-          userIds: userIds,
-          alertgroupId: this.item.id
-        })
-        this.transferDialog = false
-      },
       close () {
         this.transferDialog = false
-      },
-
-      _grantAuthorization (api, param) {
-        this.grantAuthorization({
-          api: api,
-          param: param
-        }).then(res => {
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
       }
     },
     watch: {

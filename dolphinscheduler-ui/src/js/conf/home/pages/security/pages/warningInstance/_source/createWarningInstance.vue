@@ -18,7 +18,7 @@
   <m-popup
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit alarm group') : $t('Create alarm group')"
+          :nameText="item ? $t('Edit Alarm Instance') : $t('Create Alarm Instance')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -28,7 +28,7 @@
           <template slot="content">
             <el-input
                     type="input"
-                    v-model="groupName"
+                    v-model="instanceName"
                     maxlength="60"
                     size="small"
                     :placeholder="$t('Please enter group name')">
@@ -38,7 +38,15 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Select plugin')}}</template>
           <template slot="content">
-            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin">
+            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" disabled="true" v-if="item.id">
+              <el-option
+                      v-for="items in pulginInstance"
+                      :key="items.id"
+                      :value="items.id"
+                      :label="items.pluginName">
+              </el-option>
+            </el-select>
+            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" v-else>
               <el-option
                       v-for="items in pulginInstance"
                       :key="items.id"
@@ -68,34 +76,11 @@
     data () {
       return {
         store,
-        groupName: '',
+        instanceName: '',
         pluginDefineId: null,
-        description: '',
         options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }],
         $f: {},
-        rule: [
-          {
-            type: 'input',
-            field: 'dingTalkWebHook',
-            className: 'user-name-dom',
-            title: 'dingtalk.webhook',
-            value: null,
-            props: {
-              placeholder: '请输入用户名称！',
-              size: 'small',
-              disabled: false,
-              readonly: false,
-              clearable: true
-            },
-            validate: [
-              {
-                trigger: 'blur',
-                required: true,
-                message: '用户名称不能为空！'
-              }
-            ]
-          }
-        ]
+        rule: []
       }
     },
     props: {
@@ -106,15 +91,15 @@
       _ok () {
         if (this._verification()) {
           // The name is not verified
-          if (this.item && this.item.groupName === this.groupName) {
+          if (this.item && this.item.instanceName === this.instanceName) {
             this._submit()
             return
           }
 
           // Verify username
           this.store.dispatch('security/verifyName', {
-            type: 'alertgroup',
-            groupName: this.groupName
+            type: 'alarmInstance',
+            instanceName: this.instanceName
           }).then(res => {
             this._submit()
           }).catch(e => {
@@ -124,34 +109,56 @@
       },
       _verification () {
         // group name
-        if (!this.groupName.replace(/\s*/g, '')) {
+        if (!this.instanceName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
         return true
       },
       changePlugin () {
-        console.log(this.rule)
-        console.log(this.pluginDefineId)
+        // this.rule = [
+        //   {
+        //     type: 'input',
+        //     field: 'dingTalkWebHook',
+        //     className: 'user-name-dom',
+        //     title: $t('Alarm instance name'),
+        //     value: null,
+        //     props: {
+        //       placeholder: '请输入用户名称！',
+        //       size: 'small',
+        //       disabled: false,
+        //       readonly: false,
+        //       clearable: true
+        //     },
+        //     validate: [
+        //       {
+        //         trigger: 'blur',
+        //         required: true,
+        //         message: '用户名称不能为空！'
+        //       }
+        //     ]
+        //   }
+        // ]
         this.store.dispatch('security/getUiPluginsByID', {
           pluginId: this.pluginDefineId
         }).then(res => {
-          console.log(res)
+          this.rule = JSON.parse(res.pluginParams)
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
       _submit () {
         let param = {
-          groupName: this.groupName,
-          groupType: this.groupType,
-          description: this.description
+          instanceName: this.instanceName,
+          pluginDefineId: this.pluginDefineId,
+          pluginInstanceParams: JSON.stringify(this.$f.rule)
         }
         if (this.item) {
-          param.id = this.item.id
+          param.alertPluginInstanceId = this.item.id
+          param.pluginDefineId = null
         }
         this.$refs.popup.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
+        this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
@@ -169,9 +176,9 @@
     watch: {},
     created () {
       if (this.item) {
-        this.groupName = this.item.groupName
-        this.groupType = this.item.groupType
-        this.description = this.item.description
+        this.instanceName = this.item.instanceName
+        this.pluginDefineId = this.item.pluginDefineId
+        this.rule = JSON.parse(this.item.pluginInstanceParams)
       }
     },
     mounted () {
@@ -181,8 +188,14 @@
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .alertForm {
+    label {
+      span {
+        font-weight: 10!important;
+      }
+    }
     .el-form-item__label {
       width: 144px!important;
+      color: #606266!important;
     }
     .el-form-item__content {
       margin-left: 144px!important;

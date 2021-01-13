@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Warning group manage')">
+  <m-list-construction :title="$t('Warning instance manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create('')">{{$t('Create alarm group')}}</el-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create Alarm Instance')}}</el-button>
           <el-dialog
             :visible.sync="createWarningDialog"
-            width="auto">
-            <m-create-warning :item="item" :pulginInstance="pulginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning>
+            width="45%">
+            <m-create-warning-instance :item="item" :pulginInstance="pulginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning-instance>
           </el-dialog>
         </template>
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="alertgroupList.length || total>0">
+      <template v-if="alertgroupList!==null || total>0 ">
         <m-list @on-edit="_onEdit"
                 @on-update="_onUpdate"
                 :alertgroup-list="alertgroupList"
@@ -49,7 +49,7 @@
           </el-pagination>
         </div>
       </template>
-      <template v-if="!alertgroupList.length && total<=0">
+      <template v-if="alertgroupList===null && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
@@ -62,14 +62,14 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateWarning from './_source/createWarning'
+  import mCreateWarningInstance from './_source/createWarningInstance'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'warning-groups-index',
+    name: 'warning-instance-index',
     data () {
       return {
         total: null,
@@ -90,7 +90,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getAlertgroupP', 'getPlugins']),
+      ...mapActions('security', ['queryAlertPluginInstanceListPaging', 'getPlugins']),
       /**
        * Inquire
        */
@@ -136,7 +136,7 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.getAlertgroupP(this.searchParams).then(res => {
+        this.queryAlertPluginInstanceListPaging(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
@@ -164,6 +164,6 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWarning }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWarningInstance }
   }
 </script>

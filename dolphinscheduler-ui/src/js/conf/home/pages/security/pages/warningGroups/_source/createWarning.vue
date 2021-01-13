@@ -38,12 +38,12 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Alarm plugin instance')}}</template>
           <template slot="content">
-            <el-select v-model="groupType" size="small">
+            <el-select v-model="alertInstanceIds" size="small" style="width: 100%">
               <el-option
-                      v-for="city in options"
-                      :key="city.id"
-                      :value="city.id"
-                      :label="city.code">
+                      v-for="items in allAlertPluginInstance"
+                      :key="items.id"
+                      :value="items.id"
+                      :label="items.instanceName">
               </el-option>
             </el-select>
           </template>
@@ -75,7 +75,7 @@
       return {
         store,
         groupName: '',
-        groupType: 'EMAIL',
+        alertInstanceIds: null,
         description: '',
         options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
       }
@@ -115,7 +115,7 @@
       _submit () {
         let param = {
           groupName: this.groupName,
-          groupType: this.groupType,
+          alertInstanceIds: this.alertInstanceIds,
           description: this.description
         }
         if (this.item) {
@@ -141,7 +141,7 @@
     created () {
       if (this.item) {
         this.groupName = this.item.groupName
-        this.groupType = this.item.groupType
+        this.alertInstanceIds = Number(this.item.alertInstanceIds)
         this.description = this.item.description
       }
     },
