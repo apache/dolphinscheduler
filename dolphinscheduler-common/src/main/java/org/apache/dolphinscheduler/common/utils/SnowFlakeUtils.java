@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Objects;
 
 public class SnowFlakeUtils {
@@ -42,7 +41,7 @@ public class SnowFlakeUtils {
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
-    private SnowFlakeUtils() throws UnknownHostException {
+    private SnowFlakeUtils() throws Exception {
         this.dataCenterId = PropertyUtils.getInt(Constants.SNOW_FLAKE_DATA_CENTER_ID, 1);
         if (dataCenterId > maxDataCenterNum || dataCenterId < 0) {
             throw new IllegalArgumentException(String.format("dataCenterId can't be greater than %d or less than 0", maxDataCenterNum));
@@ -52,7 +51,7 @@ public class SnowFlakeUtils {
 
     private static SnowFlakeUtils instance = null;
 
-    public static synchronized SnowFlakeUtils getInstance() throws UnknownHostException {
+    public static synchronized SnowFlakeUtils getInstance() throws Exception {
         if (instance == null) {
             instance = new SnowFlakeUtils();
         }
