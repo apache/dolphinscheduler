@@ -20,33 +20,38 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Objects;
 
 public class SnowFlakeUtils {
     // start timestamp
-    private static final long startTimestamp = 1609430400000L; //2021-01-01
+    private static final long START_TIMESTAMP = 1609430400000L; //2021-01-01
     // Number of digits
-    private static final long sequenceBit = 12;
-    private static final long machineBit = 5;
-    private static final long dataCenterBit = 5;
+    private static final long SEQUENCE_BIT = 12;
+    private static final long MACHINE_BIT = 5;
+    private static final long DATA_CENTER_BIT = 5;
     // Maximum value
-    private static final long maxDataCenterNum = ~(-1L << dataCenterBit);
-    private static final long maxSequence = ~(-1L << sequenceBit);
+    private static final long MAX_DATA_CENTER_NUM = ~(-1L << DATA_CENTER_BIT);
+    private static final long MAX_SEQUENCE = ~(-1L << SEQUENCE_BIT);
     // The displacement to the left
-    private static final long machineLeft = sequenceBit;
-    private static final long dataCenterLeft = sequenceBit + machineBit;
-    private static final long timestampLeft = dataCenterLeft + dataCenterBit;
+    private static final long MACHINE_LEFT = SEQUENCE_BIT;
+    private static final long DATA_CENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT;
+    private static final long TIMESTAMP_LEFT = DATA_CENTER_LEFT + DATA_CENTER_BIT;
     private final int dataCenterId;
     private final int machineId;
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
-    private SnowFlakeUtils() throws Exception {
+    private SnowFlakeUtils() throws SnowFlakeException {
         this.dataCenterId = PropertyUtils.getInt(Constants.SNOW_FLAKE_DATA_CENTER_ID, 1);
-        if (dataCenterId > maxDataCenterNum || dataCenterId < 0) {
-            throw new IllegalArgumentException(String.format("dataCenterId can't be greater than %d or less than 0", maxDataCenterNum));
+        if (dataCenterId > MAX_DATA_CENTER_NUM || dataCenterId < 0) {
+            throw new IllegalArgumentException(String.format("dataCenterId can't be greater than %d or less than 0", MAX_DATA_CENTER_NUM));
         }
-        this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 32;
+        try {
+            this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 32;
+        } catch (UnknownHostException e) {
+            throw new SnowFlakeException(e.getMessage());
+        }
     }
 
     private static SnowFlakeUtils instance = null;
@@ -64,7 +69,7 @@ public class SnowFlakeUtils {
             throw new RuntimeException("Clock moved backwards. Refusing to generate id");
         }
         if (currStmp == lastTimestamp) {
-            sequence = (sequence + 1) & maxSequence;
+            sequence = (sequence + 1) & MAX_SEQUENCE;
             if (sequence == 0L) {
                 currStmp = getNextMill();
             }
@@ -72,9 +77,9 @@ public class SnowFlakeUtils {
             sequence = 0L;
         }
         lastTimestamp = currStmp;
-        return (currStmp - startTimestamp) << timestampLeft
-                | dataCenterId << dataCenterLeft
-                | machineId << machineLeft
+        return (currStmp - START_TIMESTAMP) << TIMESTAMP_LEFT
+                | dataCenterId << DATA_CENTER_LEFT
+                | machineId << MACHINE_LEFT
                 | sequence;
     }
 
@@ -88,5 +93,11 @@ public class SnowFlakeUtils {
 
     private long nowTimestamp() {
         return System.currentTimeMillis();
+    }
+
+    public static class SnowFlakeException extends Exception {
+        public SnowFlakeException(String message) {
+            super(message);
+        }
     }
 }

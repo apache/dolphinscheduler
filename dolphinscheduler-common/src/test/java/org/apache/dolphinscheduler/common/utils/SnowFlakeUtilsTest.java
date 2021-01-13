@@ -21,9 +21,13 @@ import org.junit.Test;
 
 public class SnowFlakeUtilsTest {
     @Test
-    public void nextId() throws Exception {
-        for (int i = 0; i < 5; i++) {
-            System.out.println(SnowFlakeUtils.getInstance().nextId());
+    public void nextId() {
+        try {
+            for (int i = 0; i < 5; i++) {
+                System.out.println(SnowFlakeUtils.getInstance().nextId());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
