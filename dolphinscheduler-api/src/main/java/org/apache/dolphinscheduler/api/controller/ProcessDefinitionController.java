@@ -259,7 +259,8 @@ public class ProcessDefinitionController extends BaseController {
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
             processDefinitionJson, description, locations, connects);
         //  If the update fails, the result will be returned directly
-        if (result.get("status") != Status.SUCCESS) {
+        Status status = (Status) result.get("status");
+        if (status.getCode() != 0) {
             return returnDataList(result);
         }
         //  Judge whether to go online after editing,0 means offline, 1 means online
