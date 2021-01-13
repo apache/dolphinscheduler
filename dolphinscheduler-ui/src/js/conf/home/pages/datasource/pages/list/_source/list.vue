@@ -20,6 +20,7 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="name" :label="$t('Datasource Name')"></el-table-column>
+        <el-table-column prop="userName" :label="$t('Datasource userName')"></el-table-column>
         <el-table-column prop="type" :label="$t('Datasource Type')"></el-table-column>
         <el-table-column :label="$t('Datasource Parameter')">
           <template slot-scope="scope">
@@ -50,7 +51,7 @@
         <el-table-column :label="$t('Operation')" width="150">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
+              <span><el-button type="prximary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
               <el-popconfirm
