@@ -14,8 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.api.service;
+
+import java.text.MessageFormat;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -24,12 +29,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.text.MessageFormat;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * base service
@@ -60,20 +59,6 @@ public class BaseService {
             return true;
         }
         return false;
-    }
-
-    /**
-     * error handle
-     *
-     * @param code result code
-     * @param msg result message
-     * @return error result code
-     */
-    public Result error(Integer code, String msg) {
-        Result result = new Result();
-        result.setCode(code);
-        result.setMsg(msg);
-        return result;
     }
 
     /**
@@ -127,6 +112,7 @@ public class BaseService {
         }
         return false;
     }
+
 
     /**
      * get cookie info by name

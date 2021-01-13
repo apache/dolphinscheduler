@@ -389,7 +389,7 @@ public class DataSourceService extends BaseService {
             return result;
         } catch (Exception e) {
             logger.error("datasource test connection error, dbType:{}, jdbcUrl:{}, message:{}.", type, datasource.getJdbcUrl(), e.getMessage());
-            return error(Status.CONNECTION_TEST_FAILURE.getCode(),e.getMessage());
+            return new Result(Status.CONNECTION_TEST_FAILURE.getCode(),e.getMessage());
         }
     }
 
