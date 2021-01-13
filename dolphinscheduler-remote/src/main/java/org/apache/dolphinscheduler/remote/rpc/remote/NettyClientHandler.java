@@ -5,6 +5,10 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
+
+import java.net.InetSocketAddress;
+
 /**
  * @author jiangli
  * @date 2021-01-13 13:33
@@ -20,12 +24,15 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
+
+        ctx.channel().close();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
+        InetSocketAddress address =(InetSocketAddress) ctx.channel().remoteAddress();
+        ctx.channel().close();
+       //todo connectManage.removeChannel(ctx.channel());
     }
 
     @Override
