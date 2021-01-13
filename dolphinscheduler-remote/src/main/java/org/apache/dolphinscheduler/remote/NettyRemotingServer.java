@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.remote;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.handler.NettyServerHandler;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
