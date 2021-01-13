@@ -90,7 +90,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getAlertgroupP', 'queryAllAlertPluginInstance']),
+      ...mapActions('security', ['queryAlertGroupListPaging', 'queryAllAlertPluginInstance']),
       /**
        * Inquire
        */
@@ -112,7 +112,7 @@
       },
       _create (item) {
         this.queryAllAlertPluginInstance().then(res => {
-          this.allAlertPluginInstance = res.data
+          this.allAlertPluginInstance = res
         }).catch(e => {
           this.$message.error(e.msg)
         })
@@ -136,7 +136,7 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.getAlertgroupP(this.searchParams).then(res => {
+        this.queryAlertGroupListPaging(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {

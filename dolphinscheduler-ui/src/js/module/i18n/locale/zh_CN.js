@@ -208,6 +208,8 @@ export default {
   'Please select UDF resources directory': '请选择UDF资源目录',
   'Edit alarm group': '编辑告警组',
   'Create alarm group': '创建告警组',
+  'Create Alarm Instance': '创建告警实例',
+  'Edit Alarm Instance': '编辑告警实例',
   'Group Name': '组名称',
   'Alarm instance name': '告警实例名称',
   'Select plugin': '选择插件',
