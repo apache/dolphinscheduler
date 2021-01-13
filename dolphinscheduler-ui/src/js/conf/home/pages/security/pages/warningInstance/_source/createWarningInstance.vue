@@ -78,7 +78,6 @@
         store,
         instanceName: '',
         pluginDefineId: null,
-        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }],
         $f: {},
         rule: []
       }
@@ -115,30 +114,8 @@
         }
         return true
       },
+      // Select plugin
       changePlugin () {
-        // this.rule = [
-        //   {
-        //     type: 'input',
-        //     field: 'dingTalkWebHook',
-        //     className: 'user-name-dom',
-        //     title: $t('Alarm instance name'),
-        //     value: null,
-        //     props: {
-        //       placeholder: '请输入用户名称！',
-        //       size: 'small',
-        //       disabled: false,
-        //       readonly: false,
-        //       clearable: true
-        //     },
-        //     validate: [
-        //       {
-        //         trigger: 'blur',
-        //         required: true,
-        //         message: '用户名称不能为空！'
-        //       }
-        //     ]
-        //   }
-        // ]
         this.store.dispatch('security/getUiPluginsByID', {
           pluginId: this.pluginDefineId
         }).then(res => {
