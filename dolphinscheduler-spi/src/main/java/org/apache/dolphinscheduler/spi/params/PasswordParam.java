@@ -44,7 +44,6 @@ public class PasswordParam extends PluginParams {
         public Builder(String name, String title) {
             super(name, FormType.INPUT, title);
             ParamsProps paramsProps = new ParamsProps();
-            paramsProps.setPropsType(PropsType.PASSWORD);
             this.props = paramsProps;
         }
 
