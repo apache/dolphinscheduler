@@ -399,7 +399,7 @@ const router = new Router({
           }
         },
         {
-          path: '/security/warning-Instance',
+          path: '/security/warning-instance',
           name: 'warning-instance-manage',
           component: resolve => require(['../pages/security/pages/warningInstance/index'], resolve),
           meta: {
