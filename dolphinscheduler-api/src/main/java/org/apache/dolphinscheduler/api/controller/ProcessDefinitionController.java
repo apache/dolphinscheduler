@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -238,6 +239,7 @@ public class ProcessDefinitionController extends BaseController {
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type = "String"),
             @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
+            @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES",required = false,dataType = "Int", example = "0")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -249,13 +251,18 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "processDefinitionJson", required = true) String processDefinitionJson,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "connects", required = false) String connects,
-                                          @RequestParam(value = "description", required = false) String description) {
+                                          @RequestParam(value = "description", required = false) String description,
+                                          @RequestParam(value = "releaseState", required = false,defaultValue = "0") int releaseState) {
 
         logger.info("login user {}, update process define, project name: {}, process define name: {}, "
                         + "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
                 loginUser.getUserName(), projectName, name, processDefinitionJson, description, locations, connects);
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
                 processDefinitionJson, description, locations, connects);
+        //  Judge whether to go online after editing,0 means offline, 1 means online
+        if (releaseState == 1) {
+            processDefinitionService.releaseProcessDefinition(loginUser, projectName, id, ReleaseState.ONLINE.ordinal());
+        }
         return returnDataList(result);
     }
 
