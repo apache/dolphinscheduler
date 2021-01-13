@@ -1029,4 +1029,9 @@ public final class Constants {
      * pstree, get pud and sub pid
      */
     public static final String PSTREE = "pstree";
+
+    /**
+     * snow flake, data center id, this id must be greater than 0 and less than 32
+     */
+    public static final String SNOW_FLAKE_DATA_CENTER_ID = "data.center.id";
 }
