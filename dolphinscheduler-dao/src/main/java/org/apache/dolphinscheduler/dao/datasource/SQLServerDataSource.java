@@ -21,15 +21,10 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * data source of SQL Server
  */
 public class SQLServerDataSource extends BaseDataSource {
-
-    private static final Logger logger = LoggerFactory.getLogger(SQLServerDataSource.class);
 
     /**
      * gets the JDBC url for the data source connection

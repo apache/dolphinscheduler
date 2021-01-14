@@ -89,15 +89,15 @@ public class DataSourceService extends BaseService {
      * @param parameter datasource parameters
      * @return create result code
      */
-    public Result createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
+    public Result<Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
 
-        Result result = new Result();
+        Result<Object> result = new Result<>();
         // check name can use or not
         if (checkName(name)) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
-        Result isConnection = checkConnection(type, parameter);
+        Result<Object> isConnection = checkConnection(type, parameter);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             return result;
         }
@@ -132,9 +132,9 @@ public class DataSourceService extends BaseService {
      * @param id        data source id
      * @return update result code
      */
-    public Result updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
+    public Result<Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
 
-        Result result = new Result();
+        Result<Object> result = new Result<>();
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
@@ -163,7 +163,7 @@ public class DataSourceService extends BaseService {
         // connectionParams json
         String connectionParams = paramObject.toString();
 
-        Result isConnection = checkConnection(type, parameter);
+        Result<Object> isConnection = checkConnection(type, parameter);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             return result;
         }
@@ -353,8 +353,8 @@ public class DataSourceService extends BaseService {
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
-    public Result verifyDataSourceName(String name) {
-        Result result = new Result();
+    public Result<Object> verifyDataSourceName(String name) {
+        Result<Object> result = new Result<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
         if (dataSourceList != null && dataSourceList.size() > 0) {
             logger.error("datasource name:{} has exist, can't create again.", name);
@@ -373,8 +373,8 @@ public class DataSourceService extends BaseService {
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
-    public Result checkConnection(DbType type, String parameter) {
-        Result result = new Result();
+    public Result<Object> checkConnection(DbType type, String parameter) {
+        Result<Object> result = new Result<>();
         BaseDataSource datasource = DataSourceFactory.getDatasource(type, parameter);
         if (datasource == null) {
             putMsg(result, Status.DATASOURCE_TYPE_NOT_EXIST, type);
@@ -399,10 +399,10 @@ public class DataSourceService extends BaseService {
      * @param id datasource id
      * @return connect result code
      */
-    public Result connectionTest(int id) {
+    public Result<Object> connectionTest(int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
-            Result result = new Result();
+            Result<Object> result = new Result<>();
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -537,8 +537,8 @@ public class DataSourceService extends BaseService {
      * @return delete result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public Result delete(User loginUser, int datasourceId) {
-        Result result = new Result();
+    public Result<Object> delete(User loginUser, int datasourceId) {
+        Result<Object> result = new Result<>();
         try {
             //query datasource by id
             DataSource dataSource = dataSourceMapper.selectById(datasourceId);
