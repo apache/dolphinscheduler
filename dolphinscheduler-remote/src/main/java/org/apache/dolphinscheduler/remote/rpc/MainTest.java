@@ -24,7 +24,7 @@ public class MainTest {
         Host host = new Host("127.0.0.1", 12366);
 
         IRpcClient rpcClient = new RpcClient();
-        IUserService userService = rpcClient.create(UserService.class);
+        UserService userService = rpcClient.create(UserService.class);
         String result = userService.say("calvin");
         System.out.println("我是你爸爸吧"+result);
 
