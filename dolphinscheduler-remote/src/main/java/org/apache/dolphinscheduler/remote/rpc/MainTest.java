@@ -17,19 +17,19 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 public class MainTest {
 
     public static void main(String[] args) throws Exception {
-        NettyServer nettyServer=new NettyServer(new NettyServerConfig());
+        NettyServer nettyServer = new NettyServer(new NettyServerConfig());
 
-       // NettyClient nettyClient=new NettyClient(new NettyClientConfig());
+        // NettyClient nettyClient=new NettyClient(new NettyClientConfig());
 
-        Host host=new Host("127.0.0.1",12366);
+        Host host = new Host("127.0.0.1", 12366);
 
-        IRpcClient rpcClient=new RpcClient();
-       IUserService userService= rpcClient.create(UserService.class);
-       userService.say("calvin");
+        IRpcClient rpcClient = new RpcClient();
+        IUserService userService = rpcClient.create(UserService.class);
+        String result = userService.say("calvin");
+        System.out.println("我是你爸爸吧"+result);
 
 
-
-      // nettyClient.sendMsg(host,rpcRequest);
+        // nettyClient.sendMsg(host,rpcRequest);
 
     }
 }
