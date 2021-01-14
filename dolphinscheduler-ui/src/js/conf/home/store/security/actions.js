@@ -382,11 +382,11 @@ export default {
     })
   },
   /**
-   * queryUiPluginsByID
+   * queryUiPluginById
    */
-  getUiPluginsByID ({ state }, payload) {
+  getUiPluginById ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post('ui-plugins/queryUiPluginsByID', payload, res => {
+      io.post('ui-plugins/queryUiPluginDetailById', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
