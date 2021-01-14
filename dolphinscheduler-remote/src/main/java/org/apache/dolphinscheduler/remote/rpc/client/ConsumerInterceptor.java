@@ -4,9 +4,12 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.rpc.Invoker;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.filter.FilterChain;
+import org.apache.dolphinscheduler.remote.rpc.remote.NettyClient;
+import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -32,6 +35,9 @@ public class ConsumerInterceptor {
         RpcRequest request = buildReq(args, method);
         //todo
         System.out.println(invoker.invoke(request));
+        NettyClient nettyClient = new NettyClient(new NettyClientConfig());
+        Host host = new Host("127.0.0.1", 12366);
+        nettyClient.sendMsg(host, request);
         return null;
 
     }

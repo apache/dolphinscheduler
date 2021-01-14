@@ -6,5 +6,5 @@ package org.apache.dolphinscheduler.remote.rpc;
  */
 public interface IUserService {
 
-    String say();
+    String say(String sb);
 }
