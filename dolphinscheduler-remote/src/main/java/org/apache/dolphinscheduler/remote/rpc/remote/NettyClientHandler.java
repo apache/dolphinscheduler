@@ -11,8 +11,10 @@ import io.netty.handler.timeout.IdleStateEvent;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestTable;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
+import org.apache.dolphinscheduler.remote.rpc.future.RpcFuture;
 
 import java.net.InetSocketAddress;
 
@@ -47,6 +49,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("收到消息");
         RpcResponse rsp = (RpcResponse) msg;
+        RpcFuture rpcFuture= RpcRequestTable.get(rsp.getRequestId());
+        if(null!=rpcFuture){
+            RpcRequestTable.remove(rsp.getRequestId());
+            rpcFuture.done(rsp);
+        }
         System.out.println(rsp.getResult().toString());
     }
 
