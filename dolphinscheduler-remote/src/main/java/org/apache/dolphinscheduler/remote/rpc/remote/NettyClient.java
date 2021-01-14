@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -171,16 +172,20 @@ public class NettyClient {
         System.out.println("netty client start");
     }
 
-    public void sendMsg(Host host, RpcRequest request) {
+    public Object sendMsg(Host host, RpcRequest request)  {
         Channel channel = getChannel(host);
         assert channel != null;
-        // ctx.writeAndFlush(Unpooled.copiedBuffer
         RpcFuture future = new RpcFuture();
         RpcRequestTable.put(request.getRequestId(), future);
-
         channel.writeAndFlush(request);
-        // System.out.println();
-        // channel.writeAndFlush( ProtoStuffUtils.serialize(request));
+        Object result = null;
+        try {
+            result=future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return result;
+
 
     }
 
