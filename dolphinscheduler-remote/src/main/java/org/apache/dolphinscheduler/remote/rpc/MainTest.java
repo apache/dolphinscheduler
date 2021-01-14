@@ -3,6 +3,8 @@ package org.apache.dolphinscheduler.remote.rpc;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 
+import org.apache.dolphinscheduler.remote.rpc.client.IRpcClient;
+import org.apache.dolphinscheduler.remote.rpc.client.RpcClient;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.remote.rpc.remote.NettyServer;
@@ -17,16 +19,17 @@ public class MainTest {
     public static void main(String[] args) throws Exception {
         NettyServer nettyServer=new NettyServer(new NettyServerConfig());
 
-        NettyClient nettyClient=new NettyClient(new NettyClientConfig());
+       // NettyClient nettyClient=new NettyClient(new NettyClientConfig());
 
         Host host=new Host("127.0.0.1",12366);
-        RpcRequest rpcRequest=new RpcRequest();
-        rpcRequest.setRequestId("988");
-        rpcRequest.setClassName("kris");
-        rpcRequest.setMethodName("ll");
+
+        IRpcClient rpcClient=new RpcClient();
+       IUserService userService= rpcClient.create(IUserService.class);
+       userService.say("calvin");
 
 
-       nettyClient.sendMsg(host,rpcRequest);
+
+      // nettyClient.sendMsg(host,rpcRequest);
 
     }
 }
