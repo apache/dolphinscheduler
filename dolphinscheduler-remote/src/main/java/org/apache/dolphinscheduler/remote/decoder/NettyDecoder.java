@@ -23,6 +23,7 @@ public class NettyDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+        System.out.println("decoder");
         if (byteBuf.readableBytes() < 4) {
             return;
         }
