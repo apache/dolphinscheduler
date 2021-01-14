@@ -64,7 +64,7 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
             putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL);
             return result;
         }
-        pluginDefines=buildPluginParams(pluginDefines);
+       // pluginDefines=buildPluginParams(pluginDefines);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefines);
         return result;
@@ -78,13 +78,13 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
             putMsg(result, Status.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL);
             return result;
         }
-        String params=pluginDefine.getPluginParams();
-        pluginDefine.setPluginParams(parseParams(params));
+       // String params=pluginDefine.getPluginParams();
+       // pluginDefine.setPluginParams(parseParams(params));
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefine);
         return result;
     }
-
+/*
 
     private List<PluginDefine> buildPluginParams(List<PluginDefine> pluginDefines){
         List<PluginDefine> newPluginDefines=new ArrayList<>(pluginDefines.size());
@@ -94,8 +94,8 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
             newPluginDefines.add(newPluginDefine);
         });
         return newPluginDefines;
-    }
-
+    }*/
+/*
     private static String parseParams(String param){
         Pattern pattern = Pattern.compile(LANGUAGE_REGEX);
 
@@ -117,6 +117,6 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
     public static void main(String[] args) {
         String msg="[{\"field\":\"receivers\",\"props\":{\"placeholder\":\"please input receives\",\"size\":\"small\"},\"type\":\"input\",\"title\":\"$t('receivers')\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"receiverCcs\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"input\",\"title\":\"$t('receiverCcs')\",\"value\":null,\"validate\":null},{\"field\":\"mailServerHost\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"input\",\"title\":\"mail.smtp.host\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"mailServerPort\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"input\",\"title\":\"mail.smtp.port\",\"value\":25,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"number\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"mailSender\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"input\",\"title\":\"mail.sender\",\"value\":null,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"enableSmtpAuth\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"mail.smtp.auth\",\"value\":true,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"mailUser\",\"props\":{\"placeholder\":\"if enable use authentication, you need input user\",\"size\":\"small\"},\"type\":\"input\",\"title\":\"mail.user\",\"value\":null,\"validate\":null},{\"field\":\"mailPasswd\",\"props\":{\"placeholder\":\"if enable use authentication, you need input password\",\"size\":\"small\"},\"type\":\"input\",\"title\":\"mail.passwd\",\"value\":null,\"validate\":null},{\"field\":\"starttlsEnable\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"mail.smtp.starttls.enable\",\"value\":false,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"sslEnable\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"mail.smtp.ssl.enable\",\"value\":false,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"mailSmtpSslTrust\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"input\",\"title\":\"mail.smtp.ssl.trust\",\"value\":\"*\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}]},{\"field\":\"show_type\",\"props\":{\"placeholder\":null,\"size\":\"small\"},\"type\":\"radio\",\"title\":\"show_type\",\"value\":\"table\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"options\":[{\"label\":\"table\",\"value\":\"table\",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"table attachment\",\"value\":\"table attachment\",\"disabled\":false}]}]";
         System.out.println(parseParams(msg));
-    }
+    }*/
 
 }
