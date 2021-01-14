@@ -116,15 +116,23 @@
       },
       // Select plugin
       changePlugin () {
-        this.store.dispatch('security/getUiPluginsByID', {
+        this.store.dispatch('security/getUiPluginById', {
           pluginId: this.pluginDefineId
         }).then(res => {
           this.rule = JSON.parse(res.pluginParams)
+          this.rule.forEach(item => {
+            if (item.title.indexOf('$t') !== -1) {
+              item.title = $t(item.field)
+            }
+          })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
       _submit () {
+        this.$f.rule.forEach(item => {
+          item.title = item.name
+        })
         let param = {
           instanceName: this.instanceName,
           pluginDefineId: this.pluginDefineId,
@@ -152,10 +160,17 @@
     },
     watch: {},
     created () {
+      let pluginInstanceParams = []
       if (this.item) {
         this.instanceName = this.item.instanceName
         this.pluginDefineId = this.item.pluginDefineId
-        this.rule = JSON.parse(this.item.pluginInstanceParams)
+        JSON.parse(this.item.pluginInstanceParams).forEach(item => {
+          if (item.title.indexOf('$t') !== -1) {
+            item.title = $t(item.field)
+          }
+          pluginInstanceParams.push(item)
+        })
+        this.rule = pluginInstanceParams
       }
     },
     mounted () {
