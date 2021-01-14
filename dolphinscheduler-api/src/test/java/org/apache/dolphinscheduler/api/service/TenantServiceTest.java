@@ -35,9 +35,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
