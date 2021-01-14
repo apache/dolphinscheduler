@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -189,7 +190,7 @@ public class TenantServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         // tenantCode  exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
-        Assert.assertTrue(Status.OS_TENANT_CODE_EXIST.getCode() == result.getCode());
+        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
     }
 
     /**
