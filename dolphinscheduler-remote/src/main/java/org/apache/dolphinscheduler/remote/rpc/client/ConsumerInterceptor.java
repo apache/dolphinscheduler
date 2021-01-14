@@ -36,7 +36,7 @@ public class ConsumerInterceptor {
         //todo
         System.out.println(invoker.invoke(request));
         NettyClient nettyClient = new NettyClient(new NettyClientConfig());
-        Host host = new Host("127.0.0.1", 12366);
+        Host host = new Host("127.0.0.1", 12336);
         nettyClient.sendMsg(host, request);
         return null;
 

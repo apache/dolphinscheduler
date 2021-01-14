@@ -47,7 +47,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("收到消息");
         RpcResponse rsp = (RpcResponse) msg;
-        System.out.println(rsp);
+        System.out.println(rsp.getResult().toString());
     }
 
     @Override

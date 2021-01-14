@@ -40,7 +40,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, InstantiationException {
         logger.info("server read msg");
         System.out.println("收到消息");
         RpcRequest req= (RpcRequest) msg;
@@ -49,17 +49,26 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         response.setMsg("llll");
         response.setRequestId(req.getRequestId());
 
-        Class<?> handlerClass = req.getClass();
-        System.out.println(req.getMethodName());
-        System.out.println(req.getClassName());
-        String methodName = req.getMethodName();
-        Class<?>[] parameterTypes = req.getParameterTypes();
-        Object[] parameters = req.getParameters();
 
-        // JDK reflect
-        Method method = handlerClass.getMethod(methodName, parameterTypes);
-        method.setAccessible(true);
-        Object result = method.invoke(req.getClassName(), parameters);
+        String classname=req.getClassName();
+        //获得服务端要调用的方法名称
+        String methodName=req.getMethodName();
+        //获得服务端要调用方法的参数类型
+        Class<?>[] parameterTypes=req.getParameterTypes();
+        //获得服务端要调用方法的每一个参数的值
+        Object[] arguments=req.getParameters();
+
+        //创建类
+        Class serviceClass=Class.forName(classname);
+        //创建对象
+        Object object = serviceClass.newInstance();
+        //获得该类的对应的方法
+        Method method=serviceClass.getMethod(methodName, parameterTypes);
+
+        //该对象调用指定方法
+        Object result=method.invoke(object, arguments);
+
+
         response.setResult(result);
         ctx.writeAndFlush(response);
     }
