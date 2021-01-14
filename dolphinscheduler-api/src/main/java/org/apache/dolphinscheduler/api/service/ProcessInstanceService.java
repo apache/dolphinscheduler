@@ -382,7 +382,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
             originDefParams = JSONUtils.toJson(processData.getGlobalParams());
             List<Property> globalParamList = processData.getGlobalParams();
-            Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
                     processInstance.getCmdTypeIfComplement(), schedule);
             timeout = processData.getTimeout();
