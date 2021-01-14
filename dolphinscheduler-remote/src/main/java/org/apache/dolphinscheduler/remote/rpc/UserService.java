@@ -6,7 +6,7 @@ package org.apache.dolphinscheduler.remote.rpc;
  */
 public class UserService implements IUserService{
     @Override
-    public String say() {
-        return null;
+    public String say(String s) {
+        return "krris"+s;
     }
 }
