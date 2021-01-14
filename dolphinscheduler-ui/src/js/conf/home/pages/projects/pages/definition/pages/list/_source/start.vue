@@ -127,7 +127,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        <span>{{$t('Set global')}}</span>
+        <span>{{$t('Startup parameters')}}</span>
       </div>
       <div class="cont" style="width: 688px;">
         <div style="padding-top: 6px;">
