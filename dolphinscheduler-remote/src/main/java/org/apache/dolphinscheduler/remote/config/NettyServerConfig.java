@@ -56,7 +56,7 @@ public class NettyServerConfig {
     /**
      *  listen port
      */
-    private int listenPort = 12346;
+    private int listenPort = 12366;
 
     public int getListenPort() {
         return listenPort;
