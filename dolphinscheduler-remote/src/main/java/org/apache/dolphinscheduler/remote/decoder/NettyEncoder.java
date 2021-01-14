@@ -4,13 +4,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.serialize.ProtoStuffUtils;
 
 /**
  * @author jiangli
  * @date 2021-01-12 18:52
  */
-public class NettyEncoder extends MessageToByteEncoder {
+public class NettyEncoder extends MessageToByteEncoder  {
 
 
     private Class<?> genericClass;
@@ -21,12 +22,13 @@ public class NettyEncoder extends MessageToByteEncoder {
     }
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-
+        System.out.println("encsss");
         if (genericClass.isInstance(o)) {
             byte[] data = ProtoStuffUtils.serialize(o);
             byteBuf.writeInt(data.length);
             byteBuf.writeBytes(data);
         }
+
 
     }
 }
