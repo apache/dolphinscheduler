@@ -22,10 +22,10 @@ package org.apache.dolphinscheduler.plugin.alert.email;
  */
 public class MailParamsConstants {
 
-    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "$t('receivers')";
     public static final String NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
 
-    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "$t('receiverCcs')";
     public static final String NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
 
     public static final String MAIL_PROTOCOL = "mail.transport.protocol";

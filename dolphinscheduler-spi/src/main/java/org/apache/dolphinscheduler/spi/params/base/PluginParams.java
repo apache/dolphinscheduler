@@ -38,6 +38,12 @@ public class PluginParams {
     @JsonProperty("field")
     protected String name;
 
+    /**
+     * param name
+     */
+    @JsonProperty("name")
+    protected String fieldName;
+
     @JsonProperty("props")
     protected ParamsProps props;
 
@@ -72,6 +78,7 @@ public class PluginParams {
         if (null == builder.props) {
             builder.props = new ParamsProps();
         }
+        this.fieldName=builder.title;
         this.props = builder.props;
         this.value = builder.value;
         this.validateList = builder.validateList;
@@ -86,6 +93,8 @@ public class PluginParams {
         protected FormType formType;
 
         protected String title;
+
+        protected String fieldName;
 
         //option params
         protected ParamsProps props;
@@ -103,6 +112,7 @@ public class PluginParams {
             this.name = name;
             this.formType = formType;
             this.title = title;
+            this.fieldName = title;
         }
 
         //for json deserialize to POJO
@@ -112,6 +122,7 @@ public class PluginParams {
                        @JsonProperty("title") String title,
                        @JsonProperty("props") ParamsProps props,
                        @JsonProperty("value") Object value,
+                       @JsonProperty("name") String fieldName,
                        @JsonProperty("validate") List<Validate> validateList
         ) {
             requireNonNull(name, "name is null");
@@ -123,6 +134,7 @@ public class PluginParams {
             this.props = props;
             this.value = value;
             this.validateList = validateList;
+            this.fieldName = fieldName;
         }
 
         public PluginParams build() {
