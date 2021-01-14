@@ -94,11 +94,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     registry.addViewController("/").setViewName("forward:/ui/index.html");
   }
 
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping(PATH_PATTERN).allowedOrigins("*").allowedMethods("*");
-  }
-
 
   /**
    * Turn off suffix-based content negotiation
