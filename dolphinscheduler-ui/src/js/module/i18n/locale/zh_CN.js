@@ -665,7 +665,6 @@ export default {
   'Min Memory': '最小内存',
   'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建',
   Info: '提示',
-  'Startup parameters': '启动参数',
   'Datasource userName': '所属用户',
   'Resource userName': '所属用户'
 }

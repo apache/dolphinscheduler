@@ -666,7 +666,6 @@ export default {
   'Min Memory': 'Min Memory',
   'The workflow canvas is abnormal and cannot be saved, please recreate': 'The workflow canvas is abnormal and cannot be saved, please recreate',
   Info: 'Info',
-  'Startup parameters': 'Startup parameters',
   'Datasource userName': 'owner',
   'Resource userName': 'owner'
 }
