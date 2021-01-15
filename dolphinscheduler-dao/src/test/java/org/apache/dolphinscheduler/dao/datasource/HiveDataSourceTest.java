@@ -26,7 +26,7 @@ import org.junit.Test;
 public class HiveDataSourceTest {
 
   @Test
-  public void testfilterOther() {
+  public void testFilterOther() {
     BaseDataSource hiveDataSource = new HiveDataSource();
 
     // not contain hive_site_conf
