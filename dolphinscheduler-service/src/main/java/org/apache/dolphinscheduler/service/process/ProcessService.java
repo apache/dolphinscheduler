@@ -667,6 +667,12 @@ public class ProcessService {
                 processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
+                // Recalculate global parameters after rerun.
+                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                    processDefinition.getGlobalParamMap(),
+                    processDefinition.getGlobalParamList(),
+                    getCommandTypeIfComplement(processInstance, command),
+                    processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
