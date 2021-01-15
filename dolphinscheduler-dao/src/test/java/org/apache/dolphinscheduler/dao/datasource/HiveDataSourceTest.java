@@ -56,6 +56,11 @@ public class HiveDataSourceTest {
     // contain multi hive_site_conf
     other = hiveDataSource.filterOther("charset=UTF-8;foo=bar;hive.mapred.mode=strict;hive.exec.parallel=true");
     Assert.assertEquals("charset=UTF-8;foo=bar?hive.mapred.mode=strict;hive.exec.parallel=true", other);
+
+    // the security authorization hive conf var
+    other = hiveDataSource.filterOther("tez.queue.name=tezTest");
+    Assert.assertEquals("?tez.queue.name=tezTest", other);
+
   }
 
   @Test
@@ -71,14 +76,14 @@ public class HiveDataSourceTest {
     hiveDataSource.setOther("charset=UTF-8;hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2");
 
     Assert.assertEquals(
-        "jdbc:hive2://127.0.0.1:10000/test;charset=UTF-8?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
-        hiveDataSource.getJdbcUrl());
+            "jdbc:hive2://127.0.0.1:10000/test;charset=UTF-8?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
+            hiveDataSource.getJdbcUrl());
 
     hiveDataSource.setOther("hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2");
 
     Assert.assertEquals(
-        "jdbc:hive2://127.0.0.1:10000/test;?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
-        hiveDataSource.getJdbcUrl());
+            "jdbc:hive2://127.0.0.1:10000/test;?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
+            hiveDataSource.getJdbcUrl());
 
   }
 
