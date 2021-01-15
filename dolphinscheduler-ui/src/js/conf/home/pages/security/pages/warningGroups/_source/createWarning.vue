@@ -38,7 +38,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Alarm plugin instance')}}</template>
           <template slot="content">
-            <el-select v-model="alertInstanceIds" size="small" style="width: 100%">
+            <el-select v-model="alertInstanceIds" size="small" style="width: 100%" multiple>
               <el-option
                       v-for="items in allAlertPluginInstance"
                       :key="items.id"
@@ -64,6 +64,7 @@
   </m-popup>
 </template>
 <script>
+  import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
@@ -75,7 +76,7 @@
       return {
         store,
         groupName: '',
-        alertInstanceIds: null,
+        alertInstanceIds: [],
         description: ''
       }
     },
@@ -114,7 +115,7 @@
       _submit () {
         let param = {
           groupName: this.groupName,
-          alertInstanceIds: this.alertInstanceIds,
+          alertInstanceIds: this.alertInstanceIds.join(','),
           description: this.description
         }
         if (this.item) {
@@ -124,9 +125,7 @@
         this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
+          this.$refs.popup.spinnerLoading = false
         }).catch(e => {
           this.$message.error(e.msg || '')
           this.$refs.popup.spinnerLoading = false
@@ -140,7 +139,10 @@
     created () {
       if (this.item) {
         this.groupName = this.item.groupName
-        this.alertInstanceIds = Number(this.item.alertInstanceIds)
+        let dataStrArr = this.item.alertInstanceIds.split(',')
+        this.alertInstanceIds = _.map(dataStrArr, v => {
+          return +v
+        })
         this.description = this.item.description
       }
     },
