@@ -672,6 +672,7 @@ public class ProcessService {
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
                 processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                    // Recalculate global parameters after rerun.
                     processDefinition.getGlobalParamMap(),
                     processDefinition.getGlobalParamList(),
                     getCommandTypeIfComplement(processInstance, command),
