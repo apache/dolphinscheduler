@@ -9,21 +9,19 @@ import org.apache.dolphinscheduler.remote.serialize.ProtoStuffUtils;
 import java.util.List;
 
 /**
- * @author jiangli
- * @date 2021-01-12 18:53
+ * NettyDecoder
  */
 public class NettyDecoder extends ByteToMessageDecoder {
 
     private Class<?> genericClass;
 
-    // 构造函数传入向反序列化的class
+
     public NettyDecoder(Class<?> genericClass) {
         this.genericClass = genericClass;
     }
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        System.out.println("decoder");
         if (byteBuf.readableBytes() < 4) {
             return;
         }

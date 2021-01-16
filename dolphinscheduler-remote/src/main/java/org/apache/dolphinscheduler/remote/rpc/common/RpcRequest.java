@@ -1,8 +1,7 @@
 package org.apache.dolphinscheduler.remote.rpc.common;
 
 /**
- * @author jiangli
- * @date 2021-01-09 13:21
+ * RpcRequest
  */
 public class RpcRequest {
 

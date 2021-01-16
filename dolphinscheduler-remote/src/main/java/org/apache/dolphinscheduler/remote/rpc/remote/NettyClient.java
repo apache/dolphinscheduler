@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 
 import org.apache.dolphinscheduler.remote.decoder.NettyEncoder;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
+import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestCache;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestTable;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
@@ -41,8 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jiangli
- * @date 2021-01-13 19:31
+ * NettyClient
  */
 public class NettyClient {
 
@@ -172,23 +172,29 @@ public class NettyClient {
         System.out.println("netty client start");
     }
 
-    public Object sendMsg(Host host, RpcRequest request)  {
+    public Object sendMsg(Host host, RpcRequest request, Boolean async) {
+
+        System.out.println("这个不是异步"+async);
         Channel channel = getChannel(host);
         assert channel != null;
+        RpcRequestCache rpcRequestCache = new RpcRequestCache();
+        rpcRequestCache.setServiceName(request.getClassName() + request.getMethodName());
         RpcFuture future = new RpcFuture();
-        RpcRequestTable.put(request.getRequestId(), future);
+        rpcRequestCache.setRpcFuture(future);
+        RpcRequestTable.put(request.getRequestId(), rpcRequestCache);
         channel.writeAndFlush(request);
+
         Object result = null;
+        if (async) {
+            return true;
+        }
         try {
-            result=future.get();
+            result = future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         return result;
-
-
     }
-
 
     /**
      * close
