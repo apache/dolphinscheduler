@@ -140,7 +140,7 @@ public class TaskDefinitionLog {
     /**
      * timeout notify strategy
      */
-    private TaskTimeoutStrategy TaskTimeoutStrategy;
+    private TaskTimeoutStrategy taskTimeoutStrategy;
 
     /**
      * task warning time out. unit: minute
@@ -350,11 +350,11 @@ public class TaskDefinitionLog {
     }
 
     public TaskTimeoutStrategy getTaskTimeoutStrategy() {
-        return TaskTimeoutStrategy;
+        return taskTimeoutStrategy;
     }
 
     public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
-        TaskTimeoutStrategy = taskTimeoutStrategy;
+        this.taskTimeoutStrategy = taskTimeoutStrategy;
     }
 
     public int getOperator() {

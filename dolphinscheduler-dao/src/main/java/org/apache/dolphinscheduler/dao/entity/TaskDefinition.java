@@ -23,7 +23,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -138,7 +141,7 @@ public class TaskDefinition {
     /**
      * timeout notify strategy
      */
-    private TaskTimeoutStrategy TaskTimeoutStrategy;
+    private TaskTimeoutStrategy taskTimeoutStrategy;
 
     /**
      * task warning time out. unit: minute
@@ -337,10 +340,10 @@ public class TaskDefinition {
     }
 
     public TaskTimeoutStrategy getTaskTimeoutStrategy() {
-        return TaskTimeoutStrategy;
+        return taskTimeoutStrategy;
     }
 
     public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
-        TaskTimeoutStrategy = taskTimeoutStrategy;
+        this.taskTimeoutStrategy = taskTimeoutStrategy;
     }
 }
