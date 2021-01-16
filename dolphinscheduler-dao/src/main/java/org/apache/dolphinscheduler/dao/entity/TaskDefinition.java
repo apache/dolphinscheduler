@@ -98,7 +98,6 @@ public class TaskDefinition {
     @TableField(exist = false)
     private Map<String, String> taskParamMap;
 
-
     /**
      * task is valid: yes/no
      */
@@ -108,7 +107,6 @@ public class TaskDefinition {
      * task priority
      */
     private Priority taskPriority;
-
 
     /**
      * user name
@@ -222,7 +220,6 @@ public class TaskDefinition {
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
-
 
     public String getTaskParams() {
         return taskParams;

@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 /**
  * task definition log
  */
@@ -101,7 +100,6 @@ public class TaskDefinitionLog {
     @TableField(exist = false)
     private Map<String, String> taskParamMap;
 
-
     /**
      * task is valid: yes/no
      */
@@ -111,7 +109,6 @@ public class TaskDefinitionLog {
      * task priority
      */
     private Priority taskPriority;
-
 
     /**
      * user name
@@ -236,7 +233,6 @@ public class TaskDefinitionLog {
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
-
 
     public String getTaskParams() {
         return taskParams;

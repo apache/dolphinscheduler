@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -30,7 +31,6 @@ public enum ConditionType {
     NONE(0, "none"),
     JUDGE(1, "judge"),
     DELAY(2, "delay");
-
 
     ConditionType(int code, String desc) {
         this.code = code;
