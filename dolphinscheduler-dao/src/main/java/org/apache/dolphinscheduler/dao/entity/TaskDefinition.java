@@ -23,10 +23,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -137,6 +134,11 @@ public class TaskDefinition {
      * fail retry interval
      */
     private int failRetryInterval;
+
+    /**
+     * timeout flag
+     */
+    private TimeoutFlag timeoutFlag;
 
     /**
      * timeout notify strategy
@@ -345,5 +347,13 @@ public class TaskDefinition {
 
     public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
         this.taskTimeoutStrategy = taskTimeoutStrategy;
+    }
+
+    public TimeoutFlag getTimeoutFlag() {
+        return timeoutFlag;
+    }
+
+    public void setTimeoutFlag(TimeoutFlag timeoutFlag) {
+        this.timeoutFlag = timeoutFlag;
     }
 }
