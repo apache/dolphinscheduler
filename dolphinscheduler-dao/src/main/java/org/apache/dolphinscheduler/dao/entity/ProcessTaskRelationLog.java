@@ -277,27 +277,4 @@ public class ProcessTaskRelationLog {
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
     }
-
-    @Override
-    public String toString() {
-        return "ProcessTaskRelationLog{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", projectCode=" + projectCode +
-                ", processDefinitionCode=" + processDefinitionCode +
-                ", preProjectCode=" + preProjectCode +
-                ", preTaskCode=" + preTaskCode +
-                ", postProjectCode=" + postProjectCode +
-                ", postTaskCode=" + postTaskCode +
-                ", conditionType=" + conditionType +
-                ", conditionParams='" + conditionParams + '\'' +
-                ", conditionParamList=" + conditionParamList +
-                ", conditionParamMap=" + conditionParamMap +
-                ", operator=" + operator +
-                ", operateTime=" + operateTime +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }

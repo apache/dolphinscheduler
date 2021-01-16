@@ -22,30 +22,30 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * condition type
  */
 public enum ConditionType {
-  /**
-   * 0 none
-   * 1 judge
-   * 2 delay
-   */
-  NONE(0, "none"),
-  JUDGE(1, "judge"),
-  DELAY(2, "delay");
+    /**
+     * 0 none
+     * 1 judge
+     * 2 delay
+     */
+    NONE(0, "none"),
+    JUDGE(1, "judge"),
+    DELAY(2, "delay");
 
 
-  ConditionType(int code, String desc){
-    this.code = code;
-    this.desc = desc;
-  }
+    ConditionType(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
-  @EnumValue
-  private final int code;
-  private final String desc;
+    @EnumValue
+    private final int code;
+    private final String desc;
 
-  public int getCode() {
-    return code;
-  }
+    public int getCode() {
+        return code;
+    }
 
-  public String getDesc() {
-    return desc;
-  }
+    public String getDesc() {
+        return desc;
+    }
 }

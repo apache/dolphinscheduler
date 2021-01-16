@@ -346,32 +346,4 @@ public class TaskDefinition {
     public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
         TaskTimeoutStrategy = taskTimeoutStrategy;
     }
-
-    @Override
-    public String toString() {
-        return "TaskDefinition{" +
-                "id=" + id +
-                ", code=" + code +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", description='" + description + '\'' +
-                ", projectCode=" + projectCode +
-                ", userId=" + userId +
-                ", taskType=" + taskType +
-                ", taskParams='" + taskParams + '\'' +
-                ", taskParamList=" + taskParamList +
-                ", taskParamMap=" + taskParamMap +
-                ", flag=" + flag +
-                ", taskPriority=" + taskPriority +
-                ", userName='" + userName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", workerGroup='" + workerGroup + '\'' +
-                ", failRetryTimes=" + failRetryTimes +
-                ", failRetryInterval=" + failRetryInterval +
-                ", TaskTimeoutStrategy=" + TaskTimeoutStrategy +
-                ", timeout=" + timeout +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }

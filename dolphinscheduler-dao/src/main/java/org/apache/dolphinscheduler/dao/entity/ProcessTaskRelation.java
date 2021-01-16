@@ -250,25 +250,4 @@ public class ProcessTaskRelation {
     public void setConditionType(ConditionType conditionType) {
         this.conditionType = conditionType;
     }
-
-    @Override
-    public String toString() {
-        return "ProcessTaskRelation{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", projectCode=" + projectCode +
-                ", processDefinitionCode=" + processDefinitionCode +
-                ", preProjectCode=" + preProjectCode +
-                ", preTaskCode=" + preTaskCode +
-                ", postProjectCode=" + postProjectCode +
-                ", postTaskCode=" + postTaskCode +
-                ", conditionType=" + conditionType +
-                ", conditionParams='" + conditionParams + '\'' +
-                ", conditionParamList=" + conditionParamList +
-                ", conditionParamMap=" + conditionParamMap +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }

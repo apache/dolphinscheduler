@@ -376,34 +376,4 @@ public class TaskDefinitionLog {
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
     }
-
-    @Override
-    public String toString() {
-        return "TaskDefinitionLog{" +
-                "id=" + id +
-                ", code=" + code +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", description='" + description + '\'' +
-                ", projectCode=" + projectCode +
-                ", userId=" + userId +
-                ", taskType=" + taskType +
-                ", taskParams='" + taskParams + '\'' +
-                ", taskParamList=" + taskParamList +
-                ", taskParamMap=" + taskParamMap +
-                ", flag=" + flag +
-                ", taskPriority=" + taskPriority +
-                ", userName='" + userName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", workerGroup='" + workerGroup + '\'' +
-                ", failRetryTimes=" + failRetryTimes +
-                ", failRetryInterval=" + failRetryInterval +
-                ", TaskTimeoutStrategy=" + TaskTimeoutStrategy +
-                ", timeout=" + timeout +
-                ", operator=" + operator +
-                ", operateTime=" + operateTime +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }
