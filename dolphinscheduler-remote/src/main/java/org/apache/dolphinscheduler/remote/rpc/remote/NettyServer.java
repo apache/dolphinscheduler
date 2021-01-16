@@ -31,8 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jiangli
- * @date 2021-01-13 19:32
+ * NettyServer
  */
 public class NettyServer {
 

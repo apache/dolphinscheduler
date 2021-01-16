@@ -1,8 +1,7 @@
 package org.apache.dolphinscheduler.remote.rpc.client;
 
 /**
- * @author jiangli
- * @date 2021-01-09 10:58
+ * IRpcClient
  */
 public interface IRpcClient {
 
