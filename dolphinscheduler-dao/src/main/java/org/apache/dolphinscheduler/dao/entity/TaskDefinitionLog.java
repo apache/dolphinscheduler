@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * task definition
+ * task definition log
  */
 @TableName("t_ds_task_definition_log")
 public class TaskDefinitionLog {

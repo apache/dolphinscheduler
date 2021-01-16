@@ -35,9 +35,9 @@ import java.util.stream.Collectors;
 
 
 /**
- * process task relation
+ * process task relation log
  */
-@TableName("t_ds_process_task_relation")
+@TableName("t_ds_process_task_relation_log")
 public class ProcessTaskRelationLog {
 
     /**
