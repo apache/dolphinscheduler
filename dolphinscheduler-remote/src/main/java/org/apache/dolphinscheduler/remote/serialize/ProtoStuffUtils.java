@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author jiangli
- * @date 2021-01-12 18:56
+ * ProtoStuffUtils
  */
 public class ProtoStuffUtils {
 

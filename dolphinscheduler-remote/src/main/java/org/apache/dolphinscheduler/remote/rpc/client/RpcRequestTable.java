@@ -5,24 +5,23 @@ import org.apache.dolphinscheduler.remote.rpc.future.RpcFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author jiangli
- * @date 2021-01-14 10:42
+ * RpcRequestTable
  */
 public class RpcRequestTable {
 
-    // key: requestId     value: RpcFuture
-    private static ConcurrentHashMap<String, RpcFuture> processingRpc = new ConcurrentHashMap<>();
 
-    public static void put(String requestId,RpcFuture rpcFuture){
-        processingRpc.put(requestId,rpcFuture);
+    private static ConcurrentHashMap<String, RpcRequestCache> requestMap = new ConcurrentHashMap<>();
+
+    public static void put(String requestId,RpcRequestCache rpcRequestCache){
+        requestMap.put(requestId,rpcRequestCache);
     }
 
-    public static RpcFuture get(String requestId){
-        return processingRpc.get(requestId);
+    public static RpcRequestCache get(String requestId){
+        return requestMap.get(requestId);
     }
 
     public static void remove(String requestId){
-        processingRpc.remove(requestId);
+        requestMap.remove(requestId);
     }
 
 }

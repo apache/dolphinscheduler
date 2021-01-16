@@ -5,20 +5,17 @@ import net.bytebuddy.implementation.MethodDelegation;
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.rpc.base.Rpc;
 import org.apache.dolphinscheduler.remote.rpc.remote.NettyClient;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author jiangli
- * @date 2021-01-09 10:59
+ * RpcClient
  */
 public class RpcClient implements IRpcClient{
 
     private ConcurrentHashMap<String,Object> classMap=new ConcurrentHashMap<>();
-
-
-
 
     @Override
     public <T> T create(Class<T> clazz) throws Exception {

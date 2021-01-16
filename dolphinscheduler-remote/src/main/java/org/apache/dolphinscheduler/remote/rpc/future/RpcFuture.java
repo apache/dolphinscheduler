@@ -9,8 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * @author jiangli
- * @date 2021-01-14 09:24
+ * RpcFuture
  */
 public class RpcFuture implements Future<Object> {
 

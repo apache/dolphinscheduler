@@ -1,16 +1,12 @@
 package org.apache.dolphinscheduler.remote.rpc.remote;
 
-
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestCache;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestTable;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
@@ -22,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jiangli
- * @date 2021-01-13 13:33
+ * NettyClientHandler
  */
 @ChannelHandler.Sharable
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
@@ -32,44 +27,34 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-
-       // ctx.channel().close();
-    }
-
-    @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        System.out.println("client 关闭channel");
         InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
         ctx.channel().close();
-        //todo connectManage.removeChannel(ctx.channel());
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("收到消息");
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RpcResponse rsp = (RpcResponse) msg;
-        RpcFuture rpcFuture= RpcRequestTable.get(rsp.getRequestId());
-        if(null!=rpcFuture){
+        RpcRequestCache rpcRequest = RpcRequestTable.get(rsp.getRequestId());
+        if (null != rpcRequest) {
+            RpcFuture future = rpcRequest.getRpcFuture();
             RpcRequestTable.remove(rsp.getRequestId());
-            rpcFuture.done(rsp);
+            future.done(rsp);
         }
-        System.out.println(rsp.getResult().toString());
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 
-        if (evt instanceof IdleStateEvent){
-            IdleStateEvent event = (IdleStateEvent)evt;
-            if (event.state()== IdleState.ALL_IDLE){
-                RpcRequest request = new RpcRequest();
-                request.setMethodName("heartBeat");
-                ctx.channel().writeAndFlush(request);
-                logger.info("已超过30秒未与RPC服务器进行读写操作!将发送心跳消息...");
-            }
-        }else{
-            super.userEventTriggered(ctx,evt);
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            RpcRequest request = new RpcRequest();
+            request.setMethodName("heart");
+            ctx.channel().writeAndFlush(request);
+            logger.info("已超过30秒未与RPC服务器进行读写操作!将发送心跳消息...");
+
+        } else {
+            super.userEventTriggered(ctx, evt);
         }
     }
 
