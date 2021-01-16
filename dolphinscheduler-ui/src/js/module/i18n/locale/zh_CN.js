@@ -64,6 +64,7 @@ export default {
   'Set the DAG diagram name': '设置DAG图名称',
   'Please enter description(optional)': '请输入描述(选填)',
   'Set global': '设置全局',
+  'Whether to go online the process definition': '是否上线流程定义',
   'Whether to update the process definition': '是否更新流程定义',
   Add: '添加',
   'DAG graph name cannot be empty': 'DAG图名称不能为空',
