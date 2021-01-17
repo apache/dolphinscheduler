@@ -318,7 +318,8 @@ export default {
         connects: JSON.stringify(state.connects),
         name: _.trim(state.name),
         description: _.trim(state.description),
-        id: payload
+        id: payload,
+        releaseState: state.releaseState
       }, res => {
         resolve(res)
         state.isEditDag = false

@@ -64,6 +64,7 @@ export default {
   'Set the DAG diagram name': 'Set the DAG diagram name',
   'Please enter description(optional)': 'Please enter description(optional)',
   'Set global': 'Set global',
+  'Whether to go online the process definition': 'Whether to go online the process definition',
   'Whether to update the process definition': 'Whether to update the process definition',
   Add: 'Add',
   'DAG graph name cannot be empty': 'DAG graph name cannot be empty',
