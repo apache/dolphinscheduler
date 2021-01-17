@@ -9,7 +9,7 @@ import org.apache.dolphinscheduler.remote.rpc.common.AbstractRpcCallBack;
 public class UserCallback extends AbstractRpcCallBack {
     @Override
     public void run(Object object) {
-        String msg= (String) object;
-        System.out.println("我是异步回调"+msg);
+        Boolean msg= (Boolean) object;
+        System.out.println("我是异步回调handle Kris"+msg);
     }
 }

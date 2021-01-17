@@ -3,9 +3,11 @@ package org.apache.dolphinscheduler.remote.rpc.remote;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.concurrent.FastThreadLocalThread;
 
+import org.apache.dolphinscheduler.remote.rpc.client.ConsumerConfig;
+import org.apache.dolphinscheduler.remote.rpc.client.ConsumerConfigCache;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestCache;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestTable;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
@@ -36,11 +38,36 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RpcResponse rsp = (RpcResponse) msg;
         RpcRequestCache rpcRequest = RpcRequestTable.get(rsp.getRequestId());
-        if (null != rpcRequest) {
+
+        if (null == rpcRequest) {
+            logger.warn("未知响应");
+            return;
+        }
+
+        String serviceName = rpcRequest.getServiceName();
+        ConsumerConfig consumerConfig = ConsumerConfigCache.getConfigByServersName(serviceName);
+        if (!consumerConfig.getAsync()) {
             RpcFuture future = rpcRequest.getRpcFuture();
             RpcRequestTable.remove(rsp.getRequestId());
             future.done(rsp);
+            return;
+
         }
+
+        //async
+        new FastThreadLocalThread(() -> {
+            try {
+                if (rsp.getStatus() == 0) {
+                    consumerConfig.getCallBackClass().newInstance().run(rsp.getResult());
+                } else {
+                    logger.error("xxxx fail");
+                }
+            } catch (InstantiationException | IllegalAccessException e) {
+                logger.error("execute async error", e);
+            }
+        }).start();
+
+
     }
 
     @Override
@@ -51,7 +78,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             RpcRequest request = new RpcRequest();
             request.setMethodName("heart");
             ctx.channel().writeAndFlush(request);
-            logger.info("已超过30秒未与RPC服务器进行读写操作!将发送心跳消息...");
+            logger.debug("send heart beat msg...");
 
         } else {
             super.userEventTriggered(ctx, evt);

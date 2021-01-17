@@ -18,12 +18,20 @@ public class MainTest {
 
         // NettyClient nettyClient=new NettyClient(new NettyClientConfig());
 
-        Host host = new Host("127.0.0.1", 12366);
+        Host host = new Host("127.0.0.1", 12636);
 
         IRpcClient rpcClient = new RpcClient();
-        UserService userService = rpcClient.create(UserService.class);
-        String result = userService.say("calvin");
+        IUserService userService = rpcClient.create(UserService.class,host);
+        boolean result = userService.say("calvin");
         System.out.println( "异步回掉成功"+result);
+
+        System.out.println(userService.hi(10));
+        System.out.println(userService.hi(188888888));
+
+        UserService user = rpcClient.create(UserService.class,host);
+        System.out.println(user.hi(99999));
+        System.out.println(user.hi(998888888));
+      // UserCallback.class.newInstance().run("lllll");
 
         // nettyClient.sendMsg(host,rpcRequest);
 
