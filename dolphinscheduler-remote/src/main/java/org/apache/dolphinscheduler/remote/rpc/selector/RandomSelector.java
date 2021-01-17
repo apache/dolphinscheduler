@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * @author jiangli
- * @date 2021-01-11 12:00
+ * RandomSelector
  */
 public class RandomSelector extends AbstractSelector<Host> {
 

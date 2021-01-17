@@ -1,7 +1,5 @@
 package org.apache.dolphinscheduler.remote.rpc.client;
 
-import org.apache.dolphinscheduler.remote.rpc.future.RpcFuture;
-
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

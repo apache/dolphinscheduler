@@ -9,5 +9,7 @@ import org.apache.dolphinscheduler.remote.rpc.base.Rpc;
 public interface IUserService {
 
     @Rpc(async = true,callback = UserCallback.class)
-    String say(String sb);
+    Boolean say(String sb);
+
+    String hi(int num);
 }
