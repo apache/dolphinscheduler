@@ -1,20 +1,20 @@
 package org.apache.dolphinscheduler.remote.rpc.client;
 
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.rpc.Invoker;
 import org.apache.dolphinscheduler.remote.rpc.base.Rpc;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
+import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.remote.rpc.filter.FilterChain;
 import org.apache.dolphinscheduler.remote.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.function.Consumer;
+
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
 /**
  * ConsumerInterceptor
@@ -26,30 +26,41 @@ public class ConsumerInterceptor {
 
     private FilterChain filterChain;
 
-    private NettyClient nettyClient=new NettyClient(new NettyClientConfig());
+    private Host host;
 
-    public ConsumerInterceptor(Invoker invoker) {
+    private NettyClient nettyClient = NettyClient.getInstance();
+
+    public ConsumerInterceptor(Invoker invoker, Host host) {
         this.filterChain = new FilterChain(invoker);
         this.invoker = this.filterChain.buildFilterChain();
+        this.host = host;
     }
 
 
     @RuntimeType
-    public Object intercept(@AllArguments Object[] args, @Origin Method method) throws Throwable {
+    public Object intercept(@AllArguments Object[] args, @Origin Method method) throws RemotingException {
         RpcRequest request = buildReq(args, method);
 
 
-        String serviceName = method.getDeclaringClass().getName() + method;
+        String serviceName = method.getDeclaringClass().getName() + method.getName();
         ConsumerConfig consumerConfig = ConsumerConfigCache.getConfigByServersName(serviceName);
         if (null == consumerConfig) {
             consumerConfig = cacheServiceConfig(method, serviceName);
         }
         boolean async = consumerConfig.getAsync();
 
-        //load balance
-        Host host = new Host("127.0.0.1", 12336);
+        int retries = consumerConfig.getRetries();
 
-        return nettyClient.sendMsg(host, request, async);
+        while (retries-- > 0) {
+            RpcResponse rsp = (RpcResponse) nettyClient.sendMsg(host, request, async);
+            //success
+            if (null != rsp && rsp.getStatus() == 0) {
+                return rsp.getResult();
+            }
+        }
+        // execute fail
+        throw new RemotingException("send msg error");
+
     }
 
     private RpcRequest buildReq(Object[] args, Method method) {
@@ -61,7 +72,7 @@ public class ConsumerInterceptor {
 
         request.setParameters(args);
 
-        String serviceName = method.getDeclaringClass().getName() + method;
+        String serviceName = method.getDeclaringClass().getName();
 
         return request;
     }
@@ -77,6 +88,7 @@ public class ConsumerInterceptor {
             consumerConfig.setRetries(rpc.retries());
             consumerConfig.setOneway(rpc.isOneway());
         }
+
         ConsumerConfigCache.putConfig(serviceName, consumerConfig);
 
         return consumerConfig;

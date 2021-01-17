@@ -1,17 +1,16 @@
 package org.apache.dolphinscheduler.remote.rpc.remote;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.timeout.IdleStateEvent;
-
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
 
 /**
  * NettyServerHandler
@@ -39,16 +38,18 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, InstantiationException {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
 
         RpcRequest req = (RpcRequest) msg;
 
         RpcResponse response = new RpcResponse();
-        if(req.getMethodName().equals("heart")){
+        if (req.getMethodName().equals("heart")) {
             logger.info("接受心跳消息!...");
             return;
         }
         response.setRequestId(req.getRequestId());
+
+        response.setStatus((byte) 0);
 
 
         String classname = req.getClassName();
@@ -58,14 +59,20 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         Class<?>[] parameterTypes = req.getParameterTypes();
 
         Object[] arguments = req.getParameters();
+        Object result = null;
+        try {
 
-        Class serviceClass = Class.forName(classname);
+            Class serviceClass = Class.forName(classname);
 
-        Object object = serviceClass.newInstance();
+            Object object = serviceClass.newInstance();
 
-        Method method = serviceClass.getMethod(methodName, parameterTypes);
+            Method method = serviceClass.getMethod(methodName, parameterTypes);
 
-        Object result = method.invoke(object, arguments);
+            result = method.invoke(object, arguments);
+        } catch (Exception e) {
+            logger.error("netty server execute error",e);
+            response.setStatus((byte)-1);
+        }
 
         response.setResult(result);
         ctx.writeAndFlush(response);

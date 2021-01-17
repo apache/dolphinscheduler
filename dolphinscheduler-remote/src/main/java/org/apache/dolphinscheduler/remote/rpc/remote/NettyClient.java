@@ -1,31 +1,13 @@
 package org.apache.dolphinscheduler.remote.rpc.remote;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.CharsetUtil;
-
-import org.apache.dolphinscheduler.remote.decoder.NettyDecoder;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-
+import org.apache.dolphinscheduler.remote.decoder.NettyDecoder;
 import org.apache.dolphinscheduler.remote.decoder.NettyEncoder;
-import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestCache;
 import org.apache.dolphinscheduler.remote.rpc.client.RpcRequestTable;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.remote.rpc.future.RpcFuture;
-import org.apache.dolphinscheduler.remote.serialize.ProtoStuffUtils;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
@@ -41,10 +23,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+
 /**
  * NettyClient
  */
 public class NettyClient {
+
+    public static NettyClient getInstance() {
+        return NettyClient.NettyClientInner.INSTANCE;
+    }
+
+    private static class NettyClientInner {
+
+        private static final NettyClient INSTANCE = new NettyClient(new NettyClientConfig());
+    }
 
     private final Logger logger = LoggerFactory.getLogger(NettyClient.class);
 
@@ -160,38 +164,43 @@ public class NettyClient {
                 @Override
                 public void initChannel(SocketChannel ch) {
                     ch.pipeline()
-                        .addLast(new NettyEncoder(RpcRequest.class))  //OUT - 1
+                        .addLast(new NettyEncoder(RpcRequest.class))
                         .addLast(new NettyDecoder(RpcResponse.class))
                         .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
-
                         .addLast(new NettyClientHandler());
                 }
             });
 
         isStarted.compareAndSet(false, true);
-        System.out.println("netty client start");
     }
 
-    public Object sendMsg(Host host, RpcRequest request, Boolean async) {
+    public RpcResponse sendMsg(Host host, RpcRequest request, Boolean async) {
 
-        System.out.println("这个不是异步"+async);
         Channel channel = getChannel(host);
         assert channel != null;
         RpcRequestCache rpcRequestCache = new RpcRequestCache();
         rpcRequestCache.setServiceName(request.getClassName() + request.getMethodName());
-        RpcFuture future = new RpcFuture();
-        rpcRequestCache.setRpcFuture(future);
+
+
+        RpcFuture future = null;
+        if (!async) {
+            future = new RpcFuture();
+            rpcRequestCache.setRpcFuture(future);
+        }
         RpcRequestTable.put(request.getRequestId(), rpcRequestCache);
         channel.writeAndFlush(request);
 
-        Object result = null;
+        RpcResponse result = null;
         if (async) {
-            return true;
+            result=new RpcResponse();
+            result.setStatus((byte)0);
+            result.setResult(true);
+            return result;
         }
         try {
             result = future.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+           logger.error("send msg error",e);
         }
         return result;
     }
