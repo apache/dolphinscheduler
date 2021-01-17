@@ -19,6 +19,6 @@
 echo "------ push start -------"
 printenv
 
-docker push $DOCKER_REPO:${VERSION}
+docker push "$DOCKER_REPO:${VERSION}"
 
 echo "------ push end -------"
