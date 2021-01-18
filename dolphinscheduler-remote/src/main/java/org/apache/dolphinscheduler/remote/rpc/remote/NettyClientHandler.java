@@ -76,7 +76,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             RpcRequest request = new RpcRequest();
-            request.setMethodName("heart");
+            request.setEventType((byte)0);
             ctx.channel().writeAndFlush(request);
             logger.debug("send heart beat msg...");
 

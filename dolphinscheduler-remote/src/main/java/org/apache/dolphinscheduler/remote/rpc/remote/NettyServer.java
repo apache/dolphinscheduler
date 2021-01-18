@@ -128,7 +128,7 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
 
                     @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
+                    protected void initChannel(SocketChannel ch){
                         initNettyChannel(ch);
                     }
                 });
@@ -137,11 +137,11 @@ public class NettyServer {
             try {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
-                //logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
+                logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
                 throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
             }
             if (future.isSuccess()) {
-               // logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
+                logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
             } else if (future.cause() != null) {
                 throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()), future.cause());
             } else {
