@@ -18,8 +18,6 @@ public @interface Rpc {
 
     boolean async() default false;
 
-    boolean isOneway() default true;
-
     Class<? extends AbstractRpcCallBack> callback() default AbstractRpcCallBack.class;
 
 }

@@ -86,7 +86,6 @@ public class ConsumerInterceptor {
             consumerConfig.setAsync(rpc.async());
             consumerConfig.setCallBackClass(rpc.callback());
             consumerConfig.setRetries(rpc.retries());
-            consumerConfig.setOneway(rpc.isOneway());
         }
 
         ConsumerConfigCache.putConfig(serviceName, consumerConfig);

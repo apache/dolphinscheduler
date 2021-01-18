@@ -8,7 +8,5 @@ public class ConsumerConfigConstants {
 
     public static final Boolean DEFAULT_SYNC = false;
 
-    public static final Boolean DEFAULT_IS_ONEWAY = false;
-
     public static final Integer DEFAULT_RETRIES = 3;
 }
