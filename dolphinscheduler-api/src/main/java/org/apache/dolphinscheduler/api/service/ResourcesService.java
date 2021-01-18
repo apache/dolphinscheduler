@@ -1264,7 +1264,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
-        if (isNotAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
