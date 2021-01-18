@@ -265,7 +265,6 @@ public class ProcessDefinitionLog {
         this.projectName = projectName;
     }
 
-
     public String getGlobalParams() {
         return globalParams;
     }
