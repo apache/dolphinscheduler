@@ -89,7 +89,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
 
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -141,7 +141,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -174,7 +174,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -235,7 +235,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 

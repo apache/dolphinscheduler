@@ -1158,7 +1158,7 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
@@ -1185,7 +1185,7 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> unauthorizedFile(User loginUser, Integer userId) {
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
@@ -1215,7 +1215,7 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -1247,7 +1247,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
@@ -1266,7 +1266,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)){
             return result;
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
