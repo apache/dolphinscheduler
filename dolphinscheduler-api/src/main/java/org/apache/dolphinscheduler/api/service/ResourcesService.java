@@ -1158,20 +1158,20 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        List<ResourceComponent> list ;
+        List<ResourceComponent> list;
         if (CollectionUtils.isNotEmpty(resourceList)) {
             Visitor visitor = new ResourceTreeVisitor(resourceList);
             list = visitor.visit().getChildren();
-        }else {
+        } else {
             list = new ArrayList<>(0);
         }
 
         result.put(Constants.DATA_LIST, list);
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1185,23 +1185,23 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> unauthorizedFile(User loginUser, Integer userId) {
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        List<Resource> list ;
+        List<Resource> list;
         if (resourceList != null && resourceList.size() > 0) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
 
             getAuthorizedResourceList(resourceSet, authedResourceList);
             list = new ArrayList<>(resourceSet);
-        }else {
+        } else {
             list = new ArrayList<>(0);
         }
         Visitor visitor = new ResourceTreeVisitor(list);
         result.put(Constants.DATA_LIST, visitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1215,7 +1215,7 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -1231,11 +1231,9 @@ public class ResourcesService extends BaseService {
             resultList = new ArrayList<>(udfFuncSet);
         }
         result.put(Constants.DATA_LIST, resultList);
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
-
-
 
 
     /**
@@ -1247,12 +1245,12 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1266,7 +1264,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
