@@ -19,8 +19,11 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import java.sql.Connection;
 
 /**
  * data source of hive
@@ -85,5 +88,16 @@ public class HiveDataSource extends BaseDataSource {
 
         return sessionVarListSb.toString() + hiveConfListSb.toString();
     }
-  
+
+    /**
+     * the data source test connection
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    @Override
+    public Connection getConnection() throws Exception {
+        CommonUtils.loadKerberosConf();
+        return super.getConnection();
+    }
+
 }
