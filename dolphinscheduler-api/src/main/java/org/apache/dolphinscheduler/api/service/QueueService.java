@@ -75,9 +75,9 @@ public class QueueService extends BaseService {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return queue list
      */
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
@@ -105,7 +105,7 @@ public class QueueService extends BaseService {
      * create queue
      *
      * @param loginUser login user
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return create result
      */
@@ -153,8 +153,8 @@ public class QueueService extends BaseService {
      * update queue
      *
      * @param loginUser login user
-     * @param queue     queue
-     * @param id        queue id
+     * @param queue queue
+     * @param id queue id
      * @param queueName queue name
      * @return update result code
      */

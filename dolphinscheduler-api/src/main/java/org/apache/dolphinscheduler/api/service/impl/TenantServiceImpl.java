@@ -134,8 +134,8 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return tenant list page
      */
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
@@ -227,7 +227,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * delete tenant
      *
      * @param loginUser login user
-     * @param id        tenant id
+     * @param id tenant id
      * @return delete result code
      * @throws Exception exception
      */
