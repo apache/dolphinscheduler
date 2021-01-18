@@ -419,34 +419,34 @@ public class ProcessDefinition {
 
     @Override
     public String toString() {
-        return "ProcessDefinition{" +
-                "id=" + id +
-                ", code=" + code +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", releaseState=" + releaseState +
-                ", projectId=" + projectId +
-                ", projectCode=" + projectCode +
-                ", processDefinitionJson='" + processDefinitionJson + '\'' +
-                ", description='" + description + '\'' +
-                ", globalParams='" + globalParams + '\'' +
-                ", globalParamList=" + globalParamList +
-                ", globalParamMap=" + globalParamMap +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", flag=" + flag +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", locations='" + locations + '\'' +
-                ", connects='" + connects + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", scheduleReleaseState=" + scheduleReleaseState +
-                ", timeout=" + timeout +
-                ", tenantId=" + tenantId +
-                ", modifyBy='" + modifyBy + '\'' +
-                ", resourceIds='" + resourceIds + '\'' +
-                '}';
+        return "ProcessDefinition{"
+                + "id=" + id
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", version=" + version
+                + ", releaseState=" + releaseState
+                + ", projectId=" + projectId
+                + ", projectCode=" + projectCode
+                + ", processDefinitionJson='" + processDefinitionJson + '\''
+                + ", description='" + description + '\''
+                + ", globalParams='" + globalParams + '\''
+                + ", globalParamList=" + globalParamList
+                + ", globalParamMap=" + globalParamMap
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", flag=" + flag
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", projectName='" + projectName + '\''
+                + ", locations='" + locations + '\''
+                + ", connects='" + connects + '\''
+                + ", receivers='" + receivers + '\''
+                + ", receiversCc='" + receiversCc + '\''
+                + ", scheduleReleaseState=" + scheduleReleaseState
+                + ", timeout=" + timeout
+                + ", tenantId=" + tenantId
+                + ", modifyBy='" + modifyBy + '\''
+                + ", resourceIds='" + resourceIds + '\''
+                + '}';
     }
 }
