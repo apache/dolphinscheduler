@@ -847,3 +847,38 @@ INSERT INTO `t_ds_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 1
 -- Records of t_ds_user
 -- ----------------------------
 INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
+
+-- ----------------------------
+-- Fixed case insensitive issue in creating queues.
+-- ----------------------------
+ALTER TABLE `t_ds_queue` MODIFY queue_name VARCHAR(64) COLLATE utf8_bin;
+
+-- ----------------------------
+-- Fixed case insensitive issue for creating users.
+-- ----------------------------
+ALTER TABLE `t_ds_user` MODIFY user_name VARCHAR(64) COLLATE utf8_bin;
+
+-- ----------------------------
+-- Fixed case insensitive issue for creating tenants.
+-- ----------------------------
+ALTER TABLE `t_ds_tenant` MODIFY tenant_code VARCHAR(64) COLLATE utf8_bin;
+
+-- ----------------------------
+-- Fixed case insensitive problem in creating data sources.
+-- ----------------------------
+ALTER TABLE `t_ds_datasource` MODIFY NAME VARCHAR(64) COLLATE utf8_bin;
+
+-- ----------------------------
+-- Fixed case insensitive issue in creating projects.
+-- ----------------------------
+ALTER TABLE `t_ds_project` MODIFY NAME VARCHAR(64) COLLATE utf8_bin;
+
+-- ----------------------------
+-- Fixed case insensitivity of UDF function.
+-- ----------------------------
+ALTER TABLE `t_ds_udfs` MODIFY func_name VARCHAR(64) COLLATE utf8_bin;
+
+-- ----------------------------
+-- Fixed case insensitivity of create key folder.
+-- ----------------------------
+ALTER TABLE `t_ds_resources` MODIFY file_name VARCHAR(64) COLLATE utf8_bin;
