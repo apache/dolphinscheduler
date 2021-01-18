@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -28,19 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 
 /**
- * process definition
+ * process definition log
  */
-@TableName("t_ds_process_definition")
-public class ProcessDefinition {
+@TableName("t_ds_process_definition_log")
+public class ProcessDefinitionLog {
 
     /**
      * id
@@ -69,20 +68,9 @@ public class ProcessDefinition {
     private ReleaseState releaseState;
 
     /**
-     * project id
-     * TODO: delete
-     */
-    private int projectId;
-
-    /**
      * project code
      */
     private Long projectCode;
-
-    /**
-     * definition json string
-     */
-    private String processDefinitionJson;
 
     /**
      * description
@@ -146,12 +134,6 @@ public class ProcessDefinition {
     private String locations;
 
     /**
-     * connects array for web
-     * TODO: delete
-     */
-    private String connects;
-
-    /**
      * receivers
      */
     private String receivers;
@@ -187,6 +169,21 @@ public class ProcessDefinition {
      */
     private String resourceIds;
 
+    public Long getCode() {
+        return code;
+    }
+
+    public void setCode(Long code) {
+        this.code = code;
+    }
+
+    public Long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(Long projectCode) {
+        this.projectCode = projectCode;
+    }
 
     public String getName() {
         return name;
@@ -220,28 +217,12 @@ public class ProcessDefinition {
         this.releaseState = releaseState;
     }
 
-    public String getProcessDefinitionJson() {
-        return processDefinitionJson;
-    }
-
-    public void setProcessDefinitionJson(String processDefinitionJson) {
-        this.processDefinitionJson = processDefinitionJson;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public int getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
     }
 
     public Date getUpdateTime() {
@@ -328,14 +309,6 @@ public class ProcessDefinition {
         this.locations = locations;
     }
 
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
-    }
-
     public String getReceivers() {
         return receivers;
     }
@@ -400,33 +373,15 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
-    public Long getCode() {
-        return code;
-    }
-
-    public void setCode(Long code) {
-        this.code = code;
-    }
-
-    public Long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(Long projectCode) {
-        this.projectCode = projectCode;
-    }
-
     @Override
     public String toString() {
-        return "ProcessDefinition{" +
+        return "ProcessDefinitionLog{" +
                 "id=" + id +
                 ", code=" + code +
                 ", name='" + name + '\'' +
                 ", version=" + version +
                 ", releaseState=" + releaseState +
-                ", projectId=" + projectId +
                 ", projectCode=" + projectCode +
-                ", processDefinitionJson='" + processDefinitionJson + '\'' +
                 ", description='" + description + '\'' +
                 ", globalParams='" + globalParams + '\'' +
                 ", globalParamList=" + globalParamList +
@@ -438,7 +393,6 @@ public class ProcessDefinition {
                 ", userName='" + userName + '\'' +
                 ", projectName='" + projectName + '\'' +
                 ", locations='" + locations + '\'' +
-                ", connects='" + connects + '\'' +
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
                 ", scheduleReleaseState=" + scheduleReleaseState +
