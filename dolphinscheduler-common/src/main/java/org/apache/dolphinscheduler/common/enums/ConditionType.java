@@ -15,24 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.template;
+package org.apache.dolphinscheduler.common.enums;
 
-import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * the alert template factory
+ * condition type
  */
-public class AlertTemplateFactory {
+public enum ConditionType {
+    /**
+     * 0 none
+     * 1 judge
+     * 2 delay
+     */
+    NONE(0, "none"),
+    JUDGE(1, "judge"),
+    DELAY(2, "delay");
 
-    private AlertTemplateFactory() {
+    ConditionType(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
 
-    /**
-     * get a template from alert.properties conf file
-     *
-     * @return a template, default is DefaultHTMLTemplate
-     */
-    public static AlertTemplate getMessageTemplate() {
-        return new DefaultHTMLTemplate();
+    @EnumValue
+    private final int code;
+    private final String desc;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }
