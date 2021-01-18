@@ -43,7 +43,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         RpcRequest req = (RpcRequest) msg;
 
         RpcResponse response = new RpcResponse();
-        if (req.getMethodName().equals("heart")) {
+        if (req.getEventType() == 0) {
+
             logger.info("接受心跳消息!...");
             return;
         }
@@ -70,8 +71,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
             result = method.invoke(object, arguments);
         } catch (Exception e) {
-            logger.error("netty server execute error",e);
-            response.setStatus((byte)-1);
+            logger.error("netty server execute error", e);
+            response.setStatus((byte) -1);
         }
 
         response.setResult(result);

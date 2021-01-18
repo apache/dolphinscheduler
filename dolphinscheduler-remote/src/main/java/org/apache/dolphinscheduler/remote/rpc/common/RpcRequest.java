@@ -10,6 +10,16 @@ public class RpcRequest {
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
+    // 0 hear beat,1 businness msg
+    private Byte eventType=1;
+
+    public Byte getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(Byte eventType) {
+        this.eventType = eventType;
+    }
 
     public String getRequestId() {
         return requestId;
