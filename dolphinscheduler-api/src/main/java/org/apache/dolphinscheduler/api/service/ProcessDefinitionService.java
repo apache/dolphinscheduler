@@ -196,7 +196,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setFlag(Flag.YES);
         processDefineMapper.insert(processDefine);
         putMsg(result, Status.SUCCESS);
-        result.put(PROCESSDEFINITIONID,processDefine.getId());
+        result.put(Constants.DATA_LIST,processDefine.getId());
         return result;
     }
 
