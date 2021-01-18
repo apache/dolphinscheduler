@@ -14,8 +14,6 @@ public class ConsumerConfig {
 
     private Boolean async = ConsumerConfigConstants.DEFAULT_SYNC;
 
-    private Boolean isOneway = ConsumerConfigConstants.DEFAULT_IS_ONEWAY;
-
     private Integer retries = ConsumerConfigConstants.DEFAULT_RETRIES;
 
 
@@ -41,14 +39,6 @@ public class ConsumerConfig {
 
     public void setAsync(Boolean async) {
         this.async = async;
-    }
-
-    public Boolean getOneway() {
-        return isOneway;
-    }
-
-    public void setOneway(Boolean oneway) {
-        isOneway = oneway;
     }
 
     public Integer getRetries() {
