@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
-
 @PrepareForTest(PropertyUtils.class)
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.net.ssl.*")
@@ -97,8 +95,8 @@ public class DingTalkUtilsTest {
     @Test
     public void testProxyConfig() {
         RequestConfig rc = DingTalkUtils.getProxyConfig();
-        Assert.assertEquals(rc.getProxy().getPort(), 80);
-        Assert.assertEquals(rc.getProxy().getHostName(), "proxy.com.cn");
+        Assert.assertEquals(80, rc.getProxy().getPort());
+        Assert.assertEquals("proxy.com.cn", rc.getProxy().getHostName());
     }
 
     @Test
@@ -114,7 +112,7 @@ public class DingTalkUtilsTest {
         String msg = DingTalkUtils.textToJsonString("this is test:中文");
 
         logger.info("test support utf8, actual:" + msg);
-        logger.info("test support utf8, actual:" + DingTalkUtils.isEnableDingTalk);
+        logger.info("test support utf8, actual:" + DingTalkUtils.IS_ENABLE_DING_TALK);
         String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
         Assert.assertEquals(expect, msg);
     }

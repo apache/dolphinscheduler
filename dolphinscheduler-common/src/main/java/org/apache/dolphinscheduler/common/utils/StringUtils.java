@@ -33,11 +33,17 @@ public class StringUtils {
         return !isEmpty(cs);
     }
 
-    public static boolean isBlank(String s) {
-        if (isEmpty(s)) {
-            return true;
+    public static boolean isBlank(String str) {
+        int strLen;
+        if (str != null && (strLen = str.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(str.charAt(i))) {
+                    return false;
+                }
+            }
         }
-        return s.trim().length() == 0;
+        return true;
+
     }
 
     public static boolean isNotBlank(String s) {

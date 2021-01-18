@@ -14,12 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,27 +24,36 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.datasource.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
+import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * datasource service
@@ -67,10 +73,8 @@ public class DataSourceService extends BaseService {
     public static final String USER_NAME = "userName";
     public static final String OTHER = "other";
 
-
     @Autowired
     private DataSourceMapper dataSourceMapper;
-
 
     @Autowired
     private DataSourceUserMapper datasourceUserMapper;
@@ -85,24 +89,16 @@ public class DataSourceService extends BaseService {
      * @param parameter datasource parameters
      * @return create result code
      */
-    public Map<String, Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
+    public Result<Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
 
-        Map<String, Object> result = new HashMap<>();
+        Result<Object> result = new Result<>();
         // check name can use or not
         if (checkName(name)) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
-        Boolean isConnection = checkConnection(type, parameter);
-        if (!isConnection) {
-            logger.info("connect failed, type:{}, parameter:{}", type, parameter);
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
-        }
-
-        BaseDataSource datasource = DataSourceFactory.getDatasource(type, parameter);
-        if (datasource == null) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, parameter);
+        Result<Object> isConnection = checkConnection(type, parameter);
+        if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             return result;
         }
 
@@ -125,7 +121,6 @@ public class DataSourceService extends BaseService {
         return result;
     }
 
-
     /**
      * updateProcessInstance datasource
      *
@@ -137,9 +132,9 @@ public class DataSourceService extends BaseService {
      * @param id        data source id
      * @return update result code
      */
-    public Map<String, Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
+    public Result<Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
 
-        Map<String, Object> result = new HashMap<>();
+        Result<Object> result = new Result<>();
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
@@ -168,12 +163,11 @@ public class DataSourceService extends BaseService {
         // connectionParams json
         String connectionParams = paramObject.toString();
 
-        Boolean isConnection = checkConnection(type, connectionParams);
-        if (!isConnection) {
-            logger.info("connect failed, type:{}, parameter:{}", type, parameter);
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+        Result<Object> isConnection = checkConnection(type, parameter);
+        if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             return result;
         }
+
         Date now = new Date();
 
         dataSource.setName(name.trim());
@@ -191,7 +185,6 @@ public class DataSourceService extends BaseService {
         List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
         return queryDataSource != null && queryDataSource.size() > 0;
     }
-
 
     /**
      * updateProcessInstance datasource
@@ -360,8 +353,8 @@ public class DataSourceService extends BaseService {
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
-    public Result verifyDataSourceName(String name) {
-        Result result = new Result();
+    public Result<Object> verifyDataSourceName(String name) {
+        Result<Object> result = new Result<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
         if (dataSourceList != null && dataSourceList.size() > 0) {
             logger.error("datasource name:{} has exist, can't create again.", name);
@@ -374,95 +367,30 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * get connection
-     *
-     * @param dbType    datasource type
-     * @param parameter parameter
-     * @return connection for datasource
-     */
-    private Connection getConnection(DbType dbType, String parameter) {
-        Connection connection = null;
-        BaseDataSource datasource = null;
-        try {
-            switch (dbType) {
-                case POSTGRESQL:
-                    datasource = JSONUtils.parseObject(parameter, PostgreDataSource.class);
-                    Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
-                    break;
-                case MYSQL:
-                    datasource = JSONUtils.parseObject(parameter, MySQLDataSource.class);
-                    Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
-                    break;
-                case HIVE:
-                case SPARK:
-                    if (CommonUtils.getKerberosStartupState()) {
-                        System.setProperty(org.apache.dolphinscheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
-                                getString(org.apache.dolphinscheduler.common.Constants.JAVA_SECURITY_KRB5_CONF_PATH));
-                        Configuration configuration = new Configuration();
-                        configuration.set(org.apache.dolphinscheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
-                        UserGroupInformation.setConfiguration(configuration);
-                        UserGroupInformation.loginUserFromKeytab(getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                                getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
-                    }
-                    if (dbType == DbType.HIVE) {
-                        datasource = JSONUtils.parseObject(parameter, HiveDataSource.class);
-                    } else if (dbType == DbType.SPARK) {
-                        datasource = JSONUtils.parseObject(parameter, SparkDataSource.class);
-                    }
-                    Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
-                    break;
-                case CLICKHOUSE:
-                    datasource = JSONUtils.parseObject(parameter, ClickHouseDataSource.class);
-                    Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
-                    break;
-                case ORACLE:
-                    datasource = JSONUtils.parseObject(parameter, OracleDataSource.class);
-                    Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
-                    break;
-                case SQLSERVER:
-                    datasource = JSONUtils.parseObject(parameter, SQLServerDataSource.class);
-                    Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
-                    break;
-                case DB2:
-                    datasource = JSONUtils.parseObject(parameter, DB2ServerDataSource.class);
-                    Class.forName(Constants.COM_DB2_JDBC_DRIVER);
-                    break;
-                case PRESTO:
-                    datasource = JSONUtils.parseObject(parameter, PrestoDataSource.class);
-                    Class.forName(Constants.COM_PRESTO_JDBC_DRIVER);
-                    break;
-                default:
-                    break;
-            }
-
-            if (datasource != null) {
-                connection = DriverManager.getConnection(datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        return connection;
-    }
-
-    /**
      * check connection
      *
      * @param type      data source type
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
-    public boolean checkConnection(DbType type, String parameter) {
-        Boolean isConnection = false;
-        Connection con = getConnection(type, parameter);
-        if (con != null) {
-            isConnection = true;
-            try {
-                con.close();
-            } catch (SQLException e) {
-                logger.error("close connection fail at DataSourceService::checkConnection()", e);
-            }
+    public Result<Object> checkConnection(DbType type, String parameter) {
+        Result<Object> result = new Result<>();
+        BaseDataSource datasource = DataSourceFactory.getDatasource(type, parameter);
+        if (datasource == null) {
+            putMsg(result, Status.DATASOURCE_TYPE_NOT_EXIST, type);
+            return result;
         }
-        return isConnection;
+        try (Connection connection = datasource.getConnection()) {
+            if (connection == null) {
+                putMsg(result, Status.CONNECTION_TEST_FAILURE);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
+            return result;
+        } catch (Exception e) {
+            logger.error("datasource test connection error, dbType:{}, jdbcUrl:{}, message:{}.", type, datasource.getJdbcUrl(), e.getMessage());
+            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(),e.getMessage());
+        }
     }
 
     /**
@@ -471,13 +399,14 @@ public class DataSourceService extends BaseService {
      * @param id datasource id
      * @return connect result code
      */
-    public boolean connectionTest(int id) {
+    public Result<Object> connectionTest(int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
-        if (dataSource != null) {
-            return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
-        } else {
-            return false;
+        if (dataSource == null) {
+            Result<Object> result = new Result<>();
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
         }
+        return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
     }
 
     /**
@@ -510,8 +439,8 @@ public class DataSourceService extends BaseService {
             parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         }
 
-        if (CommonUtils.getKerberosStartupState() &&
-                (type == DbType.HIVE || type == DbType.SPARK)) {
+        if (CommonUtils.getKerberosStartupState()
+                && (type == DbType.HIVE || type == DbType.SPARK)) {
             jdbcUrl += ";principal=" + principal;
         }
 
@@ -535,8 +464,8 @@ public class DataSourceService extends BaseService {
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
         parameterMap.put(Constants.PASSWORD, CommonUtils.encodePassword(password));
-        if (CommonUtils.getKerberosStartupState() &&
-                (type == DbType.HIVE || type == DbType.SPARK)) {
+        if (CommonUtils.getKerberosStartupState()
+                && (type == DbType.HIVE || type == DbType.SPARK)) {
             parameterMap.put(Constants.PRINCIPAL, principal);
         }
 
@@ -556,7 +485,6 @@ public class DataSourceService extends BaseService {
             logger.info("parameters map:{}", JSONUtils.toJsonString(parameterMap));
         }
         return JSONUtils.toJsonString(parameterMap);
-
 
     }
 
@@ -609,8 +537,8 @@ public class DataSourceService extends BaseService {
      * @return delete result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public Result delete(User loginUser, int datasourceId) {
-        Result result = new Result();
+    public Result<Object> delete(User loginUser, int datasourceId) {
+        Result<Object> result = new Result<>();
         try {
             //query datasource by id
             DataSource dataSource = dataSourceMapper.selectById(datasourceId);
@@ -673,7 +601,6 @@ public class DataSourceService extends BaseService {
         return result;
     }
 
-
     /**
      * authorized datasource
      *
@@ -694,7 +621,6 @@ public class DataSourceService extends BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 
     /**
      * get host and port by address
