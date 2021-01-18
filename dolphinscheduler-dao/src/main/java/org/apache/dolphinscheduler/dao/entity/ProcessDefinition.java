@@ -81,6 +81,7 @@ public class ProcessDefinition {
 
     /**
      * definition json string
+     * TODO: delete
      */
     private String processDefinitionJson;
 
