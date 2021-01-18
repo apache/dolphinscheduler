@@ -22,7 +22,7 @@ public class MainTest {
         Host host = new Host("127.0.0.1", 12636);
 
         IRpcClient rpcClient = new RpcClient();
-        IUserService userService = rpcClient.create(UserService.class, host);
+        UserService userService = rpcClient.create(UserService.class, host);
         boolean result = userService.say("calvin");
         System.out.println("异步回掉成功" + result);
 
