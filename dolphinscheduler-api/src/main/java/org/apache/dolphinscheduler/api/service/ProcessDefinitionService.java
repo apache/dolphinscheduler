@@ -846,7 +846,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         //create process definition
         Integer processDefinitionId =
-                Objects.isNull(createProcessResult.get(PROCESSDEFINITIONID)) ? null : Integer.parseInt(createProcessResult.get(PROCESSDEFINITIONID).toString());
+                Objects.isNull(createProcessResult.get(Constants.DATA_LIST)) ? null : Integer.parseInt(createProcessResult.get(Constants.DATA_LIST).toString());
 
         //scheduler param
         return getImportProcessScheduleResult(loginUser,
