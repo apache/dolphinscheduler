@@ -295,7 +295,7 @@
       _downline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 0
+          releaseState: 'OFFLINE'
         })
       },
       /**
@@ -304,7 +304,7 @@
       _poponline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 1
+          releaseState: 'ONLINE'
         })
       },
       /**
