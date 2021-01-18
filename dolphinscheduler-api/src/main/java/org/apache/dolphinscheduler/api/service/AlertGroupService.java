@@ -75,7 +75,7 @@ public class AlertGroupService extends BaseService{
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -83,7 +83,7 @@ public class AlertGroupService extends BaseService{
         IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
                 page, searchVal);
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int)alertGroupIPage.getTotal());
+        pageInfo.setTotalCount((int) alertGroupIPage.getTotal());
         pageInfo.setLists(alertGroupIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -103,7 +103,7 @@ public class AlertGroupService extends BaseService{
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, AlertType groupType, String desc) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (checkAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -140,7 +140,7 @@ public class AlertGroupService extends BaseService{
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, AlertType groupType, String desc) {
         Map<String, Object> result = new HashMap<>();
 
-        if (checkAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -183,7 +183,7 @@ public class AlertGroupService extends BaseService{
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (checkAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         //check exist
@@ -213,7 +213,7 @@ public class AlertGroupService extends BaseService{
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (checkAdmin(loginUser, result)){
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
