@@ -17,37 +17,34 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
+import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.Locale;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 public class LocaleChangeInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        Cookie cookie = BaseService.getCookie(request, Constants.LOCALE_LANGUAGE);
+        if (cookie != null) {
+            // Proceed in cookie
+            return true;
+        }
+        // Proceed in header
         String newLocale = request.getHeader(Constants.LOCALE_LANGUAGE);
         if (newLocale != null) {
-            LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-            if (localeResolver == null) {
-                throw new IllegalStateException("No LocaleResolver found: not in a DispatcherServlet request?");
-            }
-            try {
-                localeResolver.setLocale(request, response, parseLocaleValue(newLocale));
-            }
-            catch (IllegalArgumentException ex) {
-                throw ex;
-            }
+            LocaleContextHolder.setLocale(parseLocaleValue(newLocale));
         }
-        // Proceed in any case.
         return true;
     }
 

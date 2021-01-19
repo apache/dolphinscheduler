@@ -42,7 +42,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String REGISTER_PATH_PATTERN = "/users/register";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
-    public static final int COOKIE_MAX_AGE = 3600;
 
     @Bean
     public CorsFilter corsFilter() {
@@ -70,8 +69,8 @@ public class AppConfiguration implements WebMvcConfigurer {
         localeResolver.setCookieName(LOCALE_LANGUAGE_COOKIE);
         // set default locale
         localeResolver.setDefaultLocale(Locale.US);
-        // set cookie max age
-        localeResolver.setCookieMaxAge(COOKIE_MAX_AGE);
+        // set language tag compliant
+        localeResolver.setLanguageTagCompliant(false);
         return localeResolver;
     }
 
