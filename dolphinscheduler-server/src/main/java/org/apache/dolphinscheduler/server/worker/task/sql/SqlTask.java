@@ -182,7 +182,9 @@ public class SqlTask extends AbstractTask {
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
-
+        //Replace the original value in sql ！{...} ，Does not participate in precompilation
+        String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
+        sql = replaceOriginalValue(sql,rgexo,paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
         String formatSql = sql.replaceAll(rgex, "?");
         sqlBuilder.append(formatSql);
@@ -190,6 +192,24 @@ public class SqlTask extends AbstractTask {
         // print repalce sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
+    }
+    public  String replaceOriginalValue(String content, String rgex, Map<String,Property> sqlParamsMap){
+        Pattern pattern = Pattern.compile(rgex);
+        // Matcher m = pattern.matcher(content);
+        String s="";
+        while (true) {
+            Matcher m = pattern.matcher(content);
+            if(m.find()){
+                break;
+            }
+            String paramName = m.group(1);
+            String paramValue = sqlParamsMap.get(paramName).getValue();
+            System.out.println(paramValue);
+            content = m.replaceFirst(paramValue);
+
+            //content=content.replaceAll(rgex,paramValue);
+        }
+        return content;
     }
 
     @Override
