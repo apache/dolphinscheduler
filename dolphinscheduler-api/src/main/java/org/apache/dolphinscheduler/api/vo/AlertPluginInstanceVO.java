@@ -19,17 +19,10 @@ package org.apache.dolphinscheduler.api.vo;
 
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-
 /**
- * @author jiangli
- * @date 2021-01-13 17:01
+ * AlertPluginInstanceVO
  */
 public class AlertPluginInstanceVO {
-
-
 
     /**
      * id

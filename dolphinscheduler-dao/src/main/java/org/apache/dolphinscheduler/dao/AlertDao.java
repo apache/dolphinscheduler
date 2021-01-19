@@ -102,8 +102,8 @@ public class AlertDao extends AbstractBaseDao {
         Alert alert = new Alert();
         List<ServerAlertContent> serverAlertContents = new ArrayList<>(1);
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
-            type(serverType).host(host).event(AlertEvent.SERVER_DOWN).warningLevel(AlertWarnLevel.SERIOUS).
-            build();
+                type(serverType).host(host).event(AlertEvent.SERVER_DOWN).warningLevel(AlertWarnLevel.SERIOUS).
+                build();
         serverAlertContents.add(serverStopAlertContent);
         String content = JSONUtils.toJsonString(serverAlertContents);
         alert.setTitle("Fault tolerance warning");
@@ -121,11 +121,11 @@ public class AlertDao extends AbstractBaseDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-            .processId(processInstance.getId())
-            .processName(processInstance.getName())
-            .event(AlertEvent.TIME_OUT)
-            .warningLevel(AlertWarnLevel.MIDDLE)
-            .build();
+                .processId(processInstance.getId())
+                .processName(processInstance.getName())
+                .event(AlertEvent.TIME_OUT)
+                .warningLevel(AlertWarnLevel.MIDDLE)
+                .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Process Timeout Warn");
@@ -154,13 +154,13 @@ public class AlertDao extends AbstractBaseDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-            .processId(processInstanceId)
-            .processName(processInstanceName)
-            .taskId(taskId)
-            .taskName(taskName)
-            .event(AlertEvent.TIME_OUT)
-            .warningLevel(AlertWarnLevel.MIDDLE)
-            .build();
+                .processId(processInstanceId)
+                .processName(processInstanceName)
+                .taskId(taskId)
+                .taskName(taskName)
+                .event(AlertEvent.TIME_OUT)
+                .warningLevel(AlertWarnLevel.MIDDLE)
+                .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
@@ -196,8 +196,8 @@ public class AlertDao extends AbstractBaseDao {
         if (StringUtils.isNotBlank(alertInstanceIdsParam)) {
             String[] idsArray = alertInstanceIdsParam.split(",");
             List<Integer> ids = Arrays.stream(idsArray)
-                .map(s->Integer.parseInt(s.trim()))
-                .collect(Collectors.toList());
+                    .map(s -> Integer.parseInt(s.trim()))
+                    .collect(Collectors.toList());
             return alertPluginInstanceMapper.queryByIds(ids);
         }
         return null;

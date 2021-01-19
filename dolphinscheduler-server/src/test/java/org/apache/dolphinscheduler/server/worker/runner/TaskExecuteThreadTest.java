@@ -32,9 +32,10 @@ import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -118,9 +119,7 @@ public class TaskExecuteThreadTest {
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getSystemEnvPath()).thenReturn("/user_home/.bash_profile");
 
-        List<String> osUserList = new ArrayList<String>() {{
-            add("test");
-        }};
+        List<String> osUserList = Collections.singletonList("test");
         PowerMockito.mockStatic(OSUtils.class);
         PowerMockito.when(OSUtils.getUserList()).thenReturn(osUserList);
     }

@@ -78,7 +78,7 @@ public class PluginParams {
         if (null == builder.props) {
             builder.props = new ParamsProps();
         }
-        this.fieldName=builder.title;
+        this.fieldName = builder.title;
         this.props = builder.props;
         this.value = builder.value;
         this.validateList = builder.validateList;

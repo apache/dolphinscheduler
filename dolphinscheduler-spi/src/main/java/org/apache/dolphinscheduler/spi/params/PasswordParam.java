@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.spi.params;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.PropsType;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
 import java.util.ArrayList;
