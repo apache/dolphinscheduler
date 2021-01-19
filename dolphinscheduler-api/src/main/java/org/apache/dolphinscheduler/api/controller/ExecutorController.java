@@ -119,21 +119,25 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                       @RequestParam(value = "timeout", required = false) Integer timeout) throws ParseException {
-        logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
+                                       @RequestParam(value = "timeout", required = false) Integer timeout,
+                                       @RequestParam(value = "startParams", required = false) String startParams) throws ParseException {
+        logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {},  "
                 + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                + "notify group id: {}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
+                + "notify group id: {}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}, startParams: {} ",
             loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
             failureStrategy, startNodeList, taskDependType, warningType, workerGroup, runMode, processInstancePriority,
-            workerGroup, timeout);
+            workerGroup, timeout, startParams);
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
-
+        Map<String, String> startParamMap = null;
+        if (startParams != null) {
+            startParamMap = JSONUtils.toMap(startParams);
+        }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
             startNodeList, taskDependType, warningType,
-            warningGroupId, runMode, processInstancePriority, workerGroup, timeout);
+            warningGroupId, runMode, processInstancePriority, workerGroup, timeout,startParamsMap);
         return returnDataList(result);
     }
 

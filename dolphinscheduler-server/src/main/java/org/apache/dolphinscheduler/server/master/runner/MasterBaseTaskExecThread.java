@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -97,8 +98,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * constructor of MasterBaseTaskExecThread
-     *
-     * @param taskInstance task instance
+     * @param taskInstance      task instance
      */
     public MasterBaseTaskExecThread(TaskInstance taskInstance) {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
@@ -125,7 +125,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
 
-        if (taskTimeoutParameter.getEnable()) {
+        if(taskTimeoutParameter.getEnable()){
             checkTimeoutFlag = true;
         }
     }
@@ -224,7 +224,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     taskInstance.getId(),
                     org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
             taskUpdateQueue.put(taskPriority);
-            logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
+            logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
             return true;
         } catch (Exception e) {
             logger.error("submit task  Exception: ", e);
@@ -275,25 +275,27 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * alert time out
+     * @return
      */
-    protected boolean alertTimeout() {
-        if (TaskTimeoutStrategy.FAILED == this.taskTimeoutParameter.getStrategy()) {
+    protected boolean alertTimeout(){
+        if( TaskTimeoutStrategy.FAILED == this.taskTimeoutParameter.getStrategy()){
             return true;
         }
         logger.warn("process id:{} process name:{} task id: {},name:{} execution time out",
                 processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
         // send warn mail
         ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
-        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(), processInstance.getName(),
-                taskInstance.getId(), taskInstance.getName());
+        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
+                processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
+                taskInstance.getId(),taskInstance.getName());
         return true;
     }
 
     /**
      * handle time out for time out strategy warn&&failed
      */
-    protected void handleTimeoutFailed() {
-        if (TaskTimeoutStrategy.WARN == this.taskTimeoutParameter.getStrategy()) {
+    protected void handleTimeoutFailed(){
+        if(TaskTimeoutStrategy.WARN == this.taskTimeoutParameter.getStrategy()){
             return;
         }
         logger.info("process id:{} name:{} task id:{} name:{} cancel because of timeout.",
@@ -303,9 +305,10 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * check task remain time valid
+     * @return
      */
-    protected boolean checkTaskTimeout() {
-        if (!checkTimeoutFlag || taskInstance.getStartTime() == null) {
+    protected boolean checkTaskTimeout(){
+        if (!checkTimeoutFlag || taskInstance.getStartTime() == null){
             return false;
         }
         long remainTime = getRemainTime(taskTimeoutParameter.getInterval() * 60L);

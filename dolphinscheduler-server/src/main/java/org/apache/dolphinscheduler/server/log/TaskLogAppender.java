@@ -27,11 +27,11 @@ import ch.qos.logback.core.FileAppender;
 /**
  * Task log appender
  */
-public class TaskLogAppender extends FileAppender<ILoggingEvent> {
+public class TaskLogAppender extends FileAppender<ILoggingEvent>{
     @Override
     protected void append(ILoggingEvent event) {
         Marker marker = event.getMarker();
-        if (marker != null) {
+        if (marker !=null) {
             if (marker.equals(FINALIZE_SESSION_MARKER)) {
                 stop();
             }

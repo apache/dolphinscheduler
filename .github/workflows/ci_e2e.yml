@@ -30,12 +30,10 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
-      - name: checkout submodules
-        shell: bash
-        run: |
-          git submodule sync --recursive
-          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with:
+          submodule: true
+      - name: Check License Header
+        uses: apache/skywalking-eyes@9bd5feb
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository

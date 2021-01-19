@@ -79,7 +79,7 @@ public class AlertGroupService extends BaseService {
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -107,7 +107,7 @@ public class AlertGroupService extends BaseService {
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -145,7 +145,7 @@ public class AlertGroupService extends BaseService {
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -185,7 +185,7 @@ public class AlertGroupService extends BaseService {
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         //check exist

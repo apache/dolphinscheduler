@@ -43,8 +43,6 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
     private PropertyUtils() {
         init();
     }
@@ -108,7 +106,7 @@ public class PropertyUtils {
     /**
      * get int value
      *
-     * @param key          the key
+     * @param key the key
      * @param defaultValue the default value
      * @return the value related the key or the default value if the key not existed
      */
@@ -159,7 +157,7 @@ public class PropertyUtils {
     /**
      * get long value
      *
-     * @param key        the key
+     * @param key the key
      * @param defaultVal the default value
      * @return the value related the key or the default value if the key not existed
      */
@@ -186,14 +184,13 @@ public class PropertyUtils {
      * @return if the value not existed, return -1.0, or will return the related value
      */
     public static double getDouble(String key) {
-        String val = getString(key);
         return getDouble(key, -1.0);
     }
 
     /**
      * get double value
      *
-     * @param key        the key
+     * @param key the key
      * @param defaultVal the default value
      * @return the value related the key or the default value if the key not existed
      */
@@ -216,7 +213,7 @@ public class PropertyUtils {
     /**
      * get array
      *
-     * @param key      property name
+     * @param key property name
      * @param splitStr separator
      * @return the result array
      */
@@ -236,10 +233,10 @@ public class PropertyUtils {
     /**
      * get enum
      *
-     * @param key          the key
-     * @param type         the class type
+     * @param key the key
+     * @param type the class type
      * @param defaultValue the default value
-     * @param <T>          the generic class type
+     * @param <T> the generic class type
      * @return get enum value
      */
     public static <T extends Enum<T>> T getEnum(String key, Class<T> type,

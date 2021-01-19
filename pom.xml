@@ -95,10 +95,8 @@
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
-        <jsp-2.1.version>6.1.14</jsp-2.1.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
-        <apache.rat.version>0.13</apache.rat.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -355,6 +353,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -919,7 +918,6 @@
                         <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
-                        <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
@@ -1022,53 +1020,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache.rat.version}</version>
-                <configuration>
-                    <excludeSubProjects>false</excludeSubProjects>
-                    <addDefaultLicenseMatchers>false</addDefaultLicenseMatchers>
-                    <licenses>
-                        <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
-                            <licenseFamilyCategory>AL20</licenseFamilyCategory>
-                            <licenseFamilyName>Apache License, 2.0</licenseFamilyName>
-                            <patterns>
-                                <pattern>Licensed to the Apache Software Foundation (ASF)</pattern>
-                            </patterns>
-                        </license>
-                    </licenses>
-                    <licenseFamilies>
-                        <licenseFamily implementation="org.apache.rat.license.SimpleLicenseFamily">
-                            <familyName>Apache License, 2.0</familyName>
-                        </licenseFamily>
-                    </licenseFamilies>
-                    <excludes>
-                        <exclude>**/alert/plugin/DolphinPluginClassLoader.java</exclude>
-                        <exclude>**/alert/plugin/DolphinPluginDiscovery.java</exclude>
-                        <exclude>**/alert/plugin/DolphinPluginLoader.java</exclude>
-                        <exclude>**/node_modules/**</exclude>
-                        <exclude>**/node/**</exclude>
-                        <exclude>**/dist/**</exclude>
-                        <exclude>**/licenses/**</exclude>
-                        <exclude>.github/**</exclude>
-                        <exclude>**/sql/soft_version</exclude>
-                        <exclude>**/common/utils/ScriptRunner.java</exclude>
-                        <exclude>**/*.json</exclude>
-                        <!-- document files -->
-                        <exclude>**/*.md</exclude>
-                        <excldue>**/*.MD</excldue>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/docs/**</exclude>
-                        <exclude>**/*.babelrc</exclude>
-                        <exclude>**/*.eslint*</exclude>
-                        <exclude>**/.mvn/jvm.config</exclude>
-                        <exclude>**/.mvn/wrapper/**</exclude>
-                        <exclude>**/*.iml</exclude>
-                    </excludes>
-                    <consoleOutput>true</consoleOutput>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>${spotbugs.version}</version>
@@ -1144,7 +1095,7 @@
     </build>
 
     <modules>
-        <module>dolphinscheduler-alert-plugin</module>
+        <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>

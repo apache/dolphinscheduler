@@ -46,7 +46,7 @@ public class Constants {
 
     public static final String MESSAGE = "message";
 
-    
+
 
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 
@@ -127,7 +127,6 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
-    
 
     public static final String DINGTALK_WEBHOOK = "dingtalk.webhook";
 
@@ -144,12 +143,5 @@ public class Constants {
     public static final String DINGTALK_PASSWORD = "dingtalk.password";
 
     public static final String DINGTALK_ENABLE = "dingtalk.isEnable";
-
-
-
-    /**
-     * plugin config
-     */
-    
 
 }

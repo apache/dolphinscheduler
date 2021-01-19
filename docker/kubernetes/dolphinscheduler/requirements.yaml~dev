@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -15,10 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-echo "------ push start -------"
-printenv
-
-docker push "$DOCKER_REPO:${VERSION}"
-
-echo "------ push end -------"
+dependencies:
+- name: postgresql
+  version: 8.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
+- name: zookeeper
+  version: 5.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: redis.enabled
