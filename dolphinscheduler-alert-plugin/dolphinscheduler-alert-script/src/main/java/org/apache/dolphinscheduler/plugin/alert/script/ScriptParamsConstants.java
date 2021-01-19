@@ -22,15 +22,15 @@ package org.apache.dolphinscheduler.plugin.alert.script;
  */
 public class ScriptParamsConstants {
 
-    static final String SCRIPT_TYPE = "script.type";
+    static final String SCRIPT_TYPE = "type";
 
-    static final String NAME_SCRIPT_TYPE = "scriptType";
+    static final String NAME_SCRIPT_TYPE = "type";
 
-    static final String SCRIPT_PATH = "script.path";
+    static final String SCRIPT_PATH = "path";
 
-    static final String NAME_SCRIPT_PATH = "scriptPath";
+    static final String NAME_SCRIPT_PATH = "path";
 
-    static final String SCRIPT_USER_PARAMS = "script.user.params";
+    static final String SCRIPT_USER_PARAMS = "user.params";
 
-    static final String NAME_SCRIPT_USER_PARAMS = "scriptUserParams";
+    static final String NAME_SCRIPT_USER_PARAMS = "userParams";
 }

@@ -35,7 +35,7 @@ import java.util.List;
 public class DingTalkAlertChannelFactory implements AlertChannelFactory {
     @Override
     public String getName() {
-        return "ding talk alert";
+        return "DingTalk";
     }
 
     @Override

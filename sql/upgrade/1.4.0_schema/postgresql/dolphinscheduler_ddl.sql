@@ -34,7 +34,6 @@ CREATE TABLE t_ds_alert_plugin_instance (
                                             plugin_instance_params text NULL,
                                             create_time            timestamp NULL,
                                             update_time            timestamp NULL,
-                                            alert_group_id         int4   NOT NULL,
                                             instance_name          varchar(200) NULL,
                                             CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
@@ -46,7 +45,9 @@ ALTER TABLE t_ds_process_definition_version
     ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
 
 ALTER TABLE t_ds_alertgroup
-    ADD COLUMN `create_user_id` int4 DEFAULT NULL COMMENT 'create user id' AFTER `id`;
+    ADD COLUMN `alert_instance_ids` int4 DEFAULT NULL COMMENT 'alert instance ids' AFTER `id`;
+    ADD COLUMN `create_user_id` varchar(255) DEFAULT NULL COMMENT 'create user id' AFTER `alert_instance_ids`,
+
 
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
