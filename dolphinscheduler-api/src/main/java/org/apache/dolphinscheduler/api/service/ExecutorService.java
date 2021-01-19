@@ -120,8 +120,6 @@ public class ExecutorService extends BaseService {
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
-                                                   Priority processInstancePriority, String workerGroup, Integer timeout) throws ParseException {
-                                                   RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout,
                                                    Map<String, String> startParams) throws ParseException {
         Map<String, Object> result = new HashMap<>();

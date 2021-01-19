@@ -232,7 +232,7 @@ public class AlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
-        String content = getContentProcessInstance(processInstance, taskInstances);
+        String content = getContentProcessInstance(processInstance, taskInstances,projectUser);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
