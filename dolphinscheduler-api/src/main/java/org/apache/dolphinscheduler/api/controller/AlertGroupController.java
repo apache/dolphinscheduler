@@ -70,16 +70,16 @@ public class AlertGroupController extends BaseController {
     /**
      * create alert group
      *
-     * @param loginUser   login user
-     * @param groupName   group name
+     * @param loginUser login user
+     * @param groupName group name
      * @param description description
      * @return create result code
      */
     @ApiOperation(value = "createAlertgroup", notes = "CREATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", dataType = "String")
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
+            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -88,10 +88,10 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        String userName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("loginUser user {}, create alertgroup, groupName: {}, desc: {}",
-            userName, groupName, description);
-        Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description,alertInstanceIds);
+                userReplace, groupName, description);
+        Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -107,7 +107,7 @@ public class AlertGroupController extends BaseController {
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login  user {}, query all alertGroup",
-            loginUser.getUserName());
+                loginUser.getUserName());
         HashMap<String, Object> result = alertGroupService.queryAlertgroup();
         return returnDataList(result);
     }
@@ -116,16 +116,16 @@ public class AlertGroupController extends BaseController {
      * paging query alarm group list
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return alert group list page
      */
     @ApiOperation(value = "queryAlertGroupListPaging", notes = "QUERY_ALERT_GROUP_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -135,7 +135,7 @@ public class AlertGroupController extends BaseController {
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
         logger.info("login  user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
-            loginUser.getUserName(), pageNo, searchVal, pageSize);
+                loginUser.getUserName(), pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -149,18 +149,18 @@ public class AlertGroupController extends BaseController {
     /**
      * updateProcessInstance alert group
      *
-     * @param loginUser   login user
-     * @param id          alert group id
-     * @param groupName   group name
+     * @param loginUser login user
+     * @param id alert group id
+     * @param groupName group name
      * @param description description
      * @return update result code
      */
     @ApiOperation(value = "updateAlertgroup", notes = "UPDATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
-        @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-        @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", dataType = "String")
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
+            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -170,10 +170,10 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        String userName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login  user {}, updateProcessInstance alertgroup, groupName: {},  desc: {}",
-            userName, groupName, description);
-        Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description,alertInstanceIds);
+                userReplace, groupName, description);
+        Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -181,12 +181,12 @@ public class AlertGroupController extends BaseController {
      * delete alert group by id
      *
      * @param loginUser login user
-     * @param id        alert group id
+     * @param id alert group id
      * @return delete result code
      */
     @ApiOperation(value = "delAlertgroupById", notes = "DELETE_ALERT_GROUP_BY_ID_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -208,7 +208,7 @@ public class AlertGroupController extends BaseController {
      */
     @ApiOperation(value = "verifyGroupName", notes = "VERIFY_ALERT_GROUP_NAME_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
     })
     @GetMapping(value = "/verify-group-name")
     @ResponseStatus(HttpStatus.OK)
