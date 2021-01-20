@@ -174,6 +174,8 @@ public class AlertGroupController extends BaseController {
         String replaceGroupName = StringUtils.replaceNRTtoUnderline(groupName);
         String replaceDescription = StringUtils.replaceNRTtoUnderline(description);
         logger.info("login user:{}, updateProcessInstance alert group, groupName: {},  desc: {}", userReplace, replaceGroupName, replaceDescription);
+
+        logger.info("updateProcessInstance alert group, groupName: {},  desc: {}", replaceGroupName, replaceDescription);
         Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }

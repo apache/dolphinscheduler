@@ -88,9 +88,8 @@ public class AlertPluginInstanceController extends BaseController {
                                             @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        logger.info("login user {},create alert plugin instance, instanceName:{} ",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                StringUtils.replaceNRTtoUnderline(instanceName));
+        String replaceInstanceName = StringUtils.replaceNRTtoUnderline(instanceName);
+        logger.info("create alert plugin instance, instanceName:{} ", replaceInstanceName);
         Map<String, Object> result = alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
