@@ -94,7 +94,7 @@ public class ProcessDefinitionControllerTest {
         String connects = "[]";
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId", 1);
+        result.put(Constants.DATA_LIST, 1);
 
         Mockito.when(processDefinitionService.createProcessDefinition(user, projectName, name, json,
                 description, locations, connects)).thenReturn(result);
