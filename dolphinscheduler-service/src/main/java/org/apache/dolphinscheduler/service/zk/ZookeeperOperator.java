@@ -91,7 +91,8 @@ public class ZookeeperOperator implements InitializingBean {
     private CuratorFramework buildClient() {
         logger.info("zookeeper registry center init, server lists is: {}.", zookeeperConfig.getServerList());
 
-        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(), "zookeeper quorum can't be null")))
+        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(),
+                "zookeeper quorum can't be null")))
                 .retryPolicy(new ExponentialBackoffRetry(zookeeperConfig.getBaseSleepTimeMs(), zookeeperConfig.getMaxRetries(), zookeeperConfig.getMaxSleepMs()));
 
         //these has default value

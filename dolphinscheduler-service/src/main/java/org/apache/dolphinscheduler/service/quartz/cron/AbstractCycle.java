@@ -78,7 +78,6 @@ public abstract class AbstractCycle {
                 || minFieldExpression instanceof On);
     }
 
-
     /**
      * whether the minute field has a value of every or always
      *
@@ -121,7 +120,6 @@ public abstract class AbstractCycle {
                 || dayOfMonthField.getExpression() instanceof Between || dayOfMonthField.getExpression() instanceof And
                 || dayOfMonthField.getExpression() instanceof On);
     }
-
 
     /**
      * whether the day Of Month field has a value of every or always
