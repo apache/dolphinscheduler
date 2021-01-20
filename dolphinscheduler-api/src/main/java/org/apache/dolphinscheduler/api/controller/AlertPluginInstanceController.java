@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -87,7 +88,9 @@ public class AlertPluginInstanceController extends BaseController {
                                             @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        logger.info("create alert plugin instance, instanceName:{} ", instanceName);
+        logger.info("login user {},create alert plugin instance, instanceName:{} ",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(instanceName));
         Map<String, Object> result = alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
@@ -114,7 +117,7 @@ public class AlertPluginInstanceController extends BaseController {
                                             @RequestParam(value = "alertPluginInstanceId") int alertPluginInstanceId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        logger.info("update alert plugin instance id {}", alertPluginInstanceId);
+        logger.info("login user {},update alert plugin instance id {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), alertPluginInstanceId);
         Map<String, Object> result = alertPluginInstanceService.update(loginUser, alertPluginInstanceId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
@@ -135,7 +138,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ApiException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result deleteAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "id") int id) {
-        logger.info("delete alert plugin instance id {}", id);
+        logger.info("login user {},delete alert plugin instance id {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
 
         Map<String, Object> result = alertPluginInstanceService.delete(loginUser, id);
         return returnDataList(result);
@@ -154,7 +157,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ApiException(GET_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result getAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "id") int id) {
-        logger.info("get alert plugin instance, id {}", id);
+        logger.info("login user {},get alert plugin instance, id {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
         Map<String, Object> result = alertPluginInstanceService.get(loginUser, id);
         return returnDataList(result);
     }
@@ -170,7 +173,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result getAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info(" query all alert plugin instance");
+        logger.info("login user {}, query all alert plugin instance", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
         Map<String, Object> result = alertPluginInstanceService.queryAll();
         return returnDataList(result);
     }
@@ -190,7 +193,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "alertInstanceName") String alertInstanceName) {
-        logger.info("verify alert instance name: {}", alertInstanceName);
+        logger.info("login user {},verify alert instance name: {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(alertInstanceName));
 
         boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(alertInstanceName);
         Result result = new Result();
@@ -224,7 +227,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
-        logger.info(" list paging, pageNo: {}, pageSize: {}", pageNo, pageSize);
+        logger.info("login user {}, list paging, pageNo: {}, pageSize: {}",StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), pageNo, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
