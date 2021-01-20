@@ -101,7 +101,7 @@ javax.servlet-api-3.1.0.jar
 javolution-5.5.1.jar
 jaxb-api-2.3.1.jar
 jaxb-impl-2.2.3-1.jar
-jboss-logging-3.3.2.Final.jar
+jboss-logging-3.3.3.Final.jar
 jdo-api-3.0.1.jar
 jersey-client-1.9.jar
 jersey-core-1.9.jar
