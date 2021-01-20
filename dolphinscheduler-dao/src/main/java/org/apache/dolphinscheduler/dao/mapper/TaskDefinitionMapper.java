@@ -100,12 +100,4 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     @MapKey("id")
     List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
-
-    /**
-     * switch task definition version by task definition code
-     *
-     * @param taskDefinitionCode task definition code
-     * @param version version
-     */
-    void switchVersionByCode(@Param("taskDefinitionCode") long taskDefinitionCode, @Param("version") int version);
 }

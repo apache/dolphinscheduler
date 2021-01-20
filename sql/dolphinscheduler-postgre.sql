@@ -337,8 +337,6 @@ CREATE TABLE t_ds_process_definition_log (
   CONSTRAINT process_definition_unique UNIQUE (name, project_id)
 ) ;
 
-create index process_definition_index on t_ds_process_definition_log (project_code,id);
-
 DROP TABLE IF EXISTS t_ds_task_definition;
 CREATE TABLE t_ds_task_definition (
   id int NOT NULL  ,
@@ -394,8 +392,6 @@ CREATE TABLE t_ds_task_definition_log (
   PRIMARY KEY (id),
   CONSTRAINT task_definition_unique UNIQUE (name, project_id)
 ) ;
-
-create index task_definition_index on t_ds_task_definition_log (project_code,id);
 
 DROP TABLE IF EXISTS t_ds_process_task_relation;
 CREATE TABLE t_ds_process_task_relation (
