@@ -84,7 +84,6 @@
               <el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
