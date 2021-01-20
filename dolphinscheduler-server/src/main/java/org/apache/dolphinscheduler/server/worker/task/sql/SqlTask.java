@@ -201,19 +201,14 @@ public class SqlTask extends AbstractTask {
 
     public String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
         Pattern pattern = Pattern.compile(rgex);
-        // Matcher m = pattern.matcher(content);
-        String s = "";
         while (true) {
             Matcher m = pattern.matcher(content);
-            if (m.find()) {
+            if (!m.find()) {
                 break;
             }
             String paramName = m.group(1);
             String paramValue = sqlParamsMap.get(paramName).getValue();
-            System.out.println(paramValue);
             content = m.replaceFirst(paramValue);
-
-            //content=content.replaceAll(rgex,paramValue);
         }
         return content;
     }
