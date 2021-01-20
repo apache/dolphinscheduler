@@ -15,7 +15,7 @@ public class MainTest {
     public static void main(String[] args) throws Exception {
 
 
-        NettyServer nettyServer = new NettyServer(new NettyServerConfig());
+       // NettyServer nettyServer = new NettyServer(new NettyServerConfig());
 
         // NettyClient nettyClient=new NettyClient(new NettyClientConfig());
 
