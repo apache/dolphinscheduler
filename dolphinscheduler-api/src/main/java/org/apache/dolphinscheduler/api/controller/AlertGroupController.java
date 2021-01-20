@@ -88,10 +88,12 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        logger.info("loginUser user {}, create alert group, groupName: {}, desc: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                StringUtils.replaceNRTtoUnderline(groupName),
-                StringUtils.replaceNRTtoUnderline(description));
+        String strUserName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String strGroupName = StringUtils.replaceNRTtoUnderline(groupName);
+        String strDescription = StringUtils.replaceNRTtoUnderline(description);
+        String strAlertInstanceIds = StringUtils.replaceNRTtoUnderline(alertInstanceIds);
+        logger.info("loginUser user {}, create alert group, groupName: {}, desc: {},alertInstanceIds:{}",
+                strUserName, strGroupName, strDescription, strAlertInstanceIds);
         Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
