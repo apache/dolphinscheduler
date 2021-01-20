@@ -674,7 +674,5 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': 'The workflow canvas is abnormal and cannot be saved, please recreate',
   Info: 'Info',
   'Datasource userName': 'owner',
-  'Resource userName': 'owner',
-  receivers: 'receivers',
-  receiverCcs: 'receiverCcs'
+  'Resource userName': 'owner'
 }

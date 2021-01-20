@@ -673,7 +673,5 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建',
   Info: '提示',
   'Datasource userName': '所属用户',
-  'Resource userName': '所属用户',
-  receivers: '收件人',
-  receiverCcs: '抄送人'
+  'Resource userName': '所属用户'
 }
