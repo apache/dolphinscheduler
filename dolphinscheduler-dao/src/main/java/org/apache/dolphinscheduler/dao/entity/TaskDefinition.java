@@ -151,6 +151,11 @@ public class TaskDefinition {
     private int timeout;
 
     /**
+     * resource ids
+     */
+    private String resourceIds;
+
+    /**
      * create time
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -355,5 +360,13 @@ public class TaskDefinition {
 
     public void setTimeoutFlag(TimeoutFlag timeoutFlag) {
         this.timeoutFlag = timeoutFlag;
+    }
+
+    public String getResourceIds() {
+        return resourceIds;
+    }
+
+    public void setResourceIds(String resourceIds) {
+        this.resourceIds = resourceIds;
     }
 }

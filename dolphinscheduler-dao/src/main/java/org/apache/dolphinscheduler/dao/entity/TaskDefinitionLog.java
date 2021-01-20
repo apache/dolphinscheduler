@@ -150,6 +150,11 @@ public class TaskDefinitionLog {
     private int timeout;
 
     /**
+     * resource ids
+     */
+    private String resourceIds;
+
+    /**
      * operator user id
      */
     private int operator;
@@ -381,5 +386,13 @@ public class TaskDefinitionLog {
 
     public void setTimeoutFlag(TimeoutFlag timeoutFlag) {
         this.timeoutFlag = timeoutFlag;
+    }
+
+    public String getResourceIds() {
+        return resourceIds;
+    }
+
+    public void setResourceIds(String resourceIds) {
+        this.resourceIds = resourceIds;
     }
 }
