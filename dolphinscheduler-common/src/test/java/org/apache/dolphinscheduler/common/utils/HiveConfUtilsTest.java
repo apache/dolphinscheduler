@@ -15,24 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.template;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * the alert template factory
+ * hive conf utils test
  */
-public class AlertTemplateFactory {
-
-    private AlertTemplateFactory() {
-    }
+public class HiveConfUtilsTest {
 
     /**
-     * get a template from alert.properties conf file
-     *
-     * @return a template, default is DefaultHTMLTemplate
+     * test is hive conf var
      */
-    public static AlertTemplate getMessageTemplate() {
-        return new DefaultHTMLTemplate();
+    @Test
+    public void testIsHiveConfVar() {
+
+        String conf = "hive.exec.script.wrapper=123";
+        boolean hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
+        Assert.assertTrue(hiveConfVar);
+
+        conf = "hive.test.v1=v1";
+        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
+        Assert.assertFalse(hiveConfVar);
+
+        conf = "tez.queue.name=tezQueue";
+        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
+        Assert.assertTrue(hiveConfVar);
+
     }
 }

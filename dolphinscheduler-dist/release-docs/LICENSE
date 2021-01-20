@@ -479,7 +479,6 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
-    ans-UI 1.1.7: https://github.com/analysys/ans-ui MIT
     axios 0.16.2: https://github.com/axios/axios MIT
     bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
     canvg 1.5.1: https://github.com/canvg/canvg MIT
@@ -504,6 +503,7 @@ MIT licenses
 Apache 2.0 licenses
 ========================================
     echarts	4.1.0: https://github.com/apache/incubator-echarts	Apache-2.0
+    remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
 
 
 ========================================

@@ -97,7 +97,6 @@
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
-        <apache.rat.version>0.13</apache.rat.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -791,6 +790,7 @@
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/utils/KerberosHttpClientTest.java</include>
+                        <include>**/common/utils/HiveConfUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
@@ -923,49 +923,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache.rat.version}</version>
-                <configuration>
-                    <excludeSubProjects>false</excludeSubProjects>
-                    <addDefaultLicenseMatchers>false</addDefaultLicenseMatchers>
-                    <licenses>
-                        <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
-                            <licenseFamilyCategory>AL20</licenseFamilyCategory>
-                            <licenseFamilyName>Apache License, 2.0</licenseFamilyName>
-                            <patterns>
-                                <pattern>Licensed to the Apache Software Foundation (ASF)</pattern>
-                            </patterns>
-                        </license>
-                    </licenses>
-                    <licenseFamilies>
-                        <licenseFamily implementation="org.apache.rat.license.SimpleLicenseFamily">
-                            <familyName>Apache License, 2.0</familyName>
-                        </licenseFamily>
-                    </licenseFamilies>
-                    <excludes>
-                        <exclude>**/node_modules/**</exclude>
-                        <exclude>**/node/**</exclude>
-                        <exclude>**/dist/**</exclude>
-                        <exclude>**/licenses/**</exclude>
-                        <exclude>.github/**</exclude>
-                        <exclude>**/sql/soft_version</exclude>
-                        <exclude>**/common/utils/ScriptRunner.java</exclude>
-                        <exclude>**/*.json</exclude>
-                        <!-- document files -->
-                        <exclude>**/*.md</exclude>
-                        <excldue>**/*.MD</excldue>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/docs/**</exclude>
-                        <exclude>**/*.babelrc</exclude>
-                        <exclude>**/*.eslint*</exclude>
-                        <exclude>**/.mvn/jvm.config</exclude>
-                        <exclude>**/.mvn/wrapper/**</exclude>
-                    </excludes>
-                    <consoleOutput>true</consoleOutput>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
