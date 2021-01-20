@@ -28,8 +28,8 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.HashMap;
@@ -88,8 +88,9 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+        String userName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("loginUser user {}, create alertgroup, groupName: {}, desc: {}",
-            loginUser.getUserName(), groupName, description);
+            userName, groupName, description);
         Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description,alertInstanceIds);
         return returnDataList(result);
     }
@@ -169,8 +170,9 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+        String userName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login  user {}, updateProcessInstance alertgroup, groupName: {},  desc: {}",
-            loginUser.getUserName(), groupName, description);
+            userName, groupName, description);
         Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description,alertInstanceIds);
         return returnDataList(result);
     }

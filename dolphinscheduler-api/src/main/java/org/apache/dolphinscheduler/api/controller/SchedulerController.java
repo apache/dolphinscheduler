@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -113,9 +114,10 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
+        String userName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {},"
                         + "failure policy: {},processInstancePriority : {}, workGroupId:{}",
-                loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
+                userName, projectName, processDefinitionId, schedule, warningType, warningGroupId,
                 failureStrategy, processInstancePriority, workerGroup);
         Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
                 warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
@@ -158,9 +160,10 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
+        String userName = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, "
                         + "failure policy: {},processInstancePriority : {},workerGroupId:{}",
-                loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,
+                userName, projectName, id, schedule, warningType, warningGroupId, failureStrategy,
                 processInstancePriority, workerGroup);
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
