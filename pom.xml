@@ -518,13 +518,6 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- for api module -->
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jsp-2.1</artifactId>
-                <version>${jsp-2.1.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
