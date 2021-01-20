@@ -88,8 +88,9 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("loginUser user {}, create alert group, groupName: {}, desc: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                userReplace,
                 StringUtils.replaceNRTtoUnderline(groupName),
                 StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
@@ -171,8 +172,9 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login  user {}, updateProcessInstance alert group, groupName: {},  desc: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                userReplace,
                 StringUtils.replaceNRTtoUnderline(groupName),
                 StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
