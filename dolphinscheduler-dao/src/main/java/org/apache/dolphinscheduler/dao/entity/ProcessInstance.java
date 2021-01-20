@@ -47,10 +47,23 @@ public class ProcessInstance {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+
     /**
      * process definition id
+     * TODO delete
      */
     private int processDefinitionId;
+
+    /**
+     * process definition code
+     */
+    private Long processDefinitionCode;
+
+    /**
+     * process definition version
+     */
+    private int processDefinitionVersion;
+
     /**
      * process state
      */
@@ -145,6 +158,7 @@ public class ProcessInstance {
 
     /**
      * process instance json
+     * TODO delete
      */
     private String processInstanceJson;
 
@@ -607,6 +621,22 @@ public class ProcessInstance {
         this.receiversCc = receiversCc;
     }
 
+    public Long getProcessDefinitionCode() {
+        return processDefinitionCode;
+    }
+
+    public void setProcessDefinitionCode(Long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
+    }
+
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
+    }
+
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{"
@@ -685,6 +715,12 @@ public class ProcessInstance {
                 + ", receiversCc='"
                 + receiversCc
                 + '\''
+                + ", processDefinitionCode='"
+                + processDefinitionCode
+                + '\''
+                + ", processDefinitionVersion='"
+                + processDefinitionVersion
+                + '\''
                 + '}';
     }
 
@@ -706,4 +742,5 @@ public class ProcessInstance {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }
