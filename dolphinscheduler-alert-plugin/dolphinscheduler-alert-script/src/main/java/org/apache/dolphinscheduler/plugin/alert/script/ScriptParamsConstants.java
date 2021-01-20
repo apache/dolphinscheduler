@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.plugin.alert.script;
  */
 public class ScriptParamsConstants {
 
+    public ScriptParamsConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     static final String SCRIPT_TYPE = "type";
 
     static final String NAME_SCRIPT_TYPE = "type";
