@@ -88,9 +88,7 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("loginUser user {}, create alert group, groupName: {}, desc: {}",
-                userReplace,
+        logger.info("create alert group, groupName: {}, desc: {}",
                 StringUtils.replaceNRTtoUnderline(groupName),
                 StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
@@ -173,10 +171,9 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
         String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login  user {}, updateProcessInstance alert group, groupName: {},  desc: {}",
-                userReplace,
-                StringUtils.replaceNRTtoUnderline(groupName),
-                StringUtils.replaceNRTtoUnderline(description));
+        String replaceGroupName = StringUtils.replaceNRTtoUnderline(groupName);
+        String replaceDescription = StringUtils.replaceNRTtoUnderline(description);
+        logger.info("login user:{}, updateProcessInstance alert group, groupName: {},  desc: {}", userReplace, replaceGroupName, replaceDescription);
         Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
