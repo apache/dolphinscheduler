@@ -46,13 +46,13 @@ public class BaseService {
     }
 
     /**
-     * check admin
+     * isNotAdmin
      *
      * @param loginUser login user
      * @param result result code
-     * @return true if administrator, otherwise false
+     * @return true if not administrator, otherwise false
      */
-    protected boolean checkAdmin(User loginUser, Map<String, Object> result) {
+    protected boolean isNotAdmin(User loginUser, Map<String, Object> result) {
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);

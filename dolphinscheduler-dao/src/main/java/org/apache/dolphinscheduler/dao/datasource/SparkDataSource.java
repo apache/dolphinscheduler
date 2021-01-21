@@ -14,30 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+
+import java.sql.Connection;
 
 /**
  * data source of spark
  */
 public class SparkDataSource extends BaseDataSource {
 
-  /**
-   * gets the JDBC url for the data source connection
-   * @return jdbc url
-   */
-  @Override
-  public String driverClassSelector() {
-    return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
-  }
+    /**
+     * gets the JDBC url for the data source connection
+     * @return jdbc url
+     */
+    @Override
+    public String driverClassSelector() {
+        return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+    }
 
-  /**
-   * @return db type
-   */
-  @Override
-  public DbType dbTypeSelector() {
-    return DbType.SPARK;
-  }
+    /**
+     * @return db type
+     */
+    @Override
+    public DbType dbTypeSelector() {
+        return DbType.SPARK;
+    }
+
+    /**
+     * the data source test connection
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    @Override
+    public Connection getConnection() throws Exception {
+        CommonUtils.loadKerberosConf();
+        return super.getConnection();
+    }
 }
