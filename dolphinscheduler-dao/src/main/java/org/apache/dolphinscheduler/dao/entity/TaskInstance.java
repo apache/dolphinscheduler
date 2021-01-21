@@ -60,11 +60,11 @@ public class TaskInstance implements Serializable {
      * process definition id
      * TODO delete
      */
+    @TableField(exist = false)
     private int processDefinitionId;
 
     /**
      * process instance id
-     * TODO delete
      */
     private int processInstanceId;
 
@@ -93,6 +93,7 @@ public class TaskInstance implements Serializable {
      * task json
      * TODO delete
      */
+    @TableField(exist = false)
     private String taskJson;
 
     /**
