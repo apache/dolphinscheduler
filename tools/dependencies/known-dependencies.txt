@@ -23,7 +23,7 @@ commons-compress-1.4.1.jar
 commons-compiler-3.0.16.jar
 commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
-commons-beanutils-1.7.0.jar
+commons-beanutils-1.8.0-BETA.jar
 commons-dbcp-1.4.jar
 commons-email-1.5.jar
 commons-httpclient-3.0.1.jar
