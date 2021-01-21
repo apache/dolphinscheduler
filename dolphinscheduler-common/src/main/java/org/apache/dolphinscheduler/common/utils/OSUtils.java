@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.Configuration;
@@ -126,11 +128,18 @@ public class OSUtils {
    * @return load average
    */
   public static double loadAverage() {
-    double loadAverage =  hal.getProcessor().getSystemLoadAverage();
-    if (Double.isNaN(loadAverage)) {
-      return NEGATIVE_ONE;
-    }
+    double loadAverage;
+    try {
+      OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+      loadAverage = osBean.getSystemLoadAverage();
+    } catch (Exception e) {
+      logger.error("",e);
+      loadAverage =  hal.getProcessor().getSystemLoadAverage();
+      if (Double.isNaN(loadAverage)) {
+        return NEGATIVE_ONE;
+      }
 
+    }
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
     df.setRoundingMode(RoundingMode.HALF_UP);
     return Double.parseDouble(df.format(loadAverage));
