@@ -19,13 +19,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper">
     <sql id="baseSql">
-        id, name, task_type, process_definition_id, process_instance_id, task_code, task_definition_version, process_definition_code, task_json, state, submit_time,
+        id, name, task_type, process_instance_id, task_code, task_definition_version, process_definition_code, task_json, state, submit_time,
         start_time, end_time, host, execute_path, log_path, alert_flag, retry_times, pid, app_link,
         flag, retry_interval, max_retry_times, task_instance_priority, worker_group, executor_id,
         first_submit_time, delay_time, var_pool
     </sql>
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.process_definition_id, ${alias}.process_instance_id, ${alias}.task_json, ${alias}.state, ${alias}.submit_time,
+        ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.process_definition_code, ${alias}.process_instance_id, ${alias}.state, ${alias}.submit_time,
         ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.execute_path, ${alias}.log_path, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid, ${alias}.app_link,
         ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group, ${alias}.executor_id,
         ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.var_pool
@@ -120,7 +120,7 @@
         ,
         process.name as process_instance_name
         from t_ds_task_instance instance
-        left join t_ds_process_definition define on instance.process_definition_id = define.id
+        left join t_ds_process_definition define on instance.process_definition_code = define.code
         left join t_ds_process_instance process on process.id=instance.process_instance_id
         where define.project_id = #{projectId}
         <if test="startTime != null">
