@@ -180,19 +180,19 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", code=" + code +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", perm=" + perm +
-                ", defCount=" + defCount +
-                ", instRunningCount=" + instRunningCount +
-                '}';
+        return "Project{"
+                + "id=" + id
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", perm=" + perm
+                + ", defCount=" + defCount
+                + ", instRunningCount=" + instRunningCount
+                + '}';
     }
 
     @Override
