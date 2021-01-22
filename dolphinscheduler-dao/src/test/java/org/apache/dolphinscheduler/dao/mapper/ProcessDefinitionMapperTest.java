@@ -366,4 +366,12 @@ public class ProcessDefinitionMapperTest {
         ProcessDefinition processDefinition1 = processDefinitionMapper.selectById(processDefinition.getId());
         Assert.assertEquals(expectedVersion, processDefinition1.getVersion());
     }
+
+    @Test
+    public void listProjectIds(){
+        ProcessDefinition processDefinition = insertOne();
+        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
+        Assert.assertNotNull(projectIds);
+    }
+
 }
