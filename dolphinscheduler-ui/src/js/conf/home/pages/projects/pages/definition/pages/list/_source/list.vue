@@ -177,6 +177,8 @@
         timingDialog: false,
         timingData: {
           item: {},
+          receiversD: [],
+          receiversCcD: [],
           type: ''
         },
         relatedItemsDialog: false,
@@ -189,7 +191,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
 
       selectable (row, index) {
@@ -225,12 +227,29 @@
         this.startDialog = false
       },
       /**
+       * get emial
+       */
+      _getReceiver (id) {
+        return new Promise((resolve, reject) => {
+          this.getReceiver({ processDefinitionId: id }).then(res => {
+            resolve({
+              receivers: res.receivers && res.receivers.split(',') || [],
+              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
+            })
+          })
+        })
+      },
+      /**
        * timing
        */
       _timing (item) {
-        this.timingData.item = item
-        this.timingData.type = 'timing'
-        this.timingDialog = true
+        this._getReceiver(item.id).then(res => {
+          this.timingData.item = item
+          this.timingData.receiversD = res.receivers
+          this.timingData.receiversCcD = res.receiversCc
+          this.timingData.type = 'timing'
+          this.timingDialog = true
+        })
       },
       onUpdateTiming () {
         this._onUpdate()
