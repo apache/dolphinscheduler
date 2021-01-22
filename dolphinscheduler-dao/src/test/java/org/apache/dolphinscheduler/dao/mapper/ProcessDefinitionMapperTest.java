@@ -368,7 +368,7 @@ public class ProcessDefinitionMapperTest {
     }
 
     @Test
-    public void listProjectIds(){
+    public void listProjectIds() {
         ProcessDefinition processDefinition = insertOne();
         List<Integer> projectIds = processDefinitionMapper.listProjectIds();
         Assert.assertNotNull(projectIds);
