@@ -66,18 +66,17 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
         long version = this.queryMaxVersionByProcessDefinitionId(processDefinition.getId()) + 1;
 
         ProcessDefinitionVersion processDefinitionVersion = ProcessDefinitionVersion
-                .newBuilder()
-                .processDefinitionId(processDefinition.getId())
-                .version(version)
-                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
-                .description(processDefinition.getDescription())
-                .locations(processDefinition.getLocations())
-                .connects(processDefinition.getConnects())
-                .timeout(processDefinition.getTimeout())
-                .globalParams(processDefinition.getGlobalParams())
-                .createTime(processDefinition.getUpdateTime())
-                .receivers(processDefinition.getReceivers())
-                .receiversCc(processDefinition.getReceiversCc())
+            .newBuilder()
+            .processDefinitionId(processDefinition.getId())
+            .version(version)
+            .processDefinitionJson(processDefinition.getProcessDefinitionJson())
+            .description(processDefinition.getDescription())
+            .locations(processDefinition.getLocations())
+            .connects(processDefinition.getConnects())
+            .timeout(processDefinition.getTimeout())
+            .globalParams(processDefinition.getGlobalParams())
+            .createTime(processDefinition.getUpdateTime())
+            .warningGroupId(processDefinition.getWarningGroupId())
                 .resourceIds(processDefinition.getResourceIds())
                 .build();
 

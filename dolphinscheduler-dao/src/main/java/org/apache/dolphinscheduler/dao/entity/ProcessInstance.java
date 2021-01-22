@@ -228,18 +228,6 @@ public class ProcessInstance {
      * varPool string
      */
     private String varPool;
-    
-    /**
-     * receivers for api
-     */
-    @TableField(exist = false)
-    private String receivers;
-
-    /**
-     * receivers cc for api
-     */
-    @TableField(exist = false)
-    private String receiversCc;
 
     public ProcessInstance() {
 
@@ -268,7 +256,7 @@ public class ProcessInstance {
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
-    
+
     public ProcessDefinition getProcessDefinition() {
         return processDefinition;
     }
@@ -591,22 +579,6 @@ public class ProcessInstance {
         this.tenantId = tenantId;
     }
 
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
-    }
-
     @Override
     public String toString() {
         return "ProcessInstance{"
@@ -679,12 +651,6 @@ public class ProcessInstance {
                 + timeout
                 + ", tenantId="
                 + tenantId
-                + ", receivers='"
-                + receivers
-                + '\''
-                + ", receiversCc='"
-                + receiversCc
-                + '\''
                 + '}';
     }
 

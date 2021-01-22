@@ -1176,7 +1176,6 @@
         if (val !== 0) {
           this.title = ''
           this.receivers = []
-          this.receiversCc = []
         }
       },
       // Listening data source
