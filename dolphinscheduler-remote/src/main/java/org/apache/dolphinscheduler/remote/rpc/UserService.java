@@ -8,7 +8,7 @@ import org.apache.dolphinscheduler.remote.rpc.base.Rpc;
  */
 public class UserService  {
 
-    @Rpc(async = true, callback = UserCallback.class, retries = 9999)
+    @Rpc(async = true, serviceCallback = UserCallback.class, retries = 9999)
     public Boolean say(String s) {
         return true;
     }
