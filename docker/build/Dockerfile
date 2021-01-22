@@ -15,40 +15,36 @@
 # limitations under the License.
 #
 
-FROM nginx:alpine
+FROM openjdk:8-jdk-alpine
 
 ARG VERSION
 
 ENV TZ Asia/Shanghai
 ENV LANG C.UTF-8
-ENV DEBIAN_FRONTEND noninteractive
+ENV DOCKER true
 
-#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip tini kazoo.
-#If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
-#RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+# 1. install command/library/software
+# If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
+# RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirror.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk update && \
-    apk --update add --no-cache dos2unix shadow bash openrc python2 python3 sudo vim wget iputils net-tools openssh-server py-pip tini && \
-    apk add --update procps && \
-    openrc boot
+    apk add --no-cache tzdata dos2unix bash python2 python3 procps sudo shadow nginx tini postgresql-client && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    apk del tzdata && \
+    rm -rf /var/cache/apk/*
 
-#2. install jdk
-RUN apk add openjdk8
-ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
-ENV PATH $JAVA_HOME/bin:$PATH
-
-#3. add dolphinscheduler
+# 2. add dolphinscheduler
 ADD ./apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz /opt/
-RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ /opt/dolphinscheduler/
+RUN ln -s /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin /opt/dolphinscheduler
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-#4. install pg
-RUN apk add postgresql postgresql-contrib
-#5. modify nginx
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
+# 3. modify nginx
+RUN mkdir -p /var/run/nginx && \
+    echo "daemon off;" >> /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/*
 ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
-#6. add configuration and modify permissions and set soft links
+# 4. add configuration and modify permissions and set soft links
 ADD ./checkpoint.sh /root/checkpoint.sh
 ADD ./startup-init-conf.sh /root/startup-init-conf.sh
 ADD ./startup.sh /root/startup.sh
@@ -69,13 +65,10 @@ RUN chmod +x /root/checkpoint.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
     rm -rf /bin/sh && \
     ln -s /bin/bash /bin/sh && \
-    mkdir -p /tmp/xls
-
-#7. remove apk index cache and disable coredup for sudo
-RUN rm -rf /var/cache/apk/* && \
+    mkdir -p /tmp/xls && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
-#8. expose port
-EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
+# 5. expose port
+EXPOSE 8888 5678 1234 12345 50051
 
 ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]
