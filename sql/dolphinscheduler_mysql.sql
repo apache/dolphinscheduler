@@ -279,14 +279,10 @@ DROP TABLE IF EXISTS `t_ds_alert`;
 CREATE TABLE `t_ds_alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `title` varchar(64) DEFAULT NULL COMMENT 'title',
-  `show_type` tinyint(4) DEFAULT NULL COMMENT 'send email type,0:TABLE,1:TEXT',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
-  `alert_type` tinyint(4) DEFAULT NULL COMMENT '0:email,1:sms',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
   `log` text COMMENT 'log',
   `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `receivers` text COMMENT 'receivers',
-  `receivers_cc` text COMMENT 'cc',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
@@ -300,14 +296,15 @@ CREATE TABLE `t_ds_alert` (
 -- Table structure for t_ds_alertgroup
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
-CREATE TABLE `t_ds_alertgroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `group_name` varchar(255) DEFAULT NULL COMMENT 'group name',
-  `group_type` tinyint(4) DEFAULT NULL COMMENT 'Group type (message 0, SMS 1...)',
-  `description` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+CREATE TABLE `t_ds_alertgroup`(
+                                  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+                                  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
+                                  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
+                                  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
+                                  `description`    varchar(255) DEFAULT NULL,
+                                  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
+                                  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
+                                  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -406,8 +403,7 @@ CREATE TABLE `t_ds_process_definition` (
   `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
   `locations` text COMMENT 'Node location information',
   `connects` text COMMENT 'Node connection information',
-  `receivers` text COMMENT 'receivers',
-  `receivers_cc` text COMMENT 'cc',
+  `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
@@ -436,8 +432,7 @@ CREATE TABLE `t_ds_process_definition_version` (
   `global_params` text COMMENT 'global parameters',
   `locations` text COMMENT 'Node location information',
   `connects` text COMMENT 'Node connection information',
-  `receivers` text COMMENT 'receivers',
-  `receivers_cc` text COMMENT 'cc',
+  `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids',
@@ -619,27 +614,6 @@ CREATE TABLE `t_ds_relation_udfs_user` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of t_ds_relation_udfs_user
--- ----------------------------
-
--- ----------------------------
--- Table structure for t_ds_relation_user_alertgroup
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_relation_user_alertgroup`;
-CREATE TABLE `t_ds_relation_user_alertgroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `user_id` int(11) DEFAULT NULL COMMENT 'user id',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of t_ds_relation_user_alertgroup
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_resources
@@ -830,20 +804,51 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT INTO `t_ds_version` VALUES ('1', '1.3.0');
+INSERT INTO `t_ds_version`
+VALUES ('1', '1.3.0');
 
 
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
-INSERT INTO `t_ds_alertgroup` VALUES ('1', 'default admin warning group', '0', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
-
--- ----------------------------
--- Records of t_ds_relation_user_alertgroup
--- ----------------------------
-INSERT INTO `t_ds_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
+INSERT INTO `t_ds_alertgroup`
+VALUES (1,"1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
+        '2018-11-29 10:20:39');
 
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
-INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
+INSERT INTO `t_ds_user`
+VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50',
+        '2018-10-24 17:40:22', null, 1);
+
+-- ----------------------------
+-- Table structure for t_ds_plugin_define
+-- ----------------------------
+SET
+sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+DROP TABLE IF EXISTS `t_ds_plugin_define`;
+CREATE TABLE `t_ds_plugin_define` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plugin_name` varchar(100) NOT NULL COMMENT 'the name of plugin eg: email',
+  `plugin_type` varchar(100) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin',
+  `plugin_params` text COMMENT 'plugin params',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_alert_plugin_instance`;
+CREATE TABLE `t_ds_alert_plugin_instance` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plugin_define_id` int NOT NULL,
+  `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

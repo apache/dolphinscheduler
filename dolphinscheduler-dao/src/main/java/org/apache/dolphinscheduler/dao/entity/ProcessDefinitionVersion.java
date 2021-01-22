@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -58,16 +59,6 @@ public class ProcessDefinitionVersion {
     private String description;
 
     /**
-     * receivers
-     */
-    private String receivers;
-
-    /**
-     * receivers cc
-     */
-    private String receiversCc;
-
-    /**
      * process warning time out. unit: minute
      */
     private int timeout;
@@ -97,6 +88,13 @@ public class ProcessDefinitionVersion {
      * connects array for web
      */
     private String connects;
+
+
+    /**
+     * warningGroupId
+     */
+    @TableField(exist = false)
+    private int warningGroupId;
 
     public String getGlobalParams() {
         return globalParams;
@@ -170,22 +168,6 @@ public class ProcessDefinitionVersion {
         this.connects = connects;
     }
 
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
-    }
-
     public int getTimeout() {
         return timeout;
     }
@@ -202,23 +184,30 @@ public class ProcessDefinitionVersion {
         this.resourceIds = resourceIds;
     }
 
+    public int getWarningGroupId() {
+        return warningGroupId;
+    }
+
+    public void setWarningGroupId(int warningGroupId) {
+        this.warningGroupId = warningGroupId;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinitionVersion{"
-                + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
-                + ", version=" + version
-                + ", processDefinitionJson='" + processDefinitionJson + '\''
-                + ", description='" + description + '\''
-                + ", globalParams='" + globalParams + '\''
-                + ", createTime=" + createTime
-                + ", locations='" + locations + '\''
-                + ", connects='" + connects + '\''
-                + ", receivers='" + receivers + '\''
-                + ", receiversCc='" + receiversCc + '\''
-                + ", timeout=" + timeout
-                + ", resourceIds='" + resourceIds + '\''
-                + '}';
+            + "id=" + id
+            + ", processDefinitionId=" + processDefinitionId
+            + ", version=" + version
+            + ", processDefinitionJson='" + processDefinitionJson + '\''
+            + ", description='" + description + '\''
+            + ", globalParams='" + globalParams + '\''
+            + ", createTime=" + createTime
+            + ", locations='" + locations + '\''
+            + ", connects='" + connects + '\''
+            + ", timeout=" + timeout
+            + ", warningGroupId=" + warningGroupId
+            + ", resourceIds='" + resourceIds + '\''
+            + '}';
     }
 
     public static Builder newBuilder() {
@@ -235,9 +224,8 @@ public class ProcessDefinitionVersion {
         private Date createTime;
         private String locations;
         private String connects;
-        private String receivers;
-        private String receiversCc;
         private int timeout;
+        private int warningGroupId;
         private String resourceIds;
 
         private Builder() {
@@ -288,18 +276,13 @@ public class ProcessDefinitionVersion {
             return this;
         }
 
-        public Builder receivers(String receivers) {
-            this.receivers = receivers;
-            return this;
-        }
-
-        public Builder receiversCc(String receiversCc) {
-            this.receiversCc = receiversCc;
-            return this;
-        }
-
         public Builder timeout(int timeout) {
             this.timeout = timeout;
+            return this;
+        }
+
+        public Builder warningGroupId(int warningGroupId) {
+            this.warningGroupId = warningGroupId;
             return this;
         }
 
@@ -319,9 +302,8 @@ public class ProcessDefinitionVersion {
             processDefinitionVersion.setCreateTime(createTime);
             processDefinitionVersion.setLocations(locations);
             processDefinitionVersion.setConnects(connects);
-            processDefinitionVersion.setReceivers(receivers);
-            processDefinitionVersion.setReceiversCc(receiversCc);
             processDefinitionVersion.setTimeout(timeout);
+            processDefinitionVersion.setWarningGroupId(warningGroupId);
             processDefinitionVersion.setResourceIds(resourceIds);
             return processDefinitionVersion;
         }

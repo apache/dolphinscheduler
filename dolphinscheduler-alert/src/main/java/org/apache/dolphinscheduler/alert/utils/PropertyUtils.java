@@ -43,6 +43,11 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
+    /**
+     *  init properties
+     */
+    private static final PropertyUtils propertyUtils = new PropertyUtils();
+
     private PropertyUtils() {
         init();
     }
@@ -83,7 +88,7 @@ public class PropertyUtils {
     /**
      * get property value
      *
-     * @param key property name
+     * @param key        property name
      * @param defaultVal default value
      * @return property value
      */

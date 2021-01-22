@@ -1,5 +1,5 @@
 HikariCP-3.2.0.jar
-activation-1.1.jar
+animal-sniffer-annotations-1.14.jar
 aopalliance-1.0.jar
 apache-el-8.5.54.jar
 apacheds-i18n-2.0.0-M15.jar
@@ -13,6 +13,7 @@ avro-1.7.4.jar
 aws-java-sdk-1.7.4.jar
 bonecp-0.8.0.RELEASE.jar
 byte-buddy-1.9.16.jar
+checker-compat-qual-2.0.0.jar
 classmate-1.4.0.jar
 clickhouse-jdbc-0.1.52.jar
 commons-cli-1.2.jar
@@ -25,7 +26,6 @@ commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
 commons-beanutils-1.7.0.jar
 commons-dbcp-1.4.jar
-commons-email-1.5.jar
 commons-httpclient-3.0.1.jar
 commons-io-2.4.jar
 commons-lang-2.6.jar
@@ -41,9 +41,11 @@ datanucleus-api-jdo-4.2.1.jar
 datanucleus-core-4.1.6.jar
 datanucleus-rdbms-4.1.7.jar
 derby-10.14.2.0.jar
+error_prone_annotations-2.1.3.jar
 druid-1.1.22.jar
 gson-2.8.6.jar
-guava-20.0.jar
+guava-24.1-jre.jar
+guava-retrying-2.0.0.jar
 guice-3.0.jar
 guice-servlet-3.0.jar
 h2-1.4.200.jar
@@ -76,6 +78,7 @@ htrace-core-3.1.0-incubating.jar
 httpclient-4.4.1.jar
 httpcore-4.4.1.jar
 httpmime-4.5.12.jar
+j2objc-annotations-1.1.jar
 jackson-annotations-2.9.10.jar
 jackson-core-2.9.10.jar
 jackson-core-asl-1.9.13.jar
@@ -93,7 +96,6 @@ javax.activation-api-1.2.0.jar
 javax.annotation-api-1.3.2.jar
 javax.inject-1.jar
 javax.jdo-3.2.0-m3.jar
-javax.mail-1.6.2.jar
 javax.servlet-api-3.1.0.jar
 javolution-5.5.1.jar
 jaxb-api-2.3.1.jar
@@ -158,6 +160,7 @@ paranamer-2.3.jar
 parquet-hadoop-bundle-1.8.1.jar
 poi-3.17.jar
 postgresql-42.1.4.jar
+presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
 quartz-2.3.0.jar
 quartz-jobs-2.3.0.jar
@@ -205,5 +208,3 @@ xml-apis-1.4.01.jar
 xmlenc-0.52.jar
 xz-1.0.jar
 zookeeper-3.4.14.jar
-guava-retrying-2.0.0.jar
-presto-jdbc-0.238.1.jar
