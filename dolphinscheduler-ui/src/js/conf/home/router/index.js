@@ -387,7 +387,8 @@ const router = new Router({
           name: 'users-manage',
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
-            title: `${i18n.$t('User Manage')}`
+            title: `${i18n.$t('User Manage')}`,
+            refresh_in_switched_tab: false
           }
         },
         {
@@ -396,6 +397,14 @@ const router = new Router({
           component: resolve => require(['../pages/security/pages/warningGroups/index'], resolve),
           meta: {
             title: `${i18n.$t('Warning group manage')}`
+          }
+        },
+        {
+          path: '/security/warning-instance',
+          name: 'warning-instance-manage',
+          component: resolve => require(['../pages/security/pages/warningInstance/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Warning instance manage')}`
           }
         },
         {
