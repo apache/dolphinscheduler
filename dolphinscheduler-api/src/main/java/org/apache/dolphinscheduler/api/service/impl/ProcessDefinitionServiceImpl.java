@@ -157,7 +157,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param locations locations for nodes
      * @param connects connects for nodes
      * @return create result code
-     * @throws JsonProcessingException JsonProcessingException
      */
     @Override
     public Map<String, Object> createProcessDefinition(User loginUser,
@@ -1130,8 +1129,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 processDefine.setCreateTime(now);
                 processDefine.setUpdateTime(now);
                 processDefine.setFlag(subProcess.getFlag());
-                processDefine.setReceivers(subProcess.getReceivers());
-                processDefine.setReceiversCc(subProcess.getReceiversCc());
+                processDefine.setWarningGroupId(subProcess.getWarningGroupId());
                 processDefineMapper.insert(processDefine);
 
                 logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), processDefine.getName());
@@ -1659,8 +1657,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefinition.setTimeout(processDefinitionVersion.getTimeout());
         processDefinition.setGlobalParams(processDefinitionVersion.getGlobalParams());
         processDefinition.setUpdateTime(new Date());
-        processDefinition.setReceivers(processDefinitionVersion.getReceivers());
-        processDefinition.setReceiversCc(processDefinitionVersion.getReceiversCc());
+        processDefinition.setWarningGroupId(processDefinitionVersion.getWarningGroupId());
         processDefinition.setResourceIds(processDefinitionVersion.getResourceIds());
 
         if (processDefineMapper.updateById(processDefinition) > 0) {

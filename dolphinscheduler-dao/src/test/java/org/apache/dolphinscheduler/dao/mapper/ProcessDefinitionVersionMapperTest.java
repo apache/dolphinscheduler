@@ -76,8 +76,6 @@ public class ProcessDefinitionVersionMapperTest {
         processDefinitionVersion.setCreateTime(new Date());
         processDefinitionVersion.setLocations(StringUtils.EMPTY);
         processDefinitionVersion.setConnects(StringUtils.EMPTY);
-        processDefinitionVersion.setReceivers(StringUtils.EMPTY);
-        processDefinitionVersion.setReceiversCc(StringUtils.EMPTY);
         processDefinitionVersion.setTimeout(10);
         processDefinitionVersion.setResourceIds("1,2");
         processDefinitionVersionMapper.insert(processDefinitionVersion);
@@ -101,8 +99,6 @@ public class ProcessDefinitionVersionMapperTest {
         processDefinitionVersion.setCreateTime(new Date());
         processDefinitionVersion.setLocations(StringUtils.EMPTY);
         processDefinitionVersion.setConnects(StringUtils.EMPTY);
-        processDefinitionVersion.setReceivers(StringUtils.EMPTY);
-        processDefinitionVersion.setReceiversCc(StringUtils.EMPTY);
         processDefinitionVersion.setTimeout(10);
         processDefinitionVersion.setResourceIds("1,2");
         processDefinitionVersionMapper.insert(processDefinitionVersion);

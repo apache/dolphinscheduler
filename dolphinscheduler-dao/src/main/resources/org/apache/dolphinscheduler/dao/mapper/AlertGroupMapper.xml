@@ -19,7 +19,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper">
     <sql id="baseSql">
-        id, group_name, group_type, description, create_time, update_time
+        id
+        , group_name, description,alert_instance_ids, create_user_id,create_time, update_time
     </sql>
     <select id="queryAlertGroupPage" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
@@ -38,21 +39,21 @@
         where group_name=#{groupName}
     </select>
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select t.id, t.group_name, t.group_type, t.description, t.create_time, t.update_time
-        from t_ds_alertgroup t
-        left join t_ds_relation_user_alertgroup r on t.id=r.alertgroup_id
-        where r.user_id=#{userId}
-    </select>
-    <select id="queryByAlertType" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
         <include refid="baseSql"/>
         from t_ds_alertgroup
-        where group_type=#{alertType}
+        where create_user_id = #{userId}
     </select>
+
     <select id="queryAllGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
         <include refid="baseSql"/>
         from t_ds_alertgroup
         order by update_time desc
+    </select>
+
+    <select id="queryAlertGroupInstanceIdsById" resultType="String">
+        select alert_instance_ids  from t_ds_alertgroup
+        where id = #{alertGroupId}
     </select>
 </mapper>

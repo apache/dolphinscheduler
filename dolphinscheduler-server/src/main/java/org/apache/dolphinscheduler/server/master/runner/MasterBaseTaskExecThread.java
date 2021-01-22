@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -25,19 +26,18 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * master task exec base class
@@ -97,7 +97,8 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * constructor of MasterBaseTaskExecThread
-     * @param taskInstance      task instance
+     *
+     * @param taskInstance task instance
      */
     public MasterBaseTaskExecThread(TaskInstance taskInstance) {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
@@ -124,7 +125,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
 
-        if(taskTimeoutParameter.getEnable()){
+        if (taskTimeoutParameter.getEnable()) {
             checkTimeoutFlag = true;
         }
     }
@@ -147,6 +148,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * submit master base task exec thread
+     *
      * @return TaskInstance
      */
     protected TaskInstance submit() {
@@ -157,30 +159,30 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         boolean submitDB = false;
         boolean submitTask = false;
         TaskInstance task = null;
-        while (retryTimes <= commitRetryTimes){
+        while (retryTimes <= commitRetryTimes) {
             try {
-                if(!submitDB){
+                if (!submitDB) {
                     // submit task to db
                     task = processService.submitTask(taskInstance);
-                    if(task != null && task.getId() != 0){
+                    if (task != null && task.getId() != 0) {
                         submitDB = true;
                     }
                 }
-                if(submitDB && !submitTask){
+                if (submitDB && !submitTask) {
                     // dispatch task
                     submitTask = dispatchTask(task);
                 }
-                if(submitDB && submitTask){
+                if (submitDB && submitTask) {
                     return task;
                 }
-                if(!submitDB){
+                if (!submitDB) {
                     logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
-                }else if(!submitTask){
+                } else if (!submitTask) {
                     logger.error("task commit  failed , taskId {} has already retry {} times, please check", taskInstance.getId(), retryTimes);
                 }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql and dispatcht task failed",e);
+                logger.error("task commit to mysql and dispatcht task failed", e);
             }
             retryTimes += 1;
         }
@@ -189,18 +191,19 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * dispatcht task
+     *
      * @param taskInstance taskInstance
      * @return whether submit task success
      */
     public Boolean dispatchTask(TaskInstance taskInstance) {
 
-        try{
-            if(taskInstance.isConditionsTask()
+        try {
+            if (taskInstance.isConditionsTask()
                     || taskInstance.isDependTask()
-                    || taskInstance.isSubProcess()){
+                    || taskInstance.isSubProcess()) {
                 return true;
             }
-            if(taskInstance.getState().typeIsFinished()){
+            if (taskInstance.getState().typeIsFinished()) {
                 logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
                 return true;
             }
@@ -221,9 +224,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     taskInstance.getId(),
                     org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
             taskUpdateQueue.put(taskPriority);
-            logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
+            logger.info(String.format("master submit success, task : %s", taskInstance.getName()));
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("submit task  Exception: ", e);
             logger.error("task error : %s", JSONUtils.toJsonString(taskInstance));
             return false;
@@ -251,6 +254,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * submit wait complete
+     *
      * @return true
      */
     protected Boolean submitWaitComplete() {
@@ -259,6 +263,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * call
+     *
      * @return boolean
      * @throws Exception exception
      */
@@ -270,27 +275,25 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * alert time out
-     * @return
      */
-    protected boolean alertTimeout(){
-        if( TaskTimeoutStrategy.FAILED == this.taskTimeoutParameter.getStrategy()){
+    protected boolean alertTimeout() {
+        if (TaskTimeoutStrategy.FAILED == this.taskTimeoutParameter.getStrategy()) {
             return true;
         }
         logger.warn("process id:{} process name:{} task id: {},name:{} execution time out",
                 processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
         // send warn mail
         ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
-        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
-                processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
-                taskInstance.getId(),taskInstance.getName());
+        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(), processInstance.getName(),
+                taskInstance.getId(), taskInstance.getName());
         return true;
     }
 
     /**
      * handle time out for time out strategy warn&&failed
      */
-    protected void handleTimeoutFailed(){
-        if(TaskTimeoutStrategy.WARN == this.taskTimeoutParameter.getStrategy()){
+    protected void handleTimeoutFailed() {
+        if (TaskTimeoutStrategy.WARN == this.taskTimeoutParameter.getStrategy()) {
             return;
         }
         logger.info("process id:{} name:{} task id:{} name:{} cancel because of timeout.",
@@ -300,10 +303,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * check task remain time valid
-     * @return
      */
-    protected boolean checkTaskTimeout(){
-        if (!checkTimeoutFlag || taskInstance.getStartTime() == null){
+    protected boolean checkTaskTimeout() {
+        if (!checkTimeoutFlag || taskInstance.getStartTime() == null) {
             return false;
         }
         long remainTime = getRemainTime(taskTimeoutParameter.getInterval() * 60L);
