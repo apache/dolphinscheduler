@@ -65,10 +65,6 @@ public class AlertPluginInstanceMapperTest {
         Assert.assertNotNull(testAlertGroupList);
         Assert.assertTrue(testAlertGroupList.size() > 0);
         AlertGroup alertGroup = testAlertGroupList.get(0);
-        List<AlertPluginInstance> alertPluginInstances = alertPluginInstanceMapper.queryByAlertGroupId(alertGroup.getId());
-        Assert.assertNotNull(alertPluginInstances);
-        Assert.assertTrue(alertPluginInstances.size() > 0);
-        Assert.assertEquals("test_instance", alertPluginInstances.get(0).getInstanceName());
     }
 
     /**
@@ -80,7 +76,7 @@ public class AlertPluginInstanceMapperTest {
 
         PluginDefine pluginDefine = createPluginDefine();
         AlertGroup alertGroup = createAlertGroup("test_group_01");
-        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(pluginDefine.getId(), "", alertGroup.getId(), "test_instance");
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(pluginDefine.getId(), "", "test_instance");
         alertPluginInstanceMapper.insert(alertPluginInstance);
         return alertPluginInstance;
     }

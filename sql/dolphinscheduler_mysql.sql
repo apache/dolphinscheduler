@@ -298,6 +298,7 @@ CREATE TABLE `t_ds_alert` (
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup`(
                                   `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+                                  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
                                   `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
                                   `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
                                   `description`    varchar(255) DEFAULT NULL,
@@ -811,7 +812,7 @@ VALUES ('1', '1.3.0');
 -- Records of t_ds_alertgroup
 -- ----------------------------
 INSERT INTO `t_ds_alertgroup`
-VALUES (1, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
+VALUES (1,"1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
 -- ----------------------------
@@ -848,7 +849,6 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `alert_group_id` int DEFAULT NULL,
   `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

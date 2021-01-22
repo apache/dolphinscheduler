@@ -58,9 +58,9 @@ public class WeChatSenderTest {
     @Before
     public void initDingTalkConfig() {
         // Just for this test, I will delete these configurations before this PR is merged
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, "1000002");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, "ww8cc690c06761eaa3");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, "MYL0_O91ICNrdjkAhgeXIOAj4gEKIirf0-xoYnA25vg");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, "100000");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, "NAME_ENTERPRISE_WE_CHAT_CORP_ID");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, "NAME_ENTERPRISE_WE_CHAT_SECRET");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, "{\"touser\":\"{toUser}\",\"agentid\":{agentId}"
                 +
                 ",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}"
@@ -75,7 +75,7 @@ public class WeChatSenderTest {
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
 
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assert.assertEquals("false", alertResult.getStatus());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class WeChatSenderTest {
         weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assert.assertEquals("false", alertResult.getStatus());
     }
 
 }

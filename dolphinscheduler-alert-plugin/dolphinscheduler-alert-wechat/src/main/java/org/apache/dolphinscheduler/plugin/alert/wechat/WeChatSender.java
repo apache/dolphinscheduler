@@ -90,8 +90,8 @@ public class WeChatSender {
         showType = config.get(AlertConstants.SHOW_TYPE);
         requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
         weChatTokenUrlReplace = weChatTokenUrl
-                .replace(corpIdRegex, weChatCorpId)
-                .replace(secretRegex, weChatSecret);
+            .replace(corpIdRegex, weChatCorpId)
+            .replace(secretRegex, weChatSecret);
         weChatToken = getToken();
     }
 
@@ -106,8 +106,8 @@ public class WeChatSender {
     private String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = mkString(toUser);
         return weChatUserSendMsg.replace(userRegExp, listUser)
-                .replace(agentIdRegExp, agentId)
-                .replace(msgRegExp, msg);
+            .replace(agentIdRegExp, agentId)
+            .replace(msgRegExp, msg);
     }
 
     /**
@@ -117,11 +117,18 @@ public class WeChatSender {
      * @throws Exception the Exception
      */
     public AlertResult sendEnterpriseWeChat(String title, String content) {
+        AlertResult alertResult;
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
+        if (null == weChatToken) {
+            alertResult = new AlertResult();
+            alertResult.setMessage("send we chat alert fail,get weChat token error");
+            alertResult.setStatus("false");
+            return alertResult;
+        }
         String enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(tokenRegex, weChatToken);
-        AlertResult alertResult;
+
         try {
             return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));
         } catch (Exception e) {
@@ -147,7 +154,7 @@ public class WeChatSender {
                 response.close();
             }
             logger.info("Enterprise WeChat send [{}], param:{}, resp:{}",
-                    url, data, resp);
+                url, data, resp);
             return resp;
         }
     }
@@ -253,7 +260,7 @@ public class WeChatSender {
             }
 
             HashMap map = JSONUtils.parseObject(resp, HashMap.class);
-            if (map != null) {
+            if (map != null && null != map.get("access_token")) {
                 return map.get("access_token").toString();
             } else {
                 return null;

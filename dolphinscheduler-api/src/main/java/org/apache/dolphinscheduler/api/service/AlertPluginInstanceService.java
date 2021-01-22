@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -31,28 +30,31 @@ public interface AlertPluginInstanceService {
      * creat alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param pluginDefineId plugin define id
+     * @param instanceName instance name
+     * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> create(User loginUser, AlertPluginInstance alertPluginInstance);
+    Map<String, Object> create(User loginUser,int pluginDefineId,String instanceName,String pluginInstanceParams);
 
     /**
-     * update alert plugin instance
-     *
+     * update
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param alertPluginInstanceId plugin instance id
+     * @param instanceName instance name
+     * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> update(User loginUser, AlertPluginInstance alertPluginInstance);
+    Map<String, Object> update(User loginUser, int alertPluginInstanceId,String instanceName,String pluginInstanceParams);
 
     /**
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param alertPluginInstance alert plugin instance
+     * @param id id
      * @return result
      */
-    Map<String, Object> delete(User loginUser, AlertPluginInstance alertPluginInstance);
+    Map<String, Object> delete(User loginUser, int id);
 
     /**
      * get alert plugin instance
@@ -62,4 +64,26 @@ public interface AlertPluginInstanceService {
      * @return alert plugin
      */
     Map<String, Object> get(User loginUser, int id);
+
+    /**
+     * queryAll
+     *
+     * @return alert plugins
+     */
+    Map<String, Object> queryAll();
+
+    /**
+     * checkExistPluginInstanceName
+     * @param pluginName plugin name
+     * @return isExist
+     */
+    boolean checkExistPluginInstanceName(String pluginName);
+
+    /**
+     * queryPluginPage
+     * @param pageIndex page index
+     * @param pageSize  page size
+     * @return plugins
+     */
+    Map<String, Object> queryPluginPage(int pageIndex,int pageSize);
 }

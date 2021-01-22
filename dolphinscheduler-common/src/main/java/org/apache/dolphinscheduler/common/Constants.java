@@ -462,6 +462,8 @@ public final class Constants {
 
     public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
 
+    public static final String CMD_PARAM_START_PARAMS = "StartParams";
+
     /**
      * complement data start date
      */
@@ -856,7 +858,10 @@ public final class Constants {
         ExecutionStatus.WAITTING_DEPEND.ordinal()
     };
 
-
+    /**
+     * status
+     */
+    public static final String STATUS = "status";
 
     /**
      * message
@@ -991,10 +996,6 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
-    /**
-     * status
-     */
-    public static final String STATUS = "status";
     public static final int NORAML_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 

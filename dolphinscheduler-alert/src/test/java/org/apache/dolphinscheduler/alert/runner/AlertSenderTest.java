@@ -83,7 +83,7 @@ public class AlertSenderTest {
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId,pluginInstanceParams,alertGroupId,pluginInstanceName);
+                pluginDefineId,pluginInstanceParams,pluginInstanceName);
         alertInstanceList.add(alertPluginInstance);
         PowerMockito.when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
 
@@ -157,7 +157,7 @@ public class AlertSenderTest {
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId,pluginInstanceParams,alertGroupId,pluginInstanceName);
+                pluginDefineId,pluginInstanceParams,pluginInstanceName);
         alertInstanceList.add(alertPluginInstance);
         PowerMockito.when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(alertInstanceList);
 

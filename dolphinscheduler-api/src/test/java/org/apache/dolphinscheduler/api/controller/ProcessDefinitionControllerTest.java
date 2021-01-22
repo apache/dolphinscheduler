@@ -94,7 +94,7 @@ public class ProcessDefinitionControllerTest {
         String connects = "[]";
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId", 1);
+        result.put(Constants.DATA_LIST, 1);
 
         Mockito.when(processDefinitionService.createProcessDefinition(user, projectName, name, json,
                 description, locations, connects)).thenReturn(result);
@@ -142,6 +142,7 @@ public class ProcessDefinitionControllerTest {
         String description = "desc test";
         String connects = "[]";
         int id = 1;
+        int releaseState = 0;
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId", 1);
@@ -150,7 +151,7 @@ public class ProcessDefinitionControllerTest {
                 description, locations, connects)).thenReturn(result);
 
         Result response = processDefinitionController.updateProcessDefinition(user, projectName, name, id, json,
-                locations, connects, description);
+                locations, connects, description,releaseState);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 

@@ -230,14 +230,4 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return true;
     }
 
-    /**
-     * get task timeout parameter
-     *
-     * @return TaskTimeoutParameter
-     */
-    private TaskTimeoutParameter getTaskTimeoutParameter() {
-        String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        return taskNode.getTaskTimeoutParameter();
-    }
 }

@@ -38,7 +38,7 @@ import java.util.List;
 public class EmailAlertChannelFactory implements AlertChannelFactory {
     @Override
     public String getName() {
-        return "email alert";
+        return "Email";
     }
 
     @Override

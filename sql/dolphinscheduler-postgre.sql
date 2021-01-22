@@ -202,6 +202,7 @@ CREATE TABLE t_ds_alert (
 DROP TABLE IF EXISTS t_ds_alertgroup;
 CREATE TABLE t_ds_alertgroup(
                                 id             int NOT NULL,
+                                alert_instance_ids varchar (255) DEFAULT NULL,
                                 create_user_id int4         DEFAULT NULL,
                                 group_name     varchar(255) DEFAULT NULL,
                                 description    varchar(255) DEFAULT NULL,
@@ -767,8 +768,8 @@ VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0',
         '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup，dolphinscheduler warning group
-INSERT INTO t_ds_alertgroup(id, create_user_id, group_name, description, create_time, update_time)
-VALUES (1, 'dolphinscheduler warning group', 'dolphinscheduler warning group', '2018-11-29 10:20:39',
+INSERT INTO t_ds_alertgroup(id,alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES (1, '1,2','dolphinscheduler warning group', 'dolphinscheduler warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
@@ -803,7 +804,6 @@ CREATE TABLE t_ds_alert_plugin_instance (
 	plugin_instance_params text NULL,
 	create_time timestamp NULL,
 	update_time timestamp NULL,
-	alert_group_id int4 NOT NULL,
 	instance_name varchar(200) NULL,
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );

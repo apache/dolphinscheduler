@@ -124,7 +124,6 @@ public class EmailAlertPluginTest {
 
         //create email alert plugin instance
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
-        alertPluginInstance.setAlertGroupId(alertGroup.getId());
         alertPluginInstance.setCreateTime(new Date());
         alertPluginInstance.setInstanceName("test email alert");
 

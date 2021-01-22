@@ -145,6 +145,50 @@ public class TaskInstanceService extends BaseService {
         return result;
     }
 
+    /**
+     * change one task instance's state from failure to forced success
+     *
+     * @param loginUser      login user
+     * @param projectName    project name
+     * @param taskInstanceId task instance id
+     * @return the result code and msg
+     */
+    public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        // check user auth
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        // check whether the task instance can be found
+        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
+        if (task == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return result;
+        }
+
+        // check whether the task instance state type is failure
+        if (!task.getState().typeIsFailure()) {
+            putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
+            return result;
+        }
+
+        // change the state of the task instance
+        task.setState(ExecutionStatus.FORCED_SUCCESS);
+        int changedNum = taskInstanceMapper.updateById(task);
+        if (changedNum > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
+        }
+
+        return result;
+    }
+
     /***
      * generate {@link org.apache.dolphinscheduler.api.enums.Status#REQUEST_PARAMS_NOT_VALID_ERROR} res with  param name
      * @param result exist result map

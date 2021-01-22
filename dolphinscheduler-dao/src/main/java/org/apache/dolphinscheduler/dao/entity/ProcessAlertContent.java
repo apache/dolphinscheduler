@@ -33,6 +33,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(Include.NON_NULL)
 public class ProcessAlertContent implements Serializable {
+    @JsonProperty("projectId")
+    private int projectId;
+    @JsonProperty("projectName")
+    private String projectName;
+    @JsonProperty("owner")
+    private String owner;
     @JsonProperty("processId")
     private int processId;
     @JsonProperty("processName")
@@ -79,6 +85,9 @@ public class ProcessAlertContent implements Serializable {
     private String logPath;
 
     private ProcessAlertContent(Builder builder) {
+        this.projectId = builder.projectId;
+        this.projectName = builder.projectName;
+        this.owner = builder.owner;
         this.processId = builder.processId;
         this.processName = builder.processName;
         this.processType = builder.processType;
@@ -107,7 +116,9 @@ public class ProcessAlertContent implements Serializable {
     }
 
     public static class Builder {
-
+        private int projectId;
+        private String projectName;
+        private String owner;
         private int processId;
         private String processName;
         private CommandType processType;
@@ -128,6 +139,21 @@ public class ProcessAlertContent implements Serializable {
         private Date taskEndTime;
         private String taskHost;
         private String logPath;
+
+        public Builder projectId(int projectId) {
+            this.projectId = projectId;
+            return this;
+        }
+
+        public Builder projectName(String projectName) {
+            this.projectName = projectName;
+            return this;
+        }
+
+        public Builder owner(String owner) {
+            this.owner = owner;
+            return this;
+        }
 
         public Builder processId(int processId) {
             this.processId = processId;

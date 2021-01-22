@@ -35,7 +35,7 @@ public class ScriptAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String getName() {
-        return "script alert";
+        return "Script";
     }
 
     @Override

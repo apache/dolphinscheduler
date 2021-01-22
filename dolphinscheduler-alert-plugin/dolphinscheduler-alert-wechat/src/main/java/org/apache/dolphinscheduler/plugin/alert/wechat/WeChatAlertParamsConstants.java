@@ -23,34 +23,34 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 public class WeChatAlertParamsConstants {
 
 
-    static final String ENTERPRISE_WE_CHAT_CORP_ID = "enterprise.wechat.corp.id";
+    static final String ENTERPRISE_WE_CHAT_CORP_ID = "corp.id";
 
-    static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "enterpriseWeChatCorpId";
-
-
-    static final String ENTERPRISE_WE_CHAT_SECRET = "enterprise.wechat.secret";
-
-    static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "enterpriseWeChatSecret";
-
-    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
-
-    static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterpriseWeChatTeamSendMsg";
+    static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "corpId";
 
 
-    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterprise.wechat.user.send.msg";
+    static final String ENTERPRISE_WE_CHAT_SECRET = "secret";
 
-    static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterpriseWeChatUserSendMsg";
+    static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "secret";
 
+    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "team.send.msg";
 
-    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "enterprise.wechat.agent.id";
-
-    static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "enterpriseWeChatAgentId";
-
-
-    static final String ENTERPRISE_WE_CHAT_USERS = "enterprise.wechat.users";
+    static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "teamSendMsg";
 
 
-    static final String NAME_ENTERPRISE_WE_CHAT_USERS = "enterpriseWeChatUsers";
+    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "user.send.msg";
+
+    static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "userSendMsg";
+
+
+    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "agent.id";
+
+    static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "agentId";
+
+
+    static final String ENTERPRISE_WE_CHAT_USERS = "users";
+
+
+    static final String NAME_ENTERPRISE_WE_CHAT_USERS = "users";
 
 
 }

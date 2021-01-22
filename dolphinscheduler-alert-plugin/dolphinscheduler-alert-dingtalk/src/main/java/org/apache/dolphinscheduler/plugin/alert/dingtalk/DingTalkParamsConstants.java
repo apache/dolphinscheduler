@@ -22,6 +22,9 @@ package org.apache.dolphinscheduler.plugin.alert.dingtalk;
  */
 public class DingTalkParamsConstants {
 
+    public DingTalkParamsConstants() {
+        throw new IllegalStateException("Utility class");
+    }
 
     static final String DING_TALK_WEB_HOOK = "dingtalk.webhook";
 
