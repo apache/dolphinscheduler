@@ -79,10 +79,10 @@ httpclient-4.4.1.jar
 httpcore-4.4.1.jar
 httpmime-4.5.12.jar
 j2objc-annotations-1.1.jar
-jackson-annotations-2.9.10.jar
-jackson-core-2.9.10.jar
+jackson-annotations-2.10.5.jar
+jackson-core-2.10.5.jar
 jackson-core-asl-1.9.13.jar
-jackson-databind-2.9.10.jar
+jackson-databind-2.10.5.jar
 jackson-datatype-jdk8-2.9.10.jar
 jackson-datatype-jsr310-2.9.10.jar
 jackson-jaxrs-1.9.13.jar
