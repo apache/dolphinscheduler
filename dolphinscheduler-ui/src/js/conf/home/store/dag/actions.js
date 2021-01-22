@@ -807,18 +807,6 @@ export default {
       })
     })
   },
-  /**
-   * Get the mailbox list interface
-   */
-  getReceiver ({ state }, payload) {
-    return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/executors/get-receiver-cc`, payload, res => {
-        resolve(res.data)
-      }).catch(e => {
-        reject(e)
-      })
-    })
-  },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectName}/process/get-task-list`, payload, res => {
