@@ -14,19 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-#This configuration file configures the configuration parameters related to the AlertServer.
-#These parameters are only related to the AlertServer, and it has nothing to do with the specific Alert Plugin.
-#eg : max retry num.
-#eg : Alert Server Listener port
-
-#alert.plugin.dir config the Alert Plugin dir . AlertServer while find and load the Alert Plugin Jar from this dir when deploy and start AlertServer on the server .
-#eg :alert.plugin.dir=/opt/soft/spi/lib/plugin/alert
-
-#maven.local.repository=/Users/gaojun/Documents/jianguoyun/localRepository
-
-#alert.plugin.binding config the Alert Plugin need be load when development and run in IDE
-#alert.plugin.binding=\
-#  ./dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml
-
-
+dependencies:
+- name: postgresql
+  version: 8.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
+- name: zookeeper
+  version: 5.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: redis.enabled
