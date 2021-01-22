@@ -111,15 +111,5 @@ public enum CommandType {
     /**
      *  pong
      */
-    PONG,
-
-    /**
-     *  alert send request
-     */
-    ALERT_SEND_REQUEST,
-
-    /**
-     *  alert send response
-     */
-    ALERT_SEND_RESPONSE;
+    PONG;
 }

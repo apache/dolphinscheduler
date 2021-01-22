@@ -401,16 +401,12 @@ public final class Constants {
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
+
     /***
      *
      * rpc port
      */
     public static final int RPC_PORT = 50051;
-
-    /***
-     * alert rpc port
-     */
-    public static final int ALERT_RPC_PORT = 50052;
 
     /**
      * forbid running task
@@ -1011,8 +1007,6 @@ public final class Constants {
      */
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
-
-    public static final String EXCEL_SUFFIX_XLS = ".xls";
 
     /**
      * datasource encryption salt
