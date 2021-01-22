@@ -59,9 +59,8 @@ public class CuratorZookeeperClientTest {
         zookeeperConfig.setDsRoot("/dolphinscheduler");
         zookeeperConfig.setMaxWaitTime(30000);
         zookeeperClient.setZookeeperConfig(zookeeperConfig);
-        System.out.println("start");
         zookeeperClient.afterPropertiesSet();
-        System.out.println("end");
+
         Assert.assertNotNull(zookeeperClient.getZkClient());
     }
 }

@@ -17,6 +17,12 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GENERATE_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ACCESS_TOKEN_ERROR;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
@@ -24,20 +30,26 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * access token controller
@@ -74,7 +86,7 @@ public class AccessTokenController extends BaseController {
         logger.info("login user {}, create token , userId : {} , token expire time : {} , token : {}", loginUser.getUserName(),
                 userId, expireTime, token);
 
-        Map<String, Object> result = accessTokenService.createToken(userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.createToken(loginUser, userId, expireTime, token);
         return returnDataList(result);
     }
 
@@ -94,7 +106,7 @@ public class AccessTokenController extends BaseController {
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "expireTime") String expireTime) {
         logger.info("login user {}, generate token , userId : {} , token expire time : {}", loginUser, userId, expireTime);
-        Map<String, Object> result = accessTokenService.generateToken(userId, expireTime);
+        Map<String, Object> result = accessTokenService.generateToken(loginUser, userId, expireTime);
         return returnDataList(result);
     }
 
@@ -173,7 +185,7 @@ public class AccessTokenController extends BaseController {
         logger.info("login user {}, update token , userId : {} , token expire time : {} , token : {}", loginUser.getUserName(),
                 userId, expireTime, token);
 
-        Map<String, Object> result = accessTokenService.updateToken(id, userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.updateToken(loginUser, id, userId, expireTime, token);
         return returnDataList(result);
     }
 

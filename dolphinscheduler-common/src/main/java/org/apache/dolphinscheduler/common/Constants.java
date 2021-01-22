@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     private Constants() {
-        throw new IllegalStateException("Constants class");
+        throw new UnsupportedOperationException("Construct Constants");
     }
 
     /**
@@ -138,7 +139,7 @@ public final class Constants {
     /**
      * python home
      */
-    public static final String PYTHON_HOME="PYTHON_HOME";
+    public static final String PYTHON_HOME = "PYTHON_HOME";
 
     /**
      * resource.view.suffixs
@@ -221,6 +222,11 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
+     * SPACE " "
+     */
+    public static final String SPACE = " ";
+
+    /**
      * SINGLE_SLASH /
      */
     public static final String SINGLE_SLASH = "/";
@@ -229,6 +235,15 @@ public final class Constants {
      * DOUBLE_SLASH //
      */
     public static final String DOUBLE_SLASH = "//";
+
+    /**
+     * SINGLE_QUOTES "'"
+     */
+    public static final String SINGLE_QUOTES = "'";
+    /**
+     * DOUBLE_QUOTES "\""
+     */
+    public static final String DOUBLE_QUOTES = "\"";
 
     /**
      * SEMICOLON ;
@@ -265,6 +280,10 @@ public final class Constants {
      */
     public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
+    /**
+     * date format of yyyyMMddHHmmssSSS
+     */
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
     /**
      * http connect time out
      */
@@ -366,7 +385,6 @@ public final class Constants {
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
 
-
     /**
      * default log cache rows num,output when reach the number
      */
@@ -383,12 +401,16 @@ public final class Constants {
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
-
     /***
      *
      * rpc port
      */
     public static final int RPC_PORT = 50051;
+
+    /***
+     * alert rpc port
+     */
+    public static final int ALERT_RPC_PORT = 50052;
 
     /**
      * forbid running task
@@ -424,21 +446,23 @@ public final class Constants {
     /**
      * command parameter keys
      */
-    public static final String CMDPARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
+    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
 
-    public static final String CMDPARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
+    public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
 
-    public static final String CMDPARAM_RECOVERY_WAITTING_THREAD = "WaittingThreadInstanceId";
+    public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS = "processInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
 
-    public static final String CMDPARAM_EMPTY_SUB_PROCESS = "0";
+    public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
 
-    public static final String CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
+    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
-    public static final String CMDPARAM_START_NODE_NAMES = "StartNodeNameList";
+    public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
+
+    public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
     /**
      * complement data start date
@@ -519,10 +543,9 @@ public final class Constants {
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
 
 
+
     /**
-     * hadoop params constant
-     */
-    /**
+     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -585,12 +608,6 @@ public final class Constants {
      * --queue QUEUE
      */
     public static final String SPARK_QUEUE = "--queue";
-
-
-    /**
-     * --queue --qu
-     */
-    public static final String FLINK_QUEUE = "--qu";
 
 
     /**
@@ -752,7 +769,7 @@ public final class Constants {
 
 
     /**
-     *  preview schedule execute count
+     * preview schedule execute count
      */
     public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
 
@@ -821,6 +838,7 @@ public final class Constants {
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
     public static final String FLINK_APP_NAME = "-ynm";
+    public static final String FLINK_QUEUE = "-yqu";
     public static final String FLINK_TASK_MANAGE = "-yn";
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
@@ -829,14 +847,15 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
 
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITTING_THREAD.ordinal(),
-            ExecutionStatus.WAITTING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[] {
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.DELAY_EXECUTION.ordinal(),
+        ExecutionStatus.READY_PAUSE.ordinal(),
+        ExecutionStatus.READY_STOP.ordinal(),
+        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+        ExecutionStatus.WAITTING_THREAD.ordinal(),
+        ExecutionStatus.WAITTING_DEPEND.ordinal()
     };
 
     /**
@@ -852,18 +871,17 @@ public final class Constants {
     /**
      * data total
      */
-    public  static final String COUNT = "count";
+    public static final String COUNT = "count";
 
     /**
      * page size
      */
-    public  static final String PAGE_SIZE = "pageSize";
+    public static final String PAGE_SIZE = "pageSize";
 
     /**
      * current page no
      */
-    public  static final String PAGE_NUMBER = "pageNo";
-
+    public static final String PAGE_NUMBER = "pageNo";
 
 
     /**
@@ -898,6 +916,7 @@ public final class Constants {
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
+    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
 
     /**
      * database type
@@ -910,6 +929,7 @@ public final class Constants {
     public static final String ORACLE = "ORACLE";
     public static final String SQLSERVER = "SQLSERVER";
     public static final String DB2 = "DB2";
+    public static final String PRESTO = "PRESTO";
 
     /**
      * jdbc url
@@ -922,6 +942,7 @@ public final class Constants {
     public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
+    public static final String JDBC_PRESTO = "jdbc:presto://";
 
 
     public static final String ADDRESS = "address";
@@ -963,11 +984,11 @@ public final class Constants {
     /**
      * authorize writable perm
      */
-    public static final int AUTHORIZE_WRITABLE_PERM=7;
+    public static final int AUTHORIZE_WRITABLE_PERM = 7;
     /**
      * authorize readable perm
      */
-    public static final int AUTHORIZE_READABLE_PERM=4;
+    public static final int AUTHORIZE_READABLE_PERM = 4;
 
 
     /**
@@ -978,6 +999,8 @@ public final class Constants {
     public static final int NORAML_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
+    public static final String START_TIME = "start time";
+    public static final String END_TIME = "end time";
     /**
      * system line separator
      */
@@ -989,4 +1012,27 @@ public final class Constants {
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
 
+    public static final String EXCEL_SUFFIX_XLS = ".xls";
+
+    /**
+     * datasource encryption salt
+     */
+    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
+    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
+    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
+
+    /**
+     * Network IP gets priority, default inner outer
+     */
+    public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+
+    /**
+     * exec shell scripts
+     */
+    public static final String SH = "sh";
+
+    /**
+     * pstree, get pud and sub pid
+     */
+    public static final String PSTREE = "pstree";
 }

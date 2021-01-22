@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.config;
+
+import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.Set;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,12 @@ public class WorkerConfig {
 
     @Value("${worker.listen.port: 1234}")
     private int listenPort;
+
+    @Value("${worker.weight:100}")
+    private int weight;
+
+    @Value("${alert.listen.host:localhost}")
+    private String alertListenHost;
 
     public int getListenPort() {
         return listenPort;
@@ -98,7 +105,7 @@ public class WorkerConfig {
     }
 
     public int getWorkerMaxCpuloadAvg() {
-        if (workerMaxCpuloadAvg == -1){
+        if (workerMaxCpuloadAvg == -1) {
             return Constants.DEFAULT_WORKER_CPU_LOAD;
         }
         return workerMaxCpuloadAvg;
@@ -106,5 +113,21 @@ public class WorkerConfig {
 
     public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public String getAlertListenHost() {
+        return alertListenHost;
+    }
+
+    public void setAlertListenHost(String alertListenHost) {
+        this.alertListenHost = alertListenHost;
     }
 }

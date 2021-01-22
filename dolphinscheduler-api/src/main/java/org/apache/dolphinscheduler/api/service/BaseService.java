@@ -16,6 +16,12 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.text.MessageFormat;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -23,11 +29,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.text.MessageFormat;
-import java.util.Map;
 
 /**
  * base service
@@ -45,13 +46,13 @@ public class BaseService {
     }
 
     /**
-     * check admin
+     * isNotAdmin
      *
      * @param loginUser login user
      * @param result result code
-     * @return true if administrator, otherwise false
+     * @return true if not administrator, otherwise false
      */
-    protected boolean checkAdmin(User loginUser, Map<String, Object> result) {
+    protected boolean isNotAdmin(User loginUser, Map<String, Object> result) {
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -95,7 +96,27 @@ public class BaseService {
     }
 
     /**
+     * check
+     *
+     * @param result result
+     * @param bool bool
+     * @param userNoOperationPerm status
+     * @return check result
+     */
+    protected boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
+        //only admin can operate
+        if (bool) {
+            result.put(Constants.STATUS, userNoOperationPerm);
+            result.put(Constants.MSG, userNoOperationPerm.getMsg());
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * get cookie info by name
+     *
      * @param request request
      * @param name 'sessionId'
      * @return get cookie info
@@ -115,10 +136,11 @@ public class BaseService {
 
     /**
      * create tenant dir if not exists
+     *
      * @param tenantCode tenant code
      * @throws Exception if hdfs operation exception
      */
-    protected void createTenantDirIfNotExists(String tenantCode)throws Exception{
+    protected void createTenantDirIfNotExists(String tenantCode) throws Exception {
 
         String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
         String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
@@ -129,7 +151,7 @@ public class BaseService {
         HadoopUtils.getInstance().mkdir(udfsPath);
     }
 
-    protected boolean hasPerm(User operateUser, int createUserId){
+    protected boolean hasPerm(User operateUser, int createUserId) {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
 }

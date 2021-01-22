@@ -25,7 +25,9 @@ tar -zxf dolphinscheduler-dist/target/apache-dolphinscheduler*-bin.tar.gz --stri
 # licenses
 echo '=== Self modules: ' && ./mvnw --batch-mode --quiet -Dexec.executable='echo' -Dexec.args='${project.artifactId}-${project.version}.jar' exec:exec | tee self-modules.txt
 
-echo '=== Distributed dependencies: ' && ls dist/lib | tee all-dependencies.txt
+echo '=== Distributed dependencies: ' && find dist/lib -name "*.jar" | tee all-dependencies.txt
+# The prefix "dist/lib/" (9 chars) should be stripped to be ready to compare
+sed -i 's/.\{9\}//' all-dependencies.txt
 
 # Exclude all self modules(jars) to generate all third-party dependencies
 echo '=== Third party dependencies: ' && grep -vf self-modules.txt all-dependencies.txt | tee third-party-dependencies.txt

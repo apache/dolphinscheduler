@@ -20,8 +20,11 @@ import org.openqa.selenium.By;
 
 public class ProcessInstanceLocator {
     // jump Process Instance page
+    // process instance state is success
+    public static final By PROCESS_INSTANCE_SUCCESS_STATE = By.xpath("//table/tr[2]/td[4]/span/em[@title['data-original-title']='成功']");
+
     //click Process Instance name
-    public static final By CLICK_PROCESS_INSTANCE_NAME = By.xpath("//div[3]/div/ul/li[2]");
+    public static final By CLICK_PROCESS_INSTANCE_NAME = By.xpath("//div[4]/div/ul/li[2]");
 
     // click rerun button
     public static final By CLICK_RERUN_BUTTON = By.xpath("//tr[2]/td[14]/div[1]/button[2]");

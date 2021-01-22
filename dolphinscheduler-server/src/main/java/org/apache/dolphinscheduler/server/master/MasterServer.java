@@ -123,8 +123,8 @@ public class MasterServer {
         // self tolerant
         this.zkMasterClient.start();
 
-        //
-        masterSchedulerService.start();
+        // scheduler start
+        this.masterSchedulerService.start();
 
         // start QuartzExecutors
         // what system should do if exception

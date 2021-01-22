@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -26,6 +27,5 @@ public class PropertyUtilsTest {
     @Test
     public void getString() {
         assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULTFS));
-        assertNotNull(PropertyUtils.getInt("spring.redis.port"));
     }
 }

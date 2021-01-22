@@ -17,27 +17,44 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
+import org.apache.dolphinscheduler.remote.utils.Host;
+
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * random selector
- * @param <T> T
  */
-public class RandomSelector<T> extends AbstractSelector<T> {
-
-    private final Random random = new Random();
+public class RandomSelector extends AbstractSelector<Host> {
 
     @Override
-    public T doSelect(final Collection<T> source) {
+    public Host doSelect(final Collection<Host> source) {
 
-        int size = source.size();
-        /**
-         *  random select
-         */
-        int randomIndex = random.nextInt(size);
+        List<Host> hosts = new ArrayList<>(source);
+        int size = hosts.size();
+        int[] weights = new int[size];
+        int totalWeight = 0;
+        int index = 0;
 
-        return (T) source.toArray()[randomIndex];
+        for (Host host : hosts) {
+            totalWeight += host.getWeight();
+            weights[index] = host.getWeight();
+            index++;
+        }
+
+        if (totalWeight > 0) {
+            int offset = ThreadLocalRandom.current().nextInt(totalWeight);
+
+            for (int i = 0; i < size; i++) {
+                offset -= weights[i];
+                if (offset < 0) {
+                    return hosts.get(i);
+                }
+            }
+        }
+        return hosts.get(ThreadLocalRandom.current().nextInt(size));
     }
 
 }

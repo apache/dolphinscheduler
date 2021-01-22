@@ -28,7 +28,6 @@ public class LoginData {
      */
     public static final String URL = PropertiesReader.getKey("LOGIN_URL");
 
-
     /**
      * Login username
      */
@@ -38,6 +37,4 @@ public class LoginData {
      * Login password
      */
     public static final String PASSWORD = PropertiesReader.getKey("PASSWORD");
-
-    public static final String TENANT = "租户管理 - DolphinScheduler";
 }
