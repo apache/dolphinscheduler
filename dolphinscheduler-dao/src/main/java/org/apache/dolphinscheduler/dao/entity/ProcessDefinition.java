@@ -153,16 +153,6 @@ public class ProcessDefinition {
     private String connects;
 
     /**
-     * receivers
-     */
-    private String receivers;
-
-    /**
-     * receivers cc
-     */
-    private String receiversCc;
-
-    /**
      * schedule release state : online/offline
      */
     @TableField(exist = false)
@@ -188,6 +178,11 @@ public class ProcessDefinition {
      */
     private String resourceIds;
 
+    /**
+     * warningGroupId
+     */
+    @TableField(exist = false)
+    private int warningGroupId;
 
     public String getName() {
         return name;
@@ -285,7 +280,6 @@ public class ProcessDefinition {
         this.projectName = projectName;
     }
 
-
     public String getGlobalParams() {
         return globalParams;
     }
@@ -335,22 +329,6 @@ public class ProcessDefinition {
 
     public void setConnects(String connects) {
         this.connects = connects;
-    }
-
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
     }
 
     public ReleaseState getScheduleReleaseState() {
@@ -417,36 +395,43 @@ public class ProcessDefinition {
         this.projectCode = projectCode;
     }
 
+    public int getWarningGroupId() {
+        return warningGroupId;
+    }
+
+    public void setWarningGroupId(int warningGroupId) {
+        this.warningGroupId = warningGroupId;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{"
-                + "id=" + id
-                + ", code=" + code
-                + ", name='" + name + '\''
-                + ", version=" + version
-                + ", releaseState=" + releaseState
-                + ", projectId=" + projectId
-                + ", projectCode=" + projectCode
-                + ", processDefinitionJson='" + processDefinitionJson + '\''
-                + ", description='" + description + '\''
-                + ", globalParams='" + globalParams + '\''
-                + ", globalParamList=" + globalParamList
-                + ", globalParamMap=" + globalParamMap
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + ", flag=" + flag
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", projectName='" + projectName + '\''
-                + ", locations='" + locations + '\''
-                + ", connects='" + connects + '\''
-                + ", receivers='" + receivers + '\''
-                + ", receiversCc='" + receiversCc + '\''
-                + ", scheduleReleaseState=" + scheduleReleaseState
-                + ", timeout=" + timeout
-                + ", tenantId=" + tenantId
-                + ", modifyBy='" + modifyBy + '\''
-                + ", resourceIds='" + resourceIds + '\''
-                + '}';
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", code=" + code
+            + ", version=" + version
+            + ", releaseState=" + releaseState
+            + ", projectId=" + projectId
+            + ", projectCode=" + projectCode
+            + ", processDefinitionJson='" + processDefinitionJson + '\''
+            + ", description='" + description + '\''
+            + ", globalParams='" + globalParams + '\''
+            + ", globalParamList=" + globalParamList
+            + ", globalParamMap=" + globalParamMap
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + ", flag=" + flag
+            + ", userId=" + userId
+            + ", userName='" + userName + '\''
+            + ", projectName='" + projectName + '\''
+            + ", locations='" + locations + '\''
+            + ", connects='" + connects + '\''
+            + ", scheduleReleaseState=" + scheduleReleaseState
+            + ", timeout=" + timeout
+            + ", warningGroupId=" + warningGroupId
+            + ", tenantId=" + tenantId
+            + ", modifyBy='" + modifyBy + '\''
+            + ", resourceIds='" + resourceIds + '\''
+            + '}';
     }
 }

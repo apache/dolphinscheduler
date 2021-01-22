@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -45,6 +46,8 @@ public class TaskManagerTest {
     private Logger taskLogger;
 
     private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+
+    private AlertClientService alertClientService;
 
     @Before
     public void before() {
@@ -74,41 +77,43 @@ public class TaskManagerTest {
         PowerMockito.mockStatic(SpringApplicationContext.class);
         PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
                 .thenReturn(taskExecutionContextCacheManager);
+
+        alertClientService = PowerMockito.mock(AlertClientService.class);
     }
 
     @Test
     public void testNewTask() {
 
         taskExecutionContext.setTaskType("SHELL");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("WATERDROP");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("HTTP");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("MR");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("SPARK");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("FLINK");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("PYTHON");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("DATAX");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
         taskExecutionContext.setTaskType("SQOOP");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNull() {
         taskExecutionContext.setTaskType(null);
-        TaskManager.newTask(taskExecutionContext,taskLogger);
+        TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNotExists() {
         taskExecutionContext.setTaskType("XXX");
-        TaskManager.newTask(taskExecutionContext,taskLogger);
+        TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
     }
 }
