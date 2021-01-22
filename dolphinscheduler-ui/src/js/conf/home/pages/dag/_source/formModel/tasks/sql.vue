@@ -55,6 +55,18 @@
           </el-input>
         </div>
       </m-list-box>
+      <m-list-box>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Recipient')}}</div>
+        <div slot="content">
+          <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text">{{$t('Cc')}}</div>
+        <div slot="content">
+          <m-email ref="refCc" v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
+        </div>
+      </m-list-box>
     </template>
     <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
@@ -143,6 +155,7 @@
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
   import disabledState from '@/module/mixin/disabledState'
+  import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
   let editor
@@ -265,6 +278,10 @@
         if (this.sqlType === 0 && !this.$refs.refEmail._manualEmail()) {
           return false
         }
+        // receiversCc Subcomponent verification
+        if (this.sqlType === 0 && !this.$refs.refCc._manualEmail()) {
+          return false
+        }
         // udfs Subcomponent verification Verification only if the data type is HIVE
         if (this.type === 'HIVE') {
           if (!this.$refs.refUdfs._verifUdfs()) {
@@ -349,6 +366,19 @@
 
         return editor
       },
+      _getReceiver () {
+        let param = {}
+        let current = this.router.history.current
+        if (current.name === 'projects-definition-details') {
+          param.processDefinitionId = current.params.id
+        } else {
+          param.processInstanceId = current.params.id
+        }
+        this.store.dispatch('dag/getReceiver', param).then(res => {
+          this.receivers = res.receivers && res.receivers.split(',') || []
+          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+        })
+      },
       _cacheParams () {
         this.$emit('on-cache-params', {
           type: this.type,
@@ -389,6 +419,8 @@
         }
         if (val !== 0) {
           this.title = ''
+          this.receivers = []
+          this.receiversCc = []
         }
       },
       // Listening data source
@@ -423,10 +455,13 @@
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''
+        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
+        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }
       // read tasks from cache
       if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
         this.router.history.current.name !== 'definition-create') {
+        this._getReceiver()
       }
     },
     mounted () {
@@ -469,6 +504,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
   }
 </script>

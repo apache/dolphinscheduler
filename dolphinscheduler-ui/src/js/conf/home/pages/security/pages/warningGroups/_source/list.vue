@@ -38,6 +38,9 @@
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="130">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('Managing Users')" placement="top">
+              <el-button type="primary" size="mini" icon="el-icon-user" @click="_mangeUser(scope.row, scope.$index)" circle></el-button>
+            </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
@@ -57,17 +60,33 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="transferDialog"
+      width="auto">
+      <m-transfer :transferData="transferData" @onUpdate="onUpdate" @close="close"></m-transfer>
+    </el-dialog>
   </div>
 </template>
 <script>
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
+  import mTransfer from '@/module/components/transfer/transfer'
 
   export default {
     name: 'user-list',
     data () {
       return {
         list: [],
-        item: {}
+        transferDialog: false,
+        item: {},
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: `${i18n.$t('Managing Users')}`
+          }
+        }
       }
     },
     props: {
@@ -76,7 +95,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization']),
+      ...mapActions('security', ['deleteAlertgrou', 'getAuthList', 'grantAuthorization']),
       _delete (item, i) {
         this.deleteAlertgrou({
           id: item.id
@@ -89,6 +108,40 @@
       },
       _edit (item) {
         this.$emit('on-edit', item)
+      },
+      _mangeUser (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'user',
+          category: 'users'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.userName
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.userName
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferDialog = true
+        })
+      },
+      onUpdate (userIds) {
+        this._grantAuthorization('alert-group/grant-user', {
+          userIds: userIds,
+          alertgroupId: this.item.id
+        })
+        this.transferDialog = false
+      },
+      close () {
+        this.transferDialog = false
       },
 
       _grantAuthorization (api, param) {
@@ -115,6 +168,6 @@
     },
     mounted () {
     },
-    components: {}
+    components: { mTransfer }
   }
 </script>
