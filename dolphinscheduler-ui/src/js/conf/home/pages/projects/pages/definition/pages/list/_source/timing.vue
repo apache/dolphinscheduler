@@ -136,6 +136,22 @@
         </el-select>
       </div>
     </div>
+    <div class="clearfix list">
+      <div class="text">
+        {{$t('Recipient')}}
+      </div>
+      <div class="cont" style="width: 680px;">
+        <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
+        {{$t('Cc')}}
+      </div>
+      <div class="cont" style="width: 680px;">
+        <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
+      </div>
+    </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
       <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (timingData.item.crontab ? $t('Edit') : $t('Create'))}} </el-button>
@@ -143,7 +159,9 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import i18n from '@/module/i18n'
+  import mEmail from './email.vue'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
   import { vCrontab } from '@/module/components/crontab/index'
@@ -166,6 +184,8 @@
         scheduleTime: '',
         crontab: '0 0 * * * ? *',
         cronPopover: false,
+        receivers: [],
+        receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
         workerGroup: '',
@@ -209,6 +229,8 @@
             warningType: this.warningType,
             processInstancePriority: this.processInstancePriority,
             warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
+            receivers: this.receivers.join(',') || '',
+            receiversCc: this.receiversCc.join(',') || '',
             workerGroup: this.workerGroup
           }
           let msg = ''
@@ -315,6 +337,8 @@
         this.crontab = '0 0 * * * ? *'
         this.scheduleTime = times
       }
+      this.receivers = _.cloneDeep(this.timingData.receiversD)
+      this.receiversCc = _.cloneDeep(this.timingData.receiversCcD)
     },
     mounted () {
       let item = this.timingData.item
@@ -327,6 +351,7 @@
         this.processInstancePriority = item.processInstancePriority
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
+            // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
             this.warningGroupId = item.warningGroupId
           })
         }).catch(() => { this.warningGroupId = '' })
@@ -338,7 +363,7 @@
         }).catch(() => { this.warningGroupId = '' })
       }
     },
-    components: { vCrontab, mPriority, mWorkerGroups }
+    components: { vCrontab, mEmail, mPriority, mWorkerGroups }
   }
 </script>
 
