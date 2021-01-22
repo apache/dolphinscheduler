@@ -32,9 +32,10 @@ import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -66,6 +67,8 @@ public class TaskExecuteThreadTest {
     private Logger taskLogger;
 
     private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+
+    private AlertClientService alertClientService;
 
     @Before
     public void before() {
@@ -103,8 +106,10 @@ public class TaskExecuteThreadTest {
         PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
                 .thenReturn(taskExecutionContextCacheManager);
 
+        alertClientService = PowerMockito.mock(AlertClientService.class);
+
         PowerMockito.mockStatic(TaskManager.class);
-        PowerMockito.when(TaskManager.newTask(taskExecutionContext, taskLogger))
+        PowerMockito.when(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService))
                 .thenReturn(new SimpleTask(taskExecutionContext, taskLogger));
 
         PowerMockito.mockStatic(JSONUtils.class);
@@ -114,9 +119,7 @@ public class TaskExecuteThreadTest {
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getSystemEnvPath()).thenReturn("/user_home/.bash_profile");
 
-        List<String> osUserList = new ArrayList<String>() {{
-                add("test");
-            }};
+        List<String> osUserList = Collections.singletonList("test");
         PowerMockito.mockStatic(OSUtils.class);
         PowerMockito.when(OSUtils.getUserList()).thenReturn(osUserList);
     }
@@ -127,7 +130,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskExecutionContext.setTenantCode("test");
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecuteThread.run();
         taskExecutionContext.getCurrentExecutionStatus();
 
@@ -143,7 +146,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setDelayTime(1);
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
         taskExecutionContext.setTenantCode("test");
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecuteThread.run();
 
         Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
