@@ -14,23 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.dao.entity.Alert;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * SMS send manager
  */
-public class MsgManager  {
+public class MsgManager {
 
     private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
+
     /**
      * SMS send
+     *
      * @param alert the alert
      */
-    public void send(Alert alert){
-        logger.info("send message {}",alert);
+    public void send(Alert alert) {
+        logger.info("send message {}", alert);
     }
 }
