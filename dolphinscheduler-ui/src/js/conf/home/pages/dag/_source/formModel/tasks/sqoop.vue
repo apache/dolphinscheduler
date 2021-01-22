@@ -1175,7 +1175,6 @@
         }
         if (val !== 0) {
           this.title = ''
-          this.receivers = []
         }
       },
       // Listening data source

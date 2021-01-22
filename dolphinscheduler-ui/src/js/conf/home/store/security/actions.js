@@ -43,6 +43,12 @@ export default {
           groupName: payload.groupName
         },
         api: 'alert-group/verify-group-name'
+      },
+      alarmInstance: {
+        param: {
+          alertInstanceName: payload.instanceName
+        },
+        api: 'alert-plugin-instance/verify-alert-instance-name'
       }
     }
 
@@ -340,11 +346,59 @@ export default {
     })
   },
   /**
-   * Paging query alarm group list
+   * queryAlertGroupListPaging
    */
-  getAlertgroupP ({ state }, payload) {
+  queryAlertGroupListPaging ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get('alert-group/list-paging', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * queryAlertPluginInstanceListPaging
+   */
+  queryAlertPluginInstanceListPaging ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('alert-plugin-instance/list-paging', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * queryUiPlugins
+   */
+  getPlugins ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('ui-plugins/queryUiPluginsByType', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * queryUiPluginById
+   */
+  getUiPluginById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('ui-plugins/queryUiPluginDetailById', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * queryAll alert-plugin-instance
+   */
+  queryAllAlertPluginInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('alert-plugin-instance/queryAll', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -376,6 +430,30 @@ export default {
     })
   },
   /**
+   * create alert plugin instance operation
+   */
+  createAlertPluginInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post('alert-plugin-instance/create', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * update alert plugin instance operation
+   */
+  updateAlertPluginInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('alert-plugin-instance/update', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * update an alarm group.
    */
   updateAlertgrou ({ state }, payload) {
@@ -393,6 +471,18 @@ export default {
   deleteAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post('alert-group/delete', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * delete alert plugin instance operation
+   */
+  deletAelertPluginInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('alert-plugin-instance/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
