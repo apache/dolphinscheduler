@@ -18,10 +18,25 @@
 package org.apache.dolphinscheduler.server.registry;
 
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
+import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.RandomHostManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
@@ -29,6 +44,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
+
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,108 +66,118 @@ public class DependencyConfig {
     }
 
     @Bean
-    public UserAlertGroupMapper userAlertGroupMapper() {
-        return Mockito.mock(UserAlertGroupMapper.class);
-    }
-
-    @Bean
-    public TaskInstanceCacheManagerImpl taskInstanceCacheManagerImpl(){
+    public TaskInstanceCacheManagerImpl taskInstanceCacheManagerImpl() {
         return Mockito.mock(TaskInstanceCacheManagerImpl.class);
     }
 
     @Bean
-    public ProcessService processService(){
+    public ProcessService processService() {
         return Mockito.mock(ProcessService.class);
     }
 
     @Bean
-    public MasterConfig masterConfig(){
+    public MasterConfig masterConfig() {
         return Mockito.mock(MasterConfig.class);
     }
+
     @Bean
-    public UserMapper userMapper(){
+    public UserMapper userMapper() {
         return Mockito.mock(UserMapper.class);
     }
 
     @Bean
-    public ProcessDefinitionMapper processDefineMapper(){
+    public ProcessDefinitionMapper processDefineMapper() {
         return Mockito.mock(ProcessDefinitionMapper.class);
     }
 
     @Bean
-    public ProcessInstanceMapper processInstanceMapper(){
+    public ProcessInstanceMapper processInstanceMapper() {
         return Mockito.mock(ProcessInstanceMapper.class);
     }
 
     @Bean
-    public DataSourceMapper dataSourceMapper(){
+    public DataSourceMapper dataSourceMapper() {
         return Mockito.mock(DataSourceMapper.class);
     }
 
     @Bean
-    public ProcessInstanceMapMapper processInstanceMapMapper(){
+    public ProcessInstanceMapMapper processInstanceMapMapper() {
         return Mockito.mock(ProcessInstanceMapMapper.class);
     }
 
     @Bean
-    public TaskInstanceMapper taskInstanceMapper(){
+    public TaskInstanceMapper taskInstanceMapper() {
         return Mockito.mock(TaskInstanceMapper.class);
     }
 
     @Bean
-    public CommandMapper commandMapper(){
+    public CommandMapper commandMapper() {
         return Mockito.mock(CommandMapper.class);
     }
 
     @Bean
-    public ScheduleMapper scheduleMapper(){
+    public ScheduleMapper scheduleMapper() {
         return Mockito.mock(ScheduleMapper.class);
     }
 
     @Bean
-    public UdfFuncMapper udfFuncMapper(){
+    public UdfFuncMapper udfFuncMapper() {
         return Mockito.mock(UdfFuncMapper.class);
     }
 
     @Bean
-    public ResourceMapper resourceMapper(){
+    public ResourceMapper resourceMapper() {
         return Mockito.mock(ResourceMapper.class);
     }
 
-
-
     @Bean
-    public ErrorCommandMapper errorCommandMapper(){
+    public ErrorCommandMapper errorCommandMapper() {
         return Mockito.mock(ErrorCommandMapper.class);
     }
 
     @Bean
-    public TenantMapper tenantMapper(){
+    public TenantMapper tenantMapper() {
         return Mockito.mock(TenantMapper.class);
     }
 
     @Bean
-    public ProjectMapper projectMapper(){
+    public ProjectMapper projectMapper() {
         return Mockito.mock(ProjectMapper.class);
     }
 
     @Bean
-    public TaskCallbackService taskCallbackService(){
+    public TaskCallbackService taskCallbackService() {
         return Mockito.mock(TaskCallbackService.class);
     }
 
     @Bean
-    public HostManager hostManager(){
+    public HostManager hostManager() {
         return new RandomHostManager();
     }
 
     @Bean
-    public TaskResponseService taskResponseService(){
+    public TaskResponseService taskResponseService() {
         return Mockito.mock(TaskResponseService.class);
     }
 
     @Bean
-    public TaskPriorityQueue taskPriorityQueue(){
+    public TaskPriorityQueue taskPriorityQueue() {
         return new TaskPriorityQueueImpl();
     }
+
+    @Bean
+    public AlertPluginInstanceMapper alertPluginInstanceMapper() {
+        return Mockito.mock(AlertPluginInstanceMapper.class);
+    }
+
+    @Bean
+    public AlertGroupMapper alertGroupMapper() {
+        return Mockito.mock(AlertGroupMapper.class);
+    }
+
+    @Bean
+    public PluginDefineMapper pluginDefineMapper() {
+        return Mockito.mock(PluginDefineMapper.class);
+    }
+
 }
