@@ -211,8 +211,6 @@ public class ProcessInstanceServiceTest {
 
         //project auth success
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setReceivers("xxx@qq.com");
-        processInstance.setReceiversCc("xxx@qq.com");
         processInstance.setProcessDefinitionId(46);
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);

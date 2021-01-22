@@ -157,7 +157,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param locations locations for nodes
      * @param connects connects for nodes
      * @return create result code
-     * @throws JsonProcessingException JsonProcessingException
      */
     @Override
     public Map<String, Object> createProcessDefinition(User loginUser,
@@ -221,9 +220,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefineMapper.updateVersionByProcessDefinitionId(processDefine.getId(), version);
 
         // return processDefinition object with ID
-        result.put(Constants.DATA_LIST, processDefineMapper.selectById(processDefine.getId()));
+        result.put(Constants.DATA_LIST, processDefine.getId());
         putMsg(result, Status.SUCCESS);
-        result.put(PROCESSDEFINITIONID, processDefine.getId());
         return result;
     }
 
@@ -888,8 +886,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         //create process definition
         Integer processDefinitionId =
-                Objects.isNull(createProcessResult.get(PROCESSDEFINITIONID))
-                        ? null : Integer.parseInt(createProcessResult.get(PROCESSDEFINITIONID).toString());
+                Objects.isNull(createProcessResult.get(Constants.DATA_LIST))
+                        ? null : Integer.parseInt(createProcessResult.get(Constants.DATA_LIST).toString());
 
         //scheduler param
         return getImportProcessScheduleResult(loginUser,
@@ -1131,8 +1129,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 processDefine.setCreateTime(now);
                 processDefine.setUpdateTime(now);
                 processDefine.setFlag(subProcess.getFlag());
-                processDefine.setReceivers(subProcess.getReceivers());
-                processDefine.setReceiversCc(subProcess.getReceiversCc());
+                processDefine.setWarningGroupId(subProcess.getWarningGroupId());
                 processDefineMapper.insert(processDefine);
 
                 logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), processDefine.getName());
@@ -1517,41 +1514,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     }
 
     /**
-     * copy process definition
-     *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param processId process definition id
-     * @return copy result code
-     */
-    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) {
-
-        Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return checkResult;
-        }
-
-        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
-        if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
-            return result;
-        } else {
-            return createProcessDefinition(
-                    loginUser,
-                    projectName,
-                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
-                    processDefinition.getProcessDefinitionJson(),
-                    processDefinition.getDescription(),
-                    processDefinition.getLocations(),
-                    processDefinition.getConnects());
-        }
-    }
-
-    /**
      * batch copy process definition
      *
      * @param loginUser loginUser
@@ -1695,8 +1657,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefinition.setTimeout(processDefinitionVersion.getTimeout());
         processDefinition.setGlobalParams(processDefinitionVersion.getGlobalParams());
         processDefinition.setUpdateTime(new Date());
-        processDefinition.setReceivers(processDefinitionVersion.getReceivers());
-        processDefinition.setReceiversCc(processDefinitionVersion.getReceiversCc());
+        processDefinition.setWarningGroupId(processDefinitionVersion.getWarningGroupId());
         processDefinition.setResourceIds(processDefinitionVersion.getResourceIds());
 
         if (processDefineMapper.updateById(processDefinition) > 0) {
