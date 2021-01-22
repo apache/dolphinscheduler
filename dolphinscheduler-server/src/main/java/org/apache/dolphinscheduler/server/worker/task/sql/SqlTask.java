@@ -14,62 +14,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import static org.apache.dolphinscheduler.common.Constants.HIVE_CONF;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SEMICOLON;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.commons.lang.StringUtils;
+
+import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import org.slf4j.Logger;
+
+import java.sql.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
 
 /**
  * sql task
@@ -99,10 +83,7 @@ public class SqlTask extends AbstractTask {
      */
     private static final int LIMIT = 10000;
 
-
-    private AlertClientService alertClientService;
-
-    public SqlTask(TaskExecutionContext taskExecutionContext, Logger logger, AlertClientService alertClientService) {
+    public SqlTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
 
         this.taskExecutionContext = taskExecutionContext;
@@ -114,7 +95,6 @@ public class SqlTask extends AbstractTask {
             throw new RuntimeException("sql task params is not valid");
         }
 
-        this.alertClientService = alertClientService;
         this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
     }
 
@@ -180,6 +160,7 @@ public class SqlTask extends AbstractTask {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // find process instance by task id
+
 
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
@@ -311,7 +292,8 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         logger.debug("execute sql : {}", result);
 
-        sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
+        sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ?
+                        sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
                 JSONUtils.toJsonString(resultJSONArray));
     }
 
@@ -437,8 +419,8 @@ public class SqlTask extends AbstractTask {
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
         // is the timeout set
-        boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED
-                || TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
+        boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED ||
+                TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
         PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
         if (timeoutFlag) {
             stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
@@ -460,10 +442,45 @@ public class SqlTask extends AbstractTask {
      * @param title title
      * @param content content
      */
-    public void sendAttachment(int groupId, String title, String content) {
-        AlertSendResponseCommand alertSendResponseCommand = alertClientService.sendAlert(groupId, title, content);
-        if (!alertSendResponseCommand.getResStatus()) {
-            throw new RuntimeException("send mail failed!");
+    public void sendAttachment(String title, String content) {
+
+        List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
+
+        // receiving group list
+        List<String> receiversList = new ArrayList<>();
+        for (User user : users) {
+            receiversList.add(user.getEmail().trim());
+        }
+        // custom receiver
+        String receivers = sqlParameters.getReceivers();
+        if (StringUtils.isNotEmpty(receivers)) {
+            String[] splits = receivers.split(COMMA);
+            for (String receiver : splits) {
+                receiversList.add(receiver.trim());
+            }
+        }
+
+        // copy list
+        List<String> receiversCcList = new ArrayList<>();
+        // Custom Copier
+        String receiversCc = sqlParameters.getReceiversCc();
+        if (StringUtils.isNotEmpty(receiversCc)) {
+            String[] splits = receiversCc.split(COMMA);
+            for (String receiverCc : splits) {
+                receiversCcList.add(receiverCc.trim());
+            }
+        }
+
+        String showTypeName = sqlParameters.getShowType().replace(COMMA, "").trim();
+        if (EnumUtils.isValidEnum(ShowType.class, showTypeName)) {
+            Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
+                    receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
+            if (!(boolean) mailResult.get(STATUS)) {
+                throw new RuntimeException("send mail failed!");
+            }
+        } else {
+            logger.error("showType: {} is not valid ", showTypeName);
+            throw new RuntimeException(String.format("showType: %s is not valid ", showTypeName));
         }
     }
 
