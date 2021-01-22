@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import org.apache.dolphinscheduler.common.enums.AlertType;
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 @TableName("t_ds_alertgroup")
 public class AlertGroup {
@@ -36,11 +36,10 @@ public class AlertGroup {
      */
     @TableField(value = "group_name")
     private String groupName;
-    /**
-     * group_type
-     */
-    @TableField(value = "group_type")
-    private AlertType groupType;
+
+    @TableField(value = "alert_instance_ids")
+    private String alertInstanceIds;
+
     /**
      * description
      */
@@ -57,6 +56,12 @@ public class AlertGroup {
     @TableField(value = "update_time")
     private Date updateTime;
 
+    /**
+     * create_user_id
+     */
+    @TableField(value = "create_user_id")
+    private int createUserId;
+
     public int getId() {
         return id;
     }
@@ -71,14 +76,6 @@ public class AlertGroup {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
-    }
-
-    public AlertType getGroupType() {
-        return groupType;
-    }
-
-    public void setGroupType(AlertType groupType) {
-        this.groupType = groupType;
     }
 
     public Date getCreateTime() {
@@ -105,6 +102,22 @@ public class AlertGroup {
         this.description = description;
     }
 
+    public int getCreateUserId() {
+        return createUserId;
+    }
+
+    public void setCreateUserId(int createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public String getAlertInstanceIds() {
+        return alertInstanceIds;
+    }
+
+    public void setAlertInstanceIds(String alertInstanceIds) {
+        this.alertInstanceIds = alertInstanceIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -119,10 +132,13 @@ public class AlertGroup {
         if (id != that.id) {
             return false;
         }
+        if (createUserId != that.createUserId) {
+            return false;
+        }
         if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
             return false;
         }
-        if (groupType != that.groupType) {
+        if (alertInstanceIds != null ? !alertInstanceIds.equals(that.alertInstanceIds) : that.alertInstanceIds != null) {
             return false;
         }
         if (description != null ? !description.equals(that.description) : that.description != null) {
@@ -135,8 +151,9 @@ public class AlertGroup {
     @Override
     public int hashCode() {
         int result = id;
+        result = 31 * result + createUserId;
         result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
-        result = 31 * result + (groupType != null ? groupType.hashCode() : 0);
+        result = 31 * result + (alertInstanceIds != null ? alertInstanceIds.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
@@ -145,13 +162,13 @@ public class AlertGroup {
 
     @Override
     public String toString() {
-        return "AlertGroup{" +
-                "id=" + id +
-                ", groupName='" + groupName + '\'' +
-                ", groupType=" + groupType +
-                ", description='" + description + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "AlertGroup{"
+            + "id=" + id
+            + "createUserId=" + createUserId
+            + ", groupName='" + groupName + '\''
+            + ", description='" + description + '\''
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + '}';
     }
 }
