@@ -75,9 +75,8 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
      * @param zNode node path
      * @param zkNodeType master or worker
      * @param opType delete or add
-     * @throws Exception errors
      */
-    public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
+    public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) {
         String host = getHostByEventDataPath(zNode);
         String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
 

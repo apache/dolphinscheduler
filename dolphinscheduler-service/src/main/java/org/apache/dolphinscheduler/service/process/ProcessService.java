@@ -912,7 +912,8 @@ public class ProcessService {
      */
     private void initTaskInstance(TaskInstance taskInstance) {
 
-        if (!taskInstance.isSubProcess() && taskInstance.getState().typeIsCancel() || taskInstance.getState().typeIsFailure()) {
+        if (!taskInstance.isSubProcess()
+                && (taskInstance.getState().typeIsCancel() || taskInstance.getState().typeIsFailure())) {
             taskInstance.setFlag(Flag.NO);
             updateTaskInstance(taskInstance);
             return;
