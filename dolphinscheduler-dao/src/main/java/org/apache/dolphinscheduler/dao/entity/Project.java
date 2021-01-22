@@ -48,6 +48,11 @@ public class Project {
     private String userName;
 
     /**
+     * project code
+     */
+    private Long code;
+
+    /**
      * project name
      */
     private String name;
@@ -84,6 +89,14 @@ public class Project {
      */
     @TableField(exist = false)
     private int instRunningCount;
+
+    public Long getCode() {
+        return code;
+    }
+
+    public void setCode(Long code) {
+        this.code = code;
+    }
 
     public int getDefCount() {
         return defCount;
@@ -167,15 +180,19 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "Project{"
+                + "id=" + id
+                + ", userId=" + userId
+                + ", userName='" + userName + '\''
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + ", perm=" + perm
+                + ", defCount=" + defCount
+                + ", instRunningCount=" + instRunningCount
+                + '}';
     }
 
     @Override
@@ -211,6 +228,7 @@ public class Project {
         private int id;
         private int userId;
         private String userName;
+        private Long code;
         private String name;
         private String description;
         private Date createTime;
@@ -220,6 +238,11 @@ public class Project {
         private int instRunningCount;
 
         private Builder() {
+        }
+
+        public Builder code(Long code) {
+            this.code = code;
+            return this;
         }
 
         public Builder id(int id) {
@@ -276,6 +299,7 @@ public class Project {
             Project project = new Project();
             project.setId(id);
             project.setUserId(userId);
+            project.setCode(code);
             project.setUserName(userName);
             project.setName(name);
             project.setDescription(description);
