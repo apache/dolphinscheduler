@@ -189,6 +189,7 @@ public class ProcessInstanceService extends BaseService {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
 
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        processInstance.setProcessDefinitionId(processDefinition.getId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
         result.put(DATA_LIST, processInstance);

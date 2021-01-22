@@ -422,6 +422,7 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 -- Table structure for t_ds_process_definition_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_log`;
 CREATE TABLE `t_ds_process_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
@@ -448,6 +449,7 @@ CREATE TABLE `t_ds_process_definition_log` (
 -- ----------------------------
 -- Table structure for t_ds_task_definition
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition`;
 CREATE TABLE `t_ds_task_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
@@ -476,6 +478,7 @@ CREATE TABLE `t_ds_task_definition` (
 -- ----------------------------
 -- Table structure for t_ds_task_definition_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition_log`;
 CREATE TABLE `t_ds_task_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
@@ -505,6 +508,7 @@ CREATE TABLE `t_ds_task_definition_log` (
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation`;
 CREATE TABLE `t_ds_process_task_relation` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
@@ -525,6 +529,7 @@ CREATE TABLE `t_ds_process_task_relation` (
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
 CREATE TABLE `t_ds_process_task_relation_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
