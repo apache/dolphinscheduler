@@ -16,9 +16,6 @@
  */
 <template>
   <div class="popup-model">
-    <div class="top-p">
-      <span>{{nameText}}</span>
-    </div>
     <div class="content-p">
       <slot name="content"></slot>
     </div>
@@ -39,10 +36,6 @@
       }
     },
     props: {
-      nameText: {
-        type: String,
-        default: `${i18n.$t('Create')}`
-      },
       okText: {
         type: String,
         default: `${i18n.$t('Confirm')}`

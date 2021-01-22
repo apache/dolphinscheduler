@@ -74,8 +74,8 @@
       resourceData: Object
     },
     created () {
-      let file = this.fileSourceList
-      let udf = this.udfSourceList
+      let file = this.resourceData.fileSourceList
+      let udf = this.resourceData.udfSourceList
       this.diGuiTree(file)
       this.diGuiTree(udf)
       this.fileList = file
@@ -218,7 +218,6 @@
         delete item.children
       },
       close () {
-        console.log(888)
         this.$emit('closeAuthResource')
       }
     },
