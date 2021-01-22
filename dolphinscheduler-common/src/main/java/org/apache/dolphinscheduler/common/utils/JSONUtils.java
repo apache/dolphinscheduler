@@ -294,7 +294,11 @@ public class JSONUtils {
 
     public static ObjectNode parseObject(String text) {
         try {
-            return (ObjectNode) objectMapper.readTree(text);
+            if (text.isEmpty()) {
+                return parseObject(text, ObjectNode.class);
+            } else {
+                return (ObjectNode) objectMapper.readTree(text);
+            }
         } catch (Exception e) {
             throw new RuntimeException("String json deserialization exception.", e);
         }
