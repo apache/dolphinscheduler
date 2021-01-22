@@ -43,6 +43,11 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
+    /**
+     *  init properties
+     */
+    private static final PropertyUtils propertyUtils = new PropertyUtils();
+
     private PropertyUtils() {
         init();
     }
