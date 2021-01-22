@@ -21,6 +21,8 @@
         <template slot="button-group" v-if="isADMIN">
           <el-button size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
           <el-dialog
+            :title="item ? $t('Edit Tenant') : $t('Create Tenant')"
+            v-if="createTenementDialog"
             :visible.sync="createTenementDialog"
             width="auto">
             <m-create-tenement :item="item" @onUpdate="onUpdate" @close="close"></m-create-tenement>
