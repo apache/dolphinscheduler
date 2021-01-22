@@ -43,7 +43,7 @@ initDatabase() {
             exit 1
         fi
     else
-        v=$(sudo -u postgres PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
+        v=$(PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
         if [ "$(echo ${v} | grep 'FATAL' | wc -l)" -eq 1 ]; then
             echo "Error: Can't connect to database...${v}"
             exit 1
@@ -127,7 +127,6 @@ printUsage() {
 # init config file
 source /root/startup-init-conf.sh
 
-LOGFILE=/var/log/nginx/access.log
 case "$1" in
     (all)
         initZK
@@ -138,35 +137,36 @@ case "$1" in
         initAlertServer
         initLoggerServer
         initNginx
-        LOGFILE=/var/log/nginx/access.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler*
     ;;
     (master-server)
         initZK
         initDatabase
         initMasterServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master-server-$(hostname).out
     ;;
     (worker-server)
         initZK
         initDatabase
         initWorkerServer
         initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker-server-$(hostname).out
     ;;
     (api-server)
         initZK
         initDatabase
         initApiServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server-$(hostname).out
     ;;
     (alert-server)
         initDatabase
         initAlertServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert-server-$(hostname).out
     ;;
     (frontend)
         initNginx
         LOGFILE=/var/log/nginx/access.log
+        mkdir -p /var/log/nginx
     ;;
     (help)
         printUsage
@@ -178,9 +178,12 @@ case "$1" in
     ;;
 esac
 
-# init directories and log files
-mkdir -p ${DOLPHINSCHEDULER_LOGS} && mkdir -p /var/log/nginx/ && cat /dev/null >> ${LOGFILE}
+# init log files directories
+mkdir -p ${DOLPHINSCHEDULER_LOGS}
+
+while !(ls ${LOGFILE} &> /dev/null); do
+    sleep 1
+done
 
 echo "tail begin"
 exec bash -c "tail -n 1 -f ${LOGFILE}"
-

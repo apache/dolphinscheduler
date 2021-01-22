@@ -26,7 +26,7 @@ ENV DOCKER true
 # 1. install command/library/software
 # If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
 # RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirror.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+# RUN sed -i 's/dl-cdn.alpinelinux.org/mirror.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk update && \
     apk add --no-cache tzdata dos2unix bash python2 python3 procps sudo shadow nginx tini postgresql-client && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \

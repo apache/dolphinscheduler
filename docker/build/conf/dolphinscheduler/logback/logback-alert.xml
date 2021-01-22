@@ -29,24 +29,8 @@
         </encoder>
     </appender>
 
-    <appender name="ALERTLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/dolphinscheduler-alert.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-alert.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
-            <maxHistory>20</maxHistory>
-            <maxFileSize>64MB</maxFileSize>
-        </rollingPolicy>
-        <encoder>
-            <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
-            </pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
-
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="APILOGFILE"/>
     </root>
 
 </configuration>
