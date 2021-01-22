@@ -453,7 +453,6 @@
       _arrDelChange (v) {
         let arr = []
         arr = _.map(v, 'id')
-        console.log(arr)
         this.strDelete = _.join(arr, ',')
       },
       _batchDelete () {
