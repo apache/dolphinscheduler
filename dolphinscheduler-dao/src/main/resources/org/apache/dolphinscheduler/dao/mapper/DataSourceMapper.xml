@@ -40,11 +40,14 @@
 
     <select id="selectPaging" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
         select
-        <include refid="baseSql"/>
-        from t_ds_datasource
+        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time
+        ,
+        u.user_name as user_name
+        from t_ds_datasource d
+        join t_ds_user u on d.user_id = u.id
         where 1 =1
         <if test="userId != 0">
-            and id in
+            and d.id in
             (select datasource_id
             from t_ds_relation_datasource_user
             where user_id=#{userId}

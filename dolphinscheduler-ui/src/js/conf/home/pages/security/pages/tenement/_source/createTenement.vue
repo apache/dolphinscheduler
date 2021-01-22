@@ -24,7 +24,7 @@
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Tenant Code')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('OS Tenant Code')}}</template>
           <template slot="content">
             <el-input
                 type="input"
@@ -32,7 +32,7 @@
                 v-model="tenantCode"
                 maxlength="60"
                 size="small"
-                :placeholder="$t('Please enter tenant code')">
+                :placeholder="$t('Please enter os tenant code')">
             </el-input>
           </template>
         </m-list-box-f>
@@ -122,11 +122,11 @@
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
         if (!this.tenantCode.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
+          this.$message.warning(`${i18n.$t('Please enter the os tenant code in English')}`)
           return false
         }
         if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
-          this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
+          this.$message.warning(`${i18n.$t('Please enter os tenant code in English')}`)
           return false
         }
         return true

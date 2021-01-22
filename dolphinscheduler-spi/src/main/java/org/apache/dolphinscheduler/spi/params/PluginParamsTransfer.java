@@ -39,14 +39,12 @@ public class PluginParamsTransfer {
 
     /**
      * return the plugin params map
-     * @param paramsJsonStr
-     * @return
      */
     public static Map<String, String> getPluginParamsMap(String paramsJsonStr) {
         List<PluginParams> pluginParams = transferJsonToParamsList(paramsJsonStr);
         Map<String, String> paramsMap = new HashMap<>();
         for (PluginParams param : pluginParams) {
-            paramsMap.put(param.getName(), param.getValue().toString());
+            paramsMap.put(param.getName(), null != param.getValue() ? param.getValue().toString() : null);
         }
         return paramsMap;
     }

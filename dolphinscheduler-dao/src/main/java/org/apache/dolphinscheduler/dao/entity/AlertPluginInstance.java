@@ -37,12 +37,6 @@ public class AlertPluginInstance {
     private int id;
 
     /**
-     * alert group id
-     */
-    @TableField("alert_group_id")
-    private int alertGroupId;
-
-    /**
      * plugin_define_id
      */
     @TableField("plugin_define_id")
@@ -77,10 +71,9 @@ public class AlertPluginInstance {
         this.updateTime = new Date();
     }
 
-    public AlertPluginInstance(int pluginDefineId, String pluginInstanceParams, int alertGroupId, String instanceName) {
+    public AlertPluginInstance(int pluginDefineId, String pluginInstanceParams, String instanceName) {
         this.pluginDefineId = pluginDefineId;
         this.pluginInstanceParams = pluginInstanceParams;
-        this.alertGroupId = alertGroupId;
         this.createTime = new Date();
         this.updateTime = new Date();
         this.instanceName = instanceName;
@@ -124,14 +117,6 @@ public class AlertPluginInstance {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public int getAlertGroupId() {
-        return alertGroupId;
-    }
-
-    public void setAlertGroupId(int alertGroupId) {
-        this.alertGroupId = alertGroupId;
     }
 
     public String getInstanceName() {

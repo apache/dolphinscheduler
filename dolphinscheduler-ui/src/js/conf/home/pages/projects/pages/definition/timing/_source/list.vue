@@ -139,11 +139,10 @@
         this.deleteTiming({
           scheduleId: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.pageNo = 1
+          this._getScheduleList('false')
           this.$message.success(res.msg)
-          this.$router.push({ name: 'projects-definition-list' })
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },

@@ -37,7 +37,7 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String getName() {
-        return "we chat alert";
+        return "WeChat";
     }
 
     @Override

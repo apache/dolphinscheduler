@@ -1,6 +1,5 @@
 HikariCP-3.2.0.jar
 animal-sniffer-annotations-1.14.jar
-ant-1.6.5.jar
 aopalliance-1.0.jar
 apache-el-8.5.54.jar
 apacheds-i18n-2.0.0-M15.jar
@@ -34,7 +33,6 @@ commons-logging-1.1.1.jar
 commons-math3-3.1.1.jar
 commons-net-3.1.jar
 commons-pool-1.6.jar
-core-3.1.1.jar
 cron-utils-5.0.5.jar
 curator-client-4.3.0.jar
 curator-framework-4.3.0.jar
@@ -129,8 +127,6 @@ jna-platform-4.5.2.jar
 joda-time-2.10.6.jar
 jpam-1.1.jar
 jsch-0.1.42.jar
-jsp-2.1-6.1.14.jar
-jsp-api-2.1-6.1.14.jar
 jsp-api-2.1.jar
 jsqlparser-2.1.jar
 jsr305-3.0.0.jar

@@ -95,10 +95,8 @@
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
-        <jsp-2.1.version>6.1.14</jsp-2.1.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
-        <apache.rat.version>0.13</apache.rat.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -520,13 +518,6 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- for api module -->
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jsp-2.1</artifactId>
-                <version>${jsp-2.1.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
@@ -861,6 +852,7 @@
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/utils/KerberosHttpClientTest.java</include>
+                        <include>**/common/utils/HiveConfUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
@@ -920,7 +912,6 @@
                         <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
-                        <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
@@ -1021,53 +1012,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <version>${apache.rat.version}</version>
-                <configuration>
-                    <excludeSubProjects>false</excludeSubProjects>
-                    <addDefaultLicenseMatchers>false</addDefaultLicenseMatchers>
-                    <licenses>
-                        <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
-                            <licenseFamilyCategory>AL20</licenseFamilyCategory>
-                            <licenseFamilyName>Apache License, 2.0</licenseFamilyName>
-                            <patterns>
-                                <pattern>Licensed to the Apache Software Foundation (ASF)</pattern>
-                            </patterns>
-                        </license>
-                    </licenses>
-                    <licenseFamilies>
-                        <licenseFamily implementation="org.apache.rat.license.SimpleLicenseFamily">
-                            <familyName>Apache License, 2.0</familyName>
-                        </licenseFamily>
-                    </licenseFamilies>
-                    <excludes>
-                        <exclude>**/alert/plugin/DolphinPluginClassLoader.java</exclude>
-                        <exclude>**/alert/plugin/DolphinPluginDiscovery.java</exclude>
-                        <exclude>**/alert/plugin/DolphinPluginLoader.java</exclude>
-                        <exclude>**/node_modules/**</exclude>
-                        <exclude>**/node/**</exclude>
-                        <exclude>**/dist/**</exclude>
-                        <exclude>**/licenses/**</exclude>
-                        <exclude>.github/**</exclude>
-                        <exclude>**/sql/soft_version</exclude>
-                        <exclude>**/common/utils/ScriptRunner.java</exclude>
-                        <exclude>**/*.json</exclude>
-                        <!-- document files -->
-                        <exclude>**/*.md</exclude>
-                        <excldue>**/*.MD</excldue>
-                        <exclude>**/*.txt</exclude>
-                        <exclude>**/docs/**</exclude>
-                        <exclude>**/*.babelrc</exclude>
-                        <exclude>**/*.eslint*</exclude>
-                        <exclude>**/.mvn/jvm.config</exclude>
-                        <exclude>**/.mvn/wrapper/**</exclude>
-                        <exclude>**/*.iml</exclude>
-                    </excludes>
-                    <consoleOutput>true</consoleOutput>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
