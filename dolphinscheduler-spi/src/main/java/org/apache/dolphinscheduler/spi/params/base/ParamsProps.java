@@ -23,20 +23,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * the props field in form-create`s json rule
  */
 public class ParamsProps {
-    private PropsType propsType;
 
     private String placeholder;
 
-    private int rows;
+    private String size = "small";
 
-    @JsonProperty("type")
-    public PropsType getPropsType() {
-        return propsType;
+    public void setSize(String size) {
+        this.size = size;
     }
 
-    public ParamsProps setPropsType(PropsType propsType) {
-        this.propsType = propsType;
-        return this;
+    @JsonProperty("size")
+    public String getSize() {
+        return size;
     }
 
     @JsonProperty("placeholder")
@@ -49,13 +47,4 @@ public class ParamsProps {
         return this;
     }
 
-    @JsonProperty("rows")
-    public int getRows() {
-        return rows;
-    }
-
-    public ParamsProps setRows(int rows) {
-        this.rows = rows;
-        return this;
-    }
 }

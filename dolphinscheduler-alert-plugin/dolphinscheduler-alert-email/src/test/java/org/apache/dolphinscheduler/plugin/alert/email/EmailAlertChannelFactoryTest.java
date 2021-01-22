@@ -58,7 +58,7 @@ public class EmailAlertChannelFactoryTest {
     public void testGetParams() throws Exception {
         EmailAlertChannelFactory emailAlertChannelFactory = new EmailAlertChannelFactory();
         List<PluginParams> params = emailAlertChannelFactory.getParams();
-        JSONUtils.toJsonString(params);
+        System.out.println(JSONUtils.toJsonString(params));
         Assert.assertEquals(12, params.size());
     }
 

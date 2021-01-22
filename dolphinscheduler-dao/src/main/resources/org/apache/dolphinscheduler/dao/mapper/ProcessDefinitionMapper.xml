@@ -25,61 +25,25 @@
         tenant_id, update_time, modify_by, resource_ids
     </sql>
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select pd.id,
-               pd.name,
-               pd.version,
-               pd.release_state,
-               pd.project_id,
-               pd.user_id,
-               pd.process_definition_json,
-               pd.description,
-               pd.global_params,
-               pd.flag,
-               pd.locations,
-               pd.connects,
-               pd.warning_group_id,
-               pd.create_time,
-               pd.timeout,
-               pd.tenant_id,
-               pd.update_time,
-               pd.modify_by,
-               pd.resource_ids
+        select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
+        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+        pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids
         from t_ds_process_definition pd
         WHERE pd.project_id = #{projectId}
-          and pd.name = #{processDefinitionName}
+        and pd.name = #{processDefinitionName}
     </select>
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select pd.id,
-               pd.name,
-               pd.version,
-               pd.release_state,
-               pd.project_id,
-               pd.user_id,
-               pd.process_definition_json,
-               pd.description,
-               pd.global_params,
-               pd.flag,
-               pd.locations,
-               pd.connects,
-               pd.warning_group_id,
-               pd.create_time,
-               pd.timeout,
-               pd.tenant_id,
-               pd.update_time,
-               pd.modify_by,
-               pd.resource_ids,
-               u.user_name,
-               p.name as project_name,
-               t.tenant_code,
-               q.queue,
-               q.queue_name
+        select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
+        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+        pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids,
+        u.user_name,p.name as project_name,t.tenant_code,q.queue,q.queue_name
         from t_ds_process_definition pd
-                 JOIN t_ds_user u ON pd.user_id = u.id
-                 JOIN t_ds_project p ON pd.project_id = p.id
-                 JOIN t_ds_tenant t ON t.id = u.tenant_id
-                 JOIN t_ds_queue q ON t.queue_id = q.id
+        JOIN t_ds_user u ON pd.user_id = u.id
+        JOIN  t_ds_project p ON pd.project_id = p.id
+        JOIN  t_ds_tenant t ON t.id = u.tenant_id
+        JOIN t_ds_queue q ON t.queue_id = q.id
         WHERE p.id = #{projectId}
-          and pd.name = #{processDefinitionName}
+        and pd.name = #{processDefinitionName}
     </select>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT td.id, td.name, td.version, td.release_state, td.project_id, td.user_id, td.description,
@@ -136,33 +100,19 @@
         group by td.user_id,tu.user_name
     </select>
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        SELECT pd.id,
-               pd.name,
-               pd.version,
-               pd.release_state,
-               pd.project_id,
-               pd.user_id,
-               pd.process_definition_json,
-               pd.description,
-               pd.global_params,
-               pd.flag,
-               pd.locations,
-               pd.connects,
-               pd.warning_group_id,
-               pd.create_time,
-               pd.timeout,
-               pd.tenant_id,
-               pd.update_time,
-               pd.modify_by,
-               pd.resource_ids,
-               u.user_name,
-               p.name AS project_name
-        FROM t_ds_process_definition pd,
-             t_ds_user u,
-             t_ds_project p
-        WHERE pd.user_id = u.id
-          AND pd.project_id = p.id
-          AND pd.id = #{processDefineId}
+        SELECT
+            pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
+            pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+            pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids,
+            u.user_name,
+            p.name AS project_name
+        FROM
+            t_ds_process_definition pd,
+            t_ds_user u,
+            t_ds_project p
+        WHERE
+            pd.user_id = u.id AND pd.project_id = p.id
+        AND pd.id = #{processDefineId}
     </select>
 
 

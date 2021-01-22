@@ -21,6 +21,10 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 public class FuncUtils {
 
+    private FuncUtils() {
+        throw new IllegalStateException(FuncUtils.class.getName());
+    }
+
     public static String mkString(Iterable<String> list, String split) {
 
         if (null == list || StringUtils.isEmpty(split)) {

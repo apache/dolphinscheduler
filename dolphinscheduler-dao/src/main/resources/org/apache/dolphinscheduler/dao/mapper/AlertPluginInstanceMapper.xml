@@ -26,9 +26,21 @@
         where 1 = 1
     </select>
 
-    <select id="queryByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+    <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
         select *
         from t_ds_alert_plugin_instance
-        where alert_group_id = #{alertGroupId}
+        where id in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
+
+    <select id="queryByInstanceName" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+        select
+        *
+        from t_ds_alert_plugin_instance
+        where instance_name = #{instanceName}
+    </select>
+
 </mapper>

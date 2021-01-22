@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.spi.params;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.PropsType;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ public class PasswordParam extends PluginParams {
         public Builder(String name, String title) {
             super(name, FormType.INPUT, title);
             ParamsProps paramsProps = new ParamsProps();
-            paramsProps.setPropsType(PropsType.PASSWORD);
             this.props = paramsProps;
         }
 

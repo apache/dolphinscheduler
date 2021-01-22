@@ -35,7 +35,6 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
                                               `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
                                               `create_time`            timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                                               `update_time`            timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                              `alert_group_id`         int          DEFAULT NULL,
                                               `instance_name`          varchar(200) DEFAULT NULL COMMENT 'alert instance name',
                                               PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -47,7 +46,8 @@ ALTER TABLE t_ds_process_definition_version
     ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
 
 ALTER TABLE t_ds_alertgroup
-    ADD COLUMN `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id' AFTER `id`;
+    ADD COLUMN `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids' AFTER `id`,
+    ADD COLUMN `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id' AFTER `alert_instance_ids`;
 
 
 -- ----------------------------

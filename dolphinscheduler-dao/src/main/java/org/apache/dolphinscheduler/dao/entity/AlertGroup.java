@@ -37,6 +37,9 @@ public class AlertGroup {
     @TableField(value = "group_name")
     private String groupName;
 
+    @TableField(value = "alert_instance_ids")
+    private String alertInstanceIds;
+
     /**
      * description
      */
@@ -107,6 +110,14 @@ public class AlertGroup {
         this.createUserId = createUserId;
     }
 
+    public String getAlertInstanceIds() {
+        return alertInstanceIds;
+    }
+
+    public void setAlertInstanceIds(String alertInstanceIds) {
+        this.alertInstanceIds = alertInstanceIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -127,6 +138,9 @@ public class AlertGroup {
         if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
             return false;
         }
+        if (alertInstanceIds != null ? !alertInstanceIds.equals(that.alertInstanceIds) : that.alertInstanceIds != null) {
+            return false;
+        }
         if (description != null ? !description.equals(that.description) : that.description != null) {
             return false;
         }
@@ -139,6 +153,7 @@ public class AlertGroup {
         int result = id;
         result = 31 * result + createUserId;
         result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
+        result = 31 * result + (alertInstanceIds != null ? alertInstanceIds.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);

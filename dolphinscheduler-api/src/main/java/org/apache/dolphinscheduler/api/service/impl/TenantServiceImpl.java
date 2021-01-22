@@ -89,12 +89,12 @@ public class TenantServiceImpl extends BaseService implements TenantService {
 
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
         if (RegexUtils.isNumeric(tenantCode)) {
-            putMsg(result, Status.CHECK_TENANT_CODE_ERROR);
+            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
             return result;
         }
 
@@ -107,7 +107,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Date now = new Date();
 
         if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")) {
-            putMsg(result, Status.VERIFY_TENANT_CODE_ERROR);
+            putMsg(result, Status.VERIFY_OS_TENANT_CODE_ERROR);
             return result;
         }
         tenant.setTenantCode(tenantCode);
@@ -134,14 +134,14 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return tenant list page
      */
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -174,7 +174,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -200,7 +200,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
                     HadoopUtils.getInstance().mkdir(udfsPath);
                 }
             } else {
-                putMsg(result, Status.TENANT_CODE_HAS_ALREADY_EXISTS);
+                putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
                 return result;
             }
         }
@@ -227,7 +227,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * delete tenant
      *
      * @param loginUser login user
-     * @param id        tenant id
+     * @param id tenant id
      * @return delete result code
      * @throws Exception exception
      */
@@ -235,7 +235,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -329,7 +329,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
+            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }

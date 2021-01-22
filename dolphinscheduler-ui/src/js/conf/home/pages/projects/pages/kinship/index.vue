@@ -34,7 +34,7 @@
           </el-option>
         </el-select>
         <el-button type="primary"
-                  icon="fa-dot-circle-o"
+                  icon="ri-record-circle-fill"
                   size="mini"
                   v-tooltip.small.top.start="$t('Reset')"
                   @click="reset"
@@ -99,11 +99,10 @@
         })
       },
       async onChange (item) {
-        const { value, label } = item || {}
         this.isLoading = true
-        this.currentItemName = label
+        this.currentItemName = item
         try {
-          await this.getWorkFlowDAG(value)
+          await this.getWorkFlowDAG(item)
         } catch (error) {
           this.$message.error(error.msg || '')
         }

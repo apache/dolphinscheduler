@@ -42,6 +42,12 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
     @Autowired
     PluginDefineMapper pluginDefineMapper;
 
+    private static final String LANGUAGE_REGEX = "\"([^\"]*)\"";
+
+    private static final String LANGUAGE_SYMBOL = "$t";
+
+    private static final String ESCAPE_SYMBOL = "\\";
+
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
         Map<String, Object> result = new HashMap<>();
@@ -50,10 +56,12 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
             return result;
         }
         List<PluginDefine> pluginDefines = pluginDefineMapper.queryByPluginType(pluginType.getDesc());
+
         if (CollectionUtils.isEmpty(pluginDefines)) {
             putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL);
             return result;
         }
+        // pluginDefines=buildPluginParams(pluginDefines);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefines);
         return result;
@@ -67,8 +75,11 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
             putMsg(result, Status.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL);
             return result;
         }
+        // String params=pluginDefine.getPluginParams();
+        // pluginDefine.setPluginParams(parseParams(params));
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefine);
         return result;
     }
+
 }

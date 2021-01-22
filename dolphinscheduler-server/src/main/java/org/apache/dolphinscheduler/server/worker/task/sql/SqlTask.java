@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
@@ -46,6 +47,7 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -78,7 +80,10 @@ public class SqlTask extends AbstractTask {
      * sql parameters
      */
     private SqlParameters sqlParameters;
-
+    /**
+     * alert dao
+     */
+    private AlertDao alertDao;
     /**
      * base datasource
      */
@@ -110,6 +115,7 @@ public class SqlTask extends AbstractTask {
         }
 
         this.alertClientService = alertClientService;
+        this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
     }
 
     @Override
@@ -200,7 +206,9 @@ public class SqlTask extends AbstractTask {
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
-
+        //Replace the original value in sql ！{...} ，Does not participate in precompilation
+        String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
+        sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
         String formatSql = sql.replaceAll(rgex, "?");
         sqlBuilder.append(formatSql);
@@ -208,6 +216,20 @@ public class SqlTask extends AbstractTask {
         // print repalce sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
+    }
+
+    public String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
+        Pattern pattern = Pattern.compile(rgex);
+        while (true) {
+            Matcher m = pattern.matcher(content);
+            if (!m.find()) {
+                break;
+            }
+            String paramName = m.group(1);
+            String paramValue = sqlParamsMap.get(paramName).getValue();
+            content = m.replaceFirst(paramValue);
+        }
+        return content;
     }
 
     @Override
@@ -218,10 +240,10 @@ public class SqlTask extends AbstractTask {
     /**
      * execute function and sql
      *
-     * @param mainSqlBinds        main sql binds
-     * @param preStatementsBinds  pre statements binds
+     * @param mainSqlBinds main sql binds
+     * @param preStatementsBinds pre statements binds
      * @param postStatementsBinds post statements binds
-     * @param createFuncs         create functions
+     * @param createFuncs create functions
      */
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                   List<SqlBinds> preStatementsBinds,
@@ -296,7 +318,7 @@ public class SqlTask extends AbstractTask {
     /**
      * pre sql
      *
-     * @param connection         connection
+     * @param connection connection
      * @param preStatementsBinds preStatementsBinds
      */
     private void preSql(Connection connection,
@@ -313,9 +335,8 @@ public class SqlTask extends AbstractTask {
     /**
      * post sql
      *
-     * @param connection          connection
+     * @param connection connection
      * @param postStatementsBinds postStatementsBinds
-     * @throws Exception
      */
     private void postSql(Connection connection,
                          List<SqlBinds> postStatementsBinds) throws Exception {
@@ -330,9 +351,8 @@ public class SqlTask extends AbstractTask {
     /**
      * create temp function
      *
-     * @param connection  connection
+     * @param connection connection
      * @param createFuncs createFuncs
-     * @throws Exception
      */
     private void createTempFunction(Connection connection,
                                     List<String> createFuncs) throws Exception {
@@ -375,8 +395,8 @@ public class SqlTask extends AbstractTask {
     /**
      * close jdbc resource
      *
-     * @param resultSet  resultSet
-     * @param pstmt      pstmt
+     * @param resultSet resultSet
+     * @param pstmt pstmt
      * @param connection connection
      */
     private void close(ResultSet resultSet,
@@ -411,7 +431,7 @@ public class SqlTask extends AbstractTask {
      * preparedStatement bind
      *
      * @param connection connection
-     * @param sqlBinds   sqlBinds
+     * @param sqlBinds sqlBinds
      * @return PreparedStatement
      * @throws Exception Exception
      */
@@ -437,11 +457,11 @@ public class SqlTask extends AbstractTask {
     /**
      * send mail as an attachment
      *
-     * @param title   title
+     * @param title title
      * @param content content
      */
     public void sendAttachment(int groupId, String title, String content) {
-        AlertSendResponseCommand alertSendResponseCommand  = alertClientService.sendAlert(groupId, title, content);
+        AlertSendResponseCommand alertSendResponseCommand = alertClientService.sendAlert(groupId, title, content);
         if (!alertSendResponseCommand.getResStatus()) {
             throw new RuntimeException("send mail failed!");
         }
@@ -450,9 +470,9 @@ public class SqlTask extends AbstractTask {
     /**
      * regular expressions match the contents between two specified strings
      *
-     * @param content        content
-     * @param rgex           rgex
-     * @param sqlParamsMap   sql params map
+     * @param content content
+     * @param rgex rgex
+     * @param sqlParamsMap sql params map
      * @param paramsPropsMap params props map
      */
     public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsPropsMap) {
@@ -472,9 +492,9 @@ public class SqlTask extends AbstractTask {
     /**
      * print replace sql
      *
-     * @param content      content
-     * @param formatSql    format sql
-     * @param rgex         rgex
+     * @param content content
+     * @param formatSql format sql
+     * @param rgex rgex
      * @param sqlParamsMap sql params map
      */
     public void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {

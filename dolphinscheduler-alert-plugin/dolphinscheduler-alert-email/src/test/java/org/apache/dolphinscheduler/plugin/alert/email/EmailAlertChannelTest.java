@@ -35,32 +35,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * EmailAlertChannel Tester.
- *
- * @version 1.0
- * @since <pre>Aug 20, 2020</pre>
  */
 public class EmailAlertChannelTest {
-
-    @Before
-    public void before() throws Exception {
-    }
-
-    @After
-    public void after() throws Exception {
-    }
 
     /**
      * Method: process(AlertInfo info)
      */
     @Test
-    public void testProcess() throws Exception {
+    public void testProcess() {
         EmailAlertChannel emailAlertChannel = new EmailAlertChannel();
         AlertData alertData = new AlertData();
         LinkedHashMap<String, Object> map1 = new LinkedHashMap<>();
@@ -92,12 +79,12 @@ public class EmailAlertChannelTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
-        InputParam mailSmtpHost = InputParam.newBuilder("mailServerHost", "mail.smtp.host")
+        InputParam mailSmtpHost = InputParam.newBuilder("serverHost", "smtp.host")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue("smtp.126.com")
                 .build();
 
-        InputParam mailSmtpPort = InputParam.newBuilder("mailServerPort", "mail.smtp.port")
+        InputParam mailSmtpPort = InputParam.newBuilder("serverPort", "smtp.port")
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .setType(DataType.NUMBER.getDataType())
@@ -105,43 +92,43 @@ public class EmailAlertChannelTest {
                 .setValue(25)
                 .build();
 
-        InputParam mailSender = InputParam.newBuilder("mailSender", "mail.sender")
+        InputParam mailSender = InputParam.newBuilder("sender", "sender")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue("dolphinscheduler@126.com")
                 .build();
 
-        RadioParam enableSmtpAuth = RadioParam.newBuilder("enableSmtpAuth", "mail.smtp.auth")
+        RadioParam enableSmtpAuth = RadioParam.newBuilder("enableSmtpAuth", "smtp.auth")
                 .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue(false)
                 .build();
 
-        InputParam mailUser = InputParam.newBuilder("mailUser", "mail.user")
+        InputParam mailUser = InputParam.newBuilder("user", "user")
                 .setPlaceholder("if enable use authentication, you need input user")
                 .setValue("dolphinscheduler@126.com")
                 .build();
 
-        PasswordParam mailPassword = PasswordParam.newBuilder("mailPasswd", "mail.passwd")
+        PasswordParam mailPassword = PasswordParam.newBuilder("passwd", "passwd")
                 .setPlaceholder("if enable use authentication, you need input password")
                 .setValue("escheduler123")
                 .build();
 
-        RadioParam enableTls = RadioParam.newBuilder("starttlsEnable", "mail.smtp.starttls.enable")
+        RadioParam enableTls = RadioParam.newBuilder("starttlsEnable", "starttls.enable")
                 .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue(true)
                 .build();
 
-        RadioParam enableSsl = RadioParam.newBuilder("sslEnable", "mail.smtp.ssl.enable")
+        RadioParam enableSsl = RadioParam.newBuilder("sslEnable", "smtp.ssl.enable")
                 .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue(true)
                 .build();
 
-        InputParam sslTrust = InputParam.newBuilder("mailSmtpSslTrust", "mail.smtp.ssl.trust")
+        InputParam sslTrust = InputParam.newBuilder("smtpSslTrust", "smtp.ssl.trust")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue("smtp.126.com")
                 .build();

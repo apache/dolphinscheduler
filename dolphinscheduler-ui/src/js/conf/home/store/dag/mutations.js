@@ -75,6 +75,9 @@ export default {
   setDesc (state, payload) {
     state.description = payload
   },
+  setReleaseState (state, payload) {
+    state.releaseState = payload
+  },
   /**
    * Whether to update the process definition
    */

@@ -32,7 +32,7 @@ import java.util.List;
 public class HttpAlertChannelFactory implements AlertChannelFactory {
     @Override
     public String getName() {
-        return "http alert";
+        return "Http";
     }
 
     @Override

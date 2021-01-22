@@ -57,7 +57,7 @@
               <span>{{$t('Task Status')}}</span>
             </a>
             <a href="javascript:" v-for="(item) in tasksState" :key="item.id">
-              <em class="fa fa-square" :style="{color:item.color}"></em>
+              <em class="ri-checkbox-blank-fill" :style="{color:item.color}"></em>
               <span>{{item.desc}}</span>
             </a>
           </div>

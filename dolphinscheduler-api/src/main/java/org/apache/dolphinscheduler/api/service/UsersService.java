@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -114,13 +111,13 @@ public class UsersService extends BaseService {
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser    login user
-     * @param userName     user name
+     * @param loginUser login user
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tenant id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tenant id
+     * @param phone phone
+     * @param queue queue
      * @return create result code
      * @throws Exception exception
      */
@@ -256,7 +253,7 @@ public class UsersService extends BaseService {
     /**
      * query user
      *
-     * @param name     name
+     * @param name name
      * @param password password
      * @return user info
      */
@@ -267,6 +264,7 @@ public class UsersService extends BaseService {
 
     /**
      * get user id by user name
+     *
      * @param name user name
      * @return if name empty 0, user not exists -1, user exist user id
      */
@@ -289,13 +287,13 @@ public class UsersService extends BaseService {
      * query user list
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search avlue
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
 
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -317,13 +315,15 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
-     * @param userId       user id
-     * @param userName     user name
+     *
+     * @param loginUser
+     * @param userId user id
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tennat id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tennat id
+     * @param phone phone
+     * @param queue queue
      * @return update result code
      * @throws Exception exception
      */
@@ -335,7 +335,7 @@ public class UsersService extends BaseService {
                                           String phone,
                                           String queue,
                                           int state) throws Exception {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
         if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
@@ -406,7 +406,7 @@ public class UsersService extends BaseService {
 
                         //file resources list
                         List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-                            null, userId, ResourceType.FILE.ordinal());
+                                null, userId, ResourceType.FILE.ordinal());
                         if (CollectionUtils.isNotEmpty(fileResourcesList)) {
                             ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
@@ -415,7 +415,7 @@ public class UsersService extends BaseService {
 
                         //udf resources
                         List<Resource> udfResourceList = resourceMapper.queryResourceList(
-                            null, userId, ResourceType.UDF.ordinal());
+                                null, userId, ResourceType.UDF.ordinal());
                         if (CollectionUtils.isNotEmpty(udfResourceList)) {
                             ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
@@ -454,12 +454,12 @@ public class UsersService extends BaseService {
      * delete user
      *
      * @param loginUser login user
-     * @param id        user id
+     * @param id user id
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
     public Map<String, Object> deleteUserById(User loginUser, int id) throws Exception {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
@@ -492,14 +492,14 @@ public class UsersService extends BaseService {
     /**
      * grant project
      *
-     * @param loginUser  login user
-     * @param userId     user id
+     * @param loginUser login user
+     * @param userId user id
      * @param projectIds project id array
      * @return grant result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -542,14 +542,14 @@ public class UsersService extends BaseService {
     /**
      * grant resource
      *
-     * @param loginUser   login user
-     * @param userId      user id
+     * @param loginUser login user
+     * @param userId user id
      * @param resourceIds resource id array
      * @return grant result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -640,8 +640,8 @@ public class UsersService extends BaseService {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
+     * @param userId user id
+     * @param udfIds udf id array
      * @return grant result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
@@ -741,7 +741,7 @@ public class UsersService extends BaseService {
 
         Map<String, Object> result = new HashMap<>();
 
-        User user;
+        User user = null;
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             user = loginUser;
         } else {
@@ -832,7 +832,7 @@ public class UsersService extends BaseService {
     /**
      * unauthorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -869,7 +869,7 @@ public class UsersService extends BaseService {
     /**
      * authorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return authorized result code
      */

@@ -96,12 +96,12 @@ public class AlertGroupServiceTest {
         Mockito.when(alertGroupMapper.insert(any(AlertGroup.class))).thenReturn(2);
         User user = new User();
         //no operate
-        Map<String, Object> result = alertGroupService.createAlertgroup(user, groupName, AlertType.EMAIL, groupName);
+        Map<String, Object> result = alertGroupService.createAlertgroup(user, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         user.setUserType(UserType.ADMIN_USER);
         //success
-        result = alertGroupService.createAlertgroup(user, groupName, AlertType.EMAIL, groupName);
+        result = alertGroupService.createAlertgroup(user, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -111,17 +111,17 @@ public class AlertGroupServiceTest {
 
         User user = new User();
         // no operate
-        Map<String, Object> result = alertGroupService.updateAlertgroup(user, 1, groupName, AlertType.SMS, groupName);
+        Map<String, Object> result = alertGroupService.updateAlertgroup(user, 1, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         user.setUserType(UserType.ADMIN_USER);
         // not exist
-        result = alertGroupService.updateAlertgroup(user, 1, groupName, AlertType.SMS, groupName);
+        result = alertGroupService.updateAlertgroup(user, 1, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.ALERT_GROUP_NOT_EXIST, result.get(Constants.STATUS));
         //success
         Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
-        result = alertGroupService.updateAlertgroup(user, 2, groupName, AlertType.SMS, groupName);
+        result = alertGroupService.updateAlertgroup(user, 2, groupName, groupName, null);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -162,8 +162,6 @@ public class AlertGroupServiceTest {
 
     /**
      * create admin user
-     *
-     * @return
      */
     private User getLoginUser() {
 
@@ -175,8 +173,6 @@ public class AlertGroupServiceTest {
 
     /**
      * get list
-     *
-     * @return
      */
     private List<AlertGroup> getList() {
         List<AlertGroup> alertGroups = new ArrayList<>();
@@ -186,8 +182,6 @@ public class AlertGroupServiceTest {
 
     /**
      * get entity
-     *
-     * @return
      */
     private AlertGroup getEntity() {
         AlertGroup alertGroup = new AlertGroup();

@@ -35,7 +35,7 @@ import java.util.List;
 public class DingTalkAlertChannelFactory implements AlertChannelFactory {
     @Override
     public String getName() {
-        return "ding talk alert";
+        return "DingTalk";
     }
 
     @Override
@@ -56,24 +56,24 @@ public class DingTalkAlertChannelFactory implements AlertChannelFactory {
                     .addParamsOptions(new ParamsOptions("NO", false, false))
                 .setValue(true)
                 .addValidate(Validate.newBuilder()
-                    .setRequired(true)
+                    .setRequired(false)
                     .build())
                 .build();
         InputParam proxyParam =
             InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY, DingTalkParamsConstants.DING_TALK_PROXY)
                 .addValidate(Validate.newBuilder()
-                    .setRequired(true).build())
+                    .setRequired(false).build())
                 .build();
 
         InputParam portParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PORT, DingTalkParamsConstants.DING_TALK_PORT)
             .addValidate(Validate.newBuilder()
-                .setRequired(true).build())
+                .setRequired(false).build())
             .build();
 
         InputParam userParam =
             InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_USER, DingTalkParamsConstants.DING_TALK_USER)
                 .addValidate(Validate.newBuilder()
-                    .setRequired(true).build())
+                    .setRequired(false).build())
                 .build();
         PasswordParam passwordParam = PasswordParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, DingTalkParamsConstants.DING_TALK_PASSWORD)
             .setPlaceholder("if enable use authentication, you need input password")
