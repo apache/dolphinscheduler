@@ -27,8 +27,6 @@
            <li><span class="tab">{{$t('Worker group')}}：</span><span class="content" v-if="workerGroupList.length">{{startupParam.workerGroup}}</span></li>
            <li><span class="tab">{{$t('Notification strategy')}}：</span><span class="content">{{_rtWarningType(startupParam.warningType)}}</span></li>
            <li><span class="tab">{{$t('Notification group')}}：</span><span class="content" v-if="notifyGroupList.length">{{_rtNotifyGroupName(startupParam.warningGroupId)}}</span></li>
-           <li><span class="tab">{{$t('Recipient')}}：</span><span class="content">{{startupParam.receivers || '-'}}</span></li>
-           <li><span class="tab">{{$t('Cc')}}：</span><span class="content">{{startupParam.receiversCc || '-'}}</span></li>
          </ul>
        </div>
     </template>
