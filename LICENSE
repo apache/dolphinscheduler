@@ -216,3 +216,7 @@ The text of each license is the standard Apache 2.0 license.
     ScriptRunner from https://github.com/mybatis/mybatis-3 Apache 2.0
     mvnw files from https://github.com/takari/maven-wrapper Apache 2.0
     PropertyPlaceholderHelper from https://github.com/spring-projects/spring-framework Apache 2.0
+    DolphinPluginClassLoader from https://github.com/prestosql/presto Apache 2.0
+    DolphinPluginDiscovery from https://github.com/prestosql/presto Apache 2.0
+    DolphinPluginLoader from https://github.com/prestosql/presto Apache 2.0
+
