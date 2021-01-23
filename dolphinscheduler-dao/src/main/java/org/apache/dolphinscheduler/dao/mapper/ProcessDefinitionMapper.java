@@ -138,4 +138,10 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param version version
      */
     void updateVersionByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
+
+    /**
+     * list all project ids
+     * @return project ids list
+     */
+    List<Integer> listProjectIds();
 }

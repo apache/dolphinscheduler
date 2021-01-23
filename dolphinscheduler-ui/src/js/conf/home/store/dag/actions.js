@@ -318,7 +318,8 @@ export default {
         connects: JSON.stringify(state.connects),
         name: _.trim(state.name),
         description: _.trim(state.description),
-        id: payload
+        id: payload,
+        releaseState: state.releaseState
       }, res => {
         resolve(res)
         state.isEditDag = false
@@ -800,18 +801,6 @@ export default {
   getProcessTasksList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectName}/process/gen-task-list`, payload, res => {
-        resolve(res.data)
-      }).catch(e => {
-        reject(e)
-      })
-    })
-  },
-  /**
-   * Get the mailbox list interface
-   */
-  getReceiver ({ state }, payload) {
-    return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/executors/get-receiver-cc`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

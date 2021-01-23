@@ -19,6 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectMapper">
     <sql id="baseSql">
+
         id, name, description, user_id, flag, create_time, update_time
     </sql>
     <sql id="baseSqlV2">
@@ -95,5 +96,17 @@
         select * from t_ds_project where id in
            (select project_id from t_ds_relation_project_user  where user_id=#{userId}
              union select id as project_id  from t_ds_project where user_id=#{userId})
+    </select>
+
+    <select id="queryProjectWithUserByProcessInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
+        select
+            dp.id projectId,
+            dp.name projectName,
+            u.user_name userName
+        from t_ds_process_instance di
+        join t_ds_process_definition dpd on di.process_definition_id = dpd.id
+        join t_ds_project dp on dpd.project_id = dp.id
+        join t_ds_user u on dp.user_id = u.id
+        where di.id = #{processInstanceId};
     </select>
 </mapper>

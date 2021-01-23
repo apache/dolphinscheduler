@@ -74,6 +74,11 @@
     </div>
     <div class="bottom">
       <div class="submit">
+        <template v-if="router.history.current.name === 'projects-definition-details'">
+          <div class="lint-pt">
+            <el-checkbox v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Whether to go online the process definition')}}</el-checkbox>
+          </div>
+        </template>
         <template v-if="router.history.current.name === 'projects-instance-details'">
           <div class="lint-pt">
             <el-checkbox v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
@@ -106,6 +111,8 @@
         udpList: [],
         // Global custom parameters
         udpListCache: [],
+        // Whether to go online the process definition
+        releaseState: 'ONLINE',
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
@@ -141,6 +148,7 @@
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
         this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
+        this.store.commit('dag/setReleaseState', this.releaseState)
       },
       /**
        * submit
@@ -201,6 +209,7 @@
       this.originalName = dag.name
       this.description = dag.description
       this.syncDefine = dag.syncDefine
+      this.releaseState = dag.releaseState
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {

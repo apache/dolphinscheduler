@@ -60,17 +60,20 @@
     </select>
     <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
-        where type=#{type} and pid=#{id}
+        d.id, d.alias, d.file_name, d.description, d.user_id, d.type, d.size, d.create_time, d.update_time,
+        d.pid, d.full_name, d.is_directory,
+        u.user_name as user_name
+        from t_ds_resources d
+        join t_ds_user u on d.user_id = u.id
+        where d.type=#{type} and d.pid=#{id}
         <if test="userId != 0">
-            and id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId}
+            and d.id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId}
             union select id as resources_id from t_ds_resources where user_id=#{userId})
         </if>
         <if test="searchVal != null and searchVal != ''">
-            and alias like concat('%', #{searchVal}, '%')
+            and d.alias like concat('%', #{searchVal}, '%')
         </if>
-        order by update_time desc
+        order by d.update_time desc
     </select>
     <select id="queryAuthorizedResourceList" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select

@@ -45,6 +45,8 @@ export default {
   isEditDag: false,
   // Current project
   projectName: projectName || '',
+  // Whether to go online the process definition
+  releaseState: 'ONLINE',
   // Whether to update the process definition
   syncDefine: true,
   // tasks processList

@@ -19,78 +19,85 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+
+import java.sql.Connection;
 
 /**
  * data source of hive
  */
 public class HiveDataSource extends BaseDataSource {
 
-  /**
-   * gets the JDBC url for the data source connection
-   * @return jdbc url
-   */
-  @Override
-  public String driverClassSelector() {
-    return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
-  }
-
-  /**
-   * @return db type
-   */
-  @Override
-  public DbType dbTypeSelector() {
-    return DbType.HIVE;
-  }
-
-  /**
-   * build hive jdbc params,append : ?hive_conf_list
-   *
-   * hive jdbc url template:
-   *
-   * jdbc:hive2://<host1>:<port1>,<host2>:<port2>/dbName;initFile=<file>;sess_var_list?hive_conf_list#hive_var_list
-   *
-   * @param otherParams otherParams
-   * @return filter otherParams
-   */
-  @Override
-  protected String filterOther(String otherParams) {
-    if (StringUtils.isBlank(otherParams)) {
-      return "";
+    /**
+     * gets the JDBC url for the data source connection
+     * @return jdbc url
+     */
+    @Override
+    public String driverClassSelector() {
+        return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
-    StringBuilder hiveConfListSb = new StringBuilder();
-    hiveConfListSb.append("?");
-    StringBuilder sessionVarListSb = new StringBuilder();
-
-    String[] otherArray = otherParams.split(";", -1);
-
-    // get the default hive conf var name
-    Set<String> hiveConfSet = Stream.of(ConfVars.values()).map(confVars -> confVars.varname)
-        .collect(Collectors.toSet());
-
-    for (String conf : otherArray) {
-      if (hiveConfSet.contains(conf.split("=")[0])) {
-        hiveConfListSb.append(conf).append(";");
-      } else {
-        sessionVarListSb.append(conf).append(";");
-      }
+    /**
+     * @return db type
+     */
+    @Override
+    public DbType dbTypeSelector() {
+        return DbType.HIVE;
     }
 
-    // remove the last ";"
-    if (sessionVarListSb.length() > 0) {
-      sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1);
+    /**
+     * build hive jdbc params,append : ?hive_conf_list
+     *
+     * hive jdbc url template:
+     *
+     * jdbc:hive2://<host1>:<port1>,<host2>:<port2>/dbName;initFile=<file>;sess_var_list?hive_conf_list#hive_var_list
+     *
+     * @param otherParams otherParams
+     * @return filter otherParams
+     */
+    @Override
+    protected String filterOther(String otherParams) {
+        if (StringUtils.isBlank(otherParams)) {
+            return "";
+        }
+
+        StringBuilder hiveConfListSb = new StringBuilder();
+        hiveConfListSb.append("?");
+        StringBuilder sessionVarListSb = new StringBuilder();
+
+        String[] otherArray = otherParams.split(";", -1);
+
+        for (String conf : otherArray) {
+            if (HiveConfUtils.isHiveConfVar(conf)) {
+                hiveConfListSb.append(conf).append(";");
+            } else {
+                sessionVarListSb.append(conf).append(";");
+            }
+        }
+
+        // remove the last ";"
+        if (sessionVarListSb.length() > 0) {
+            sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1);
+        }
+
+        if (hiveConfListSb.length() > 0) {
+            hiveConfListSb.deleteCharAt(hiveConfListSb.length() - 1);
+        }
+
+        return sessionVarListSb.toString() + hiveConfListSb.toString();
     }
 
-    if (hiveConfListSb.length() > 0) {
-      hiveConfListSb.deleteCharAt(hiveConfListSb.length() - 1);
+    /**
+     * the data source test connection
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    @Override
+    public Connection getConnection() throws Exception {
+        CommonUtils.loadKerberosConf();
+        return super.getConnection();
     }
 
-    return sessionVarListSb.toString() + hiveConfListSb.toString();
-  }
-  
 }
