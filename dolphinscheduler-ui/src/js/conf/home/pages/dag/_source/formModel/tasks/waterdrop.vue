@@ -17,59 +17,56 @@
 <template>
   <div class="shell-model">
     <!--deploy mode-->
-    <div class="list-box-4p">
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Deploy Mode')}}</span>
-        <span class="sp2">
-          <el-radio-group size="small" v-model="deployMode">
-            <el-radio :label="'client'" :disabled="isDetails"></el-radio>
-            <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
-            <el-radio :label="'local'" :disabled="isDetails"></el-radio>
-          </el-radio-group>
-        </span>
-        <span class="sp1 sp3">{{$t('Queue')}}</span>
-        <span class="sp4">
-          <el-input
-            :disabled="isDetails"
-            type="input"
-            size="small"
-            v-model="queue"
-            :placeholder="$t('Please enter queue value')"
-            style="width: 60%;">
-        </el-input>
-        </span>
+    <m-list-box>
+      <div slot="text">{{$t('Deploy Mode')}}</div>
+      <div slot="content">
+        <el-radio-group size="small" v-model="deployMode">
+          <el-radio :label="'client'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'local'" :disabled="isDetails"></el-radio>
+        </el-radio-group>
       </div>
-    </div>
+    </m-list-box>
     <!--master-->
-    <div class="list-box-4p" v-if="deployMode !== 'local'">
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Master')}}</span>
-        <span class="sp4">
-          <el-select
-            style="width: 130px;"
-            size="small"
-            v-model="master"
-            :disabled="isDetails">
-            <el-option
-              v-for="city in masterType"
-              :key="city.code"
-              :value="city.code"
-              :label="city.code">
-            </el-option>
-          </el-select>
-        </span>
-        <span v-if="masterUrlState">
-          <el-input
-            :disabled="isDetails"
-            type="input"
-            size="small"
-            v-model="masterUrl"
-            :placeholder="$t('Please Enter Url')"
-            style="width: 60%;">
+    <m-list-box v-if="deployMode !== 'local'">
+      <div slot="text">{{$t('Master')}}</div>
+      <div slot="content" class="display-flex">
+        <el-select
+          size="small"
+          v-model="master"
+          :disabled="isDetails">
+          <el-option
+            v-for="city in masterType"
+            :key="city.code"
+            :value="city.code"
+            :label="city.code">
+          </el-option>
+        </el-select>
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="masterUrl"
+          :placeholder="$t('Please Enter Url')"
+          class="cont-extra"
+          v-if="masterUrlState">
         </el-input>
-        </span>
       </div>
-    </div>
+    </m-list-box>
+    <!--queue-->
+    <m-list-box v-if="deployMode !== 'local' && master === 'yarn'">
+      <div slot="text">{{$t('Queue')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="queue"
+          :placeholder="$t('Please enter queue value')"
+          style="width: 192px;">
+        </el-input>
+      </div>
+    </m-list-box>
     <!--config file-->
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
@@ -93,6 +90,7 @@
     </m-list-box>
   </div>
 </template>
+
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
@@ -414,58 +412,3 @@
     components: { mLocalParams, mListBox, Treeselect }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .scriptModal {
-    .ans-modal-box-content-wrapper {
-      width: 90%;
-      .ans-modal-box-close {
-        right: -12px;
-        top: -16px;
-        color: #fff;
-      }
-    }
-  }
-  .ans-modal-box-close {
-    z-index: 100;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-  .list-box-4p {
-    .list {
-      margin-bottom: 14px;
-      .sp1 {
-        float: left;
-        width: 112px;
-        text-align: right;
-        margin-right: 10px;
-        font-size: 14px;
-        color: #777;
-        display: inline-block;
-        padding-top: 6px;
-      }
-      .sp2 {
-        float: left;
-        margin-right: 4px;
-        padding-top: 6px;
-      }
-      .sp3 {
-        width: 90px;
-      }
-      .sp4 {
-        float: left;
-        margin-right: 4px;
-      }
-    }
-  }
-</style>

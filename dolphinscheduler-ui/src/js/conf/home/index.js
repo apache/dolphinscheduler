@@ -17,6 +17,7 @@
 
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+import 'babel-polyfill'
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -36,7 +37,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
-import 'font-awesome/css/font-awesome.min.css'
+import 'remixicon/fonts/remixicon.css'
+import formCreate from '@form-create/element-ui'
 
 // Component internationalization
 const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}
@@ -45,6 +47,7 @@ i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(E
 
 // Vue.use(ans)
 Vue.use(useOpt)
+Vue.use(formCreate)
 
 sync(store, router)
 

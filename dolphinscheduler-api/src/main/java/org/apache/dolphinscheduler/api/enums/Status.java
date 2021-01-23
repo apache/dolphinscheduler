@@ -36,7 +36,7 @@ public enum Status {
     USER_NAME_NULL(10004, "user name is null", "用户名不能为空"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),
     TASK_INSTANCE_NOT_FOUND(10008, "task instance not found", "任务实例不存在"),
-    TENANT_CODE_EXIST(10009, "tenant code {0} already exists", "租户编码[{0}]已存在"),
+    OS_TENANT_CODE_EXIST(10009, "os tenant code {0} already exists", "操作系统租户[{0}]已存在"),
     USER_NOT_EXIST(10010, "user {0} not exists", "用户[{0}]不存在"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found", "告警组不存在"),
     ALERT_GROUP_EXIST(10012, "alarm group already exists", "告警组名称已存在"),
@@ -116,7 +116,7 @@ public enum Status {
     QUERY_TENANT_LIST_ERROR(10086, "query tenant list error", "查询租户列表错误"),
     UPDATE_TENANT_ERROR(10087, "update tenant error", "更新租户错误"),
     DELETE_TENANT_BY_ID_ERROR(10088, "delete tenant by id error", "删除租户错误"),
-    VERIFY_TENANT_CODE_ERROR(10089, "verify tenant code error", "租户编码验证错误"),
+    VERIFY_OS_TENANT_CODE_ERROR(10089, "verify os tenant code error", "操作系统租户验证错误"),
     CREATE_USER_ERROR(10090, "create user error", "创建用户错误"),
     QUERY_USER_LIST_PAGING_ERROR(10091, "query user list paging error", "分页查询用户列表错误"),
     UPDATE_USER_ERROR(10092, "update user error", "更新用户错误"),
@@ -151,7 +151,7 @@ public enum Status {
     ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR(10121, "encapsulation process instance gantt structure error", "查询工作流实例甘特图数据错误"),
     QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR(10122, "query process definition list paging error", "分页查询工作流定义列表错误"),
     SIGN_OUT_ERROR(10123, "sign out error", "退出错误"),
-    TENANT_CODE_HAS_ALREADY_EXISTS(10124, "tenant code has already exists", "租户编码已存在"),
+    OS_TENANT_CODE_HAS_ALREADY_EXISTS(10124, "os tenant code has already exists", "操作系统租户已存在"),
     IP_IS_EMPTY(10125, "ip is empty", "IP地址不能为空"),
     SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE(10126, "schedule release is already {0}", "调度配置上线错误[{0}]"),
     CREATE_QUEUE_ERROR(10127, "create queue error", "创建队列错误"),
@@ -195,7 +195,10 @@ public enum Status {
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR(10162, "query authorized and user created project error error", "查询授权的和用户创建的项目错误"),
     DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
-    CHECK_TENANT_CODE_ERROR(10164, "Please enter the English tenant code", "请输入英文租户编码"),
+    CHECK_OS_TENANT_CODE_ERROR(10164, "Please enter the English os tenant code", "请输入英文操作系统租户"),
+    FORCE_TASK_SUCCESS_ERROR(10165, "force task success error", "强制成功任务实例错误"),
+    TASK_INSTANCE_STATE_OPERATION_ERROR(10166, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
+    DATASOURCE_TYPE_NOT_EXIST(10167, "data source type not exist", "数据源类型不存在"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -233,7 +236,7 @@ public enum Status {
     COUNT_PROCESS_DEFINITION_USER_ERROR(50013, "count process definition user error", "查询各用户流程定义数错误"),
     START_PROCESS_INSTANCE_ERROR(50014, "start process instance error", "运行工作流实例错误"),
     EXECUTE_PROCESS_INSTANCE_ERROR(50015, "execute process instance error", "操作工作流实例错误"),
-    CHECK_PROCESS_DEFINITION_ERROR(50016, "check process definition error", "检查工作流实例错误"),
+    CHECK_PROCESS_DEFINITION_ERROR(50016, "check process definition error", "工作流定义错误"),
     QUERY_RECIPIENTS_AND_COPYERS_BY_PROCESS_DEFINITION_ERROR(50017, "query recipients and copyers by process definition error", "查询收件人和抄送人错误"),
     DATA_IS_NOT_VALID(50017, "data {0} not valid", "数据[{0}]无效"),
     DATA_IS_NULL(50018, "data {0} is null", "数据[{0}]不能为空"),
@@ -247,7 +250,7 @@ public enum Status {
     BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026, "batch delete process definition by ids {0} error", "批量删除工作流定义[{0}]错误"),
     TENANT_NOT_SUITABLE(50027, "there is not any tenant suitable, please choose a tenant available.", "没有合适的租户，请选择可用的租户"),
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028, "export process definition by id error", "导出工作流定义错误"),
-    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028, "batch export process definition by ids error", "批量导出工作流定义错误"),
+    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028,"batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029, "import process definition error", "导入工作流定义错误"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
@@ -273,13 +276,28 @@ public enum Status {
     QUEUE_COUNT_ERROR(90001, "queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
+
+    //plugin
+    PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
+    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
+    QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
+    QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
+
+    UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(110005, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR(110006, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
+    GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
+    CREATE_ALERT_PLUGIN_INSTANCE_ERROR(110008, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
+    QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
+    PLUGIN_INSTANCE_ALREADY_EXIT(110010,"plugin instance already exit","该告警插件实例已存在"),
+    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011,"query plugin instance page error","分页查询告警实例失败"),
+
     ;
 
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    private Status(int code, String enMsg, String zhMsg) {
+    Status(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

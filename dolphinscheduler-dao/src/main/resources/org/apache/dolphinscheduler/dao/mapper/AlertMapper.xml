@@ -19,8 +19,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertMapper">
     <sql id="baseSql">
-        id, title, show_type, content, alert_type, alert_status, log,
-        alertgroup_id, receivers, receivers_cc, create_time, update_time
+        id
+        , title, content, alert_status, log,
+        alertgroup_id, create_time, update_time
     </sql>
     <select id="listAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select

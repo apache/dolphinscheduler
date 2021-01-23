@@ -19,7 +19,7 @@
     <div class="text-1">
       <a href="javascript:"></a>
     </div>
-    <div class="from-model">
+    <div class="form-model">
       <div class="list">
         <label>{{$t('User Name')}}</label>
         <div>
@@ -168,7 +168,7 @@
         margin: 0 auto;
       }
     }
-    .from-model {
+    .form-model {
       padding: 30px 20px;
       .list {
         margin-bottom: 24px;

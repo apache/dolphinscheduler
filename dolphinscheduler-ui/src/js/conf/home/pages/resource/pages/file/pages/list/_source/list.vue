@@ -29,6 +29,7 @@
             </el-popover>
           </template>
         </el-table-column>
+        <el-table-column prop="userName" :label="$t('Resource userName')"></el-table-column>
         <el-table-column :label="$t('Whether directory')" width="100">
           <template slot-scope="scope">
             {{scope.row.directory? $t('Yes') : $t('No')}}
@@ -79,7 +80,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
-      width="45%">
+      width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
   </div>

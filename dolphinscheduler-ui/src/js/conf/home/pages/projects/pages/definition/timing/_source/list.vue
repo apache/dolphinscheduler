@@ -100,7 +100,7 @@
     <el-dialog
       :title="$t('Set parameters before timing')"
       :visible.sync="timingDialog"
-      width="65%">
+      width="auto">
       <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
     </el-dialog>
   </div>
@@ -124,16 +124,14 @@
         list: [],
         timingDialog: false,
         timingData: {
-          item: {},
-          receiversD: [],
-          receiversCcD: []
+          item: {}
         }
       }
     },
     props: {
     },
     methods: {
-      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver', 'deleteTiming']),
+      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'deleteTiming']),
       /**
        * delete
        */
@@ -141,11 +139,10 @@
         this.deleteTiming({
           scheduleId: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.pageNo = 1
+          this._getScheduleList('false')
           this.$message.success(res.msg)
-          this.$router.push({ name: 'projects-definition-list' })
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
@@ -230,28 +227,11 @@
         })
       },
       /**
-       * get email
-       */
-      _getReceiver (id) {
-        return new Promise((resolve, reject) => {
-          this.getReceiver({ processDefinitionId: id }).then(res => {
-            resolve({
-              receivers: res.receivers && res.receivers.split(',') || [],
-              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
-            })
-          })
-        })
-      },
-      /**
        * timing
        */
       _editTiming (item) {
-        this._getReceiver(item.processDefinitionId).then(res => {
-          this.timingData.item = item
-          this.timingData.receiversD = res.receivers
-          this.timingData.receiversCcD = res.receiversCc
-          this.timingDialog = true
-        })
+        this.timingData.item = item
+        this.timingDialog = true
       },
       onUpdateTiming () {
         this.pageNo = 1

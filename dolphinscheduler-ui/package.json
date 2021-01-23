@@ -13,6 +13,7 @@
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
+    "@form-create/element-ui": "^1.0.18",
     "@riophae/vue-treeselect": "^0.4.0",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
@@ -24,7 +25,6 @@
     "dayjs": "^1.7.8",
     "echarts": "4.1.0",
     "element-ui": "2.13.2",
-    "font-awesome": "^4.7.0",
     "html2canvas": "^0.5.0-beta4",
     "jquery": "3.3.1",
     "jquery-ui": "^1.12.1",
@@ -32,6 +32,7 @@
     "jsplumb": "^2.8.6",
     "lodash": "^4.17.11",
     "normalize.css": "^8.0.1",
+    "remixicon": "^2.5.0",
     "vue": "^2.5.17",
     "vue-router": "^3.0.0",
     "vuex": "^3.0.0",
@@ -48,6 +49,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-plugin-transform-vue-jsx": "^3.5.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "copy-webpack-plugin": "^4.5.2",
     "cross-env": "^5.2.0",
@@ -86,5 +88,14 @@
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0",
     "webpack-merge": "^4.2.2"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "ie >= 9",
+    "edge >= 12",
+    "firefox >= 28",
+    "chrome >= 29",
+    "opera >= 17"
+  ]
 }

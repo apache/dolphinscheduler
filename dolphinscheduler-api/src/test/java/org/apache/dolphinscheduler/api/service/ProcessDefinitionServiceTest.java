@@ -341,12 +341,47 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processDefineMapper.selectById(1)).thenReturn(null);
         Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionById(loginUser,
                 "project_test1", 1);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
 
         //instance exit
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
         Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionById(loginUser,
                 "project_test1", 46);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testQueryProcessDefinitionByName() {
+        String projectName = "project_test1";
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+
+        Project project = getProject(projectName);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+
+        //project check auth fail
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Map<String, Object> map = processDefinitionService.queryProcessDefinitionByName(loginUser,
+                "project_test1", "test_def");
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
+
+        //project check auth success, instance not exist
+        putMsg(result, Status.SUCCESS, projectName);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(processDefineMapper.queryByDefineName(project.getId(),"test_def")).thenReturn(null);
+        Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionByName(loginUser,
+                "project_test1", "test_def");
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
+
+        //instance exit
+        Mockito.when(processDefineMapper.queryByDefineName(project.getId(),"test")).thenReturn(getProcessDefinition());
+        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByName(loginUser,
+                "project_test1", "test");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -557,14 +592,14 @@ public class ProcessDefinitionServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-                6, ReleaseState.OFFLINE.getCode());
+                6, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         // project check auth success, processs definition online
         putMsg(result, Status.SUCCESS, projectName);
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, "project_test1", 46, ReleaseState.ONLINE.getCode());
+                loginUser, "project_test1", 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
 
         // project check auth success, processs definition online
@@ -573,12 +608,12 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition1);
         Mockito.when(processService.getUserById(1)).thenReturn(loginUser);
         Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, "project_test1", 46, ReleaseState.ONLINE.getCode());
+                loginUser, "project_test1", 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
 
         // release error code
         Map<String, Object> failRes = processDefinitionService.releaseProcessDefinition(
-                loginUser, "project_test1", 46, 2);
+                loginUser, "project_test1", 46, ReleaseState.getEnum(2));
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
 
         //FIXME has function exit code 1 when exception
