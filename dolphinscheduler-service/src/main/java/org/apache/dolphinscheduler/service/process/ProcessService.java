@@ -2023,7 +2023,7 @@ public class ProcessService {
         List<TaskNode> tasks = processData.getTasks();
         for (int i = 0; i < tasks.size(); i++) {
             TaskNode taskNode = newTasks.get(i);
-            String type = taskNode.getType();
+            String type = taskNode.getType().toLowerCase();
             if (TaskType.CONDITIONS.getDescp().equals(type)) {
                 ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
                 String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
