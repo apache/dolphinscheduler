@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -293,7 +294,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      */
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
         /**
@@ -344,7 +345,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -364,7 +365,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
     public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -442,21 +443,13 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      */
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.selectList(null);
-        List<ProcessDefinition> processDefinitions = processDefinitionMapper.selectList(null);
-        if (projects != null) {
-            Set<Integer> set = new HashSet<>();
-            for (ProcessDefinition processDefinition : processDefinitions) {
-                set.add(processDefinition.getProjectId());
-            }
-            List<Project> tempDeletelist = new ArrayList<>();
-            for (Project project : projects) {
-                if (!set.contains(project.getId())) {
-                    tempDeletelist.add(project);
-                }
-            }
-            projects.removeAll(tempDeletelist);
+        List<Project> projects = new ArrayList<>();
+
+        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
+        if (CollectionUtils.isNotEmpty(projectIds)) {
+            projects = projectMapper.selectBatchIds(projectIds);
         }
+
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
         return result;

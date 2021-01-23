@@ -38,6 +38,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
 import 'remixicon/fonts/remixicon.css'
+import formCreate from '@form-create/element-ui'
 
 // Component internationalization
 const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}
@@ -46,6 +47,7 @@ i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(E
 
 // Vue.use(ans)
 Vue.use(useOpt)
+Vue.use(formCreate)
 
 sync(store, router)
 
