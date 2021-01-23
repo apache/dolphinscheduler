@@ -64,6 +64,8 @@ sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttl
 sed -i ${txt} "s#mail.smtp.ssl.trust.*#mail.smtp.ssl.trust=${sslTrust}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 
+sed -i ${txt} "s#alert.listen.host.*#alert.listen.host=${alertServer}#g" conf/worker.properties
+
 # 2.create directory
 echo "2.create directory"
 

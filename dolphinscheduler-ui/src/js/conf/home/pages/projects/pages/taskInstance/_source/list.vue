@@ -73,8 +73,9 @@
       </el-table>
     </div>
     <el-dialog
+      :show-close="false"
       :visible.sync="logDialog"
-      width="30%">
+      width="auto">
       <m-log :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
   </div>
@@ -116,21 +117,23 @@
         this.logDialog = true
       },
       ok () {},
-
       close () {
         this.logDialog = false
       },
-
       _forceSuccess (item) {
         this.forceTaskSuccess({ taskInstanceId: item.id }).then(res => {
           if (res.code === 0) {
             this.$message.success(res.msg)
+            setTimeout(this._onUpdate, 1000)
           } else {
             this.$message.error(res.msg)
           }
         }).catch(e => {
           this.$message.error(e.msg)
         })
+      },
+      _onUpdate () {
+        this.$emit('on-update')
       },
       _go (item) {
         this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })

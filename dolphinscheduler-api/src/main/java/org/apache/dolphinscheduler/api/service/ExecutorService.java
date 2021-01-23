@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
@@ -106,12 +107,11 @@ public class ExecutorService extends BaseService {
      * @param taskDependType node dependency type
      * @param warningType warning type
      * @param warningGroupId notify group id
-     * @param receivers receivers
-     * @param receiversCc receivers cc
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group name
      * @param runMode run mode
      * @param timeout timeout
+     * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
      * @throws ParseException Parse Exception
      */
@@ -119,8 +119,9 @@ public class ExecutorService extends BaseService {
                                                    int processDefinitionId, String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
-                                                   String receivers, String receiversCc, RunMode runMode,
-                                                   Priority processInstancePriority, String workerGroup, Integer timeout) throws ParseException {
+                                                   RunMode runMode,
+                                                   Priority processInstancePriority, String workerGroup, Integer timeout,
+                                                   Map<String, String> startParams) throws ParseException {
         Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
@@ -157,13 +158,10 @@ public class ExecutorService extends BaseService {
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup);
+                warningGroupId, runMode, processInstancePriority, workerGroup, startParams);
+
         if (create > 0) {
-            /**
-             * according to the process definition ID updateProcessInstance and CC recipient
-             */
-            processDefinition.setReceivers(receivers);
-            processDefinition.setReceiversCc(receiversCc);
+            processDefinition.setWarningGroupId(warningGroupId);
             processDefinitionMapper.updateById(processDefinition);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -446,42 +444,6 @@ public class ExecutorService extends BaseService {
     }
 
     /**
-     * query recipients and copyers by process definition id or processInstanceId
-     *
-     * @param processDefineId process definition id
-     * @param processInstanceId process instance id
-     * @return receivers cc list
-     */
-    public Map<String, Object> getReceiverCc(Integer processDefineId, Integer processInstanceId) {
-        Map<String, Object> result = new HashMap<>();
-        logger.info("processInstanceId {}", processInstanceId);
-        if (processDefineId == null && processInstanceId == null) {
-            throw new RuntimeException("You must set values for parameters processDefineId or processInstanceId");
-        }
-        if (processDefineId == null && processInstanceId != null) {
-            ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
-            if (processInstance == null) {
-                throw new RuntimeException("processInstanceId is not exists");
-            }
-            processDefineId = processInstance.getProcessDefinitionId();
-        }
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processDefineId);
-        if (processDefinition == null) {
-            throw new RuntimeException(String.format("processDefineId %d is not exists", processDefineId));
-        }
-
-        String receivers = processDefinition.getReceivers();
-        String receiversCc = processDefinition.getReceiversCc();
-        Map<String, String> dataMap = new HashMap<>();
-        dataMap.put(Constants.RECEIVERS, receivers);
-        dataMap.put(Constants.RECEIVERS_CC, receiversCc);
-
-        result.put(Constants.DATA_LIST, dataMap);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
      * create command
      *
      * @param commandType commandType
@@ -502,7 +464,8 @@ public class ExecutorService extends BaseService {
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
-                              RunMode runMode, Priority processInstancePriority, String workerGroup) throws ParseException {
+                              RunMode runMode, Priority processInstancePriority, String workerGroup,
+                              Map<String, String> startParams) throws ParseException {
 
         /**
          * instantiate command schedule instance
@@ -528,6 +491,9 @@ public class ExecutorService extends BaseService {
         }
         if (warningType != null) {
             command.setWarningType(warningType);
+        }
+        if (startParams != null && startParams.size() > 0) {
+            cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(executorId);

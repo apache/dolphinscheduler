@@ -59,7 +59,7 @@
         </el-select>
       </template>
       <el-input
-              :disabled="isDetails"
+              :disabled="isDetails && !isStartProcess"
               type="text"
               size="small"
               v-model="localParamsList[$index].value"
@@ -68,18 +68,18 @@
               @blur="_handleValue()"
               :style="inputStyle">
       </el-input>
-      <span class="lt-add">
+      <span class="lt-add" v-show="!isStartProcess">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
           <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
         </a>
       </span>
-      <span class="add" v-if="$index === (localParamsList.length - 1)">
+      <span class="add" v-if="$index === (localParamsList.length - 1)" v-show="!isStartProcess">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
           <em class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
-    <span class="add-dp" v-if="!localParamsList.length">
+    <span class="add-dp" v-if="!localParamsList.length" v-show="!isStartProcess">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
         <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
@@ -112,6 +112,10 @@
       hide: {
         type: Boolean,
         default: true
+      },
+      isStartProcess: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
@@ -197,7 +201,7 @@
     },
     computed: {
       inputStyle () {
-        return `width:${this.hide ? 160 : 262}px`
+        return `width:${this.hide ? 160 : 252}px`
       }
     },
     mounted () {
@@ -212,31 +216,33 @@
       margin-bottom: 6px;
       .lt-add {
         padding-left: 4px;
+        line-height: 32px;
         a {
-          .iconfont {
-            font-size: 18px;
+          .iconfont, [class^="el-icon"] {
+            font-size: 17px;
             vertical-align: middle;
-            margin-bottom: -2px;
             display: inline-block;
+            margin-top: 0;
           }
         }
       }
     }
     .add {
+      line-height: 32px;
       a {
         color: #000;
-        .iconfont {
-          font-size: 16px;
+        .iconfont, [class^="el-icon"] {
+          font-size: 18px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: -5px;
+          margin-top: 0;
         }
       }
     }
-    .add-dp{
+    .add-dp {
       a {
         color: #0097e0;
-        .iconfont {
+        .iconfont, [class^="el-icon"] {
           font-size: 18px;
           vertical-align: middle;
           display: inline-block;

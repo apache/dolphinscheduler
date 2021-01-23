@@ -122,7 +122,7 @@
           <m-list-box>
             <div slot="text">{{$t('ModelType')}}</div>
             <div slot="content">
-              <el-radio-group v-model="srcQueryType" size="small" @change="_handleQueryType" style="vertical-align: sub;">
+              <el-radio-group v-model="srcQueryType" size="small" @change="_handleQueryType">
                 <el-radio label="0">{{$t('Form')}}</el-radio>
                 <el-radio label="1">SQL</el-radio>
               </el-radio-group>
@@ -246,7 +246,7 @@
                   style="opacity: 0;">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="el-icon-rank" @click="setEditorVal"></em>
+            <em class="el-icon-full-screen" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -1175,8 +1175,6 @@
         }
         if (val !== 0) {
           this.title = ''
-          this.receivers = []
-          this.receiversCc = []
         }
       },
       // Listening data source
@@ -1264,14 +1262,3 @@
     components: { mListBox, mDatasource, mLocalParams, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .requiredIcon {
-    color: #ff0000;
-    padding-right: 4px;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>

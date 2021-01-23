@@ -35,10 +35,10 @@
                 <em class="el-icon-refresh"></em>
               </a>
               <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('Enter full screen')">
-                <em class="el-icon-rank"></em>
+                <em class="el-icon-full-screen"></em>
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('Cancel full screen')">
-                <em class="el-icon-full-screen"></em>
+                <em class="el-icon-minus"></em>
               </a>
             </div>
           </div>
@@ -288,9 +288,10 @@
           top: 12px;
           a{
             color: #0097e0;
-            font-size: 12px;
             margin-left: 10px;
             em {
+              font-size: 17px;
+              font-weight: 400;
               text-decoration: none !important;
               vertical-align: middle;
             }

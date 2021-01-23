@@ -26,7 +26,7 @@
             style="opacity: 0">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="el-icon-rank" @click="setEditorVal"></em>
+            <em class="el-icon-full-screen" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -52,7 +52,7 @@
     </m-list-box>
     <el-dialog
       :visible.sync="scriptBoxDialog"
-      modal-append-to-body="true"
+      append-to-body="true"
       width="80%">
       <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
     </el-dialog>
@@ -361,31 +361,3 @@
     components: { mLocalParams, mListBox, mScriptBox, Treeselect }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .scriptModal {
-    .ans-modal-box-content-wrapper {
-      width: 90%;
-      .ans-modal-box-close {
-        right: -12px;
-        top: -16px;
-        color: #fff;
-      }
-    }
-  }
-  .ans-modal-box-close {
-    z-index: 100;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-</style>

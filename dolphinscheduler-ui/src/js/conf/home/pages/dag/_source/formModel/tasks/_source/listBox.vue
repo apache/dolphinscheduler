@@ -40,7 +40,6 @@
       }
     }
   }
-
   .v-checkbox-wrapper {
     &.v-checkbox-wrapper-disabled {
       color: #999 ;
@@ -58,5 +57,4 @@
       }
     }
   }
-
 </style>

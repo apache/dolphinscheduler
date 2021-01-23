@@ -408,35 +408,3 @@
     components: { mLocalParams, mListBox, Treeselect }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .spark-model {
-    .list-box-4p {
-      .list {
-        margin-bottom: 14px;
-        .sp1 {
-          float: left;
-          width: 112px;
-          text-align: right;
-          margin-right: 10px;
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding-top: 6px;
-        }
-        .sp2 {
-          float: left;
-          margin-right: 4px;
-        }
-      }
-    }
-  }
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-</style>

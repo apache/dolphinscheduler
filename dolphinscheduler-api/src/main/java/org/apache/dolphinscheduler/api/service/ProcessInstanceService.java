@@ -66,11 +66,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -187,8 +189,7 @@ public class ProcessInstanceService extends BaseService {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
 
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
-        processInstance.setReceivers(processDefinition.getReceivers());
-        processInstance.setReceiversCc(processDefinition.getReceiversCc());
+        processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
         result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
@@ -449,7 +450,7 @@ public class ProcessInstanceService extends BaseService {
 
             originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
             List<Property> globalParamList = processData.getGlobalParams();
-            Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
                     processInstance.getCmdTypeIfComplement(), schedule);
             timeout = processData.getTimeout();
