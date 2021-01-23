@@ -172,9 +172,9 @@ public class ProcessInstanceService extends BaseService {
     /**
      * query process instance by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param processId process instance id
+     * @param processId   process instance id
      * @return process instance detail
      */
     public Map<String, Object> queryProcessInstanceById(User loginUser, String projectName, Integer processId) {
@@ -199,16 +199,16 @@ public class ProcessInstanceService extends BaseService {
     /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param loginUser       login user
+     * @param projectName     project name
+     * @param pageNo          page number
+     * @param pageSize        page size
      * @param processDefineId process definition id
-     * @param searchVal search value
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
+     * @param searchVal       search value
+     * @param stateType       state type
+     * @param host            host
+     * @param startDate       start time
+     * @param endDate         end time
      * @return process instance list
      */
     public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
@@ -273,9 +273,9 @@ public class ProcessInstanceService extends BaseService {
     /**
      * query task list by process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param processId process instance id
+     * @param processId   process instance id
      * @return task list for the process instance
      * @throws IOException io exception
      */
@@ -348,9 +348,9 @@ public class ProcessInstanceService extends BaseService {
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param taskId task id
+     * @param taskId      task id
      * @return sub process instance detail
      */
     public Map<String, Object> querySubProcessInstanceByTaskId(User loginUser, String projectName, Integer taskId) {
@@ -389,15 +389,15 @@ public class ProcessInstanceService extends BaseService {
     /**
      * update process instance
      *
-     * @param loginUser login user
-     * @param projectName project name
+     * @param loginUser           login user
+     * @param projectName         project name
      * @param processInstanceJson process instance json
-     * @param processInstanceId process instance id
-     * @param scheduleTime schedule time
-     * @param syncDefine sync define
-     * @param flag flag
-     * @param locations locations
-     * @param connects connects
+     * @param processInstanceId   process instance id
+     * @param scheduleTime        schedule time
+     * @param syncDefine          sync define
+     * @param flag                flag
+     * @param locations           locations
+     * @param connects            connects
      * @return update result code
      * @throws ParseException parse exception for json parse
      */
@@ -460,6 +460,58 @@ public class ProcessInstanceService extends BaseService {
             if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
+            // get the processinstancejson before saving,and then save the name and taskid
+            String oldJson = processInstance.getProcessInstanceJson();
+            ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
+            if (oldProcessData != null) {
+                HashMap<String, String> oldNameTaskId = new HashMap<>();
+                List<TaskNode> oldTasks = oldProcessData.getTasks();
+                for (int i = 0; i < oldTasks.size(); i++) {
+                    TaskNode taskNode = oldTasks.get(i);
+                    String oldName = taskNode.getName();
+                    String oldId = taskNode.getId();
+                    oldNameTaskId.put(oldName, oldId);
+                }
+
+                // take the processinstancejson saved this time, and then save the taskid and name
+                HashMap<String, String> newNameTaskId = new HashMap<>();
+                List<TaskNode> newTasks = processData.getTasks();
+                for (int i = 0; i < newTasks.size(); i++) {
+                    TaskNode taskNode = newTasks.get(i);
+                    String newId = taskNode.getId();
+                    String newName = taskNode.getName();
+                    newNameTaskId.put(newId, newName);
+                }
+
+                // replace the previous conditionresult with a new one
+                List<TaskNode> tasks = processData.getTasks();
+                for (int i = 0; i < tasks.size(); i++) {
+                    TaskNode taskNode = newTasks.get(i);
+                    String type = taskNode.getType();
+                    if ("CONDITIONS".equals(type)) {
+                        String conditionResult = taskNode.getConditionResult();
+                        String[] split = conditionResult.split(",");
+                        String oldSuccessNodeStr = split[0];
+                        String oldFailedNodeStr = split[1];
+                        String oldSuccessNodeName = oldSuccessNodeStr.substring(oldSuccessNodeStr.indexOf('[') + 1, oldSuccessNodeStr.indexOf(']')).replaceAll("\"", "");
+                        String oldFailedNodeName = oldFailedNodeStr.substring(oldFailedNodeStr.indexOf('[') + 1, oldFailedNodeStr.indexOf(']')).replaceAll("\"", "");
+                        String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
+                        String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
+                        if (newSuccessNodeName != null || newFailedNodeName != null) {
+                            if (newSuccessNodeName == null) {
+                                newSuccessNodeName = "";
+                            }
+                            if (newFailedNodeName == null) {
+                                newFailedNodeName = "";
+                            }
+                            String conditionResultStr = "{\"successNode\": [\"" + newSuccessNodeName + "\"],\"failedNode\": [\"" + newFailedNodeName + "\"]}";
+                            taskNode.setConditionResult(conditionResultStr);
+                            tasks.set(i, taskNode);
+                        }
+                    }
+                }
+                processInstanceJson = JSONUtils.toJsonString(processData);
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
@@ -492,9 +544,9 @@ public class ProcessInstanceService extends BaseService {
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param subId sub process id
+     * @param subId       sub process id
      * @return parent instance detail
      */
     public Map<String, Object> queryParentInstanceBySubId(User loginUser, String projectName, Integer subId) {
@@ -532,8 +584,8 @@ public class ProcessInstanceService extends BaseService {
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
      *
-     * @param loginUser login user
-     * @param projectName project name
+     * @param loginUser         login user
+     * @param projectName       project name
      * @param processInstanceId process instance id
      * @return delete result code
      */
@@ -713,8 +765,9 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * query process instance by processDefinitionId and stateArray
+     *
      * @param processDefinitionId processDefinitionId
-     * @param states states array
+     * @param states              states array
      * @return process instance list
      */
     public List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states) {
@@ -723,11 +776,12 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * query process instance by processDefinitionId
+     *
      * @param processDefinitionId processDefinitionId
-     * @param size size
+     * @param size                size
      * @return process instance list
      */
-    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size) {
+    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId, int size) {
         return processInstanceMapper.queryByProcessDefineId(processDefinitionId, size);
     }
 
