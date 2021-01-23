@@ -460,6 +460,58 @@ public class ProcessInstanceService extends BaseService {
             if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
+            // get the processinstancejson before saving,and then save the name and taskid
+            String oldJson = processInstance.getProcessInstanceJson();
+            ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
+            if (oldProcessData != null) {
+                HashMap<String, String> oldNameTaskId = new HashMap<>();
+                List<TaskNode> oldTasks = oldProcessData.getTasks();
+                for (int i = 0; i < oldTasks.size(); i++) {
+                    TaskNode taskNode = oldTasks.get(i);
+                    String oldName = taskNode.getName();
+                    String oldId = taskNode.getId();
+                    oldNameTaskId.put(oldName, oldId);
+                }
+
+                // take the processinstancejson saved this time, and then save the taskid and name
+                HashMap<String, String> newNameTaskId = new HashMap<>();
+                List<TaskNode> newTasks = processData.getTasks();
+                for (int i = 0; i < newTasks.size(); i++) {
+                    TaskNode taskNode = newTasks.get(i);
+                    String newId = taskNode.getId();
+                    String newName = taskNode.getName();
+                    newNameTaskId.put(newId, newName);
+                }
+
+                // replace the previous conditionresult with a new one
+                List<TaskNode> tasks = processData.getTasks();
+                for (int i = 0; i < tasks.size(); i++) {
+                    TaskNode taskNode = newTasks.get(i);
+                    String type = taskNode.getType();
+                    if ("CONDITIONS".equals(type)) {
+                        String conditionResult = taskNode.getConditionResult();
+                        String[] split = conditionResult.split(",");
+                        String oldSuccessNodeStr = split[0];
+                        String oldFailedNodeStr = split[1];
+                        String oldSuccessNodeName = oldSuccessNodeStr.substring(oldSuccessNodeStr.indexOf('[') + 1, oldSuccessNodeStr.indexOf(']')).replaceAll("\"", "");
+                        String oldFailedNodeName = oldFailedNodeStr.substring(oldFailedNodeStr.indexOf('[') + 1, oldFailedNodeStr.indexOf(']')).replaceAll("\"", "");
+                        String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
+                        String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
+                        if (newSuccessNodeName != null || newFailedNodeName != null) {
+                            if (newSuccessNodeName == null) {
+                                newSuccessNodeName = "";
+                            }
+                            if (newFailedNodeName == null) {
+                                newFailedNodeName = "";
+                            }
+                            String conditionResultStr = "{\"successNode\": [\"" + newSuccessNodeName + "\"],\"failedNode\": [\"" + newFailedNodeName + "\"]}";
+                            taskNode.setConditionResult(conditionResultStr);
+                            tasks.set(i, taskNode);
+                        }
+                    }
+                }
+                processInstanceJson = JSONUtils.toJsonString(processData);
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
