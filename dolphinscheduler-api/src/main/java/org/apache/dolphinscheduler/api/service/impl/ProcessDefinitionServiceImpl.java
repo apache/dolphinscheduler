@@ -149,13 +149,13 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * create process definition
      *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param name process definition name
+     * @param loginUser             login user
+     * @param projectName           project name
+     * @param name                  process definition name
      * @param processDefinitionJson process definition json
-     * @param desc description
-     * @param locations locations for nodes
-     * @param connects connects for nodes
+     * @param desc                  description
+     * @param locations             locations for nodes
+     * @param connects              connects for nodes
      * @return create result code
      * @throws JsonProcessingException JsonProcessingException
      */
@@ -268,7 +268,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * query process definition list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
      * @return definition list
      */
@@ -294,12 +294,12 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * query process definition list paging
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param userId user id
+     * @param searchVal   search value
+     * @param pageNo      page number
+     * @param pageSize    page size
+     * @param userId      user id
      * @return process definition page
      */
     @Override
@@ -330,9 +330,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * query datail of process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param processId process definition id
+     * @param processId   process definition id
      * @return process definition detail
      */
     @Override
@@ -360,14 +360,14 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * update  process definition
      *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param name process definition name
-     * @param id process definition id
+     * @param loginUser             login user
+     * @param projectName           project name
+     * @param name                  process definition name
+     * @param id                    process definition id
      * @param processDefinitionJson process definition json
-     * @param desc description
-     * @param locations locations for nodes
-     * @param connects connects for nodes
+     * @param desc                  description
+     * @param locations             locations for nodes
+     * @param connects              connects for nodes
      * @return update result code
      */
     @Override
@@ -507,9 +507,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * verify process definition name unique
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param name name
+     * @param name        name
      * @return true if process definition name not exists, otherwise false
      */
     @Override
@@ -535,8 +535,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * delete process definition by id
      *
-     * @param loginUser login user
-     * @param projectName project name
+     * @param loginUser           login user
+     * @param projectName         project name
      * @param processDefinitionId process definition id
      * @return delete result code
      */
@@ -607,9 +607,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * release process definition: online / offline
      *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param id process definition id
+     * @param loginUser    login user
+     * @param projectName  project name
+     * @param id           process definition id
      * @param releaseState release state
      * @return release result code
      */
@@ -762,7 +762,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * get export process metadata string
      *
      * @param processDefinitionId process definition id
-     * @param processDefinition process definition
+     * @param processDefinition   process definition
      * @return export process metadata string
      */
     public String exportProcessMetaDataStr(Integer processDefinitionId, ProcessDefinition processDefinition) {
@@ -774,7 +774,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * get export process metadata string
      *
      * @param processDefinitionId process definition id
-     * @param processDefinition process definition
+     * @param processDefinition   process definition
      * @return export process metadata string
      */
     public ProcessMeta exportProcessMetaData(Integer processDefinitionId, ProcessDefinition processDefinition) {
@@ -847,8 +847,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * import process definition
      *
-     * @param loginUser login user
-     * @param file process metadata json file
+     * @param loginUser          login user
+     * @param file               process metadata json file
      * @param currentProjectName current project name
      * @return import process
      */
@@ -1005,9 +1005,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * import process add special task param
      *
-     * @param loginUser login user
+     * @param loginUser             login user
      * @param processDefinitionJson process definition json
-     * @param targetProject target project
+     * @param targetProject         target project
      * @return import process param
      */
     private String addImportTaskNodeParam(User loginUser, String processDefinitionJson, Project targetProject) {
@@ -1041,11 +1041,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * import process schedule
      *
-     * @param loginUser login user
-     * @param currentProjectName current project name
-     * @param processMeta process meta data
+     * @param loginUser             login user
+     * @param currentProjectName    current project name
+     * @param processMeta           process meta data
      * @param processDefinitionName process definition name
-     * @param processDefinitionId process definition id
+     * @param processDefinitionId   process definition id
      * @return insert schedule flag
      */
     public int importProcessSchedule(User loginUser, String currentProjectName, ProcessMeta processMeta,
@@ -1095,9 +1095,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * check import process has sub process
      * recursion create sub process
      *
-     * @param loginUser login user
-     * @param targetProject target project
-     * @param jsonArray process task array
+     * @param loginUser       login user
+     * @param targetProject   target project
+     * @param jsonArray       process task array
      * @param subProcessIdMap correct sub process id map
      */
     private void importSubProcess(User loginUser, Project targetProject, ArrayNode jsonArray, Map<Integer, Integer> subProcessIdMap) {
@@ -1182,7 +1182,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * check the process definition node meets the specifications
      *
-     * @param processData process data
+     * @param processData           process data
      * @param processDefinitionJson process definition json
      * @return check result code
      */
@@ -1329,7 +1329,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * Encapsulates the TreeView structure
      *
      * @param processId process definition id
-     * @param limit limit
+     * @param limit     limit
      * @return tree view json data
      * @throws Exception exception
      */
@@ -1549,9 +1549,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * copy process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectName project name
-     * @param processId process definition id
+     * @param processId   process definition id
      * @return copy result code
      */
     public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) {
@@ -1584,10 +1584,10 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * batch copy process definition
      *
-     * @param loginUser loginUser
-     * @param projectName projectName
+     * @param loginUser            loginUser
+     * @param projectName          projectName
      * @param processDefinitionIds processDefinitionIds
-     * @param targetProjectId targetProjectId
+     * @param targetProjectId      targetProjectId
      */
     @Override
     public Map<String, Object> batchCopyProcessDefinition(User loginUser,
@@ -1632,10 +1632,10 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * batch move process definition
      *
-     * @param loginUser loginUser
-     * @param projectName projectName
+     * @param loginUser            loginUser
+     * @param projectName          projectName
      * @param processDefinitionIds processDefinitionIds
-     * @param targetProjectId targetProjectId
+     * @param targetProjectId      targetProjectId
      */
     @Override
     public Map<String, Object> batchMoveProcessDefinition(User loginUser,
@@ -1680,10 +1680,10 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * switch the defined process definition verison
      *
-     * @param loginUser login user
-     * @param projectName project name
+     * @param loginUser           login user
+     * @param projectName         project name
      * @param processDefinitionId process definition id
-     * @param version the version user want to switch
+     * @param version             the version user want to switch
      * @return switch process definition version result code
      */
     @Override
@@ -1740,8 +1740,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * do batch move process definition
      *
-     * @param targetProject targetProject
-     * @param failedProcessList failedProcessList
+     * @param targetProject           targetProject
+     * @param failedProcessList       failedProcessList
      * @param processDefinitionIdList processDefinitionIdList
      */
     private void doBatchMoveProcessDefinition(Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
@@ -1762,9 +1762,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * batch copy process definition
      *
-     * @param loginUser loginUser
-     * @param targetProject targetProject
-     * @param failedProcessList failedProcessList
+     * @param loginUser               loginUser
+     * @param targetProject           targetProject
+     * @param failedProcessList       failedProcessList
      * @param processDefinitionIdList processDefinitionIdList
      */
     private void doBatchCopyProcessDefinition(User loginUser, Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
@@ -1785,7 +1785,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * set failed processList
      *
-     * @param failedProcessList failedProcessList
+     * @param failedProcessList   failedProcessList
      * @param processDefinitionId processDefinitionId
      */
     private void setFailedProcessList(List<String> failedProcessList, String processDefinitionId) {
@@ -1800,7 +1800,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * check project and auth
      *
-     * @param loginUser loginUser
+     * @param loginUser   loginUser
      * @param projectName projectName
      */
     private Map<String, Object> checkProjectAndAuth(User loginUser, String projectName) {
@@ -1819,7 +1819,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * move process definition
      *
-     * @param processId processId
+     * @param processId     processId
      * @param targetProject targetProject
      * @return move result code
      */
@@ -1847,11 +1847,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     /**
      * check batch operate result
      *
-     * @param srcProjectName srcProjectName
+     * @param srcProjectName    srcProjectName
      * @param targetProjectName targetProjectName
-     * @param result result
+     * @param result            result
      * @param failedProcessList failedProcessList
-     * @param isCopy isCopy
+     * @param isCopy            isCopy
      */
     private void checkBatchOperateResult(String srcProjectName, String targetProjectName,
                                          Map<String, Object> result, List<String> failedProcessList, boolean isCopy) {
