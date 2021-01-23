@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -319,9 +320,8 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAllProjectList() {
-
-        Mockito.when(projectMapper.selectList(null)).thenReturn(getList());
-        Mockito.when(processDefinitionMapper.selectList(null)).thenReturn(getProcessDefinitions());
+        Mockito.when(processDefinitionMapper.listProjectIds()).thenReturn(getProjectIds());
+        Mockito.when(projectMapper.selectBatchIds(getProjectIds())).thenReturn(getList());
 
         Map<String, Object> result = projectService.queryAllProjectList();
         logger.info(result.toString());
@@ -386,6 +386,11 @@ public class ProjectServiceTest {
         list.add(processDefinition);
         return list;
     }
+
+    private List<Integer> getProjectIds() {
+        return Collections.singletonList(1);
+    }
+
 
     private String getDesc() {
         return "projectUserMapper.deleteProjectRelation(projectId,userId)projectUserMappe"
