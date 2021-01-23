@@ -509,7 +509,6 @@ public class ProcessInstanceService extends BaseService {
                         }
                     }
                 }
-
                 processInstanceJson = JSONUtils.toJsonString(processData);
             }
             processInstance.setProcessInstanceJson(processInstanceJson);
