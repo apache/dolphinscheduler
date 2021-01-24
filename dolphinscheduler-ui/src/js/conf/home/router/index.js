@@ -388,7 +388,7 @@ const router = new Router({
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
             title: `${i18n.$t('User Manage')}`,
-            refresh_in_switched_tab: false
+            refresh_in_switched_tab: true
           }
         },
         {

@@ -21,8 +21,10 @@
         <template slot="button-group" v-if="isADMIN">
           <el-button size="mini" @click="_create('')">{{$t('Create Alarm Instance')}}</el-button>
           <el-dialog
+            :title="item ? $t('Edit Alarm Instance') : $t('Create Alarm Instance')"
+            v-if="createWarningDialog"
             :visible.sync="createWarningDialog"
-            width="45%">
+            width="auto">
             <m-create-warning-instance :item="item" :pulginInstance="pulginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning-instance>
           </el-dialog>
         </template>
