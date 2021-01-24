@@ -71,6 +71,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             logger.info("accept heartbeat msg");
             return;
         }
+        //todo 使用业务线程池去处理 不要占用netty的资源
         response.setRequestId(req.getRequestId());
 
 
