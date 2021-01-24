@@ -68,9 +68,8 @@ public class WeChatSender {
 
     private String showType;
 
-    private final String mustNotNull = " must not null";
 
-
+    private static final String MUST_NOT_NULL = " must not null";
     private static final String ALERT_STATUS = "false";
     private static final String AGENT_ID_REG_EXP = "{agentId}";
     private static final String MSG_REG_EXP = "{msg}";
@@ -87,7 +86,7 @@ public class WeChatSender {
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
         showType = config.get(AlertConstants.SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.SHOW_TYPE + mustNotNull);
+        requireNonNull(showType, AlertConstants.SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
             .replace(CORP_ID_REGEX, weChatCorpId)
             .replace(SECRET_REGEX, weChatSecret);
