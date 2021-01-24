@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit queue') : $t('Create queue')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -50,13 +49,13 @@
 
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -90,17 +89,17 @@
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
+            this.$refs.popover.spinnerLoading = false
           }, 800)
         }
 
         let $catch = (e) => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         }
 
         if (this.item) {
-          this.$refs.popup.spinnerLoading = true
+          this.$refs.popover.spinnerLoading = true
           this.store.dispatch('security/updateQueueQ', param).then(res => {
             $then(res)
           }).catch(e => {
@@ -108,7 +107,7 @@
           })
         } else {
           this._verifyName(param).then(() => {
-            this.$refs.popup.spinnerLoading = true
+            this.$refs.popover.spinnerLoading = true
             this.store.dispatch('security/createQueueQ', param).then(res => {
               $then(res)
             }).catch(e => {
@@ -154,6 +153,6 @@
     mounted () {
 
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>
