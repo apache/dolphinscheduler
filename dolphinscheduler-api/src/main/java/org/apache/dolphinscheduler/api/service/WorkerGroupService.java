@@ -70,7 +70,7 @@ public class WorkerGroupService extends BaseService {
         Integer toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
