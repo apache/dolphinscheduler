@@ -22,15 +22,18 @@ public class MainTest {
         Host host = new Host("127.0.0.1", 12636);
 
         IRpcClient rpcClient = new RpcClient();
-        UserService userService = rpcClient.create(UserService.class, host);
+        IUserService userService = rpcClient.create(IUserService.class, host);
         boolean result = userService.say("calvin");
         System.out.println("异步回掉成功" + result);
 
         System.out.println(userService.hi(10));
         System.out.println(userService.hi(188888888));
 
-        UserService user = rpcClient.create(UserService.class, host);
+        IUserService user = rpcClient.create(IUserService.class, host);
         System.out.println(user.hi(99999));
         System.out.println(user.hi(998888888));
+
+        System.out.println(IUserService.class.getSimpleName());
+        System.out.println(UserService.class.getSimpleName());
     }
 }

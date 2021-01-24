@@ -25,7 +25,9 @@ import org.apache.dolphinscheduler.remote.rpc.common.ConsumerConfigConstants;
  */
 public class ConsumerConfig {
 
-    private Class<? extends AbstractRpcCallBack> callBackClass;
+    private Class<? extends AbstractRpcCallBack> serviceCallBackClass;
+
+    private Class<? extends AbstractRpcCallBack> ackCallBackClass;
 
     private String serviceName;
 
@@ -33,13 +35,20 @@ public class ConsumerConfig {
 
     private Integer retries = ConsumerConfigConstants.DEFAULT_RETRIES;
 
-    public Class<? extends AbstractRpcCallBack> getCallBackClass() {
-        return callBackClass;
+    public Class<? extends AbstractRpcCallBack> getServiceCallBackClass() {
+        return serviceCallBackClass;
     }
 
-    //set call back class
-    void setCallBackClass(Class<? extends AbstractRpcCallBack> callBackClass) {
-        this.callBackClass = callBackClass;
+    public void setServiceCallBackClass(Class<? extends AbstractRpcCallBack> serviceCallBackClass) {
+        this.serviceCallBackClass = serviceCallBackClass;
+    }
+
+    public Class<? extends AbstractRpcCallBack> getAckCallBackClass() {
+        return ackCallBackClass;
+    }
+
+    public void setAckCallBackClass(Class<? extends AbstractRpcCallBack> ackCallBackClass) {
+        this.ackCallBackClass = ackCallBackClass;
     }
 
     public String getServiceName() {
