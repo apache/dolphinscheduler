@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.utils;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *  server address
+ * server address
  */
 public class Host implements Serializable {
 
@@ -39,6 +40,21 @@ public class Host implements Serializable {
      */
     private int port;
 
+    /**
+     * weight
+     */
+    private int weight;
+
+    /**
+     * startTime
+     */
+    private long startTime;
+
+    /**
+     * workGroup
+     */
+    private String workGroup;
+
     public Host() {
     }
 
@@ -46,6 +62,23 @@ public class Host implements Serializable {
         this.ip = ip;
         this.port = port;
         this.address = ip + ":" + port;
+    }
+
+    public Host(String ip, int port, int weight, long startTime) {
+        this.ip = ip;
+        this.port = port;
+        this.address = ip + ":" + port;
+        this.weight = getWarmUpWeight(weight, startTime);
+        this.startTime = startTime;
+    }
+
+    public Host(String ip, int port, int weight, long startTime, String workGroup) {
+        this.ip = ip;
+        this.port = port;
+        this.address = ip + ":" + port;
+        this.weight = getWarmUpWeight(weight, startTime);
+        this.workGroup = workGroup;
+        this.startTime = startTime;
     }
 
     public String getAddress() {
@@ -65,6 +98,22 @@ public class Host implements Serializable {
         this.address = ip + ":" + port;
     }
 
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
     public int getPort() {
         return port;
     }
@@ -74,31 +123,47 @@ public class Host implements Serializable {
         this.address = ip + ":" + port;
     }
 
+    public String getWorkGroup() {
+        return workGroup;
+    }
+
+    public void setWorkGroup(String workGroup) {
+        this.workGroup = workGroup;
+    }
+
     /**
      * address convert host
+     *
      * @param address address
      * @return host
      */
-    public static Host of(String address){
-        if(address == null) {
+    public static Host of(String address) {
+        if (address == null) {
             throw new IllegalArgumentException("Host : address is null.");
         }
         String[] parts = address.split(":");
-        if (parts.length != 2) {
+        if (parts.length < 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
-        Host host = new Host(parts[0], Integer.parseInt(parts[1]));
+        Host host = null;
+        if (parts.length == 2) {
+            host = new Host(parts[0], Integer.parseInt(parts[1]));
+        }
+        if (parts.length == 4) {
+            host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Long.parseLong(parts[3]));
+        }
         return host;
     }
 
     /**
      * whether old version
+     *
      * @param address address
      * @return old version is true , otherwise is false
      */
-    public static Boolean isOldVersion(String address){
+    public static Boolean isOldVersion(String address) {
         String[] parts = address.split(":");
-        return parts.length != 2 ? true : false;
+        return parts.length != 2 && parts.length != 3;
     }
 
     @Override
@@ -120,8 +185,20 @@ public class Host implements Serializable {
 
     @Override
     public String toString() {
-        return "Host{" +
-                "address='" + address + '\'' +
-                '}';
+        return "Host{"
+            + "address='" + address + '\''
+            + '}';
+    }
+
+    /**
+     * warm up
+     */
+    private int getWarmUpWeight(int weight, long startTime) {
+        long uptime = System.currentTimeMillis() - startTime;
+        //If the warm-up is not over, reduce the weight
+        if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
+            return (int) (weight * ((float) uptime / Constants.WARM_UP_TIME));
+        }
+        return weight;
     }
 }

@@ -14,7 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -22,16 +34,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 /**
@@ -54,7 +56,7 @@ public class ProcessDefinition {
     /**
      * version
      */
-    private int version;
+    private long version;
 
     /**
      * release state : online/offline
@@ -96,13 +98,13 @@ public class ProcessDefinition {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     /**
@@ -138,16 +140,6 @@ public class ProcessDefinition {
     private String connects;
 
     /**
-     * receivers
-     */
-    private String receivers;
-
-    /**
-     * receivers cc
-     */
-    private String receiversCc;
-
-    /**
      * schedule release state : online/offline
      */
     @TableField(exist = false)
@@ -173,6 +165,11 @@ public class ProcessDefinition {
      */
     private String resourceIds;
 
+    /**
+     * warningGroupId
+     */
+    @TableField(exist = false)
+    private int warningGroupId;
 
     public String getName() {
         return name;
@@ -182,11 +179,11 @@ public class ProcessDefinition {
         this.name = name;
     }
 
-    public int getVersion() {
+    public long getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(long version) {
         this.version = version;
     }
 
@@ -270,15 +267,14 @@ public class ProcessDefinition {
         this.projectName = projectName;
     }
 
-
     public String getGlobalParams() {
         return globalParams;
     }
 
     public void setGlobalParams(String globalParams) {
-        if (globalParams == null){
+        if (globalParams == null) {
             this.globalParamList = new ArrayList<>();
-        }else {
+        } else {
             this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         }
         this.globalParams = globalParams;
@@ -295,7 +291,7 @@ public class ProcessDefinition {
 
     public Map<String, String> getGlobalParamMap() {
         if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
-            List<Property> propList = JSONUtils.toList(globalParams,Property.class);
+            List<Property> propList = JSONUtils.toList(globalParams, Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 
@@ -320,22 +316,6 @@ public class ProcessDefinition {
 
     public void setConnects(String connects) {
         this.connects = connects;
-    }
-
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
     }
 
     public ReleaseState getScheduleReleaseState() {
@@ -386,35 +366,42 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
+    public int getWarningGroupId() {
+        return warningGroupId;
+    }
+
+    public void setWarningGroupId(int warningGroupId) {
+        this.warningGroupId = warningGroupId;
+    }
+
     @Override
     public String toString() {
-        return "ProcessDefinition{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", releaseState=" + releaseState +
-                ", projectId=" + projectId +
-                ", processDefinitionJson='" + processDefinitionJson + '\'' +
-                ", description='" + description + '\'' +
-                ", globalParams='" + globalParams + '\'' +
-                ", globalParamList=" + globalParamList +
-                ", globalParamMap=" + globalParamMap +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", flag=" + flag +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", locations='" + locations + '\'' +
-                ", connects='" + connects + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", scheduleReleaseState=" + scheduleReleaseState +
-                ", timeout=" + timeout +
-                ", tenantId=" + tenantId +
-                ", modifyBy='" + modifyBy + '\'' +
-                ", resourceIds='" + resourceIds + '\'' +
-                '}';
+        return "ProcessDefinition{"
+            + "id=" + id
+            + ", name='" + name + '\''
+            + ", version=" + version
+            + ", releaseState=" + releaseState
+            + ", projectId=" + projectId
+            + ", processDefinitionJson='" + processDefinitionJson + '\''
+            + ", description='" + description + '\''
+            + ", globalParams='" + globalParams + '\''
+            + ", globalParamList=" + globalParamList
+            + ", globalParamMap=" + globalParamMap
+            + ", createTime=" + createTime
+            + ", updateTime=" + updateTime
+            + ", flag=" + flag
+            + ", userId=" + userId
+            + ", userName='" + userName + '\''
+            + ", projectName='" + projectName + '\''
+            + ", locations='" + locations + '\''
+            + ", connects='" + connects + '\''
+            + ", scheduleReleaseState=" + scheduleReleaseState
+            + ", timeout=" + timeout
+            + ", warningGroupId=" + warningGroupId
+            + ", tenantId=" + tenantId
+            + ", modifyBy='" + modifyBy + '\''
+            + ", resourceIds='" + resourceIds + '\''
+            + '}';
     }
 
 }

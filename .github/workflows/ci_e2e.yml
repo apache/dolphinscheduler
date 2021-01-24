@@ -30,12 +30,10 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
-      - name: checkout submodules
-        shell: bash
-        run: |
-          git submodule sync --recursive
-          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with:
+          submodule: true
+      - name: Check License Header
+        uses: apache/skywalking-eyes@9bd5feb
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -58,7 +56,9 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
           sudo apt-get install -f -y
-          wget -N https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip
+          google-chrome -version
+          googleVersion=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          wget -N https://chromedriver.storage.googleapis.com/${googleVersion}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv -f chromedriver /usr/local/share/chromedriver
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver

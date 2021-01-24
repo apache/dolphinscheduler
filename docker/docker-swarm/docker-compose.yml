@@ -187,6 +187,7 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
+      WORKER_WEIGHT: "100"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432

@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.service.zk;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
@@ -39,14 +41,6 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
      */
     @Override
     protected void registerListener() {
-        treeCache = new TreeCache(getZkClient(), getZookeeperConfig().getDsRoot() + "/nodes");
-        logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
-        try {
-            treeCache.start();
-        } catch (Exception e) {
-            logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
-            throw new RuntimeException(e);
-        }
 
         treeCache.getListenable().addListener((client, event) -> {
             String path = null == event.getData() ? "" : event.getData().getPath();
@@ -55,7 +49,18 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
             }
             dataChanged(client, event, path);
         });
+    }
 
+    @Override
+    protected void treeCacheStart() {
+        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot() + "/nodes");
+        logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
+        try {
+            treeCache.start();
+        } catch (Exception e) {
+            logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
+            throw new RuntimeException(e);
+        }
     }
 
     //for sub class
@@ -80,10 +85,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
     @Override
     public void close() {
         treeCache.close();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException ignore) {
-        }
+        ThreadUtils.sleep(500);
         super.close();
     }
 }

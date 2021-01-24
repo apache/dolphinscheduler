@@ -28,8 +28,9 @@ public class AlertManageLocator {
     public static final By INPUT_ALERT_DESCRIPTION = By.xpath("//textarea");
     public static final By SUBMIT_ALERT = By.xpath("//div[3]/button[2]/span");
 
+    public static final By ALERT_NAME = By.xpath("//table/tr[2]/td[2]/span");
+
     //delete alert locator
     public static final By DELETE_ALERT_BUTTON = By.xpath("//span/button");
     public static final By CONFIRM_DELETE_ALERT_BUTTON = By.xpath("//div[2]/div/button[2]/span");
 }
-

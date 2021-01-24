@@ -27,8 +27,7 @@
 
   export default {
     name: 'password-index',
-    mounted() {
-      this.$modal.destroy()
+    mounted () {
     },
     components: { mListConstruction, mInfo }
   }

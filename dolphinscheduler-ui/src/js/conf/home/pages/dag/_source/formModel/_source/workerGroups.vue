@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 <template>
-  <x-select
+  <el-select
           :disabled="isDetails"
-          @on-change="_onChange"
-          v-model="value"
+          @change="_onChange"
+          v-model="selectedValue"
+          size="small"
           style="width: 180px">
-    <x-option
+    <el-option
             v-for="item in workerGroupsList"
             :key="item.id"
             :value="item.id"
             :label="item.name">
-    </x-option>
-  </x-select>
+    </el-option>
+  </el-select>
 </template>
 <script>
   import disabledState from '@/module/mixin/disabledState'
@@ -34,6 +35,7 @@
     name: 'form-worker-group',
     data () {
       return {
+        selectedValue: this.value,
         workerGroupsList: []
       }
     },
@@ -50,11 +52,13 @@
     },
     methods: {
       _onChange (o) {
-        this.value = o.value
-        this.$emit('workerGroupsEvent', o.value)
+        this.$emit('workerGroupsEvent', o)
       }
     },
     watch: {
+      value (val) {
+        this.selectedValue = val
+      }
     },
     created () {
       let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []

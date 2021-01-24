@@ -25,29 +25,31 @@
     <m-list-box-f>
       <template slot="name">{{$t('Password')}}</template>
       <template slot="content">
-        <x-input
+        <el-input
                 style="width: 320px;"
                 type="password"
+                size="small"
                 v-model="userPassword"
                 :placeholder="$t('Please enter your password')">
-        </x-input>
+        </el-input>
       </template>
     </m-list-box-f>
     <m-list-box-f>
       <template slot="name">{{$t('Confirm Password')}}</template>
       <template slot="content">
-        <x-input
+        <el-input
                 style="width: 320px;"
                 type="password"
+                size="small"
                 v-model="oldUserPassword"
                 :placeholder="$t('Please enter confirm password')">
-        </x-input>
+        </el-input>
       </template>
     </m-list-box-f>
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : $t('Edit')}}</x-button>
+        <el-button type="primary" round size="small" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : $t('Edit')}}</el-button>
       </template>
     </m-list-box-f>
   </div>
@@ -85,7 +87,8 @@
             userPassword: this.userPassword,
             tenantId: this.userInfo.tenantId,
             email: this.userInfo.email,
-            phone: this.userInfo.phone
+            phone: this.userInfo.phone,
+            state: this.userInfo.state
           }
           this.spinnerLoading = true
           this.updateUser(param).then(res => {
@@ -104,7 +107,7 @@
        * verification
        */
       _verification () {
-        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
+        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/
 
         // password
         if (!regPassword.test(this.userPassword)) {

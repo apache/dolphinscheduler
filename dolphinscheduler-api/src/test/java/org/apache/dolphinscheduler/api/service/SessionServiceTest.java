@@ -16,7 +16,12 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -38,10 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class SessionServiceTest {
@@ -49,7 +50,7 @@ public class SessionServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
 
     @InjectMocks
-    private SessionService sessionService;
+    private SessionServiceImpl sessionService;
 
     @Mock
     private SessionMapper sessionMapper;
