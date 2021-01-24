@@ -21,6 +21,8 @@
         <template slot="button-group" v-if="isADMIN">
           <el-button size="mini" @click="_create('')">{{$t('Create alarm group')}}</el-button>
           <el-dialog
+            :title="item ? $t('Edit alarm group') : $t('Create alarm group')"
+            v-if="createWarningDialog"
             :visible.sync="createWarningDialog"
             width="auto">
             <m-create-warning :item="item" :allAlertPluginInstance="allAlertPluginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning>
