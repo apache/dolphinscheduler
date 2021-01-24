@@ -191,6 +191,7 @@ public class ProcessInstanceService extends BaseService {
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
         processInstance.setIsParallel(processDefinition.getIsParallel());
         processInstance.setSerialCommandLengh(processDefinition.getSerialCommandLengh());
+        processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
         result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
