@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.remote.rpc.client;
 
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.rpc.Invoker;
 import org.apache.dolphinscheduler.remote.rpc.base.Rpc;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
@@ -37,9 +36,6 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
  */
 public class ConsumerInterceptor {
 
-    private Invoker invoker;
-
-
     private Host host;
 
     private NettyClient nettyClient = NettyClient.getInstance();
@@ -52,7 +48,7 @@ public class ConsumerInterceptor {
     public Object intercept(@AllArguments Object[] args, @Origin Method method) throws RemotingException {
         RpcRequest request = buildReq(args, method);
 
-        String serviceName = method.getDeclaringClass().getName() + method.getName();
+        String serviceName = method.getDeclaringClass().getSimpleName() + method.getName();
         ConsumerConfig consumerConfig = ConsumerConfigCache.getConfigByServersName(serviceName);
         if (null == consumerConfig) {
             consumerConfig = cacheServiceConfig(method, serviceName);
@@ -76,7 +72,7 @@ public class ConsumerInterceptor {
     private RpcRequest buildReq(Object[] args, Method method) {
         RpcRequest request = new RpcRequest();
         request.setRequestId(UUID.randomUUID().toString());
-        request.setClassName(method.getDeclaringClass().getName());
+        request.setClassName(method.getDeclaringClass().getSimpleName());
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
 
@@ -94,7 +90,8 @@ public class ConsumerInterceptor {
         if (annotationPresent) {
             Rpc rpc = method.getAnnotation(Rpc.class);
             consumerConfig.setAsync(rpc.async());
-            consumerConfig.setCallBackClass(rpc.callback());
+            consumerConfig.setServiceCallBackClass(rpc.serviceCallback());
+            consumerConfig.setAckCallBackClass(rpc.ackCallback());
             consumerConfig.setRetries(rpc.retries());
         }
 

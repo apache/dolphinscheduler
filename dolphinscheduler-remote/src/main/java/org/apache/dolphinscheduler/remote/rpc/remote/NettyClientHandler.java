@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.remote.rpc.future.RpcFuture;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 
 import org.slf4j.Logger;
@@ -75,7 +76,12 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         new FastThreadLocalThread(() -> {
             try {
                 if (rsp.getStatus() == 0) {
-                    consumerConfig.getCallBackClass().newInstance().run(rsp.getResult());
+                    try {
+                        consumerConfig.getServiceCallBackClass().getDeclaredConstructor().newInstance().run(rsp.getResult());
+                    } catch (InvocationTargetException | NoSuchMethodException e) {
+                       logger.error("rpc call back error",e);
+                    }
+
                 } else {
                     logger.error("xxxx fail");
                 }
@@ -107,5 +113,9 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         System.out.println("exceptionCaught");
         logger.error("exceptionCaught : {}", cause.getMessage(), cause);
         ctx.channel().close();
+    }
+
+    private void executeAsyncHandler(){
+
     }
 }

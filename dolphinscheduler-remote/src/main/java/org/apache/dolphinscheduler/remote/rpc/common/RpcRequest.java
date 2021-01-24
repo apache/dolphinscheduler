@@ -27,8 +27,12 @@ public class RpcRequest {
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
-    // 0 hear beat,1 businness msg
+    /**
+     * @see RequestEventType
+     */
     private Byte eventType = 1;
+
+    private Boolean ack;
 
     public Byte getEventType() {
         return eventType;
@@ -76,5 +80,13 @@ public class RpcRequest {
 
     public void setParameters(Object[] parameters) {
         this.parameters = parameters;
+    }
+
+    public Boolean getAck() {
+        return ack;
+    }
+
+    public void setAck(Boolean ack) {
+        this.ack = ack;
     }
 }

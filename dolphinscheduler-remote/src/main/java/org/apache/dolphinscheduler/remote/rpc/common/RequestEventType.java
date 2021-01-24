@@ -17,50 +17,26 @@
 
 package org.apache.dolphinscheduler.remote.rpc.common;
 
-/**
- * RpcResponse
- */
-public class RpcResponse {
+public enum RequestEventType {
 
-    private String requestId;
-    private String msg;
-    private Object result;
-    private Byte status;
+    HEARTBEAT((byte)1,"heartbeat"),
+    BUSINESS((byte)2,"business request");
 
-    /**
-     * @see ResponseEventType
-     */
-    private Byte responseType;
 
-    public String getRequestId() {
-        return requestId;
+    private Byte type;
+
+    private String description;
+
+    RequestEventType(Byte type, String description) {
+        this.type = type;
+        this.description = description;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public Byte getType() {
+        return type;
     }
 
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public Object getResult() {
-        return result;
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    public Byte getStatus() {
-        return status;
-    }
-
-    public void setStatus(Byte status) {
-        this.status = status;
+    public String getDescription() {
+        return description;
     }
 }

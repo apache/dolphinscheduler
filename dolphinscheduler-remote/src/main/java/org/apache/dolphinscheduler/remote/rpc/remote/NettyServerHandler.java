@@ -17,10 +17,16 @@
 
 package org.apache.dolphinscheduler.remote.rpc.remote;
 
+import org.apache.dolphinscheduler.remote.rpc.IUserService;
+import org.apache.dolphinscheduler.remote.rpc.base.RpcService;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.rpc.common.RpcResponse;
+import org.apache.dolphinscheduler.remote.rpc.config.ServiceBean;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,10 +68,11 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         RpcResponse response = new RpcResponse();
         if (req.getEventType() == 0) {
 
-            logger.info("接受心跳消息!...");
+            logger.info("accept heartbeat msg");
             return;
         }
         response.setRequestId(req.getRequestId());
+
 
         response.setStatus((byte) 0);
 
@@ -79,8 +86,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         Object[] arguments = req.getParameters();
         Object result = null;
         try {
-
-            Class serviceClass = Class.forName(classname);
+            Class serviceClass = ServiceBean.getServiceClass(classname);
 
             Object object = serviceClass.newInstance();
 
