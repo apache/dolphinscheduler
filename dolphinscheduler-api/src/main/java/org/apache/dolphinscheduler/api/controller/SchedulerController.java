@@ -14,8 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.OFFLINE_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.PREVIEW_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.PUBLISH_SCHEDULE_ONLINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
+import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
@@ -25,20 +35,30 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.*;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.io.IOException;
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
-import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 /**
  * schedule controller
@@ -61,17 +81,15 @@ public class SchedulerController extends BaseController {
     /**
      * create schedule
      *
-     * @param loginUser               login user
-     * @param projectName             project name
-     * @param processDefinitionId     process definition id
-     * @param schedule                scheduler
-     * @param warningType             warning type
-     * @param warningGroupId          warning group id
-     * @param failureStrategy         failure strategy
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param schedule scheduler
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
      * @param processInstancePriority process instance priority
-     * @param receivers               receivers
-     * @param receiversCc             receivers cc
-     * @param workerGroup             worker group
+     * @param workerGroup worker group
      * @return create result code
      */
     @ApiOperation(value = "createSchedule", notes = "CREATE_SCHEDULE_NOTES")
@@ -81,8 +99,6 @@ public class SchedulerController extends BaseController {
             @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
             @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
-            @ApiImplicitParam(name = "receivers", value = "RECEIVERS", type = "String"),
-            @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC", type = "String"),
             @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
@@ -96,16 +112,14 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
                                  @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
-                                 @RequestParam(value = "receivers", required = false) String receivers,
-                                 @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) throws IOException {
-        logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
-                        "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
-                loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
-                failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
+                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
+        logger.info("login user {},project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {},"
+                        + "failure policy: {},processInstancePriority : {}, workGroupId:{}",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(projectName), processDefinitionId, schedule, warningType, warningGroupId,
+                failureStrategy, processInstancePriority, workerGroup);
         Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                warningType, warningGroupId, failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
+                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
 
         return returnDataList(result);
     }
@@ -113,17 +127,15 @@ public class SchedulerController extends BaseController {
     /**
      * updateProcessInstance schedule
      *
-     * @param loginUser               login user
-     * @param projectName             project name
-     * @param id                      scheduler id
-     * @param schedule                scheduler
-     * @param warningType             warning type
-     * @param warningGroupId          warning group id
-     * @param failureStrategy         failure strategy
-     * @param receivers               receivers
-     * @param workerGroup             worker group
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id scheduler id
+     * @param schedule scheduler
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param workerGroup worker group
      * @param processInstancePriority process instance priority
-     * @param receiversCc             receivers cc
      * @return update result code
      */
     @ApiOperation(value = "updateSchedule", notes = "UPDATE_SCHEDULE_NOTES")
@@ -133,8 +145,6 @@ public class SchedulerController extends BaseController {
             @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
             @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
-            @ApiImplicitParam(name = "receivers", value = "RECEIVERS", type = "String"),
-            @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC", type = "String"),
             @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
@@ -147,26 +157,24 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
                                  @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
-                                 @RequestParam(value = "receivers", required = false) String receivers,
-                                 @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                 @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) throws IOException {
-        logger.info("login user {}, project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, " +
-                        "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {},workerGroupId:{}",
-                loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,
-                receivers, receiversCc, processInstancePriority, workerGroup);
+                                 @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
+        logger.info("login user {},project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, "
+                        + "failure policy: {},processInstancePriority : {},workerGroupId:{}",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(projectName), id, schedule, warningType, warningGroupId, failureStrategy,
+                processInstancePriority, workerGroup);
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                warningType, warningGroupId, failureStrategy, receivers, receiversCc, null, processInstancePriority, workerGroup);
+                warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
         return returnDataList(result);
     }
 
     /**
      * publish schedule setScheduleState
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectName project name
-     * @param id          scheduler id
+     * @param id scheduler id
      * @return publish result code
      */
     @ApiOperation(value = "online", notes = "ONLINE_SCHEDULE_NOTES")
@@ -176,7 +184,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable("projectName") String projectName,
+                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                          @RequestParam("id") Integer id) {
         logger.info("login user {}, schedule setScheduleState, project name: {}, id: {}",
                 loginUser.getUserName(), projectName, id);
@@ -187,9 +195,9 @@ public class SchedulerController extends BaseController {
     /**
      * offline schedule
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectName project name
-     * @param id          schedule id
+     * @param id schedule id
      * @return operation result code
      */
     @ApiOperation(value = "offline", notes = "OFFLINE_SCHEDULE_NOTES")
@@ -199,7 +207,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable("projectName") String projectName,
+                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("id") Integer id) {
         logger.info("login user {}, schedule offline, project name: {}, process definition id: {}",
                 loginUser.getUserName(), projectName, id);
@@ -211,12 +219,12 @@ public class SchedulerController extends BaseController {
     /**
      * query schedule list paging
      *
-     * @param loginUser           login user
-     * @param projectName         project name
+     * @param loginUser login user
+     * @param projectName project name
      * @param processDefinitionId process definition id
-     * @param pageNo              page number
-     * @param pageSize            page size
-     * @param searchVal           search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param searchVal search value
      * @return schedule list page
      */
     @ApiOperation(value = "queryScheduleListPaging", notes = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
@@ -245,9 +253,9 @@ public class SchedulerController extends BaseController {
     /**
      * delete schedule by id
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectName project name
-     * @param scheduleId  scheule id
+     * @param scheduleId scheule id
      * @return delete result code
      */
     @ApiOperation(value = "deleteScheduleById", notes = "OFFLINE_SCHEDULE_NOTES")
@@ -270,7 +278,7 @@ public class SchedulerController extends BaseController {
     /**
      * query schedule list
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectName project name
      * @return schedule list
      */
@@ -288,9 +296,9 @@ public class SchedulerController extends BaseController {
     /**
      * preview schedule
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectName project name
-     * @param schedule    schedule expression
+     * @param schedule schedule expression
      * @return the next five fire time
      */
     @ApiOperation(value = "previewSchedule", notes = "PREVIEW_SCHEDULE_NOTES")

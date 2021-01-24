@@ -49,6 +49,8 @@ public class UserManageLocator {
 
     public static final By SUBMIT = By.xpath("//div[3]/button[2]/span");
 
+    public static final By USERNAME = By.xpath("//table/tr[2]/td[2]/span");
+
     /**
      * edit user
      */

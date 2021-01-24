@@ -14,26 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.apache.commons.io.IOUtils;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
@@ -43,7 +49,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * hadoop utils
@@ -101,7 +113,6 @@ public class HadoopUtils implements Closeable {
             logger.error(e.getMessage(), e);
         }
     }
-
 
     /**
      * init hadoop configuration
@@ -167,7 +178,6 @@ public class HadoopUtils implements Closeable {
                 fs = FileSystem.get(configuration);
             }
 
-
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -232,10 +242,10 @@ public class HadoopUtils implements Closeable {
             return new byte[0];
         }
 
-        FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath));
-        return IOUtils.toByteArray(fsDataInputStream);
+        try (FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath))) {
+            return IOUtils.toByteArray(fsDataInputStream);
+        }
     }
-
 
     /**
      * cat file on hdfs
@@ -254,7 +264,7 @@ public class HadoopUtils implements Closeable {
         }
 
         try (FSDataInputStream in = fs.open(new Path(hdfsFilePath))) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }
@@ -527,7 +537,6 @@ public class HadoopUtils implements Closeable {
         return String.format("%s/udfs", getHdfsTenantDir(tenantCode));
     }
 
-
     /**
      * get hdfs file name
      *
@@ -579,7 +588,6 @@ public class HadoopUtils implements Closeable {
         return String.format("%s/%s", getHdfsDataBasePath(), tenantCode);
     }
 
-
     /**
      * getAppAddress
      *
@@ -610,7 +618,6 @@ public class HadoopUtils implements Closeable {
         return start + activeRM + end;
     }
 
-
     @Override
     public void close() throws IOException {
         if (fs != null) {
@@ -622,7 +629,6 @@ public class HadoopUtils implements Closeable {
             }
         }
     }
-
 
     /**
      * yarn ha admin utils
@@ -643,32 +649,29 @@ public class HadoopUtils implements Closeable {
 
             String yarnUrl = "http://%s:" + activeResourceManagerPort + "/ws/v1/cluster/info";
 
-            String state = null;
             try {
-                /**
-                 * send http get request to rm1
-                 */
-                state = getRMState(String.format(yarnUrl, rmIdArr[0]));
 
-                if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                    return rmIdArr[0];
-                } else if (Constants.HADOOP_RM_STATE_STANDBY.equals(state)) {
-                    state = getRMState(String.format(yarnUrl, rmIdArr[1]));
+                /**
+                 * send http get request to rm
+                 */
+
+                for (String rmId : rmIdArr) {
+                    String state = getRMState(String.format(yarnUrl, rmId));
                     if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                        return rmIdArr[1];
+                        return rmId;
                     }
-                } else {
-                    return null;
                 }
+
             } catch (Exception e) {
-                state = getRMState(String.format(yarnUrl, rmIdArr[1]));
-                if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                    return rmIdArr[0];
+                for (int i = 1; i < rmIdArr.length; i++) {
+                    String  state = getRMState(String.format(yarnUrl, rmIdArr[i]));
+                    if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
+                        return rmIdArr[i];
+                    }
                 }
             }
             return null;
         }
-
 
         /**
          * get ResourceManager state
@@ -694,4 +697,5 @@ public class HadoopUtils implements Closeable {
         }
 
     }
+
 }

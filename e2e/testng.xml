@@ -18,7 +18,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="dolphinscheduler_e2e" verbose="1">
     <test name="dolphinscheduler_test" preserve-order="true">
-        <groups>
+        <!-- <groups>
             <run>
                 <include name="functionTests"/>
             </run>
@@ -51,14 +51,14 @@
                 </methods>
             </class>
 
-            <class name="org.apache.dolphinscheduler.testcase.testProject.TestRunWorkflow"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestRunWorkflow"></class> -->
 
             <!--<class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming">-->
                 <!--<methods>-->
                     <!--<include name="testCreateTiming" />-->
+                    <!--<include name="testEditTiming" />-->
                     <!--<include name="testOnlineTiming" />-->
                     <!--<include name="testOfflineTiming" />-->
-                    <!--<include name="testEditTiming" />-->
                     <!--<include name="testDeleteTiming" />-->
                 <!--</methods>-->
             <!--</class>-->
@@ -68,7 +68,7 @@
                 <!--</methods>-->
             <!--</class>-->
 
-            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow">
+            <!-- <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow">
                 <methods>
                     <include name="testOfflineWorkflow" />
                     <include name="testDeleteWorkflow" />
@@ -80,7 +80,7 @@
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteToken"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteTenant"></class>
-        </classes>
+        </classes> -->
     </test>
 
     <listeners>

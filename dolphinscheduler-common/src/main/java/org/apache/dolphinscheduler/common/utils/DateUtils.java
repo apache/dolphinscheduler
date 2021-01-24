@@ -444,4 +444,14 @@ public class DateUtils {
         long usedTime = (System.currentTimeMillis() - baseTime.getTime()) / 1000;
         return intervalSeconds - usedTime;
     }
+
+    /**
+     * get current time stamp : yyyyMMddHHmmssSSS
+     *
+     * @return date string
+     */
+    public static String getCurrentTimeStamp() {
+        return getCurrentTime(Constants.YYYYMMDDHHMMSSSSS);
+    }
+
 }

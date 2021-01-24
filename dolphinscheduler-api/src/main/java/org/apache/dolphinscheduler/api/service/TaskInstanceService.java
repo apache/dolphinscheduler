@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -69,7 +69,6 @@ public class TaskInstanceService extends BaseService {
     @Autowired
     UsersService usersService;
 
-
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
@@ -87,7 +86,7 @@ public class TaskInstanceService extends BaseService {
      * @return task list page
      */
     public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
-                                                   Integer processInstanceId, String taskName, String executorName, String startDate,
+                                                   Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
                                                    String endDate, String searchVal, ExecutionStatus stateType, String host,
                                                    Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
@@ -124,7 +123,7 @@ public class TaskInstanceService extends BaseService {
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getId(), processInstanceId, searchVal, taskName, executorId, statusArray, host, start, end
+                page, project.getId(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
         );
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
@@ -142,6 +141,50 @@ public class TaskInstanceService extends BaseService {
         pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * change one task instance's state from failure to forced success
+     *
+     * @param loginUser      login user
+     * @param projectName    project name
+     * @param taskInstanceId task instance id
+     * @return the result code and msg
+     */
+    public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        // check user auth
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        // check whether the task instance can be found
+        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
+        if (task == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return result;
+        }
+
+        // check whether the task instance state type is failure
+        if (!task.getState().typeIsFailure()) {
+            putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
+            return result;
+        }
+
+        // change the state of the task instance
+        task.setState(ExecutionStatus.FORCED_SUCCESS);
+        int changedNum = taskInstanceMapper.updateById(task);
+        if (changedNum > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
+        }
 
         return result;
     }

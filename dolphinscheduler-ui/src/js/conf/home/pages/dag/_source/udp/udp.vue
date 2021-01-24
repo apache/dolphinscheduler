@@ -17,28 +17,26 @@
 <template>
   <div class="udp-model">
     <div class="scrollbar contpi-boxt">
-      <div class="title">
-        <span>{{$t('Set the DAG diagram name')}}</span>
-      </div>
-
       <div>
-        <x-input
-          type="text"
-          v-model="name"
-          :disabled="router.history.current.name === 'projects-instance-details'"
-          :placeholder="$t('Please enter name (required)')">
-        </x-input>
+        <el-input
+                type="text"
+                size="small"
+                v-model="name"
+                :disabled="router.history.current.name === 'projects-instance-details'"
+                :placeholder="$t('Please enter name (required)')">
+        </el-input>
       </div>
 
       <template v-if="router.history.current.name !== 'projects-instance-details'">
         <div style="padding-top: 12px;">
-          <x-input
-            type="textarea"
-            v-model="description"
-            :autosize="{minRows:2}"
-            :placeholder="$t('Please enter description(optional)')"
-            autocomplete="off">
-          </x-input>
+          <el-input
+                  type="textarea"
+                  size="small"
+                  v-model="description"
+                  :autosize="{minRows:2}"
+                  :placeholder="$t('Please enter description(optional)')"
+                  autocomplete="off">
+          </el-input>
         </div>
       </template>
 
@@ -70,14 +68,14 @@
       <div class="title" style="padding-top: 6px;">
         <span class="text-b">{{$t('warning of timeout')}}</span>
         <span style="padding-left: 6px;">
-          <x-switch v-model="checkedTimeout"></x-switch>
+          <el-switch v-model="checkedTimeout" size="small"></el-switch>
         </span>
       </div>
       <div class="content" style="padding-bottom: 10px;" v-if="checkedTimeout">
         <span>
-          <x-input v-model="timeout" style="width: 160px;" maxlength="9">
+          <el-input v-model="timeout" style="width: 160px;" maxlength="9" size="small">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
         </span>
       </div>
 
@@ -97,13 +95,18 @@
     </div>
     <div class="bottom">
       <div class="submit">
-        <template v-if="router.history.current.name === 'projects-instance-details'">
+        <template v-if="router.history.current.name === 'projects-definition-details'">
           <div class="lint-pt">
-            <x-checkbox v-model="syncDefine">{{$t('Whether to update the process definition')}}</x-checkbox>
+            <el-checkbox v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Whether to go online the process definition')}}</el-checkbox>
           </div>
         </template>
-        <x-button type="text" @click="close()"> {{$t('Cancel')}}</x-button>
-        <x-button type="primary" shape="circle" @click="ok()">{{$t('Add')}}</x-button>
+        <template v-if="router.history.current.name === 'projects-instance-details'">
+          <div class="lint-pt">
+            <el-checkbox v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
+          </div>
+        </template>
+        <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()">{{$t('Add')}}</el-button>
       </div>
     </div>
   </div>
@@ -128,6 +131,8 @@
                 udpList: [],
                 // Global custom parameters
                 udpListCache: [],
+                // Whether to go online the process definition
+                releaseState: 'ONLINE',
                 // Whether to update the process definition
                 syncDefine: true,
                 // Timeout alarm
@@ -173,6 +178,7 @@
                 this.store.commit('dag/setSerialCommandLengh', _.cloneDeep(this.serialCommandLengh))
                 this.store.commit('dag/setDesc', _.cloneDeep(this.description))
                 this.store.commit('dag/setSyncDefine', this.syncDefine)
+                this.store.commit('dag/setReleaseState', this.releaseState)
             },
             /**
              * submit
@@ -196,7 +202,6 @@
                     if (!this._verifSerialCommandLengh()) {
                         return
                     }
-
                     // Storage global globalParams
                     this._accuStore()
 
@@ -249,12 +254,53 @@
                     this.tenantId = dag.tenantId
                 }
             })
-
-        },
-        mounted() {
-        },
-        components: {FormTenant, mLocalParams}
-    }
+        if (this.originalName !== this.name) {
+          this.store.dispatch('dag/verifDAGName', this.name).then(res => {
+            _verif()
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+          })
+        } else {
+          _verif()
+        }
+      },
+      /**
+       * Close the popup
+       */
+      close () {
+        this.$emit('close')
+      }
+    },
+    watch: {
+      checkedTimeout (val) {
+        if (!val) {
+          this.timeout = 0
+          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+        }
+      }
+    },
+    created () {
+      const dag = _.cloneDeep(this.store.state.dag)
+      this.udpList = dag.globalParams
+      this.udpListCache = dag.globalParams
+      this.name = dag.name
+      this.originalName = dag.name
+      this.description = dag.description
+      this.syncDefine = dag.syncDefine
+      this.releaseState = dag.releaseState
+      this.timeout = dag.timeout || 0
+      this.checkedTimeout = this.timeout !== 0
+      this.$nextTick(() => {
+        if (dag.tenantId === -1) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
+        } else {
+          this.tenantId = dag.tenantId
+        }
+      })
+    },
+    mounted () {},
+    components: { FormTenant, mLocalParams }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

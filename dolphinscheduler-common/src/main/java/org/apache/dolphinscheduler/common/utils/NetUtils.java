@@ -21,6 +21,8 @@ import static org.apache.dolphinscheduler.common.Constants.DOLPHIN_SCHEDULER_PRE
 
 import static java.util.Collections.emptyList;
 
+import org.apache.dolphinscheduler.common.Constants;
+
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -42,21 +44,19 @@ import org.slf4j.LoggerFactory;
  */
 public class NetUtils {
 
+    private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
+    private static final String NETWORK_PRIORITY_DEFAULT = "default";
+    private static final String NETWORK_PRIORITY_INNER = "inner";
+    private static final String NETWORK_PRIORITY_OUTER = "outer";
+    private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
+    private static final String ANY_HOST_VALUE = "0.0.0.0";
+    private static final String LOCAL_HOST_VALUE = "127.0.0.1";
+    private static InetAddress LOCAL_ADDRESS = null;
+    private static volatile String HOST_ADDRESS;
+
     private NetUtils() {
         throw new UnsupportedOperationException("Construct NetUtils");
     }
-
-    private static Logger logger = LoggerFactory.getLogger(NetUtils.class);
-
-    private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
-
-    private static String ANY_HOST_VALUE = "0.0.0.0";
-
-    private static String LOCAL_HOST_VALUE = "127.0.0.1";
-
-    private static InetAddress LOCAL_ADDRESS = null;
-
-    private static volatile String HOST_ADDRESS;
 
     public static String getHost() {
         if (HOST_ADDRESS != null) {
@@ -87,24 +87,27 @@ public class NetUtils {
         if (null != LOCAL_ADDRESS) {
             return LOCAL_ADDRESS;
         }
+
         InetAddress localAddress = null;
-        NetworkInterface networkInterface = findNetworkInterface();
-        Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-        while (addresses.hasMoreElements()) {
-            Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
-            if (addressOp.isPresent()) {
-                try {
-                    if (addressOp.get().isReachable(100)) {
-                        LOCAL_ADDRESS = addressOp.get();
-                        return LOCAL_ADDRESS;
+        try {
+            NetworkInterface networkInterface = findNetworkInterface();
+            if (networkInterface != null) {
+                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
+                    if (addressOp.isPresent()) {
+                        try {
+                            if (addressOp.get().isReachable(100)) {
+                                LOCAL_ADDRESS = addressOp.get();
+                                return LOCAL_ADDRESS;
+                            }
+                        } catch (IOException e) {
+                            logger.warn("test address id reachable io exception", e);
+                        }
                     }
-                } catch (IOException e) {
-                    logger.warn("test address id reachable io exception", e);
                 }
             }
-        }
 
-        try {
             localAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             logger.warn("InetAddress get LocalHost exception", e);
@@ -190,7 +193,7 @@ public class NetUtils {
         if (null != result) {
             return result;
         }
-        return validNetworkInterfaces.get(0);
+        return findAddress(validNetworkInterfaces);
     }
 
     /**
@@ -227,4 +230,70 @@ public class NetUtils {
         String preferredNetworkInterface = System.getProperty(DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE);
         return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
     }
+
+    private static NetworkInterface findAddress(List<NetworkInterface> validNetworkInterfaces) {
+        if (validNetworkInterfaces.isEmpty()) {
+            return null;
+        }
+        String networkPriority = PropertyUtils.getString(Constants.NETWORK_PRIORITY_STRATEGY, NETWORK_PRIORITY_DEFAULT);
+        if (NETWORK_PRIORITY_DEFAULT.equalsIgnoreCase(networkPriority)) {
+            return findAddressByDefaultPolicy(validNetworkInterfaces);
+        } else if (NETWORK_PRIORITY_INNER.equalsIgnoreCase(networkPriority)) {
+            return findInnerAddress(validNetworkInterfaces);
+        } else if (NETWORK_PRIORITY_OUTER.equalsIgnoreCase(networkPriority)) {
+            return findOuterAddress(validNetworkInterfaces);
+        } else {
+            logger.error("There is no matching network card acquisition policy!");
+            return null;
+        }
+    }
+
+    private static NetworkInterface findAddressByDefaultPolicy(List<NetworkInterface> validNetworkInterfaces) {
+        NetworkInterface networkInterface;
+        networkInterface = findInnerAddress(validNetworkInterfaces);
+        if (networkInterface == null) {
+            networkInterface = findOuterAddress(validNetworkInterfaces);
+            if (networkInterface == null) {
+                networkInterface = validNetworkInterfaces.get(0);
+            }
+        }
+        return networkInterface;
+    }
+
+    /**
+     * Get the Intranet IP
+     *
+     * @return If no {@link NetworkInterface} is available , return <code>null</code>
+     */
+    private static NetworkInterface findInnerAddress(List<NetworkInterface> validNetworkInterfaces) {
+
+        NetworkInterface networkInterface = null;
+        for (NetworkInterface ni : validNetworkInterfaces) {
+            Enumeration<InetAddress> address = ni.getInetAddresses();
+            while (address.hasMoreElements()) {
+                InetAddress ip = address.nextElement();
+                if (ip.isSiteLocalAddress()
+                        && !ip.isLoopbackAddress()) {
+                    networkInterface = ni;
+                }
+            }
+        }
+        return networkInterface;
+    }
+
+    private static NetworkInterface findOuterAddress(List<NetworkInterface> validNetworkInterfaces) {
+        NetworkInterface networkInterface = null;
+        for (NetworkInterface ni : validNetworkInterfaces) {
+            Enumeration<InetAddress> address = ni.getInetAddresses();
+            while (address.hasMoreElements()) {
+                InetAddress ip = address.nextElement();
+                if (!ip.isSiteLocalAddress()
+                        && !ip.isLoopbackAddress()) {
+                    networkInterface = ni;
+                }
+            }
+        }
+        return networkInterface;
+    }
+
 }

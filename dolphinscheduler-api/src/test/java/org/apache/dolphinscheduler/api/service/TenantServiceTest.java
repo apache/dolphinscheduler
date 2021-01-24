@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -73,8 +72,6 @@ public class TenantServiceTest {
 
     private static final String tenantCode = "TenantServiceTest";
 
-    private static final String tenantName = "TenantServiceTest";
-
     @Test
     public void testCreateTenant() {
 
@@ -83,17 +80,17 @@ public class TenantServiceTest {
         try {
             //check tenantCode
             Map<String, Object> result =
-                    tenantService.createTenant(getLoginUser(), "%!1111", tenantName, 1, "TenantServiceTest");
+                tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.VERIFY_TENANT_CODE_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.VERIFY_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
             //check exist
-            result = tenantService.createTenant(loginUser, tenantCode, tenantName, 1, "TenantServiceTest");
+            result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // success
-            result = tenantService.createTenant(loginUser, "test", "test", 1, "TenantServiceTest");
+            result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -111,7 +108,7 @@ public class TenantServiceTest {
         page.setRecords(getList());
         page.setTotal(1L);
         Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq("TenantServiceTest")))
-                .thenReturn(page);
+            .thenReturn(page);
         Map<String, Object> result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.get(Constants.DATA_LIST);
@@ -126,11 +123,11 @@ public class TenantServiceTest {
         try {
             // id not exist
             Map<String, Object> result =
-                    tenantService.updateTenant(getLoginUser(), 912222, tenantCode, tenantName, 1, "desc");
+                tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, "desc");
             logger.info(result.toString());
             // success
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
-            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, "TenantServiceTest001", 1, "desc");
+            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, "desc");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
@@ -145,7 +142,7 @@ public class TenantServiceTest {
 
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES))
-                .thenReturn(getInstanceList());
+            .thenReturn(getInstanceList());
         Mockito.when(processDefinitionMapper.queryDefinitionListByTenant(2)).thenReturn(getDefinitionsList());
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
@@ -193,14 +190,7 @@ public class TenantServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         // tenantCode  exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
-        String resultString;
-        if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
-            resultString = "租户编码[TenantServiceTest]已存在";
-        } else {
-            resultString = "tenant code TenantServiceTest already exists";
-        }
-        logger.info(result.toString());
-        Assert.assertEquals(resultString, result.getMsg());
+        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
     }
 
     /**
@@ -236,7 +226,6 @@ public class TenantServiceTest {
         Tenant tenant = new Tenant();
         tenant.setId(id);
         tenant.setTenantCode(tenantCode);
-        tenant.setTenantName(tenantName);
         return tenant;
     }
 

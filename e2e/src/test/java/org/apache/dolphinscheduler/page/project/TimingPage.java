@@ -18,23 +18,24 @@ package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.data.project.TimingData;
-import org.apache.dolphinscheduler.data.project.WorkflowDefineData;
 import org.apache.dolphinscheduler.locator.project.TimingLocator;
 import org.apache.dolphinscheduler.locator.project.WorkflowDefineLocator;
 import org.openqa.selenium.WebDriver;
 
 public class TimingPage extends PageCommon {
+    TimingData timingData = new TimingData();
+
     public TimingPage(WebDriver driver) {
         super(driver);
     }
-
 
     /**
      * create timing
      */
     public boolean createTiming() throws InterruptedException {
+        flushPage();
         // Determine whether the workflow status is online
-        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, WorkflowDefineData.WORKFLOW_ONLINE_STATE);
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, timingData.getTimingData("online"));
 
         // click timing button
         System.out.println("Click timing button");
@@ -52,11 +53,11 @@ public class TimingPage extends PageCommon {
         clickElement(TimingLocator.SELECT_WORKER_GROUP);
         clickElement(TimingLocator.CLICK_NOTICE_GROUP);
         clickElement(TimingLocator.SELECT_NOTICE_GROUP);
-        sendInput(TimingLocator.INPUT_RECIPIENT, TimingData.RECIPIENT);
-        sendInput(TimingLocator.INPUT_Cc,TimingData.Cc);
+        sendInput(TimingLocator.INPUT_RECIPIENT, timingData.getTimingData("recipient"));
+        sendInput(TimingLocator.INPUT_Cc, timingData.getTimingData("Cc"));
         clickButton(TimingLocator.CLICK_CREATE_BUTTON);
 
-        return ifTextExists(TimingLocator.TIMING_STATE, TimingData.TIMING_OFFLINE_STATE);
+        return ifTextExists(TimingLocator.TIMING_STATE, timingData.getTimingData("offline"));
     }
 
     /**
@@ -68,7 +69,7 @@ public class TimingPage extends PageCommon {
         clickButton(TimingLocator.CLICK_TIMING_MANAGEMENT_BUTTON);
 
         // Determine whether the workflow name exists
-        ifTextExists(TimingLocator.WORKFLOW_NAME, WorkflowDefineData.INPUT_WORKFLOW_NAME);
+        ifTextExists(TimingLocator.WORKFLOW_NAME, timingData.getTimingData("offline"));
 
         System.out.println("Click edit timing button");
         clickButton(TimingLocator.CLICK_EDIT_TIMING_BUTTON);
@@ -85,11 +86,11 @@ public class TimingPage extends PageCommon {
         clickElement(TimingLocator.SELECT_WORKER_GROUP);
         clickElement(TimingLocator.CLICK_NOTICE_GROUP);
         clickElement(TimingLocator.SELECT_NOTICE_GROUP);
-        sendInput(TimingLocator.INPUT_RECIPIENT, TimingData.EDIT_RECIPIENT);
-        sendInput(TimingLocator.INPUT_Cc,TimingData.EDIT_Cc);
+        sendInput(TimingLocator.INPUT_RECIPIENT, timingData.getTimingData("editRecipient"));
+        sendInput(TimingLocator.INPUT_Cc, timingData.getTimingData("editCc"));
         clickButton(TimingLocator.CLICK_CREATE_BUTTON);
 
-        return ifTitleContains(TimingData.TIMING_TITLE );
+        return ifTitleContains(timingData.getTimingData("timingTitle"));
     }
 
 
@@ -99,13 +100,13 @@ public class TimingPage extends PageCommon {
     public boolean onlineTiming() throws InterruptedException {
         flushPage();
         // Determine whether the timing is offline
-        ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, TimingData.TIMING_OFFLINE_STATE);
+        ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, timingData.getTimingData("offline"));
 
         // click online timing button
         System.out.println("Click online timing  button");
         clickElement(TimingLocator.CLICK_ONLINE_TIMING_BUTTON);
 
-        return ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, TimingData.TIMING_ONLINE_STATE);
+        return ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, timingData.getTimingData("online"));
     }
 
 
@@ -115,13 +116,13 @@ public class TimingPage extends PageCommon {
     public boolean offlineTiming() throws InterruptedException {
         flushPage();
         // Determine whether the timing is online
-        ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, TimingData.TIMING_ONLINE_STATE);
+        ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, timingData.getTimingData("online"));
 
         // click offline timing button
         System.out.println("Click offline timing  button");
         clickElement(TimingLocator.CLICK_OFFLINE_TIMING_BUTTON);
 
-        return ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, TimingData.TIMING_OFFLINE_STATE);
+        return ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, timingData.getTimingData("offline"));
     }
 
 
@@ -131,7 +132,7 @@ public class TimingPage extends PageCommon {
      */
     public boolean deleteTiming() throws InterruptedException {
         // Determine whether the timing is offline
-        ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, TimingData.TIMING_OFFLINE_STATE);
+        ifTextExists(TimingLocator.TIMING_MANAGEMENT_TIMING_STATE, timingData.getTimingData("offline"));
 
         // click offline timing button
         System.out.println("Click delete timing  button");

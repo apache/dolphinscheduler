@@ -22,11 +22,13 @@ import org.apache.dolphinscheduler.api.service.TaskRecordService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
@@ -59,7 +61,7 @@ public class TaskRecordController extends BaseController {
      * @param taskDate    task date
      * @param startTime   start time
      * @param endTime     end time
-     * @param pageNo      page numbere
+     * @param pageNo      page number
      * @param pageSize    page size
      * @return task record list
      */

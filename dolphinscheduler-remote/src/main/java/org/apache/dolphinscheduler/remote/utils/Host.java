@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.utils;
 
 import java.io.Serializable;
@@ -45,6 +46,11 @@ public class Host implements Serializable {
     private int weight;
 
     /**
+     * startTime
+     */
+    private long startTime;
+
+    /**
      * workGroup
      */
     private String workGroup;
@@ -58,19 +64,21 @@ public class Host implements Serializable {
         this.address = ip + ":" + port;
     }
 
-    public Host(String ip, int port, int weight) {
+    public Host(String ip, int port, int weight, long startTime) {
         this.ip = ip;
         this.port = port;
         this.address = ip + ":" + port;
-        this.weight = weight;
+        this.weight = getWarmUpWeight(weight, startTime);
+        this.startTime = startTime;
     }
 
-    public Host(String ip, int port, int weight,String workGroup) {
+    public Host(String ip, int port, int weight, long startTime, String workGroup) {
         this.ip = ip;
         this.port = port;
         this.address = ip + ":" + port;
-        this.weight = weight;
-        this.workGroup=workGroup;
+        this.weight = getWarmUpWeight(weight, startTime);
+        this.workGroup = workGroup;
+        this.startTime = startTime;
     }
 
     public String getAddress() {
@@ -96,6 +104,14 @@ public class Host implements Serializable {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
     public int getPort() {
@@ -133,8 +149,8 @@ public class Host implements Serializable {
         if (parts.length == 2) {
             host = new Host(parts[0], Integer.parseInt(parts[1]));
         }
-        if (parts.length == 3) {
-            host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        if (parts.length == 4) {
+            host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Long.parseLong(parts[3]));
         }
         return host;
     }
@@ -169,8 +185,20 @@ public class Host implements Serializable {
 
     @Override
     public String toString() {
-        return "Host{" +
-                "address='" + address + '\'' +
-                '}';
+        return "Host{"
+            + "address='" + address + '\''
+            + '}';
+    }
+
+    /**
+     * warm up
+     */
+    private int getWarmUpWeight(int weight, long startTime) {
+        long uptime = System.currentTimeMillis() - startTime;
+        //If the warm-up is not over, reduce the weight
+        if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
+            return (int) (weight * ((float) uptime / Constants.WARM_UP_TIME));
+        }
+        return weight;
     }
 }

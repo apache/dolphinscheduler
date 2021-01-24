@@ -75,7 +75,7 @@ io.interceptors.request.use(
     const sIdCookie = cookies.get('sessionId')
     const sessionId = sessionStorage.getItem('sessionId')
     const requstUrl = config.url.substring(config.url.lastIndexOf('/') + 1)
-    if (sIdCookie !== null && requstUrl !== 'login' && sIdCookie !== sessionId) {
+    if ((!sIdCookie || (sessionId && sessionId !== sIdCookie)) && requstUrl !== 'login') {
       window.location.href = `${PUBLIC_PATH}/view/login/index.html`
     } else {
       const { method } = config
@@ -84,6 +84,10 @@ io.interceptors.request.use(
           _t: Math.random()
         })
       }
+      config.headers = config.headers || {}
+      const language = cookies.get('language')
+      if (language) config.headers.language = language
+      if (sIdCookie) config.headers.sessionId = sIdCookie
       return config
     }
   }, error => {

@@ -19,7 +19,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
     <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-SELECT command.*
+SELECT command.id, command.command_type, command.process_definition_id, command.command_param, command.task_depend_type, command.failure_strategy,
+        command.warning_type, command.warning_group_id, command.schedule_time, command.start_time, command.executor_id, command.dependence, command.update_time,
+        command.process_instance_priority, command.worker_group
 FROM (
     SELECT *
     FROM t_ds_process_definition definition
@@ -61,12 +63,9 @@ LIMIT 1
         </if>
         group by cmd.command_type
     </select>
-
-
     <select id="countNeedRunSerialCommandByProcessDefinitionId" resultType="int">
         select count(1) FROM t_ds_command cmd,t_ds_process_definition process where cmd.process_definition_id = process.id and process.is_parallel=0
         and process.id=#{processDefinitionId}
     </select>
-
-
 </mapper>
+
