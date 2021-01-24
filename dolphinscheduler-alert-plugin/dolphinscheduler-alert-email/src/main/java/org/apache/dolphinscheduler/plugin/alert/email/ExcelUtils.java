@@ -58,7 +58,7 @@ public class ExcelUtils {
      * @param xlsFilePath the xls path
      */
     public static void genExcelFile(String content, String title, String xlsFilePath) {
-        List<LinkedHashMap<String, Object>> itemsList;
+        List<LinkedHashMap> itemsList;
 
         //The JSONUtils.toList has been try catch ex
         itemsList = JSONUtils.toList(content, LinkedHashMap.class);

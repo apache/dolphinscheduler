@@ -66,7 +66,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTableTypeMessage(String content, boolean showAll) {
 
         if (StringUtils.isNotEmpty(content)) {
-            List<LinkedHashMap<String, Object>> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
             if (!showAll && mapItemsList.size() > EmailConstants.NUMBER_1000) {
                 mapItemsList = mapItemsList.subList(0, EmailConstants.NUMBER_1000);
