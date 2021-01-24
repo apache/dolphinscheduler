@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.script;
+package org.apache.dolphinscheduler.plugin.alert.email.exception;
 
-/**
- * ScriptParamsConstants
- */
-public class ScriptParamsConstants {
+public class AlertEmailException extends RuntimeException {
 
-    private ScriptParamsConstants() {
-        throw new IllegalStateException("Utility class");
+    /**
+     * Create Runtime exception
+     *
+     * @param errMsg - Error message
+     */
+    public AlertEmailException(String errMsg) {
+        super(errMsg);
     }
 
-    static final String SCRIPT_TYPE = "type";
-
-    static final String NAME_SCRIPT_TYPE = "type";
-
-    static final String SCRIPT_PATH = "path";
-
-    static final String NAME_SCRIPT_PATH = "path";
-
-    static final String SCRIPT_USER_PARAMS = "user.params";
-
-    static final String NAME_SCRIPT_USER_PARAMS = "userParams";
+    /**
+     * Create Runtime exception
+     *
+     * @param errMsg - Error message
+     * @param cause - cause
+     */
+    public AlertEmailException(String errMsg, Throwable cause) {
+        super(errMsg, cause);
+    }
 }

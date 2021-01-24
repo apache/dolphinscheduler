@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExcelUtils {
 
-    public ExcelUtils() {
+    private ExcelUtils() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -58,23 +58,21 @@ public class ExcelUtils {
      * @param xlsFilePath the xls path
      */
     public static void genExcelFile(String content, String title, String xlsFilePath) {
-        List<LinkedHashMap> itemsList;
+        List<LinkedHashMap<String, Object>> itemsList;
 
         //The JSONUtils.toList has been try catch ex
         itemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
         if (CollectionUtils.isEmpty(itemsList)) {
             logger.error("itemsList is null");
-            throw new RuntimeException("itemsList is null");
+            throw new AlertEmailException("itemsList is null");
         }
 
         LinkedHashMap<String, Object> headerMap = itemsList.get(0);
 
         List<String> headerList = new ArrayList<>();
 
-        Iterator<Map.Entry<String, Object>> iter = headerMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Object> en = iter.next();
+        for (Map.Entry<String, Object> en : headerMap.entrySet()) {
             headerList.add(en.getKey());
         }
 
@@ -130,8 +128,7 @@ public class ExcelUtils {
             wb.write(fos);
 
         } catch (Exception e) {
-            logger.error("generate excel error", e);
-            throw new RuntimeException("generate excel error", e);
+            throw new AlertEmailException("generate excel error", e);
         } finally {
             if (wb != null) {
                 try {

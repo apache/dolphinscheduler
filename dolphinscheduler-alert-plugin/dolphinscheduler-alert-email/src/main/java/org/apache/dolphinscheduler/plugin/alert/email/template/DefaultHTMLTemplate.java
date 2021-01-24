@@ -50,7 +50,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             case TABLE:
                 return getTableTypeMessage(content, showAll);
             case TEXT:
-                return getTextTypeMessage(content, showAll);
+                return getTextTypeMessage(content);
             default:
                 throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate", showType));
         }
@@ -66,7 +66,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTableTypeMessage(String content, boolean showAll) {
 
         if (StringUtils.isNotEmpty(content)) {
-            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+            List<LinkedHashMap<String, Object>> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
             if (!showAll && mapItemsList.size() > EmailConstants.NUMBER_1000) {
                 mapItemsList = mapItemsList.subList(0, EmailConstants.NUMBER_1000);
@@ -77,7 +77,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             boolean flag = true;
 
             String title = "";
-            for (LinkedHashMap mapItems : mapItemsList) {
+            for (LinkedHashMap<String, Object> mapItems : mapItemsList) {
 
                 Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
 
@@ -111,10 +111,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
      * get alert message which type is TEXT
      *
      * @param content message content
-     * @param showAll weather to show all
      * @return alert message
      */
-    private String getTextTypeMessage(String content, boolean showAll) {
+    private String getTextTypeMessage(String content) {
 
         if (StringUtils.isNotEmpty(content)) {
             ArrayNode list = JSONUtils.parseArray(content);
@@ -135,14 +134,14 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     /**
      * get alert message from a html template
      *
-     * @param title   message title
+     * @param title message title
      * @param content message content
      * @return alert message which use html template
      */
     private String getMessageFromHtmlTemplate(String title, String content) {
 
         requireNonNull(content, "content must not null");
-        String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n", title);
+        String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>%n", title);
 
         return EmailConstants.HTML_HEADER_PREFIX + htmlTableThead + content + EmailConstants.TABLE_BODY_HTML_TAIL;
     }
