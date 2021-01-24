@@ -66,19 +66,9 @@ public class ProcessTaskRelation {
     private long processDefinitionCode;
 
     /**
-     * pre project code
-     */
-    private long preProjectCode;
-
-    /**
      * pre task code
      */
     private long preTaskCode;
-
-    /**
-     * post project code
-     */
-    private long postProjectCode;
 
     /**
      * post task code
@@ -118,6 +108,22 @@ public class ProcessTaskRelation {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    public ProcessTaskRelation() {
+    }
+
+    public ProcessTaskRelation(String name, int version, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode, ConditionType conditionType, String conditionParams, Date createTime, Date updateTime) {
+        this.name = name;
+        this.version = version;
+        this.projectCode = projectCode;
+        this.processDefinitionCode = processDefinitionCode;
+        this.preTaskCode = preTaskCode;
+        this.postTaskCode = postTaskCode;
+        this.conditionType = conditionType;
+        this.conditionParams = conditionParams;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
 
     public String getName() {
         return name;
@@ -210,28 +216,12 @@ public class ProcessTaskRelation {
         this.processDefinitionCode = processDefinitionCode;
     }
 
-    public long getPreProjectCode() {
-        return preProjectCode;
-    }
-
-    public void setPreProjectCode(long preProjectCode) {
-        this.preProjectCode = preProjectCode;
-    }
-
     public long getPreTaskCode() {
         return preTaskCode;
     }
 
     public void setPreTaskCode(long preTaskCode) {
         this.preTaskCode = preTaskCode;
-    }
-
-    public long getPostProjectCode() {
-        return postProjectCode;
-    }
-
-    public void setPostProjectCode(long postProjectCode) {
-        this.postProjectCode = postProjectCode;
     }
 
     public long getPostTaskCode() {
