@@ -157,4 +157,33 @@ public class DateUtilsTest {
         Assert.assertNotNull(timeStamp);
     }
 
+    @Test
+    public void testFormat2Duration() {
+
+        // days hours minutes seconds
+        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        Date d2 = DateUtils.stringToDate("2020-01-21 12:10:10");
+        String duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("1d 1h 10m 10s", duration);
+
+        // hours minutes seconds
+        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        d2 = DateUtils.stringToDate("2020-01-20 12:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("1h 10m 10s", duration);
+
+        // minutes seconds
+        d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("10m 10s", duration);
+
+        // minutes seconds
+        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
+        d2 = DateUtils.stringToDate("2020-01-20 11:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("10s", duration);
+
+    }
+
 }
