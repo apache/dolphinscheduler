@@ -66,19 +66,9 @@ public class ProcessTaskRelationLog {
     private long processDefinitionCode;
 
     /**
-     * pre project code
-     */
-    private long preProjectCode;
-
-    /**
      * pre task code
      */
     private long preTaskCode;
-
-    /**
-     * post project code
-     */
-    private long postProjectCode;
 
     /**
      * post task code
@@ -221,28 +211,12 @@ public class ProcessTaskRelationLog {
         this.processDefinitionCode = processDefinitionCode;
     }
 
-    public long getPreProjectCode() {
-        return preProjectCode;
-    }
-
-    public void setPreProjectCode(long preProjectCode) {
-        this.preProjectCode = preProjectCode;
-    }
-
     public long getPreTaskCode() {
         return preTaskCode;
     }
 
     public void setPreTaskCode(long preTaskCode) {
         this.preTaskCode = preTaskCode;
-    }
-
-    public long getPostProjectCode() {
-        return postProjectCode;
-    }
-
-    public void setPostProjectCode(long postProjectCode) {
-        this.postProjectCode = postProjectCode;
     }
 
     public long getPostTaskCode() {
@@ -275,5 +249,16 @@ public class ProcessTaskRelationLog {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    public void set(ProcessTaskRelation processTaskRelation) {
+        this.name = processTaskRelation.getName();
+        this.version = processTaskRelation.getVersion();
+        this.projectCode = processTaskRelation.getProjectCode();
+        this.processDefinitionCode = processTaskRelation.getProcessDefinitionCode();
+        this.preTaskCode = processTaskRelation.getPreTaskCode();
+        this.postTaskCode = processTaskRelation.getPostTaskCode();
+        this.conditionType = processTaskRelation.getConditionType();
+        this.conditionParams = processTaskRelation.getConditionParams();
     }
 }
