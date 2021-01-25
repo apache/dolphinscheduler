@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.remote.serialize;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ProtoStuffUtils
@@ -49,20 +49,13 @@ public class ProtoStuffUtils {
 
     @SuppressWarnings("unchecked")
     private static <T> Schema<T> getSchema(Class<T> clazz) {
-        Schema<T> schema = (Schema<T>) schemaCache.get(clazz);
-        if (schema == null) {
-            schema = RuntimeSchema.getSchema(clazz);
-            if (schema != null) {
-                schemaCache.put(clazz, schema);
-            }
-        }
-        return schema;
+        return (Schema<T>) schemaCache.computeIfAbsent(clazz, RuntimeSchema::createFrom);
     }
 
     public static <T> T deserialize(byte[] bytes, Class<T> clazz) {
         Schema<T> schema = getSchema(clazz);
         T obj = schema.newMessage();
-        if(null==obj){
+        if (null == obj) {
             return null;
         }
         ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
