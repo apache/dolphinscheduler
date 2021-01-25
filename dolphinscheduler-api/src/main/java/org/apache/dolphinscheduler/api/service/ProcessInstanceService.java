@@ -459,6 +459,12 @@ public class ProcessInstanceService extends BaseService {
             if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
+            // get the processinstancejson before saving,and then save the name and taskid
+            String oldJson = processInstance.getProcessInstanceJson();
+            ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
+            if (oldProcessData != null) {
+                processInstanceJson = processService.changeJson(processData,oldProcessData);
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
