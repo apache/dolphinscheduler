@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit token') : $t('Create token')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -65,7 +64,7 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import _ from 'lodash'
@@ -73,7 +72,7 @@
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import Permissions from '@/module/permissions'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -177,7 +176,7 @@
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>
 

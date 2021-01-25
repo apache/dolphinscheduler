@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -239,7 +240,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
         @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type = "String"),
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
-        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "Int", example = "0")
+        @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -252,7 +253,7 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "connects", required = false) String connects,
                                           @RequestParam(value = "description", required = false) String description,
-                                          @RequestParam(value = "releaseState", required = false, defaultValue = "0") int releaseState) {
+                                          @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
         logger.info("login user {}, update process define, project name: {}, process define name: {}, "
                 + "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
@@ -260,12 +261,12 @@ public class ProcessDefinitionController extends BaseController {
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
             processDefinitionJson, description, locations, connects);
         //  If the update fails, the result will be returned directly
-        Status status = (Status) result.get("status");
-        if (status.getCode() != 0) {
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
         }
+
         //  Judge whether to go online after editing,0 means offline, 1 means online
-        if (releaseState == 1) {
+        if (releaseState == ReleaseState.ONLINE) {
             result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, id, releaseState);
         }
         return returnDataList(result);
@@ -367,7 +368,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
         @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, dataType = "ReleaseState"),
     })
     @PostMapping(value = "/release")
     @ResponseStatus(HttpStatus.OK)
@@ -375,7 +376,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result releaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam(value = "processId", required = true) int processId,
-                                           @RequestParam(value = "releaseState", required = true) int releaseState) {
+                                           @RequestParam(value = "releaseState", required = true) ReleaseState releaseState) {
 
         logger.info("login user {}, release process definition, project name: {}, release state: {}",
             loginUser.getUserName(), projectName, releaseState);

@@ -128,6 +128,12 @@
         WHERE user_id = #{userId} and release_state = 1 and resource_ids is not null and resource_ids != ''
     </select>
 
+    <select id="listProjectIds" resultType="java.lang.Integer">
+        SELECT DISTINCT(project_id) as project_id
+        FROM t_ds_process_definition
+    </select>
+
+
     <update id="updateVersionByProcessDefinitionId">
         update  t_ds_process_definition
         set version = #{version}

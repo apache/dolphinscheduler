@@ -17,16 +17,19 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import java.util.Locale;
-
 
 /**
  * application configuration
@@ -39,7 +42,17 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String REGISTER_PATH_PATTERN = "/users/register";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
-    public static final int COOKIE_MAX_AGE = 3600;
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
+        configSource.registerCorsConfiguration(PATH_PATTERN, config);
+        return new CorsFilter(configSource);
+    }
 
     @Bean
     public LoginHandlerInterceptor loginInterceptor() {
@@ -56,16 +69,14 @@ public class AppConfiguration implements WebMvcConfigurer {
         localeResolver.setCookieName(LOCALE_LANGUAGE_COOKIE);
         // set default locale
         localeResolver.setDefaultLocale(Locale.US);
-        // set cookie max age
-        localeResolver.setCookieMaxAge(COOKIE_MAX_AGE);
+        // set language tag compliant
+        localeResolver.setLanguageTagCompliant(false);
         return localeResolver;
     }
 
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-        lci.setParamName("language");
-        return lci;
+        return new LocaleChangeInterceptor();
     }
 
     @Override
@@ -92,11 +103,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/ui/").setViewName("forward:/ui/index.html");
         registry.addViewController("/").setViewName("forward:/ui/index.html");
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping(PATH_PATTERN).allowedOrigins("*").allowedMethods("*");
     }
 
     /**
