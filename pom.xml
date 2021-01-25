@@ -122,6 +122,7 @@
         <dep.packaging.version>${dep.airlift.version}</dep.packaging.version>
         <protostuff.version>1.7.2</protostuff.version>
         <reflections.version>0.9.12</reflections.version>
+        <byte-buddy.version>1.9.16</byte-buddy.version>
     </properties>
 
     <dependencyManagement>
@@ -328,6 +329,12 @@
                 <groupId>io.protostuff</groupId>
                 <artifactId>protostuff-runtime</artifactId>
                 <version>${protostuff.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
 
             <dependency>
@@ -1124,6 +1131,5 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
-        <module>dolphinscheduler-remote-connfig</module>
     </modules>
 </project>
