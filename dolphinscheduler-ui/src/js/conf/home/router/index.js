@@ -558,6 +558,11 @@ const router = new Router({
   ]
 })
 
+const VueRouterPush = Router.prototype.push
+Router.prototype.push = function push (to) {
+  return VueRouterPush.call(this, to).catch(err => err)
+}
+
 router.beforeEach((to, from, next) => {
   const $body = $('body')
   $body.find('.tooltip.fade.top.in').remove()
