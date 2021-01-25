@@ -245,6 +245,7 @@
             this.syncDefine = dag.syncDefine
             this.isParallel = dag.isParallel ||0
             this.serialCommandLengh = dag.serialCommandLengh ||0
+            this.releaseState = dag.releaseState
             this.timeout = dag.timeout || 0
             this.checkedTimeout = this.timeout !== 0
             this.$nextTick(() => {
@@ -270,33 +271,6 @@
       close () {
         this.$emit('close')
       }
-    },
-    watch: {
-      checkedTimeout (val) {
-        if (!val) {
-          this.timeout = 0
-          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-        }
-      }
-    },
-    created () {
-      const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
-      this.name = dag.name
-      this.originalName = dag.name
-      this.description = dag.description
-      this.syncDefine = dag.syncDefine
-      this.releaseState = dag.releaseState
-      this.timeout = dag.timeout || 0
-      this.checkedTimeout = this.timeout !== 0
-      this.$nextTick(() => {
-        if (dag.tenantId === -1) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        } else {
-          this.tenantId = dag.tenantId
-        }
-      })
     },
     mounted () {},
     components: { FormTenant, mLocalParams }
