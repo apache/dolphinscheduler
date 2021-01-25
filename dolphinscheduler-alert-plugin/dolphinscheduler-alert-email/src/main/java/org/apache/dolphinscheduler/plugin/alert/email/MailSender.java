@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static java.util.Objects.requireNonNull;
 
+import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.spi.alert.AlertConstants;
@@ -67,7 +68,7 @@ public class MailSender {
     private String mailProtocol = "SMTP";
     private String mailSmtpHost;
     private String mailSmtpPort;
-    private String mailSender;
+    private String mailSenderEmail;
     private String enableSmtpAuth;
     private String mailUser;
     private String mailPasswd;
@@ -77,12 +78,13 @@ public class MailSender {
     private String sslTrust;
     private String showType;
     private AlertTemplate alertTemplate;
+    private String mustNotNull = "must not be null";
 
     public MailSender(Map<String, String> config) {
 
         String receiversConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS);
         if (receiversConfig == null || "".equals(receiversConfig)) {
-            throw new RuntimeException(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS + "must not be null");
+            throw new AlertEmailException(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS + mustNotNull);
         }
 
         receivers = Arrays.asList(receiversConfig.split(","));
@@ -95,33 +97,33 @@ public class MailSender {
         }
 
         mailSmtpHost = config.get(MailParamsConstants.NAME_MAIL_SMTP_HOST);
-        requireNonNull(mailSmtpHost, MailParamsConstants.MAIL_SMTP_HOST + " must not null");
+        requireNonNull(mailSmtpHost, MailParamsConstants.MAIL_SMTP_HOST + mustNotNull);
 
         mailSmtpPort = config.get(MailParamsConstants.NAME_MAIL_SMTP_PORT);
-        requireNonNull(mailSmtpPort, MailParamsConstants.MAIL_SMTP_PORT + " must not null");
+        requireNonNull(mailSmtpPort, MailParamsConstants.MAIL_SMTP_PORT + mustNotNull);
 
-        mailSender = config.get(MailParamsConstants.NAME_MAIL_SENDER);
-        requireNonNull(mailSender, MailParamsConstants.MAIL_SENDER + " must not null");
+        mailSenderEmail = config.get(MailParamsConstants.NAME_MAIL_SENDER);
+        requireNonNull(mailSenderEmail, MailParamsConstants.MAIL_SENDER + mustNotNull);
 
         enableSmtpAuth = config.get(MailParamsConstants.NAME_MAIL_SMTP_AUTH);
 
         mailUser = config.get(MailParamsConstants.NAME_MAIL_USER);
-        requireNonNull(mailUser, MailParamsConstants.MAIL_USER + " must not null");
+        requireNonNull(mailUser, MailParamsConstants.MAIL_USER + mustNotNull);
 
         mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
-        requireNonNull(mailPasswd, MailParamsConstants.MAIL_PASSWD + " must not null");
+        requireNonNull(mailPasswd, MailParamsConstants.MAIL_PASSWD + mustNotNull);
 
         mailUseStartTLS = config.get(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE);
-        requireNonNull(mailUseStartTLS, MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE + " must not null");
+        requireNonNull(mailUseStartTLS, MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
 
         mailUseSSL = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE);
-        requireNonNull(mailUseSSL, MailParamsConstants.MAIL_SMTP_SSL_ENABLE + " must not null");
+        requireNonNull(mailUseSSL, MailParamsConstants.MAIL_SMTP_SSL_ENABLE + mustNotNull);
 
         sslTrust = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST);
-        requireNonNull(sslTrust, MailParamsConstants.MAIL_SMTP_SSL_TRUST + " must not null");
+        requireNonNull(sslTrust, MailParamsConstants.MAIL_SMTP_SSL_TRUST + mustNotNull);
 
         showType = config.get(AlertConstants.SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
+        requireNonNull(showType, AlertConstants.SHOW_TYPE + mustNotNull);
 
         xlsFilePath = config.get(EmailConstants.XLS_FILE_PATH);
         if (StringUtils.isBlank(xlsFilePath)) {
@@ -134,9 +136,8 @@ public class MailSender {
     /**
      * send mail to receivers
      *
-     * @param title   title
+     * @param title title
      * @param content content
-     * @return
      */
     public AlertResult sendMails(String title, String content) {
         return sendMails(this.receivers, this.receiverCcs, title, content);
@@ -145,9 +146,8 @@ public class MailSender {
     /**
      * send mail to receivers
      *
-     * @param title   email title
+     * @param title email title
      * @param content email content
-     * @return
      */
     public AlertResult sendMailsToReceiverOnly(String title, String content) {
         return sendMails(this.receivers, null, title, content);
@@ -156,11 +156,10 @@ public class MailSender {
     /**
      * send mail
      *
-     * @param receivers   receivers
+     * @param receivers receivers
      * @param receiverCcs receiverCcs
-     * @param title       title
-     * @param content     content
-     * @return
+     * @param title title
+     * @param content content
      */
     public AlertResult sendMails(List<String> receivers, List<String> receiverCcs, String title, String content) {
         AlertResult alertResult = new AlertResult();
@@ -180,7 +179,7 @@ public class MailSender {
             try {
                 Session session = getSession();
                 email.setMailSession(session);
-                email.setFrom(mailSender);
+                email.setFrom(mailSenderEmail);
                 email.setCharset(EmailConstants.UTF_8);
                 if (CollectionUtils.isNotEmpty(receivers)) {
                     // receivers mail
@@ -251,11 +250,6 @@ public class MailSender {
 
     /**
      * send mail as Excel attachment
-     *
-     * @param title
-     * @param content
-     * @param partContent
-     * @throws Exception
      */
     private void attachment(String title, String content, String partContent) throws Exception {
         MimeMessage msg = getMimeMessage();
@@ -265,9 +259,6 @@ public class MailSender {
 
     /**
      * get MimeMessage
-     *
-     * @return
-     * @throws MessagingException
      */
     private MimeMessage getMimeMessage() throws MessagingException {
 
@@ -279,7 +270,7 @@ public class MailSender {
         // 2. creating mail: Creating a MimeMessage
         MimeMessage msg = new MimeMessage(session);
         // 3. set sender
-        msg.setFrom(new InternetAddress(mailSender));
+        msg.setFrom(new InternetAddress(mailSenderEmail));
         // 4. set receivers
         for (String receiver : receivers) {
             msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
@@ -317,16 +308,9 @@ public class MailSender {
 
     /**
      * attach content
-     *
-     * @param title
-     * @param content
-     * @param partContent
-     * @param msg
-     * @throws MessagingException
-     * @throws IOException
      */
     private void attachContent(String title, String content, String partContent, MimeMessage msg) throws MessagingException, IOException {
-        /**
+        /*
          * set receiverCc
          */
         if (CollectionUtils.isNotEmpty(receiverCcs)) {
@@ -365,21 +349,14 @@ public class MailSender {
 
     /**
      * the string object map
-     *
-     * @param title
-     * @param content
-     * @param alertResult
-     * @param email
-     * @return
-     * @throws EmailException
      */
     private AlertResult getStringObjectMap(String title, String content, AlertResult alertResult, HtmlEmail email) throws EmailException {
 
-        /**
+        /*
          * the subject of the message to be sent
          */
         email.setSubject(title);
-        /**
+        /*
          * to send information, you can use HTML tags in mail content because of the use of HtmlEmail
          */
         if (showType.equals(ShowType.TABLE.getDescp())) {
@@ -417,9 +394,6 @@ public class MailSender {
 
     /**
      * handle exception
-     *
-     * @param alertResult
-     * @param e
      */
     private void handleException(AlertResult alertResult, Exception e) {
         logger.error("Send email to {} failed", receivers, e);
