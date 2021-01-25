@@ -417,8 +417,6 @@ public class ProcessDefinition {
                 + ", projectName='" + projectName + '\''
                 + ", locations='" + locations + '\''
                 + ", connects='" + connects + '\''
-                + ", receivers='" + receivers + '\''
-                + ", receiversCc='" + receiversCc + '\''
                 + ", scheduleReleaseState=" + scheduleReleaseState
                 + ", timeout=" + timeout
                 + ", warningGroupId=" + warningGroupId
