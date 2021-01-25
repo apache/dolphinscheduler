@@ -88,9 +88,7 @@
         let $then = (res) => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popover.spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
         }
 
         let $catch = (e) => {
