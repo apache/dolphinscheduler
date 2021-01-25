@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
  */
 public interface IRpcClient {
 
-
     <T> T create(Class<T> clazz, Host host) throws Exception;
 
 }

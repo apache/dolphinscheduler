@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.rpc.codec;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
-
 import org.apache.dolphinscheduler.remote.serialize.ProtoStuffUtils;
 
 import java.util.List;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
  * NettyDecoder
@@ -31,7 +31,6 @@ import java.util.List;
 public class NettyDecoder extends ByteToMessageDecoder {
 
     private Class<?> genericClass;
-
 
     public NettyDecoder(Class<?> genericClass) {
         this.genericClass = genericClass;
