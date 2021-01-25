@@ -60,7 +60,6 @@ public enum ConditionType {
         }
     }
 
-
     public static ConditionType of(String desc) {
         if (CONDITION_TYPE_MAP.containsKey(desc)) {
             return CONDITION_TYPE_MAP.get(desc);

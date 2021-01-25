@@ -112,7 +112,16 @@ public class ProcessTaskRelation {
     public ProcessTaskRelation() {
     }
 
-    public ProcessTaskRelation(String name, int version, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode, ConditionType conditionType, String conditionParams, Date createTime, Date updateTime) {
+    public ProcessTaskRelation(String name,
+                               int version,
+                               long projectCode,
+                               long processDefinitionCode,
+                               long preTaskCode,
+                               long postTaskCode,
+                               ConditionType conditionType,
+                               String conditionParams,
+                               Date createTime,
+                               Date updateTime) {
         this.name = name;
         this.version = version;
         this.projectCode = projectCode;

@@ -17,16 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * process task relation service
@@ -47,13 +40,13 @@ public interface ProcessTaskRelationService {
      * @return create result code
      */
     Map<String, Object> createProcessTaskRelation(User loginUser,
-                                                String name,
-                                                Long projectCode,
-                                                Long processDefinitionCode,
-                                                Long preTaskCode,
-                                                Long postTaskCode,
-                                                String conditionType,
-                                                String conditionParams);
+                                                  String name,
+                                                  Long projectCode,
+                                                  Long processDefinitionCode,
+                                                  Long preTaskCode,
+                                                  Long postTaskCode,
+                                                  String conditionType,
+                                                  String conditionParams);
 
 }
 

@@ -170,7 +170,24 @@ public class TaskDefinition {
     public TaskDefinition() {
     }
 
-    public TaskDefinition(long code, String name, int version, String description, long projectCode, int userId, TaskType taskType, String taskParams, Flag flag, Priority taskPriority, String workerGroup, int failRetryTimes, int failRetryInterval, TimeoutFlag timeoutFlag, TaskTimeoutStrategy taskTimeoutStrategy, int timeout, Date createTime, Date updateTime) {
+    public TaskDefinition(long code,
+                          String name,
+                          int version,
+                          String description,
+                          long projectCode,
+                          int userId,
+                          TaskType taskType,
+                          String taskParams,
+                          Flag flag,
+                          Priority taskPriority,
+                          String workerGroup,
+                          int failRetryTimes,
+                          int failRetryInterval,
+                          TimeoutFlag timeoutFlag,
+                          TaskTimeoutStrategy taskTimeoutStrategy,
+                          int timeout,
+                          Date createTime,
+                          Date updateTime) {
         this.code = code;
         this.name = name;
         this.version = version;

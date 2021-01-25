@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -47,8 +46,8 @@ public class ProcessTaskRelationServiceImpl extends BaseService implements
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessTaskRelationServiceImpl.class);
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    //@Autowired
+    //private ProjectMapper projectMapper;
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;

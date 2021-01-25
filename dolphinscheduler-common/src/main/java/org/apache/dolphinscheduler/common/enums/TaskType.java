@@ -86,7 +86,6 @@ public enum TaskType {
         }
     }
 
-
     public static TaskType of(String descp) {
         if (TASK_TYPE_MAP.containsKey(descp)) {
             return TASK_TYPE_MAP.get(descp);
