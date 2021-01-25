@@ -84,7 +84,6 @@
                 <span><el-button type="error" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
               <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
                 <el-popconfirm
                   :confirmButtonText="$t('Confirm')"
                   :cancelButtonText="$t('Cancel')"
@@ -92,7 +91,7 @@
                   iconColor="red"
                   :title="$t('Delete?')"
                   @onConfirm="_delete(scope.row,scope.row.id)">
-                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.releaseState === 'ONLINE'" circle slot="reference"></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP' && scope.row.state !== 'PAUSE'" circle slot="reference"></el-button>
                 </el-popconfirm>
               </el-tooltip>
               <el-tooltip :content="$t('Gantt')" placement="top" :enterable="false">
