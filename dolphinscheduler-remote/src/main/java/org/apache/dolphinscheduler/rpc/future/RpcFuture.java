@@ -51,17 +51,17 @@ public class RpcFuture implements Future<Object> {
 
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        boolean b = latch.await(5,TimeUnit.SECONDS);
+        latch.await(-1, TimeUnit.SECONDS);
         return response;
     }
 
     @Override
     public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        boolean b = latch.await(timeout,unit);
+        latch.await(timeout, unit);
         return response;
     }
 
-    public void done(RpcResponse response){
+    public void done(RpcResponse response) {
         this.response = response;
         latch.countDown();
     }
