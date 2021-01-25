@@ -40,6 +40,8 @@ public @interface Rpc {
 
     boolean ack() default false;
 
+    //todo It is better to set the timeout period for synchronous calls
+
     /**
      * When it is asynchronous transmission, callback must be set
      */

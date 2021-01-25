@@ -460,7 +460,7 @@ The following components are provided under a MPL 1.1 license. See project link 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     jamon-runtime 2.3.1: https://mvnrepository.com/artifact/org.jamon/jamon-runtime/2.3.1, MPL-1.1
-
+    javassist 3.26.0-GA: https://github.com/jboss-javassist/javassist, MPL-1.1
 
 ========================================================================
 Public Domain licenses
@@ -508,6 +508,8 @@ Apache 2.0 licenses
     remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
     protostuff-core 1.7.2: https://github.com/protostuff/protostuff/protostuff-core Apache-2.0
     protostuff-runtime 1.7.2: https://github.com/protostuff/protostuff/protostuff-core Apache-2.0
+    protostuff-api 1.7.2: https://github.com/protostuff/protostuff/protostuff-api Apache-2.0
+    protostuff-collectionschema 1.7.2: https://github.com/protostuff/protostuff/protostuff-collectionschema Apache-2.0
 
 
 ========================================

@@ -50,10 +50,8 @@ public class NettyDecoder extends ByteToMessageDecoder {
         if (byteBuf.readableBytes() < dataLength) {
             byteBuf.resetReaderIndex();
         }
-        //将ByteBuf转换为byte[]
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
-        //将data转换成object
         Object obj = ProtoStuffUtils.deserialize(data, genericClass);
         list.add(obj);
     }

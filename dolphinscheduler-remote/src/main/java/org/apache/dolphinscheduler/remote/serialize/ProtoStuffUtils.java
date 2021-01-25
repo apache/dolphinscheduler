@@ -52,7 +52,7 @@ public class ProtoStuffUtils {
         Schema<T> schema = (Schema<T>) schemaCache.get(clazz);
         if (schema == null) {
             schema = RuntimeSchema.getSchema(clazz);
-            if (schema == null) {
+            if (schema != null) {
                 schemaCache.put(clazz, schema);
             }
         }
