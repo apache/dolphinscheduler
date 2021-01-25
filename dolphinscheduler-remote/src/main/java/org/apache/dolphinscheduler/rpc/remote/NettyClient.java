@@ -18,16 +18,16 @@
 package org.apache.dolphinscheduler.rpc.remote;
 
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.rpc.codec.NettyDecoder;
-import org.apache.dolphinscheduler.rpc.codec.NettyEncoder;
-import org.apache.dolphinscheduler.rpc.client.RpcRequestCache;
-import org.apache.dolphinscheduler.rpc.client.RpcRequestTable;
-import org.apache.dolphinscheduler.rpc.common.RpcRequest;
-import org.apache.dolphinscheduler.rpc.common.RpcResponse;
-import org.apache.dolphinscheduler.rpc.future.RpcFuture;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
+import org.apache.dolphinscheduler.rpc.client.RpcRequestCache;
+import org.apache.dolphinscheduler.rpc.client.RpcRequestTable;
+import org.apache.dolphinscheduler.rpc.codec.NettyDecoder;
+import org.apache.dolphinscheduler.rpc.codec.NettyEncoder;
+import org.apache.dolphinscheduler.rpc.common.RpcRequest;
+import org.apache.dolphinscheduler.rpc.common.RpcResponse;
+import org.apache.dolphinscheduler.rpc.future.RpcFuture;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -200,7 +200,7 @@ public class NettyClient {
         rpcRequestCache.setServiceName(serviceName);
         RpcFuture future = null;
         if (!async) {
-            future = new RpcFuture();
+            future = new RpcFuture(request);
             rpcRequestCache.setRpcFuture(future);
         }
         RpcRequestTable.put(request.getRequestId(), rpcRequestCache);
