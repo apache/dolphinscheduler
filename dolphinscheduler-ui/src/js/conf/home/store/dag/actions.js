@@ -289,8 +289,8 @@ export default {
         globalParams: state.globalParams,
         tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
-        isParallel:state.isParallel,
-        serialCommandLengh:state.serialCommandLengh,
+        isParallel: state.isParallel,
+        serialCommandLengh: state.serialCommandLengh,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/save`, {
@@ -315,8 +315,8 @@ export default {
         globalParams: state.globalParams,
         tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
-        isParallel:state.isParallel,
-        serialCommandLengh:state.serialCommandLengh,
+        isParallel: state.isParallel,
+        serialCommandLengh: state.serialCommandLengh,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/update`, {
@@ -344,8 +344,8 @@ export default {
         globalParams: state.globalParams,
         tasks: state.tasks,
         tenantId: state.tenantId,
-        isParallel:state.isParallel,
-        serialCommandLengh:state.serialCommandLengh,
+        isParallel: state.isParallel,
+        serialCommandLengh: state.serialCommandLengh,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/instance/update`, {
