@@ -296,6 +296,7 @@ CREATE TABLE t_ds_process_definition (
   user_id int DEFAULT NULL ,
   global_params text ,
   locations text ,
+  connects text ,
   warning_group_id int4 DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,

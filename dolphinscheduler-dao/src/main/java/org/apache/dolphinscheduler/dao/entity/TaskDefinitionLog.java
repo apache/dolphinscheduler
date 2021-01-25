@@ -395,4 +395,25 @@ public class TaskDefinitionLog {
     public void setResourceIds(String resourceIds) {
         this.resourceIds = resourceIds;
     }
+
+    public void set(TaskDefinition taskDefinition) {
+        this.code = taskDefinition.getCode();
+        this.name = taskDefinition.getName();
+        this.version = taskDefinition.getVersion();
+        this.description = taskDefinition.getDescription();
+        this.projectCode = taskDefinition.getProjectCode();
+        this.userId = taskDefinition.getUserId();
+        this.taskType = taskDefinition.getTaskType();
+        this.taskParams = taskDefinition.getTaskParams();
+        this.flag = taskDefinition.getFlag();
+        this.taskPriority = taskDefinition.getTaskPriority();
+        this.workerGroup = taskDefinition.getWorkerGroup();
+        this.failRetryTimes = taskDefinition.getFailRetryTimes();
+        this.failRetryInterval = taskDefinition.getFailRetryInterval();
+        this.timeoutFlag = taskDefinition.getTimeoutFlag();
+        this.taskTimeoutStrategy = taskDefinition.getTaskTimeoutStrategy();
+        this.timeout = taskDefinition.getTimeout();
+        this.createTime = taskDefinition.getCreateTime();
+        this.updateTime = taskDefinition.getUpdateTime();
+    }
 }

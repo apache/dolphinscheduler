@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
@@ -47,5 +50,20 @@ public enum ConditionType {
 
     public String getDesc() {
         return desc;
+    }
+
+    private static final Map<String, ConditionType> CONDITION_TYPE_MAP = new HashMap<>();
+
+    static {
+        for (ConditionType conditionType : ConditionType.values()) {
+            CONDITION_TYPE_MAP.put(conditionType.desc, conditionType);
+        }
+    }
+
+    public static ConditionType of(String desc) {
+        if (CONDITION_TYPE_MAP.containsKey(desc)) {
+            return CONDITION_TYPE_MAP.get(desc);
+        }
+        throw new IllegalArgumentException("invalid type : " + desc);
     }
 }

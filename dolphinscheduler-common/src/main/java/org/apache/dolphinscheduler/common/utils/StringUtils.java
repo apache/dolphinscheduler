@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.Iterator;
+
 public class StringUtils {
 
     public static final String EMPTY = "";
@@ -60,5 +62,31 @@ public class StringUtils {
 
     public static String trim(String str) {
         return str == null ? null : str.trim();
+    }
+
+    public static String join(final Iterable<?> iterable, final String separator) {
+        if (iterable == null) {
+            return null;
+        }
+        Iterator<?> iterator = iterable.iterator();
+        if (!iterator.hasNext()) {
+            return EMPTY;
+        }
+        final Object first = iterator.next();
+        if (!iterator.hasNext()) {
+            return String.valueOf(first);
+        }
+        // two or more elements
+        final StringBuilder buf = new StringBuilder(256);
+        while (iterator.hasNext()) {
+            if (separator != null) {
+                buf.append(separator);
+            }
+            final Object obj = iterator.next();
+            if (obj != null) {
+                buf.append(obj);
+            }
+        }
+        return buf.toString();
     }
 }
