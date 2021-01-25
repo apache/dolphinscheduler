@@ -37,10 +37,12 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -2021,14 +2023,10 @@ public class ProcessService {
         List<TaskNode> tasks = processData.getTasks();
         for (int i = 0; i < tasks.size(); i++) {
             TaskNode taskNode = newTasks.get(i);
-            String type = taskNode.getType();
-            if ("CONDITIONS".equals(type)) {
-                String conditionResult = taskNode.getConditionResult();
-                String[] split = conditionResult.split(",");
-                String oldSuccessNodeStr = split[0];
-                String oldFailedNodeStr = split[1];
-                String oldSuccessNodeName = oldSuccessNodeStr.substring(oldSuccessNodeStr.indexOf('[') + 1, oldSuccessNodeStr.indexOf(']')).replaceAll("\"", "");
-                String oldFailedNodeName = oldFailedNodeStr.substring(oldFailedNodeStr.indexOf('[') + 1, oldFailedNodeStr.indexOf(']')).replaceAll("\"", "");
+            if (TaskType.CONDITIONS.getDescp().equals("conditions")) {
+                ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
+                String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
+                String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
                 String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
                 String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
                 if (newSuccessNodeName != null || newFailedNodeName != null) {
