@@ -69,6 +69,8 @@
       <template slot="content">
         <el-button type="primary" size="small" round @click="_edit()" >{{$t('Edit')}}</el-button>
         <el-dialog
+          :title="item ? $t('Edit User') : $t('Create User')"
+          v-if="createUserDialog"
           :visible.sync="createUserDialog"
           width="auto">
           <m-create-user :item="item" @onUpdate="onUpdate" @close="close"></m-create-user>
@@ -131,12 +133,10 @@
     padding-top: 30px;
     .list-box-f {
       .text {
-        width: 200px;
         font-size: 14px;
         color: #888;
       }
       .cont {
-        width: calc(100% - 210px);
         margin-left: 10px;
         .sp1 {
           font-size: 14px;

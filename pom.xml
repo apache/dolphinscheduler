@@ -81,7 +81,7 @@
         <slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
         <commons.collections.version>3.2.2</commons.collections.version>
         <commons.httpclient>3.0.1</commons.httpclient>
-        <commons.beanutils.version>1.7.0</commons.beanutils.version>
+        <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.email.version>1.5</commons.email.version>
         <poi.version>3.17</poi.version>
@@ -776,6 +776,7 @@
                         <include>**/api/enums/StatusTest.java</include>
                         <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
+                        <include>**/api/interceptor/LocaleChangeInterceptorTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
                         <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
