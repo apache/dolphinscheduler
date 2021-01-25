@@ -58,7 +58,7 @@ public class JSONUtils {
     /**
      * json representation of object
      *
-     * @param object  object
+     * @param object object
      * @param feature feature
      * @return object to json string
      */
@@ -81,9 +81,9 @@ public class JSONUtils {
      * the fields of the specified object are generics, just the object itself should not be a
      * generic type.
      *
-     * @param json  the string from which the object is to be deserialized
+     * @param json the string from which the object is to be deserialized
      * @param clazz the class of T
-     * @param <T>   T
+     * @param <T> T
      * @return an object of type T from the string
      * classOfT
      */
@@ -103,9 +103,9 @@ public class JSONUtils {
     /**
      * json to list
      *
-     * @param json  json string
+     * @param json json string
      * @param clazz class
-     * @param <T>   T
+     * @param <T> T
      * @return list
      */
     public static <T> List<T> toList(String json, Class<T> clazz) {
