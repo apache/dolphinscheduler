@@ -113,7 +113,7 @@ public class DingTalkSender {
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send [ %s ], resp:{%s}", msg, resp);
+            logger.info("Ding Talk send {}, resp: {}", msg, resp);
             return resp;
         } finally {
             httpClient.close();
