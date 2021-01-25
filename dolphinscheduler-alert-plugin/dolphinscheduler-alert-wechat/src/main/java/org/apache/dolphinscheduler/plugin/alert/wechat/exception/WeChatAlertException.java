@@ -15,26 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.script;
+package org.apache.dolphinscheduler.plugin.alert.wechat.exception;
 
-/**
- * ScriptParamsConstants
- */
-public class ScriptParamsConstants {
+public class WeChatAlertException extends RuntimeException {
 
-    private ScriptParamsConstants() {
-        throw new IllegalStateException("Utility class");
+    /**
+     * Create Runtime Exception
+     *
+     * @param errMsg - Error message
+     */
+    public WeChatAlertException(String errMsg) {
+        super(errMsg);
     }
-
-    static final String SCRIPT_TYPE = "type";
-
-    static final String NAME_SCRIPT_TYPE = "type";
-
-    static final String SCRIPT_PATH = "path";
-
-    static final String NAME_SCRIPT_PATH = "path";
-
-    static final String SCRIPT_USER_PARAMS = "user.params";
-
-    static final String NAME_SCRIPT_USER_PARAMS = "userParams";
 }
