@@ -15,28 +15,28 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Queue manage')">
+  <m-list-construction :title="$t('Warning instance manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create('')">{{$t('Create queue')}}</el-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create Alarm Instance')}}</el-button>
           <el-dialog
-            :title="item ? $t('Edit queue') : $t('Create queue')"
-            :v-if="createQueueDialog"
-            :visible.sync="createQueueDialog"
+            :title="item ? $t('Edit Alarm Instance') : $t('Create Alarm Instance')"
+            v-if="createWarningDialog"
+            :visible.sync="createWarningDialog"
             width="auto">
-            <m-create-queue :item="item" @onUpdate="onUpdate" @close="close"></m-create-queue>
+            <m-create-warning-instance :item="item" :pulginInstance="pulginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning-instance>
           </el-dialog>
         </template>
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="queueList.length || total>0">
+      <template v-if="alertgroupList!==null || total>0 ">
         <m-list @on-edit="_onEdit"
-                :queue-list="queueList"
+                @on-update="_onUpdate"
+                :alertgroup-list="alertgroupList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
-
         </m-list>
         <div class="page-box">
           <el-pagination
@@ -51,7 +51,7 @@
           </el-pagination>
         </div>
       </template>
-      <template v-if="!queueList.length && total<=0">
+      <template v-if="alertgroupList===null && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
@@ -64,19 +64,19 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateQueue from './_source/createQueue'
+  import mCreateWarningInstance from './_source/createWarningInstance'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'queue-index',
+    name: 'warning-instance-index',
     data () {
       return {
         total: null,
-        isLoading: true,
-        queueList: [],
+        isLoading: false,
+        alertgroupList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
@@ -84,17 +84,17 @@
         },
         isLeft: true,
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
+        createWarningDialog: false,
         item: {},
-        createQueueDialog: false
-
+        pulginInstance: []
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getQueueListP']),
+      ...mapActions('security', ['queryAlertPluginInstanceListPaging', 'getPlugins']),
       /**
-       * Query
+       * Inquire
        */
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -106,20 +106,29 @@
       _pageSize (val) {
         this.searchParams.pageSize = val
       },
+      _onUpdate () {
+        this._debounceGET()
+      },
       _onEdit (item) {
         this._create(item)
       },
       _create (item) {
+        this.getPlugins({ pluginType: 'ALERT' }).then(res => {
+          this.pulginInstance = res
+        }).catch(e => {
+          this.$message.error(e.msg)
+        })
         this.item = item
-        this.createQueueDialog = true
+        this.createWarningDialog = true
       },
+
       onUpdate () {
         this._debounceGET('false')
-        this.createQueueDialog = false
+        this.createWarningDialog = false
       },
 
       close () {
-        this.createQueueDialog = false
+        this.createWarningDialog = false
       },
 
       _getList (flag) {
@@ -129,12 +138,12 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.getQueueListP(this.searchParams).then(res => {
+        this.queryAlertPluginInstanceListPaging(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
-            this.queueList = []
-            this.queueList = res.totalList
+            this.alertgroupList = []
+            this.alertgroupList = res.totalList
             this.total = res.total
             this.isLoading = false
           }
@@ -157,6 +166,6 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateQueue }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWarningInstance }
   }
 </script>

@@ -76,7 +76,7 @@
       <div class="submit">
         <template v-if="router.history.current.name === 'projects-definition-details'">
           <div class="lint-pt">
-            <el-checkbox v-model="releaseState" size="small" :false-label="0" :true-label="1">{{$t('Whether to go online the process definition')}}</el-checkbox>
+            <el-checkbox v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Whether to go online the process definition')}}</el-checkbox>
           </div>
         </template>
         <template v-if="router.history.current.name === 'projects-instance-details'">
@@ -112,7 +112,7 @@
         // Global custom parameters
         udpListCache: [],
         // Whether to go online the process definition
-        releaseState: 1,
+        releaseState: 'ONLINE',
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm

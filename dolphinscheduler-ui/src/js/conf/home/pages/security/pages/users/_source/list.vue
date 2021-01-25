@@ -99,6 +99,7 @@
     </el-dialog>
 
     <el-dialog
+      v-if="resourceDialog"
       :visible.sync="resourceDialog"
       width="auto">
       <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
