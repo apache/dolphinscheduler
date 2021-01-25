@@ -51,7 +51,7 @@ public class RpcFuture implements Future<Object> {
 
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        latch.await(-1, TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
         return response;
     }
 
