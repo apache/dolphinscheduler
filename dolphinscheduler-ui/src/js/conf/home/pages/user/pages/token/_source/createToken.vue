@@ -119,16 +119,16 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs.popup.spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
         this.store.dispatch(`user/${this.item ? 'updateToken' : 'createToken'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
+            this.$refs.popover.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
       },
       _generateToken () {
