@@ -641,8 +641,6 @@ public class ProcessInstance {
                 + ", workerGroup='" + workerGroup + '\''
                 + ", timeout=" + timeout
                 + ", tenantId=" + tenantId
-                + ", receivers='" + receivers + '\''
-                + ", receiversCc='" + receiversCc + '\''
                 + ", processDefinition="
                 + processDefinition
                 + ", commandType="
