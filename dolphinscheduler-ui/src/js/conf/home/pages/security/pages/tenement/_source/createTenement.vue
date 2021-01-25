@@ -144,9 +144,7 @@
         this.store.dispatch(`security/${this.item ? 'updateQueue' : 'createQueue'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popover.spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
         }).catch(e => {
           this.$message.error(e.msg || '')
           this.$refs.popover.spinnerLoading = false
