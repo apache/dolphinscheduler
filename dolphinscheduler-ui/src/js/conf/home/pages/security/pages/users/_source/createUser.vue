@@ -268,9 +268,7 @@
         }
 
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
-          setTimeout(() => {
-            this.$refs.popover.spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate', param)
           this.$message.success(res.msg)
         }).catch(e => {
