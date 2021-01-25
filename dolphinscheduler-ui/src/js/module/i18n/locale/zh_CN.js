@@ -669,7 +669,7 @@ export default {
   'Pre tasks': '前置任务',
   'command queue length': '命令等待队列长度',
   'Please enter a positive integer greater than or equal 0': '请输入大于等于 0 的正整数',
-  'select run type': '选择执行方式'
+  'select run type': '选择执行方式',
   'Running Memory': '运行内存',
   'Max Memory': '最大内存',
   'Min Memory': '最小内存',
