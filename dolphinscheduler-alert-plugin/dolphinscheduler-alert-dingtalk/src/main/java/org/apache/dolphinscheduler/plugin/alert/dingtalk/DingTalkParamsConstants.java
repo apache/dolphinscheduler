@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.plugin.alert.dingtalk;
  */
 public class DingTalkParamsConstants {
 
-    public DingTalkParamsConstants() {
+    private DingTalkParamsConstants() {
         throw new IllegalStateException("Utility class");
     }
 
