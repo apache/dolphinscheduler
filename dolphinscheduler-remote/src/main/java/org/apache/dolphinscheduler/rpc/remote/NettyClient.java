@@ -217,6 +217,7 @@ public class NettyClient {
             result = future.get();
         } catch (InterruptedException | ExecutionException e) {
             logger.error("send msg error，service name is {}", serviceName, e);
+            Thread.currentThread().interrupt();
         }
         return result;
     }
