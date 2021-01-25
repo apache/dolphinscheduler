@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import org.apache.commons.configuration.Configuration;
 
+import java.lang.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -130,11 +131,17 @@ public class OSUtils {
      * @return load average
      */
     public static double loadAverage() {
-        double loadAverage = hal.getProcessor().getSystemLoadAverage();
-        if (Double.isNaN(loadAverage)) {
-            return NEGATIVE_ONE;
+        double loadAverage;
+        try {
+            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+            loadAverage = osBean.getSystemLoadAverage();
+        } catch (Exception e) {
+            logger.error("get operation system load average exception, try another method ", e);
+            loadAverage = hal.getProcessor().getSystemLoadAverage();
+            if (Double.isNaN(loadAverage)) {
+                return NEGATIVE_ONE;
+            }
         }
-
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(loadAverage));
