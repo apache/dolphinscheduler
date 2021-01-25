@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.rpc.remote;
 
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.remote.decoder.NettyDecoder;
-import org.apache.dolphinscheduler.remote.decoder.NettyEncoder;
+import org.apache.dolphinscheduler.rpc.codec.NettyDecoder;
+import org.apache.dolphinscheduler.rpc.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
