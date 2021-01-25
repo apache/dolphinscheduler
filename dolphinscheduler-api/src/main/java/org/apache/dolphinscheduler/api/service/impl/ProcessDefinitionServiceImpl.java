@@ -495,7 +495,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
         }
         return result;
     }
