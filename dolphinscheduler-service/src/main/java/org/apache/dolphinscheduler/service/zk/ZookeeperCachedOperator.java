@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.service.zk;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.service.exceptions.ZKServerException;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
@@ -63,7 +63,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
             treeCache.start();
         } catch (Exception e) {
             logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
-            throw new ZKServerException(e);
+            throw new ServiceException(e);
         }
     }
 

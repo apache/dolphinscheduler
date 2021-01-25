@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.service.zk;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.service.exceptions.ZKServerException;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
@@ -147,7 +147,7 @@ public class ZKServer {
 
                 zooKeeperServerMain.initializeAndRun(args);
             } catch (QuorumPeerConfig.ConfigException | IOException e) {
-                throw new ZKServerException("Caught exception while starting ZK", e);
+                throw new ServiceException("Caught exception while starting ZK", e);
             }
         }
     }
@@ -182,7 +182,7 @@ public class ZKServer {
                     org.apache.commons.io.FileUtils.deleteDirectory(new File(dataDir));
                 }
             } catch (Exception e) {
-                throw new ZKServerException("Caught exception while starting ZK", e);
+                throw new ServiceException("Caught exception while starting ZK", e);
             }
         }
     }

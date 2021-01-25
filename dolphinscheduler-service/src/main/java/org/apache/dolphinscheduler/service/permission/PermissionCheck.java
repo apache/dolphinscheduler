@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.exceptions.PermissionException;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.List;
@@ -159,23 +159,23 @@ public class PermissionCheck<T> {
     /**
      * check permission
      *
-     * @throws PermissionException exception
+     * @throws ServiceException exception
      */
-    public void checkPermission() throws PermissionException {
+    public void checkPermission() throws ServiceException {
         if (this.needChecks.length > 0) {
 
             // get user type in order to judge whether the user is admin
             User user = processService.getUserById(userId);
             if (user == null) {
                 logger.error("user id {} doesn't exist", userId);
-                throw new PermissionException(String.format("user %s doesn't exist", userId));
+                throw new ServiceException(String.format("user %s doesn't exist", userId));
             }
             if (user.getUserType() != UserType.ADMIN_USER) {
                 List<T> unauthorizedList = processService.listUnauthorized(userId, needChecks, authorizationType);
                 // if exist unauthorized resource
                 if (CollectionUtils.isNotEmpty(unauthorizedList)) {
                     logger.error("user {} doesn't have permission of {}: {}", user.getUserName(), authorizationType.getDescp(), unauthorizedList);
-                    throw new PermissionException(String.format("user %s doesn't have permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
+                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }
         }

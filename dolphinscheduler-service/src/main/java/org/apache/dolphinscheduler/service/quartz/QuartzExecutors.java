@@ -62,7 +62,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.service.exceptions.QuartzExecutorsException;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -282,7 +282,7 @@ public class QuartzExecutors {
             }
 
         } catch (Exception e) {
-            throw new QuartzExecutorsException("add job failed", e);
+            throw new ServiceException("add job failed", e);
         } finally {
             lock.writeLock().unlock();
         }

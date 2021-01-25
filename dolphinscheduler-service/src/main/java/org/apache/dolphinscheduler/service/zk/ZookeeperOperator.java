@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.service.zk;
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.service.exceptions.ZKServerException;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -121,7 +121,7 @@ public class ZookeeperOperator implements InitializingBean {
         try {
             zkClient.blockUntilConnected();
         } catch (final Exception ex) {
-            throw new ZKServerException(ex);
+            throw new ServiceException(ex);
         }
         return zkClient;
     }
@@ -145,7 +145,7 @@ public class ZookeeperOperator implements InitializingBean {
             throw new IllegalStateException(ex);
         } catch (Exception ex) {
             logger.error("getChildrenKeys key : {}", key, ex);
-            throw new ZKServerException(ex);
+            throw new ServiceException(ex);
         }
     }
 

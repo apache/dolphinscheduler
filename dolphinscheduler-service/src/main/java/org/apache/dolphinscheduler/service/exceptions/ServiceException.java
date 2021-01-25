@@ -18,17 +18,26 @@
 package org.apache.dolphinscheduler.service.exceptions;
 
 /**
- * Custom QuartzExecutorsException exception
+ * Custom ZKServerException exception
  */
-public class QuartzExecutorsException extends RuntimeException {
+public class ServiceException extends RuntimeException {
 
     /**
-     * Construct a new runtime exception with the detail message
+     * Construct a new runtime exception with the error message
      *
-     * @param errMsg message
+     * @param errMsg Error message
      */
-    public QuartzExecutorsException(String errMsg) {
+    public ServiceException(String errMsg) {
         super(errMsg);
+    }
+
+    /**
+     * Construct a new runtime exception with the cause
+     *
+     * @param cause cause
+     */
+    public ServiceException(Throwable cause) {
+        super(cause);
     }
 
     /**
@@ -37,7 +46,7 @@ public class QuartzExecutorsException extends RuntimeException {
      * @param errMsg message
      * @param cause cause
      */
-    public QuartzExecutorsException(String errMsg, Throwable cause) {
+    public ServiceException(String errMsg, Throwable cause) {
         super(errMsg, cause);
     }
 }
