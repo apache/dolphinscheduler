@@ -62,6 +62,9 @@ public class ProtoStuffUtils {
     public static <T> T deserialize(byte[] bytes, Class<T> clazz) {
         Schema<T> schema = getSchema(clazz);
         T obj = schema.newMessage();
+        if(null==obj){
+            return null;
+        }
         ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
         return obj;
     }

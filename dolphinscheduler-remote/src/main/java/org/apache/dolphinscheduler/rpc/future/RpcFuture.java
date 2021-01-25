@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.rpc.future;
 
+import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 
 import java.util.concurrent.CountDownLatch;
@@ -33,6 +34,12 @@ public class RpcFuture implements Future<Object> {
     private CountDownLatch latch = new CountDownLatch(1);
 
     private RpcResponse response;
+
+    private RpcRequest request;
+
+    public RpcFuture(RpcRequest rpcRequest) {
+        this.request = rpcRequest;
+    }
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
@@ -51,13 +58,23 @@ public class RpcFuture implements Future<Object> {
 
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        latch.await(5, TimeUnit.SECONDS);
+        boolean success = latch.await(5, TimeUnit.SECONDS);
+        if (!success) {
+            throw new RuntimeException("Timeout exception. Request id: " + this.request.getRequestId()
+                    + ". Request class name: " + this.request.getClassName()
+                    + ". Request method: " + this.request.getMethodName());
+        }
         return response;
     }
 
     @Override
     public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        latch.await(timeout, unit);
+        boolean success = latch.await(timeout, unit);
+        if (!success) {
+            throw new RuntimeException("Timeout exception. Request id: " + this.request.getRequestId()
+                    + ". Request class name: " + this.request.getClassName()
+                    + ". Request method: " + this.request.getMethodName());
+        }
         return response;
     }
 
