@@ -162,8 +162,11 @@ poi-3.17.jar
 postgresql-42.1.4.jar
 presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
+protostuff-core-1.7.2.jar
+protostuff-runtime-1.7.2.jar
 quartz-2.3.0.jar
 quartz-jobs-2.3.0.jar
+reflections-0.9.11.jar
 slf4j-api-1.7.5.jar
 snakeyaml-1.23.jar
 snappy-0.2.jar
