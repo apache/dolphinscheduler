@@ -23,11 +23,11 @@
     <template slot="content">
       <div class="create-warning-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Alarm instance name')}}</template>
           <template slot="content">
             <el-input
                     type="input"
-                    v-model="groupName"
+                    v-model="instanceName"
                     maxlength="60"
                     size="small"
                     :placeholder="$t('Please enter group name')">
@@ -35,35 +35,36 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Alarm plugin instance')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Select plugin')}}</template>
           <template slot="content">
-            <el-select v-model="alertInstanceIds" size="small" style="width: 100%" multiple>
+            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" disabled="true" v-if="item.id">
               <el-option
-                      v-for="items in allAlertPluginInstance"
+                      v-for="items in pulginInstance"
                       :key="items.id"
                       :value="items.id"
-                      :label="items.instanceName">
+                      :label="items.pluginName">
+              </el-option>
+            </el-select>
+            <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" v-else>
+              <el-option
+                      v-for="items in pulginInstance"
+                      :key="items.id"
+                      :value="items.id"
+                      :label="items.pluginName">
               </el-option>
             </el-select>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name">{{$t('Remarks')}}</template>
-          <template slot="content">
-            <el-input
-                type="textarea"
-                v-model="description"
-                size="small"
-                :placeholder="$t('Please enter description')">
-            </el-input>
+        <div  class="alertForm">
+          <template>
+            <form-create v-model="$f" :rule="rule" :option="{submitBtn:false}" size="mini"></form-create>
           </template>
-        </m-list-box-f>
+        </div>
       </div>
     </template>
   </m-popover>
 </template>
 <script>
-  import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopover from '@/module/components/popup/popover'
@@ -74,28 +75,29 @@
     data () {
       return {
         store,
-        groupName: '',
-        alertInstanceIds: [],
-        description: ''
+        instanceName: '',
+        pluginDefineId: null,
+        $f: {},
+        rule: []
       }
     },
     props: {
       item: Object,
-      allAlertPluginInstance: Array
+      pulginInstance: Array
     },
     methods: {
       _ok () {
         if (this._verification()) {
           // The name is not verified
-          if (this.item && this.item.groupName === this.groupName) {
+          if (this.item && this.item.instanceName === this.instanceName) {
             this._submit()
             return
           }
 
           // Verify username
           this.store.dispatch('security/verifyName', {
-            type: 'alertgroup',
-            groupName: this.groupName
+            type: 'alarmInstance',
+            instanceName: this.instanceName
           }).then(res => {
             this._submit()
           }).catch(e => {
@@ -105,26 +107,45 @@
       },
       _verification () {
         // group name
-        if (!this.groupName.replace(/\s*/g, '')) {
+        if (!this.instanceName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
         return true
       },
+      // Select plugin
+      changePlugin () {
+        this.store.dispatch('security/getUiPluginById', {
+          pluginId: this.pluginDefineId
+        }).then(res => {
+          this.rule = JSON.parse(res.pluginParams)
+          this.rule.forEach(item => {
+            if (item.title.indexOf('$t') !== -1) {
+              item.title = $t(item.field)
+            }
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
       _submit () {
+        this.$f.rule.forEach(item => {
+          item.title = item.name
+        })
         let param = {
-          groupName: this.groupName,
-          alertInstanceIds: this.alertInstanceIds.join(','),
-          description: this.description
+          instanceName: this.instanceName,
+          pluginDefineId: this.pluginDefineId,
+          pluginInstanceParams: JSON.stringify(this.$f.rule)
         }
         if (this.item) {
-          param.id = this.item.id
+          param.alertPluginInstanceId = this.item.id
+          param.pluginDefineId = null
         }
         this.$refs.popover.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
+        this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          this.$refs.popover.spinnerLoading = false
         }).catch(e => {
           this.$message.error(e.msg || '')
           this.$refs.popover.spinnerLoading = false
@@ -136,13 +157,17 @@
     },
     watch: {},
     created () {
+      let pluginInstanceParams = []
       if (this.item) {
-        this.groupName = this.item.groupName
-        let dataStrArr = this.item.alertInstanceIds.split(',')
-        this.alertInstanceIds = _.map(dataStrArr, v => {
-          return +v
+        this.instanceName = this.item.instanceName
+        this.pluginDefineId = this.item.pluginDefineId
+        JSON.parse(this.item.pluginInstanceParams).forEach(item => {
+          if (item.title.indexOf('$t') !== -1) {
+            item.title = $t(item.field)
+          }
+          pluginInstanceParams.push(item)
         })
-        this.description = this.item.description
+        this.rule = pluginInstanceParams
       }
     },
     mounted () {
@@ -150,3 +175,23 @@
     components: { mPopover, mListBoxF }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss">
+  .alertForm {
+    label {
+      span {
+        font-weight: 10!important;
+      }
+    }
+    .el-row {
+      width: 520px;
+    }
+    .el-form-item__label {
+      width: 144px!important;
+      color: #606266!important;
+    }
+    .el-form-item__content {
+      margin-left: 144px!important;
+      width: calc(100% - 162px);
+    }
+  }
+</style>
