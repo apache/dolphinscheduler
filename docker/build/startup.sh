@@ -70,12 +70,6 @@ initZK() {
     done
 }
 
-# start nginx
-initNginx() {
-    echo "start nginx"
-    nginx &
-}
-
 # start master-server
 initMasterServer() {
     echo "start master-server"
@@ -115,13 +109,12 @@ initAlertServer() {
 printUsage() {
     echo -e "Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system,"
     echo -e "dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.\n"
-    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server | frontend ]\n"
-    printf "%-13s:  %s\n" "all"           "Run master-server, worker-server, api-server, alert-server and frontend."
+    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server ]\n"
+    printf "%-13s:  %s\n" "all"           "Run master-server, worker-server, api-server and alert-server"
     printf "%-13s:  %s\n" "master-server" "MasterServer is mainly responsible for DAG task split, task submission monitoring."
-    printf "%-13s:  %s\n" "worker-server" "WorkerServer is mainly responsible for task execution and providing log services.."
-    printf "%-13s:  %s\n" "api-server"    "ApiServer is mainly responsible for processing requests from the front-end UI layer."
+    printf "%-13s:  %s\n" "worker-server" "WorkerServer is mainly responsible for task execution and providing log services."
+    printf "%-13s:  %s\n" "api-server"    "ApiServer is mainly responsible for processing requests and providing the front-end UI layer."
     printf "%-13s:  %s\n" "alert-server"  "AlertServer mainly include Alarms."
-    printf "%-13s:  %s\n" "frontend"      "Frontend mainly provides various visual operation interfaces of the system."
 }
 
 # init config file
@@ -136,7 +129,6 @@ case "$1" in
         initApiServer
         initAlertServer
         initLoggerServer
-        initNginx
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler*
     ;;
     (master-server)
@@ -162,11 +154,6 @@ case "$1" in
         initDatabase
         initAlertServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert-server-$(hostname).out
-    ;;
-    (frontend)
-        initNginx
-        LOGFILE=/var/log/nginx/access.log
-        mkdir -p /var/log/nginx
     ;;
     (help)
         printUsage
