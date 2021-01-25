@@ -123,9 +123,7 @@
         this.store.dispatch(`user/${this.item ? 'updateToken' : 'createToken'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popover.spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
         }).catch(e => {
           this.$message.error(e.msg || '')
           this.$refs.popover.spinnerLoading = false
