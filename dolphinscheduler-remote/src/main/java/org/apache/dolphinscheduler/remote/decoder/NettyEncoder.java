@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-import org.apache.dolphinscheduler.remote.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.remote.serialize.ProtoStuffUtils;
 
 /**
