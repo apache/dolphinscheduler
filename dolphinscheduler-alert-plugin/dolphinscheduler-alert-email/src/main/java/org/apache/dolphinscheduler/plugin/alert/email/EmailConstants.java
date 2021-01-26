@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 public class EmailConstants {
 
+    private EmailConstants() {
+        throw new IllegalStateException(EmailConstants.class.getName());
+    }
+
 
     public static final String XLS_FILE_PATH = "xls.file.path";
 

@@ -14,11 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import merge from 'webpack-merge'
-import router from '@/conf/home/router'
 
-export function setUrlParams (o) {
-  router.push({
-    query: merge(router.history.current.query, o)
-  })
+package org.apache.dolphinscheduler.plugin.alert.email.exception;
+
+public class AlertEmailException extends RuntimeException {
+
+    /**
+     * Create Runtime exception
+     *
+     * @param errMsg - Error message
+     */
+    public AlertEmailException(String errMsg) {
+        super(errMsg);
+    }
+
+    /**
+     * Create Runtime exception
+     *
+     * @param errMsg - Error message
+     * @param cause - cause
+     */
+    public AlertEmailException(String errMsg, Throwable cause) {
+        super(errMsg, cause);
+    }
 }
