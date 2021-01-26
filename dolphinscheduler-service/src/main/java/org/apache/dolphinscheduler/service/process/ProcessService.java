@@ -2030,17 +2030,15 @@ public class ProcessService {
                 String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
                 String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
                 String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
-                if (newSuccessNodeName != null || newFailedNodeName != null) {
-                    if (newSuccessNodeName == null) {
-                        newSuccessNodeName = "";
-                    }
-                    if (newFailedNodeName == null) {
-                        newFailedNodeName = "";
-                    }
-                    String conditionResultStr = "{\"successNode\": [\"" + newSuccessNodeName + "\"],\"failedNode\": [\"" + newFailedNodeName + "\"]}";
-                    taskNode.setConditionResult(conditionResultStr);
-                    tasks.set(i, taskNode);
-                }
+                ArrayList<String> successNode = new ArrayList<>();
+                successNode.add("\"" + newSuccessNodeName + "\"");
+                ArrayList<String> failedNode = new ArrayList<>();
+                failedNode.add("\"" + newFailedNodeName + "\"");
+                conditionsParameters.setSuccessNode(successNode);
+                conditionsParameters.setFailedNode(failedNode);
+                String conditionResultStr = conditionsParameters.toJsonString();
+                taskNode.setConditionResult(conditionResultStr);
+                tasks.set(i, taskNode);
             }
         }
         return JSONUtils.toJsonString(processData);
