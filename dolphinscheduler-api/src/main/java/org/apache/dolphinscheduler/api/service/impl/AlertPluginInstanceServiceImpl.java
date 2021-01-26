@@ -131,6 +131,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
         boolean hasAssociatedAlertGroup = checkHasAssociatedAlertGroup(String.valueOf(id));
         if (hasAssociatedAlertGroup) {
             putMsg(result, Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
+            return result;
         }
 
         int i = alertPluginInstanceMapper.deleteById(id);
