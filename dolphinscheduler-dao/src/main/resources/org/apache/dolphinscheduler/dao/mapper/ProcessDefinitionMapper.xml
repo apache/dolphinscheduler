@@ -19,11 +19,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper">
     <sql id="baseSql">
-        id
-        , name, version, release_state, project_id, user_id, process_definition_json, description,
+        id, code, name, version, release_state, project_id, project_code, user_id, process_definition_json, description,
         global_params, flag, locations, connects, warning_group_id, create_time, timeout,
         tenant_id, update_time, modify_by, resource_ids
     </sql>
+
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
         pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
@@ -32,6 +32,19 @@
         WHERE pd.project_id = #{projectId}
         and pd.name = #{processDefinitionName}
     </select>
+
+    <delete id="deleteByCode">
+        delete from t_ds_process_definition
+        where code = #{code}
+    </delete>
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition
+        where code = #{code}
+    </select>
+
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
         pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
