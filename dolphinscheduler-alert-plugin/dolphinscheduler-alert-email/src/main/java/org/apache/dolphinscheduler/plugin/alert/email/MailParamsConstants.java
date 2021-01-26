@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.plugin.alert.email;
  */
 public class MailParamsConstants {
 
-    public MailParamsConstants() {
+    private MailParamsConstants() {
         throw new IllegalStateException("Utility class");
     }
 
