@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.rpc.common;
  */
 public class ConsumerConfigConstants {
 
+    private ConsumerConfigConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final Boolean DEFAULT_SYNC = false;
 
     public static final Integer DEFAULT_RETRIES = 3;

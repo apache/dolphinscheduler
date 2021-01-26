@@ -24,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RpcRequestTable {
 
+    private RpcRequestTable() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static ConcurrentHashMap<String, RpcRequestCache> requestMap = new ConcurrentHashMap<>();
 
     public static void put(String requestId, RpcRequestCache rpcRequestCache) {
