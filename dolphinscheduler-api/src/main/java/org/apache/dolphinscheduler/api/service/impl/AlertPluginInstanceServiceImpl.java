@@ -223,7 +223,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
         if (CollectionUtils.isEmpty(idsList)) {
             return false;
         }
-        Optional<String> first = idsList.stream().filter(k -> Arrays.asList(k.split(",")).contains(id)).findFirst();
+        Optional<String> first = idsList.stream().filter(k -> null != k && Arrays.asList(k.split(",")).contains(id)).findFirst();
         return first.isPresent();
     }
 
