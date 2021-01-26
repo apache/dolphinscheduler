@@ -85,13 +85,13 @@ public class AlertPluginInstanceServiceTest {
     }
 
     @Test
-   public void testDelete() {
-        List<String> ids = Arrays.asList("11,2,3",null,"98,1");
+    public void testDelete() {
+        List<String> ids = Arrays.asList("11,2,3", null, "98,1");
         Mockito.when(alertGroupMapper.queryInstanceIdsList()).thenReturn(ids);
-        Map<String, Object> result= alertPluginInstanceService.delete(user, 1);
+        Map<String, Object> result = alertPluginInstanceService.delete(user, 1);
         Assert.assertEquals(result.get(Constants.STATUS), Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
         Mockito.when(alertPluginInstanceMapper.deleteById(9)).thenReturn(1);
-        result= alertPluginInstanceService.delete(user, 9);
+        result = alertPluginInstanceService.delete(user, 9);
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
 
     }
