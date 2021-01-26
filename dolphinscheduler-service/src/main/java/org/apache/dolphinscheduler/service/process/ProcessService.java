@@ -1999,7 +1999,7 @@ public class ProcessService {
      * @param oldProcessData
      * @return String
      */
-    public String changeJson(ProcessData processData,ProcessData oldProcessData) {
+    public String changeJson(ProcessData processData, ProcessData oldProcessData) {
         HashMap<String, String> oldNameTaskId = new HashMap<>();
         List<TaskNode> oldTasks = oldProcessData.getTasks();
         for (int i = 0; i < oldTasks.size(); i++) {
@@ -2028,17 +2028,19 @@ public class ProcessService {
                 ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
                 String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
                 String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
-                String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
-                String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
-                ArrayList<String> successNode = new ArrayList<>();
-                successNode.add("\"" + newSuccessNodeName + "\"");
-                ArrayList<String> failedNode = new ArrayList<>();
-                failedNode.add("\"" + newFailedNodeName + "\"");
-                conditionsParameters.setSuccessNode(successNode);
-                conditionsParameters.setFailedNode(failedNode);
-                String conditionResultStr = conditionsParameters.toJsonString();
-                taskNode.setConditionResult(conditionResultStr);
-                tasks.set(i, taskNode);
+                String newSuccessNodeName = newNameTaskId.getOrDefault(oldNameTaskId.get(oldSuccessNodeName), "");
+                String newFailedNodeName = newNameTaskId.getOrDefault(oldNameTaskId.get(oldFailedNodeName), "");
+                if (!"".equals(newSuccessNodeName) || !"".equals(newFailedNodeName)) {
+                    ArrayList<String> successNode = new ArrayList<>();
+                    successNode.add("\"" + newSuccessNodeName + "\"");
+                    ArrayList<String> failedNode = new ArrayList<>();
+                    failedNode.add("\"" + newFailedNodeName + "\"");
+                    conditionsParameters.setSuccessNode(successNode);
+                    conditionsParameters.setFailedNode(failedNode);
+                    String conditionResultStr = conditionsParameters.toJsonString();
+                    taskNode.setConditionResult(conditionResultStr);
+                    tasks.set(i, taskNode);
+                }
             }
         }
         return JSONUtils.toJsonString(processData);
