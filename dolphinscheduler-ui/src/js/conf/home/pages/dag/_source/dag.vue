@@ -70,32 +70,38 @@
                :id="item.code"
                :key="$index"
                @click="_ckOperation(item,$event)">
-              <el-button type="text" class="operBtn" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></el-button>
+              <el-tooltip :content="item.desc" placement="top" :enterable="false">
+                <span><el-button type="text" class="operBtn" data-container="body" :icon="item.icon"></el-button></span>
+              </el-tooltip>
             </a>
           </div>
-          <el-button
-            type="primary"
-            v-tooltip.light="$t('Format DAG')"
-            icon="el-icon-caret-right"
-            size="mini"
-            data-container="body"
-            v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
-            style="vertical-align: middle;"
-            @click="dagAutomaticLayout">
-          </el-button>
-          <span>
-            <el-button
-              v-tooltip.light="$t('Refresh DAG status')"
-              data-container="body"
-              style="vertical-align: middle;"
-              icon="el-icon-refresh"
-              type="primary"
-              :loading="isRefresh"
-              v-if="type === 'instance'"
-              @click="!isRefresh && _refresh()"
-              size="mini" >
-            </el-button>
-          </span>
+          <el-tooltip :content="$t('Format DAG')" placement="top" :enterable="false">
+            <span>
+              <el-button
+                type="primary"
+                icon="el-icon-caret-right"
+                size="mini"
+                data-container="body"
+                v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
+                style="vertical-align: middle;"
+                @click="dagAutomaticLayout">
+              </el-button>
+            </span>
+          </el-tooltip>
+          <el-tooltip :content="$t('Refresh DAG status')" placement="top" :enterable="false">
+            <span>
+              <el-button
+                data-container="body"
+                style="vertical-align: middle;"
+                icon="el-icon-refresh"
+                type="primary"
+                :loading="isRefresh"
+                v-if="type === 'instance'"
+                @click="!isRefresh && _refresh()"
+                size="mini" >
+              </el-button>
+            </span>
+          </el-tooltip>
           <el-button
                   v-if="isRtTasks"
                   style="vertical-align: middle;"
@@ -108,7 +114,6 @@
           <span>
             <el-button
               type="primary"
-              v-tooltip.light="$t('Close')"
               icon="el-icon-switch-button"
               size="mini"
               data-container="body"
