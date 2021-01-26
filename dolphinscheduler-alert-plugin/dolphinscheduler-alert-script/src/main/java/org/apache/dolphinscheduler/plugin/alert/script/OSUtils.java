@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.plugin.alert.script;
  */
 public class OSUtils {
 
-    public OSUtils() {
+    private OSUtils() {
         throw new UnsupportedOperationException("Construct OSUtils");
     }
 

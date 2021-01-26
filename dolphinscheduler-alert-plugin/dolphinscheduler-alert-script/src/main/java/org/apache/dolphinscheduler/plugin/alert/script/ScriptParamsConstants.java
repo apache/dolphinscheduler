@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.plugin.alert.script;
  */
 public class ScriptParamsConstants {
 
-    public ScriptParamsConstants() {
+    private ScriptParamsConstants() {
         throw new IllegalStateException("Utility class");
     }
 
