@@ -24,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConsumerConfigCache {
 
+    private ConsumerConfigCache() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static ConcurrentHashMap<String, ConsumerConfig> consumerMap = new ConcurrentHashMap<>();
 
     public static ConsumerConfig getConfigByServersName(String serviceName) {

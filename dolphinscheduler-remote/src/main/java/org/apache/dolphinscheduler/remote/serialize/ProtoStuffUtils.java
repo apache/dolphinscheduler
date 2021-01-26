@@ -30,6 +30,10 @@ import io.protostuff.runtime.RuntimeSchema;
  */
 public class ProtoStuffUtils {
 
+    private ProtoStuffUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 
     private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.rpc.remote;
 
+import org.apache.dolphinscheduler.rpc.common.RequestEventType;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.common.ThreadPoolManager;
@@ -38,12 +39,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private final ThreadPoolManager threadPoolManager = ThreadPoolManager.INSTANCE;
-
-    @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        super.channelRegistered(ctx);
-    }
+    private static final ThreadPoolManager threadPoolManager = ThreadPoolManager.INSTANCE;
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
@@ -61,7 +57,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
         RpcRequest req = (RpcRequest) msg;
 
-        if (req.getEventType() == 0) {
+        if (req.getEventType().equals(RequestEventType.HEARTBEAT.getType())) {
 
             logger.info("accept heartbeat msg");
             return;
@@ -111,7 +107,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        System.out.println("exceptionCaught");
         logger.error("exceptionCaught : {}", cause.getMessage(), cause);
         ctx.channel().close();
     }

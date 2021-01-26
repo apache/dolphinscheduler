@@ -36,9 +36,13 @@ public class ServiceBean {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceBean.class);
 
-    private static Map<String, Object> serviceMap = new HashMap<>();
+    private static Map<String, Class> serviceMap = new HashMap<>();
 
     private static AtomicBoolean initialized = new AtomicBoolean(false);
+
+    private ServiceBean() {
+        throw new IllegalStateException("Utility class");
+    }
 
     private static synchronized void init() {
         // todo config
@@ -47,16 +51,17 @@ public class ServiceBean {
         list.forEach(rpcClass -> {
             RpcService rpcService = rpcClass.getAnnotation(RpcService.class);
             serviceMap.put(rpcService.value(), rpcClass);
+            logger.info("load rpc service {}", rpcService.value());
         });
     }
 
     public static Class getServiceClass(String className) {
         if (initialized.get()) {
-            return (Class) serviceMap.get(className);
+            return serviceMap.get(className);
         } else {
             init();
         }
-        return (Class) serviceMap.get(className);
+        return serviceMap.get(className);
     }
 
 }

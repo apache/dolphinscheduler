@@ -199,7 +199,7 @@ public class NettyClient {
         String serviceName = request.getClassName() + request.getMethodName();
         rpcRequestCache.setServiceName(serviceName);
         RpcFuture future = null;
-        if (!async) {
+        if (Boolean.FALSE.equals(async)) {
             future = new RpcFuture(request);
             rpcRequestCache.setRpcFuture(future);
         }
@@ -207,13 +207,14 @@ public class NettyClient {
         channel.writeAndFlush(request);
 
         RpcResponse result = null;
-        if (async) {
+        if (Boolean.TRUE.equals(async)) {
             result = new RpcResponse();
             result.setStatus((byte) 0);
             result.setResult(true);
             return result;
         }
         try {
+            assert future != null;
             result = future.get();
         } catch (InterruptedException | ExecutionException e) {
             logger.error("send msg error，service name is {}", serviceName, e);
