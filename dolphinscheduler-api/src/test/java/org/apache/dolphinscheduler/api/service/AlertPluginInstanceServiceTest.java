@@ -78,7 +78,7 @@ public class AlertPluginInstanceServiceTest {
     public void testCreate() {
         Mockito.when(alertPluginInstanceMapper.queryByInstanceName("test")).thenReturn(alertPluginInstances);
         Map<String, Object> result = alertPluginInstanceService.create(user, 1, "test", "test params");
-        Assert.assertEquals(result.get(Constants.STATUS), Status.PLUGIN_INSTANCE_ALREADY_EXIT);
+        Assert.assertEquals(Status.PLUGIN_INSTANCE_ALREADY_EXIT, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
         result = alertPluginInstanceService.create(user, 1, "test1", "test params");
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
@@ -89,10 +89,10 @@ public class AlertPluginInstanceServiceTest {
         List<String> ids = Arrays.asList("11,2,3", null, "98,1");
         Mockito.when(alertGroupMapper.queryInstanceIdsList()).thenReturn(ids);
         Map<String, Object> result = alertPluginInstanceService.delete(user, 1);
-        Assert.assertEquals(result.get(Constants.STATUS), Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
+        Assert.assertEquals(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.deleteById(9)).thenReturn(1);
         result = alertPluginInstanceService.delete(user, 9);
-        Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
     }
 
