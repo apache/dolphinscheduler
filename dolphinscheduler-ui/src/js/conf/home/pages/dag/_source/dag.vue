@@ -34,30 +34,30 @@
     <div class="dag-contect">
       <div class="dag-toolbar">
         <div class="assist-btn">
-          <el-button
-            style="vertical-align: middle;"
-            data-toggle="tooltip"
-            :title="$t('View variables')"
-            data-container="body"
-            type="primary"
-            size="mini"
-            :disabled="$route.name !== 'projects-instance-details'"
-            @click="_toggleView"
-            icon="el-icon-c-scale-to-original">
-          </el-button>
-          <span>
+          <el-tooltip :content="$t('View variables')" placement="top" :enterable="false">
+           <span>
             <el-button
               style="vertical-align: middle;"
-              data-toggle="tooltip"
-              :title="$t('Startup parameter')"
-              data-container="body"
               type="primary"
               size="mini"
               :disabled="$route.name !== 'projects-instance-details'"
-              @click="_toggleParam"
-              icon="el-icon-arrow-right">
+              @click="_toggleView"
+              icon="el-icon-c-scale-to-original">
             </el-button>
-          </span>
+           </span>
+          </el-tooltip>
+          <el-tooltip :content="$t('Startup parameter')" placement="top" :enterable="false">
+            <span>
+              <el-button
+                style="vertical-align: middle;"
+                type="primary"
+                size="mini"
+                :disabled="$route.name !== 'projects-instance-details'"
+                @click="_toggleParam"
+                icon="el-icon-arrow-right">
+              </el-button>
+            </span>
+          </el-tooltip>
           <span class="name">{{name}}</span>
           &nbsp;
           <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
@@ -71,7 +71,7 @@
                :key="$index"
                @click="_ckOperation(item,$event)">
               <el-tooltip :content="item.desc" placement="top" :enterable="false">
-                <span><el-button type="text" class="operBtn" data-container="body" :icon="item.icon"></el-button></span>
+                <span><el-button type="text" class="operBtn" :icon="item.icon"></el-button></span>
               </el-tooltip>
             </a>
           </div>
@@ -81,7 +81,6 @@
                 type="primary"
                 icon="el-icon-caret-right"
                 size="mini"
-                data-container="body"
                 v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
                 style="vertical-align: middle;"
                 @click="dagAutomaticLayout">
@@ -91,7 +90,6 @@
           <el-tooltip :content="$t('Refresh DAG status')" placement="top" :enterable="false">
             <span>
               <el-button
-                data-container="body"
                 style="vertical-align: middle;"
                 icon="el-icon-refresh"
                 type="primary"
@@ -116,7 +114,6 @@
               type="primary"
               icon="el-icon-switch-button"
               size="mini"
-              data-container="body"
               v-if="(type === 'instance' || 'definition') "
               style="vertical-align: middle;"
               @click="_closeDAG">
