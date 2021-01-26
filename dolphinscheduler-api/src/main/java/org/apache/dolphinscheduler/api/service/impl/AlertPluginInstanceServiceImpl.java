@@ -27,13 +27,16 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +58,9 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
 
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
+
+    @Autowired
+    private AlertGroupMapper alertGroupMapper;
 
     /**
      * creat alert plugin instance
@@ -121,6 +127,12 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     @Override
     public Map<String, Object> delete(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
+        //check if there is an associated alert group
+        boolean hasAssociatedAlertGroup = checkHasAssociatedAlertGroup(String.valueOf(id));
+        if (hasAssociatedAlertGroup) {
+            putMsg(result, Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
+        }
+
         int i = alertPluginInstanceMapper.deleteById(id);
         if (i > 0) {
             putMsg(result, Status.SUCCESS);
@@ -205,4 +217,14 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
         return alertPluginInstanceVOS;
 
     }
+
+    private boolean checkHasAssociatedAlertGroup(String id) {
+        List<String> idsList = alertGroupMapper.queryInstanceIdsList();
+        if (CollectionUtils.isEmpty(idsList)) {
+            return false;
+        }
+        Optional<String> first = idsList.stream().filter(k -> Arrays.asList(k.split(",")).contains(id)).findFirst();
+        return first.isPresent();
+    }
+
 }
