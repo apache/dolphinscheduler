@@ -29,13 +29,12 @@ public enum ThreadPoolManager {
 
     ExecutorService executorService;
 
+    private static final int WORK_QUEUE_SIZE = 200;
+    private static final long KEEP_ALIVE_TIME = 60;
+
     ThreadPoolManager() {
-        int SIZE_WORK_QUEUE = 200;
-        long KEEP_ALIVE_TIME = 60;
-        int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-        int MAXI_MUM_POOL_SIZE = CORE_POOL_SIZE * 4;
-        executorService = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXI_MUM_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(SIZE_WORK_QUEUE),
+        executorService = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, Runtime.getRuntime().availableProcessors() * 4, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(WORK_QUEUE_SIZE),
                 new DiscardPolicy());
     }
 

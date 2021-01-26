@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.rpc.client.ConsumerConfig;
 import org.apache.dolphinscheduler.rpc.client.ConsumerConfigCache;
 import org.apache.dolphinscheduler.rpc.client.RpcRequestCache;
 import org.apache.dolphinscheduler.rpc.client.RpcRequestTable;
+import org.apache.dolphinscheduler.rpc.common.RequestEventType;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.common.ThreadPoolManager;
 import org.apache.dolphinscheduler.rpc.future.RpcFuture;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.InetSocketAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.concurrent.FastThreadLocalThread;
 
 /**
  * NettyClientHandler
@@ -47,11 +46,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
-    private final ThreadPoolManager threadPoolManager = ThreadPoolManager.INSTANCE;
+    private static final ThreadPoolManager threadPoolManager = ThreadPoolManager.INSTANCE;
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
         ctx.channel().close();
     }
 
@@ -70,7 +68,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     private void readHandler(RpcResponse rsp, RpcRequestCache rpcRequest) {
         String serviceName = rpcRequest.getServiceName();
         ConsumerConfig consumerConfig = ConsumerConfigCache.getConfigByServersName(serviceName);
-        if (!consumerConfig.getAsync()) {
+        if (Boolean.FALSE.equals(consumerConfig.getAsync())) {
             RpcFuture future = rpcRequest.getRpcFuture();
             RpcRequestTable.remove(rsp.getRequestId());
             future.done(rsp);
@@ -78,31 +76,26 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
         }
         //async
-        new FastThreadLocalThread(() -> {
-            try {
-                if (rsp.getStatus() == 0) {
-                    try {
-                        consumerConfig.getServiceCallBackClass().getDeclaredConstructor().newInstance().run(rsp.getResult());
-                    } catch (InvocationTargetException | NoSuchMethodException e) {
-                        logger.error("rpc call back error, serviceName {} ", serviceName, e);
-                    }
 
-                } else {
-                    logger.error("rpc response error ,serviceName {}", serviceName);
-                }
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.error("execute async error,serviceName {}", serviceName, e);
+        if (rsp.getStatus() == 0) {
+
+            try {
+                consumerConfig.getServiceCallBackClass().getDeclaredConstructor().newInstance().run(rsp.getResult());
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                logger.error("rpc service call back error,serviceName {},rsp {}", serviceName, rsp);
             }
-        }).start();
+        } else {
+            logger.error("rpc response error ,serviceName {},rsp {}", serviceName, rsp);
+        }
+
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 
         if (evt instanceof IdleStateEvent) {
-            IdleStateEvent event = (IdleStateEvent) evt;
             RpcRequest request = new RpcRequest();
-            request.setEventType((byte) 0);
+            request.setEventType(RequestEventType.HEARTBEAT.getType());
             ctx.channel().writeAndFlush(request);
             logger.debug("send heart beat msg...");
 

@@ -75,10 +75,7 @@ public class ConsumerInterceptor {
         request.setClassName(method.getDeclaringClass().getSimpleName());
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
-
         request.setParameters(args);
-
-        String serviceName = method.getDeclaringClass().getName();
 
         return request;
     }
