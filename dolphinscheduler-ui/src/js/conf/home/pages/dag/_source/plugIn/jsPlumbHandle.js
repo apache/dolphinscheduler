@@ -627,7 +627,7 @@ JSP.prototype.saveStore = function () {
         tasks.push(tasksParam)
       }
     })
-    console.log(store.state.dag.connects.length, this.JspInstance.getConnections().length)
+    
     if (store.state.dag.connects.length === this.JspInstance.getConnections().length) {
       _.map(store.state.dag.connects, u => {
         connects.push({
