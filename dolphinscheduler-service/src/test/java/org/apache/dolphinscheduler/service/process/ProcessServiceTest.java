@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
@@ -320,6 +321,75 @@ public class ProcessServiceTest {
         Mockito.when(processDefineMapper.selectById(parentId)).thenReturn(processDefinition);
         Mockito.when(processDefineMapper.selectById(222)).thenReturn(processDefinition2);
         processService.recurseFindSubProcessId(parentId, ids);
+
+    }
+
+    @Test
+    public void testChangeJson() {
+        String oldJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-82223\",\"name\""
+            + ":\"testa\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testa\"},\"description\""
+            + ":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\""
+            + ":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\""
+            + ":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\""
+            + ":\"default\",\"preTasks\":[]},{\"type\":\"SHELL\",\"id\":\"tasks-88338\",\"name\":\"testb\",\"params\":{\"resourceList\":[],\"localParams\""
+            + ":[],\"rawScript\":\"testb\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\""
+            + ":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\""
+            + ":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\""
+            + ":[\"branch\"]},{\"type\":\"SHELL\",\"id\":\"tasks-91388\",\"name\":\"testc\",\"params\":{\"resourceList\":[],\"localParams\""
+            + ":[],\"rawScript\":\"testc\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\""
+            + ":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\""
+            + ":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\""
+            + ":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[\"branch\"]},{\"type\":\"CONDITIONS\",\"id\":\"tasks-77673\",\"name\""
+            + ":\"branch\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\""
+            + ":[\"testb\"],\"failedNode\":[\"testc\"]},\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"maxRetryTimes\""
+            + ":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\""
+            + ":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\""
+            + ":[\"testa\"]}],\"tenantId\":0,\"timeout\":0}";
+
+        String newJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-82223\",\"name\""
+            + ":\"testa\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testa\"},\"description\":\"\",\"runFlag\""
+            + ":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\""
+            + ":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\""
+            + ":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\""
+            + ":[]},{\"type\":\"SHELL\",\"id\":\"tasks-88338\",\"name\":\"testbchange\",\"params\":{\"resourceList\":[],\"localParams\""
+            + ":[],\"rawScript\":\"testb\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\""
+            + ":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\""
+            + ":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\""
+            + ":\"default\",\"preTasks\":[\"branch\"]},{\"type\":\"SHELL\",\"id\":\"tasks-91388\",\"name\":\"testc\",\"params\""
+            + ":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testc\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\""
+            + ":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\""
+            + ":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\""
+            + ":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[\"branch\"]},{\"type\":\"CONDITIONS\",\"id\":\"tasks-77673\",\"name\""
+            + ":\"branch\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"testb\"],\"failedNode\""
+            + ":[\"testc\"]},\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"maxRetryTimes\":\"0\",\"retryInterval\""
+            + ":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\""
+            + ":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[\"testa\"]}],\"tenantId\":0,\"timeout\":0}";
+
+        String expected = "{\"tasks\":[{\"id\":\"tasks-82223\",\"name\":\"testa\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\""
+            + ":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":1,\"params\":{\"resourceList\":[],\"localParams\""
+            + ":[],\"rawScript\":\"testa\"},\"preTasks\":[],\"extras\":null,\"depList\":[],\"dependence\":{},\"conditionResult\""
+            + ":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\""
+            + ":\"default\",\"workerGroupId\":null,\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\""
+            + ":0},{\"id\":\"tasks-88338\",\"name\":\"testbchange\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\""
+            + ":null,\"maxRetryTimes\":0,\"retryInterval\":1,\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\""
+            + ":\"testb\"},\"preTasks\":[\"branch\"],\"extras\":null,\"depList\":[\"branch\"],\"dependence\":{},\"conditionResult\""
+            + ":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\""
+            + ":null,\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0},{\"id\":\"tasks-91388\",\"name\""
+            + ":\"testc\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\""
+            + ":1,\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testc\"},\"preTasks\":[\"branch\"],\"extras\""
+            + ":null,\"depList\":[\"branch\"],\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\""
+            + ":[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\""
+            + ":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0},{\"id\":\"tasks-77673\",\"name\""
+            + ":\"branch\",\"desc\":null,\"type\":\"CONDITIONS\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\""
+            + ":1,\"params\":{},\"preTasks\":[\"testa\"],\"extras\":null,\"depList\":[\"testa\"],\"dependence\":{\"relation\""
+            + ":\"AND\",\"dependTaskList\":[]},\"conditionResult\":{\"successNode\": [\"testbchange\"],\"failedNode\""
+            + ": [\"testc\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\""
+            + ":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0}],\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
+
+        ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
+        ProcessData processData = JSONUtils.parseObject(newJson, ProcessData.class);
+
+        Assert.assertEquals(expected, processService.changeJson(processData, oldProcessData));
 
     }
 }
