@@ -30,7 +30,7 @@ public class RpcRequest {
     /**
      * @see RequestEventType
      */
-    private Byte eventType = 1;
+    private Byte eventType = RequestEventType.BUSINESS.getType();
 
     private Boolean ack;
 
