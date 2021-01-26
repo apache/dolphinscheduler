@@ -627,6 +627,7 @@ JSP.prototype.saveStore = function () {
         tasks.push(tasksParam)
       }
     })
+
     if (store.state.dag.connects.length === this.JspInstance.getConnections().length) {
       _.map(store.state.dag.connects, u => {
         connects.push({
@@ -651,6 +652,14 @@ JSP.prototype.saveStore = function () {
         })
       })
     } else if (store.state.dag.connects.length === 0) {
+      _.map(this.JspInstance.getConnections(), v => {
+        connects.push({
+          endPointSourceId: v.sourceId,
+          endPointTargetId: v.targetId,
+          label: v._jsPlumb.overlays.label.canvas.innerText
+        })
+      })
+    } else if (store.state.dag.connects.length > this.JspInstance.getConnections().length) {
       _.map(this.JspInstance.getConnections(), v => {
         connects.push({
           endPointSourceId: v.sourceId,
