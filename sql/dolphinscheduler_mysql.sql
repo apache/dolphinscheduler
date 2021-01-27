@@ -400,7 +400,6 @@ CREATE TABLE `t_ds_process_definition` (
   `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
   `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
   `global_params` text COMMENT 'global parameters',
-  `locations` text COMMENT 'node location information',
   `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
   `locations` text COMMENT 'Node location information',
   `connects` text COMMENT 'Node connection information',
@@ -420,6 +419,7 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 -- Table structure for t_ds_process_definition_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_log`;
 CREATE TABLE `t_ds_process_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
@@ -446,6 +446,7 @@ CREATE TABLE `t_ds_process_definition_log` (
 -- ----------------------------
 -- Table structure for t_ds_task_definition
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition`;
 CREATE TABLE `t_ds_task_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
@@ -474,6 +475,7 @@ CREATE TABLE `t_ds_task_definition` (
 -- ----------------------------
 -- Table structure for t_ds_task_definition_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition_log`;
 CREATE TABLE `t_ds_task_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
@@ -503,6 +505,7 @@ CREATE TABLE `t_ds_task_definition_log` (
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation`;
 CREATE TABLE `t_ds_process_task_relation` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
@@ -523,6 +526,7 @@ CREATE TABLE `t_ds_process_task_relation` (
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation_log
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
 CREATE TABLE `t_ds_process_task_relation_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
@@ -837,7 +841,7 @@ CREATE TABLE `t_ds_task_instance` (
   `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
-  KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,
+  KEY `task_instance_index` (`process_definition_code`,`process_instance_id`) USING BTREE,
   CONSTRAINT `foreign_key_instance_id` FOREIGN KEY (`process_instance_id`) REFERENCES `t_ds_process_instance` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
