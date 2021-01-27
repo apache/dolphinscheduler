@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -326,68 +328,104 @@ public class ProcessServiceTest {
 
     @Test
     public void testChangeJson() {
-        String oldJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-82223\",\"name\""
-            + ":\"testa\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testa\"},\"description\""
-            + ":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\""
-            + ":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\""
-            + ":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\""
-            + ":\"default\",\"preTasks\":[]},{\"type\":\"SHELL\",\"id\":\"tasks-88338\",\"name\":\"testb\",\"params\":{\"resourceList\":[],\"localParams\""
-            + ":[],\"rawScript\":\"testb\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\""
-            + ":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\""
-            + ":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\""
-            + ":[\"branch\"]},{\"type\":\"SHELL\",\"id\":\"tasks-91388\",\"name\":\"testc\",\"params\":{\"resourceList\":[],\"localParams\""
-            + ":[],\"rawScript\":\"testc\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\""
-            + ":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\""
-            + ":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\""
-            + ":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[\"branch\"]},{\"type\":\"CONDITIONS\",\"id\":\"tasks-77673\",\"name\""
-            + ":\"branch\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\""
-            + ":[\"testb\"],\"failedNode\":[\"testc\"]},\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"maxRetryTimes\""
-            + ":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\""
-            + ":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\""
-            + ":[\"testa\"]}],\"tenantId\":0,\"timeout\":0}";
 
-        String newJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-82223\",\"name\""
-            + ":\"testa\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testa\"},\"description\":\"\",\"runFlag\""
-            + ":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\""
-            + ":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\""
-            + ":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\""
-            + ":[]},{\"type\":\"SHELL\",\"id\":\"tasks-88338\",\"name\":\"testbchange\",\"params\":{\"resourceList\":[],\"localParams\""
-            + ":[],\"rawScript\":\"testb\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\""
-            + ":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\""
-            + ":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\""
-            + ":\"default\",\"preTasks\":[\"branch\"]},{\"type\":\"SHELL\",\"id\":\"tasks-91388\",\"name\":\"testc\",\"params\""
-            + ":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testc\"},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\""
-            + ":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"delayTime\""
-            + ":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\":{},\"taskInstancePriority\""
-            + ":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[\"branch\"]},{\"type\":\"CONDITIONS\",\"id\":\"tasks-77673\",\"name\""
-            + ":\"branch\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\",\"conditionResult\":{\"successNode\":[\"testb\"],\"failedNode\""
-            + ":[\"testc\"]},\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"maxRetryTimes\":\"0\",\"retryInterval\""
-            + ":\"1\",\"delayTime\":\"0\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"waitStartTimeout\""
-            + ":{},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[\"testa\"]}],\"tenantId\":0,\"timeout\":0}";
+        ProcessData oldProcessData = new ProcessData();
+        ConditionsParameters conditionsParameters = new ConditionsParameters();
+        ArrayList<TaskNode> tasks = new ArrayList<>();
+        TaskNode taskNode = new TaskNode();
+        TaskNode taskNode11 = new TaskNode();
+        TaskNode taskNode111 = new TaskNode();
+        ArrayList<String> successNode = new ArrayList<>();
+        ArrayList<String> faildNode = new ArrayList<>();
 
-        String expected = "{\"tasks\":[{\"id\":\"tasks-82223\",\"name\":\"testa\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\":"
-            + "null,\"maxRetryTimes\":0,\"retryInterval\":1,\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":"
-            + "\"testa\"},\"preTasks\":[],\"extras\":null,\"depList\":[],\"dependence\":{},\"conditionResult\":{\"successNode\":"
-            + "[\"\"],\"failedNode\":[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":"
-            + "null,\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0},{\"id\":\"tasks-88338\",\"name\":"
-            + "\"testbchange\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":"
-            + "1,\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testb\"},\"preTasks\":[\"branch\"],\"extras\":"
-            + "null,\"depList\":[\"branch\"],\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":"
-            + "[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\":"
-            + "{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0},{\"id\":\"tasks-91388\",\"name\":"
-            + "\"testc\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":"
-            + "1,\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"testc\"},\"preTasks\":[\"branch\"],\"extras\":"
-            + "null,\"depList\":[\"branch\"],\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"taskInstancePriority\":"
-            + "\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":"
-            + "0},{\"id\":\"tasks-77673\",\"name\":\"branch\",\"desc\":null,\"type\":\"CONDITIONS\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":"
-            + "0,\"retryInterval\":1,\"params\":{},\"preTasks\":[\"testa\"],\"extras\":null,\"depList\":[\"testa\"],\"dependence\":"
-            + "{\"relation\":\"AND\",\"dependTaskList\":[]},\"conditionResult\":{\"successNode\": [\"testbchange\"],\"failedNode\":"
-            + " [\"testc\"]},\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\":"
-            + "{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0}],\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
+        taskNode.setName("bbb");
+        taskNode.setType("SHELL");
+        taskNode.setId("222");
 
-        ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
-        ProcessData processData = JSONUtils.parseObject(newJson, ProcessData.class);
-        Assert.assertEquals(expected, processService.changeJson(processData, oldProcessData));
+        taskNode11.setName("vvv");
+        taskNode11.setType("CONDITIONS");
+        taskNode11.setId("444");
+        successNode.add("bbb");
+        faildNode.add("ccc");
+
+        taskNode111.setName("ccc");
+        taskNode111.setType("SHELL");
+        taskNode111.setId("333");
+
+        conditionsParameters.setSuccessNode(successNode);
+        conditionsParameters.setFailedNode(faildNode);
+        taskNode11.setConditionResult(conditionsParameters.getConditionResult());
+        tasks.add(taskNode);
+        tasks.add(taskNode11);
+        tasks.add(taskNode111);
+        oldProcessData.setTasks(tasks);
+
+        ProcessData newProcessData = new ProcessData();
+        ConditionsParameters conditionsParameters2 = new ConditionsParameters();
+        TaskNode taskNode2 = new TaskNode();
+        TaskNode taskNode22 = new TaskNode();
+        TaskNode taskNode222 = new TaskNode();
+        ArrayList<TaskNode> tasks2 = new ArrayList<>();
+        ArrayList<String> successNode2 = new ArrayList<>();
+        ArrayList<String> faildNode2 = new ArrayList<>();
+
+        taskNode2.setName("bbbchange");
+        taskNode2.setType("SHELL");
+        taskNode2.setId("222");
+
+        taskNode22.setName("vv");
+        taskNode22.setType("CONDITIONS");
+        taskNode22.setId("444");
+        successNode2.add("bbb");
+        faildNode2.add("ccc");
+
+        taskNode222.setName("ccc");
+        taskNode222.setType("SHELL");
+        taskNode222.setId("333");
+
+        conditionsParameters2.setSuccessNode(successNode2);
+        conditionsParameters2.setFailedNode(faildNode2);
+        taskNode22.setConditionResult(conditionsParameters2.getConditionResult());
+        tasks2.add(taskNode2);
+        tasks2.add(taskNode22);
+        tasks2.add(taskNode222);
+
+        newProcessData.setTasks(tasks2);
+
+        ProcessData exceptProcessData = new ProcessData();
+        ConditionsParameters conditionsParameters3 = new ConditionsParameters();
+        TaskNode taskNode3 = new TaskNode();
+        TaskNode taskNode33 = new TaskNode();
+        TaskNode taskNode333 = new TaskNode();
+        ArrayList<TaskNode> tasks3 = new ArrayList<>();
+        ArrayList<String> successNode3 = new ArrayList<>();
+        ArrayList<String> faildNode3 = new ArrayList<>();
+
+        taskNode3.setName("bbbchange");
+        taskNode3.setType("SHELL");
+        taskNode3.setId("222");
+
+        taskNode33.setName("vv");
+        taskNode33.setType("CONDITIONS");
+        taskNode33.setId("444");
+        successNode3.add("bbbchange");
+        faildNode3.add("ccc");
+
+        taskNode333.setName("ccc");
+        taskNode333.setType("SHELL");
+        taskNode333.setId("333");
+
+        conditionsParameters3.setSuccessNode(successNode3);
+        conditionsParameters3.setFailedNode(faildNode3);
+        taskNode33.setConditionResult(conditionsParameters3.getConditionResult());
+        tasks3.add(taskNode3);
+        tasks3.add(taskNode33);
+        tasks3.add(taskNode333);
+        exceptProcessData.setTasks(tasks3);
+
+        String expect = JSONUtils.toJsonString(exceptProcessData);
+
+        Assert.assertEquals(expect, processService.changeJson(newProcessData,oldProcessData));
 
     }
 }
