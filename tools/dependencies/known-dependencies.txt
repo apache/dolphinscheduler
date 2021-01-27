@@ -24,7 +24,7 @@ commons-compress-1.4.1.jar
 commons-compiler-3.0.16.jar
 commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
-commons-beanutils-1.7.0.jar
+commons-beanutils-1.9.4.jar
 commons-dbcp-1.4.jar
 commons-httpclient-3.0.1.jar
 commons-io-2.4.jar
@@ -79,10 +79,10 @@ httpclient-4.4.1.jar
 httpcore-4.4.1.jar
 httpmime-4.5.12.jar
 j2objc-annotations-1.1.jar
-jackson-annotations-2.9.10.jar
-jackson-core-2.9.10.jar
+jackson-annotations-2.10.5.jar
+jackson-core-2.10.5.jar
 jackson-core-asl-1.9.13.jar
-jackson-databind-2.9.10.jar
+jackson-databind-2.10.5.jar
 jackson-datatype-jdk8-2.9.10.jar
 jackson-datatype-jsr310-2.9.10.jar
 jackson-jaxrs-1.9.13.jar

@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
@@ -53,7 +56,7 @@ public enum TaskType {
     SQOOP(12, "sqoop"),
     WATERDROP(13, "waterdrop");
 
-    TaskType(int code, String descp){
+    TaskType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -73,5 +76,20 @@ public enum TaskType {
 
     public String getDescp() {
         return descp;
+    }
+
+    private static final Map<String, TaskType> TASK_TYPE_MAP = new HashMap<>();
+
+    static {
+        for (TaskType taskType : TaskType.values()) {
+            TASK_TYPE_MAP.put(taskType.descp, taskType);
+        }
+    }
+
+    public static TaskType of(String descp) {
+        if (TASK_TYPE_MAP.containsKey(descp)) {
+            return TASK_TYPE_MAP.get(descp);
+        }
+        throw new IllegalArgumentException("invalid type : " + descp);
     }
 }
