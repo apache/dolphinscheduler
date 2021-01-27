@@ -33,7 +33,7 @@ public class FeiShuSenderTest {
 
     @Before
     public void initFeiShuConfig() {
-        feiShuConfig.put(FeiShuParamsConstants.FEI_SHU_WEB_HOOK, "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxx");
+        feiShuConfig.put(FeiShuParamsConstants.WEB_HOOK, "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxx");
     }
 
     @Test

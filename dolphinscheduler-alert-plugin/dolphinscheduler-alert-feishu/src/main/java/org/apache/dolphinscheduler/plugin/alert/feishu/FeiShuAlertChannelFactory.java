@@ -37,7 +37,7 @@ public class FeiShuAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> getParams() {
-        InputParam webHookParam = InputParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_WEB_HOOK, FeiShuParamsConstants.FEI_SHU_WEB_HOOK)
+        InputParam webHookParam = InputParam.newBuilder(FeiShuParamsConstants.NAME_WEB_HOOK, FeiShuParamsConstants.WEB_HOOK)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())

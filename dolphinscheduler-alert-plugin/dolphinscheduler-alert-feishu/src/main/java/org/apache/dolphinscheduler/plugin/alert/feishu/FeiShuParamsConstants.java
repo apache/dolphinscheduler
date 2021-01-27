@@ -23,9 +23,9 @@ public class FeiShuParamsConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    static final String FEI_SHU_WEB_HOOK = "feishu.webhook";
+    static final String WEB_HOOK = "webhook";
 
-    static final String NAME_FEI_SHU_WEB_HOOK = "feiShuWebHook";
+    static final String NAME_WEB_HOOK = "WebHook";
 
     public static final String FEI_SHU_PROXY_ENABLE = "feishu.isEnableProxy";
 

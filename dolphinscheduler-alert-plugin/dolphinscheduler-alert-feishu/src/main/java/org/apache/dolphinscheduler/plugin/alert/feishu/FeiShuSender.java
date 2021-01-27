@@ -61,7 +61,7 @@ public class FeiShuSender {
     private String password;
 
     FeiShuSender(Map<String, String> config) {
-        url = config.get(FeiShuParamsConstants.FEI_SHU_WEB_HOOK);
+        url = config.get(FeiShuParamsConstants.WEB_HOOK);
         enableProxy = Boolean.valueOf(config.get(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(FeiShuParamsConstants.NAME_FEI_SHU_PORT));
