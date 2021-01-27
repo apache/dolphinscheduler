@@ -79,10 +79,11 @@ public class ConditionsParameters extends AbstractParameters {
         this.failedNode = failedNode;
     }
 
-    public String toJsonString() {
+    public String getConditionResult() {
         return "{"
-            + "\"successNode\": " + successNode
-            + ",\"failedNode\": " + failedNode
-            + "}";
+            + "\"successNode\": [\"" + successNode.get(0)
+            + "\"],\"failedNode\": [\"" + failedNode.get(0)
+            + "\"]}";
     }
+
 }

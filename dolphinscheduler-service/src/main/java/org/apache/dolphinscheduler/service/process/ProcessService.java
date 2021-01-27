@@ -2028,19 +2028,21 @@ public class ProcessService {
                 ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
                 String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
                 String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
-                String newSuccessNodeName = newNameTaskId.getOrDefault(oldNameTaskId.get(oldSuccessNodeName), "");
-                String newFailedNodeName = newNameTaskId.getOrDefault(oldNameTaskId.get(oldFailedNodeName), "");
-                if (!"".equals(newSuccessNodeName) || !"".equals(newFailedNodeName)) {
+                String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
+                String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
+                if (newSuccessNodeName != null) {
                     ArrayList<String> successNode = new ArrayList<>();
-                    successNode.add("\"" + newSuccessNodeName + "\"");
-                    ArrayList<String> failedNode = new ArrayList<>();
-                    failedNode.add("\"" + newFailedNodeName + "\"");
+                    successNode.add(newSuccessNodeName);
                     conditionsParameters.setSuccessNode(successNode);
-                    conditionsParameters.setFailedNode(failedNode);
-                    String conditionResultStr = conditionsParameters.toJsonString();
-                    taskNode.setConditionResult(conditionResultStr);
-                    tasks.set(i, taskNode);
                 }
+                if (newFailedNodeName != null) {
+                    ArrayList<String> failedNode = new ArrayList<>();
+                    failedNode.add(newFailedNodeName);
+                    conditionsParameters.setFailedNode(failedNode);
+                }
+                String conditionResultStr = conditionsParameters.getConditionResult();
+                taskNode.setConditionResult(conditionResultStr);
+                tasks.set(i, taskNode);
             }
         }
         return JSONUtils.toJsonString(processData);
