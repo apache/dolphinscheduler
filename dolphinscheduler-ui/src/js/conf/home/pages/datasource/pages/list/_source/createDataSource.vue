@@ -102,7 +102,7 @@
               type="input"
               v-model="loginUserKeytabUsername"
               size="small"
-              :placeholder="$t('Please enter Principal')">
+              :placeholder="$t('Please enter the kerberos authentication parameter login.user.keytab.username')">
             </el-input>
           </template>
         </m-list-box-f>
@@ -113,7 +113,7 @@
               type="input"
               v-model="loginUserKeytabPath"
               size="small"
-              :placeholder="$t('Please enter Principal')">
+              :placeholder="$t('Please enter the kerberos authentication parameter login.user.keytab.path')">
             </el-input>
           </template>
         </m-list-box-f>
