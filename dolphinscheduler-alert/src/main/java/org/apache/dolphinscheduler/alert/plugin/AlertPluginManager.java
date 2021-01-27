@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 
 import java.util.List;
 import java.util.Map;
@@ -47,21 +48,21 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
 
-    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
+    private void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
 
         if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getName(), alertChannelFactory) != null) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is already registered", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '%s' is already registered", alertChannelFactory.getName()));
         }
 
         try {
             loadAlertChannel(alertChannelFactory.getName());
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load .", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '%s' is can not load .", alertChannelFactory.getName()));
         }
     }
 
-    protected void loadAlertChannel(String name) {
+    private void loadAlertChannel(String name) {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
@@ -75,7 +76,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
         logger.info("-- Loaded Alert Plugin {} --", name);
     }
 
-    public Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {
+    Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {
         return alertChannelFactoryMap;
     }
 

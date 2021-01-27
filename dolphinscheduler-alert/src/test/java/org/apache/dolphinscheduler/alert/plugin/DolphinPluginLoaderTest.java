@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.alert.plugin;
 
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

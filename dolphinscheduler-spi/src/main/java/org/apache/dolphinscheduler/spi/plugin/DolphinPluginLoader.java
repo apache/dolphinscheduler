@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.plugin;
+package org.apache.dolphinscheduler.spi.plugin;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-
-import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
@@ -31,7 +29,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -40,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.artifact.Artifact;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
@@ -106,7 +104,7 @@ public class DolphinPluginLoader {
     private void loadPlugin(URLClassLoader pluginClassLoader) {
         ServiceLoader<DolphinSchedulerPlugin> serviceLoader = ServiceLoader.load(DolphinSchedulerPlugin.class, pluginClassLoader);
         List<DolphinSchedulerPlugin> plugins = ImmutableList.copyOf(serviceLoader);
-        checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
+        Preconditions.checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
         for (DolphinSchedulerPlugin plugin : plugins) {
             logger.info("Installing {}", plugin.getClass().getName());
             for (AbstractDolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
@@ -125,7 +123,7 @@ public class DolphinPluginLoader {
         if (file.isDirectory()) {
             return buildPluginClassLoaderFromDirectory(file);
         } else {
-            throw new IllegalArgumentException(format("plugin must be a pom file or directory {} .", plugin));
+            throw new IllegalArgumentException(format("plugin must be a pom file or directory %s .", plugin));
         }
     }
 
@@ -187,7 +185,7 @@ public class DolphinPluginLoader {
 
     private static List<Artifact> sortArtifacts(List<Artifact> artifacts) {
         List<Artifact> list = new ArrayList<>(artifacts);
-        Collections.sort(list, Ordering.natural().nullsLast().onResultOf(Artifact::getFile));
+        list.sort(Ordering.natural().nullsLast().onResultOf(Artifact::getFile));
         return list;
     }
 

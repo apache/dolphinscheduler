@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.plugin;
+package org.apache.dolphinscheduler.spi.plugin;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -49,21 +49,20 @@ public class DolphinPluginManagerConfig {
     private String mavenLocalRepository = System.getProperty("user.home") + "/.m2/repository";
     private List<String> mavenRemoteRepository = ImmutableList.of("http://repo1.maven.org/maven2/");
 
-    public File getInstalledPluginsDir() {
+    File getInstalledPluginsDir() {
         return installedPluginsDir;
     }
 
     /**
-     * @param pluginDir
+     * @param pluginDir plugin directory
      */
-    public DolphinPluginManagerConfig setInstalledPluginsDir(String pluginDir) {
+    public void setInstalledPluginsDir(String pluginDir) {
         requireNonNull(pluginDir, "pluginDir can not be null");
         File pluginDirFile = new File(pluginDir);
         if (!pluginDirFile.exists()) {
-            throw new IllegalArgumentException(format("plugin dir not exists ! {}", pluginDirFile.getPath()));
+            throw new IllegalArgumentException(format("plugin dir not exists ! %s", pluginDirFile.getPath()));
         }
         this.installedPluginsDir = pluginDirFile;
-        return this;
     }
 
     public List<String> getPlugins() {
@@ -84,8 +83,8 @@ public class DolphinPluginManagerConfig {
      * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml, \
      * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-wechat/pom.xml
      *
-     * @param plugins
-     * @return
+     * @param plugins plugins
+     * @return DolphinPluginManagerConfig
      */
     public DolphinPluginManagerConfig setPlugins(String plugins) {
         if (plugins == null) {
@@ -96,16 +95,15 @@ public class DolphinPluginManagerConfig {
         return this;
     }
 
-    public String getMavenLocalRepository() {
+    String getMavenLocalRepository() {
         return mavenLocalRepository;
     }
 
-    public DolphinPluginManagerConfig setMavenLocalRepository(String mavenLocalRepository) {
+    public void setMavenLocalRepository(String mavenLocalRepository) {
         this.mavenLocalRepository = mavenLocalRepository;
-        return this;
     }
 
-    public List<String> getMavenRemoteRepository() {
+    List<String> getMavenRemoteRepository() {
         return mavenRemoteRepository;
     }
 

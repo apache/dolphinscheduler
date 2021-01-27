@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.plugin;
+package org.apache.dolphinscheduler.spi.plugin;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.walkFileTree;
-
-import static com.google.common.io.ByteStreams.toByteArray;
 
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 
@@ -45,6 +43,7 @@ import org.sonatype.aether.artifact.Artifact;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.ByteStreams;
 
 /**
  * The role of this class is to load the plugin class during development
@@ -56,7 +55,7 @@ final class DolphinPluginDiscovery {
     private DolphinPluginDiscovery() {
     }
 
-    public static Set<String> discoverPluginsFromArtifact(Artifact artifact, ClassLoader classLoader)
+    static Set<String> discoverPluginsFromArtifact(Artifact artifact, ClassLoader classLoader)
             throws IOException {
         if (!artifact.getExtension().equals("dolphinscheduler-plugin")) {
             throw new RuntimeException("Unexpected extension for main artifact: " + artifact);
@@ -79,7 +78,7 @@ final class DolphinPluginDiscovery {
                 .collect(Collectors.toSet());
     }
 
-    public static void writePluginServices(Iterable<String> plugins, File root)
+    static void writePluginServices(Iterable<String> plugins, File root)
             throws IOException {
         Path path = root.toPath().resolve(PLUGIN_SERVICES_FILE);
         createDirectories(path.getParent());
@@ -123,7 +122,7 @@ final class DolphinPluginDiscovery {
             if (in == null) {
                 throw new RuntimeException("Failed to read class: " + name);
             }
-            return new ClassReader(toByteArray(in));
+            return new ClassReader(ByteStreams.toByteArray(in));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
