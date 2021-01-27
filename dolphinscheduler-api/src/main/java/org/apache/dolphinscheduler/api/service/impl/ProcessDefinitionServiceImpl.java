@@ -204,7 +204,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return result;
         }
 
-
         processDefine.setName(name);
         processDefine.setReleaseState(ReleaseState.OFFLINE);
         processDefine.setProjectId(project.getId());
