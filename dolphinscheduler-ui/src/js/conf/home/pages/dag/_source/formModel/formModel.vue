@@ -349,6 +349,8 @@
         dependence: {},
         // cache dependence
         cacheDependence: {},
+        //task code
+        code:'',
         // Current node params data
         params: {},
         // Running sign
@@ -490,6 +492,7 @@
             type: this.nodeData.taskType,
             id: this.nodeData.id,
             name: this.name,
+            code:this.code,
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
@@ -613,6 +616,7 @@
             type: this.nodeData.taskType,
             id: this.nodeData.id,
             name: this.name,
+            code: this.code,
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
