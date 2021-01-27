@@ -124,7 +124,7 @@ public class KerberosHttpClient {
 	    lc = new LoginContext("", sub, null, config);
 	    lc.login();
 	    Subject serviceSubject = lc.getSubject();
-	    return Subject. doAs(serviceSubject, (PrivilegedAction<String>) () -> {
+	    return Subject.doAs(serviceSubject, (PrivilegedAction<String>) () -> {
 		CloseableHttpClient httpClient = buildSpengoHttpClient();
 		HttpGet httpget = new HttpGet(url);
 		return HttpUtils.getResponseContentString(httpget, httpClient);

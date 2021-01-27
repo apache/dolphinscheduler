@@ -64,8 +64,19 @@ public abstract class BaseDataSource {
      */
     private String principal;
 
+    /**
+     * java.security.krb5.conf
+     */
     private String javaSecurityKrb5Conf;
+
+    /**
+     * login.user.keytab.username
+     */
     private String loginUserKeytabUsername;
+
+    /**
+     * login.user.keytab.path
+     */
     private String loginUserKeytabPath;
 
     public String getPrincipal() {
