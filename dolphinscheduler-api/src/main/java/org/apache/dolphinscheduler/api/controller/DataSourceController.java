@@ -99,7 +99,11 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "DATA_SOURCE_PRINCIPAL", dataType = "String"),
+            @ApiImplicitParam(name = "javaSecurityKrb5Conf", value = "DATA_SOURCE_KERBEROS_KRB5_CONF", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabUsername", value = "DATA_SOURCE_KERBEROS_KEYTAB_USERNAME", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabPath", value = "DATA_SOURCE_KERBEROS_KEYTAB_PATH", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -155,7 +159,11 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "DATA_SOURCE_PRINCIPAL", dataType = "String"),
+            @ApiImplicitParam(name = "javaSecurityKrb5Conf", value = "DATA_SOURCE_KERBEROS_KRB5_CONF", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabUsername", value = "DATA_SOURCE_KERBEROS_KEYTAB_USERNAME", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabPath", value = "DATA_SOURCE_KERBEROS_KEYTAB_PATH", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -283,7 +291,11 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "DATA_SOURCE_PRINCIPAL", dataType = "String"),
+            @ApiImplicitParam(name = "javaSecurityKrb5Conf", value = "DATA_SOURCE_KERBEROS_KRB5_CONF", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabUsername", value = "DATA_SOURCE_KERBEROS_KEYTAB_USERNAME", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabPath", value = "DATA_SOURCE_KERBEROS_KEYTAB_PATH", dataType = "String")
     })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
