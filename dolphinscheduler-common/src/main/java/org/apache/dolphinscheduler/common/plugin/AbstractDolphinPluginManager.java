@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.plugin;
 
-
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 
 public abstract class AbstractDolphinPluginManager {
