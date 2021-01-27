@@ -297,14 +297,14 @@ CREATE TABLE `t_ds_alert` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup`(
-                                  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-                                  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
-                                  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
-                                  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
-                                  `description`    varchar(255) DEFAULT NULL,
-                                  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
-                                  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
-                                  PRIMARY KEY (`id`)
+  `id`                 int(11)       NOT NULL     AUTO_INCREMENT COMMENT 'key',
+  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
+  `create_user_id`     int(11)       DEFAULT NULL COMMENT 'create user id',
+  `group_name`         varchar(255)  DEFAULT NULL COMMENT 'group name',
+  `description`        varchar(255)  DEFAULT NULL,
+  `create_time`        datetime      DEFAULT NULL COMMENT 'create time',
+  `update_time`        datetime      DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -512,9 +512,7 @@ CREATE TABLE `t_ds_process_task_relation` (
   `version` int(11) DEFAULT NULL COMMENT 'relation version',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
-  `pre_project_code` bigint(20) NOT NULL COMMENT 'pre process code',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
-  `post_project_code` bigint(20) NOT NULL COMMENT 'post process code',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
   `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
   `condition_params` text COMMENT 'condition params(json)',
