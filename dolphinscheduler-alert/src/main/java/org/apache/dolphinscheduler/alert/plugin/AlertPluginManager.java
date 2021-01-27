@@ -23,6 +23,8 @@ import static java.util.Objects.requireNonNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.dao.DaoFactory;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
@@ -47,6 +49,8 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
 
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
+
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     private void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
