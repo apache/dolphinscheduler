@@ -135,8 +135,6 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getConnParams());
         try {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
-            // load class
-            DataSourceFactory.loadClass(DbType.valueOf(sqlParameters.getType()));
 
             // get datasource
             baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(sqlParameters.getType()),
@@ -253,10 +251,8 @@ public class SqlTask extends AbstractTask {
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
         try {
-            // if upload resource is HDFS and kerberos startup
-            CommonUtils.loadKerberosConf();
             // create connection
-            connection = createConnection();
+            connection = baseDataSource.getConnection();
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -362,34 +358,6 @@ public class SqlTask extends AbstractTask {
                 funcStmt.execute(createFunc);
             }
         }
-    }
-
-    /**
-     * create connection
-     *
-     * @return connection
-     * @throws Exception Exception
-     */
-    private Connection createConnection() throws Exception {
-        // if hive , load connection params if exists
-        Connection connection = null;
-        if (HIVE == DbType.valueOf(sqlParameters.getType())) {
-            Properties paramProp = new Properties();
-            paramProp.setProperty(USER, baseDataSource.getUser());
-            paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
-            Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
-                    SEMICOLON,
-                    HIVE_CONF);
-            paramProp.putAll(connParamMap);
-
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    paramProp);
-        } else {
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    baseDataSource.getUser(),
-                    baseDataSource.getPassword());
-        }
-        return connection;
     }
 
     /**

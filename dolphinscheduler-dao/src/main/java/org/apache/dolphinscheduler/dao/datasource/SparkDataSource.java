@@ -52,7 +52,7 @@ public class SparkDataSource extends BaseDataSource {
      */
     @Override
     public Connection getConnection() throws Exception {
-        CommonUtils.loadKerberosConf();
+        CommonUtils.loadKerberosConf(getJavaSecurityKrb5Conf(), getLoginUserKeytabUsername(), getLoginUserKeytabPath());
         return super.getConnection();
     }
 }

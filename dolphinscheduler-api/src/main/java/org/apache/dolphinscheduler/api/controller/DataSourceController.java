@@ -115,10 +115,13 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "connectType") DbConnectType connectType,
-                                   @RequestParam(value = "other") String other) {
+                                   @RequestParam(value = "other") String other,
+                                   @RequestParam(value = "javaSecurityKrb5Conf", required = false) String javaSecurityKrb5Conf,
+                                   @RequestParam(value = "loginUserKeytabUsername", required = false) String loginUserKeytabUsername,
+                                   @RequestParam(value = "loginUserKeytabPath", required = false) String loginUserKeytabPath) {
         logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, host, port, database, principal, userName, connectType, other);
-        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other, javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath);
         return dataSourceService.createDataSource(loginUser, name, note, type, parameter);
     }
 
@@ -169,10 +172,13 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "connectType") DbConnectType connectType,
-                                   @RequestParam(value = "other") String other) {
+                                   @RequestParam(value = "other") String other,
+                                   @RequestParam(value = "javaSecurityKrb5Conf", required = false) String javaSecurityKrb5Conf,
+                                   @RequestParam(value = "loginUserKeytabUsername", required = false) String loginUserKeytabUsername,
+                                   @RequestParam(value = "loginUserKeytabPath", required = false) String loginUserKeytabPath) {
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other, javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath);
         return dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
     }
 
@@ -293,10 +299,13 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "userName") String userName,
                                     @RequestParam(value = "password") String password,
                                     @RequestParam(value = "connectType") DbConnectType connectType,
-                                    @RequestParam(value = "other") String other) {
+                                    @RequestParam(value = "other") String other,
+                                    @RequestParam(value = "javaSecurityKrb5Conf", required = false) String javaSecurityKrb5Conf,
+                                    @RequestParam(value = "loginUserKeytabUsername", required = false) String loginUserKeytabUsername,
+                                    @RequestParam(value = "loginUserKeytabPath", required = false) String loginUserKeytabPath) {
         logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other, javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath);
         return dataSourceService.checkConnection(type, parameter);
     }
 

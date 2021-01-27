@@ -61,4 +61,8 @@ public class StringUtils {
     public static String trim(String str) {
         return str == null ? null : str.trim();
     }
+
+    public static String defaultIfBlank(String str, String defaultStr) {
+        return isBlank(str) ? defaultStr : str;
+    }
 }
