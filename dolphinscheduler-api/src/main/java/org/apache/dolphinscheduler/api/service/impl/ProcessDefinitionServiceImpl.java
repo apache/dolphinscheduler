@@ -205,7 +205,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         Long processDefinitionCode;
         try {
             processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
-            processDefinition.setCode(SnowFlakeUtils.getInstance().nextId());
+            processDefinition.setCode(processDefinitionCode);
         } catch (SnowFlakeException e) {
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
             return result;
@@ -213,9 +213,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         processDefinition.setName(name);
         processDefinition.setReleaseState(ReleaseState.OFFLINE);
-        processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(loginUser.getId());
-        processDefinition.setProcessDefinitionJson(processDefinitionJson);
         processDefinition.setDescription(desc);
         processDefinition.setLocations(locations);
         processDefinition.setConnects(connects);
