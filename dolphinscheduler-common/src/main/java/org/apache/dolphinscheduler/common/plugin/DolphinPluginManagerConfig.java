@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.plugin;
+package org.apache.dolphinscheduler.common.plugin;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;

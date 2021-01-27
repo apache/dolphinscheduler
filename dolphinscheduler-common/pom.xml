@@ -50,6 +50,24 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.airlift.resolver</groupId>
+			<artifactId>resolver</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+
+		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
 			<scope>test</scope>
@@ -605,6 +623,10 @@
 					<artifactId>jsr305</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.dolphinscheduler</groupId>
+			<artifactId>dolphinscheduler-spi</artifactId>
 		</dependency>
 	</dependencies>
 </project>

@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.dao.AlertDao;

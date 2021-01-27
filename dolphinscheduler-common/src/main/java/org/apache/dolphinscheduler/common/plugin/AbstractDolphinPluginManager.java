@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.plugin;
+package org.apache.dolphinscheduler.common.plugin;
+
 
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 
