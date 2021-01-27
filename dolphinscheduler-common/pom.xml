@@ -32,6 +32,12 @@
 		<codehaus.janino.version>3.1.0</codehaus.janino.version>
 	</properties>
 	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.dolphinscheduler</groupId>
+			<artifactId>dolphinscheduler-spi</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -65,7 +71,6 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.powermock</groupId>
@@ -623,10 +628,6 @@
 					<artifactId>jsr305</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.dolphinscheduler</groupId>
-			<artifactId>dolphinscheduler-spi</artifactId>
 		</dependency>
 	</dependencies>
 </project>
