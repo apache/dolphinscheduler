@@ -17,7 +17,7 @@ Dolphin Scheduler Official Website
 
 ### Design features:
 
-Dolphin Scheduler is a distributed and easy-to-extend visual DAG workflow scheduling system. It dedicates to solving the complex dependencies in data processing to make the scheduling system `out of the box` for the data processing process.
+DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing multiple types of jobs available `out of the box`. 
 
 Its main objectives are as follows:
 
