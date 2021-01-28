@@ -429,9 +429,8 @@ public class ProcessInstanceService extends BaseService {
         Date schedule = null;
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
-        } else {
-            schedule = processInstance.getScheduleTime();
         }
+        schedule = processInstance.getScheduleTime();
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
         processInstance.setConnects(connects);
@@ -470,19 +469,18 @@ public class ProcessInstanceService extends BaseService {
 
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
-        if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
-            processDefinition.setProcessDefinitionJson(processInstanceJson);
-            processDefinition.setGlobalParams(originDefParams);
-            processDefinition.setLocations(locations);
-            processDefinition.setConnects(connects);
-            processDefinition.setTimeout(timeout);
-            processDefinition.setUpdateTime(new Date());
 
-            // add process definition version
-            long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
-            processDefinition.setVersion(version);
-            updateDefine = processDefineMapper.updateById(processDefinition);
-        }
+        processDefinition.setProcessDefinitionJson(processInstanceJson);
+        processDefinition.setGlobalParams(originDefParams);
+        processDefinition.setLocations(locations);
+        processDefinition.setConnects(connects);
+        processDefinition.setTimeout(timeout);
+        processDefinition.setUpdateTime(new Date());
+
+        // add process definition version
+        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+        processDefinition.setVersion(version);
+        updateDefine = processDefineMapper.updateById(processDefinition);
         if (update > 0 && updateDefine > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
