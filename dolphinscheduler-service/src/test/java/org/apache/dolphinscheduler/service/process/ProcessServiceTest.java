@@ -424,8 +424,9 @@ public class ProcessServiceTest {
         exceptProcessData.setTasks(tasks3);
 
         String expect = JSONUtils.toJsonString(exceptProcessData);
+        String oldJson = JSONUtils.toJsonString(oldProcessData);
 
-        Assert.assertEquals(expect, processService.changeJson(newProcessData,oldProcessData));
+        Assert.assertEquals(expect, processService.changeJson(newProcessData,oldJson));
 
     }
 }

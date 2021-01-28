@@ -1996,10 +1996,11 @@ public class ProcessService {
      * solve the branch rename bug
      *
      * @param processData
-     * @param oldProcessData
+     * @param oldJson
      * @return String
      */
-    public String changeJson(ProcessData processData, ProcessData oldProcessData) {
+    public String changeJson(ProcessData processData, String oldJson) {
+        ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
         HashMap<String, String> oldNameTaskId = new HashMap<>();
         List<TaskNode> oldTasks = oldProcessData.getTasks();
         for (int i = 0; i < oldTasks.size(); i++) {
