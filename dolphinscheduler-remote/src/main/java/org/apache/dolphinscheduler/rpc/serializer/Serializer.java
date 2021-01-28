@@ -15,33 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.rpc.codec;
+package org.apache.dolphinscheduler.rpc.serializer;
 
-import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
+import java.io.IOException;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+public interface Serializer {
 
-/**
- * NettyEncoder
- */
-public class NettyEncoder extends MessageToByteEncoder {
+    <T> byte[] serialize(T obj) throws IOException;
 
+    <T> T deserialize(byte[] data, Class<T> clz) throws IOException;
 
-    private Class<?> genericClass;
-
-    public NettyEncoder(Class<?> genericClass) {
-        this.genericClass = genericClass;
-    }
-
-    @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        if (genericClass.isInstance(o)) {
-            byte[] data = ProtoStuffUtils.serialize(o);
-            byteBuf.writeInt(data.length);
-            byteBuf.writeBytes(data);
-        }
-
-    }
 }
