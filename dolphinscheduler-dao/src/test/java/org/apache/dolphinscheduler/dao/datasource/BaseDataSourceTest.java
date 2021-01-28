@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.datasource;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,12 +64,12 @@ public class BaseDataSourceTest {
         //set principal
         hiveDataSource.setPrincipal("hive/test.com@TEST.COM");
         Assert.assertEquals("jdbc:hive2://127.0.0.1:10000/test;principal=hive/test.com@TEST.COM",
-            hiveDataSource.getJdbcUrl());
+                hiveDataSource.getJdbcUrl());
         //set fake other
         hiveDataSource.setOther("charset=UTF-8");
         Assert.assertEquals(
-            "jdbc:hive2://127.0.0.1:10000/test;principal=hive/test.com@TEST.COM;charset=UTF-8",
-            hiveDataSource.getJdbcUrl());
+                "jdbc:hive2://127.0.0.1:10000/test;principal=hive/test.com@TEST.COM;charset=UTF-8",
+                hiveDataSource.getJdbcUrl());
 
         BaseDataSource clickHouseDataSource = new ClickHouseDataSource();
         clickHouseDataSource.setAddress("jdbc:clickhouse://127.0.0.1:8123");
@@ -82,7 +83,7 @@ public class BaseDataSourceTest {
         //set fake other
         clickHouseDataSource.setOther("charset=UTF-8");
         Assert.assertEquals("jdbc:clickhouse://127.0.0.1:8123/test?charset=UTF-8",
-            clickHouseDataSource.getJdbcUrl());
+                clickHouseDataSource.getJdbcUrl());
 
         BaseDataSource sqlServerDataSource = new SQLServerDataSource();
         sqlServerDataSource.setAddress("jdbc:sqlserver://127.0.0.1:1433");
@@ -90,15 +91,15 @@ public class BaseDataSourceTest {
         sqlServerDataSource.setPassword("123456");
         sqlServerDataSource.setUser("test");
         Assert.assertEquals("jdbc:sqlserver://127.0.0.1:1433;databaseName=test",
-            sqlServerDataSource.getJdbcUrl());
+                sqlServerDataSource.getJdbcUrl());
         //set fake principal
         sqlServerDataSource.setPrincipal("fake principal");
         Assert.assertEquals("jdbc:sqlserver://127.0.0.1:1433;databaseName=test",
-            sqlServerDataSource.getJdbcUrl());
+                sqlServerDataSource.getJdbcUrl());
         //set fake other
         sqlServerDataSource.setOther("charset=UTF-8");
         Assert.assertEquals("jdbc:sqlserver://127.0.0.1:1433;databaseName=test;charset=UTF-8",
-            sqlServerDataSource.getJdbcUrl());
+                sqlServerDataSource.getJdbcUrl());
 
         BaseDataSource db2DataSource = new DB2ServerDataSource();
         db2DataSource.setAddress("jdbc:db2://127.0.0.1:50000");
@@ -120,19 +121,19 @@ public class BaseDataSourceTest {
         BaseDataSource dataSource = new BaseDataSource() {
             @Override
             public String driverClassSelector() {
-              return null;
+                return null;
             }
 
             @Override
             public DbType dbTypeSelector() {
-              return null;
+                return null;
             }
         };
 
-        String password= "";
+        String password = "";
         dataSource.setPassword(password);
         Assert.assertEquals("", dataSource.getPassword());
-        password= "IUAjJCVeJipNVEl6TkRVMg==";
+        password = "IUAjJCVeJipNVEl6TkRVMg==";
         dataSource.setPassword(password);
         Assert.assertNotNull(dataSource.getPassword());
         Assert.assertNotNull(dataSource.getPassword());
