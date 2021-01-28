@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -42,6 +42,7 @@ public class FlinkTask extends AbstractYarnTask {
 
   /**
    *  flink command
+   *  usage: flink run [OPTIONS] <jar-file> <arguments>
    */
   private static final String FLINK_COMMAND = "flink";
   private static final String FLINK_RUN = "run";
@@ -102,6 +103,7 @@ public class FlinkTask extends AbstractYarnTask {
    */
   @Override
   protected String buildCommand() {
+    // flink run [OPTIONS] <jar-file> <arguments>
     List<String> args = new ArrayList<>();
 
     args.add(FLINK_COMMAND);
