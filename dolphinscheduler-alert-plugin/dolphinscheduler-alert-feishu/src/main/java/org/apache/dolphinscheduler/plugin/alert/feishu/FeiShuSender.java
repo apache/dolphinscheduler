@@ -23,16 +23,11 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -72,25 +67,6 @@ public class FeiShuSender {
 
     }
 
-    private static HttpPost constructHttpPost(String url, String msg, String charset) {
-        HttpPost post = new HttpPost(url);
-        StringEntity entity = new StringEntity(msg, charset);
-        post.setEntity(entity);
-        post.addHeader("Content-Type", "application/json; charset=utf-8");
-        return post;
-    }
-
-    private static CloseableHttpClient getProxyClient(String proxy, int port, String user, String password) {
-        HttpHost httpProxy = new HttpHost(proxy, port);
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-        return HttpClients.custom().setDefaultCredentialsProvider(provider).build();
-    }
-
-    private static CloseableHttpClient getDefaultClient() {
-        return HttpClients.createDefault();
-    }
-
     private static RequestConfig getProxyConfig(String proxy, int port) {
         HttpHost httpProxy = new HttpHost(proxy, port);
         return RequestConfig.custom().setProxy(httpProxy).build();
@@ -112,12 +88,13 @@ public class FeiShuSender {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
 
-        if (null == result) {
+        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(result)) {
             alertResult.setMessage("send fei shu msg error");
             logger.info("send fei shu msg error,fei shu server resp is null");
             return alertResult;
         }
         FeiShuSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, FeiShuSendMsgResponse.class);
+
         if (null == sendMsgResponse) {
             alertResult.setMessage("send fei shu msg fail");
             logger.info("send fei shu msg error,resp error");
@@ -129,7 +106,7 @@ public class FeiShuSender {
             return alertResult;
         }
         alertResult.setMessage(String.format("alert send fei shu msg error : %s", sendMsgResponse.getStatusMessage()));
-        logger.info("alert send fei shu msg error : {}", sendMsgResponse.getStatusMessage());
+        logger.info("alert send fei shu msg error : {} ,Extra : {} ", sendMsgResponse.getStatusMessage(), sendMsgResponse.getExtra());
         return alertResult;
     }
 
@@ -150,19 +127,20 @@ public class FeiShuSender {
     private String sendMsg(String msg, String charset) throws IOException {
 
         String msgToJson = textToJsonString(msg);
-        HttpPost httpPost = constructHttpPost(url, msgToJson, charset);
+
+        HttpPost httpPost = HttpRequestUtil.constructHttpPost(url, msgToJson);
 
         CloseableHttpClient httpClient;
-        if (Boolean.TRUE.equals(enableProxy)) {
-            httpClient = getProxyClient(proxy, port, user, password);
-            RequestConfig rcf = getProxyConfig(proxy, port);
-            httpPost.setConfig(rcf);
-        } else {
-            httpClient = getDefaultClient();
-        }
+
+        httpClient = HttpRequestUtil.getHttpClient(enableProxy, proxy, port, user, password);
 
         try {
             CloseableHttpResponse response = httpClient.execute(httpPost);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != HttpStatus.SC_OK) {
+                logger.error("send feishu message error, return http status code: " + statusCode);
+            }
             String resp;
             try {
                 HttpEntity entity = response.getEntity();
