@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.rpc.serializer;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.serialize;
-
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,21 +24,20 @@ import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
 
-/**
- * ProtoStuffUtils
- */
-public class ProtoStuffUtils {
-
-    private ProtoStuffUtils() {
-        throw new IllegalStateException("Utility class");
-    }
+public class ProtoStuffSerializer implements Serializer{
 
     private static LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 
     private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
 
+
     @SuppressWarnings("unchecked")
-    public static <T> byte[] serialize(T obj) {
+    private static <T> Schema<T> getSchema(Class<T> clazz) {
+        return (Schema<T>) schemaCache.computeIfAbsent(clazz, RuntimeSchema::createFrom);
+    }
+
+    @Override
+    public  <T> byte[] serialize(T obj) throws IOException {
         Class<T> clazz = (Class<T>) obj.getClass();
         Schema<T> schema = getSchema(clazz);
         byte[] data;
@@ -51,18 +49,14 @@ public class ProtoStuffUtils {
         return data;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> Schema<T> getSchema(Class<T> clazz) {
-        return (Schema<T>) schemaCache.computeIfAbsent(clazz, RuntimeSchema::createFrom);
-    }
-
-    public static <T> T deserialize(byte[] bytes, Class<T> clazz) {
-        Schema<T> schema = getSchema(clazz);
+    @Override
+    public <T> T deserialize(byte[] data, Class<T> clz) throws IOException {
+        Schema<T> schema = getSchema(clz);
         T obj = schema.newMessage();
         if (null == obj) {
             return null;
         }
-        ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
+        ProtostuffIOUtil.mergeFrom(data, obj, schema);
         return obj;
     }
 }
