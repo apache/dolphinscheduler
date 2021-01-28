@@ -129,31 +129,31 @@ case "$1" in
         initApiServer
         initAlertServer
         initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler*
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (master-server)
         initZK
         initDatabase
         initMasterServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master-server-$(hostname).out
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
     ;;
     (worker-server)
         initZK
         initDatabase
         initWorkerServer
         initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker-server-$(hostname).out
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
     ;;
     (api-server)
         initZK
         initDatabase
         initApiServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server-$(hostname).out
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (alert-server)
         initDatabase
         initAlertServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert-server-$(hostname).out
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
     ;;
     (help)
         printUsage
@@ -165,12 +165,8 @@ case "$1" in
     ;;
 esac
 
-# init log files directories
-mkdir -p ${DOLPHINSCHEDULER_LOGS}
-
-while !(ls ${LOGFILE} &> /dev/null); do
-    sleep 1
-done
+# init directories and log files
+mkdir -p ${DOLPHINSCHEDULER_LOGS} && mkdir -p /var/log/nginx/ && cat /dev/null >> ${LOGFILE}
 
 echo "tail begin"
 exec bash -c "tail -n 1 -f ${LOGFILE}"
