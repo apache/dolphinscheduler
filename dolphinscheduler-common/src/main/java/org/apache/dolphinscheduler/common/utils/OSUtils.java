@@ -26,6 +26,9 @@ import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 
+import org.apache.commons.configuration.Configuration;
+
+import java.lang.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,6 +54,12 @@ public class OSUtils {
 
   private static final SystemInfo SI = new SystemInfo();
   public static final String TWO_DECIMAL = "0.00";
+
+    /**
+     * return -1 when the function can not get hardware env info
+     * e.g {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
+     */
+    public static final double NEGATIVE_ONE = -1;
 
   private static HardwareAbstractionLayer hal = SI.getHardware();
 
@@ -110,8 +119,17 @@ public class OSUtils {
    * @return load average
    */
   public static double loadAverage() {
-    double loadAverage =  hal.getProcessor().getSystemLoadAverage();
-
+        double loadAverage;
+        try {
+            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+            loadAverage = osBean.getSystemLoadAverage();
+        } catch (Exception e) {
+            logger.error("get operation system load average exception, try another method ", e);
+            loadAverage = hal.getProcessor().getSystemLoadAverage();
+            if (Double.isNaN(loadAverage)) {
+                return NEGATIVE_ONE;
+            }
+        }
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
 
     df.setRoundingMode(RoundingMode.HALF_UP);
