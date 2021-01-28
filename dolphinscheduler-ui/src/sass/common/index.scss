@@ -102,6 +102,9 @@ body{
   }
   .main-layout-model {
     &.dag-screen {
+      .m-top {
+        position: unset;
+      }
       .m-bottom {
         z-index: 2;
       }
