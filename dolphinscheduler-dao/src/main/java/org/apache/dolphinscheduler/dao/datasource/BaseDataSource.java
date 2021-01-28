@@ -16,11 +16,13 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +99,7 @@ public abstract class BaseDataSource {
    * append database
    * @param jdbcUrl jdbc url
    */
-  private void appendDatabase(StringBuilder jdbcUrl) {
+    protected void appendDatabase(StringBuilder jdbcUrl) {
     if (dbTypeSelector() == DbType.SQLSERVER) {
       jdbcUrl.append(";databaseName=").append(getDatabase());
     } else {
@@ -149,29 +151,18 @@ public abstract class BaseDataSource {
     }
   }
 
+    /**
+     * the data source test connection
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    public Connection getConnection() throws Exception {
+        Class.forName(driverClassSelector());
+        return DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+    }
+
   protected String filterOther(String otherParams){
     return otherParams;
-  }
-
-  /**
-   * test whether the data source can be connected successfully
-   */
-  public void isConnectable() {
-    Connection con = null;
-    try {
-      Class.forName(driverClassSelector());
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
-    } catch (ClassNotFoundException | SQLException e) {
-      logger.error("Get connection error: {}", e.getMessage());
-    } finally {
-      if (con != null) {
-        try {
-          con.close();
-        } catch (SQLException e) {
-          logger.error(e.getMessage(), e);
-        }
-      }
-    }
   }
 
   public String getUser() {
@@ -182,8 +173,12 @@ public abstract class BaseDataSource {
     this.user = user;
   }
 
+    /**
+     * password need decode
+     * @return
+     */
   public String getPassword() {
-    return password;
+        return CommonUtils.decodePassword(password);
   }
 
   public void setPassword(String password) {
