@@ -427,10 +427,10 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
         Date schedule = null;
+        schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
         }
-        schedule = processInstance.getScheduleTime();
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
         processInstance.setConnects(connects);
