@@ -207,6 +207,8 @@ export default {
   'UDF resources': 'UDF resources',
   'UDF resources directory': 'UDF resources directory',
   'Please select UDF resources directory': 'Please select UDF resources directory',
+  'Alarm group': 'Alarm group',
+  'Alarm group required': 'Alarm group required',
   'Edit alarm group': 'Edit alarm group',
   'Create alarm group': 'Create alarm group',
   'Create Alarm Instance': 'Create Alarm Instance',
