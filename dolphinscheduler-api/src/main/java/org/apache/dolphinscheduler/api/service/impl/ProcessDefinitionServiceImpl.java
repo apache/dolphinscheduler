@@ -27,8 +27,10 @@ import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
+import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -54,17 +56,21 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StreamUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -78,6 +84,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,6 +139,15 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     private ProcessDefinitionVersionService processDefinitionVersionService;
 
     @Autowired
+    private TaskDefinitionService taskDefinitionService;
+
+    @Autowired
+    private ProcessTaskRelationService processTaskRelationService;
+
+    @Autowired
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Autowired
     private ProcessDefinitionMapper processDefineMapper;
 
     @Autowired
@@ -159,6 +175,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return create result code
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createProcessDefinition(User loginUser,
                                                        String projectName,
                                                        String name,
@@ -176,7 +193,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return checkResult;
         }
 
-        ProcessDefinition processDefine = new ProcessDefinition();
+        ProcessDefinition processDefinition = new ProcessDefinition();
         Date now = new Date();
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
@@ -185,42 +202,84 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return checkProcessJson;
         }
 
-        processDefine.setName(name);
-        processDefine.setReleaseState(ReleaseState.OFFLINE);
-        processDefine.setProjectId(project.getId());
-        processDefine.setUserId(loginUser.getId());
-        processDefine.setProcessDefinitionJson(processDefinitionJson);
-        processDefine.setDescription(desc);
-        processDefine.setLocations(locations);
-        processDefine.setConnects(connects);
-        processDefine.setTimeout(processData.getTimeout());
-        processDefine.setTenantId(processData.getTenantId());
-        processDefine.setModifyBy(loginUser.getUserName());
-        processDefine.setResourceIds(getResourceIds(processData));
+        Long processDefinitionCode;
+        try {
+            processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
+            processDefinition.setCode(processDefinitionCode);
+        } catch (SnowFlakeException e) {
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+            return result;
+        }
+
+        processDefinition.setName(name);
+        processDefinition.setReleaseState(ReleaseState.OFFLINE);
+        processDefinition.setUserId(loginUser.getId());
+        processDefinition.setDescription(desc);
+        processDefinition.setLocations(locations);
+        processDefinition.setConnects(connects);
+        processDefinition.setTimeout(processData.getTimeout());
+        processDefinition.setTenantId(processData.getTenantId());
+        processDefinition.setModifyBy(loginUser.getUserName());
+        processDefinition.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
         if (CollectionUtils.isNotEmpty(globalParamsList)) {
             Set<Property> globalParamsSet = new HashSet<>(globalParamsList);
             globalParamsList = new ArrayList<>(globalParamsSet);
-            processDefine.setGlobalParamList(globalParamsList);
+            processDefinition.setGlobalParamList(globalParamsList);
         }
-        processDefine.setCreateTime(now);
-        processDefine.setUpdateTime(now);
-        processDefine.setFlag(Flag.YES);
+        processDefinition.setCreateTime(now);
+        processDefinition.setUpdateTime(now);
+        processDefinition.setFlag(Flag.YES);
 
         // save the new process definition
-        processDefineMapper.insert(processDefine);
+        processDefineMapper.insert(processDefinition);
+
+        // parse and save the taskDefinition and processTaskRelation
+        try {
+            List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
+
+            for (TaskNode task : taskNodeList) {
+                taskDefinitionService.createTaskDefinition(loginUser, projectName, JSONUtils.toJsonString(task));
+            }
+
+            DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
+            Collection<String> beginNode = dag.getBeginNode();
+            Collection<String> endNode = dag.getEndNode();
+
+            // TODO:  query taskCode by  projectCode and taskName
+
+            processTaskRelationService.createProcessTaskRelation(
+                    loginUser,
+                    name,
+                    project.getCode(),
+                    processDefinitionCode,
+                    0L,
+                    0L,
+                    "0",
+                    "");
+
+        } catch (Exception e) {
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+            return result;
+        }
+
+        // save process definition log
+        ProcessDefinitionLog processDefinitionLog = JSONUtils.parseObject(
+                JSONUtils.toJsonString(processDefinition), ProcessDefinitionLog.class);
+
+        processDefinitionLog.setOperator(loginUser.getId());
+        processDefinitionLog.setOperateTime(now);
+        processDefinitionLogMapper.insert(processDefinitionLog);
 
         // add process definition version
-        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefine);
-
-        processDefine.setVersion(version);
-
-        processDefineMapper.updateVersionByProcessDefinitionId(processDefine.getId(), version);
+        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+        processDefinition.setVersion(version);
+        processDefineMapper.updateVersionByProcessDefinitionId(processDefinition.getId(), version);
 
         // return processDefinition object with ID
-        result.put(Constants.DATA_LIST, processDefine.getId());
+        result.put(Constants.DATA_LIST, processDefinition.getId());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -367,7 +426,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(),processDefinitionName);
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), processDefinitionName);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
         } else {
@@ -523,6 +582,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processDefinitionId);
 
+        // TODO: replace id to code
+        // ProcessDefinition processDefinition = processDefineMapper.selectByCode(processDefinitionCode);
+
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
             return result;
@@ -562,6 +624,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             }
         }
 
+        // TODO: replace id to code
+        // ProcessDefinition processDefinition = processDefineMapper.deleteByCode(processDefinitionCode);
         int delete = processDefineMapper.deleteById(processDefinitionId);
 
         if (delete > 0) {

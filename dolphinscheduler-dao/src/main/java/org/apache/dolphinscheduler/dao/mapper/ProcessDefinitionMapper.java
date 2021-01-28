@@ -35,6 +35,22 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
+     * query process definition by code
+     *
+     * @param code code
+     * @return process definition
+     */
+    ProcessDefinition queryByCode(@Param("code") Long code);
+    
+    /**
+     * delete process definition by code
+     *
+     * @param code code
+     * @return delete result
+     */
+    int deleteByCode(@Param("code") Long code);
+    
+    /**
      * verify process definition by name
      *
      * @param projectId projectId
