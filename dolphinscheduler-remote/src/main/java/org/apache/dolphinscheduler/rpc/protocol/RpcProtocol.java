@@ -15,33 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.rpc.codec;
+package org.apache.dolphinscheduler.rpc.protocol;
 
-import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
+public class RpcProtocol<T>{
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+    private MessageHeader msgHeader;
 
-/**
- * NettyEncoder
- */
-public class NettyEncoder extends MessageToByteEncoder {
+    private T body;
 
-
-    private Class<?> genericClass;
-
-    public NettyEncoder(Class<?> genericClass) {
-        this.genericClass = genericClass;
+    public MessageHeader getMsgHeader() {
+        return msgHeader;
     }
 
-    @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        if (genericClass.isInstance(o)) {
-            byte[] data = ProtoStuffUtils.serialize(o);
-            byteBuf.writeInt(data.length);
-            byteBuf.writeBytes(data);
-        }
+    public void setMsgHeader(MessageHeader msgHeader) {
+        this.msgHeader = msgHeader;
+    }
 
+    public T getBody() {
+        return body;
+    }
+
+    public void setBody(T body) {
+        this.body = body;
     }
 }

@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.rpc.serializer;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,33 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.rpc.codec;
+import java.util.HashMap;
 
-import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
-
-/**
- * NettyEncoder
- */
-public class NettyEncoder extends MessageToByteEncoder {
+public enum RpcSerializer {
 
 
-    private Class<?> genericClass;
+    PROTOSTUFF((byte) 1, new ProtoStuffSerializer());
 
-    public NettyEncoder(Class<?> genericClass) {
-        this.genericClass = genericClass;
+    byte type;
+
+    Serializer serializer;
+
+    RpcSerializer(byte type, Serializer serializer) {
+        this.type = type;
+        this.serializer = serializer;
     }
 
-    @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        if (genericClass.isInstance(o)) {
-            byte[] data = ProtoStuffUtils.serialize(o);
-            byteBuf.writeInt(data.length);
-            byteBuf.writeBytes(data);
-        }
+    private static HashMap<Byte, Serializer> SERIALIZERS_MAP = new HashMap<>();
 
+    static {
+        for (RpcSerializer rpcSerializer : RpcSerializer.values()) {
+            SERIALIZERS_MAP.put(rpcSerializer.type, rpcSerializer.serializer);
+        }
+    }
+
+    public static Serializer getSerializerByType(byte type) {
+        return SERIALIZERS_MAP.get(type);
     }
 }

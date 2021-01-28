@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.rpc.codec;
 
-import org.apache.dolphinscheduler.remote.serialize.ProtoStuffUtils;
+import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
+import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
+import org.apache.dolphinscheduler.rpc.serializer.Serializer;
 
 import java.util.List;
 
@@ -49,9 +51,12 @@ public class NettyDecoder extends ByteToMessageDecoder {
         if (byteBuf.readableBytes() < dataLength) {
             byteBuf.resetReaderIndex();
         }
+
+        byte serializerType=1;
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
-        Object obj = ProtoStuffUtils.deserialize(data, genericClass);
+        Serializer serializer=RpcSerializer.getSerializerByType(serializerType);
+        Object obj = serializer.deserialize(data, genericClass);
         list.add(obj);
     }
 }

@@ -40,7 +40,7 @@ public class ConsumerInterceptor {
 
     private NettyClient nettyClient = NettyClient.getInstance();
 
-    public ConsumerInterceptor(Host host) {
+    ConsumerInterceptor(Host host) {
         this.host = host;
     }
 
