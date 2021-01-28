@@ -28,10 +28,12 @@ import java.util.List;
 
 
 /**
- *  spark args utils
+ * flink args utils
  */
 public class FlinkArgsUtils {
     private static final String LOCAL_DEPLOY_MODE = "local";
+    private static final String FLINK_VERSION_BEFORE_1_10 = "<1.10";
+
     /**
      * build args
      * @param param flink parameters
@@ -46,6 +48,7 @@ public class FlinkArgsUtils {
             deployMode = tmpDeployMode;
 
         }
+        String others = param.getOthers();
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
             args.add(Constants.FLINK_RUN_MODE);  //-m
 
@@ -60,15 +63,18 @@ public class FlinkArgsUtils {
             String appName = param.getAppName();
             if (StringUtils.isNotEmpty(appName)) { //-ynm
                 args.add(Constants.FLINK_APP_NAME);
-                args.add(appName);
+                args.add(ArgsUtils.escape(appName));
             }
 
-            int taskManager = param.getTaskManager();
-            if (taskManager != 0) {                        //-yn
+            // judge flink version,from flink1.10,the parameter -yn removed
+            String flinkVersion = param.getFlinkVersion();
+            if (FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
+               int taskManager = param.getTaskManager();
+                if (taskManager != 0) {                        //-yn
                 args.add(Constants.FLINK_TASK_MANAGE);
                 args.add(String.format("%d", taskManager));
+                }
             }
-
             String jobManagerMemory = param.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
                 args.add(Constants.FLINK_JOB_MANAGE_MEM);
@@ -81,8 +87,21 @@ public class FlinkArgsUtils {
                 args.add(taskManagerMemory);
             }
 
+            if (StringUtils.isEmpty(others) || !others.contains(Constants.FLINK_QUEUE)) {
+                String queue = param.getQueue();
+                if (StringUtils.isNotEmpty(queue)) { // -yqu
+                    args.add(Constants.FLINK_QUEUE);
+                    args.add(queue);
+                }
+            }
+
             args.add(Constants.FLINK_DETACH); //-d
 
+        }
+
+        // -p -s -yqu -yat -sae -yD -D
+        if (StringUtils.isNotEmpty(others)) {
+            args.add(others);
         }
 
         ProgramType programType = param.getProgramType();
@@ -100,21 +119,6 @@ public class FlinkArgsUtils {
         String mainArgs = param.getMainArgs();
         if (StringUtils.isNotEmpty(mainArgs)) {
             args.add(mainArgs);
-        }
-
-        // --files --conf --libjar ...
-        String others = param.getOthers();
-        String queue = param.getQueue();
-        if (StringUtils.isNotEmpty(others)) {
-
-            if (!others.contains(Constants.FLINK_QUEUE) && StringUtils.isNotEmpty(queue) && !deployMode.equals(LOCAL_DEPLOY_MODE)) {
-                args.add(Constants.FLINK_QUEUE);
-                args.add(param.getQueue());
-            }
-            args.add(others);
-        } else if (StringUtils.isNotEmpty(queue) && !deployMode.equals(LOCAL_DEPLOY_MODE)) {
-            args.add(Constants.FLINK_QUEUE);
-            args.add(param.getQueue());
         }
 
         return args;

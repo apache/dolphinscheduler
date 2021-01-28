@@ -597,12 +597,6 @@ public final class Constants {
 
 
     /**
-     * --queue --qu
-     */
-    public static final String FLINK_QUEUE = "--qu";
-
-
-    /**
      * exit code success
      */
     public static final int EXIT_CODE_SUCCESS = 0;
@@ -826,6 +820,7 @@ public final class Constants {
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
     public static final String FLINK_APP_NAME = "-ynm";
+    public static final String FLINK_QUEUE = "-yqu";
     public static final String FLINK_TASK_MANAGE = "-yn";
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
