@@ -24,7 +24,7 @@
         <el-table-column prop="watches" :label="'watches'+$t('Number')"></el-table-column>
         <el-table-column prop="sent" :label="$t('Sent')"></el-table-column>
         <el-table-column prop="received" :label="$t('Received')"></el-table-column>
-        <el-table-column prop="mode" label="leader/follower"></el-table-column>
+        <el-table-column prop="mode" label="leader/follower" min-width="100"></el-table-column>
         <el-table-column prop="minLatency" :label="$t('Min latency')"></el-table-column>
         <el-table-column prop="avgLatency" :label="$t('Avg latency')"></el-table-column>
         <el-table-column prop="maxLatency" :label="$t('Max latency')"></el-table-column>
