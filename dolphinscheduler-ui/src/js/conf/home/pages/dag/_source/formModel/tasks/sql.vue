@@ -51,8 +51,15 @@
             type="input"
             size="small"
             v-model="title"
+            :disabled="isDetails"
             :placeholder="$t('Please enter the title of email')">
           </el-input>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Alarm group')}}</div>
+        <div slot="content">
+          <m-warning-groups v-model="groupId"></m-warning-groups>
         </div>
       </m-list-box>
     </template>
@@ -142,6 +149,7 @@
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
+  import mWarningGroups from './_source/warningGroups'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
@@ -176,7 +184,8 @@
         // Post statements
         postStatements: [],
         item: '',
-        scriptBoxDialog: false
+        scriptBoxDialog: false,
+        groupId: null
       }
     },
     mixins: [disabledState],
@@ -245,16 +254,16 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType === 0 && !this.showType.length) {
+        if (this.sqlType === '0' && !this.showType.length) {
           this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
           return false
         }
-        if (this.sqlType === 0 && !this.title) {
+        if (this.sqlType === '0' && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType === 0 && !this.receivers.length) {
-          this.$message.warning(`${i18n.$t('Recipient required')}`)
+        if (this.sqlType === '0' && (this.groupId === '' || this.groupId === null)) {
+          this.$message.warning(`${i18n.$t('Alarm group required')}`)
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -287,6 +296,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
+          groupId: this.groupId,
           showType: (() => {
             /**
              * Special processing return order TABLE,ATTACHMENT
@@ -347,6 +357,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
+          groupId: this.groupId,
           showType: (() => {
             let showType = this.showType
             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
@@ -377,6 +388,7 @@
         }
         if (val !== 0) {
           this.title = ''
+          this.groupId = null
         }
       },
       // Listening data source
@@ -411,6 +423,7 @@
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''
+        this.groupId = o.params.groupId
       }
     },
     mounted () {
@@ -436,6 +449,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
+          groupId: this.groupId,
           showType: (() => {
             let showType = this.showType
             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
@@ -451,6 +465,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox, mWarningGroups }
   }
 </script>

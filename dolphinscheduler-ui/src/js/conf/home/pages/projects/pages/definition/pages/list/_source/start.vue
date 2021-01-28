@@ -78,15 +78,16 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Notification group')}}
+        {{$t('Alarm group')}}
       </div>
       <div class="cont">
         <el-select
            style="width: 200px;"
+           clearable
            size="small"
            v-model="warningGroupId"
           :disabled="!notifyGroupList.length">
-          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
             <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
             <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
           </el-input>
@@ -263,7 +264,6 @@
         })
       },
       _getGlobalParams () {
-        this.setIsDetails(true)
         this.store.dispatch('dag/getProcessDetails', this.startData.id).then(res => {
           this.definitionGlobalParams = _.cloneDeep(this.store.state.dag.globalParams)
           this.udpList = _.cloneDeep(this.store.state.dag.globalParams)
