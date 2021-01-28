@@ -178,7 +178,7 @@ public abstract class BaseDataSource {
      * @return
      */
   public String getPassword() {
-        return CommonUtils.decodePassword(password);
+    return password;
   }
 
   public void setPassword(String password) {

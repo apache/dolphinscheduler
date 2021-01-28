@@ -19,17 +19,12 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.URL;
 
 /**
@@ -37,8 +32,6 @@ import java.net.URL;
  */
 public class CommonUtils {
   private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
-
-    private static final Base64 BASE64 = new Base64();
 
   private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
@@ -78,7 +71,7 @@ public class CommonUtils {
    * @return true if upload resource is HDFS and kerberos startup
    */
   public static boolean getKerberosStartupState(){
-        String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
+    String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
     ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
     Boolean kerberosStartupState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
     return resUploadType == ResUploadType.HDFS && kerberosStartupState;
@@ -98,48 +91,4 @@ public class CommonUtils {
               PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
     }
   }
-
-    /**
-     * encode password
-     */
-    public static String encodePassword(String password) {
-        if (StringUtils.isEmpty(password)) {
-            return StringUtils.EMPTY;
-        }
-        //if encryption is not turned on, return directly
-        boolean encryptionEnable = PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE, false);
-        if (!encryptionEnable) {
-            return password;
-        }
-
-        // Using Base64 + salt to process password
-        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT, Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
-        String passwordWithSalt = salt + new String(BASE64.encode(password.getBytes(StandardCharsets.UTF_8)));
-        return new String(BASE64.encode(passwordWithSalt.getBytes(StandardCharsets.UTF_8)));
-    }
-
-    /**
-     * decode password
-     */
-    public static String decodePassword(String password) {
-        if (StringUtils.isEmpty(password)) {
-            return StringUtils.EMPTY;
-        }
-
-        //if encryption is not turned on, return directly
-        boolean encryptionEnable = PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE, false);
-        if (!encryptionEnable) {
-            return password;
-        }
-
-        // Using Base64 + salt to process password
-        String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT, Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
-        String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
-        if (!passwordWithSalt.startsWith(salt)) {
-            logger.warn("There is a password and salt mismatch: {} ", password);
-            return password;
-        }
-        return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8);
-    }
-
 }
