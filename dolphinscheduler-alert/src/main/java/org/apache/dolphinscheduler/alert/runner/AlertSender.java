@@ -106,8 +106,8 @@ public class AlertSender {
 
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
-        alertData.setContent(title)
-            .setTitle(content);
+        alertData.setContent(content)
+            .setTitle(title);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
