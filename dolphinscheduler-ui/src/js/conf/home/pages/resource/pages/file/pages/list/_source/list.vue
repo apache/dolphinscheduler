@@ -179,7 +179,7 @@
         findComponentDownward(this.$root, 'roof-nav')._fileReUpload('FILE',item)
       },
       _downloadFile (item) {
-        downloadFile('/dolphinscheduler/resources/download', {
+        downloadFile('resources/download', {
           id: item.id
         })
       },
