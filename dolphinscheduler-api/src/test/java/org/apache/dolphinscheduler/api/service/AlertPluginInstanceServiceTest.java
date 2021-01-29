@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceIm
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +62,82 @@ public class AlertPluginInstanceServiceTest {
 
     private User user;
 
+    private String uiParams="[\n"
+            + "    {\n"
+            + "        \"field\":\"userParams\",\n"
+            + "        \"name\":\"user.params\",\n"
+            + "        \"props\":{\n"
+            + "            \"placeholder\":\"please enter your custom parameters, which will be passed to you when calling your script\",\n"
+            + "            \"size\":\"small\"\n"
+            + "        },\n"
+            + "        \"type\":\"input\",\n"
+            + "        \"title\":\"user.params\",\n"
+            + "        \"value\":\"userParams\",\n"
+            + "        \"validate\":[\n"
+            + "            {\n"
+            + "                \"required\":false,\n"
+            + "                \"message\":null,\n"
+            + "                \"type\":\"string\",\n"
+            + "                \"trigger\":\"blur\",\n"
+            + "                \"min\":null,\n"
+            + "                \"max\":null\n"
+            + "            }\n"
+            + "        ]\n"
+            + "    },\n"
+            + "    {\n"
+            + "        \"field\":\"path\",\n"
+            + "        \"name\":\"path\",\n"
+            + "        \"props\":{\n"
+            + "            \"placeholder\":\"please upload the file to the disk directory of the alert server, and ensure that the path is absolute and has the corresponding access rights\",\n"
+            + "            \"size\":\"small\"\n"
+            + "        },\n"
+            + "        \"type\":\"input\",\n"
+            + "        \"title\":\"path\",\n"
+            + "        \"value\":\"/kris/script/path\",\n"
+            + "        \"validate\":[\n"
+            + "            {\n"
+            + "                \"required\":true,\n"
+            + "                \"message\":null,\n"
+            + "                \"type\":\"string\",\n"
+            + "                \"trigger\":\"blur\",\n"
+            + "                \"min\":null,\n"
+            + "                \"max\":null\n"
+            + "            }\n"
+            + "        ]\n"
+            + "    },\n"
+            + "    {\n"
+            + "        \"field\":\"type\",\n"
+            + "        \"name\":\"type\",\n"
+            + "        \"props\":{\n"
+            + "            \"placeholder\":null,\n"
+            + "            \"size\":\"small\"\n"
+            + "        },\n"
+            + "        \"type\":\"radio\",\n"
+            + "        \"title\":\"type\",\n"
+            + "        \"value\":0,\n"
+            + "        \"validate\":[\n"
+            + "            {\n"
+            + "                \"required\":true,\n"
+            + "                \"message\":null,\n"
+            + "                \"type\":\"string\",\n"
+            + "                \"trigger\":\"blur\",\n"
+            + "                \"min\":null,\n"
+            + "                \"max\":null\n"
+            + "            }\n"
+            + "        ],\n"
+            + "        \"options\":[\n"
+            + "            {\n"
+            + "                \"label\":\"SHELL\",\n"
+            + "                \"value\":0,\n"
+            + "                \"disabled\":false\n"
+            + "            }\n"
+            + "        ]\n"
+            + "    }\n"
+            + "]\n"
+            + "\n";
+
+    private String paramsMap="{\"path\":\"/kris/script/path\",\"userParams\":\"userParams\",\"type\":\"0\"}";
+
     @Before
     public void before() {
         user = new User();
@@ -77,10 +155,10 @@ public class AlertPluginInstanceServiceTest {
     @Test
     public void testCreate() {
         Mockito.when(alertPluginInstanceMapper.queryByInstanceName("test")).thenReturn(alertPluginInstances);
-        Map<String, Object> result = alertPluginInstanceService.create(user, 1, "test", "test params");
+        Map<String, Object> result = alertPluginInstanceService.create(user, 1, "test", uiParams);
         Assert.assertEquals(Status.PLUGIN_INSTANCE_ALREADY_EXIT, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
-        result = alertPluginInstanceService.create(user, 1, "test1", "test params");
+        result = alertPluginInstanceService.create(user, 1, "test1", uiParams);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
@@ -94,6 +172,33 @@ public class AlertPluginInstanceServiceTest {
         result = alertPluginInstanceService.delete(user, 9);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
+    }
+
+    @Test
+    public void testUpdate(){
+        Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(0);
+        Map<String, Object> result= alertPluginInstanceService.update(user,1,"testUpdate",uiParams);
+        Assert.assertEquals(Status.SAVE_ERROR, result.get(Constants.STATUS));
+        Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(1);
+        result= alertPluginInstanceService.update(user,1,"testUpdate",uiParams);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public  void testQueryAll(){
+        AlertPluginInstance alertPluginInstance=new AlertPluginInstance();
+        alertPluginInstance.setId(1);
+        alertPluginInstance.setPluginDefineId(1);
+        alertPluginInstance.setPluginInstanceParams(paramsMap);
+        alertPluginInstance.setInstanceName("test");
+        PluginDefine pluginDefine=new PluginDefine("script","script",uiParams);
+        pluginDefine.setId(1);
+        List<PluginDefine> pluginDefines= Collections.singletonList(pluginDefine);
+        List<AlertPluginInstance> pluginInstanceList= Collections.singletonList(alertPluginInstance);
+        Mockito.when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList()).thenReturn(pluginInstanceList);
+        Mockito.when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(pluginDefines);
+        Map<String, Object> result = alertPluginInstanceService.queryAll();
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
 }

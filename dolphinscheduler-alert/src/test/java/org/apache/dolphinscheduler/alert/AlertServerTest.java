@@ -40,7 +40,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({AlertServer.class,DaoFactory.class})
+@PrepareForTest({AlertServer.class, DaoFactory.class})
 public class AlertServerTest {
 
     @Before
@@ -62,7 +62,7 @@ public class AlertServerTest {
         AlertPluginManager alertPluginManager = PowerMockito.mock(AlertPluginManager.class);
         PowerMockito.whenNew(AlertPluginManager.class).withNoArguments().thenReturn(alertPluginManager);
         ConcurrentHashMap alertChannelMap = new ConcurrentHashMap<>();
-        alertChannelMap.put("pluginName",alertChannelMock);
+        alertChannelMap.put("pluginName", alertChannelMock);
         PowerMockito.when(alertPluginManager.getPluginNameById(Mockito.anyInt())).thenReturn("pluginName");
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
 
@@ -81,7 +81,8 @@ public class AlertServerTest {
         Assert.assertNotNull(alertServer);
 
         new Thread(() -> {
-            alertServer.start(); })
+            alertServer.start();
+        })
                 .start();
 
         Thread.sleep(5 * Constants.ALERT_SCAN_INTERVAL);
