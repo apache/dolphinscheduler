@@ -153,9 +153,6 @@ public class WorkerGroupService extends BaseService {
             }
         }
 
-        // available workerGroup list
-        List<String> availableWorkerGroupList = new ArrayList<>();
-
         for (String workerGroup : workerGroupList) {
             String workerGroupPath = workerPath + "/" + workerGroup;
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
@@ -166,7 +163,6 @@ public class WorkerGroupService extends BaseService {
                 timeStamp = ip.substring(ip.lastIndexOf(":"));
             }
             if (CollectionUtils.isNotEmpty(childrenNodes)) {
-                availableWorkerGroupList.add(workerGroup);
                 WorkerGroup wg = new WorkerGroup();
                 wg.setName(workerGroup);
                 if (isPaging) {

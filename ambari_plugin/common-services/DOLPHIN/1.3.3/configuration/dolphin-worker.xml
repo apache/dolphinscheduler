@@ -64,4 +64,13 @@
 		<description>default worker group</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
+	<property>
+		<name>worker.weigth</name>
+		<value>100</value>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<description>worker weight</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
 </configuration>
