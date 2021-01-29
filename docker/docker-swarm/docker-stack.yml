@@ -27,6 +27,7 @@ services:
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
+      POSTGRESQL_REPLICATION_PASSWORD: dolphinscheduler@123
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
     networks:
@@ -64,37 +65,15 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      ZOOKEEPER_ROOT: /dolphinscheduler
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
-      interval: 30
+      interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-    networks: 
-    - dolphinscheduler
-    deploy:
-      mode: replicated
-      replicas: 1
-
-  dolphinscheduler-frontend:
-    image: apache/dolphinscheduler:latest
-    command: ["frontend"]
-    ports:
-    - 8888:8888
-    environment:
-      TZ: Asia/Shanghai
-      FRONTEND_API_SERVER_HOST: dolphinscheduler-api
-      FRONTEND_API_SERVER_PORT: 12345
-    healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "8888"]
-      interval: 30
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    volumes:
-    - dolphinscheduler-logs:/var/log/nginx
     networks:
     - dolphinscheduler
     deploy:
@@ -127,13 +106,13 @@ services:
       DATABASE_DATABASE: dolphinscheduler
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
-      interval: 30
+      interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-    networks: 
+    networks:
     - dolphinscheduler
     deploy:
       mode: replicated
@@ -142,9 +121,9 @@ services:
   dolphinscheduler-master:
     image: apache/dolphinscheduler:latest
     command: ["master-server"]
-    ports: 
+    ports:
     - 5678:5678
-    environment: 
+    environment:
       TZ: Asia/Shanghai
       MASTER_EXEC_THREADS: "100"
       MASTER_EXEC_TASK_NUM: "20"
@@ -161,7 +140,7 @@ services:
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
-      interval: 30
+      interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
@@ -176,10 +155,10 @@ services:
   dolphinscheduler-worker:
     image: apache/dolphinscheduler:latest
     command: ["worker-server"]
-    ports: 
+    ports:
     - 1234:1234
     - 50051:50051
-    environment: 
+    environment:
       TZ: Asia/Shanghai
       WORKER_EXEC_THREADS: "100"
       WORKER_HEARTBEAT_INTERVAL: "10"
@@ -196,7 +175,7 @@ services:
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
-      interval: 30
+      interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s

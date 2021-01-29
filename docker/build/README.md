@@ -15,9 +15,9 @@ Official Website: https://dolphinscheduler.apache.org
 
 #### You can start a dolphinscheduler instance
 ```
-$ docker run -dit --name dolphinscheduler \ 
+$ docker run -dit --name dolphinscheduler \
 -e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
--p 8888:8888 \
+-p 12345:12345 \
 dolphinscheduler all
 ```
 
@@ -33,7 +33,7 @@ You can specify **existing postgres service**. Example:
 $ docker run -dit --name dolphinscheduler \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
--p 8888:8888 \
+-p 12345:12345 \
 dolphinscheduler all
 ```
 
@@ -43,7 +43,7 @@ You can specify **existing zookeeper service**. Example:
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
--p 8888:8888 \
+-p 12345:12345 \
 dolphinscheduler all
 ```
 
@@ -88,15 +88,6 @@ $ docker run -dit --name dolphinscheduler \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler alert-server
-```
-
-* Start a **frontend**, For example:
-
-```
-$ docker run -dit --name dolphinscheduler \
--e FRONTEND_API_SERVER_HOST="192.168.x.x" -e FRONTEND_API_SERVER_PORT="12345" \
--p 8888:8888 \
-dolphinscheduler frontend
 ```
 
 **Note**: You must be specify `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
@@ -302,18 +293,6 @@ This environment variable sets enterprise wechat agent id for `alert-server`. Th
 
 This environment variable sets enterprise wechat users for `alert-server`. The default value is empty.
 
-**`FRONTEND_API_SERVER_HOST`**
-
-This environment variable sets api server host for `frontend`. The default value is `127.0.0.1`.
-
-**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `api-server`.
-
-**`FRONTEND_API_SERVER_PORT`**
-
-This environment variable sets api server port for `frontend`. The default value is `123451`.
-
-**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `api-server`.
-
 ## Initialization scripts
 
 If you would like to do additional initialization in an image derived from this one, add one or more environment variable under `/root/start-init-conf.sh`, and modify template files in `/opt/dolphinscheduler/conf/*.tpl`.
@@ -322,7 +301,7 @@ For example, to add an environment variable `API_SERVER_PORT` in `/root/start-in
 
 ```
 export API_SERVER_PORT=5555
-``` 
+```
 
 and to modify `/opt/dolphinscheduler/conf/application-api.properties.tpl` template file, add server port:
 ```
@@ -339,8 +318,4 @@ $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
 EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
-
-echo "generate nginx config"
-sed -i "s/FRONTEND_API_SERVER_HOST/${FRONTEND_API_SERVER_HOST}/g" /etc/nginx/conf.d/dolphinscheduler.conf
-sed -i "s/FRONTEND_API_SERVER_PORT/${FRONTEND_API_SERVER_PORT}/g" /etc/nginx/conf.d/dolphinscheduler.conf
 ```
