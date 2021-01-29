@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -45,6 +46,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -84,7 +86,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
      * @param projectName project name
      * @param taskDefinitionJson task definition json
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createTaskDefinition(User loginUser,
                                                     String projectName,
@@ -117,7 +119,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
             logger.error("Task code get error, ", e);
         }
         if (code == 0L) {
-            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);// TODO code message
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
             return result;
         }
         Date now = new Date();
@@ -125,7 +127,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
                 taskNode.getName(),
                 1,
                 taskNode.getDesc(),
-                0L, // TODO  project.getCode()
+                project.getCode(),
                 loginUser.getId(),
                 TaskType.of(taskNode.getType()),
                 taskNode.getParams(),
@@ -174,6 +176,34 @@ public class TaskDefinitionServiceImpl extends BaseService implements
             return StringUtils.EMPTY;
         }
         return StringUtils.join(resourceIds, ",");
+    }
+
+    /**
+     * query task definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskName task name
+     */
+    @Override
+    public Map<String, Object> queryTaskDefinitionByName(User loginUser, String projectName, String taskName) {
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(project.getCode(), taskName);
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskName);
+        } else {
+            result.put(Constants.DATA_LIST, taskDefinition);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
     }
 
 }
