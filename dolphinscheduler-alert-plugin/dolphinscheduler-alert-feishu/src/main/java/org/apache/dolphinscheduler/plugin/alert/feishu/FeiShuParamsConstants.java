@@ -25,25 +25,25 @@ public class FeiShuParamsConstants {
 
     static final String WEB_HOOK = "webhook";
 
-    static final String NAME_WEB_HOOK = "WebHook";
+    static final String NAME_WEB_HOOK = "webHook";
 
-    public static final String FEI_SHU_PROXY_ENABLE = "feishu.isEnableProxy";
+    public static final String FEI_SHU_PROXY_ENABLE = "isEnableProxy";
 
-    static final String NAME_FEI_SHU_PROXY_ENABLE = "feiShuIsEnableProxy";
+    static final String NAME_FEI_SHU_PROXY_ENABLE = "isEnableProxy";
 
-    static final String FEI_SHU_PROXY = "feishu.proxy";
+    static final String FEI_SHU_PROXY = "proxy";
 
-    static final String NAME_FEI_SHU_PROXY = "feiShuProxy";
+    static final String NAME_FEI_SHU_PROXY = "proxy";
 
-    static final String FEI_SHU_PORT = "feishu.port";
+    static final String FEI_SHU_PORT = "port";
 
-    static final String NAME_FEI_SHU_PORT = "feiShuPort";
+    static final String NAME_FEI_SHU_PORT = "port";
 
-    static final String FEI_SHU_USER = "feishu.user";
+    static final String FEI_SHU_USER = "user";
 
-    static final String NAME_FEI_SHU_USER = "feiShuUser";
+    static final String NAME_FEI_SHU_USER = "user";
 
-    static final String FEI_SHU_PASSWORD = "feishu.password";
+    static final String FEI_SHU_PASSWORD = "password";
 
-    static final String NAME_FEI_SHU_PASSWORD = "feiShuPassword";
+    static final String NAME_FEI_SHU_PASSWORD = "password";
 }
