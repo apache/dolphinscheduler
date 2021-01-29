@@ -33,6 +33,8 @@ import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -215,7 +217,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
             alertPluginInstanceVO.setAlertPluginName(pluginDefine.getPluginName());
             //todo List pages do not recommend returning this parameter
             String pluginParamsMapString = alertPluginInstance.getPluginInstanceParams();
-            String uiPluginParams=parseToPluginUiParams(pluginParamsMapString,pluginDefine.getPluginParams());
+            String uiPluginParams = parseToPluginUiParams(pluginParamsMapString, pluginDefine.getPluginParams());
             alertPluginInstanceVO.setPluginInstanceParams(uiPluginParams);
             alertPluginInstanceVOS.add(alertPluginInstanceVO);
         });
@@ -242,9 +244,10 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
      * @return Complete parameters list(include ui)
      */
     private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {
-        //todo npe
-        HashMap paramsMap = JSONUtils.parseObject(pluginParamsMapString, HashMap.class);
-        assert paramsMap != null;
+        Map<String, String> paramsMap = JSONUtils.toMap(pluginParamsMapString);
+        if (MapUtils.isEmpty(paramsMap)) {
+            return null;
+        }
         List<PluginParams> pluginParamsList = JSONUtils.toList(pluginUiParams, PluginParams.class);
         List<PluginParams> newPluginParamsList = new ArrayList<>(pluginParamsList.size());
         pluginParamsList.forEach(pluginParams -> {
