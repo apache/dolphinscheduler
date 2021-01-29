@@ -108,7 +108,7 @@ public class NettyRemotingServer {
         this.serverConfig = serverConfig;
         if (NettyUtils.useEpoll()) {
             this.bossGroup = new EpollEventLoopGroup(1, new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -117,7 +117,7 @@ public class NettyRemotingServer {
             });
 
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -126,7 +126,7 @@ public class NettyRemotingServer {
             });
         } else {
             this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -135,7 +135,7 @@ public class NettyRemotingServer {
             });
 
             this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {

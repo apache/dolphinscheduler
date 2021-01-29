@@ -216,7 +216,7 @@ public class NettyRemotingClient {
                     invokeCallback,
                     releaseSemaphore);
             try {
-                channel.writeAndFlush(command).addListener((ChannelFutureListener) future -> {
+                channel.writeAndFlush(command).addListener(future -> {
                     if (future.isSuccess()) {
                         responseFuture.setSendOk(true);
                         return;
@@ -259,7 +259,7 @@ public class NettyRemotingClient {
         }
         final long opaque = command.getOpaque();
         final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
-        channel.writeAndFlush(command).addListener((ChannelFutureListener) future -> {
+        channel.writeAndFlush(command).addListener(future -> {
             if (future.isSuccess()) {
                 responseFuture.setSendOk(true);
                 return;
