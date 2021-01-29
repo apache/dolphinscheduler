@@ -144,7 +144,7 @@ public class AlertSender {
      * @return AlertResult
      */
     private AlertResult alertResultHandler(AlertPluginInstance instance, AlertData alertData) {
-        String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
+        String pluginName = AlertPluginManager.pluginDefineMap.get(instance.getPluginDefineId());
         AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
         AlertResult alertResultExtend = new AlertResult();
         String pluginInstanceName = instance.getInstanceName();
