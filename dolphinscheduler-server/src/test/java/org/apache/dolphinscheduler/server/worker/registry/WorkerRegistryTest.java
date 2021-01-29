@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class WorkerRegistryTest {
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     @Mock
-    private ZookeeperCachedOperator zookeeperCachedOperator;
+    private RegisterOperator registerOperator;
 
     @Mock
     private CuratorFrameworkImpl zkClient;
@@ -75,9 +75,9 @@ public class WorkerRegistryTest {
         Mockito.when(workerConfig.getWorkerGroups()).thenReturn(workerGroups);
 
         Mockito.when(zookeeperRegistryCenter.getWorkerPath()).thenReturn("/dolphinscheduler/nodes/worker");
-        Mockito.when(zookeeperRegistryCenter.getZookeeperCachedOperator()).thenReturn(zookeeperCachedOperator);
-        Mockito.when(zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient()).thenReturn(zkClient);
-        Mockito.when(zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable()).thenReturn(
+        Mockito.when(zookeeperRegistryCenter.getRegisterOperator()).thenReturn(registerOperator);
+        Mockito.when(zookeeperRegistryCenter.getRegisterOperator().getZkClient()).thenReturn(zkClient);
+        Mockito.when(zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable()).thenReturn(
                 new Listenable<ConnectionStateListener>() {
                     @Override
                     public void addListener(ConnectionStateListener connectionStateListener) {
@@ -114,7 +114,7 @@ public class WorkerRegistryTest {
         int i = 0;
         for (String workerGroup : workerConfig.getWorkerGroups()) {
             String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
-            String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(workerZkPath);
+            String heartbeat = zookeeperRegistryCenter.getRegisterOperator().get(workerZkPath);
             if (0 == i) {
                 Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/test/"));
             } else {
@@ -156,7 +156,7 @@ public class WorkerRegistryTest {
 
         for (String workerGroup : workerConfig.getWorkerGroups()) {
             String workerGroupPath = workerPath + "/" + workerGroup.trim();
-            List<String> childrenKeys = zookeeperRegistryCenter.getZookeeperCachedOperator().getChildrenKeys(workerGroupPath);
+            List<String> childrenKeys = zookeeperRegistryCenter.getRegisterOperator().getChildrenKeys(workerGroupPath);
             Assert.assertTrue(childrenKeys.isEmpty());
         }
 
