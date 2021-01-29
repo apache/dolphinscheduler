@@ -130,7 +130,7 @@ public class NettyRemotingClient {
         this.clientConfig = clientConfig;
         if (NettyUtils.useEpoll()) {
             this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -139,7 +139,7 @@ public class NettyRemotingClient {
             });
         } else {
             this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -197,18 +197,18 @@ public class NettyRemotingClient {
         if (channel == null) {
             throw new RemotingException("network error");
         }
-        /**
+        /*
          * request unique identification
          */
         final long opaque = command.getOpaque();
-        /**
+        /*
          *  control concurrency number
          */
         boolean acquired = this.asyncSemaphore.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {
             final ReleaseSemaphore releaseSemaphore = new ReleaseSemaphore(this.asyncSemaphore);
 
-            /**
+            /*
              *  response future
              */
             final ResponseFuture responseFuture = new ResponseFuture(opaque,
@@ -216,25 +216,21 @@ public class NettyRemotingClient {
                     invokeCallback,
                     releaseSemaphore);
             try {
-                channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
-
-                    @Override
-                    public void operationComplete(ChannelFuture future) {
-                        if (future.isSuccess()) {
-                            responseFuture.setSendOk(true);
-                            return;
-                        } else {
-                            responseFuture.setSendOk(false);
-                        }
-                        responseFuture.setCause(future.cause());
-                        responseFuture.putResponse(null);
-                        try {
-                            responseFuture.executeInvokeCallback();
-                        } catch (Exception ex) {
-                            logger.error("execute callback error", ex);
-                        } finally {
-                            responseFuture.release();
-                        }
+                channel.writeAndFlush(command).addListener((ChannelFutureListener) future -> {
+                    if (future.isSuccess()) {
+                        responseFuture.setSendOk(true);
+                        return;
+                    } else {
+                        responseFuture.setSendOk(false);
+                    }
+                    responseFuture.setCause(future.cause());
+                    responseFuture.putResponse(null);
+                    try {
+                        responseFuture.executeInvokeCallback();
+                    } catch (Exception ex) {
+                        logger.error("execute callback error", ex);
+                    } finally {
+                        responseFuture.release();
                     }
                 });
             } catch (Exception ex) {
@@ -263,21 +259,18 @@ public class NettyRemotingClient {
         }
         final long opaque = command.getOpaque();
         final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
-        channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (future.isSuccess()) {
-                    responseFuture.setSendOk(true);
-                    return;
-                } else {
-                    responseFuture.setSendOk(false);
-                }
-                responseFuture.setCause(future.cause());
-                responseFuture.putResponse(null);
-                logger.error("send command {} to host {} failed", command, host);
+        channel.writeAndFlush(command).addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                responseFuture.setSendOk(true);
+                return;
+            } else {
+                responseFuture.setSendOk(false);
             }
+            responseFuture.setCause(future.cause());
+            responseFuture.putResponse(null);
+            logger.error("send command {} to host {} failed", command, host);
         });
-        /**
+        /*
          * sync wait for result
          */
         Command result = responseFuture.waitResponse();

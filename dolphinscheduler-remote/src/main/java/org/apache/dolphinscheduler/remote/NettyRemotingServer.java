@@ -97,7 +97,7 @@ public class NettyRemotingServer {
     /**
      * Netty server bind fail message
      */
-    private final String nettyBindFailureMsg = "NettyRemotingServer bind %s fail";
+    private static final String NETTY_BIND_FAILURE_MSG = "NettyRemotingServer bind %s fail";
 
     /**
      * server init
@@ -172,14 +172,14 @@ public class NettyRemotingServer {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
                 logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
-                throw new RemoteException(String.format(nettyBindFailureMsg, serverConfig.getListenPort()));
+                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
             }
             if (future.isSuccess()) {
                 logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
             } else if (future.cause() != null) {
-                throw new RemoteException(String.format(nettyBindFailureMsg, serverConfig.getListenPort()), future.cause());
+                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()), future.cause());
             } else {
-                throw new RemoteException(String.format(nettyBindFailureMsg, serverConfig.getListenPort()));
+                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
             }
         }
     }
