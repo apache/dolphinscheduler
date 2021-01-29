@@ -48,25 +48,22 @@ public class AlertSender {
 
     private List<Alert> alertList;
     private AlertDao alertDao;
-    private PluginDao pluginDao;
     private AlertPluginManager alertPluginManager;
 
     public AlertSender(AlertPluginManager alertPluginManager) {
         this.alertPluginManager = alertPluginManager;
     }
 
-    public AlertSender(AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
+    public AlertSender(AlertDao alertDao, AlertPluginManager alertPluginManager) {
         super();
         this.alertDao = alertDao;
-        this.pluginDao = pluginDao;
         this.alertPluginManager = alertPluginManager;
     }
 
-    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
+    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertPluginManager alertPluginManager) {
         super();
         this.alertList = alertList;
         this.alertDao = alertDao;
-        this.pluginDao = pluginDao;
         this.alertPluginManager = alertPluginManager;
     }
 

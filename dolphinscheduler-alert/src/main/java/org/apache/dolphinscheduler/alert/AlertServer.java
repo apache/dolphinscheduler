@@ -133,7 +133,7 @@ public class AlertServer {
                 logger.warn("No Alert Plugin . Can not send alert info. ");
             } else {
                 List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
+                alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
                 alertSender.run();
             }
         }
