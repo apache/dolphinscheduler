@@ -46,6 +46,7 @@ public class FeiShuSenderTest {
         AlertResult alertResult = feiShuSender.sendFeiShuMsg(alertData);
         Assert.assertEquals("false", alertResult.getStatus());
     }
+
     @Test
     public void testFormatContent() {
         String alertMsg = "[\n"
