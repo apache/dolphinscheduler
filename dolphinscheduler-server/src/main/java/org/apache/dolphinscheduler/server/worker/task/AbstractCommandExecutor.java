@@ -353,7 +353,7 @@ public abstract class AbstractCommandExecutor {
                             varPool.append(line.substring("${setValue(".length(), line.length() - 2));
                             varPool.append("$VarPool$");
                         } else {
-                            if(null != line){
+                            if (null != line) {
                             logBuffer.add(line);
                             }
                             lastFlushTime = flush(lastFlushTime);
