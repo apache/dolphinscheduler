@@ -34,59 +34,9 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  * abstract zookeeper client
  */
 @Component
-public abstract class AbstractZKClient extends ZookeeperCachedOperator {
+public abstract class AbstractZKClient extends RegisterOperator {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractZKClient.class);
-
-
-	/**
-	 *  remove dead server by host
-	 * @param host host
-	 * @param serverType serverType
-	 * @throws Exception
-	 */
-	public void removeDeadServerByHost(String host, String serverType) throws Exception {
-		List<String> deadServers = super.getChildrenKeys(getDeadZNodeParentPath());
-		for(String serverPath : deadServers){
-			if(serverPath.startsWith(serverType+UNDERLINE+host)){
-				String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-				super.remove(server);
-				logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
-			}
-		}
-	}
-
-
-	/**
-	 * opType(add): if find dead server , then add to zk deadServerPath
-	 * opType(delete): delete path from zk
-	 *
-	 * @param zNode   		  node path
-	 * @param zkNodeType	  master or worker
-	 * @param opType		  delete or add
-	 * @throws Exception errors
-	 */
-	public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
-		String host = getHostByEventDataPath(zNode);
-		String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
-
-		//check server restart, if restart , dead server path in zk should be delete
-		if(opType.equals(DELETE_ZK_OP)){
-			removeDeadServerByHost(host, type);
-
-		}else if(opType.equals(ADD_ZK_OP)){
-			String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
-			if(!super.isExisted(deadServerPath)){
-				//add dead server info to zk dead server path : /dead-servers/
-
-				super.persist(deadServerPath,(type + UNDERLINE + host));
-
-				logger.info("{} server dead , and {} added to zk dead server path success" ,
-						zkNodeType.toString(), zNode);
-			}
-		}
-
-	}
 
 	/**
 	 * get active master num
@@ -238,13 +188,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		return path;
 	}
 
-	/**
-	 *
-	 * @return get dead server node parent path
-	 */
-	protected String getDeadZNodeParentPath(){
-		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS;
-	}
+
 
 	/**
 	 *
@@ -302,25 +246,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		} catch (Exception e) {
 			logger.error("init system znode failed",e);
 		}
-	}
-
-	/**
-	 *  get host ip, string format: masterParentPath/ip
-	 * @param path path
-	 * @return host ip, string format: masterParentPath/ip
-	 */
-	protected String getHostByEventDataPath(String path) {
-		if(StringUtils.isEmpty(path)){
-			logger.error("empty path!");
-			return "";
-		}
-		String[] pathArray = path.split(SINGLE_SLASH);
-		if(pathArray.length < 1){
-			logger.error("parse ip error: {}", path);
-			return "";
-		}
-		return pathArray[pathArray.length - 1];
-
 	}
 
 	@Override

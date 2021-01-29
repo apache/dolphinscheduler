@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  *  zookeeper register center
@@ -38,8 +42,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
 
     @Autowired
-    protected ZookeeperCachedOperator zookeeperCachedOperator;
-
+    protected RegisterOperator registerOperator;
     @Autowired
     private  ZookeeperConfig zookeeperConfig;
 
@@ -59,6 +62,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     public String WORKER_PATH;
 
     public final String EMPTY = "";
+
+    private IStoppable stoppable;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -82,8 +87,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      * init nodes
      */
     private void initNodes() {
-        zookeeperCachedOperator.persist(MASTER_PATH, EMPTY);
-        zookeeperCachedOperator.persist(WORKER_PATH, EMPTY);
+        registerOperator.persist(MASTER_PATH, EMPTY);
+        registerOperator.persist(WORKER_PATH, EMPTY);
     }
 
     /**
@@ -91,8 +96,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      */
     public void close() {
         if (isStarted.compareAndSet(true, false)) {
-            if (zookeeperCachedOperator != null) {
-                zookeeperCachedOperator.close();
+            if (registerOperator != null) {
+                registerOperator.close();
             }
         }
     }
@@ -183,15 +188,50 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      * @return children nodes
      */
     public List<String> getChildrenKeys(final String key) {
-        return zookeeperCachedOperator.getChildrenKeys(key);
+        return registerOperator.getChildrenKeys(key);
     }
 
     /**
-     * get zookeeperCachedOperator
-     * @return zookeeperCachedOperator
+     *
+     * @return get dead server node parent path
      */
-    public ZookeeperCachedOperator getZookeeperCachedOperator() {
-        return zookeeperCachedOperator;
+    public String getDeadZNodeParentPath(){
+        return registerOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS;
     }
 
+    public void setStoppable(IStoppable stoppable) {
+        this.stoppable = stoppable;
+    }
+
+    public IStoppable getStoppable() {
+        return stoppable;
+    }
+
+    /**
+     *	check dead server or not , if dead, stop self
+     *
+     * @param zNode   	 node path
+     * @param serverType master or worker prefix
+     * @return  true if not exists
+     * @throws Exception errors
+     */
+    protected boolean checkIsDeadServer(String zNode, String serverType) throws Exception{
+        //ip_sequenceno
+        String[] zNodesPath = zNode.split("\\/");
+        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
+
+        String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
+        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
+
+        if(!registerOperator.isExisted(zNode) || registerOperator.isExisted(deadServerPath)){
+            return true;
+        }
+
+
+        return false;
+    }
+
+    public RegisterOperator getRegisterOperator() {
+        return registerOperator;
+    }
 }

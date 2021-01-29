@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -48,7 +50,7 @@ import javax.annotation.PostConstruct;
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
-public class MasterServer {
+public class MasterServer implements IStoppable {
 
     /**
      * logger of MasterServer
@@ -107,18 +109,26 @@ public class MasterServer {
      */
     @PostConstruct
     public void run(){
+        try {
+            //init remoting server
+            NettyServerConfig serverConfig = new NettyServerConfig();
+            serverConfig.setListenPort(masterConfig.getListenPort());
+            this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
+            this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
+            this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+            this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+            this.nettyRemotingServer.start();
 
-        //init remoting server
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(masterConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
-        this.nettyRemotingServer.start();
+            this.masterRegistry.getZookeeperRegistryCenter().setStoppable(this);
 
-        // register
-        this.masterRegistry.registry();
+            String registPath = this.masterRegistry.getMasterPath();
+            this.masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER,Constants.DELETE_ZK_OP);
+            // register
+            this.masterRegistry.registry();
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            throw new RuntimeException(e);
+        }
 
         // self tolerant
         this.zkMasterClient.start();
@@ -146,7 +156,9 @@ public class MasterServer {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                close("shutdownHook");
+                if (Stopper.isRunning()) {
+                    close("shutdownHook");
+                }
             }
         }));
 
@@ -187,10 +199,17 @@ public class MasterServer {
             }catch (Exception e){
                 logger.warn("Quartz service stopped exception:{}",e.getMessage());
             }
+
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
+        } finally {
             System.exit(-1);
         }
+    }
+
+    @Override
+    public void stop(String cause) {
+        close(cause);
     }
 }
 

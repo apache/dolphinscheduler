@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
-
-import java.util.Date;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.Set;
+
+import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
 
 public class HeartBeatTask extends Thread {
 
@@ -36,23 +37,41 @@ public class HeartBeatTask extends Thread {
     private double reservedMemory;
     private double maxCpuloadAvg;
     private Set<String> heartBeatPaths;
+    private String serverType;
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    /**
+     * server stop or not
+     */
+    protected IStoppable stoppable = null;
 
     public HeartBeatTask(String startTime,
                          double reservedMemory,
                          double maxCpuloadAvg,
                          Set<String> heartBeatPaths,
+                         String serverType,
                          ZookeeperRegistryCenter zookeeperRegistryCenter) {
         this.startTime = startTime;
         this.reservedMemory = reservedMemory;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.heartBeatPaths = heartBeatPaths;
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
+        this.serverType = serverType;
     }
 
     @Override
     public void run() {
         try {
+
+            //check dead or not in zookeeper
+            for (String heartBeatPath : heartBeatPaths) {
+                if(zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)){
+                    //logger.error("i was judged to death, release resources and stop myself");
+                    zookeeperRegistryCenter.getStoppable().stop("i was judged to death, release resources and stop myself");
+                    return;
+                }
+            }
+
+
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
 
@@ -78,10 +97,18 @@ public class HeartBeatTask extends Thread {
             builder.append(OSUtils.getProcessID());
 
             for (String heartBeatPath : heartBeatPaths) {
-                zookeeperRegistryCenter.getZookeeperCachedOperator().update(heartBeatPath, builder.toString());
+                zookeeperRegistryCenter.getRegisterOperator().update(heartBeatPath, builder.toString());
             }
         } catch (Throwable ex) {
             logger.error("error write heartbeat info", ex);
         }
+    }
+
+    /**
+     * for stop server
+     * @param serverStoppable server stoppable interface
+     */
+    public void setStoppable(IStoppable serverStoppable){
+        this.stoppable = serverStoppable;
     }
 }
