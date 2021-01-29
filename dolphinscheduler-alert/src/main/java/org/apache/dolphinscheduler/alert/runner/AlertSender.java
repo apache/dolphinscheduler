@@ -75,13 +75,14 @@ public class AlertSender {
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
                 logger.error("send alert msg fail,no bind plugin instance.");
-                return;
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alert.getId());
+                continue;
             }
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
-                .setContent(alert.getContent())
-                .setLog(alert.getLog())
-                .setTitle(alert.getTitle());
+                    .setContent(alert.getContent())
+                    .setLog(alert.getLog())
+                    .setTitle(alert.getTitle());
 
             for (AlertPluginInstance instance : alertInstanceList) {
 
@@ -106,8 +107,8 @@ public class AlertSender {
 
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
-        alertData.setContent(title)
-            .setTitle(content);
+        alertData.setContent(content)
+            .setTitle(title);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -126,7 +127,7 @@ public class AlertSender {
         for (AlertPluginInstance instance : alertInstanceList) {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
             AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                    Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
             sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
             sendResponseResults.add(alertSendResponseResult);
         }
