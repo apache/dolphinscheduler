@@ -347,7 +347,7 @@ public abstract class AbstractCommandExecutor {
                     String line;
 
                     long lastFlushTime = System.currentTimeMillis();
-
+                    logBuffer.add("welcome to use dolphinscheduler scheduling system...");
                     while ((line = inReader.readLine()) != null || logBuffer.size() > 0) {
                         if (null != line) {
                             if (line.startsWith("${setValue(")) {
