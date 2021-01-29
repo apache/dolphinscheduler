@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Map;
 
@@ -35,8 +34,8 @@ public class DingTalkAlertChannel implements AlertChannel {
 
         AlertData alertData = alertInfo.getAlertData();
         Map<String, String> paramsMap = alertInfo.getAlertParams();
-        if(null==paramsMap){
-            return new AlertResult("false","ding talk params is null");
+        if (null == paramsMap) {
+            return new AlertResult("false", "ding talk params is null");
         }
         return new DingTalkSender(paramsMap).sendDingTalkMsg(alertData.getTitle(), alertData.getContent());
     }
