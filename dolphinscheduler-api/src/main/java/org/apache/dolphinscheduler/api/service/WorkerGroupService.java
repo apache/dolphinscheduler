@@ -164,8 +164,12 @@ public class WorkerGroupService extends BaseService {
                 WorkerGroup wg = new WorkerGroup();
                 wg.setName(workerGroup);
                 if (isPaging) {
-                    wg.setIpList(childrenNodes);
                     String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
+                    for (int i = 0; i < childrenNodes.size(); i++) {
+                        String ip = childrenNodes.get(i);
+                        childrenNodes.set(i, ip.substring(0, ip.lastIndexOf(":")));
+                    }
+                    wg.setIpList(childrenNodes);
                     wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
                     wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
                 }
