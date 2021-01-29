@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 
 /**
- *  alert request processor
+ * alert request processor
  */
 public class AlertRequestProcessor implements NettyRequestProcessor {
 
@@ -59,7 +59,7 @@ public class AlertRequestProcessor implements NettyRequestProcessor {
                 command.getBody(), AlertSendRequestCommand.class);
         logger.info("received command : {}", alertSendRequestCommand);
 
-        AlertSender alertSender = new AlertSender(alertDao, alertPluginManager, pluginDao);
+        AlertSender alertSender = new AlertSender(alertDao, alertPluginManager);
         AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(alertSendRequestCommand.getGroupId(), alertSendRequestCommand.getTitle(), alertSendRequestCommand.getContent());
         channel.writeAndFlush(alertSendResponseCommand.convert2Command(command.getOpaque()));
 

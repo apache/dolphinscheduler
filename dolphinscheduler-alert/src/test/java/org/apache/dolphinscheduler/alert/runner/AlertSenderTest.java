@@ -67,7 +67,7 @@ public class AlertSenderTest {
         int alertGroupId = 1;
         String title = "alert mail test title";
         String content = "alert mail test content";
-        alertSender = new AlertSender(alertDao,alertPluginManager,pluginDao);
+        alertSender = new AlertSender(alertDao, alertPluginManager);
 
         //1.alert instance does not exist
         PowerMockito.when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(null);
@@ -75,7 +75,7 @@ public class AlertSenderTest {
         AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content);
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+                logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //2.alert plugin does not exist
         int pluginDefineId = 1;
@@ -83,31 +83,31 @@ public class AlertSenderTest {
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId,pluginInstanceParams,pluginInstanceName);
+                pluginDefineId, pluginInstanceParams, pluginInstanceName);
         alertInstanceList.add(alertPluginInstance);
         PowerMockito.when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
 
         String pluginName = "alert-plugin-mail";
-        PluginDefine pluginDefine = new PluginDefine(pluginName,"1",null);
+        PluginDefine pluginDefine = new PluginDefine(pluginName, "1", null);
         PowerMockito.when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
 
         alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content);
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+                logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //3.alert result value is null
         AlertChannel alertChannelMock = PowerMockito.mock(AlertChannel.class);
         PowerMockito.when(alertChannelMock.process(Mockito.any())).thenReturn(null);
         Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
-        alertChannelMap.put(pluginName,alertChannelMock);
+        alertChannelMap.put(pluginName, alertChannelMock);
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
         PowerMockito.when(alertPluginManager.getPluginNameById(Mockito.anyInt())).thenReturn("alert-plugin-mail");
 
         alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content);
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+                logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //4.abnormal information inside the alert plug-in code
         AlertResult alertResult = new AlertResult();
@@ -115,27 +115,27 @@ public class AlertSenderTest {
         alertResult.setMessage("Abnormal information inside the alert plug-in code");
         PowerMockito.when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         alertChannelMap = new ConcurrentHashMap<>();
-        alertChannelMap.put(pluginName,alertChannelMock);
+        alertChannelMap.put(pluginName, alertChannelMock);
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
 
         alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content);
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+                logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
         //5.alert plugin send success
         alertResult = new AlertResult();
         alertResult.setStatus(String.valueOf(true));
-        alertResult.setMessage(String.format("Alert Plugin %s send success",pluginInstanceName));
+        alertResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
         PowerMockito.when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         alertChannelMap = new ConcurrentHashMap<>();
-        alertChannelMap.put(pluginName,alertChannelMock);
+        alertChannelMap.put(pluginName, alertChannelMock);
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
 
         alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content);
         Assert.assertTrue(alertSendResponseCommand.getResStatus());
         alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+                logger.info("alert send response result, status:{}, message:{}", result.getStatus(), result.getMessage()));
 
     }
 
@@ -151,29 +151,29 @@ public class AlertSenderTest {
         alert.setContent(content);
         alertList.add(alert);
 
-        alertSender = new AlertSender(alertList,alertDao,alertPluginManager,pluginDao);
+        alertSender = new AlertSender(alertList, alertDao, alertPluginManager);
 
         int pluginDefineId = 1;
         String pluginInstanceParams = "alert-instance-mail-params";
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId,pluginInstanceParams,pluginInstanceName);
+                pluginDefineId, pluginInstanceParams, pluginInstanceName);
         alertInstanceList.add(alertPluginInstance);
         PowerMockito.when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(alertInstanceList);
 
         String pluginName = "alert-plugin-mail";
-        PluginDefine pluginDefine = new PluginDefine(pluginName,"1",null);
+        PluginDefine pluginDefine = new PluginDefine(pluginName, "1", null);
         PowerMockito.when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
         PowerMockito.when(alertPluginManager.getPluginNameById(1)).thenReturn("alert-instance-mail");
 
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus(String.valueOf(true));
-        alertResult.setMessage(String.format("Alert Plugin %s send success",pluginInstanceName));
+        alertResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
         AlertChannel alertChannelMock = PowerMockito.mock(AlertChannel.class);
         PowerMockito.when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         ConcurrentHashMap alertChannelMap = new ConcurrentHashMap<>();
-        alertChannelMap.put(pluginName,alertChannelMock);
+        alertChannelMap.put(pluginName, alertChannelMock);
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
         Assert.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         alertSender.run();
