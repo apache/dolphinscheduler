@@ -58,22 +58,22 @@ public class PluginDao extends AbstractBaseDao {
      *
      * @param pluginDefine new pluginDefine
      */
-    public void addOrUpdatePluginDefine(PluginDefine pluginDefine) {
+    public int addOrUpdatePluginDefine(PluginDefine pluginDefine) {
         requireNonNull(pluginDefine, "pluginDefine is null");
         requireNonNull(pluginDefine.getPluginName(), "pluginName is null");
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
         List<PluginDefine> pluginDefineList = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (pluginDefineList == null || pluginDefineList.size() == 0) {
-            pluginDefineMapper.insert(pluginDefine);
-        } else {
-            PluginDefine currPluginDefine = pluginDefineList.get(0);
-            if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
-                currPluginDefine.setUpdateTime(pluginDefine.getUpdateTime());
-                currPluginDefine.setPluginParams(pluginDefine.getPluginParams());
-                pluginDefineMapper.updateById(currPluginDefine);
-            }
+            return pluginDefineMapper.insert(pluginDefine);
         }
+        PluginDefine currPluginDefine = pluginDefineList.get(0);
+        if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
+            currPluginDefine.setUpdateTime(pluginDefine.getUpdateTime());
+            currPluginDefine.setPluginParams(pluginDefine.getPluginParams());
+            pluginDefineMapper.updateById(currPluginDefine);
+        }
+        return currPluginDefine.getId();
     }
 
     /**
