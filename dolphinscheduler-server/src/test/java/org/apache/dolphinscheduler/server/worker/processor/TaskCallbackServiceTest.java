@@ -42,7 +42,7 @@ import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.Date;
@@ -70,7 +70,7 @@ import io.netty.channel.Channel;
     ZookeeperRegistryCenter.class,
     MasterConfig.class,
     WorkerConfig.class,
-    ZookeeperCachedOperator.class,
+    RegisterOperator.class,
     ZookeeperConfig.class,
     ZookeeperNodeManager.class,
     TaskCallbackService.class,

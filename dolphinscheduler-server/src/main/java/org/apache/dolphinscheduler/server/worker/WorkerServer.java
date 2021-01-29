@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,18 +33,21 @@ import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import javax.annotation.PostConstruct;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
-import javax.annotation.PostConstruct;
-import java.util.Set;
 
 /**
- *  worker server
+ * worker server
  */
 @ComponentScan("org.apache.dolphinscheduler")
 public class WorkerServer implements IStoppable {
@@ -54,31 +58,31 @@ public class WorkerServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
     /**
-     *  netty remote server
+     * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     *  worker registry
+     * worker registry
      */
     @Autowired
     private WorkerRegistry workerRegistry;
 
     /**
-     *  worker config
+     * worker config
      */
     @Autowired
     private WorkerConfig workerConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
     /**
-     *  alert model netty remote server
+     * alert model netty remote server
      */
     private AlertClientService alertClientService;
 
@@ -87,8 +91,9 @@ public class WorkerServer implements IStoppable {
 
     /**
      * worker server startup
-     *
+     * <p>
      * worker server not use web service
+     *
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -101,7 +106,7 @@ public class WorkerServer implements IStoppable {
      * worker server run
      */
     @PostConstruct
-    public void run(){
+    public void run() {
         try {
             logger.info("start worker server...");
 
@@ -117,14 +122,14 @@ public class WorkerServer implements IStoppable {
 
             this.workerRegistry.getZookeeperRegistryCenter().setStoppable(this);
             Set<String> workerZkPaths = this.workerRegistry.getWorkerZkPaths();
-            this.workerRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(workerZkPaths, ZKNodeType.WORKER,Constants.DELETE_ZK_OP);
+            this.workerRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(workerZkPaths, ZKNodeType.WORKER, Constants.DELETE_ZK_OP);
             // worker registry
             this.workerRegistry.registry();
 
             // retry report task status
             this.retryReportTaskStatusThread.start();
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
 

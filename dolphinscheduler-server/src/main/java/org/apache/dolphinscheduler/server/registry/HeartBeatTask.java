@@ -17,18 +17,22 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
+import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Set;
 
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Heart beat task
+ */
 public class HeartBeatTask extends Thread {
 
     private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
@@ -64,7 +68,7 @@ public class HeartBeatTask extends Thread {
 
             //check dead or not in zookeeper
             for (String heartBeatPath : heartBeatPaths) {
-                if(zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)){
+                if (zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)) {
                     //logger.error("i was judged to death, release resources and stop myself");
                     zookeeperRegistryCenter.getStoppable().stop("i was judged to death, release resources and stop myself");
                     return;
@@ -106,9 +110,10 @@ public class HeartBeatTask extends Thread {
 
     /**
      * for stop server
+     *
      * @param serverStoppable server stoppable interface
      */
-    public void setStoppable(IStoppable serverStoppable){
+    public void setStoppable(IStoppable serverStoppable) {
         this.stoppable = serverStoppable;
     }
 }
