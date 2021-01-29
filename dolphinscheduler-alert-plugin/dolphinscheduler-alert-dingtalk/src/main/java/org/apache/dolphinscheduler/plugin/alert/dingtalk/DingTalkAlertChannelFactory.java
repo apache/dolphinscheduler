@@ -45,6 +45,11 @@ public class DingTalkAlertChannelFactory implements AlertChannelFactory {
                 .setRequired(true)
                 .build())
             .build();
+        InputParam keywordParam = InputParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, DingTalkParamsConstants.DING_TALK_KEYWORD)
+            .addValidate(Validate.newBuilder()
+                .setRequired(true)
+                .build())
+            .build();
         RadioParam isEnableProxy =
             RadioParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE)
                     .addParamsOptions(new ParamsOptions("YES", true, false))
@@ -74,7 +79,7 @@ public class DingTalkAlertChannelFactory implements AlertChannelFactory {
             .setPlaceholder("if enable use authentication, you need input password")
             .build();
 
-        return Arrays.asList(webHookParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
+        return Arrays.asList(webHookParam, keywordParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
 
     @Override

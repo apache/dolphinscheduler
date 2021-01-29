@@ -64,6 +64,7 @@ public class DingTalkSender {
 
     DingTalkSender(Map<String, String> config) {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
+        keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
@@ -172,7 +173,7 @@ public class DingTalkSender {
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send title : {},content : {}, resp: {}", title, content, resp);
+            logger.info("Ding Talk send title :{},content : {}, resp: {}", title, content, resp);
             return resp;
         } finally {
             httpClient.close();
