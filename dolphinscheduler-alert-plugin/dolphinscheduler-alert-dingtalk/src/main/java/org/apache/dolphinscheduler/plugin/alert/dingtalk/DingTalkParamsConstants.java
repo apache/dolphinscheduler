@@ -30,10 +30,6 @@ public class DingTalkParamsConstants {
 
     static final String NAME_DING_TALK_WEB_HOOK = "dingTalkWebHook";
 
-    static final String DING_TALK_KEYWORD = "dingtalk.keyword";
-
-    static final String NAME_DING_TALK_KEYWORD = "dingTalkKeyword";
-
     public static final String DING_TALK_PROXY_ENABLE = "dingtalk.isEnableProxy";
 
     static final String NAME_DING_TALK_PROXY_ENABLE = "dingTalkIsEnableProxy";
