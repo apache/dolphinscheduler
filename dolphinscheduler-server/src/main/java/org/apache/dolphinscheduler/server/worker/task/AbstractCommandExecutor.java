@@ -344,11 +344,10 @@ public abstract class AbstractCommandExecutor {
 
                 try {
                     inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
+                    String line = null;
 
                     long lastFlushTime = System.currentTimeMillis();
-                    //logBuffer.add("welcome to use dolphinscheduler scheduling system...");
-                    while ((line = inReader.readLine()) != null || logBuffer.size() > 0) {
+                    while (logBuffer.size()>0 || (line = inReader.readLine()) != null) {
                         if (null != line) {
                             if (line.startsWith("${setValue(")) {
                                 varPool.append(line.substring("${setValue(".length(), line.length() - 2));
