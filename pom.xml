@@ -787,6 +787,7 @@
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/BaseServiceTest.java</include>
                         <include>**/api/service/DataAnalysisServiceTest.java</include>
+                        <include>**/api/service/AlertPluginInstanceServiceTest.java</include>
                         <include>**/api/service/DataSourceServiceTest.java</include>
                         <include>**/api/service/ExecutorService2Test.java</include>
                         <include>**/api/service/ExecutorServiceTest.java</include>

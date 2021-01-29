@@ -77,7 +77,8 @@ public class AlertSender {
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
                 logger.error("send alert msg fail,no bind plugin instance.");
-                return;
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alert.getId());
+                continue;
             }
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
