@@ -31,7 +31,7 @@ public interface ProcessTaskRelationService {
      *
      * @param loginUser login user
      * @param name relation name
-     * @param projectCode process code
+     * @param projectName process name
      * @param processDefinitionCode process definition code
      * @param preTaskCode pre task code
      * @param postTaskCode post task code
@@ -41,7 +41,7 @@ public interface ProcessTaskRelationService {
      */
     Map<String, Object> createProcessTaskRelation(User loginUser,
                                                   String name,
-                                                  Long projectCode,
+                                                  String projectName,
                                                   Long processDefinitionCode,
                                                   Long preTaskCode,
                                                   Long postTaskCode,

@@ -253,7 +253,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             processTaskRelationService.createProcessTaskRelation(
                     loginUser,
                     name,
-                    project.getCode(),
+                    projectName,
                     processDefinitionCode,
                     0L,
                     0L,

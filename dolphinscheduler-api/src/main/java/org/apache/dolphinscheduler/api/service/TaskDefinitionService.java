@@ -17,12 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * task definition service
@@ -35,10 +32,20 @@ public interface TaskDefinitionService {
      * @param loginUser login user
      * @param projectName project name
      * @param taskDefinitionJson task definition json
-     * @throws JsonProcessingException JsonProcessingException
      */
     Map<String, Object> createTaskDefinition(User loginUser,
                                              String projectName,
-                                             String taskDefinitionJson) throws JsonProcessingException, SnowFlakeException;
+                                             String taskDefinitionJson);
+
+    /**
+     * query task definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskName task name
+     */
+    Map<String, Object> queryTaskDefinitionByName(User loginUser,
+                                                  String projectName,
+                                                  String taskName);
 }
 
