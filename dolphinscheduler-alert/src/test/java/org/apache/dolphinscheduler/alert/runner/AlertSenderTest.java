@@ -102,6 +102,7 @@ public class AlertSenderTest {
         Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
         alertChannelMap.put(pluginName,alertChannelMock);
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
+        PowerMockito.when(alertPluginManager.getPluginNameById(Mockito.anyInt())).thenReturn("alert-plugin-mail");
 
         alertSendResponseCommand = alertSender.syncHandler(alertGroupId, title, content);
         Assert.assertFalse(alertSendResponseCommand.getResStatus());
@@ -164,6 +165,7 @@ public class AlertSenderTest {
         String pluginName = "alert-plugin-mail";
         PluginDefine pluginDefine = new PluginDefine(pluginName,"1",null);
         PowerMockito.when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
+        PowerMockito.when(alertPluginManager.getPluginNameById(1)).thenReturn("alert-instance-mail");
 
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus(String.valueOf(true));
