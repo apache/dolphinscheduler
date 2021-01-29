@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.alert.runner;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.spi.alert.AlertResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +81,9 @@ public class AlertSender {
             }
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
-                .setContent(alert.getContent())
-                .setLog(alert.getLog())
-                .setTitle(alert.getTitle());
+                    .setContent(alert.getContent())
+                    .setLog(alert.getLog())
+                    .setTitle(alert.getTitle());
 
             for (AlertPluginInstance instance : alertInstanceList) {
 
@@ -107,7 +109,7 @@ public class AlertSender {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
         alertData.setContent(content)
-            .setTitle(title);
+                .setTitle(title);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -126,7 +128,7 @@ public class AlertSender {
         for (AlertPluginInstance instance : alertInstanceList) {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
             AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                    Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
             sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
             sendResponseResults.add(alertSendResponseResult);
         }
@@ -156,7 +158,8 @@ public class AlertSender {
 
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(instance.getPluginInstanceParams());
+        Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
+        alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = alertChannel.process(alertInfo);
 
         if (alertResult == null) {

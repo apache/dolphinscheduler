@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Map;
 
@@ -34,10 +32,9 @@ public class WeChatAlertChannel implements AlertChannel {
     @Override
     public AlertResult process(AlertInfo info) {
         AlertData alertData = info.getAlertData();
-        String alertParams = info.getAlertParams();
-        Map paramsMap = JSONUtils.parseObject(alertParams,Map.class);
-        if(null==paramsMap){
-            return new AlertResult("false","we chat params is null");
+        Map<String, String> paramsMap = info.getAlertParams();
+        if (null == paramsMap) {
+            return new AlertResult("false", "we chat params is null");
         }
         return new WeChatSender(paramsMap).sendEnterpriseWeChat(alertData.getTitle(), alertData.getContent());
 

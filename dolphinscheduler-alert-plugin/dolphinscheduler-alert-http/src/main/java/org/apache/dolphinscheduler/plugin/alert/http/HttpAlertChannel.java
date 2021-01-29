@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Map;
 
@@ -34,10 +32,9 @@ public class HttpAlertChannel implements AlertChannel {
     public AlertResult process(AlertInfo alertInfo) {
 
         AlertData alertData = alertInfo.getAlertData();
-        String alertParams = alertInfo.getAlertParams();
-        Map paramsMap = JSONUtils.parseObject(alertParams,Map.class);
-        if(null==paramsMap){
-            return new AlertResult("false","http params is null");
+        Map<String, String> paramsMap = alertInfo.getAlertParams();
+        if (null == paramsMap) {
+            return new AlertResult("false", "http params is null");
         }
 
         return new HttpSender(paramsMap).send(alertData.getContent());

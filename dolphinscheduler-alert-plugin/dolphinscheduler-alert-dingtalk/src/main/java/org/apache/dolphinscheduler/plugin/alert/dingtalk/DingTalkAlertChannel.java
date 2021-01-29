@@ -34,8 +34,7 @@ public class DingTalkAlertChannel implements AlertChannel {
     public AlertResult process(AlertInfo alertInfo) {
 
         AlertData alertData = alertInfo.getAlertData();
-        String alertParams = alertInfo.getAlertParams();
-        Map paramsMap = JSONUtils.parseObject(alertParams,Map.class);
+        Map<String, String> paramsMap = alertInfo.getAlertParams();
         if(null==paramsMap){
             return new AlertResult("false","ding talk params is null");
         }

@@ -21,12 +21,14 @@ import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +47,7 @@ public class HttpAlertChannelTest {
         alertData.setContent("Fault tolerance warning");
         alertInfo.setAlertData(alertData);
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assert.assertEquals("Request types are not supported", alertResult.getMessage());
+        Assert.assertEquals("http params is null", alertResult.getMessage());
     }
 
     @Test
@@ -56,7 +58,8 @@ public class HttpAlertChannelTest {
         AlertData alertData = new AlertData();
         alertData.setContent("Fault tolerance warning");
         alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(getParams());
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getParams());
+        alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = alertChannel.process(alertInfo);
         Assert.assertEquals("true", alertResult.getStatus());
     }
