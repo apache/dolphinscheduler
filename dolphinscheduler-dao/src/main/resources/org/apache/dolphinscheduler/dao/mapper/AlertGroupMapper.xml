@@ -52,6 +52,13 @@
         order by update_time desc
     </select>
 
+    <select id="queryInstanceIdsList" resultType="String">
+        select
+        alert_instance_ids
+        from t_ds_alertgroup
+        order by update_time desc
+    </select>
+
     <select id="queryAlertGroupInstanceIdsById" resultType="String">
         select alert_instance_ids  from t_ds_alertgroup
         where id = #{alertGroupId}
