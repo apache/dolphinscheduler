@@ -348,7 +348,7 @@ public abstract class AbstractCommandExecutor {
 
                     long lastFlushTime = System.currentTimeMillis();
 
-                    while ((line = inReader.readLine()) != null || logBuffer.size()>0) {
+                    while ((line = inReader.readLine()) != null || logBuffer.size() > 0) {
                         if (line.startsWith("${setValue(")) {
                             varPool.append(line.substring("${setValue(".length(), line.length() - 2));
                             varPool.append("$VarPool$");
