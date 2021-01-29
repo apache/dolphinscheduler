@@ -56,12 +56,12 @@ public class FeiShuSender {
     private String password;
 
     FeiShuSender(Map<String, String> config) {
-        url = config.get(FeiShuParamsConstants.WEB_HOOK);
+        url = config.get(FeiShuParamsConstants.NAME_WEB_HOOK);
         enableProxy = Boolean.valueOf(config.get(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(FeiShuParamsConstants.NAME_FEI_SHU_PORT));
             proxy = config.get(FeiShuParamsConstants.NAME_FEI_SHU_PROXY);
-            user = config.get(FeiShuParamsConstants.FEI_SHU_USER);
+            user = config.get(FeiShuParamsConstants.NAME_FEI_SHU_USER);
             password = config.get(FeiShuParamsConstants.NAME_FEI_SHU_PASSWORD);
         }
 
