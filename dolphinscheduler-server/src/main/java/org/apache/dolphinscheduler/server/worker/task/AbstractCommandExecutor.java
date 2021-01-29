@@ -350,14 +350,14 @@ public abstract class AbstractCommandExecutor {
 
                     while ((line = inReader.readLine()) != null || logBuffer.size() > 0) {
                         if (null != line) {
-                           if (line.startsWith("${setValue(")) {
-                              varPool.append(line.substring("${setValue(".length(), line.length() - 2));
-                              varPool.append("$VarPool$");
+                            if (line.startsWith("${setValue(")) {
+                                varPool.append(line.substring("${setValue(".length(), line.length() - 2));
+                                varPool.append("$VarPool$");
                             } else {
-                              logBuffer.add(line);
-                              }
-                           }
-                         lastFlushTime = flush(lastFlushTime);
+                                logBuffer.add(line);
+                            }
+                        }
+                        lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
