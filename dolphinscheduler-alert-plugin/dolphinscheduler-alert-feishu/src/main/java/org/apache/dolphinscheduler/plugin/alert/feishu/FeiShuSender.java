@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
+import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -32,7 +33,10 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,12 +76,12 @@ public class FeiShuSender {
         return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
-    private static String textToJsonString(String text) {
+    private static String textToJsonString(AlertData alertData) {
 
         Map<String, Object> items = new HashMap<>(2);
         items.put("msg_type", "text");
         Map<String, String> textContent = new HashMap<>();
-        byte[] byt = StringUtils.getBytesUtf8(text);
+        byte[] byt = StringUtils.getBytesUtf8(formatContent(alertData));
         String txt = StringUtils.newStringUtf8(byt);
         textContent.put("text", txt);
         items.put("content", textContent);
@@ -110,12 +114,40 @@ public class FeiShuSender {
         return alertResult;
     }
 
-    public AlertResult sendFeiShuMsg(String msg, String charset) {
+    public static String formatContent(AlertData alertData) {
+        if (alertData.getContent() != null) {
+            List<Map> list;
+            try {
+                list = JSONUtils.toList(alertData.getContent(), Map.class);
+            } catch (Exception e) {
+                logger.error("json format exception", e);
+                return null;
+            }
+
+            StringBuilder contents = new StringBuilder(100);
+            contents.append(String.format("`%s`%n", alertData.getTitle()));
+            for (Map map : list) {
+                Iterator<Entry<String, Object>> entries = map.entrySet().iterator();
+                while (entries.hasNext()) {
+                    Entry<String, Object> entry = entries.next();
+                    String key = entry.getKey();
+                    String value = entry.getValue().toString();
+                    contents.append(key + ":" + value);
+                    contents.append("\n");
+                }
+            }
+            return contents.toString();
+        }
+        return null;
+    }
+
+    public AlertResult sendFeiShuMsg(AlertData alertData) {
         AlertResult alertResult;
         try {
-            String resp = sendMsg(msg, charset);
+            String resp = sendMsg(alertData);
             return checkSendFeiShuSendMsgResult(resp);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.info("send fei shu alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
             alertResult.setStatus("false");
@@ -124,9 +156,9 @@ public class FeiShuSender {
         return alertResult;
     }
 
-    private String sendMsg(String msg, String charset) throws IOException {
+    private String sendMsg(AlertData alertData) throws IOException {
 
-        String msgToJson = textToJsonString(msg);
+        String msgToJson = textToJsonString(alertData);
 
         HttpPost httpPost = HttpRequestUtil.constructHttpPost(url, msgToJson);
 
@@ -144,12 +176,12 @@ public class FeiShuSender {
             String resp;
             try {
                 HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, charset);
+                resp = EntityUtils.toString(entity, "utf-8");
                 EntityUtils.consume(entity);
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send {}, resp: {}", msg, resp);
+            logger.info("Ding Talk send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
             return resp;
         } finally {
             httpClient.close();

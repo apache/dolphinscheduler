@@ -30,7 +30,7 @@ import org.apache.http.impl.client.HttpClients;
 
 public class HttpRequestUtil {
 
-    public static CloseableHttpClient getHttpClient(boolean enableProxy, String proxy, int port, String user, String password) {
+    public static CloseableHttpClient getHttpClient(boolean enableProxy, String proxy, Integer port, String user, String password) {
         if (enableProxy) {
             HttpHost httpProxy = new HttpHost(proxy, port);
             CredentialsProvider provider = new BasicCredentialsProvider();

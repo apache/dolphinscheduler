@@ -32,6 +32,6 @@ public class FeiShuAlertChannel implements AlertChannel {
         AlertData alertData = alertInfo.getAlertData();
         String alertParams = alertInfo.getAlertParams();
         Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
-        return new FeiShuSender(paramsMap).sendFeiShuMsg(alertData.getTitle(), alertData.getContent());
+        return new FeiShuSender(paramsMap).sendFeiShuMsg(alertData);
     }
 }
