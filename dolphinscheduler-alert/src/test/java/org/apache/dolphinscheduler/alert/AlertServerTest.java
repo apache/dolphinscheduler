@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -62,6 +63,7 @@ public class AlertServerTest {
         PowerMockito.whenNew(AlertPluginManager.class).withNoArguments().thenReturn(alertPluginManager);
         ConcurrentHashMap alertChannelMap = new ConcurrentHashMap<>();
         alertChannelMap.put("pluginName",alertChannelMock);
+        PowerMockito.when(alertPluginManager.getPluginNameById(Mockito.anyInt())).thenReturn("pluginName");
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
 
         DolphinPluginManagerConfig alertPluginManagerConfig = PowerMockito.mock(DolphinPluginManagerConfig.class);
