@@ -18,11 +18,8 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Assert;
@@ -37,16 +34,7 @@ public class ScriptAlertChannelFactoryTest {
     public void testGetParams() {
         ScriptAlertChannelFactory scriptAlertChannelFactory = new ScriptAlertChannelFactory();
         List<PluginParams> params = scriptAlertChannelFactory.getParams();
-
-       String pluginParamsMapString= JSONUtils.toJsonString(PluginParamsTransfer.getPluginParamsMap(JSONUtils.toJsonString(params)));
-        HashMap paramsMap=   JSONUtils.parseObject(pluginParamsMapString,HashMap.class);
-        System.out.println(paramsMap.get("path"));
         Assert.assertEquals(3, params.size());
-        List<PluginParams> paramss= JSONUtils.toList(JSONUtils.toJsonString(params),PluginParams.class);
-
-        System.out.println(PluginParamsTransfer.getPluginParamsMap(JSONUtils.toJsonString(params)));
-        System.out.println(paramss.get(0).getName());
-        System.out.println(paramss.get(0).getName());
     }
 
     @Test

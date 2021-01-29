@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.Map;
 
@@ -39,10 +37,9 @@ public class EmailAlertChannel implements AlertChannel {
     public AlertResult process(AlertInfo info) {
 
         AlertData alert = info.getAlertData();
-        String alertParams = info.getAlertParams();
-        Map paramsMap = JSONUtils.parseObject(alertParams,Map.class);
-        if(null==paramsMap){
-            return new AlertResult("false","mail params is null");
+        Map<String, String> paramsMap = info.getAlertParams();
+        if (null == paramsMap) {
+            return new AlertResult("false", "mail params is null");
         }
         MailSender mailSender = new MailSender(paramsMap);
         AlertResult alertResult = mailSender.sendMails(alert.getTitle(), alert.getContent());
