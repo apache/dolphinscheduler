@@ -469,18 +469,19 @@ public class ProcessInstanceService extends BaseService {
 
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
+        if (Boolean.TRUE.equals(syncDefine)) {
+            processDefinition.setProcessDefinitionJson(processInstanceJson);
+            processDefinition.setGlobalParams(originDefParams);
+            processDefinition.setLocations(locations);
+            processDefinition.setConnects(connects);
+            processDefinition.setTimeout(timeout);
+            processDefinition.setUpdateTime(new Date());
 
-        processDefinition.setProcessDefinitionJson(processInstanceJson);
-        processDefinition.setGlobalParams(originDefParams);
-        processDefinition.setLocations(locations);
-        processDefinition.setConnects(connects);
-        processDefinition.setTimeout(timeout);
-        processDefinition.setUpdateTime(new Date());
-
-        // add process definition version
-        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
-        processDefinition.setVersion(version);
-        updateDefine = processDefineMapper.updateById(processDefinition);
+            // add process definition version
+            long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+            processDefinition.setVersion(version);
+            updateDefine = processDefineMapper.updateById(processDefinition);
+        }
         if (update > 0 && updateDefine > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
