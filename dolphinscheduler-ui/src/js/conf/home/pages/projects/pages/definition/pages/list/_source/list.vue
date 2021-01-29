@@ -25,8 +25,8 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links" :title="scope.row.name">
-                  {{scope.row.name}}
+                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links">
+                  <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
             </el-popover>
@@ -84,7 +84,6 @@
               <el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -177,8 +176,6 @@
         timingDialog: false,
         timingData: {
           item: {},
-          receiversD: [],
-          receiversCcD: [],
           type: ''
         },
         relatedItemsDialog: false,
@@ -191,7 +188,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
 
       selectable (row, index) {
@@ -227,29 +224,12 @@
         this.startDialog = false
       },
       /**
-       * get emial
-       */
-      _getReceiver (id) {
-        return new Promise((resolve, reject) => {
-          this.getReceiver({ processDefinitionId: id }).then(res => {
-            resolve({
-              receivers: res.receivers && res.receivers.split(',') || [],
-              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
-            })
-          })
-        })
-      },
-      /**
        * timing
        */
       _timing (item) {
-        this._getReceiver(item.id).then(res => {
-          this.timingData.item = item
-          this.timingData.receiversD = res.receivers
-          this.timingData.receiversCcD = res.receiversCc
-          this.timingData.type = 'timing'
-          this.timingDialog = true
-        })
+        this.timingData.item = item
+        this.timingData.type = 'timing'
+        this.timingDialog = true
       },
       onUpdateTiming () {
         this._onUpdate()
@@ -295,7 +275,7 @@
       _downline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 0
+          releaseState: 'OFFLINE'
         })
       },
       /**
@@ -304,7 +284,7 @@
       _poponline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 1
+          releaseState: 'ONLINE'
         })
       },
       /**

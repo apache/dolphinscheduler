@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit alarm group') : $t('Create alarm group')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -36,14 +35,14 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Group Type')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Alarm plugin instance')}}</template>
           <template slot="content">
-            <el-select v-model="groupType" size="small">
+            <el-select v-model="alertInstanceIds" size="small" style="width: 100%" multiple>
               <el-option
-                      v-for="city in options"
-                      :key="city.id"
-                      :value="city.id"
-                      :label="city.code">
+                      v-for="items in allAlertPluginInstance"
+                      :key="items.id"
+                      :value="items.id"
+                      :label="items.instanceName">
               </el-option>
             </el-select>
           </template>
@@ -61,12 +60,13 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
+  import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -75,13 +75,13 @@
       return {
         store,
         groupName: '',
-        groupType: 'EMAIL',
-        description: '',
-        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
+        alertInstanceIds: [],
+        description: ''
       }
     },
     props: {
-      item: Object
+      item: Object,
+      allAlertPluginInstance: Array
     },
     methods: {
       _ok () {
@@ -114,22 +114,20 @@
       _submit () {
         let param = {
           groupName: this.groupName,
-          groupType: this.groupType,
+          alertInstanceIds: this.alertInstanceIds.join(','),
           description: this.description
         }
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs.popup.spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
         this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
       },
       close () {
@@ -140,12 +138,15 @@
     created () {
       if (this.item) {
         this.groupName = this.item.groupName
-        this.groupType = this.item.groupType
+        let dataStrArr = this.item.alertInstanceIds.split(',')
+        this.alertInstanceIds = _.map(dataStrArr, v => {
+          return +v
+        })
         this.description = this.item.description
       }
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>

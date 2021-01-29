@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit User') : $t('Create User')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -30,6 +29,7 @@
                     type="input"
                     v-model="userName"
                     maxlength="60"
+                    size="small"
                     :placeholder="$t('Please enter user name')">
             </el-input>
           </template>
@@ -40,6 +40,7 @@
             <el-input
                     type="password"
                     v-model="userPassword"
+                    size="small"
                     :placeholder="$t('Please enter your password')">
             </el-input>
           </template>
@@ -80,6 +81,7 @@
             <el-input
                     type="input"
                     v-model="email"
+                    size="small"
                     :placeholder="$t('Please enter email')">
             </el-input>
           </template>
@@ -90,6 +92,7 @@
             <el-input
                     type="input"
                     v-model="phone"
+                    size="small"
                     :placeholder="$t('Please enter phone number')">
             </el-input>
           </template>
@@ -105,14 +108,14 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import router from '@/conf/home/router'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -243,7 +246,7 @@
         })
       },
       _submit () {
-        this.$refs.popup.spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
 
         let queueCode = ''
         // get queue code
@@ -265,14 +268,12 @@
         }
 
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate', param)
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
       },
       close () {
@@ -315,6 +316,6 @@
     mounted () {
 
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>

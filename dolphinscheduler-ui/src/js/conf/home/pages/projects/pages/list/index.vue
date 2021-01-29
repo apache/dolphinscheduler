@@ -21,6 +21,8 @@
         <template slot="button-group">
           <el-button size="mini" @click="_create('')">{{ $t('Create Project') }}</el-button>
           <el-dialog
+            :title="item ? $t('Edit') : $t('Create Project')"
+            v-if="createProjectDialog"
             :visible.sync="createProjectDialog"
             width="auto">
             <m-create-project :item="item" @_onUpdate="_onUpdate" @close="_close"></m-create-project>

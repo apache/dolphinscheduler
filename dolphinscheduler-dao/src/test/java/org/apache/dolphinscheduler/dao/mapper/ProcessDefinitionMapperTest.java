@@ -77,8 +77,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-
         processDefinitionMapper.insert(processDefinition);
         return processDefinition;
     }
@@ -207,8 +205,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setCreateTime(new Date());
         processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-//
         processDefinitionMapper.insert(processDefinition);
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getId(), "def 1");
@@ -370,4 +366,12 @@ public class ProcessDefinitionMapperTest {
         ProcessDefinition processDefinition1 = processDefinitionMapper.selectById(processDefinition.getId());
         Assert.assertEquals(expectedVersion, processDefinition1.getVersion());
     }
+
+    @Test
+    public void listProjectIds() {
+        ProcessDefinition processDefinition = insertOne();
+        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
+        Assert.assertNotNull(projectIds);
+    }
+
 }

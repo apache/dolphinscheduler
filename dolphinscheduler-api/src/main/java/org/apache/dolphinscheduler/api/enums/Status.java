@@ -276,13 +276,29 @@ public enum Status {
     QUEUE_COUNT_ERROR(90001, "queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
+
+    //plugin
+    PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
+    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
+    QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
+    QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
+
+    UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(110005, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR(110006, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
+    GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
+    CREATE_ALERT_PLUGIN_INSTANCE_ERROR(110008, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
+    QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
+    PLUGIN_INSTANCE_ALREADY_EXIT(110010,"plugin instance already exit","该告警插件实例已存在"),
+    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011,"query plugin instance page error","分页查询告警实例失败"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012,"failed to delete the alert instance, there is an alarm group associated with this alert instance","删除告警实例失败，存在与此告警实例关联的警报组")
+
     ;
 
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    private Status(int code, String enMsg, String zhMsg) {
+    Status(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

@@ -84,6 +84,10 @@ io.interceptors.request.use(
           _t: Math.random()
         })
       }
+      config.headers = config.headers || {}
+      const language = cookies.get('language')
+      if (language) config.headers.language = language
+      if (sIdCookie) config.headers.sessionId = sIdCookie
       return config
     }
   }, error => {

@@ -157,7 +157,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param locations locations for nodes
      * @param connects connects for nodes
      * @return create result code
-     * @throws JsonProcessingException JsonProcessingException
      */
     @Override
     public Map<String, Object> createProcessDefinition(User loginUser,
@@ -584,7 +583,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> releaseProcessDefinition(User loginUser, String projectName, int id, int releaseState) {
+    public Map<String, Object> releaseProcessDefinition(User loginUser, String projectName, int id, ReleaseState releaseState) {
         HashMap<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
@@ -594,17 +593,15 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return checkResult;
         }
 
-        ReleaseState state = ReleaseState.getEnum(releaseState);
-
         // check state
-        if (null == state) {
+        if (null == releaseState) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
             return result;
         }
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(id);
 
-        switch (state) {
+        switch (releaseState) {
             case ONLINE:
                 // To check resources whether they are already cancel authorized or deleted
                 String resourceIds = processDefinition.getResourceIds();
@@ -620,11 +617,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     }
                 }
 
-                processDefinition.setReleaseState(state);
+                processDefinition.setReleaseState(releaseState);
                 processDefineMapper.updateById(processDefinition);
                 break;
             case OFFLINE:
-                processDefinition.setReleaseState(state);
+                processDefinition.setReleaseState(releaseState);
                 processDefineMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
                         new int[]{processDefinition.getId()}
@@ -1130,8 +1127,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 processDefine.setCreateTime(now);
                 processDefine.setUpdateTime(now);
                 processDefine.setFlag(subProcess.getFlag());
-                processDefine.setReceivers(subProcess.getReceivers());
-                processDefine.setReceiversCc(subProcess.getReceiversCc());
+                processDefine.setWarningGroupId(subProcess.getWarningGroupId());
                 processDefineMapper.insert(processDefine);
 
                 logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), processDefine.getName());
@@ -1659,8 +1655,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefinition.setTimeout(processDefinitionVersion.getTimeout());
         processDefinition.setGlobalParams(processDefinitionVersion.getGlobalParams());
         processDefinition.setUpdateTime(new Date());
-        processDefinition.setReceivers(processDefinitionVersion.getReceivers());
-        processDefinition.setReceiversCc(processDefinitionVersion.getReceiversCc());
+        processDefinition.setWarningGroupId(processDefinitionVersion.getWarningGroupId());
         processDefinition.setResourceIds(processDefinitionVersion.getResourceIds());
 
         if (processDefineMapper.updateById(processDefinition) > 0) {
