@@ -15,26 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.manager;
+package org.apache.dolphinscheduler.alert.cache;
 
-import org.apache.dolphinscheduler.dao.entity.Alert;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class AlertPluginDefineCache {
 
-/**
- * SMS send manager
- */
-public class MsgManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
+    public AlertPluginDefineCache() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
-     * SMS send
-     *
-     * @param alert the alert
+     * k->pluginDefineId v->pluginDefineName
      */
-    public void send(Alert alert) {
-        logger.info("send message {}", alert);
+    private static Map<Integer, String> pluginDefineMap = new HashMap<>();
+
+    public static void addPlugin(int id, String name) {
+        pluginDefineMap.put(id, name);
+    }
+
+    public static String getNameById(int id) {
+        return pluginDefineMap.get(id);
     }
 }

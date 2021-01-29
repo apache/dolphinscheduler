@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import org.apache.dolphinscheduler.alert.cache.AlertPluginDefineCache;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,11 +47,6 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
 
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
-
-    /**
-     * k->pluginDefineId v->pluginDefineName
-     */
-    public static Map<Integer, String> pluginDefineMap = new HashMap<>();
 
     public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
@@ -100,7 +95,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
 
             PluginDefine pluginDefine = new PluginDefine(nameEn, PluginType.ALERT.getDesc(), paramsJson);
             int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
-            pluginDefineMap.put(id, pluginDefine.getPluginName());
+            AlertPluginDefineCache.addPlugin(id, pluginDefine.getPluginName());
         }
     }
 }
