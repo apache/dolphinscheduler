@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.alert.runner;
 
+import org.apache.dolphinscheduler.alert.cache.AlertPluginDefineCache;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -145,7 +146,7 @@ public class AlertSender {
      * @return AlertResult
      */
     private AlertResult alertResultHandler(AlertPluginInstance instance, AlertData alertData) {
-        String pluginName = AlertPluginManager.pluginDefineMap.get(instance.getPluginDefineId());
+        String pluginName = AlertPluginDefineCache.getNameById(instance.getPluginDefineId());
         AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
         AlertResult alertResultExtend = new AlertResult();
         String pluginInstanceName = instance.getInstanceName();
