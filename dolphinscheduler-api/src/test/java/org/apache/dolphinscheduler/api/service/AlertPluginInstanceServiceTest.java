@@ -62,7 +62,7 @@ public class AlertPluginInstanceServiceTest {
 
     private User user;
 
-    private String uiParams="[\n"
+    private String uiParams = "[\n"
             + "    {\n"
             + "        \"field\":\"userParams\",\n"
             + "        \"name\":\"user.params\",\n"
@@ -136,7 +136,7 @@ public class AlertPluginInstanceServiceTest {
             + "]\n"
             + "\n";
 
-    private String paramsMap="{\"path\":\"/kris/script/path\",\"userParams\":\"userParams\",\"type\":\"0\"}";
+    private String paramsMap = "{\"path\":\"/kris/script/path\",\"userParams\":\"userParams\",\"type\":\"0\"}";
 
     @Before
     public void before() {
@@ -175,26 +175,26 @@ public class AlertPluginInstanceServiceTest {
     }
 
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(0);
-        Map<String, Object> result= alertPluginInstanceService.update(user,1,"testUpdate",uiParams);
+        Map<String, Object> result = alertPluginInstanceService.update(user, 1, "testUpdate", uiParams);
         Assert.assertEquals(Status.SAVE_ERROR, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(1);
-        result= alertPluginInstanceService.update(user,1,"testUpdate",uiParams);
+        result = alertPluginInstanceService.update(user, 1, "testUpdate", uiParams);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
-    public  void testQueryAll(){
-        AlertPluginInstance alertPluginInstance=new AlertPluginInstance();
+    public void testQueryAll() {
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
         alertPluginInstance.setId(1);
         alertPluginInstance.setPluginDefineId(1);
         alertPluginInstance.setPluginInstanceParams(paramsMap);
         alertPluginInstance.setInstanceName("test");
-        PluginDefine pluginDefine=new PluginDefine("script","script",uiParams);
+        PluginDefine pluginDefine = new PluginDefine("script", "script", uiParams);
         pluginDefine.setId(1);
-        List<PluginDefine> pluginDefines= Collections.singletonList(pluginDefine);
-        List<AlertPluginInstance> pluginInstanceList= Collections.singletonList(alertPluginInstance);
+        List<PluginDefine> pluginDefines = Collections.singletonList(pluginDefine);
+        List<AlertPluginInstance> pluginInstanceList = Collections.singletonList(alertPluginInstance);
         Mockito.when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList()).thenReturn(pluginInstanceList);
         Mockito.when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(pluginDefines);
         Map<String, Object> result = alertPluginInstanceService.queryAll();
