@@ -363,6 +363,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         });
+        getOutputLogService.shutdown();
 
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
         parseProcessOutputExecutorService.submit(new Runnable() {
