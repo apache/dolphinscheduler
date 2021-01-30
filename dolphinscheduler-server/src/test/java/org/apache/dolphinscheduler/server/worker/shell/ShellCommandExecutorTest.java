@@ -175,33 +175,31 @@ public class ShellCommandExecutorTest {
     }
 
     @Test
-    public void testFindAppId(){
+    public void testFindAppId() {
         Class<ShellCommandExecutor> shellCommandExecutorClass = ShellCommandExecutor.class;
-        try{
+        try {
             Object instance = shellCommandExecutorClass.newInstance();
 
             Method method = shellCommandExecutorClass.getDeclaredMethod("findAppId", new Class[]{String.class});
             method.setAccessible(true);
             Object[] arg1s = {"11111"};
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
 
     @Test
-    public void testConvertFile2List(){
+    public void testConvertFile2List() {
         Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
-        try{
+        try {
             Object instance = shellCommandExecutorClass.newInstance();
 
             Method method = shellCommandExecutorClass.getDeclaredMethod("convertFile2List", new Class[]{String.class});
             method.setAccessible(true);
             Object[] arg1s = {"/opt/1.txt"};
             AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
