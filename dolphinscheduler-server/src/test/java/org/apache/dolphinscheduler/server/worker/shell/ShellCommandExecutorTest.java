@@ -123,7 +123,7 @@ public class ShellCommandExecutorTest {
 
             Method method = shellCommandExecutorClass.getDeclaredMethod("parseProcessOutput", new Class[]{Process.class});
             method.setAccessible(true);
-            Object arg1s[] = {PowerMockito.mock(Process.class)};
+            Object[] arg1s = {PowerMockito.mock(Process.class)};
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
