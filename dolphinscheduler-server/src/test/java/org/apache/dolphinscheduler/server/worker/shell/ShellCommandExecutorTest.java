@@ -133,7 +133,6 @@ public class ShellCommandExecutorTest {
                         }
                     };
                 }
-
                 @Override
                 public InputStream getInputStream() {
                     return new InputStream() {
@@ -143,25 +142,21 @@ public class ShellCommandExecutorTest {
                         }
                     };
                 }
-
                 @Override
                 public InputStream getErrorStream() {
                     return null;
                 }
-
                 @Override
                 public int waitFor() throws InterruptedException {
                     return 0;
                 }
-
                 @Override
                 public int exitValue() {
                     return 0;
                 }
-
                 @Override
                 public void destroy() {
-                   logger.info("unit test");
+                    logger.info("unit test");
                 }
             }};
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
