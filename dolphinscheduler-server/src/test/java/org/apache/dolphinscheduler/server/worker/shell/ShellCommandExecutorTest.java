@@ -38,8 +38,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import java.util.Date;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 /**
  * python shell command executor test
