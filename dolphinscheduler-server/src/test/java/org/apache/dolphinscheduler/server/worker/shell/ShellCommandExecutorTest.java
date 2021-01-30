@@ -123,7 +123,47 @@ public class ShellCommandExecutorTest {
 
             Method method = shellCommandExecutorClass.getDeclaredMethod("parseProcessOutput", new Class[]{Process.class});
             method.setAccessible(true);
-            Object[] arg1s = {PowerMockito.mock(Process.class)};
+            Object[] arg1s = {new Process() {
+                @Override
+                public OutputStream getOutputStream() {
+                    return new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+
+                        }
+                    };
+                }
+
+                @Override
+                public InputStream getInputStream() {
+                    return new InputStream() {
+                        @Override
+                        public int read() throws IOException {
+                            return 0;
+                        }
+                    };
+                }
+
+                @Override
+                public InputStream getErrorStream() {
+                    return null;
+                }
+
+                @Override
+                public int waitFor() throws InterruptedException {
+                    return 0;
+                }
+
+                @Override
+                public int exitValue() {
+                    return 0;
+                }
+
+                @Override
+                public void destroy() {
+
+                }
+            }};
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
