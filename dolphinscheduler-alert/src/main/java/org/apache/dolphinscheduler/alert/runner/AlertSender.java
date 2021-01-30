@@ -157,7 +157,14 @@ public class AlertSender {
         alertInfo.setAlertData(alertData);
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         alertInfo.setAlertParams(paramsMap);
-        AlertResult alertResult = alertChannel.process(alertInfo);
+        AlertResult alertResult;
+        try {
+            alertResult = alertChannel.process(alertInfo);
+        } catch (Exception e) {
+            alertResult = new AlertResult("false", e.getMessage());
+            logger.error("send alert error alert data id :{},", alertData.getId(), e);
+        }
+
 
         if (alertResult == null) {
             String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);
