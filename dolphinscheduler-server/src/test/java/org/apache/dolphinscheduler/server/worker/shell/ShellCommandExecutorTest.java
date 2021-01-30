@@ -18,10 +18,10 @@ package org.apache.dolphinscheduler.server.worker.shell;
 
 import java.lang.reflect.Method;
 
-import com.alibaba.fastjson.JSON;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -80,8 +80,8 @@ public class ShellCommandExecutorTest {
         TaskInstance taskInstance = processService.findTaskInstanceById(7657);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
-        taskProps.setTaskParams(taskNode.getParams());
+//        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+//        taskProps.setTaskParams(taskNode.getParams());
 
 
         // custom logger
