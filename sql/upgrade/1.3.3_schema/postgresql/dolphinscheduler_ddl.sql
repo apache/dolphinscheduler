@@ -121,6 +121,7 @@ DROP FUNCTION IF EXISTS ct_dolphin_T_t_ds_process_definition_version();
 
 
 --  add t_ds_resources_un
+delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_resources_un() RETURNS void AS $$
 BEGIN
     IF NOT EXISTS (
@@ -129,11 +130,13 @@ BEGIN
                     AND CONSTRAINT_NAME = 't_ds_resources_un'
                 )
     THEN
-ALTER TABLE t_ds_resources ADD CONSTRAINT t_ds_resources_un UNIQUE (full_name,"type");
-END IF;
+        ALTER TABLE t_ds_resources ADD CONSTRAINT t_ds_resources_un UNIQUE (full_name,"type");
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
+d//
 
+delimiter ;
 SELECT uc_dolphin_T_t_ds_resources_un();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_resources_un();
 
