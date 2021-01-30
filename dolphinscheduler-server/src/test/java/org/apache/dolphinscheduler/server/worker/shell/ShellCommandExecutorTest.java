@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -169,6 +170,38 @@ public class ShellCommandExecutorTest {
             } };
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
         } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFindAppId(){
+        Class<ShellCommandExecutor> shellCommandExecutorClass = ShellCommandExecutor.class;
+        try{
+            Object instance = shellCommandExecutorClass.newInstance();
+
+            Method method = shellCommandExecutorClass.getDeclaredMethod("findAppId", new Class[]{String.class});
+            method.setAccessible(true);
+            Object[] arg1s = {"11111"};
+            ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
+        }
+        catch (Exception e){
+            logger.error(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testConvertFile2List(){
+        Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
+        try{
+            Object instance = shellCommandExecutorClass.newInstance();
+
+            Method method = shellCommandExecutorClass.getDeclaredMethod("convertFile2List", new Class[]{String.class});
+            method.setAccessible(true);
+            Object[] arg1s = {"/opt/1.txt"};
+            AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
+        }
+        catch (Exception e){
             logger.error(e.getMessage());
         }
     }
