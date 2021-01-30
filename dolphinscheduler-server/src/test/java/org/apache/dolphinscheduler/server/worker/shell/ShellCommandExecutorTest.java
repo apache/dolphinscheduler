@@ -85,10 +85,10 @@ public class ShellCommandExecutorTest {
 
 
         // custom logger
-        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskInstance.getProcessDefinitionId(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
+//        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+//                taskInstance.getProcessDefinitionId(),
+//                taskInstance.getProcessInstanceId(),
+//                taskInstance.getId()));
 
 
 //        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
