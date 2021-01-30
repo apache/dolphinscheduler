@@ -15,24 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.bean;
+package org.apache.dolphinscheduler.plugin.alert.feishu;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 
-@Component
-public class SpringApplicationContext implements ApplicationContextAware {
+import com.google.common.collect.ImmutableList;
 
-    private static ApplicationContext applicationContext;
-
+public class FeiShuAlertPlugin  implements DolphinSchedulerPlugin {
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        SpringApplicationContext.applicationContext = applicationContext;
-    }
-
-    public static <T> T getBean(Class<T> requiredType) {
-        return applicationContext.getBean(requiredType);
+    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
+        return ImmutableList.of(new FeiShuAlertChannelFactory());
     }
 }
