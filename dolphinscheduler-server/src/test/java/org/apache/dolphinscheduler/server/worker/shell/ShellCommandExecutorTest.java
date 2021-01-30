@@ -16,39 +16,52 @@
  */
 package org.apache.dolphinscheduler.server.worker.shell;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.springframework.context.ApplicationContext;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 
 /**
- *  python shell command executor test
+ * python shell command executor test
  */
-@Ignore
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(OSUtils.class)
+@PowerMockIgnore({"javax.management.*"})
 public class ShellCommandExecutorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellCommandExecutorTest.class);
 
     private ProcessService processService = null;
+    private ApplicationContext applicationContext;
 
     @Before
-    public void before(){
-        processService = SpringApplicationContext.getBean(ProcessService.class);
+    public void before() {
+        processService = PowerMockito.mock(ProcessService.class);
+        applicationContext = PowerMockito.mock(ApplicationContext.class);
     }
 
+    @Ignore
     @Test
     public void test() throws Exception {
 
@@ -63,11 +76,10 @@ public class ShellCommandExecutorTest {
         taskProps.setTaskInstanceId(7657);
 
 
-
         TaskInstance taskInstance = processService.findTaskInstanceById(7657);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
         taskProps.setTaskParams(taskNode.getParams());
 
 
@@ -91,14 +103,28 @@ public class ShellCommandExecutorTest {
         task.handle();
         ExecutionStatus status = ExecutionStatus.SUCCESS;
 
-        if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
+        if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
             status = ExecutionStatus.SUCCESS;
-        }else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL){
+        } else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL) {
             status = ExecutionStatus.KILL;
-        }else {
+        } else {
             status = ExecutionStatus.FAILURE;
         }
 
         logger.info(status.toString());
+    }
+
+    @Test
+    public void testParseProcessOutput() {
+        Class<ShellCommandExecutor> shellCommandExecutorClass = ShellCommandExecutor.class;
+        try {
+            Object instance = shellCommandExecutorClass.newInstance();
+
+            Method method = shellCommandExecutorClass.getDeclaredMethod("parseProcessOutput", new Class[]{});
+            method.setAccessible(true);
+            ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, new Object[]{});
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 }
