@@ -15,42 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.utils;
+package org.apache.dolphinscheduler.remote.exceptions;
 
 /**
- * key value pair
- *
- * @param <L> L generic type
- * @param <R> R generic type
+ * Custom runtime exception
  */
-public class Pair<L, R> {
+public class RemoteException extends RuntimeException {
 
-    private L left;
-
-    private R right;
-
-    public Pair(L left, R right) {
-        this.left = left;
-        this.right = right;
+    /**
+     * Construct a new runtime exception with the detail message
+     *
+     * @param   message  detail message
+     */
+    public RemoteException(String message) {
+        super(message);
     }
 
-    public L getLeft() {
-        return left;
-    }
-
-    public void setLeft(L left) {
-        this.left = left;
-    }
-
-    public R getRight() {
-        return right;
-    }
-
-    public void setRight(R right) {
-        this.right = right;
-    }
-
-    public static <L, R> Pair<L, R> of(L left, R right) {
-        return new Pair<>(left, right);
+    /**
+     * Construct a new runtime exception with the detail message and cause
+     *
+     * @param   message  detail message
+     */
+    public RemoteException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
