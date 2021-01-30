@@ -161,7 +161,7 @@ public class ShellCommandExecutorTest {
 
                 @Override
                 public void destroy() {
-
+                   logger.info("unit test");
                 }
             }};
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
