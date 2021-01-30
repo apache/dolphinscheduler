@@ -15,24 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.bean;
+package org.apache.dolphinscheduler.service.exceptions;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
+/**
+ * Custom ZKServerException exception
+ */
+public class ServiceException extends RuntimeException {
 
-@Component
-public class SpringApplicationContext implements ApplicationContextAware {
-
-    private static ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        SpringApplicationContext.applicationContext = applicationContext;
+    /**
+     * Construct a new runtime exception with the error message
+     *
+     * @param errMsg Error message
+     */
+    public ServiceException(String errMsg) {
+        super(errMsg);
     }
 
-    public static <T> T getBean(Class<T> requiredType) {
-        return applicationContext.getBean(requiredType);
+    /**
+     * Construct a new runtime exception with the cause
+     *
+     * @param cause cause
+     */
+    public ServiceException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * Construct a new runtime exception with the detail message and cause
+     *
+     * @param errMsg message
+     * @param cause cause
+     */
+    public ServiceException(String errMsg, Throwable cause) {
+        super(errMsg, cause);
     }
 }

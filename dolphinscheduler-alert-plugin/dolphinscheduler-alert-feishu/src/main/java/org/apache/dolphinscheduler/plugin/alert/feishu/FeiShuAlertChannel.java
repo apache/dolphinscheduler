@@ -15,24 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.bean;
+package org.apache.dolphinscheduler.plugin.alert.feishu;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
+import org.apache.dolphinscheduler.spi.alert.AlertChannel;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
-@Component
-public class SpringApplicationContext implements ApplicationContextAware {
+import java.util.Map;
 
-    private static ApplicationContext applicationContext;
-
+public class FeiShuAlertChannel implements AlertChannel {
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        SpringApplicationContext.applicationContext = applicationContext;
-    }
+    public AlertResult process(AlertInfo alertInfo) {
 
-    public static <T> T getBean(Class<T> requiredType) {
-        return applicationContext.getBean(requiredType);
+        AlertData alertData = alertInfo.getAlertData();
+        String alertParams = alertInfo.getAlertParams();
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
+        return new FeiShuSender(paramsMap).sendFeiShuMsg(alertData);
     }
 }
