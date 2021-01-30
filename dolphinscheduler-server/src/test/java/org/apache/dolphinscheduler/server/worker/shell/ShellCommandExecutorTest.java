@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.worker.shell;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 
 
@@ -163,7 +166,7 @@ public class ShellCommandExecutorTest {
                 public void destroy() {
                     logger.info("unit test");
                 }
-            }};
+            } };
             ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
