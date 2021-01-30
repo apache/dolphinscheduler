@@ -153,19 +153,21 @@ public class WorkerGroupService extends BaseService {
             }
         }
 
-        // available workerGroup list
-        List<String> availableWorkerGroupList = new ArrayList<>();
-
         for (String workerGroup : workerGroupList) {
             String workerGroupPath = workerPath + "/" + workerGroup;
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
+            String timeStamp = "";
+            for (int i = 0; i < childrenNodes.size(); i++) {
+                String ip = childrenNodes.get(i);
+                childrenNodes.set(i, ip.substring(0, ip.lastIndexOf(":")));
+                timeStamp = ip.substring(ip.lastIndexOf(":"));
+            }
             if (CollectionUtils.isNotEmpty(childrenNodes)) {
-                availableWorkerGroupList.add(workerGroup);
                 WorkerGroup wg = new WorkerGroup();
                 wg.setName(workerGroup);
                 if (isPaging) {
                     wg.setIpList(childrenNodes);
-                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
+                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0) + timeStamp);
                     wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
                     wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
                 }
