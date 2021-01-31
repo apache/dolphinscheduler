@@ -973,6 +973,8 @@
                         <include>**/plugin/alert/script/ScriptSenderTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertChannelTest.java</include>
+                        <include>**/plugin/alert/feishu/FeiShuAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/feishu/FeiShuSenderTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
