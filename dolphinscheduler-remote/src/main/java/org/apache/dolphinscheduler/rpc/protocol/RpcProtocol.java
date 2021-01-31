@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.rpc.protocol;
 
-public class RpcProtocol<T>{
+public class RpcProtocol<T> {
 
     private MessageHeader msgHeader;
 

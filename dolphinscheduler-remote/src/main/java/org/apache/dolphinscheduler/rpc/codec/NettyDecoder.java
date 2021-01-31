@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.rpc.codec;
 
-import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
 import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
 import org.apache.dolphinscheduler.rpc.serializer.Serializer;
 
@@ -52,10 +51,10 @@ public class NettyDecoder extends ByteToMessageDecoder {
             byteBuf.resetReaderIndex();
         }
 
-        byte serializerType=1;
+        byte serializerType = 1;
         byte[] data = new byte[dataLength];
         byteBuf.readBytes(data);
-        Serializer serializer=RpcSerializer.getSerializerByType(serializerType);
+        Serializer serializer = RpcSerializer.getSerializerByType(serializerType);
         Object obj = serializer.deserialize(data, genericClass);
         list.add(obj);
     }
