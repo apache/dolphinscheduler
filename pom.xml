@@ -772,6 +772,7 @@
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
+                        <include>**/common/utils/HiveConfUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/plugin/FilePluginManagerTest</include>
@@ -781,6 +782,7 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/datasource/HiveDataSourceTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/FastJsonSerializerTest.java</include>

@@ -49,27 +49,6 @@ public class SQLServerDataSource extends BaseDataSource {
         return jdbcUrl;
     }
 
-    /**
-     * test whether the data source can be connected successfully
-     */
-    @Override
-    public void isConnectable() {
-        Connection con = null;
-        try {
-            Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
-            con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
-        } catch (Exception e) {
-            logger.error("error", e);
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    logger.error("SQL Server datasource try conn close conn error", e);
-                }
-            }
-        }
-    }
   /**
    * @return driver class
    */

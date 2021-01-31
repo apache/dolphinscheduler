@@ -18,6 +18,11 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import java.sql.Connection;
 
 /**
  * data source of hive
@@ -40,4 +45,58 @@ public class HiveDataSource extends BaseDataSource {
   public DbType dbTypeSelector() {
     return DbType.HIVE;
   }
+
+    /**
+     * build hive jdbc params,append : ?hive_conf_list
+     *
+     * hive jdbc url template:
+     *
+     * jdbc:hive2://<host1>:<port1>,<host2>:<port2>/dbName;initFile=<file>;sess_var_list?hive_conf_list#hive_var_list
+     *
+     * @param otherParams otherParams
+     * @return filter otherParams
+     */
+    @Override
+    protected String filterOther(String otherParams) {
+        if (StringUtils.isBlank(otherParams)) {
+            return "";
+        }
+
+        StringBuilder hiveConfListSb = new StringBuilder();
+        hiveConfListSb.append("?");
+        StringBuilder sessionVarListSb = new StringBuilder();
+
+        String[] otherArray = otherParams.split(";", -1);
+
+        for (String conf : otherArray) {
+            if (HiveConfUtils.isHiveConfVar(conf)) {
+                hiveConfListSb.append(conf).append(";");
+            } else {
+                sessionVarListSb.append(conf).append(";");
+            }
+        }
+
+        // remove the last ";"
+        if (sessionVarListSb.length() > 0) {
+            sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1);
+        }
+
+        if (hiveConfListSb.length() > 0) {
+            hiveConfListSb.deleteCharAt(hiveConfListSb.length() - 1);
+        }
+
+        return sessionVarListSb.toString() + hiveConfListSb.toString();
+    }
+
+    /**
+     * the data source test connection
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    @Override
+    public Connection getConnection() throws Exception {
+        CommonUtils.loadKerberosConf();
+        return super.getConnection();
+    }
+
 }
