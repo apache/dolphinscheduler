@@ -24,12 +24,11 @@ import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
 
-public class ProtoStuffSerializer implements Serializer{
+public class ProtoStuffSerializer implements Serializer {
 
     private static LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 
     private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
-
 
     @SuppressWarnings("unchecked")
     private static <T> Schema<T> getSchema(Class<T> clazz) {
@@ -37,7 +36,7 @@ public class ProtoStuffSerializer implements Serializer{
     }
 
     @Override
-    public  <T> byte[] serialize(T obj) throws IOException {
+    public <T> byte[] serialize(T obj) throws IOException {
         Class<T> clazz = (Class<T>) obj.getClass();
         Schema<T> schema = getSchema(clazz);
         byte[] data;
