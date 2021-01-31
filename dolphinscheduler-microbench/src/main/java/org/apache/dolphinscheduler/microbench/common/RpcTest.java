@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.rpc;
+package org.apache.dolphinscheduler.microbench.common;
 
+import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.rpc.client.IRpcClient;
@@ -24,36 +25,50 @@ import org.apache.dolphinscheduler.rpc.client.RpcClient;
 import org.apache.dolphinscheduler.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.rpc.remote.NettyServer;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.concurrent.TimeUnit;
 
-public class RpcTest {
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
+
+@Warmup(iterations = 5, time = 1)
+@Measurement(iterations = 10, time = 1)
+@State(Scope.Benchmark)
+@BenchmarkMode({Mode.Throughput, Mode.AverageTime, Mode.SampleTime})
+public class RpcTest extends AbstractBaseBenchmark {
     private NettyServer nettyServer;
 
     private IUserService userService;
 
     private Host host;
+    private IRpcClient rpcClient = new RpcClient();
 
-    @Before
+    @Setup
     public void before() throws Exception {
         nettyServer = new NettyServer(new NettyServerConfig());
         IRpcClient rpcClient = new RpcClient();
         host = new Host("127.0.0.1", 12346);
         userService = rpcClient.create(IUserService.class, host);
+
     }
 
-    @Test
-    public void sendTest() {
-        Integer result = userService.hi(3);
-        Assert.assertSame(4, result);
-        result = userService.hi(4);
-        Assert.assertSame(5, result);
-        userService.say("sync");
+    @Benchmark
+    @BenchmarkMode({Mode.Throughput, Mode.AverageTime, Mode.SampleTime})
+    @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    public void sendTest() throws Exception {
+
+        userService = rpcClient.create(IUserService.class, host);
+        Integer result = userService.hi(1);
     }
 
-    @After
+    @TearDown
     public void after() {
         NettyClient.getInstance().close();
         nettyServer.close();

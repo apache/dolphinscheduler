@@ -17,26 +17,27 @@
 
 package org.apache.dolphinscheduler.remote.codec;
 
-
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ReplayingDecoder;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandContext;
 import org.apache.dolphinscheduler.remote.command.CommandHeader;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ReplayingDecoder;
+
 /**
- *  netty decoder
+ * netty decoder
  */
 public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
     private static final Logger logger = LoggerFactory.getLogger(NettyDecoder.class);
 
-    public NettyDecoder(){
+    public NettyDecoder() {
         super(State.MAGIC);
     }
 
@@ -48,11 +49,10 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
      * @param ctx channel handler context
      * @param in byte buffer
      * @param out out content
-     * @throws Exception
      */
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        switch (state()){
+        switch (state()) {
             case MAGIC:
                 checkMagic(in.readByte());
                 checkpoint(State.VERSION);
@@ -102,13 +102,13 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
     }
 
     /**
-     *  get command type
+     * get command type
+     *
      * @param type type
-     * @return
      */
-    private CommandType commandType(byte type){
-        for(CommandType ct : CommandType.values()){
-            if(ct.ordinal() == type){
+    private CommandType commandType(byte type) {
+        for (CommandType ct : CommandType.values()) {
+            if (ct.ordinal() == type) {
                 return ct;
             }
         }
@@ -116,7 +116,8 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
     }
 
     /**
-     *  check magic
+     * check magic
+     *
      * @param magic magic
      */
     private void checkMagic(byte magic) {
@@ -126,8 +127,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
     }
 
     /**
-     *  check version
-     * @param version
+     * check version
      */
     private void checkVersion(byte version) {
         if (version != Command.VERSION) {
@@ -135,7 +135,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
         }
     }
 
-    enum State{
+    enum State {
         MAGIC,
         VERSION,
         COMMAND,

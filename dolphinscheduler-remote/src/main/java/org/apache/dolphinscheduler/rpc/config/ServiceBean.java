@@ -46,7 +46,10 @@ public class ServiceBean {
 
     private static synchronized void init() {
         // todo config
-        Reflections f = new Reflections("org/apache/dolphinscheduler/rpc");
+        if(initialized.get()){
+            return;
+        }
+        Reflections f = new Reflections("org/apache/dolphinscheduler/");
         List<Class<?>> list = new ArrayList<>(f.getTypesAnnotatedWith(RpcService.class));
         list.forEach(rpcClass -> {
             RpcService rpcService = rpcClass.getAnnotation(RpcService.class);
