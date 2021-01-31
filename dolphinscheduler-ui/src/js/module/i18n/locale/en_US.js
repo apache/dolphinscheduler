@@ -400,6 +400,8 @@ export default {
   'Please select a notification group': 'Please select a notification group',
   Recipient: 'Recipient',
   Cc: 'Cc',
+  receivers: 'receivers',
+  receiverCcs: 'receiverCcs',
   'Whether it is a complement process?': 'Whether it is a complement process?',
   'Schedule date': 'Schedule date',
   'Mode of execution': 'Mode of execution',
