@@ -46,7 +46,7 @@ public class ServiceBean {
 
     private static synchronized void init() {
         // todo config
-        if(initialized.get()){
+        if (initialized.get()) {
             return;
         }
         Reflections f = new Reflections("org/apache/dolphinscheduler/");

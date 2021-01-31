@@ -19,15 +19,15 @@ package org.apache.dolphinscheduler.rpc.protocol;
 
 public class MessageHeader {
 
-    private byte magic=(byte) 0xbabe;
+    private byte magic = (byte) 0xbabe;
 
     /**
-     *  context length
+     * context length
      */
     private int contextLength;
 
     /**
-     *  context
+     * context
      */
     private byte[] context;
 
@@ -39,7 +39,6 @@ public class MessageHeader {
     private byte status;
 
     private byte serialization;
-
 
     public int getContextLength() {
         return contextLength;
