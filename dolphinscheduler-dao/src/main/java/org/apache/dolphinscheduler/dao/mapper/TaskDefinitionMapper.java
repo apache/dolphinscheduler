@@ -34,16 +34,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
 
     /**
-     * verify task definition by name
-     *
-     * @param projectCode projectCode
-     * @param name name
-     * @return task definition
-     */
-    TaskDefinition verifyByDefineName(@Param("projectCode") Long projectCode,
-                                      @Param("taskDefinitionName") String name);
-
-    /**
      * query task definition by name
      *
      * @param projectCode projectCode
@@ -51,7 +41,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition
      */
     TaskDefinition queryByDefinitionName(@Param("projectCode") Long projectCode,
-                                         @Param("taskDefinitionName") String name);
+                                      @Param("taskDefinitionName") String name);
 
     /**
      * query task definition by id
@@ -60,6 +50,14 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition
      */
     TaskDefinition queryByDefinitionId(@Param("taskDefinitionId") int taskDefinitionId);
+
+    /**
+     * query task definition by code
+     *
+     * @param taskDefinitionCode taskDefinitionCode
+     * @return task definition
+     */
+    TaskDefinition queryByDefinitionCode(@Param("taskDefinitionCode") Long taskDefinitionCode);
 
     /**
      * query all task definition list
