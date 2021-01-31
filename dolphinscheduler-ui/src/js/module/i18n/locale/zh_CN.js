@@ -400,6 +400,8 @@ export default {
   'Please select a notification group': '请选择通知组',
   Recipient: '收件人',
   Cc: '抄送人',
+  receivers: '收件人',
+  receiverCcs: '抄送人',
   'Whether it is a complement process?': '是否补数',
   'Schedule date': '调度日期',
   'Mode of execution': '执行方式',
