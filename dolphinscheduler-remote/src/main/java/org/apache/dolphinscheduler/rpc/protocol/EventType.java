@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.rpc.serializer;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,35 +15,29 @@ package org.apache.dolphinscheduler.rpc.serializer;/*
  * limitations under the License.
  */
 
-import java.util.HashMap;
+package org.apache.dolphinscheduler.rpc.protocol;
 
-public enum RpcSerializer {
+public enum EventType {
+
+    HEARTBEAT((byte)1,"heartbeat"),
+    REQUEST((byte)2,"business request"),
+    RESPONSE((byte)3,"business response");
 
 
-    PROTOSTUFF((byte) 1, new ProtoStuffSerializer());
+    private Byte type;
 
-    byte type;
+    private String description;
 
-    Serializer serializer;
-
-    RpcSerializer(byte type, Serializer serializer) {
+    EventType(Byte type, String description) {
         this.type = type;
-        this.serializer = serializer;
+        this.description = description;
     }
 
-    public byte getType() {
+    public Byte getType() {
         return type;
     }
 
-    private static HashMap<Byte, Serializer> SERIALIZERS_MAP = new HashMap<>();
-
-    static {
-        for (RpcSerializer rpcSerializer : RpcSerializer.values()) {
-            SERIALIZERS_MAP.put(rpcSerializer.type, rpcSerializer.serializer);
-        }
-    }
-
-    public static Serializer getSerializerByType(byte type) {
-        return SERIALIZERS_MAP.get(type);
+    public String getDescription() {
+        return description;
     }
 }

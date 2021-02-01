@@ -22,11 +22,11 @@ package org.apache.dolphinscheduler.rpc.common;
  */
 public class RpcRequest {
 
-    private String requestId;
     private String className;
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
+
     /**
      * @see RequestEventType
      */
@@ -40,14 +40,6 @@ public class RpcRequest {
 
     public void setEventType(Byte eventType) {
         this.eventType = eventType;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
     }
 
     public String getClassName() {
