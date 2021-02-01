@@ -87,6 +87,7 @@
        * Query
        */
       _onQuery (o) {
+        this.searchParams.pageNo = 1
         this.searchParams = _.assign(this.searchParams, o)
         setUrlParams(this.searchParams)
         this._debounceGET()
