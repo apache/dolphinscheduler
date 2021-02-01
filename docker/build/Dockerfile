@@ -39,12 +39,12 @@ RUN ln -s /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bi
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 # 3. add configuration and modify permissions and set soft links
-ADD ./checkpoint.sh /root/checkpoint.sh
-ADD ./startup-init-conf.sh /root/startup-init-conf.sh
-ADD ./startup.sh /root/startup.sh
-ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
-ADD ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
-ADD conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
+COPY ./checkpoint.sh /root/checkpoint.sh
+COPY ./startup-init-conf.sh /root/startup-init-conf.sh
+COPY ./startup.sh /root/startup.sh
+COPY ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
+COPY ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
+COPY ./conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
 RUN dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
     dos2unix /root/startup.sh && \

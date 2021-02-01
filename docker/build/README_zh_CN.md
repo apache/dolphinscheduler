@@ -13,39 +13,31 @@ Official Website: https://dolphinscheduler.apache.org
 
 ## 如何使用docker镜像
 
-#### 你可以运行一个dolphinscheduler实例
+#### **以 docker-compose 的方式启动dolphinscheduler(推荐)**
 ```
-$ docker run -dit --name dolphinscheduler \
--e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
--p 12345:12345 \
-dolphinscheduler all
+$ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 ```
 
-在`startup.sh`脚本中，默认的创建`Postgres`的用户、密码和数据库，默认值分别为：`root`、`root`、`dolphinscheduler`。
+在`docker-compose.yml`文件中，默认的创建`Postgres`的用户、密码和数据库，默认值分别为：`root`、`root`、`dolphinscheduler`。
 
-同时，默认的`Zookeeper`也会在`startup.sh`脚本中被创建。
+同时，默认的`Zookeeper`也会在`docker-compose.yml`文件中被创建。
+
+访问前端界面：http://192.168.xx.xx:12345
 
 #### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
-你可以指定一个已经存在的 **`Postgres`** 服务. 如下:
+你可以指定已经存在的 **`Postgres`** 和 **`Zookeeper`** 服务. 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
 dolphinscheduler all
 ```
 
-你也可以指定一个已经存在的 **Zookeeper** 服务. 如下:
-
-```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
--p 12345:12345 \
-dolphinscheduler all
-```
+访问前端界面：http://192.168.xx.xx:12345
 
 #### 或者运行dolphinscheduler中的部分服务
 
@@ -54,8 +46,8 @@ dolphinscheduler all
 * 启动一个 **master server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
+$ docker run -d --name dolphinscheduler-master \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler master-server
@@ -64,17 +56,16 @@ dolphinscheduler master-server
 * 启动一个 **worker server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
--e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+$ docker run -d --name dolphinscheduler-worker \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 dolphinscheduler worker-server
 ```
 
 * 启动一个 **api server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler-api \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
@@ -84,7 +75,7 @@ dolphinscheduler api-server
 * 启动一个 **alert server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler-alert \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler alert-server
@@ -106,7 +97,7 @@ $ sh ./docker/build/hooks/build
 Windows系统, 如下:
 
 ```bat
-c:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。

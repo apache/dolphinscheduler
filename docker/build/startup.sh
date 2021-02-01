@@ -22,8 +22,8 @@ DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
 DOLPHINSCHEDULER_SCRIPT=${DOLPHINSCHEDULER_HOME}/script
 DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
 
-# start database
-initDatabase() {
+# wait database
+waitDatabase() {
     echo "test ${DATABASE_TYPE} service"
     while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
         counter=$((counter+1))
@@ -49,13 +49,16 @@ initDatabase() {
             exit 1
         fi
     fi
+}
 
+# init database
+initDatabase() {
     echo "import sql data"
     ${DOLPHINSCHEDULER_SCRIPT}/create-dolphinscheduler.sh
 }
 
-# start zk
-initZK() {
+# wait zk
+waitZK() {
     echo "connect remote zookeeper"
     echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
         while ! nc -z ${line%:*} ${line#*:}; do
@@ -122,7 +125,8 @@ source /root/startup-init-conf.sh
 
 case "$1" in
     (all)
-        initZK
+        waitZK
+        waitDatabase
         initDatabase
         initMasterServer
         initWorkerServer
@@ -132,26 +136,26 @@ case "$1" in
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (master-server)
-        initZK
-        initDatabase
+        waitZK
+        waitDatabase
         initMasterServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
     ;;
     (worker-server)
-        initZK
-        initDatabase
+        waitZK
         initWorkerServer
         initLoggerServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
     ;;
     (api-server)
-        initZK
+        waitZK
+        waitDatabase
         initDatabase
         initApiServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (alert-server)
-        initDatabase
+        waitDatabase
         initAlertServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
     ;;
@@ -166,7 +170,7 @@ case "$1" in
 esac
 
 # init directories and log files
-mkdir -p ${DOLPHINSCHEDULER_LOGS} && mkdir -p /var/log/nginx/ && cat /dev/null >> ${LOGFILE}
+mkdir -p ${DOLPHINSCHEDULER_LOGS} && cat /dev/null >> ${LOGFILE}
 
 echo "tail begin"
 exec bash -c "tail -n 1 -f ${LOGFILE}"

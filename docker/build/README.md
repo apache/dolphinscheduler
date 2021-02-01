@@ -13,39 +13,31 @@ Official Website: https://dolphinscheduler.apache.org
 
 ## How to use this docker image
 
-#### You can start a dolphinscheduler instance
+#### You can start a dolphinscheduler by docker-compose (recommended)
 ```
-$ docker run -dit --name dolphinscheduler \
--e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
--p 12345:12345 \
-dolphinscheduler all
+$ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 ```
 
-The default postgres user `root`, postgres password `root` and database `dolphinscheduler` are created in the `startup.sh`.
+The default **postgres** user `root`, postgres password `root` and database `dolphinscheduler` are created in the `docker-compose.yml`.
 
-The default zookeeper is created in the `startup.sh`.
+The default **zookeeper** is created in the `docker-compose.yml`.
+
+Access the Web UI：http://192.168.xx.xx:12345
 
 #### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
 
-You can specify **existing postgres service**. Example:
+You can specify **existing postgres and zookeeper service**. Example:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
 dolphinscheduler all
 ```
 
-You can specify **existing zookeeper service**. Example:
-
-```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
--p 12345:12345 \
-dolphinscheduler all
-```
+Access the Web UI：http://192.168.xx.xx:12345
 
 #### Or start a standalone dolphinscheduler server
 
@@ -54,8 +46,8 @@ You can start a standalone dolphinscheduler server.
 * Start a **master server**, For example:
 
 ```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
+$ docker run -d --name dolphinscheduler-master \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler master-server
@@ -64,17 +56,16 @@ dolphinscheduler master-server
 * Start a **worker server**, For example:
 
 ```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
--e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+$ docker run -d --name dolphinscheduler-worker \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 dolphinscheduler worker-server
 ```
 
 * Start a **api server**, For example:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler-api \
+-e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
@@ -84,7 +75,7 @@ dolphinscheduler api-server
 * Start a **alert server**, For example:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler-alert \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler alert-server
@@ -106,7 +97,7 @@ $ sh ./docker/build/hooks/build
 In Windows, Example:
 
 ```bat
-c:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script files if you don't understand
