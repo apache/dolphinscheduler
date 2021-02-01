@@ -105,7 +105,7 @@
        * remove task
        */
       _remove (i) {
-        this.dependTaskList[this.index].dependItemList.splice(i, 1)
+        // this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
