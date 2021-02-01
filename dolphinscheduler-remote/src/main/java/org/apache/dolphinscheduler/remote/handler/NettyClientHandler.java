@@ -74,7 +74,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor) {
         this.nettyRemotingClient = nettyRemotingClient;
         this.callbackExecutor = callbackExecutor;
-        this.processors = new ConcurrentHashMap();
+        this.processors = new ConcurrentHashMap<>();
     }
 
     /**
@@ -82,10 +82,9 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * the current channel has reached the end of its life cycle
      *
      * @param ctx channel handler context
-     * @throws Exception
      */
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
@@ -95,10 +94,9 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      *
      * @param ctx channel handler context
      * @param msg message
-     * @throws Exception
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         processReceived(ctx.channel(), (Command) msg);
     }
 
@@ -106,7 +104,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * register processor
      *
      * @param commandType command type
-     * @param processor   processor
+     * @param processor processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
@@ -116,8 +114,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * register processor
      *
      * @param commandType command type
-     * @param processor   processor
-     * @param executor    thread executor
+     * @param processor processor
+     * @param executor thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
@@ -138,12 +136,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             future.setResponseCommand(command);
             future.release();
             if (future.getInvokeCallback() != null) {
-                this.callbackExecutor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        future.executeInvokeCallback();
-                    }
-                });
+                this.callbackExecutor.submit(future::executeInvokeCallback);
             } else {
                 future.putResponse(command);
             }
@@ -158,7 +151,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             Runnable run = () -> {
                 try {
                     pair.getLeft().process(channel, command);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     logger.error(String.format("process command %s exception", command), e);
                 }
             };
@@ -175,13 +168,12 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     /**
      * caught exception
      *
-     * @param ctx   channel handler context
+     * @param ctx channel handler context
      * @param cause cause
-     * @throws Exception
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught : {}", cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("exceptionCaught : {}", cause.getMessage(), cause);
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
@@ -193,7 +185,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             heartBeat.setType(CommandType.HEART_BEAT);
             heartBeat.setBody(heartBeatData);
             ctx.writeAndFlush(heartBeat)
-                .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+                    .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
 
         } else {
             super.userEventTriggered(ctx, evt);
