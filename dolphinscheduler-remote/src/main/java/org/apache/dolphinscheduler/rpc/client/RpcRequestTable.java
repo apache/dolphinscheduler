@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.rpc.client;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * RpcRequestTable
@@ -28,18 +29,24 @@ public class RpcRequestTable {
         throw new IllegalStateException("Utility class");
     }
 
-    private static ConcurrentHashMap<String, RpcRequestCache> requestMap = new ConcurrentHashMap<>();
+    private static AtomicLong requestIdGen = new AtomicLong(0);
 
-    public static void put(String requestId, RpcRequestCache rpcRequestCache) {
+    private static ConcurrentHashMap<Long, RpcRequestCache> requestMap = new ConcurrentHashMap<>();
+
+    public static void put(long requestId, RpcRequestCache rpcRequestCache) {
         requestMap.put(requestId, rpcRequestCache);
     }
 
-    public static RpcRequestCache get(String requestId) {
+    public static RpcRequestCache get(Long requestId) {
         return requestMap.get(requestId);
     }
 
-    public static void remove(String requestId) {
+    public static void remove(Long requestId) {
         requestMap.remove(requestId);
+    }
+
+    public static long getRequestId() {
+        return requestIdGen.incrementAndGet();
     }
 
 }

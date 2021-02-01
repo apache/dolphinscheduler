@@ -21,55 +21,44 @@ public class MessageHeader {
 
     private byte magic = (byte) 0xbabe;
 
-    /**
-     * context length
-     */
-    private int contextLength;
+    private byte version;
 
-    /**
-     * context
-     */
-    private byte[] context;
+    private byte eventType;
 
-    private String requestId;
-
-
-    private byte type;
+    private int msgLength;
 
     private byte status;
 
+    private long requestId;
+
     private byte serialization;
 
-    public int getContextLength() {
-        return contextLength;
+    public byte getMagic() {
+        return magic;
     }
 
-    public void setContextLength(int contextLength) {
-        this.contextLength = contextLength;
+    public byte getVersion() {
+        return version;
     }
 
-    public byte[] getContext() {
-        return context;
+    public void setVersion(byte version) {
+        this.version = version;
     }
 
-    public void setContext(byte[] context) {
-        this.context = context;
+    public byte getEventType() {
+        return eventType;
     }
 
-    public String getRequestId() {
-        return requestId;
+    public void setEventType(byte eventType) {
+        this.eventType = eventType;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public int getMsgLength() {
+        return msgLength;
     }
 
-    public byte getType() {
-        return type;
-    }
-
-    public void setType(byte type) {
-        this.type = type;
+    public void setMsgLength(int msgLength) {
+        this.msgLength = msgLength;
     }
 
     public byte getStatus() {
@@ -80,15 +69,19 @@ public class MessageHeader {
         this.status = status;
     }
 
+    public long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(long requestId) {
+        this.requestId = requestId;
+    }
+
     public byte getSerialization() {
         return serialization;
     }
 
     public void setSerialization(byte serialization) {
         this.serialization = serialization;
-    }
-
-    public byte getMagic() {
-        return magic;
     }
 }

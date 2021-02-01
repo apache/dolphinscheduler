@@ -22,7 +22,11 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.rpc.base.Rpc;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
+import org.apache.dolphinscheduler.rpc.protocol.EventType;
+import org.apache.dolphinscheduler.rpc.protocol.MessageHeader;
+import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 import org.apache.dolphinscheduler.rpc.remote.NettyClient;
+import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -57,6 +61,8 @@ public class ConsumerInterceptor {
 
         int retries = consumerConfig.getRetries();
 
+        RpcProtocol protocol=buildProtocol(request);
+
         while (retries-- > 0) {
             RpcResponse rsp = nettyClient.sendMsg(host, request, async);
             //success
@@ -71,7 +77,6 @@ public class ConsumerInterceptor {
 
     private RpcRequest buildReq(Object[] args, Method method) {
         RpcRequest request = new RpcRequest();
-        request.setRequestId(UUID.randomUUID().toString());
         request.setClassName(method.getDeclaringClass().getSimpleName());
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
@@ -95,6 +100,17 @@ public class ConsumerInterceptor {
         ConsumerConfigCache.putConfig(serviceName, consumerConfig);
 
         return consumerConfig;
+    }
+
+    private RpcProtocol buildProtocol(RpcRequest req){
+        RpcProtocol<RpcRequest> protocol=new RpcProtocol<>();
+        MessageHeader header=new MessageHeader();
+        header.setRequestId(RpcRequestTable.getRequestId());
+        header.setEventType(EventType.REQUEST.getType());
+        header.setSerialization(RpcSerializer.PROTOSTUFF.getType());
+        protocol.setMsgHeader(header);
+        protocol.setBody(req);
+        return protocol;
     }
 
 }

@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.rpc.codec.NettyEncoder;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.future.RpcFuture;
+import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -191,10 +192,11 @@ public class NettyClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public RpcResponse sendMsg(Host host, RpcRequest request, Boolean async) {
+    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) {
 
         Channel channel = getChannel(host);
         assert channel != null;
+        RpcRequest request=protocol.getBody();
         RpcRequestCache rpcRequestCache = new RpcRequestCache();
         String serviceName = request.getClassName() + request.getMethodName();
         rpcRequestCache.setServiceName(serviceName);
@@ -203,7 +205,7 @@ public class NettyClient {
             future = new RpcFuture(request);
             rpcRequestCache.setRpcFuture(future);
         }
-        RpcRequestTable.put(request.getRequestId(), rpcRequestCache);
+        RpcRequestTable.put(protocol.getMsgHeader().getRequestId(), rpcRequestCache);
         channel.writeAndFlush(request);
 
         RpcResponse result = null;
