@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 import static org.apache.dolphinscheduler.alert.utils.Constants.ALERT_PROPERTIES_PATH;
+import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_PROPERTIES_PATH;
 
 import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -44,32 +45,12 @@ public class PropertyUtils {
     private static final Properties properties = new Properties();
 
     /**
-     *  init properties
+     * init properties
      */
     private static final PropertyUtils propertyUtils = new PropertyUtils();
 
     private PropertyUtils() {
         init();
-    }
-
-    private void init() {
-        String[] propertyFiles = new String[]{ALERT_PROPERTIES_PATH};
-        for (String fileName : propertyFiles) {
-            InputStream fis = null;
-            try {
-                fis = PropertyUtils.class.getResourceAsStream(fileName);
-                properties.load(fis);
-
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                if (fis != null) {
-                    IOUtils.closeQuietly(fis);
-                }
-                System.exit(1);
-            } finally {
-                IOUtils.closeQuietly(fis);
-            }
-        }
     }
 
     /**
@@ -88,7 +69,7 @@ public class PropertyUtils {
     /**
      * get property value
      *
-     * @param key        property name
+     * @param key property name
      * @param defaultVal default value
      * @return property value
      */
@@ -258,5 +239,26 @@ public class PropertyUtils {
         }
 
         return defaultValue;
+    }
+
+    private void init() {
+        String[] propertyFiles = new String[]{ALERT_PROPERTIES_PATH, ZOOKEEPER_PROPERTIES_PATH};
+
+        for (String fileName : propertyFiles) {
+            InputStream fis = null;
+            try {
+                fis = PropertyUtils.class.getResourceAsStream(fileName);
+                properties.load(fis);
+
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                if (fis != null) {
+                    IOUtils.closeQuietly(fis);
+                }
+                System.exit(1);
+            } finally {
+                IOUtils.closeQuietly(fis);
+            }
+        }
     }
 }

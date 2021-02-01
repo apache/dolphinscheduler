@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.alert.processor.AlertRequestProcessor;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
+import org.apache.dolphinscheduler.alert.utils.ZookeeperClient;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -35,6 +36,8 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.List;
 
@@ -47,35 +50,26 @@ import com.google.common.collect.ImmutableList;
  * alert of start
  */
 public class AlertServer {
+    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
+    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
+    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
+    private static AlertServer instance;
     /**
      * Alert Dao
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-
     private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
-
     private AlertSender alertSender;
-
-    private static AlertServer instance;
-
     private AlertPluginManager alertPluginManager;
-
     private DolphinPluginManagerConfig alertPluginManagerConfig;
-
-    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
-
-    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
-
-    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
-
     /**
      * netty server
      */
     private NettyRemotingServer server;
 
-    private static class AlertServerHolder {
-        private static final AlertServer INSTANCE = new AlertServer();
+    private AlertServer() {
+
     }
 
     public static final AlertServer getInstance() {
@@ -83,8 +77,15 @@ public class AlertServer {
 
     }
 
-    private AlertServer() {
-
+    public static void main(String[] args) {
+        AlertServer alertServer = AlertServer.getInstance();
+        alertServer.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                alertServer.stop();
+            }
+        });
     }
 
     private void initPlugin() {
@@ -122,6 +123,9 @@ public class AlertServer {
      * Cyclic alert info sending alert
      */
     private void runSender() {
+
+        ZookeeperClient zookeeperClient = new ZookeeperClient();
+        zookeeperClient.init();
         while (Stopper.isRunning()) {
             try {
                 Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
@@ -132,9 +136,21 @@ public class AlertServer {
             if (alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
                 logger.warn("No Alert Plugin . Can not send alert info. ");
             } else {
-                List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
-                alertSender.run();
+                InterProcessMutex mutex = null;
+                try {
+                    logger.error("创建分布式锁 : ");
+                    mutex = zookeeperClient.getAlertLockPath();
+                    mutex.acquire();
+                    List<Alert> alerts = alertDao.listWaitExecutionAlert();
+                    alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
+                    alertSender.run();
+                } catch (Exception e) {
+                    logger.error("alert server with error : ", e);
+                } finally {
+                    zookeeperClient.release(mutex);
+
+                }
+
             }
         }
     }
@@ -157,15 +173,8 @@ public class AlertServer {
         logger.info("alert server shut down");
     }
 
-    public static void main(String[] args) {
-        AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                alertServer.stop();
-            }
-        });
+    private static class AlertServerHolder {
+        private static final AlertServer INSTANCE = new AlertServer();
     }
 
 }
