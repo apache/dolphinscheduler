@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -35,11 +36,13 @@ import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -81,6 +84,9 @@ public class TaskDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * create task definition
@@ -128,8 +134,10 @@ public class TaskDefinitionServiceImpl extends BaseService implements
                 loginUser.getId(),
                 TaskType.of(taskNode.getType()),
                 taskNode.getParams(),
-                taskNode.isForbidden() ? Flag.NO : Flag.YES, taskNode.getTaskInstancePriority(),
-                taskNode.getWorkerGroup(), taskNode.getMaxRetryTimes(),
+                taskNode.isForbidden() ? Flag.NO : Flag.YES,
+                taskNode.getTaskInstancePriority(),
+                taskNode.getWorkerGroup(),
+                taskNode.getMaxRetryTimes(),
                 taskNode.getRetryInterval(),
                 taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE,
                 taskNode.getTaskTimeoutParameter().getStrategy(),
@@ -279,8 +287,10 @@ public class TaskDefinitionServiceImpl extends BaseService implements
                 loginUser.getId(),
                 TaskType.of(taskNode.getType()),
                 taskNode.getParams(),
-                taskNode.isForbidden() ? Flag.NO : Flag.YES, taskNode.getTaskInstancePriority(),
-                taskNode.getWorkerGroup(), taskNode.getMaxRetryTimes(),
+                taskNode.isForbidden() ? Flag.NO : Flag.YES,
+                taskNode.getTaskInstancePriority(),
+                taskNode.getWorkerGroup(),
+                taskNode.getMaxRetryTimes(),
                 taskNode.getRetryInterval(),
                 taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE,
                 taskNode.getTaskTimeoutParameter().getStrategy(),
@@ -307,11 +317,14 @@ public class TaskDefinitionServiceImpl extends BaseService implements
                     .stream()
                     .map(ProcessTaskRelation::getProcessDefinitionCode)
                     .collect(Collectors.toSet());
-            // check process definition is already online  TODO
-//            if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-//                putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getCode);
-//                return result;
-//            }
+            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(processDefinitionCodes);
+            // check process definition is already online
+            for (ProcessDefinition processDefinition : processDefinitionList) {
+                if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+                    putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getCode());
+                    return;
+                }
+            }
         }
     }
 
