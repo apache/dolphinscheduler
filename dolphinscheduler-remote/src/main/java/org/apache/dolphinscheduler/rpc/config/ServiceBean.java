@@ -56,6 +56,7 @@ public class ServiceBean {
             serviceMap.put(rpcService.value(), rpcClass);
             logger.info("load rpc service {}", rpcService.value());
         });
+        initialized.set(true);
     }
 
     public static Class getServiceClass(String className) {

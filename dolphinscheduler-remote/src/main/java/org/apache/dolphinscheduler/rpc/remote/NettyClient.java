@@ -206,8 +206,7 @@ public class NettyClient {
             rpcRequestCache.setRpcFuture(future);
         }
         RpcRequestTable.put(protocol.getMsgHeader().getRequestId(), rpcRequestCache);
-        channel.writeAndFlush(request);
-
+        channel.writeAndFlush(protocol);
         RpcResponse result = null;
         if (Boolean.TRUE.equals(async)) {
             result = new RpcResponse();

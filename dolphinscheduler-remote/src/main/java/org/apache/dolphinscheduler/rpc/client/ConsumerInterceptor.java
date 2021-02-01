@@ -64,7 +64,7 @@ public class ConsumerInterceptor {
         RpcProtocol protocol=buildProtocol(request);
 
         while (retries-- > 0) {
-            RpcResponse rsp = nettyClient.sendMsg(host, request, async);
+            RpcResponse rsp = nettyClient.sendMsg(host, protocol, async);
             //success
             if (null != rsp && rsp.getStatus() == 0) {
                 return rsp.getResult();
