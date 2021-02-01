@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -134,7 +133,7 @@ public class ShellCommandExecutorTest {
                     return new OutputStream() {
                         @Override
                         public void write(int b) throws IOException {
-
+                            logger.info("unit test");
                         }
                     };
                 }
@@ -182,9 +181,8 @@ public class ShellCommandExecutorTest {
 
                 @Override
                 protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-
-                }
-            }, arg1s);
+                    logger.info("unit test");
+                } }, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -211,9 +209,8 @@ public class ShellCommandExecutorTest {
 
                 @Override
                 protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-
-                }
-            }, arg1s);
+                    logger.info("unit test");
+                } }, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -239,9 +236,8 @@ public class ShellCommandExecutorTest {
 
                 @Override
                 protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-
-                }
-            }, arg1s);
+                    logger.info("unit test");
+                } }, arg1s);
             Assert.assertTrue(true);
         } catch (Exception e) {
             logger.error(e.getMessage());
