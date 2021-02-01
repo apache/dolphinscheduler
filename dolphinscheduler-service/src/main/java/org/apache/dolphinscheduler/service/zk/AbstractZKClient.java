@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.service.zk;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.COLON;
+import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
@@ -25,9 +26,12 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import java.util.*;
-
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,11 +253,11 @@ public abstract class AbstractZKClient extends RegisterOperator {
 
     @Override
     public String toString() {
-        return "AbstractZKClient{" +
-                "zkClient=" + getZkClient() +
-                ", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\'' +
-                ", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\'' +
-                ", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\'' +
-                '}';
+        return "AbstractZKClient{"
+                + "zkClient=" + getZkClient()
+                + ", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\''
+                + ", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\''
+                + ", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\''
+                + '}';
     }
 }
