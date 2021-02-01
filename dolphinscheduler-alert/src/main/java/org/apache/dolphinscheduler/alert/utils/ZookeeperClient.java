@@ -99,7 +99,6 @@ public class ZookeeperClient {
             }
         }
 
-
         logger.info("zookeeper registry center init, server lists is: [{}]", properties.getProperty(ZOOKEEPER_LIST));
 
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
