@@ -72,6 +72,7 @@ public class ConsumerInterceptor {
                 rsp = nettyClient.sendMsg(host, protocol, async);
             } catch (InterruptedException e) {
                 logger.warn("send msg error ", e);
+                Thread.currentThread().interrupt();
             }
             //success
             if (null != rsp && rsp.getStatus() == 0) {
