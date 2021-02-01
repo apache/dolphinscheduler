@@ -15,25 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.rpc;
+package org.apache.dolphinscheduler.rpc.protocol;
 
-import org.apache.dolphinscheduler.rpc.base.RpcService;
+public class RpcProtocolConstants {
 
-/**
- * UserService
- */
-@RpcService("IUserService")
-public class UserService implements IUserService {
+    public static final int HEADER_LENGTH = 18;
 
-    @Override
-    public Boolean say(String s) {
-        return true;
-    }
+    public static final short MAGIC = (short) 0xbabe;
 
-    @Override
-    public Integer hi(int num) {
-
-        System.out.println("hihihihi+"+num);
-        return ++num;
-    }
 }

@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.rpc.codec;
 
+import org.apache.dolphinscheduler.rpc.protocol.EventType;
+import org.apache.dolphinscheduler.rpc.protocol.MessageHeader;
+import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
+import org.apache.dolphinscheduler.rpc.protocol.RpcProtocolConstants;
 import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
 import org.apache.dolphinscheduler.rpc.serializer.Serializer;
 
@@ -39,23 +43,45 @@ public class NettyDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        if (byteBuf.readableBytes() < 4) {
+
+
+        if (byteBuf.readableBytes() < RpcProtocolConstants.HEADER_LENGTH) {
+            System.out.println("llllll 长度不够");
             return;
         }
         byteBuf.markReaderIndex();
-        int dataLength = byteBuf.readInt();
-        if (dataLength < 0) {
-            channelHandlerContext.close();
-        }
-        if (byteBuf.readableBytes() < dataLength) {
-            byteBuf.resetReaderIndex();
-        }
 
-        byte serializerType = 1;
-        byte[] data = new byte[dataLength];
+        short magic = byteBuf.readShort();
+        if (RpcProtocolConstants.MAGIC != magic) {
+            throw new IllegalArgumentException("magic number is illegal, " + magic);
+        }
+        byte eventType = byteBuf.readByte();
+        byte version = byteBuf.readByte();
+        byte serialization=byteBuf.readByte();
+
+        byte state = byteBuf.readByte();
+        long requestId=byteBuf.readLong();
+        int dataLength = byteBuf.readInt();
+
+        byte[] data=new byte[dataLength];
         byteBuf.readBytes(data);
-        Serializer serializer = RpcSerializer.getSerializerByType(serializerType);
-        Object obj = serializer.deserialize(data, genericClass);
-        list.add(obj);
+        RpcProtocol rpcProtocol=new RpcProtocol();
+        MessageHeader header=new MessageHeader();
+
+        header.setVersion(version);
+        header.setSerialization(serialization);
+        header.setStatus(state);
+        header.setRequestId(requestId);
+        header.setEventType(eventType);
+        header.setMsgLength(dataLength);
+        rpcProtocol.setMsgHeader(header);
+        if(eventType!= EventType.HEARTBEAT.getType()){
+            Serializer serializer = RpcSerializer.getSerializerByType(serialization);
+            Object obj = serializer.deserialize(data, genericClass);
+            rpcProtocol.setBody(obj);
+        }
+        list.add(rpcProtocol);
     }
+
+
 }

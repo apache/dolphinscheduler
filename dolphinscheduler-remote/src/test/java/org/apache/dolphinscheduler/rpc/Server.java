@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.rpc;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,25 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.rpc;
+import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.rpc.remote.NettyServer;
 
-import org.apache.dolphinscheduler.rpc.base.RpcService;
+public class Server {
 
-/**
- * UserService
- */
-@RpcService("IUserService")
-public class UserService implements IUserService {
-
-    @Override
-    public Boolean say(String s) {
-        return true;
-    }
-
-    @Override
-    public Integer hi(int num) {
-
-        System.out.println("hihihihi+"+num);
-        return ++num;
+    public static void main(String[] args) {
+       NettyServer nettyServer=new NettyServer(new NettyServerConfig());
     }
 }

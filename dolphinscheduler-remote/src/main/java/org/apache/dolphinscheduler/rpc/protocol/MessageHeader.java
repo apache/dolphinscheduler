@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.rpc.protocol;
 
 public class MessageHeader {
 
-    private byte magic = (byte) 0xbabe;
-
     private byte version;
 
     private byte eventType;
@@ -33,7 +31,9 @@ public class MessageHeader {
 
     private byte serialization;
 
-    public byte getMagic() {
+    private short  magic = RpcProtocolConstants.MAGIC;
+
+    public short getMagic() {
         return magic;
     }
 

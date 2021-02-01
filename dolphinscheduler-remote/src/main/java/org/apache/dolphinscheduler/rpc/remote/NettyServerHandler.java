@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.common.ThreadPoolManager;
 import org.apache.dolphinscheduler.rpc.config.ServiceBean;
+import org.apache.dolphinscheduler.rpc.protocol.EventType;
+import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 
 import java.lang.reflect.Method;
 
@@ -54,20 +56,20 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
-        RpcRequest req = (RpcRequest) msg;
-
-        if (req.getEventType().equals(RequestEventType.HEARTBEAT.getType())) {
-
-            logger.info("accept heartbeat msg");
+        System.out.println("channel read"+msg.getClass().getSimpleName());
+        RpcProtocol<RpcRequest> rpcProtocol= (RpcProtocol<RpcRequest>) msg;
+        if(rpcProtocol.getMsgHeader().getEventType()==EventType.HEARTBEAT.getType()){
             return;
         }
-        threadPoolManager.addExecuteTask(() -> readHandler(ctx, req));
+        threadPoolManager.addExecuteTask(() -> readHandler(ctx, rpcProtocol));
     }
 
-    private void readHandler(ChannelHandlerContext ctx, RpcRequest req) {
+    private void readHandler(ChannelHandlerContext ctx, RpcProtocol protocol) {
+
+        RpcRequest req= (RpcRequest) protocol.getBody();
         RpcResponse response = new RpcResponse();
-        response.setRequestId(req.getRequestId());
+
+      //  response.setRequestId(req.getRequestId());
 
         response.setStatus((byte) 0);
 
@@ -93,13 +95,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         }
 
         response.setResult(result);
-        ctx.writeAndFlush(response);
+        protocol.setBody(response);
+        protocol.getMsgHeader().setEventType(EventType.RESPONSE.getType());
+        ctx.writeAndFlush(protocol);
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            ctx.channel().close();
+            logger.debug("IdleStateEvent triggered, send heartbeat to channel " + ctx.channel());
         } else {
             super.userEventTriggered(ctx, evt);
         }
