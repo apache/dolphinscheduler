@@ -48,7 +48,7 @@ public class OSUtilsTest {
         double memoryUsage = OSUtils.memoryUsage();
         Assert.assertTrue(memoryUsage > 0.0f);
         double cpuUsage = OSUtils.cpuUsage();
-        Assert.assertTrue(cpuUsage > 0.0f);
+        Assert.assertTrue(cpuUsage >= 0.0f);
     }
 
     @Test

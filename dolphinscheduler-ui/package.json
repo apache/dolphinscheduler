@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "A vue.js project",
   "author": "DolphinScheduler",
+  "repository": "https://github.com/apache/incubator-dolphinscheduler",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
