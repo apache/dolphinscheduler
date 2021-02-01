@@ -98,4 +98,19 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     @MapKey("id")
     List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
+
+    /**
+     * delete task definition by code
+     *
+     * @param code code
+     * @return int
+     */
+    int deleteByCode(@Param("code") Long code);
+
+    /**
+     * delete task definition by code
+     *
+     * @param taskDefinition taskDefinition
+     */
+    void updateByCode(@Param("taskDefinition") TaskDefinition taskDefinition);
 }

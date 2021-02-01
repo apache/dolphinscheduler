@@ -87,4 +87,65 @@
         FROM t_ds_task_definition
         WHERE user_id = #{userId} resource_ids is not null and resource_ids != ''
     </select>
+    <delete id="deleteByCode">
+        delete from t_ds_task_definition
+        where code = #{code}
+    </delete>
+    <update id="updateByCode" parameterType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        update t_ds_task_definition
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null">
+                `name`=#{name},
+            </if>
+            <if test="version != null">
+                version=#{version},
+            </if>
+            <if test="description != null">
+                description=#{description},
+            </if>
+            <if test="project_code != null">
+                project_code=#{project_code},
+            </if>
+            <if test="user_id != null">
+                user_id=#{user_id},
+            </if>
+            <if test="task_type != null">
+                task_type=#{task_type},
+            </if>
+            <if test="task_params != null">
+                task_params=#{task_params},
+            </if>
+            <if test="flag != null">
+                flag=#{flag},
+            </if>
+            <if test="task_priority != null">
+                task_priority=#{task_priority},
+            </if>
+            <if test="worker_group != null">
+                worker_group=#{worker_group},
+            </if>
+            <if test="fail_retry_times != null">
+                fail_retry_times=#{fail_retry_times},
+            </if>
+            <if test="fail_retry_interval != null">
+                fail_retry_interval=#{fail_retry_interval},
+            </if>
+            <if test="timeout_flag != null">
+                timeout_flag=#{timeout_flag},
+            </if>
+            <if test="timeout_notify_strategy != null">
+                timeout_notify_strategy=#{timeout_notify_strategy},
+            </if>
+            <if test="timeout != null">
+                timeout=#{timeout},
+            </if>
+            <if test="resource_ids != null">
+                resource_ids=#{resource_ids},
+            </if>
+            <if test="update_time != null">
+                update_time=#{update_time},
+            </if>
+            where code=#{code}
+        </trim>
+    </update>
 </mapper>

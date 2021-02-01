@@ -147,4 +147,72 @@ public class ProcessTaskRelationServiceImpl extends BaseService implements
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
     }
+
+    /**
+     * query process task relation
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionCode process definition code
+     */
+    @Override
+    public Map<String, Object> queryProcessTaskRelation(User loginUser, String projectName, Long processDefinitionCode) {
+        return null;
+    }
+
+    /**
+     * delete process task relation
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionCode process definition code
+     */
+    @Override
+    public Map<String, Object> deleteTaskDefinitionByProcess(User loginUser, String projectName, Long processDefinitionCode) {
+        return null;
+    }
+
+    /**
+     * delete process task relation
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param preTaskCode pre task code
+     */
+    @Override
+    public Map<String, Object> deleteTaskDefinitionByTask(User loginUser, String projectName, Long preTaskCode) {
+        return null;
+    }
+
+    /**
+     * update process task relation
+     *
+     * @param loginUser login user
+     * @param id process task relation id
+     * @param name relation name
+     * @param projectName process name
+     * @param processDefinitionCode process definition code
+     * @param preTaskCode pre task code
+     * @param postTaskCode post task code
+     * @param conditionType condition type
+     * @param conditionParams condition params
+     */
+    @Override
+    public Map<String, Object> updateTaskDefinition(User loginUser, int id, String name, String projectName, Long processDefinitionCode, Long preTaskCode, Long postTaskCode, String conditionType, String conditionParams) {
+        return null;
+    }
+
+    /**
+     * switch process task relation version
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processTaskRelationId process task relation id
+     * @param version the version user want to switch
+     * @return switch process task relation version result code
+     */
+    @Override
+    public Map<String, Object> switchVersion(User loginUser, String projectName, int processTaskRelationId, int version) {
+        return null;
+    }
 }
