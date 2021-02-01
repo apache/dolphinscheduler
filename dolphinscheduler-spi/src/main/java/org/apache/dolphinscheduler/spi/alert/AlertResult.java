@@ -38,4 +38,12 @@ public class AlertResult {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public AlertResult(String status, String message) {
+        this.status = status;
+        this.message = message;
+    }
+
+    public AlertResult() {
+    }
 }
