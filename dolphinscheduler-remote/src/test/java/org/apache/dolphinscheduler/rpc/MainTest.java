@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.rpc;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,18 +15,14 @@ package org.apache.dolphinscheduler.rpc;/*
  * limitations under the License.
  */
 
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+package org.apache.dolphinscheduler.rpc;
+
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.rpc.client.IRpcClient;
 import org.apache.dolphinscheduler.rpc.client.RpcClient;
-import org.apache.dolphinscheduler.rpc.protocol.RpcProtocolConstants;
 import org.apache.dolphinscheduler.rpc.remote.NettyClient;
-import org.apache.dolphinscheduler.rpc.remote.NettyServer;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 public class MainTest {
 
@@ -38,18 +34,9 @@ public class MainTest {
     public static void main(String[] args) throws Exception {
 
         IRpcClient rpcClient = new RpcClient();
-         Host host = new Host("127.0.0.1", 12346);
-         IUserService   userService = rpcClient.create(IUserService.class, host);
-         Integer result = userService.hi(3);
-        // Assert.assertSame(4, result);
-          result = userService.hi(4);
-        //   Assert.assertSame(5, result);
-        //  userService.say("sync");
+        Host host = new Host("127.0.0.1", 12346);
+        IUserService userService = rpcClient.create(IUserService.class, host);
 
-
-      //  NettyClient nettyClient = NettyClient.getInstance();
-        // NettyClient.getInstance().close();
-        // nettyServer.close();
     }
 
     public void sendTest() {
@@ -58,8 +45,6 @@ public class MainTest {
         result = userService.hi(4);
         Assert.assertSame(5, result);
         userService.say("sync");
-
-
         NettyClient.getInstance().close();
 
     }

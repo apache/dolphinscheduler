@@ -19,19 +19,17 @@ package org.apache.dolphinscheduler.rpc.protocol;
 
 public class MessageHeader {
 
-    private byte version;
+    private byte version = 1;
 
     private byte eventType;
 
-    private int msgLength;
+    private int msgLength = 0;
 
-    private byte status;
+    private long requestId = 0L;
 
-    private long requestId;
+    private byte serialization = 0;
 
-    private byte serialization;
-
-    private short  magic = RpcProtocolConstants.MAGIC;
+    private short magic = RpcProtocolConstants.MAGIC;
 
     public short getMagic() {
         return magic;
@@ -59,14 +57,6 @@ public class MessageHeader {
 
     public void setMsgLength(int msgLength) {
         this.msgLength = msgLength;
-    }
-
-    public byte getStatus() {
-        return status;
-    }
-
-    public void setStatus(byte status) {
-        this.status = status;
     }
 
     public long getRequestId() {

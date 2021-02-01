@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.rpc.remote;
 
-import org.apache.dolphinscheduler.rpc.common.RequestEventType;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.common.ThreadPoolManager;
@@ -55,21 +54,19 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        System.out.println("channel read"+msg.getClass().getSimpleName());
-        RpcProtocol<RpcRequest> rpcProtocol= (RpcProtocol<RpcRequest>) msg;
-        if(rpcProtocol.getMsgHeader().getEventType()==EventType.HEARTBEAT.getType()){
+        RpcProtocol<RpcRequest> rpcProtocol = (RpcProtocol<RpcRequest>) msg;
+        if (rpcProtocol.getMsgHeader().getEventType() == EventType.HEARTBEAT.getType()) {
+            logger.info("heart beat");
             return;
         }
         threadPoolManager.addExecuteTask(() -> readHandler(ctx, rpcProtocol));
     }
 
     private void readHandler(ChannelHandlerContext ctx, RpcProtocol protocol) {
-
-        RpcRequest req= (RpcRequest) protocol.getBody();
+        RpcRequest req = (RpcRequest) protocol.getBody();
         RpcResponse response = new RpcResponse();
-
-      //  response.setRequestId(req.getRequestId());
 
         response.setStatus((byte) 0);
 
@@ -90,7 +87,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
             result = method.invoke(object, arguments);
         } catch (Exception e) {
-            logger.error("netty server execute error,service name {}", classname + methodName, e);
+            logger.error("netty server execute error,service name :{} method name :{} ", classname + methodName, e);
             response.setStatus((byte) -1);
         }
 

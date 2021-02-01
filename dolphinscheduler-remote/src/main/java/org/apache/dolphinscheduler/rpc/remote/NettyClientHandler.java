@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.rpc.client.ConsumerConfig;
 import org.apache.dolphinscheduler.rpc.client.ConsumerConfigCache;
 import org.apache.dolphinscheduler.rpc.client.RpcRequestCache;
 import org.apache.dolphinscheduler.rpc.client.RpcRequestTable;
-import org.apache.dolphinscheduler.rpc.common.RequestEventType;
-import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.common.ThreadPoolManager;
 import org.apache.dolphinscheduler.rpc.future.RpcFuture;
@@ -58,21 +56,20 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        System.out.println("xxxxxxxx"+msg.getClass().getSimpleName());
-        RpcProtocol rpcProtocol= (RpcProtocol) msg;
+        RpcProtocol rpcProtocol = (RpcProtocol) msg;
 
         RpcResponse rsp = (RpcResponse) rpcProtocol.getBody();
-        long reqId=rpcProtocol.getMsgHeader().getRequestId();
+        long reqId = rpcProtocol.getMsgHeader().getRequestId();
         RpcRequestCache rpcRequest = RpcRequestTable.get(reqId);
 
         if (null == rpcRequest) {
             logger.warn("rpc read error,this request does not exist");
             return;
         }
-        threadPoolManager.addExecuteTask(() -> readHandler(rsp, rpcRequest,reqId));
+        threadPoolManager.addExecuteTask(() -> readHandler(rsp, rpcRequest, reqId));
     }
 
-    private void readHandler(RpcResponse rsp, RpcRequestCache rpcRequest,long reqId) {
+    private void readHandler(RpcResponse rsp, RpcRequestCache rpcRequest, long reqId) {
         String serviceName = rpcRequest.getServiceName();
         ConsumerConfig consumerConfig = ConsumerConfigCache.getConfigByServersName(serviceName);
         if (Boolean.FALSE.equals(consumerConfig.getAsync())) {
@@ -82,7 +79,6 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             return;
 
         }
-        //async
 
         if (rsp.getStatus() == 0) {
 
@@ -101,14 +97,12 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 
         if (evt instanceof IdleStateEvent) {
-            RpcProtocol rpcProtocol=new RpcProtocol();
-            MessageHeader messageHeader=new MessageHeader();
+            RpcProtocol rpcProtocol = new RpcProtocol();
+            MessageHeader messageHeader = new MessageHeader();
             messageHeader.setEventType(EventType.HEARTBEAT.getType());
             rpcProtocol.setMsgHeader(messageHeader);
-            rpcProtocol.setBody(new RpcRequest());
             ctx.channel().writeAndFlush(rpcProtocol);
             logger.debug("send heart beat msg...");
-
         } else {
             super.userEventTriggered(ctx, evt);
         }
