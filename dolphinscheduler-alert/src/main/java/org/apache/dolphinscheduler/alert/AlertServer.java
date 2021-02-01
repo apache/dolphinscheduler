@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.alert.utils.ZookeeperClient;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
-import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -50,26 +49,33 @@ import com.google.common.collect.ImmutableList;
  * alert of start
  */
 public class AlertServer {
-    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
-    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
-    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
-    private static AlertServer instance;
     /**
      * Alert Dao
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+
     private AlertSender alertSender;
+
+    private static AlertServer instance;
+
     private AlertPluginManager alertPluginManager;
+
     private DolphinPluginManagerConfig alertPluginManagerConfig;
+
+    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
+
+    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
+
+    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
+
     /**
      * netty server
      */
     private NettyRemotingServer server;
 
-    private AlertServer() {
-
+    private static class AlertServerHolder {
+        private static final AlertServer INSTANCE = new AlertServer();
     }
 
     public static final AlertServer getInstance() {
@@ -77,15 +83,8 @@ public class AlertServer {
 
     }
 
-    public static void main(String[] args) {
-        AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                alertServer.stop();
-            }
-        });
+    private AlertServer() {
+
     }
 
     private void initPlugin() {
@@ -115,7 +114,7 @@ public class AlertServer {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(ALERT_RPC_PORT);
         this.server = new NettyRemotingServer(serverConfig);
-        this.server.registerProcessor(CommandType.ALERT_SEND_REQUEST, new AlertRequestProcessor(alertDao, alertPluginManager, pluginDao));
+        this.server.registerProcessor(CommandType.ALERT_SEND_REQUEST, new AlertRequestProcessor(alertDao, alertPluginManager));
         this.server.start();
     }
 
@@ -142,15 +141,14 @@ public class AlertServer {
                     mutex = zookeeperClient.getAlertLockPath();
                     mutex.acquire();
                     List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                    alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
+                    alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
                     alertSender.run();
-                } catch (Exception e) {
-                    logger.error("alert server with error : ", e);
-                } finally {
-                    zookeeperClient.release(mutex);
+                    } catch (Exception e) {
+                        logger.error("alert server with error : ", e);
+                    } finally {
+                        zookeeperClient.release(mutex);
 
-                }
-
+                    }
             }
         }
     }
@@ -173,8 +171,15 @@ public class AlertServer {
         logger.info("alert server shut down");
     }
 
-    private static class AlertServerHolder {
-        private static final AlertServer INSTANCE = new AlertServer();
+    public static void main(String[] args) {
+        AlertServer alertServer = AlertServer.getInstance();
+        alertServer.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                alertServer.stop();
+            }
+        });
     }
 
 }
