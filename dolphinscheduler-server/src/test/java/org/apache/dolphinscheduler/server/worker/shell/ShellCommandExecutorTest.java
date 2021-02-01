@@ -25,12 +25,10 @@ import java.lang.reflect.Method;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Before;
