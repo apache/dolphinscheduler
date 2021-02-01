@@ -121,7 +121,7 @@ public class ShellCommandExecutorTest {
 
     @Test
     public void testParseProcessOutput() {
-        Class<ShellCommandExecutor> shellCommandExecutorClass = ShellCommandExecutor.class;
+        Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
         try {
             Object instance = shellCommandExecutorClass.newInstance();
 
@@ -168,7 +168,7 @@ public class ShellCommandExecutorTest {
                     logger.info("unit test");
                 }
             } };
-            ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
+            AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -176,14 +176,14 @@ public class ShellCommandExecutorTest {
 
     @Test
     public void testFindAppId() {
-        Class<ShellCommandExecutor> shellCommandExecutorClass = ShellCommandExecutor.class;
+        Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
         try {
             Object instance = shellCommandExecutorClass.newInstance();
 
             Method method = shellCommandExecutorClass.getDeclaredMethod("findAppId", new Class[]{String.class});
             method.setAccessible(true);
             Object[] arg1s = {"11111"};
-            ShellCommandExecutor result = (ShellCommandExecutor) method.invoke(instance, arg1s);
+            AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
