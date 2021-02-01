@@ -33,6 +33,8 @@ public class ConsumerConfig {
 
     private Boolean async = ConsumerConfigConstants.DEFAULT_SYNC;
 
+    private Boolean callBack = ConsumerConfigConstants.DEFAULT_CALL_BACK;
+
     private Integer retries = ConsumerConfigConstants.DEFAULT_RETRIES;
 
     public Class<? extends AbstractRpcCallBack> getServiceCallBackClass() {
@@ -73,5 +75,13 @@ public class ConsumerConfig {
 
     void setRetries(Integer retries) {
         this.retries = retries;
+    }
+
+    public Boolean getCallBack() {
+        return callBack;
+    }
+
+    public void setCallBack(Boolean callBack) {
+        this.callBack = callBack;
     }
 }

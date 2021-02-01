@@ -19,12 +19,19 @@ package org.apache.dolphinscheduler.rpc;
 
 import org.apache.dolphinscheduler.rpc.common.AbstractRpcCallBack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * UserCallback
  */
 public class UserCallback extends AbstractRpcCallBack {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserCallback.class);
+
     @Override
     public void run(Object object) {
-
+        String msg = (String) object;
+        logger.debug("Kris---------------------------------userCallBack msg is {}", msg);
     }
 }

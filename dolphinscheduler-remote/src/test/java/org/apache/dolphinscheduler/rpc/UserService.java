@@ -19,21 +19,34 @@ package org.apache.dolphinscheduler.rpc;
 
 import org.apache.dolphinscheduler.rpc.base.RpcService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * UserService
  */
 @RpcService("IUserService")
 public class UserService implements IUserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     @Override
     public Boolean say(String s) {
+
+        logger.info("Kris UserService say-------------------------------Synchronous call msg{}", s);
         return true;
     }
 
     @Override
     public Integer hi(int num) {
 
-        System.out.println("hihihihi+" + num);
+        logger.info("Kris UserService hi-------------------------------async call msg{}", num);
         return ++num;
+    }
+
+    @Override
+    public Boolean callBackIsFalse(String s) {
+        logger.info("Kris UserService callBackIsFalse-------------------------------async call msg{}", s);
+        return null;
     }
 }

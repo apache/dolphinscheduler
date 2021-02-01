@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.rpc.client;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.rpc.base.Rpc;
+import org.apache.dolphinscheduler.rpc.common.AbstractRpcCallBack;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 import org.apache.dolphinscheduler.rpc.protocol.EventType;
@@ -102,6 +103,9 @@ public class ConsumerInterceptor {
             Rpc rpc = method.getAnnotation(Rpc.class);
             consumerConfig.setAsync(rpc.async());
             consumerConfig.setServiceCallBackClass(rpc.serviceCallback());
+            if (!rpc.serviceCallback().isInstance(AbstractRpcCallBack.class)) {
+                consumerConfig.setCallBack(true);
+            }
             consumerConfig.setAckCallBackClass(rpc.ackCallback());
             consumerConfig.setRetries(rpc.retries());
         }
