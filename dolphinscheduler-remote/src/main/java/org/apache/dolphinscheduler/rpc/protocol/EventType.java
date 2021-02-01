@@ -23,7 +23,6 @@ public enum EventType {
     REQUEST((byte)2,"business request"),
     RESPONSE((byte)3,"business response");
 
-
     private Byte type;
 
     private String description;

@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.rpc.codec;
 
-import org.apache.dolphinscheduler.rpc.protocol.EventType;
 import org.apache.dolphinscheduler.rpc.protocol.MessageHeader;
 import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
-import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
 import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
 import org.apache.dolphinscheduler.rpc.serializer.Serializer;
 
@@ -40,28 +38,20 @@ public class NettyEncoder extends MessageToByteEncoder<RpcProtocol<Object>> {
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcProtocol<Object> msg, ByteBuf byteBuf) throws Exception {
-
-
         MessageHeader msgHeader = msg.getMsgHeader();
         byteBuf.writeShort(msgHeader.getMagic());
-        if(msgHeader.getEventType()== EventType.HEARTBEAT.getType()){
-            byteBuf.writeByte(EventType.HEARTBEAT.getType());
-            System.out.println("heart beat ");
-            return;
-        }
-
-
         byteBuf.writeByte(msgHeader.getEventType());
         byteBuf.writeByte(msgHeader.getVersion());
         byteBuf.writeByte(msgHeader.getSerialization());
-
-        byteBuf.writeByte(msgHeader.getStatus());
         byteBuf.writeLong(msgHeader.getRequestId());
-
+        byte[] data = new byte[0];
+        int msgLength = msgHeader.getMsgLength();
         Serializer rpcSerializer = RpcSerializer.getSerializerByType(msgHeader.getSerialization());
-
-        byte[] data = rpcSerializer.serialize(msg.getBody());
-        byteBuf.writeInt(data.length);
+        if (null != rpcSerializer) {
+            data = rpcSerializer.serialize(msg.getBody());
+            msgLength = data.length;
+        }
+        byteBuf.writeInt(msgLength);
         byteBuf.writeBytes(data);
     }
 }

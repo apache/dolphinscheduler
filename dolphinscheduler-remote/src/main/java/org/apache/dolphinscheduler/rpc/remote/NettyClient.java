@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -192,17 +191,18 @@ public class NettyClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) {
+    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) throws InterruptedException {
 
         Channel channel = getChannel(host);
         assert channel != null;
-        RpcRequest request=protocol.getBody();
+        RpcRequest request = protocol.getBody();
         RpcRequestCache rpcRequestCache = new RpcRequestCache();
         String serviceName = request.getClassName() + request.getMethodName();
         rpcRequestCache.setServiceName(serviceName);
+        long reqId = protocol.getMsgHeader().getRequestId();
         RpcFuture future = null;
         if (Boolean.FALSE.equals(async)) {
-            future = new RpcFuture(request);
+            future = new RpcFuture(request, reqId);
             rpcRequestCache.setRpcFuture(future);
         }
         RpcRequestTable.put(protocol.getMsgHeader().getRequestId(), rpcRequestCache);
@@ -217,7 +217,7 @@ public class NettyClient {
         try {
             assert future != null;
             result = future.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             logger.error("send msg error，service name is {}", serviceName, e);
             Thread.currentThread().interrupt();
         }

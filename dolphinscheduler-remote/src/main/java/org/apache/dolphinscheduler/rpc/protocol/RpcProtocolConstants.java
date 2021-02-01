@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.rpc.protocol;
 
 public class RpcProtocolConstants {
 
-    public static final int HEADER_LENGTH = 18;
+    public static final int HEADER_LENGTH = 17;
 
     public static final short MAGIC = (short) 0xbabe;
 

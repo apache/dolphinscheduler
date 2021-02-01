@@ -29,7 +29,9 @@ import org.apache.dolphinscheduler.rpc.remote.NettyClient;
 import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
 
 import java.lang.reflect.Method;
-import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -40,6 +42,7 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
  */
 public class ConsumerInterceptor {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerInterceptor.class);
     private Host host;
 
     private NettyClient nettyClient = NettyClient.getInstance();
@@ -61,10 +64,15 @@ public class ConsumerInterceptor {
 
         int retries = consumerConfig.getRetries();
 
-        RpcProtocol protocol=buildProtocol(request);
+        RpcProtocol protocol = buildProtocol(request);
 
         while (retries-- > 0) {
-            RpcResponse rsp = nettyClient.sendMsg(host, protocol, async);
+            RpcResponse rsp = null;
+            try {
+                rsp = nettyClient.sendMsg(host, protocol, async);
+            } catch (InterruptedException e) {
+                logger.warn("send msg error ", e);
+            }
             //success
             if (null != rsp && rsp.getStatus() == 0) {
                 return rsp.getResult();
@@ -102,9 +110,9 @@ public class ConsumerInterceptor {
         return consumerConfig;
     }
 
-    private RpcProtocol buildProtocol(RpcRequest req){
-        RpcProtocol<RpcRequest> protocol=new RpcProtocol<>();
-        MessageHeader header=new MessageHeader();
+    private RpcProtocol buildProtocol(RpcRequest req) {
+        RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
+        MessageHeader header = new MessageHeader();
         header.setRequestId(RpcRequestTable.getRequestId());
         header.setEventType(EventType.REQUEST.getType());
         header.setSerialization(RpcSerializer.PROTOSTUFF.getType());
