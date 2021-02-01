@@ -24,11 +24,13 @@ import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_DOLPHI
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_LIST;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_MAX_RETRY;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_MAX_SLEEP_MS;
+import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_ROOT;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_SESSION_TIMEOUT_MS;
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.alert.exception.AlertException;
+import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -41,8 +43,11 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -50,8 +55,8 @@ import org.slf4j.LoggerFactory;
 
 public class ZookeeperClient {
 
+    private static final Properties properties = new Properties();
     private final Logger logger = LoggerFactory.getLogger(ZookeeperClient.class);
-
     private CuratorFramework zkClient;
 
     public void init() {
@@ -65,29 +70,54 @@ public class ZookeeperClient {
             } else if (newState == ConnectionState.SUSPENDED) {
                 logger.warn("connection SUSPENDED to zookeeper");
             } else if (newState == ConnectionState.CONNECTED) {
-                logger.info("connected to zookeeper server list:[{}]", PropertyUtils.getString(ZOOKEEPER_LIST));
+                logger.info("connected to zookeeper server list:[{}]", properties.getProperty(ZOOKEEPER_LIST));
             }
         });
     }
 
     private CuratorFramework buildClient() {
-        logger.info("zookeeper registry center init, server lists is: [{}]", PropertyUtils.getString(ZOOKEEPER_LIST));
+
+        /**
+         * init properties
+         */
+        String[] propertyFiles = new String[]{ZOOKEEPER_PROPERTIES_PATH};
+
+        for (String fileName : propertyFiles) {
+            InputStream fis = null;
+            try {
+                fis = ZookeeperClient.class.getResourceAsStream(fileName);
+                properties.load(fis);
+
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                if (fis != null) {
+                    IOUtils.closeQuietly(fis);
+                }
+                System.exit(1);
+            } finally {
+                IOUtils.closeQuietly(fis);
+            }
+        }
+
+
+        logger.info("zookeeper registry center init, server lists is: [{}]", properties.getProperty(ZOOKEEPER_LIST));
 
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
-                .connectString(PropertyUtils.getString(ZOOKEEPER_LIST,"localhost:2181"))
-                .retryPolicy(new ExponentialBackoffRetry(PropertyUtils.getInt(ZOOKEEPER_BASE_SLEEP_TIME_MS, 100)
-                        , PropertyUtils.getInt(ZOOKEEPER_MAX_RETRY, 10), PropertyUtils.getInt(ZOOKEEPER_MAX_SLEEP_MS, 30000)));
+                .connectString(properties.getProperty(ZOOKEEPER_LIST, "localhost:2181"))
+                .retryPolicy(new ExponentialBackoffRetry(Integer.valueOf(properties.getProperty(ZOOKEEPER_BASE_SLEEP_TIME_MS, "100"))
+                        , Integer.valueOf(properties.getProperty(ZOOKEEPER_MAX_RETRY, "10")),
+                        Integer.valueOf(properties.getProperty(ZOOKEEPER_MAX_SLEEP_MS, "30000"))));
 
         //these has default value
-        if (0 != PropertyUtils.getInt(ZOOKEEPER_SESSION_TIMEOUT_MS, 60000)) {
-            builder.sessionTimeoutMs(PropertyUtils.getInt(ZOOKEEPER_SESSION_TIMEOUT_MS, 60000));
+        if (0 != Integer.valueOf(properties.getProperty(ZOOKEEPER_SESSION_TIMEOUT_MS, "60000"))) {
+            builder.sessionTimeoutMs(Integer.valueOf(properties.getProperty(ZOOKEEPER_SESSION_TIMEOUT_MS, "60000")));
         }
 
-        if (0 != PropertyUtils.getInt(ZOOKEEPER_CONNECTION_TIMEOUT_MS, 30000)) {
-            builder.connectionTimeoutMs(PropertyUtils.getInt(ZOOKEEPER_CONNECTION_TIMEOUT_MS, 30000));
+        if (0 != Integer.valueOf(properties.getProperty(ZOOKEEPER_CONNECTION_TIMEOUT_MS, "30000"))) {
+            builder.connectionTimeoutMs(Integer.valueOf(properties.getProperty(ZOOKEEPER_CONNECTION_TIMEOUT_MS, "30000")));
         }
-        if (StringUtils.isNotBlank(PropertyUtils.getString(ZOOKEEPER_DIGEST, ""))) {
-            builder.authorization("digest", PropertyUtils.getString(ZOOKEEPER_DIGEST, "").getBytes(StandardCharsets.UTF_8)).aclProvider(new ACLProvider() {
+        if (StringUtils.isNotBlank(properties.getProperty(ZOOKEEPER_DIGEST, ""))) {
+            builder.authorization("digest", properties.getProperty(ZOOKEEPER_DIGEST, "").getBytes(StandardCharsets.UTF_8)).aclProvider(new ACLProvider() {
 
                 @Override
                 public List<org.apache.zookeeper.data.ACL> getDefaultAcl() {
@@ -104,7 +134,7 @@ public class ZookeeperClient {
         zkClient = builder.build();
         zkClient.start();
         try {
-            logger.info("trying to connect zookeeper server list:{}", PropertyUtils.getString(ZOOKEEPER_LIST));
+            logger.info("trying to connect zookeeper server list:{}", properties.getProperty(ZOOKEEPER_LIST));
             zkClient.blockUntilConnected(30, TimeUnit.SECONDS);
 
         } catch (final Exception ex) {
@@ -118,7 +148,7 @@ public class ZookeeperClient {
     }
 
     public InterProcessMutex getAlertLockPath() {
-        String alertLockPath = PropertyUtils.getString(ZOOKEEPER_ROOT, "/dolphinscheduler") + ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERTS;
+        String alertLockPath = properties.getProperty(ZOOKEEPER_ROOT, "/dolphinscheduler") + ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERTS;
         return new InterProcessMutex(zkClient, alertLockPath);
 
     }
