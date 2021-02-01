@@ -49,33 +49,25 @@ import com.google.common.collect.ImmutableList;
  * alert of start
  */
 public class AlertServer {
+    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
+    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
+    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
+    private static AlertServer instance;
     /**
      * Alert Dao
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-
     private AlertSender alertSender;
-
-    private static AlertServer instance;
-
     private AlertPluginManager alertPluginManager;
-
     private DolphinPluginManagerConfig alertPluginManagerConfig;
-
-    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
-
-    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
-
-    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
-
     /**
      * netty server
      */
     private NettyRemotingServer server;
 
-    private static class AlertServerHolder {
-        private static final AlertServer INSTANCE = new AlertServer();
+    private AlertServer() {
+
     }
 
     public static final AlertServer getInstance() {
@@ -83,8 +75,15 @@ public class AlertServer {
 
     }
 
-    private AlertServer() {
-
+    public static void main(String[] args) {
+        AlertServer alertServer = AlertServer.getInstance();
+        alertServer.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                alertServer.stop();
+            }
+        });
     }
 
     private void initPlugin() {
@@ -143,12 +142,12 @@ public class AlertServer {
                     List<Alert> alerts = alertDao.listWaitExecutionAlert();
                     alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
                     alertSender.run();
-                    } catch (Exception e) {
-                        logger.error("alert server with error : ", e);
-                    } finally {
-                        zookeeperClient.release(mutex);
+                } catch (Exception e) {
+                    logger.error("alert server with error : ", e);
+                } finally {
+                    zookeeperClient.release(mutex);
 
-                    }
+                }
             }
         }
     }
@@ -171,15 +170,8 @@ public class AlertServer {
         logger.info("alert server shut down");
     }
 
-    public static void main(String[] args) {
-        AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                alertServer.stop();
-            }
-        });
+    private static class AlertServerHolder {
+        private static final AlertServer INSTANCE = new AlertServer();
     }
 
 }
