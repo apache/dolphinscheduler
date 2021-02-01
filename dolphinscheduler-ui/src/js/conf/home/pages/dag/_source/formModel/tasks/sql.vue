@@ -30,7 +30,7 @@
       <div slot="text">{{$t('SQL Type')}}</div>
       <div slot="content">
         <div style="display: inline-block;">
-          <m-sql-type :sql-type="sqlType"></m-sql-type>
+          <m-sql-type @on-sqlType="_onSqlType" :sql-type="sqlType"></m-sql-type>
         </div>
       </div>
     </m-list-box>
@@ -189,6 +189,12 @@
       },
       getSriptBoxValue (val) {
         editor.setValue(val)
+      },
+      /**
+       * return sqlType
+       */
+      _onSqlType (a) {
+        this.sqlType = a
       },
       /**
        * return udfs
