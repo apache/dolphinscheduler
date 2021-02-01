@@ -24,10 +24,14 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import java.util.Date;
+import java.util.List;
 
 /**
  * python shell command executor test
@@ -56,8 +61,11 @@ public class ShellCommandExecutorTest {
 
     @Before
     public void before() {
-        processService = PowerMockito.mock(ProcessService.class);
         applicationContext = PowerMockito.mock(ApplicationContext.class);
+        processService = PowerMockito.mock(ProcessService.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        PowerMockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
     }
 
     @Ignore
@@ -117,9 +125,8 @@ public class ShellCommandExecutorTest {
     public void testParseProcessOutput() {
         Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
         try {
-            Object instance = shellCommandExecutorClass.newInstance();
 
-            Method method = shellCommandExecutorClass.getDeclaredMethod("parseProcessOutput", new Class[]{Process.class});
+            Method method = shellCommandExecutorClass.getDeclaredMethod("parseProcessOutput", Process.class);
             method.setAccessible(true);
             Object[] arg1s = {new Process() {
                 @Override
@@ -162,7 +169,22 @@ public class ShellCommandExecutorTest {
                     logger.info("unit test");
                 }
             } };
-            AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
+             method.invoke(new AbstractCommandExecutor(null, new TaskExecutionContext(), logger) {
+                @Override
+                protected String buildCommandFilePath() {
+                    return null;
+                }
+
+                @Override
+                protected String commandInterpreter() {
+                    return null;
+                }
+
+                @Override
+                protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
+
+                }
+            }, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -172,12 +194,26 @@ public class ShellCommandExecutorTest {
     public void testFindAppId() {
         Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
         try {
-            Object instance = shellCommandExecutorClass.newInstance();
 
             Method method = shellCommandExecutorClass.getDeclaredMethod("findAppId", new Class[]{String.class});
             method.setAccessible(true);
             Object[] arg1s = {"11111"};
-            AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
+            String result = (String) method.invoke(new AbstractCommandExecutor(null, null, null) {
+                @Override
+                protected String buildCommandFilePath() {
+                    return null;
+                }
+
+                @Override
+                protected String commandInterpreter() {
+                    return null;
+                }
+
+                @Override
+                protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
+
+                }
+            }, arg1s);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -187,12 +223,26 @@ public class ShellCommandExecutorTest {
     public void testConvertFile2List() {
         Class<AbstractCommandExecutor> shellCommandExecutorClass = AbstractCommandExecutor.class;
         try {
-            Object instance = shellCommandExecutorClass.newInstance();
-
-            Method method = shellCommandExecutorClass.getDeclaredMethod("convertFile2List", new Class[]{String.class});
+            Method method = shellCommandExecutorClass.getDeclaredMethod("convertFile2List", String.class);
             method.setAccessible(true);
             Object[] arg1s = {"/opt/1.txt"};
-            AbstractCommandExecutor result = (AbstractCommandExecutor) method.invoke(instance, arg1s);
+            List<String> result = (List<String>) method.invoke(new AbstractCommandExecutor(null, null, null) {
+                @Override
+                protected String buildCommandFilePath() {
+                    return null;
+                }
+
+                @Override
+                protected String commandInterpreter() {
+                    return null;
+                }
+
+                @Override
+                protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
+
+                }
+            }, arg1s);
+            Assert.assertTrue(true);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
