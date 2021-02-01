@@ -59,22 +59,22 @@ public class RpcFuture implements Future<Object> {
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
         boolean success = latch.await(5, TimeUnit.SECONDS);
-        if (!success) {
+       /* if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + this.request.getRequestId()
                     + ". Request class name: " + this.request.getClassName()
                     + ". Request method: " + this.request.getMethodName());
-        }
+        }*/
         return response;
     }
 
     @Override
     public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         boolean success = latch.await(timeout, unit);
-        if (!success) {
+       /* if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + this.request.getRequestId()
                     + ". Request class name: " + this.request.getClassName()
                     + ". Request method: " + this.request.getMethodName());
-        }
+        }*/
         return response;
     }
 

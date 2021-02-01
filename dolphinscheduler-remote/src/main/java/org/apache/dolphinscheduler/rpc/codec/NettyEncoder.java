@@ -17,7 +17,12 @@
 
 package org.apache.dolphinscheduler.rpc.codec;
 
+import org.apache.dolphinscheduler.rpc.protocol.EventType;
+import org.apache.dolphinscheduler.rpc.protocol.MessageHeader;
+import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 import org.apache.dolphinscheduler.rpc.serializer.ProtoStuffUtils;
+import org.apache.dolphinscheduler.rpc.serializer.RpcSerializer;
+import org.apache.dolphinscheduler.rpc.serializer.Serializer;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,9 +31,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 /**
  * NettyEncoder
  */
-public class NettyEncoder extends MessageToByteEncoder {
-
-
+public class NettyEncoder extends MessageToByteEncoder<RpcProtocol<Object>> {
     private Class<?> genericClass;
 
     public NettyEncoder(Class<?> genericClass) {
@@ -36,12 +39,29 @@ public class NettyEncoder extends MessageToByteEncoder {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, Object o, ByteBuf byteBuf) throws Exception {
-        if (genericClass.isInstance(o)) {
-            byte[] data = ProtoStuffUtils.serialize(o);
-            byteBuf.writeInt(data.length);
-            byteBuf.writeBytes(data);
+    protected void encode(ChannelHandlerContext channelHandlerContext, RpcProtocol<Object> msg, ByteBuf byteBuf) throws Exception {
+
+
+        MessageHeader msgHeader = msg.getMsgHeader();
+        byteBuf.writeShort(msgHeader.getMagic());
+        if(msgHeader.getEventType()== EventType.HEARTBEAT.getType()){
+            byteBuf.writeByte(EventType.HEARTBEAT.getType());
+            System.out.println("heart beat ");
+            return;
         }
 
+
+        byteBuf.writeByte(msgHeader.getEventType());
+        byteBuf.writeByte(msgHeader.getVersion());
+        byteBuf.writeByte(msgHeader.getSerialization());
+
+        byteBuf.writeByte(msgHeader.getStatus());
+        byteBuf.writeLong(msgHeader.getRequestId());
+
+        Serializer rpcSerializer = RpcSerializer.getSerializerByType(msgHeader.getSerialization());
+
+        byte[] data = rpcSerializer.serialize(msg.getBody());
+        byteBuf.writeInt(data.length);
+        byteBuf.writeBytes(data);
     }
 }

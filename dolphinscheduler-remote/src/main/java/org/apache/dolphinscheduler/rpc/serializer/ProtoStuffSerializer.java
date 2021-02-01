@@ -15,7 +15,6 @@ package org.apache.dolphinscheduler.rpc.serializer;/*
  * limitations under the License.
  */
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,7 +35,7 @@ public class ProtoStuffSerializer implements Serializer {
     }
 
     @Override
-    public <T> byte[] serialize(T obj) throws IOException {
+    public <T> byte[] serialize(T obj) {
         Class<T> clazz = (Class<T>) obj.getClass();
         Schema<T> schema = getSchema(clazz);
         byte[] data;
@@ -49,7 +48,7 @@ public class ProtoStuffSerializer implements Serializer {
     }
 
     @Override
-    public <T> T deserialize(byte[] data, Class<T> clz) throws IOException {
+    public <T> T deserialize(byte[] data, Class<T> clz) {
         Schema<T> schema = getSchema(clz);
         T obj = schema.newMessage();
         if (null == obj) {
