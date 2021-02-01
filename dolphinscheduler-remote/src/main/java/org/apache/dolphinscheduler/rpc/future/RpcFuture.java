@@ -21,10 +21,8 @@ import org.apache.dolphinscheduler.rpc.common.RpcRequest;
 import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * RpcFuture
@@ -61,6 +59,7 @@ public class RpcFuture implements Future<Object> {
 
     @Override
     public RpcResponse get() throws InterruptedException {
+        // the timeout period should be defined by the business party
         boolean success = latch.await(5, TimeUnit.SECONDS);
         if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + this.requestId

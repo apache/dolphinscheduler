@@ -33,7 +33,7 @@ public class UserService implements IUserService {
     @Override
     public Integer hi(int num) {
 
-        System.out.println("hihihihi+"+num);
+        System.out.println("hihihihi+" + num);
         return ++num;
     }
 }
