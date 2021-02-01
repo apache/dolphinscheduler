@@ -21,6 +21,6 @@ import org.apache.dolphinscheduler.rpc.remote.NettyServer;
 public class Server {
 
     public static void main(String[] args) {
-       NettyServer nettyServer=new NettyServer(new NettyServerConfig());
+        NettyServer nettyServer = new NettyServer(new NettyServerConfig());
     }
 }
