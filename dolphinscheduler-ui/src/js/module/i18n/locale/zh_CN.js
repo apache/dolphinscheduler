@@ -207,6 +207,8 @@ export default {
   'UDF resources': 'UDF资源',
   'UDF resources directory': 'UDF资源目录',
   'Please select UDF resources directory': '请选择UDF资源目录',
+  'Alarm group': '告警组',
+  'Alarm group required': '告警组必填',
   'Edit alarm group': '编辑告警组',
   'Create alarm group': '创建告警组',
   'Create Alarm Instance': '创建告警实例',

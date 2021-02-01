@@ -600,6 +600,19 @@ export default {
       })
     })
   },
+  /**
+   * get alarm groups all
+   */
+  getAlarmGroupsAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('alert-group/list', payload, res => {
+        state.alarmGroupsListAll = res.data
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
   saveWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post('worker-group/save', payload, res => {
