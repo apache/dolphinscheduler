@@ -30,16 +30,7 @@
       <div slot="text">{{$t('SQL Type')}}</div>
       <div slot="content">
         <div style="display: inline-block;">
-          <m-sql-type
-                  @on-sqlType="_onSqlType"
-                  :sql-type="sqlType">
-          </m-sql-type>
-        </div>
-        <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
-          <el-checkbox-group v-model="showType" size="small">
-            <el-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</el-checkbox>
-            <el-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</el-checkbox>
-          </el-checkbox-group>
+          <m-sql-type :sql-type="sqlType"></m-sql-type>
         </div>
       </div>
     </m-list-box>
@@ -175,8 +166,6 @@
         sqlType: '0',
         // Email title
         title: '',
-        // Form/attachment
-        showType: ['TABLE'],
         // Sql parameter
         connParams: '',
         // Pre statements
@@ -200,15 +189,6 @@
       },
       getSriptBoxValue (val) {
         editor.setValue(val)
-      },
-      /**
-       * return sqlType
-       */
-      _onSqlType (a) {
-        this.sqlType = a
-        if (a === 0) {
-          this.showType = ['TABLE']
-        }
       },
       /**
        * return udfs
@@ -254,10 +234,6 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType === '0' && !this.showType.length) {
-          this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
-          return false
-        }
         if (this.sqlType === '0' && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
@@ -297,18 +273,6 @@
           sqlType: this.sqlType,
           title: this.title,
           groupId: this.groupId,
-          showType: (() => {
-            /**
-             * Special processing return order TABLE,ATTACHMENT
-             * Handling checkout sequence
-             */
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -358,14 +322,6 @@
           sqlType: this.sqlType,
           title: this.title,
           groupId: this.groupId,
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -383,9 +339,6 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val === 0) {
-          this.showType = []
-        }
         if (val !== 0) {
           this.title = ''
           this.groupId = null
@@ -415,11 +368,6 @@
         this.sqlType = o.params.sqlType
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
-        if (o.params.showType === '') {
-          this.showType = []
-        } else {
-          this.showType = o.params.showType.split(',') || []
-        }
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''
@@ -450,14 +398,6 @@
           sqlType: this.sqlType,
           title: this.title,
           groupId: this.groupId,
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
