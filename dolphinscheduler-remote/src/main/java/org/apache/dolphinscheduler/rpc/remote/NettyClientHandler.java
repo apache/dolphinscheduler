@@ -77,7 +77,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             RpcRequestTable.remove(reqId);
             future.done(rsp);
             return;
+        }
 
+        if (Boolean.FALSE.equals(consumerConfig.getCallBack())) {
+            return;
         }
 
         if (rsp.getStatus() == 0) {

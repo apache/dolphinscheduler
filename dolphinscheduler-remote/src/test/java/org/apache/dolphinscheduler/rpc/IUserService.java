@@ -24,8 +24,11 @@ import org.apache.dolphinscheduler.rpc.base.Rpc;
  */
 public interface IUserService {
 
-    @Rpc(async = true, serviceCallback = UserCallback.class, retries = 9999)
+    @Rpc(async = true, serviceCallback = UserCallback.class)
     Boolean say(String s);
 
     Integer hi(int num);
+
+    @Rpc(async = true)
+    Boolean callBackIsFalse(String s);
 }

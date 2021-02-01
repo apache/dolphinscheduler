@@ -51,6 +51,8 @@ public class RpcTest {
         result = userService.hi(4);
         Assert.assertSame(5, result);
         userService.say("sync");
+        userService.callBackIsFalse("async no call back");
+        userService.hi(999999);
     }
 
     @After
