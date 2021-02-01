@@ -39,9 +39,9 @@ public class RpcFuture implements Future<Object> {
 
     private long requestId;
 
-    public RpcFuture(RpcRequest rpcRequest,long requestId) {
+    public RpcFuture(RpcRequest rpcRequest, long requestId) {
         this.request = rpcRequest;
-        this.requestId=requestId;
+        this.requestId = requestId;
     }
 
     @Override
@@ -71,9 +71,9 @@ public class RpcFuture implements Future<Object> {
     }
 
     @Override
-    public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException {
         boolean success = latch.await(timeout, unit);
-       if (!success) {
+        if (!success) {
             throw new RuntimeException("Timeout exception. Request id: " + requestId
                     + ". Request class name: " + this.request.getClassName()
                     + ". Request method: " + this.request.getMethodName());
