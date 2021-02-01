@@ -56,7 +56,18 @@ public class ZookeeperClient {
 
     public void init() {
         this.zkClient = buildClient();
-        initStateLister();
+        checkNotNull(zkClient);
+        zkClient.getConnectionStateListenable().addListener((client, newState) -> {
+            if (newState == ConnectionState.LOST) {
+                logger.error("connection lost from zookeeper");
+            } else if (newState == ConnectionState.RECONNECTED) {
+                logger.info("reconnected to zookeeper");
+            } else if (newState == ConnectionState.SUSPENDED) {
+                logger.warn("connection SUSPENDED to zookeeper");
+            } else if (newState == ConnectionState.CONNECTED) {
+                logger.info("connected to zookeeper server list:[{}]", PropertyUtils.getString(ZOOKEEPER_LIST));
+            }
+        });
     }
 
     private CuratorFramework buildClient() {
@@ -102,21 +113,6 @@ public class ZookeeperClient {
         return zkClient;
     }
 
-    public void initStateLister() {
-        checkNotNull(zkClient);
-
-        zkClient.getConnectionStateListenable().addListener((client, newState) -> {
-            if (newState == ConnectionState.LOST) {
-                logger.error("connection lost from zookeeper");
-            } else if (newState == ConnectionState.RECONNECTED) {
-                logger.info("reconnected to zookeeper");
-            } else if (newState == ConnectionState.SUSPENDED) {
-                logger.warn("connection SUSPENDED to zookeeper");
-            } else if (newState == ConnectionState.CONNECTED) {
-                logger.info("connected to zookeeper server list:[{}]", PropertyUtils.getString(ZOOKEEPER_LIST));
-            }
-        });
-    }
 
     public CuratorFramework getZkClient() {
         return zkClient;
