@@ -170,7 +170,7 @@ public class ShellCommandExecutorTest {
                 public void destroy() {
                     logger.info("unit test");
                 }
-            }};
+            } };
             method.invoke(new AbstractCommandExecutor(null, new TaskExecutionContext(), logger) {
                 @Override
                 protected String buildCommandFilePath() {
