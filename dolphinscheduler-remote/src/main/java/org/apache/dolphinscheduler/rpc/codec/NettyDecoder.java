@@ -43,45 +43,40 @@ public class NettyDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-
-
         if (byteBuf.readableBytes() < RpcProtocolConstants.HEADER_LENGTH) {
-            System.out.println("llllll 长度不够");
             return;
         }
+
         byteBuf.markReaderIndex();
 
         short magic = byteBuf.readShort();
+
         if (RpcProtocolConstants.MAGIC != magic) {
             throw new IllegalArgumentException("magic number is illegal, " + magic);
         }
         byte eventType = byteBuf.readByte();
         byte version = byteBuf.readByte();
-        byte serialization=byteBuf.readByte();
-
-        byte state = byteBuf.readByte();
-        long requestId=byteBuf.readLong();
+        byte serialization = byteBuf.readByte();
+        long requestId = byteBuf.readLong();
         int dataLength = byteBuf.readInt();
+        byte[] data = new byte[dataLength];
 
-        byte[] data=new byte[dataLength];
-        byteBuf.readBytes(data);
-        RpcProtocol rpcProtocol=new RpcProtocol();
-        MessageHeader header=new MessageHeader();
+        RpcProtocol rpcProtocol = new RpcProtocol();
 
+        MessageHeader header = new MessageHeader();
         header.setVersion(version);
         header.setSerialization(serialization);
-        header.setStatus(state);
         header.setRequestId(requestId);
         header.setEventType(eventType);
         header.setMsgLength(dataLength);
+        byteBuf.readBytes(data);
         rpcProtocol.setMsgHeader(header);
-        if(eventType!= EventType.HEARTBEAT.getType()){
+        if (eventType != EventType.HEARTBEAT.getType()) {
             Serializer serializer = RpcSerializer.getSerializerByType(serialization);
             Object obj = serializer.deserialize(data, genericClass);
             rpcProtocol.setBody(obj);
         }
         list.add(rpcProtocol);
     }
-
 
 }
