@@ -75,51 +75,6 @@ public class DingTalkSender {
 
     }
 
-    public AlertResult sendDingTalkMsg(String msg, String charset) {
-        AlertResult alertResult;
-        try {
-            String resp = sendMsg(msg, charset);
-            return checkSendDingTalkSendMsgResult(resp);
-        } catch (Exception e) {
-            logger.info("send ding talk alert msg  exception : {}", e.getMessage());
-            alertResult = new AlertResult();
-            alertResult.setStatus("false");
-            alertResult.setMessage("send ding talk alert fail.");
-        }
-        return alertResult;
-    }
-
-    private String sendMsg(String msg, String charset) throws IOException {
-
-        String msgToJson = textToJsonString(msg + "#" + keyword);
-        HttpPost httpPost = constructHttpPost(url, msgToJson, charset);
-
-        CloseableHttpClient httpClient;
-        if (Boolean.TRUE.equals(enableProxy)) {
-            httpClient = getProxyClient(proxy, port, user, password);
-            RequestConfig rcf = getProxyConfig(proxy, port);
-            httpPost.setConfig(rcf);
-        } else {
-            httpClient = getDefaultClient();
-        }
-
-        try {
-            CloseableHttpResponse response = httpClient.execute(httpPost);
-            String resp;
-            try {
-                HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, charset);
-                EntityUtils.consume(entity);
-            } finally {
-                response.close();
-            }
-            logger.info("Ding Talk send {}, resp: {}", msg, resp);
-            return resp;
-        } finally {
-            httpClient.close();
-        }
-    }
-
     private static HttpPost constructHttpPost(String url, String msg, String charset) {
         HttpPost post = new HttpPost(url);
         StringEntity entity = new StringEntity(msg, charset);
@@ -155,27 +110,6 @@ public class DingTalkSender {
         return JSONUtils.toJsonString(items);
     }
 
-    public static class DingTalkSendMsgResponse {
-        private Integer errcode;
-        private String errmsg;
-
-        public Integer getErrcode() {
-            return errcode;
-        }
-
-        public void setErrcode(Integer errcode) {
-            this.errcode = errcode;
-        }
-
-        public String getErrmsg() {
-            return errmsg;
-        }
-
-        public void setErrmsg(String errmsg) {
-            this.errmsg = errmsg;
-        }
-    }
-
     private static AlertResult checkSendDingTalkSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
@@ -199,6 +133,72 @@ public class DingTalkSender {
         alertResult.setMessage(String.format("alert send ding talk msg error : %s", sendMsgResponse.getErrmsg()));
         logger.info("alert send ding talk msg error : {}", sendMsgResponse.getErrmsg());
         return alertResult;
+    }
+
+    public AlertResult sendDingTalkMsg(String title, String content) {
+        AlertResult alertResult;
+        try {
+            String resp = sendMsg(title, content);
+            return checkSendDingTalkSendMsgResult(resp);
+        } catch (Exception e) {
+            logger.info("send ding talk alert msg  exception : {}", e.getMessage());
+            alertResult = new AlertResult();
+            alertResult.setStatus("false");
+            alertResult.setMessage("send ding talk alert fail.");
+        }
+        return alertResult;
+    }
+
+    private String sendMsg(String title, String content) throws IOException {
+
+        String msgToJson = textToJsonString(title + content + "#" + keyword);
+        HttpPost httpPost = constructHttpPost(url, msgToJson, "UTF-8");
+
+        CloseableHttpClient httpClient;
+        if (Boolean.TRUE.equals(enableProxy)) {
+            httpClient = getProxyClient(proxy, port, user, password);
+            RequestConfig rcf = getProxyConfig(proxy, port);
+            httpPost.setConfig(rcf);
+        } else {
+            httpClient = getDefaultClient();
+        }
+
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, "UTF-8");
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
+            logger.info("Ding Talk send title :{},content : {}, resp: {}", title, content, resp);
+            return resp;
+        } finally {
+            httpClient.close();
+        }
+    }
+
+    public static class DingTalkSendMsgResponse {
+        private Integer errcode;
+        private String errmsg;
+
+        public Integer getErrcode() {
+            return errcode;
+        }
+
+        public void setErrcode(Integer errcode) {
+            this.errcode = errcode;
+        }
+
+        public String getErrmsg() {
+            return errmsg;
+        }
+
+        public void setErrmsg(String errmsg) {
+            this.errmsg = errmsg;
+        }
     }
 
 }
