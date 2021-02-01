@@ -75,7 +75,6 @@ public class HeartBeatTask extends Thread {
                 }
             }
 
-
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
 
