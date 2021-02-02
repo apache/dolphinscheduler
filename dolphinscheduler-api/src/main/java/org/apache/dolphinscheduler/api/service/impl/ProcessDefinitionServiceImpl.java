@@ -492,7 +492,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 return result;
             }
         }
-
+        // get the processdefinitionjson before saving,and then save the name and taskid
+        String oldJson = processDefine.getProcessDefinitionJson();
+        processDefinitionJson = processService.changeJson(processData,oldJson);
         Date now = new Date();
 
         processDefine.setId(id);

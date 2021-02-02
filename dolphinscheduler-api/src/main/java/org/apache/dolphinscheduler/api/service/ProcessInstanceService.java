@@ -429,10 +429,9 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
         Date schedule = null;
+        schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
-        } else {
-            schedule = processInstance.getScheduleTime();
         }
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
@@ -461,13 +460,18 @@ public class ProcessInstanceService extends BaseService {
             if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
+            // get the processinstancejson before saving,and then save the name and taskid
+            String oldJson = processInstance.getProcessInstanceJson();
+            if (StringUtils.isNotEmpty(oldJson)) {
+                processInstanceJson = processService.changeJson(processData,oldJson);
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
 
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
-        if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
+        if (Boolean.TRUE.equals(syncDefine)) {
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);
