@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.rpc.protocol;
 
 public class RpcProtocolConstants {
 
+    public RpcProtocolConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final int HEADER_LENGTH = 17;
 
     public static final short MAGIC = (short) 0xbabe;
