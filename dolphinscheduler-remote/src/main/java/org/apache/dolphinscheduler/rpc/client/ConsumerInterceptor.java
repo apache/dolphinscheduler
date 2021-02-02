@@ -65,16 +65,11 @@ public class ConsumerInterceptor {
 
         int retries = consumerConfig.getRetries();
 
-        RpcProtocol protocol = buildProtocol(request);
+        RpcProtocol<RpcRequest> protocol = buildProtocol(request);
 
         while (retries-- > 0) {
-            RpcResponse rsp = null;
-            try {
-                rsp = nettyClient.sendMsg(host, protocol, async);
-            } catch (InterruptedException e) {
-                logger.warn("send msg error ", e);
-                Thread.currentThread().interrupt();
-            }
+            RpcResponse rsp;
+            rsp = nettyClient.sendMsg(host, protocol, async);
             //success
             if (null != rsp && rsp.getStatus() == 0) {
                 return rsp.getResult();
@@ -115,7 +110,7 @@ public class ConsumerInterceptor {
         return consumerConfig;
     }
 
-    private RpcProtocol buildProtocol(RpcRequest req) {
+    private RpcProtocol<RpcRequest> buildProtocol(RpcRequest req) {
         RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
         MessageHeader header = new MessageHeader();
         header.setRequestId(RpcRequestTable.getRequestId());
