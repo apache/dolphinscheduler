@@ -36,6 +36,7 @@
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
+    "acorn": "^7.4.1",
     "autoprefixer": "^9.1.0",
     "babel-core": "^6.25.0",
     "babel-helper-vue-jsx-merge-props": "^2.0.2",

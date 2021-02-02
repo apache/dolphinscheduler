@@ -891,6 +891,11 @@ public final class Constants {
     public static final String PASSWORD_DEFAULT = "******";
 
     /**
+     * locale
+     */
+    public static final String LOCALE_LANGUAGE = "language";
+
+    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
