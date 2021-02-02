@@ -34,7 +34,17 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * process task relation by processDefinitionCode
      *
      * @param processDefinitionCode processDefinitionCode
-     * @return task definition
+     * @return ProcessTaskRelation
      */
     List<ProcessTaskRelation> queryByProcessDefinitionCode(@Param("processDefinitionCode") String processDefinitionCode);
+
+    /**
+     * process task relation by taskCode
+     *
+     * @param preTaskCode preTaskCode
+     * @param postTaskCode postTaskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryByTaskCode(@Param("preTaskCode") Long preTaskCode,
+                                              @Param("postTaskCode") Long postTaskCode);
 }
