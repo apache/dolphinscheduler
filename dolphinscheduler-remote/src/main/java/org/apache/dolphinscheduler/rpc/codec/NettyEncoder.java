@@ -30,11 +30,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * NettyEncoder
  */
 public class NettyEncoder extends MessageToByteEncoder<RpcProtocol<Object>> {
-    private Class<?> genericClass;
-
-    public NettyEncoder(Class<?> genericClass) {
-        this.genericClass = genericClass;
-    }
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcProtocol<Object> msg, ByteBuf byteBuf) throws Exception {

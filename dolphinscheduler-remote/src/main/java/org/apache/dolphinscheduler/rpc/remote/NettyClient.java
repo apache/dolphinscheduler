@@ -181,7 +181,7 @@ public class NettyClient {
                     @Override
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline()
-                                .addLast(new NettyEncoder(RpcRequest.class))
+                                .addLast(new NettyEncoder())
                                 .addLast(new NettyDecoder(RpcResponse.class))
                                 .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
                                 .addLast(new NettyClientHandler());
@@ -191,7 +191,7 @@ public class NettyClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) throws InterruptedException {
+    public RpcResponse sendMsg(Host host, RpcProtocol<RpcRequest> protocol, Boolean async) {
 
         Channel channel = getChannel(host);
         assert channel != null;

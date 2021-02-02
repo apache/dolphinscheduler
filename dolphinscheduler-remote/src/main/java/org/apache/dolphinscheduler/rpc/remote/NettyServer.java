@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 import org.apache.dolphinscheduler.rpc.codec.NettyDecoder;
 import org.apache.dolphinscheduler.rpc.codec.NettyEncoder;
 import org.apache.dolphinscheduler.rpc.common.RpcRequest;
-import org.apache.dolphinscheduler.rpc.common.RpcResponse;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -172,7 +171,7 @@ public class NettyServer {
     private void initNettyChannel(SocketChannel ch) {
         ch.pipeline()
                 .addLast(new NettyDecoder(RpcRequest.class))
-                .addLast(new NettyEncoder(RpcResponse.class))
+                .addLast(new NettyEncoder())
                 .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
                 .addLast("handler", new NettyServerHandler());
     }
