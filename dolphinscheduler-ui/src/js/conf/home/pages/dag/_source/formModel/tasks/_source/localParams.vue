@@ -79,7 +79,7 @@
         </a>
       </span>
     </div>
-    <span class="add-dp" v-if="!localParamsList.length" v-show="!isStartProcess">
+    <span class="add-dp" v-if="!localParamsList.length" v-show="isStartProcess">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
         <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
