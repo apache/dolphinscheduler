@@ -265,6 +265,11 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskCode);
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            return result;
+        }
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
         checkTaskNode(result, taskNode, taskDefinitionJson);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
@@ -277,28 +282,26 @@ public class TaskDefinitionServiceImpl extends BaseService implements
                 .map(TaskDefinitionLog::getVersion)
                 .max((x, y) -> x > y ? x : y)
                 .orElse(0) + 1;
-
         Date now = new Date();
-        TaskDefinition taskDefinition = new TaskDefinition(taskCode,
-                taskNode.getName(),
-                version,
-                taskNode.getDesc(),
-                project.getCode(),
-                loginUser.getId(),
-                TaskType.of(taskNode.getType()),
-                taskNode.getParams(),
-                taskNode.isForbidden() ? Flag.NO : Flag.YES,
-                taskNode.getTaskInstancePriority(),
-                taskNode.getWorkerGroup(),
-                taskNode.getMaxRetryTimes(),
-                taskNode.getRetryInterval(),
-                taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE,
-                taskNode.getTaskTimeoutParameter().getStrategy(),
-                taskNode.getTaskTimeoutParameter().getInterval(),
-                null,
-                now);
+        taskDefinition.setVersion(version);
+        taskDefinition.setCode(taskCode);
+        taskDefinition.setName(taskNode.getName());
+        taskDefinition.setDescription(taskNode.getDesc());
+        taskDefinition.setProjectCode(project.getCode());
+        taskDefinition.setUserId(loginUser.getId());
+        taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
+        taskDefinition.setTaskParams(taskNode.getParams());
+        taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
+        taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
+        taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
+        taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
+        taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
+        taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
+        taskDefinition.setTaskTimeoutStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
+        taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
+        taskDefinition.setUpdateTime(now);
         taskDefinition.setResourceIds(getResourceIds(taskDefinition));
-        taskDefinitionMapper.updateByCode(taskDefinition);
+        taskDefinitionMapper.updateById(taskDefinition);
         // save task definition log
         TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
         taskDefinitionLog.set(taskDefinition);
@@ -362,27 +365,31 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskCode);
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            return result;
+        }
         TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
-        TaskDefinition taskDefinition = new TaskDefinition(taskCode,
-                taskDefinitionLog.getName(),
-                version,
-                taskDefinitionLog.getDescription(),
-                taskDefinitionLog.getProjectCode(),
-                loginUser.getId(),
-                taskDefinitionLog.getTaskType(),
-                taskDefinitionLog.getTaskParams(),
-                taskDefinitionLog.getFlag(),
-                taskDefinitionLog.getTaskPriority(),
-                taskDefinitionLog.getWorkerGroup(),
-                taskDefinitionLog.getFailRetryTimes(),
-                taskDefinitionLog.getFailRetryInterval(),
-                taskDefinitionLog.getTimeoutFlag(),
-                taskDefinitionLog.getTaskTimeoutStrategy(),
-                taskDefinitionLog.getTimeout(),
-                null,
-                new Date());
+        taskDefinition.setVersion(version);
+        taskDefinition.setCode(taskCode);
+        taskDefinition.setName(taskDefinitionLog.getName());
+        taskDefinition.setDescription(taskDefinitionLog.getDescription());
+        taskDefinition.setProjectCode(taskDefinitionLog.getProjectCode());
+        taskDefinition.setUserId(loginUser.getId());
+        taskDefinition.setTaskType(taskDefinitionLog.getTaskType());
+        taskDefinition.setTaskParams(taskDefinitionLog.getTaskParams());
+        taskDefinition.setFlag(taskDefinitionLog.getFlag());
+        taskDefinition.setTaskPriority(taskDefinitionLog.getTaskPriority());
+        taskDefinition.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+        taskDefinition.setFailRetryTimes(taskDefinitionLog.getFailRetryTimes());
+        taskDefinition.setFailRetryInterval(taskDefinitionLog.getFailRetryInterval());
+        taskDefinition.setTimeoutFlag(taskDefinitionLog.getTimeoutFlag());
+        taskDefinition.setTaskTimeoutStrategy(taskDefinitionLog.getTaskTimeoutStrategy());
+        taskDefinition.setTimeout(taskDefinitionLog.getTimeout());
+        taskDefinition.setUpdateTime(new Date());
         taskDefinition.setResourceIds(taskDefinitionLog.getResourceIds());
-        taskDefinitionMapper.updateByCode(taskDefinition);
+        taskDefinitionMapper.updateById(taskDefinition);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
