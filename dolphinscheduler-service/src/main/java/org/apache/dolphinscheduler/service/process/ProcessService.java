@@ -28,16 +28,10 @@ import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.CycleEnum;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -80,17 +74,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.quartz.CronExpression;
@@ -684,11 +668,14 @@ public class ProcessService {
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
                 // Recalculate global parameters after rerun.
-                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    getCommandTypeIfComplement(processInstance, command),
-                    processInstance.getScheduleTime()));
+                //if the CommandType is start from fail task note,the globalparam can't be cover
+                if(commandType != CommandType.START_FAILURE_TASK_PROCESS){
+                    processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                            processDefinition.getGlobalParamMap(),
+                            processDefinition.getGlobalParamList(),
+                            getCommandTypeIfComplement(processInstance, command),
+                            processInstance.getScheduleTime()));
+                }
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
@@ -1539,15 +1526,72 @@ public class ProcessService {
                                 int processId,
                                 String appIds,
                                 int taskInstId,
-                                String varPool) {
+                                String varPool,
+                                String result) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
         taskInstance.setVarPool(varPool);
+        changeOutParam(result,taskInstance);
         saveTaskInstance(taskInstance);
     }
+    private void changeOutParam(String result,TaskInstance taskInstance) {
+        if (StringUtils.isEmpty(result)) {
+            return;
+        }
+        List<Map<String, String>> workerResultParam = getListMapByString(result);
+        if(CollectionUtils.isEmpty(workerResultParam)){
+            return;
+        }
+        //if the result more than one line,just get the first .
+        Map<String, String> row = workerResultParam.get(0);
+        if(row == null || row.size() == 0){
+            return;
+        }
+        TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(),TaskNode.class);
+        Map<String,Object> taskParams = JSONUtils.toMap(taskNode.getParams(),String.class,Object.class);
+        Object localParams = taskParams.get("localParams");
+        if(localParams == null){
+            return;
+        }
+        ProcessInstance processInstance = this.processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId());
+        List<Property> params4Process = JSONUtils.toList(processInstance.getGlobalParams(), Property.class);
+        Map<String, Property> allParamMap = params4Process.stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
 
+        List<Property> allParam = JSONUtils.toList(String.valueOf(localParams), Property.class);
+        for (Property info : allParam) {
+            if (info.getDirect() == Direct.OUT) {
+                String paramName = info.getProp();
+                Property property = allParamMap.get(paramName);
+                if (property == null) {
+                    continue;
+                }
+                String value = info.getValue();
+                if (StringUtils.isNotEmpty(value)) {
+                    property.setValue(value);
+                }
+            }
+        }
+        this.processInstanceMapper.updateGlobalParamById(JSONUtils.toJsonString(params4Process),processInstance.getId());
+    }
+
+    public static void main(String[] args) {
+        String json = "[{\"id\":70000,\"database_name\":\"yuul\",\"status\":-1,\"create_time\":1601202829000,\"update_time\":1601202829000,\"table_name3\":\"\",\"table_name4\":\"\"},{\"id\":70001,\"database_name\":\"yuul\",\"status\":-1,\"create_time\":1601202829000,\"update_time\":1601202829000,\"table_name3\":\"\",\"table_name4\":\"\"}]";
+        List<Map<String, String>> re = getListMapByString(json);
+        System.out.println(re);
+    }
+
+    public static List<Map<String, String>> getListMapByString(String json){
+        List<Map<String, String>> result1 = new ArrayList<>();
+        ArrayNode result = JSONUtils.parseArray(json);
+        Iterator<JsonNode> listIterator = result.iterator();
+        while (listIterator.hasNext()){
+            Map<String, String> ii = JSONUtils.toMap(listIterator.next().toString(),String.class,String.class);
+            result1.add(ii);
+        }
+        return result1;
+    }
     /**
      * convert integer list to string list
      *

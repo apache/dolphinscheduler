@@ -25,17 +25,12 @@ import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DependResult;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -63,17 +58,11 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -491,7 +480,8 @@ public class MasterExecThread implements Runnable {
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
                                             TaskNode taskNode) {
-
+        //update processInstance for update the globalParams
+        this.processInstance = this.processService.findProcessInstanceById(this.processInstance.getId());
         TaskInstance taskInstance = findTaskIfExists(nodeName);
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
@@ -540,11 +530,48 @@ public class MasterExecThread implements Runnable {
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
-
+            //get process global
+            String globalParams = this.processInstance.getGlobalParams();
+            if(StringUtils.isNotEmpty(globalParams)) {
+                Map<String, String> globalMap = getGlobalParamMap(globalParams);
+                if (globalMap != null) {
+                    // the param save in localParams
+                    Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+                    Object localParams = result.get("localParams");
+                    if (localParams != null) {
+                        List<Property> allParam = JSONUtils.toList(String.valueOf(localParams), Property.class);
+                        for (Property info : allParam) {
+                            if (info.getDirect().equals(Direct.IN)) {
+                                String paramName = info.getProp();
+                                String value = globalMap.get(paramName);
+                                if (StringUtils.isNotEmpty(value)) {
+                                    info.setValue(value);
+                                }
+                            }
+                        }
+                        result.put("localParams", allParam);
+                        taskNode.setParams(JSONUtils.toJsonString(result));
+                        // task instance node json
+                        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+                    }
+                }
+            }
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
         return taskInstance;
+    }
+
+
+    public Map<String, String> getGlobalParamMap(String globalParams) {
+        List<Property> propList;
+        Map<String,String> globalParamMap = new HashMap<>();
+        if (StringUtils.isNotEmpty(globalParams)) {
+            propList = JSONUtils.toList(globalParams, Property.class);
+            globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        }
+
+        return globalParamMap;
     }
 
     private void submitPostNode(String parentNodeName) {
