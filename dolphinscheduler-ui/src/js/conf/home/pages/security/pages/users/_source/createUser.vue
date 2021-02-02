@@ -226,7 +226,9 @@
               }
             })
             this.$nextTick(() => {
-              this.tenantId = this.tenantList[0].id
+              if (this.tenantList.length) {
+                this.tenantId = this.tenantList[0].id
+              }
             })
             resolve()
           })
@@ -275,9 +277,14 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
-            this.tenantId = this.item.tenantId
+            if (this.item.tenantName) {
+              this.tenantId = this.item.tenantId
+            }
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id||''
+              let queue = _.find(this.queueList, ['code', this.item.queue])
+              if (queue) {
+                this.queueName = queue.id || ''
+              }
             })
           }
         })
@@ -287,9 +294,14 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
-          this.tenantId = this.item.tenantId
+          if (this.item.tenantName) {
+            this.tenantId = this.item.tenantId
+          }
           if(this.queueList.length>0) {
-            this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+            let queue = _.find(this.queueList, ['code', this.item.queue])
+            if (queue) {
+              this.queueName = queue.id || ''
+            }
           } else {
             this.queueName = ''
           }
