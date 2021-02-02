@@ -120,8 +120,7 @@
                   ref="refLocalParams"
                   @on-local-params="_onLocalParams"
                   :udp-list="udpList"
-                  :hide="false"
-                  :isStartProcess="true">
+                  :hide="false">
           </m-local-params>
         </div>
       </div>
