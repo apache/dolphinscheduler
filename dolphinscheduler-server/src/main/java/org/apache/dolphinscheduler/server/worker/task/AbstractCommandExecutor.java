@@ -84,6 +84,11 @@ public abstract class AbstractCommandExecutor {
     protected final List<String> logBuffer;
 
     /**
+     * SHELL result string
+     */
+    protected String resultString;
+
+    /**
      * taskExecutionContext
      */
     protected TaskExecutionContext taskExecutionContext;
@@ -222,6 +227,10 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
+    public String getResultString(){
+        return resultString;
+    }
+
     /**
      * cancel application
      *
@@ -354,6 +363,7 @@ public abstract class AbstractCommandExecutor {
                             varPool.append("$VarPool$");
                         } else {
                             logBuffer.add(line);
+                            resultString = line;
                             lastFlushTime = flush(lastFlushTime);
                         }
                     }
