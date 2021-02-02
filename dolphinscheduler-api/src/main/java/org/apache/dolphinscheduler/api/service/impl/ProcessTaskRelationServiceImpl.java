@@ -168,7 +168,7 @@ public class ProcessTaskRelationServiceImpl extends BaseService implements
      * @param processDefinitionCode process definition code
      */
     @Override
-    public Map<String, Object> deleteTaskDefinitionByProcess(User loginUser, String projectName, Long processDefinitionCode) {
+    public Map<String, Object> deleteTaskDefinitionByProcessCode(User loginUser, String projectName, Long processDefinitionCode) {
         return null;
     }
 
@@ -180,7 +180,7 @@ public class ProcessTaskRelationServiceImpl extends BaseService implements
      * @param preTaskCode pre task code
      */
     @Override
-    public Map<String, Object> deleteTaskDefinitionByTask(User loginUser, String projectName, Long preTaskCode) {
+    public Map<String, Object> deleteTaskDefinitionByTaskCode(User loginUser, String projectName, Long preTaskCode) {
         return null;
     }
 

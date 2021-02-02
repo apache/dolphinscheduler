@@ -67,9 +67,9 @@ public interface ProcessTaskRelationService {
      * @param projectName project name
      * @param processDefinitionCode process definition code
      */
-    Map<String, Object> deleteTaskDefinitionByProcess(User loginUser,
-                                                      String projectName,
-                                                      Long processDefinitionCode);
+    Map<String, Object> deleteTaskDefinitionByProcessCode(User loginUser,
+                                                          String projectName,
+                                                          Long processDefinitionCode);
 
     /**
      * delete process task relation
@@ -78,9 +78,9 @@ public interface ProcessTaskRelationService {
      * @param projectName project name
      * @param preTaskCode pre task code
      */
-    Map<String, Object> deleteTaskDefinitionByTask(User loginUser,
-                                                   String projectName,
-                                                   Long preTaskCode);
+    Map<String, Object> deleteTaskDefinitionByTaskCode(User loginUser,
+                                                       String projectName,
+                                                       Long preTaskCode);
 
 
     /**
