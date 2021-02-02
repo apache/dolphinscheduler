@@ -142,7 +142,12 @@
         return true
       },
       _accuStore () {
-        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        const udp = _.cloneDeep(this.udpList)
+        udp.forEach(u => {
+          delete u.ifFixed
+        })
+        this.store.commit('dag/setGlobalParams', udp)
+
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
@@ -203,8 +208,39 @@
     },
     created () {
       const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
+
+      let fixedParam = []
+      const tasks = this.store.state.dag.tasks
+      for (const task of tasks) {
+        const localParam = task.params ? task.params.localParams : []
+        if (localParam && localParam.length > 0) {
+          fixedParam = fixedParam.concat(localParam)
+        }
+      }
+      fixedParam = fixedParam.map(f => {
+        return {
+          prop: f.prop,
+          value: f.value,
+          ifFixed: true
+        }
+      })
+
+      let globalParams = _.cloneDeep(dag.globalParams)
+
+      globalParams = globalParams.map(g => {
+        if (fixedParam.some(f => { return g.prop === f.prop })) {
+          fixedParam = fixedParam.filter(f => { return g.prop !== f.prop })
+          return Object.assign(g, {
+            ifFixed: true
+          })
+        } else {
+          return g
+        }
+      })
+
+      this.udpList = [...fixedParam, ...globalParams]
+      this.udpListCache = [...fixedParam, ...globalParams]
+
       this.name = dag.name
       this.originalName = dag.name
       this.description = dag.description
