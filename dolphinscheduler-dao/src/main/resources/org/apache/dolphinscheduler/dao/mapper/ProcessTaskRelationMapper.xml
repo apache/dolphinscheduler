@@ -19,13 +19,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper">
     <sql id="baseSql">
-        id, `name`, version, project_code, process_definition_code, pre_project_code, pre_task_code, post_project_code,
-        post_task_code, condition_type, condition_params, create_time, update_time
+        id, `name`, version, project_code, process_definition_code, pre_task_code, post_task_code,
+        condition_type, condition_params, create_time, update_time
     </sql>
     <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
         select
         <include refid="baseSql"/>
         from t_ds_process_task_relation
         WHERE process_definition_code = #{processDefinitionCode}
+    </select>
+    <select id="queryByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE pre_task_code = #{preTaskCode}
+        <if test="postTaskCode != 0">
+            or post_task_code = #{postTaskCode}
+        </if>
     </select>
 </mapper>

@@ -87,4 +87,8 @@
         FROM t_ds_task_definition
         WHERE user_id = #{userId} resource_ids is not null and resource_ids != ''
     </select>
+    <delete id="deleteByCode">
+        delete from t_ds_task_definition
+        where code = #{code}
+    </delete>
 </mapper>
