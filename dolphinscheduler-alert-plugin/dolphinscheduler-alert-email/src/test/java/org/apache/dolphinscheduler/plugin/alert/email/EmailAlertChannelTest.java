@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,7 +68,9 @@ public class EmailAlertChannelTest {
                 .setTitle("test");
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(getEmailAlertParams());
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getEmailAlertParams());
+
+        alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = emailAlertChannel.process(alertInfo);
         Assert.assertNotNull(alertResult);
         Assert.assertEquals("false", alertResult.getStatus());
