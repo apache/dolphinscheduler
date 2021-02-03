@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
@@ -1907,60 +1906,4 @@ public class ProcessService {
                 taskInstance.getId());
     }
 
-    /**
-     * solve the branch rename bug
-     *
-     * @param processData
-     * @param oldJson
-     * @return String
-     */
-    public String changeJson(ProcessData processData, String oldJson) {
-        ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
-        HashMap<String, String> oldNameTaskId = new HashMap<>();
-        List<TaskNode> oldTasks = oldProcessData.getTasks();
-        for (int i = 0; i < oldTasks.size(); i++) {
-            TaskNode taskNode = oldTasks.get(i);
-            String oldName = taskNode.getName();
-            String oldId = taskNode.getId();
-            oldNameTaskId.put(oldName, oldId);
-        }
-
-        // take the processdefinitionjson saved this time, and then save the taskid and name
-        HashMap<String, String> newNameTaskId = new HashMap<>();
-        List<TaskNode> newTasks = processData.getTasks();
-        for (int i = 0; i < newTasks.size(); i++) {
-            TaskNode taskNode = newTasks.get(i);
-            String newId = taskNode.getId();
-            String newName = taskNode.getName();
-            newNameTaskId.put(newId, newName);
-        }
-
-        // replace the previous conditionresult with a new one
-        List<TaskNode> tasks = processData.getTasks();
-        for (int i = 0; i < tasks.size(); i++) {
-            TaskNode taskNode = newTasks.get(i);
-            String type = taskNode.getType();
-            if (TaskType.CONDITIONS.getDescp().equalsIgnoreCase(type)) {
-                ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
-                String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
-                String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
-                String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
-                String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
-                if (newSuccessNodeName != null) {
-                    ArrayList<String> successNode = new ArrayList<>();
-                    successNode.add(newSuccessNodeName);
-                    conditionsParameters.setSuccessNode(successNode);
-                }
-                if (newFailedNodeName != null) {
-                    ArrayList<String> failedNode = new ArrayList<>();
-                    failedNode.add(newFailedNodeName);
-                    conditionsParameters.setFailedNode(failedNode);
-                }
-                String conditionResultStr = conditionsParameters.getConditionResult();
-                taskNode.setConditionResult(conditionResultStr);
-                tasks.set(i, taskNode);
-            }
-        }
-        return JSONUtils.toJsonString(processData);
-    }
 }
