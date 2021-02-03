@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,15 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return process definition
      */
     ProcessDefinition queryByCode(@Param("code") Long code);
-    
+
+    /**
+     * query process definition by code list
+     *
+     * @param codes codes
+     * @return process definition list
+     */
+    List<ProcessDefinition> queryByCodes(@Param("codes") Collection<Long> codes);
+
     /**
      * delete process definition by code
      *

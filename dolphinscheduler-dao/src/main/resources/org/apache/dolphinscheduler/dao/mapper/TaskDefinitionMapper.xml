@@ -23,24 +23,13 @@
         worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout,
         resource_ids, create_time, update_time
     </sql>
-    <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+    <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
         <include refid="baseSql"/>
         from t_ds_task_definition
         WHERE projectCode = #{projectCode}
         and `name` = #{taskDefinitionName}
     </select>
-    <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
-        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
-        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag,
-        td.timeout_notify_strategy, td.timeout, td.resource_ids, td.create_time, td.update_time, u.user_name,p.name as project_name
-        from t_ds_task_definition td
-        JOIN t_ds_user u ON td.user_id = u.id
-        JOIN  t_ds_project p ON td.project_code = p.code
-        WHERE p.code = #{projectCode}
-        and td.name = #{taskDefinitionName}
-    </select>
-
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
         select
         <include refid="baseSql"/>
@@ -81,6 +70,12 @@
         JOIN t_ds_project p ON td.project_code = p.code
         WHERE td.id = #{taskDefinitionId}
     </select>
+    <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        where code = #{taskDefinitionCode}
+    </select>
     <select id="listResources" resultType="java.util.HashMap">
         SELECT id,resource_ids
         FROM t_ds_task_definition
@@ -92,4 +87,8 @@
         FROM t_ds_task_definition
         WHERE user_id = #{userId} resource_ids is not null and resource_ids != ''
     </select>
+    <delete id="deleteByCode">
+        delete from t_ds_task_definition
+        where code = #{code}
+    </delete>
 </mapper>

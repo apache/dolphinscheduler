@@ -253,7 +253,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             processTaskRelationService.createProcessTaskRelation(
                     loginUser,
                     name,
-                    project.getCode(),
+                    projectName,
                     processDefinitionCode,
                     0L,
                     0L,
@@ -492,7 +492,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 return result;
             }
         }
-
+        // get the processdefinitionjson before saving,and then save the name and taskid
+        String oldJson = processDefine.getProcessDefinitionJson();
+        processDefinitionJson = processService.changeJson(processData,oldJson);
         Date now = new Date();
 
         processDefine.setId(id);

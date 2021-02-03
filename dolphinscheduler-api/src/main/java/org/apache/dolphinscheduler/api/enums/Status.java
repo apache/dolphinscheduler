@@ -252,7 +252,7 @@ public enum Status {
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028, "export process definition by id error", "导出工作流定义错误"),
     BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028,"batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029, "import process definition error", "导入工作流定义错误"),
-
+    TASK_DEFINE_NOT_EXIST(50030, "task definition {0} does not exist", "任务定义[{0}]不存在"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
@@ -290,6 +290,7 @@ public enum Status {
     QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
     PLUGIN_INSTANCE_ALREADY_EXIT(110010,"plugin instance already exit","该告警插件实例已存在"),
     LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011,"query plugin instance page error","分页查询告警实例失败"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012,"failed to delete the alert instance, there is an alarm group associated with this alert instance","删除告警实例失败，存在与此告警实例关联的警报组")
 
     ;
 

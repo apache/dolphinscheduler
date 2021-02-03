@@ -17,12 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * task definition service
@@ -35,10 +32,57 @@ public interface TaskDefinitionService {
      * @param loginUser login user
      * @param projectName project name
      * @param taskDefinitionJson task definition json
-     * @throws JsonProcessingException JsonProcessingException
      */
     Map<String, Object> createTaskDefinition(User loginUser,
                                              String projectName,
-                                             String taskDefinitionJson) throws JsonProcessingException, SnowFlakeException;
+                                             String taskDefinitionJson);
+
+    /**
+     * query task definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskName task name
+     */
+    Map<String, Object> queryTaskDefinitionByName(User loginUser,
+                                                  String projectName,
+                                                  String taskName);
+
+    /**
+     * delete task definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskCode task code
+     */
+    Map<String, Object> deleteTaskDefinitionByCode(User loginUser,
+                                                   String projectName,
+                                                   Long taskCode);
+
+    /**
+     * update task definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskCode task code
+     * @param taskDefinitionJson task definition json
+     */
+    Map<String, Object> updateTaskDefinition(User loginUser,
+                                             String projectName,
+                                             Long taskCode,
+                                             String taskDefinitionJson);
+
+    /**
+     * update task definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskCode task code
+     * @param version the version user want to switch
+     */
+    Map<String, Object> switchVersion(User loginUser,
+                                      String projectName,
+                                      Long taskCode,
+                                      int version);
 }
 

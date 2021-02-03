@@ -129,6 +129,7 @@
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
+      v-if="startDialog"
       :visible.sync="startDialog"
       width="auto">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
