@@ -33,16 +33,14 @@
     <conversionRule conversionWord="messsage"
                     converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
+
         <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
             <key>taskAppId</key>
             <logBase>${log.base}</logBase>
         </Discriminator>
         <sift>
-            <appender name="FILE-${taskAppId}" class="org.apache.dolphinscheduler.server.log.TaskLogAppender">
+            <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
                 <file>${log.base}/${taskAppId}.log</file>
                 <encoder>
                     <pattern>
@@ -56,10 +54,6 @@
     </appender>
     <appender name="WORKERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-worker.log</file>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-        <filter class="org.apache.dolphinscheduler.server.log.WorkerLogFilter"/>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${log.base}/dolphinscheduler-worker.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>168</maxHistory>
