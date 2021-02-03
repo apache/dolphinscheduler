@@ -136,7 +136,6 @@ public class AlertServer {
             } else {
                 InterProcessMutex mutex = null;
                 try {
-                    logger.error("创建分布式锁 : ");
                     mutex = zookeeperClient.getAlertLockPath();
                     mutex.acquire();
                     List<Alert> alerts = alertDao.listWaitExecutionAlert();
