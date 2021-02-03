@@ -27,7 +27,6 @@ services:
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
-      POSTGRESQL_REPLICATION_PASSWORD: dolphinscheduler@123
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
     networks:
@@ -54,7 +53,7 @@ services:
 
   dolphinscheduler-api:
     image: apache/dolphinscheduler:latest
-    command: ["api-server"]
+    command: api-server
     ports:
     - 12345:12345
     environment:
@@ -65,7 +64,9 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      ZOOKEEPER_ROOT: /dolphinscheduler
+      RESOURCE_STORAGE_TYPE: HDFS
+      RESOURCE_UPLOAD_PATH: /dolphinscheduler
+      FS_DEFAULT_FS: file:///
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
       interval: 30s
@@ -82,7 +83,7 @@ services:
 
   dolphinscheduler-alert:
     image: apache/dolphinscheduler:latest
-    command: ["alert-server"]
+    command: alert-server
     environment:
       TZ: Asia/Shanghai
       XLS_FILE_PATH: "/tmp/xls"
@@ -120,7 +121,7 @@ services:
 
   dolphinscheduler-master:
     image: apache/dolphinscheduler:latest
-    command: ["master-server"]
+    command: master-server
     ports:
     - 5678:5678
     environment:
@@ -154,7 +155,7 @@ services:
 
   dolphinscheduler-worker:
     image: apache/dolphinscheduler:latest
-    command: ["worker-server"]
+    command: worker-server
     ports:
     - 1234:1234
     - 50051:50051
@@ -166,25 +167,23 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
-      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-      DATABASE_HOST: dolphinscheduler-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: root
-      DATABASE_DATABASE: dolphinscheduler
+      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      RESOURCE_STORAGE_TYPE: HDFS
+      RESOURCE_UPLOAD_PATH: /dolphinscheduler
+      FS_DEFAULT_FS: file:///
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
-    volumes:
-    - dolphinscheduler-worker-data:/tmp/dolphinscheduler
-    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     configs:
     - source: dolphinscheduler-worker-task-env
       target: /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
+    volumes:
+    - dolphinscheduler-worker-data:/tmp/dolphinscheduler
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
     deploy:

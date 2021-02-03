@@ -28,10 +28,10 @@ services:
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
-      POSTGRESQL_REPLICATION_PASSWORD: dolphinscheduler@123
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
     - dolphinscheduler-postgresql-initdb:/docker-entrypoint-initdb.d
+    restart: unless-stopped
     networks:
     - dolphinscheduler
 
@@ -46,13 +46,14 @@ services:
       ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
     - dolphinscheduler-zookeeper:/bitnami/zookeeper
+    restart: unless-stopped
     networks:
     - dolphinscheduler
 
   dolphinscheduler-api:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-api
-    command: ["api-server"]
+    command: api-server
     ports:
     - 12345:12345
     environment:
@@ -63,9 +64,9 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      ZOOKEEPER_ROOT: /dolphinscheduler
-      DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE: "HDFS"
-      DOLPHINSCHEDULER_FS_DEFAULTFS: "file:///data/dolphinscheduler"
+      RESOURCE_STORAGE_TYPE: HDFS
+      RESOURCE_UPLOAD_PATH: /dolphinscheduler
+      FS_DEFAULT_FS: file:///
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
       interval: 30s
@@ -77,14 +78,15 @@ services:
     - dolphinscheduler-zookeeper
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-    - dolphinscheduler-resource-storage-local:/dolphinscheduler
+    - dolphinscheduler-resource-local:/dolphinscheduler
+    restart: unless-stopped
     networks:
     - dolphinscheduler
 
   dolphinscheduler-alert:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-alert
-    command: ["alert-server"]
+    command: alert-server
     environment:
       TZ: Asia/Shanghai
       XLS_FILE_PATH: "/tmp/xls"
@@ -116,13 +118,14 @@ services:
     - dolphinscheduler-postgresql
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    restart: unless-stopped
     networks:
     - dolphinscheduler
 
   dolphinscheduler-master:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-master
-    command: ["master-server"]
+    command: master-server
     ports:
     - 5678:5678
     environment:
@@ -140,7 +143,6 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      ZOOKEEPER_ROOT: /dolphinscheduler
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
       interval: 30s
@@ -152,13 +154,14 @@ services:
     - dolphinscheduler-zookeeper
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    restart: unless-stopped
     networks:
     - dolphinscheduler
 
   dolphinscheduler-worker:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-worker
-    command: ["worker-server"]
+    command: worker-server
     ports:
     - 1234:1234
     - 50051:50051
@@ -170,16 +173,11 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
-      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-      DATABASE_HOST: dolphinscheduler-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: root
-      DATABASE_DATABASE: dolphinscheduler
+      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      ZOOKEEPER_ROOT: /dolphinscheduler
-      DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE: "HDFS"
-      DOLPHINSCHEDULER_FS_DEFAULTFS: "file:///data/dolphinscheduler"
+      RESOURCE_STORAGE_TYPE: HDFS
+      RESOURCE_UPLOAD_PATH: /dolphinscheduler
+      FS_DEFAULT_FS: file:///
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
       interval: 30s
@@ -190,18 +188,11 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes:
-    - type: bind
-      source: ./dolphinscheduler_env.sh
-      target: /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
-    - type: volume
-      source: dolphinscheduler-worker-data
-      target: /tmp/dolphinscheduler
-    - type: volume
-      source: dolphinscheduler-logs
-      target: /opt/dolphinscheduler/logs
-    - type: volume
-      source: dolphinscheduler-resource-storage-local
-      target: /dolphinscheduler
+    - ./dolphinscheduler_env.sh:/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
+    - dolphinscheduler-worker-data:/tmp/dolphinscheduler
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-resource-local:/dolphinscheduler
+    restart: unless-stopped
     networks:
     - dolphinscheduler
 
@@ -215,8 +206,4 @@ volumes:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
   dolphinscheduler-logs:
-  dolphinscheduler-resource-storage-local:
-
-configs:
-  dolphinscheduler-worker-task-env:
-    file: ./dolphinscheduler_env.sh
+  dolphinscheduler-resource-local:
