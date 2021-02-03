@@ -428,60 +428,25 @@ public class ProcessInstanceService extends BaseService {
                     processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
-        Date schedule = null;
-        schedule = processInstance.getScheduleTime();
+        Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
         }
-        processInstance.setScheduleTime(schedule);
-        processInstance.setLocations(locations);
-        processInstance.setConnects(connects);
-        String globalParams = null;
-        String originDefParams = null;
-        int timeout = processInstance.getTimeout();
+
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
         //check workflow json is valid
-        Map<String, Object> checkFlowJson = processDefinitionService.checkProcessNodeList(processData, processInstanceJson);
-        if (checkFlowJson.get(Constants.STATUS) != Status.SUCCESS) {
+        result = processDefinitionService.checkProcessNodeList(processData, processInstanceJson);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        if (StringUtils.isNotEmpty(processInstanceJson)) {
-            originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
-            List<Property> globalParamList = processData.getGlobalParams();
-            Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
-            globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
-                    processInstance.getCmdTypeIfComplement(), schedule);
-            timeout = processData.getTimeout();
-            processInstance.setTimeout(timeout);
-            Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
-                    processDefinition.getUserId());
-            if (tenant != null) {
-                processInstance.setTenantCode(tenant.getTenantCode());
-            }
-            // get the processinstancejson before saving,and then save the name and taskid
-            String oldJson = processInstance.getProcessInstanceJson();
-            if (StringUtils.isNotEmpty(oldJson)) {
-                processInstanceJson = processService.changeJson(processData,oldJson);
-            }
-            processInstance.setProcessInstanceJson(processInstanceJson);
-            processInstance.setGlobalParams(globalParams);
-        }
-
+        setProcessInstance(processInstance, processDefinition, schedule, locations,
+                connects, processInstanceJson, processData);
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
-            processDefinition.setProcessDefinitionJson(processInstanceJson);
-            processDefinition.setGlobalParams(originDefParams);
-            processDefinition.setLocations(locations);
-            processDefinition.setConnects(connects);
-            processDefinition.setTimeout(timeout);
-            processDefinition.setUpdateTime(new Date());
-
-            // add process definition version
-            long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
-            processDefinition.setVersion(version);
-            updateDefine = processDefineMapper.updateById(processDefinition);
+            updateDefine = syncDefinition(processInstanceJson, locations, connects,
+                    processInstance, processDefinition, processData);
         }
         if (update > 0 && updateDefine > 0) {
             putMsg(result, Status.SUCCESS);
@@ -491,6 +456,75 @@ public class ProcessInstanceService extends BaseService {
 
         return result;
 
+    }
+
+    /**
+     * sync definition according process instance
+     *
+     * @param processInstanceJson
+     * @param locations
+     * @param connects
+     * @param processInstance
+     * @param processDefinition
+     * @param processData
+     * @return
+     */
+    private int syncDefinition(String processInstanceJson, String locations, String connects,
+                               ProcessInstance processInstance, ProcessDefinition processDefinition,
+                               ProcessData processData) {
+        String originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
+        processDefinition.setProcessDefinitionJson(processInstanceJson);
+        processDefinition.setGlobalParams(originDefParams);
+        processDefinition.setLocations(locations);
+        processDefinition.setConnects(connects);
+        processDefinition.setTimeout(processInstance.getTimeout());
+        processDefinition.setUpdateTime(new Date());
+        // add process definition version
+        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+        processDefinition.setVersion(version);
+        int updateDefine = processDefineMapper.updateById(processDefinition);
+        return updateDefine;
+    }
+
+    /**
+     * update process instance attributes
+     *
+     * @param processInstance
+     * @param processDefinition
+     * @param schedule
+     * @param locations
+     * @param connects
+     * @param processInstanceJson
+     * @param processData
+     * @return false if check failed or
+     */
+    private void setProcessInstance(ProcessInstance processInstance, ProcessDefinition processDefinition,
+                                    Date schedule, String locations, String connects, String processInstanceJson,
+                                    ProcessData processData) {
+        processInstance.setScheduleTime(schedule);
+        processInstance.setLocations(locations);
+        processInstance.setConnects(connects);
+        if (StringUtils.isNotEmpty(processInstanceJson)) {
+            return;
+        }
+        List<Property> globalParamList = processData.getGlobalParams();
+        Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        String globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
+                processInstance.getCmdTypeIfComplement(), schedule);
+        int timeout = processData.getTimeout();
+        processInstance.setTimeout(timeout);
+        Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
+                processDefinition.getUserId());
+        if (tenant != null) {
+            processInstance.setTenantCode(tenant.getTenantCode());
+        }
+        // get the processinstancejson before saving,and then save the name and taskid
+        String oldJson = processInstance.getProcessInstanceJson();
+        if (StringUtils.isNotEmpty(oldJson)) {
+            processInstanceJson = processService.changeJson(processData, oldJson);
+        }
+        processInstance.setProcessInstanceJson(processInstanceJson);
+        processInstance.setGlobalParams(globalParams);
     }
 
     /**
