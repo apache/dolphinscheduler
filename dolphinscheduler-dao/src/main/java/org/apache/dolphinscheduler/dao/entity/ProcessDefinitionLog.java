@@ -429,35 +429,35 @@ public class ProcessDefinitionLog {
 
     @Override
     public String toString() {
-        return "ProcessDefinitionLog{" +
-                "id=" + id +
-                ", code=" + code +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", releaseState=" + releaseState +
-                ", projectCode=" + projectCode +
-                ", description='" + description + '\'' +
-                ", globalParams='" + globalParams + '\'' +
-                ", globalParamList=" + globalParamList +
-                ", globalParamMap=" + globalParamMap +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", flag=" + flag +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", locations='" + locations + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", scheduleReleaseState=" + scheduleReleaseState +
-                ", timeout=" + timeout +
-                ", tenantId=" + tenantId +
-                ", modifyBy='" + modifyBy + '\'' +
-                ", warningGroupId=" + warningGroupId +
-                ", connects='" + connects + '\'' +
-                ", resourceIds='" + resourceIds + '\'' +
-                ", operator=" + operator +
-                ", operateTime=" + operateTime +
-                '}';
+        return "ProcessDefinitionLog{"
+               + "id=" + id
+               + ", code=" + code
+               + ", name='" + name + '\''
+               + ", version=" + version
+               + ", releaseState=" + releaseState
+               + ", projectCode=" + projectCode
+               + ", description='" + description + '\''
+               + ", globalParams='" + globalParams + '\''
+               + ", globalParamList=" + globalParamList
+               + ", globalParamMap=" + globalParamMap
+               + ", createTime=" + createTime
+               + ", updateTime=" + updateTime
+               + ", flag=" + flag
+               + ", userId=" + userId
+               + ", userName='" + userName + '\''
+               + ", projectName='" + projectName + '\''
+               + ", locations='" + locations + '\''
+               + ", receivers='" + receivers + '\''
+               + ", receiversCc='" + receiversCc + '\''
+               + ", scheduleReleaseState=" + scheduleReleaseState
+               + ", timeout=" + timeout
+               + ", tenantId=" + tenantId
+               + ", modifyBy='" + modifyBy + '\''
+               + ", warningGroupId=" + warningGroupId
+               + ", connects='" + connects + '\''
+               + ", resourceIds='" + resourceIds + '\''
+               + ", operator=" + operator
+               + ", operateTime=" + operateTime
+               + '}';
     }
 }
