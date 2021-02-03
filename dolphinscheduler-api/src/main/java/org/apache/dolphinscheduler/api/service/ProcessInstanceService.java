@@ -440,14 +440,13 @@ public class ProcessInstanceService extends BaseService {
         String originDefParams = null;
         int timeout = processInstance.getTimeout();
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
+        //check workflow json is valid
+        Map<String, Object> checkFlowJson = processDefinitionService.checkProcessNodeList(processData, processInstanceJson);
+        if (checkFlowJson.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
         if (StringUtils.isNotEmpty(processInstanceJson)) {
-            ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
-            //check workflow json is valid
-            Map<String, Object> checkFlowJson = processDefinitionService.checkProcessNodeList(processData, processInstanceJson);
-            if (checkFlowJson.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
-
             originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
             List<Property> globalParamList = processData.getGlobalParams();
             Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
