@@ -544,7 +544,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
     }
 
-    private int getNextVersion(List<ProcessDefinitionLog>  processDefinitionLogs){
+    private int getNextVersion(List<ProcessDefinitionLog>  processDefinitionLogs) {
         return processDefinitionLogs
                 .stream()
                 .map(ProcessDefinitionLog::getVersion)
