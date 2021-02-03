@@ -539,7 +539,7 @@ public class MasterExecThread implements Runnable {
                     Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
                     Object localParams = result.get("localParams");
                     if (localParams != null) {
-                        List<Property> allParam = JSONUtils.toList(String.valueOf(localParams), Property.class);
+                        List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
                         for (Property info : allParam) {
                             if (info.getDirect().equals(Direct.IN)) {
                                 String paramName = info.getProp();
@@ -979,6 +979,7 @@ public class MasterExecThread implements Runnable {
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
                     processInstance.setVarPool(task.getVarPool());
+                    processInstance = processService.findProcessInstanceById(processInstance.getId());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());

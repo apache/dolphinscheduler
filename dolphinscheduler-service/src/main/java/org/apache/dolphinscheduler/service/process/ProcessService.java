@@ -1559,7 +1559,7 @@ public class ProcessService {
         List<Property> params4Process = JSONUtils.toList(processInstance.getGlobalParams(), Property.class);
         Map<String, Property> allParamMap = params4Process.stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
 
-        List<Property> allParam = JSONUtils.toList(String.valueOf(localParams), Property.class);
+        List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
         for (Property info : allParam) {
             if (info.getDirect() == Direct.OUT) {
                 String paramName = info.getProp();
