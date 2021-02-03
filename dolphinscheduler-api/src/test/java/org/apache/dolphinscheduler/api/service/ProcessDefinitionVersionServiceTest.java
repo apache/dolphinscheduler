@@ -68,7 +68,7 @@ public class ProcessDefinitionVersionServiceTest {
                 .queryMaxVersionByProcessDefinitionId(processDefinition.getId()))
                 .thenReturn(expectedVersion);
 
-        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+        int version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
 
         Assert.assertEquals(expectedVersion + 1, version);
     }
