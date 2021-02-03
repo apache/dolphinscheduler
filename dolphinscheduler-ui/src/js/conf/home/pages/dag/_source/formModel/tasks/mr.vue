@@ -30,7 +30,7 @@
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
-      <div slot="text">{{$t('Main class')}}</div>
+      <div slot="text">{{$t('Main Class')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
@@ -42,7 +42,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Main package')}}</div>
+      <div slot="text">{{$t('Main Package')}}</div>
       <div slot="content">
         <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails"  :placeholder="$t('Please enter main package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
@@ -50,27 +50,27 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Command-line parameters')}}</div>
+      <div slot="text">{{$t('Main Arguments')}}</div>
       <div slot="content">
         <x-input
                 :autosize="{minRows:2}"
                 :disabled="isDetails"
                 type="textarea"
                 v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')"
+                :placeholder="$t('Please enter main arguments')"
                 autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Other parameters')}}</div>
+      <div slot="text">{{$t('Option Parameters')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
                 :autosize="{minRows:2}"
                 type="textarea"
                 v-model="others"
-                :placeholder="$t('Please enter other parameters')"
+                :placeholder="$t('Please enter option parameters')"
                 autocomplete="off">
         </x-input>
       </div>
@@ -125,9 +125,9 @@
         cacheResourceList: [],
         // Custom parameter
         localParams: [],
-        // Command line argument
+        // Main arguments
         mainArgs: '',
-        // Other parameters
+        // Option parameters
         others: '',
         // Program type
         programType: 'JAVA',
