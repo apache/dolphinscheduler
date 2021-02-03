@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.Locale;
@@ -30,12 +29,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.util.WebUtils;
 
 public class LocaleChangeInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        Cookie cookie = BaseService.getCookie(request, Constants.LOCALE_LANGUAGE);
+        Cookie cookie = WebUtils.getCookie(request, Constants.LOCALE_LANGUAGE);
         if (cookie != null) {
             // Proceed in cookie
             return true;
