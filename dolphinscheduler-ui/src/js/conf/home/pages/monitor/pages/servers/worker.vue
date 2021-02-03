@@ -94,6 +94,7 @@
     methods: {
       ...mapActions('monitor', ['getWorkerData']),
       _showZkDirectories (item) {
+        this.zkDirectories = []
         item.zkDirectories.forEach(zkDirectory => {
           this.zkDirectories.push({
             zkDirectory: zkDirectory
@@ -104,7 +105,6 @@
     },
     watch: {},
     created () {
-
     },
     mounted () {
       this.isLoading = true

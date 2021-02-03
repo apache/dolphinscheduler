@@ -25,8 +25,8 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links" :title="scope.row.name">
-                  {{scope.row.name}}
+                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links">
+                  <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
             </el-popover>
@@ -84,7 +84,6 @@
               <el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -130,6 +129,7 @@
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
+      v-if="startDialog"
       :visible.sync="startDialog"
       width="auto">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>

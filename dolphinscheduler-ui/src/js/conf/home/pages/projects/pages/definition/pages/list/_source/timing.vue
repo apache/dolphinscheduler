@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="clearfix list">
-      <el-button type="info"  style="margin-left:20px" size="small" round :loading="spinnerLoading" @click="preview()">{{$t('Execute time')}}</el-button>
+      <el-button type="primary"  style="margin-left:20px" size="small" round :loading="spinnerLoading" @click="preview()">{{$t('Execute time')}}</el-button>
       <div class="text">
         {{$t('Timing')}}
       </div>
@@ -115,15 +115,16 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Notification group')}}
+        {{$t('Alarm group')}}
       </div>
       <div class="cont">
         <el-select
           style="width: 200px;"
+          clearable
           size="small"
           :disabled="!notifyGroupList.length"
           v-model="warningGroupId">
-          <el-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
+          <el-input slot="trigger" readonly slot-scope="{ selectedModel }" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
             <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></em>
             <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId.id"></em>
           </el-input>

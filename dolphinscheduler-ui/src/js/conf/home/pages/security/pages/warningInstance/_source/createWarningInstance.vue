@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit Alarm Instance') : $t('Create Alarm Instance')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -40,7 +39,7 @@
           <template slot="content">
             <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" disabled="true" v-if="item.id">
               <el-option
-                      v-for="items in pulginInstance"
+                      v-for="items in pluginInstance"
                       :key="items.id"
                       :value="items.id"
                       :label="items.pluginName">
@@ -48,7 +47,7 @@
             </el-select>
             <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" v-else>
               <el-option
-                      v-for="items in pulginInstance"
+                      v-for="items in pluginInstance"
                       :key="items.id"
                       :value="items.id"
                       :label="items.pluginName">
@@ -56,19 +55,19 @@
             </el-select>
           </template>
         </m-list-box-f>
-        <div>
+        <div  class="alertForm">
           <template>
-            <div class="alertForm"><form-create v-model="$f" :rule="rule" :option="{submitBtn:false}" size="mini"></form-create></div>
+            <form-create v-model="$f" :rule="rule" :option="{submitBtn:false}" size="mini"></form-create>
           </template>
         </div>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -84,7 +83,7 @@
     },
     props: {
       item: Object,
-      pulginInstance: Array
+      pluginInstance: Array
     },
     methods: {
       _ok () {
@@ -122,7 +121,7 @@
           this.rule = JSON.parse(res.pluginParams)
           this.rule.forEach(item => {
             if (item.title.indexOf('$t') !== -1) {
-              item.title = $t(item.field)
+              item.title = this.$t(item.field)
             }
           })
         }).catch(e => {
@@ -142,16 +141,14 @@
           param.alertPluginInstanceId = this.item.id
           param.pluginDefineId = null
         }
-        this.$refs.popup.spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
         this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
       },
       close () {
@@ -166,7 +163,7 @@
         this.pluginDefineId = this.item.pluginDefineId
         JSON.parse(this.item.pluginInstanceParams).forEach(item => {
           if (item.title.indexOf('$t') !== -1) {
-            item.title = $t(item.field)
+            item.title = this.$t(item.field)
           }
           pluginInstanceParams.push(item)
         })
@@ -175,7 +172,7 @@
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">
@@ -184,6 +181,9 @@
       span {
         font-weight: 10!important;
       }
+    }
+    .el-row {
+      width: 520px;
     }
     .el-form-item__label {
       width: 144px!important;
