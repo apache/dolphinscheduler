@@ -359,15 +359,16 @@ public class ProcessInstanceService extends BaseDAGService {
                     processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
-        Date  schedule ;
-        schedule = processInstance.getScheduleTime();
+        Date schedule = null;
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
+        } else {
+            schedule = processInstance.getScheduleTime();
         }
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
         processInstance.setConnects(connects);
-        String globalParams;
+        String globalParams = null;
         String originDefParams = null;
         int timeout = processInstance.getTimeout();
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
@@ -391,18 +392,13 @@ public class ProcessInstanceService extends BaseDAGService {
             if(tenant != null){
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
-            // get the processinstancejson before saving,and then save the name and taskid
-            String oldJson = processInstance.getProcessInstanceJson();
-            if (StringUtils.isNotEmpty(oldJson)) {
-                processInstanceJson = processService.changeJson(processData,oldJson);
-            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
 
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
-        if (Boolean.TRUE.equals(syncDefine)) {
+        if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);

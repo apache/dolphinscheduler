@@ -36,13 +36,6 @@ public class ConditionsParameters extends AbstractParameters {
     private List<String> failedNode;
 
 
-    public String getConditionResult() {
-        return "{"
-                + "\"successNode\": [\"" + successNode.get(0)
-                + "\"],\"failedNode\": [\"" + failedNode.get(0)
-                + "\"]}";
-    }
-
     @Override
     public boolean checkParameters() {
         return true;
