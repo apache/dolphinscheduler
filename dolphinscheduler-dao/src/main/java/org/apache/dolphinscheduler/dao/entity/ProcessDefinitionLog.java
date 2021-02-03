@@ -61,7 +61,7 @@ public class ProcessDefinitionLog {
     /**
      * version
      */
-    private long version;
+    private int version;
 
     /**
      * release state : online/offline
@@ -166,6 +166,17 @@ public class ProcessDefinitionLog {
     private String modifyBy;
 
     /**
+     * warningGroupId
+     */
+    @TableField(exist = false)
+    private int warningGroupId;
+
+    /**
+     * connects array for web
+     */
+    private String connects;
+
+    /**
      * resource ids
      */
     private String resourceIds;
@@ -180,6 +191,22 @@ public class ProcessDefinitionLog {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
+
+    public int getWarningGroupId() {
+        return warningGroupId;
+    }
+
+    public void setWarningGroupId(int warningGroupId) {
+        this.warningGroupId = warningGroupId;
+    }
+
+    public String getConnects() {
+        return connects;
+    }
+
+    public void setConnects(String connects) {
+        this.connects = connects;
+    }
 
     public int getOperator() {
         return operator;
@@ -221,11 +248,11 @@ public class ProcessDefinitionLog {
         this.name = name;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
@@ -402,33 +429,35 @@ public class ProcessDefinitionLog {
 
     @Override
     public String toString() {
-        return "ProcessDefinitionLog{"
-                + "id=" + id
-                + ", code=" + code
-                + ", name='" + name + '\''
-                + ", version=" + version
-                + ", releaseState=" + releaseState
-                + ", projectCode=" + projectCode
-                + ", description='" + description + '\''
-                + ", globalParams='" + globalParams + '\''
-                + ", globalParamList=" + globalParamList
-                + ", globalParamMap=" + globalParamMap
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + ", flag=" + flag
-                + ", userId=" + userId
-                + ", userName='" + userName + '\''
-                + ", projectName='" + projectName + '\''
-                + ", locations='" + locations + '\''
-                + ", receivers='" + receivers + '\''
-                + ", receiversCc='" + receiversCc + '\''
-                + ", scheduleReleaseState=" + scheduleReleaseState
-                + ", timeout=" + timeout
-                + ", tenantId=" + tenantId
-                + ", modifyBy='" + modifyBy + '\''
-                + ", resourceIds='" + resourceIds + '\''
-                + ", operator=" + operator
-                + ", operateTime=" + operateTime
-                + '}';
+        return "ProcessDefinitionLog{" +
+                "id=" + id +
+                ", code=" + code +
+                ", name='" + name + '\'' +
+                ", version=" + version +
+                ", releaseState=" + releaseState +
+                ", projectCode=" + projectCode +
+                ", description='" + description + '\'' +
+                ", globalParams='" + globalParams + '\'' +
+                ", globalParamList=" + globalParamList +
+                ", globalParamMap=" + globalParamMap +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", flag=" + flag +
+                ", userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", projectName='" + projectName + '\'' +
+                ", locations='" + locations + '\'' +
+                ", receivers='" + receivers + '\'' +
+                ", receiversCc='" + receiversCc + '\'' +
+                ", scheduleReleaseState=" + scheduleReleaseState +
+                ", timeout=" + timeout +
+                ", tenantId=" + tenantId +
+                ", modifyBy='" + modifyBy + '\'' +
+                ", warningGroupId=" + warningGroupId +
+                ", connects='" + connects + '\'' +
+                ", resourceIds='" + resourceIds + '\'' +
+                ", operator=" + operator +
+                ", operateTime=" + operateTime +
+                '}';
     }
 }
