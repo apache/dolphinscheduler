@@ -162,11 +162,39 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 用户数据目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler`。
 
+**`RESOURCE_STORAGE_TYPE`**
+
+配置`dolphinscheduler`的资源存储类型，可选项为 `HDFS`、`S3`、`NONE`，默认值 `HDFS`。
+
+**`RESOURCE_UPLOAD_PATH`**
+
+配置`HDFS/S3`上的资源存储路径，默认值 `/dolphinscheduler`。
+
+**`FS_DEFAULT_FS`**
+
+配置资源存储的文件系统协议，如 `file:///`, `hdfs://mycluster:8020` or `s3a://dolphinscheduler`，默认值 `file:///`。
+
+**`FS_S3A_ENDPOINT`**
+
+当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的访问路径，默认值 `s3.xxx.amazonaws.com`。
+
+**`FS_S3A_ACCESS_KEY`**
+
+当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的`s3 access key`，默认值 `xxxxxxx`。
+
+**`FS_S3A_SECRET_KEY`**
+
+当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的`s3 secret key`，默认值 `xxxxxxx`。
+
 **`ZOOKEEPER_QUORUM`**
 
 配置`master-server`和`worker-serverr`的`Zookeeper`地址, 默认值 `127.0.0.1:2181`。
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`ZOOKEEPER_ROOT`**
+
+配置`dolphinscheduler`在`zookeeper`中数据存储的根目录，默认值 `/dolphinscheduler`。
 
 **`MASTER_EXEC_THREADS`**
 
@@ -207,10 +235,6 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 **`WORKER_HEARTBEAT_INTERVAL`**
 
 配置`worker-server`中的心跳交互时间，默认值 `10`。
-
-**`WORKER_FETCH_TASK_NUM`**
-
-配置`worker-server`中的获取任务的数量，默认值 `3`。
 
 **`WORKER_MAX_CPULOAD_AVG`**
 

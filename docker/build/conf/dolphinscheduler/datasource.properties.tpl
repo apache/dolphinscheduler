@@ -15,14 +15,11 @@
 # limitations under the License.
 #
 
-# db
+# postgresql
 spring.datasource.driver-class-name=${DATABASE_DRIVER}
 spring.datasource.url=jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}?${DATABASE_PARAMS}
 spring.datasource.username=${DATABASE_USERNAME}
 spring.datasource.password=${DATABASE_PASSWORD}
-
-## base spring data source configuration todo need to remove
-#spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
 
 # connection configuration
 #spring.datasource.initialSize=5
