@@ -17,21 +17,23 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_EMPTY_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
-
-import static java.util.stream.Collectors.toSet;
-
+import com.cronutils.model.Cron;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;import org.apache.dolphinscheduler.common.model.DateInterval;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.CycleEnum;
+import org.apache.dolphinscheduler.common.enums.Direct;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
@@ -73,10 +75,6 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +82,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cronutils.model.Cron;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * process relative dao that some mappers in this.
@@ -669,7 +681,7 @@ public class ProcessService {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
                 // Recalculate global parameters after rerun.
                 //if the CommandType is start from fail task note,the globalparam can't be cover
-                if(commandType != CommandType.START_FAILURE_TASK_PROCESS){
+                if(commandType!=CommandType.START_FAILURE_TASK_PROCESS){
                     processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                             processDefinition.getGlobalParamMap(),
                             processDefinition.getGlobalParamList(),
@@ -1536,8 +1548,8 @@ public class ProcessService {
         changeOutParam(result,taskInstance);
         saveTaskInstance(taskInstance);
     }
-    private void changeOutParam(String result,TaskInstance taskInstance) {
-        if (StringUtils.isEmpty(result)) {
+    private void changeOutParam(String result,TaskInstance taskInstance){
+        if (StringUtils.isEmpty(result)){
             return;
         }
         List<Map<String, String>> workerResultParam = getListMapByString(result);
@@ -1546,13 +1558,13 @@ public class ProcessService {
         }
         //if the result more than one line,just get the first .
         Map<String, String> row = workerResultParam.get(0);
-        if(row == null || row.size() == 0){
+        if(row==null||row.size()==0){
             return;
         }
         TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(),TaskNode.class);
         Map<String,Object> taskParams = JSONUtils.toMap(taskNode.getParams(),String.class,Object.class);
         Object localParams = taskParams.get("localParams");
-        if(localParams == null){
+        if(localParams==null){
             return;
         }
         ProcessInstance processInstance = this.processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId());
@@ -1593,7 +1605,7 @@ public class ProcessService {
         List<Map<String, String>> result1 = new ArrayList<>();
         ArrayNode result = JSONUtils.parseArray(json);
         Iterator<JsonNode> listIterator = result.iterator();
-        while (listIterator.hasNext()){
+        while(listIterator.hasNext()){
             Map<String, String> ii = JSONUtils.toMap(listIterator.next().toString(),String.class,String.class);
             result1.add(ii);
         }
