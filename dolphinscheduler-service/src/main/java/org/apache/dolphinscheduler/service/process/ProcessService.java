@@ -1567,13 +1567,20 @@ public class ProcessService {
                 if (property == null) {
                     continue;
                 }
-                String value = info.getValue();
+                String value = row.get(paramName);
                 if (StringUtils.isNotEmpty(value)) {
                     property.setValue(value);
+                    info.setValue(value);
                 }
             }
         }
-        this.processInstanceMapper.updateGlobalParamById(JSONUtils.toJsonString(params4Process),processInstance.getId());
+        taskParams.put("localParams", allParam);
+        taskNode.setParams(JSONUtils.toJsonString(taskParams));
+        // task instance node json
+        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+        String params4ProcessString = JSONUtils.toJsonString(params4Process);
+        int i = this.processInstanceMapper.updateGlobalParamById(params4ProcessString,processInstance.getId());
+        logger.info("i:{}, params4Process:{}, processInstanceId:{}", i, params4ProcessString, processInstance.getId());
     }
 
     public static void main(String[] args) {
