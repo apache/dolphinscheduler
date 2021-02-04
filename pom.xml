@@ -563,18 +563,21 @@
                 <groupId>org.sonatype.aether</groupId>
                 <artifactId>aether-api</artifactId>
                 <version>1.13.1</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>io.airlift.resolver</groupId>
                 <artifactId>resolver</artifactId>
                 <version>1.5</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>6.2.1</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
