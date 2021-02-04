@@ -48,6 +48,6 @@ public class DolphinPluginLoaderTest {
             throw new RuntimeException("load Alert Plugin Failed !", e);
         }
 
-        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("email alert"));
+        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
     }
 }
