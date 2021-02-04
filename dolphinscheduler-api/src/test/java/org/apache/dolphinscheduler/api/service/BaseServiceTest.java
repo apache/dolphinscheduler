@@ -94,20 +94,6 @@ public class BaseServiceTest {
         baseService.putMsg(result,Status.PROJECT_NOT_FOUNT,"test");
     }
     @Test
-    public void testGetCookie(){
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockCookie mockCookie = new MockCookie("userId","1");
-        request.setCookies(mockCookie);
-        //cookie is not null
-        Cookie cookie = BaseService.getCookie(request,"userId");
-        Assert.assertNotNull(cookie);
-        //cookie is null
-        cookie = BaseService.getCookie(request,"userName");
-        Assert.assertNull(cookie);
-
-    }
-    @Test
     public void testCreateTenantDirIfNotExists(){
 
         PowerMockito.mockStatic(HadoopUtils.class);

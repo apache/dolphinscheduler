@@ -480,7 +480,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             // check whether the new process define name exist
             ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getId(), name);
             if (definition != null) {
-                putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+                putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }
         }
@@ -575,7 +575,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
         }
         return result;
     }
