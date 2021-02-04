@@ -278,8 +278,8 @@ public class SqlTask extends AbstractTask {
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
                 String updateResult = String.valueOf(stmt.executeUpdate());
-                for(Property info :properties){
-                    if(Direct.OUT == info.getDirect()){
+                for (Property info :properties) {
+                    if (Direct.OUT == info.getDirect()) {
                         List<Map<String,String>> updateRL = new ArrayList<>();
                         Map<String,String> updateRM = new HashMap<>();
                         updateRM.put(info.getProp(),updateResult);
