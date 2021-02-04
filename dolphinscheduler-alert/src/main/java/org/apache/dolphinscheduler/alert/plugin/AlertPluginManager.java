@@ -56,7 +56,6 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
      */
     private final Map<Integer, String> pluginDefineMap = new HashMap<>();
 
-    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
     private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     private void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
