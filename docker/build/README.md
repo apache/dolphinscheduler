@@ -162,11 +162,39 @@ This environment variable sets the runtime environment for task. The default val
 
 User data directory path, self configuration, please make sure the directory exists and have read write permissions. The default value is `/tmp/dolphinscheduler`
 
+**`RESOURCE_STORAGE_TYPE`**
+
+This environment variable sets resource storage type for dolphinscheduler like `HDFS`, `S3`, `NONE`. The default value is `HDFS`.
+
+**`RESOURCE_UPLOAD_PATH`**
+
+This environment variable sets resource store path on HDFS/S3 for resource storage. The default value is `/dolphinscheduler`.
+
+**`FS_DEFAULT_FS`**
+
+This environment variable sets fs.defaultFS for resource storage like `file:///`, `hdfs://mycluster:8020` or `s3a://dolphinscheduler`. The default value is `file:///`.
+
+**`FS_S3A_ENDPOINT`**
+
+This environment variable sets s3 endpoint for resource storage. The default value is `s3.xxx.amazonaws.com`.
+
+**`FS_S3A_ACCESS_KEY`**
+
+This environment variable sets s3 access key for resource storage. The default value is `xxxxxxx`.
+
+**`FS_S3A_SECRET_KEY`**
+
+This environment variable sets s3 secret key for resource storage. The default value is `xxxxxxx`.
+
 **`ZOOKEEPER_QUORUM`**
 
 This environment variable sets zookeeper quorum for `master-server` and `worker-serverr`. The default value is `127.0.0.1:2181`.
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`.
+
+**`ZOOKEEPER_ROOT`**
+
+This environment variable sets zookeeper root directory for dolphinscheduler. The default value is `/dolphinscheduler`.
 
 **`MASTER_EXEC_THREADS`**
 
@@ -207,10 +235,6 @@ This environment variable sets exec thread num for `worker-server`. The default 
 **`WORKER_HEARTBEAT_INTERVAL`**
 
 This environment variable sets heartbeat interval for `worker-server`. The default value is `10`.
-
-**`WORKER_FETCH_TASK_NUM`**
-
-This environment variable sets fetch task num for `worker-server`. The default value is `3`.
 
 **`WORKER_MAX_CPULOAD_AVG`**
 

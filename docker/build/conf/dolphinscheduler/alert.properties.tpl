@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 #alert type is EMAIL/SMS
 alert.type=EMAIL
 
-# alter msg template, default is html template
-#alert.template=html
 # mail server configuration
 mail.protocol=SMTP
 mail.server.host=${MAIL_SERVER_HOST}
@@ -46,5 +45,4 @@ enterprise.wechat.push.url=https://qyapi.weixin.qq.com/cgi-bin/message/send?acce
 enterprise.wechat.team.send.msg={\"toparty\":\"$toParty\",\"agentid\":\"$agentId\",\"msgtype\":\"text\",\"text\":{\"content\":\"$msg\"},\"safe\":\"0\"}
 enterprise.wechat.user.send.msg={\"touser\":\"$toUser\",\"agentid\":\"$agentId\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"$msg\"}}
 
-
-
+plugin.dir=/Users/xx/your/path/to/plugin/dir
