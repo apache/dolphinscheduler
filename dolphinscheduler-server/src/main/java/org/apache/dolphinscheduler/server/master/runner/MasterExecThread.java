@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DependResult;
@@ -54,6 +55,7 @@ import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +76,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 /**
  * master exec thread,split dag
@@ -539,7 +546,7 @@ public class MasterExecThread implements Runnable {
             }
             //get process global
             String globalParams = this.processInstance.getGlobalParams();
-            if (StringUtils.isNotEmpty(globalParams)){
+            if (StringUtils.isNotEmpty(globalParams)) {
                 Map<String, String> globalMap = getGlobalParamMap(globalParams);
                 if (globalMap != null) {
                     // the param save in localParams
@@ -568,7 +575,6 @@ public class MasterExecThread implements Runnable {
         }
         return taskInstance;
     }
-
 
     public Map<String, String> getGlobalParamMap(String globalParams) {
         List<Property> propList;
