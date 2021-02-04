@@ -31,7 +31,7 @@ public interface ProcessDefinitionVersionService {
      * @param processDefinition the process definition that need to record version
      * @return the newest version number of this process definition
      */
-    long addProcessDefinitionVersion(ProcessDefinition processDefinition);
+    int addProcessDefinitionVersion(ProcessDefinition processDefinition);
 
     /**
      * query the pagination versions info by one certain process definition id

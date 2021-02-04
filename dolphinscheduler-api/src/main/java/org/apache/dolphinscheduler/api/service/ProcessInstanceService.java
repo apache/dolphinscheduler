@@ -479,7 +479,7 @@ public class ProcessInstanceService extends BaseService {
             processDefinition.setUpdateTime(new Date());
 
             // add process definition version
-            long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+            int version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
             processDefinition.setVersion(version);
             updateDefine = processDefineMapper.updateById(processDefinition);
         }
