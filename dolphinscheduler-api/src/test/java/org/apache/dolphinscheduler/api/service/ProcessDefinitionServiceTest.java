@@ -657,7 +657,7 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processDefineMapper.verifyByDefineName(project.getId(), "test_pdf")).thenReturn(getProcessDefinition());
         Map<String, Object> processExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
                 "project_test1", "test_pdf");
-        Assert.assertEquals(Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, processExistRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));
     }
 
     @Test
@@ -969,7 +969,7 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
-        Mockito.when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1L);
+        Mockito.when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1);
 
         String sqlDependentJson = "{\n"
                 + "    \"globalParams\": [\n"

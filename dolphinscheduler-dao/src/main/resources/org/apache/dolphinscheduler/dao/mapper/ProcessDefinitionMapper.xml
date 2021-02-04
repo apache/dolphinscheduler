@@ -44,6 +44,18 @@
         from t_ds_process_definition
         where code = #{code}
     </select>
+    <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition
+        where 1 = 1
+        <if test="codes != null and codes.length != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
 
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.description,
