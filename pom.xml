@@ -353,13 +353,15 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-                <scope>test</scope>
+                <!--<scope>test</scope>-->
             </dependency>
+
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -987,8 +989,14 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+                        <include>**/data/quality/configuration/ConfigurationParserTest.java</include>
+                        <include>**/data/quality/flow/connector/ConnectorFactoryTest.java</include>
+                        <include>**/data/quality/flow/connector/JdbcConnectorTest.java</include>
+                        <include>**/data/quality/flow/writer/WriterFactoryTest.java</include>
+                        <include>**/data/quality/flow/writer/JdbcWriterTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
+
                 </configuration>
             </plugin>
 
@@ -1105,5 +1113,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-data-quality</module>
     </modules>
 </project>
