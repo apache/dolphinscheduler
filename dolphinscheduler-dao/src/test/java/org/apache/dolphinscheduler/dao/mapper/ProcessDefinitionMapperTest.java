@@ -358,7 +358,7 @@ public class ProcessDefinitionMapperTest {
 
     @Test
     public void testUpdateVersionByProcessDefinitionId() {
-        long expectedVersion = 10;
+        int expectedVersion = 10;
         ProcessDefinition processDefinition = insertOne();
         processDefinition.setVersion(expectedVersion);
         processDefinitionMapper.updateVersionByProcessDefinitionId(

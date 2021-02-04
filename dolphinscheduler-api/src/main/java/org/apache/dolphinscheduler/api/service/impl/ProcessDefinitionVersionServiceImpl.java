@@ -61,7 +61,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
      * @param processDefinition the process definition that need to record version
      * @return the newest version number of this process definition
      */
-    public long addProcessDefinitionVersion(ProcessDefinition processDefinition) {
+    public int addProcessDefinitionVersion(ProcessDefinition processDefinition) {
 
         long version = this.queryMaxVersionByProcessDefinitionId(processDefinition.getId()) + 1;
 
@@ -82,7 +82,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
 
         processDefinitionVersionMapper.insert(processDefinitionVersion);
 
-        return version;
+        return Integer.parseInt(String.valueOf(version));
     }
 
     /**

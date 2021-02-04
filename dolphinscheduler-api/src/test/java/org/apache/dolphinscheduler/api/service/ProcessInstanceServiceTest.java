@@ -369,7 +369,7 @@ public class ProcessInstanceServiceTest {
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
-        when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1L);
+        when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
