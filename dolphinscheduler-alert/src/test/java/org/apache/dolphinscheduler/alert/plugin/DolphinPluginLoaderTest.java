@@ -20,10 +20,9 @@ package org.apache.dolphinscheduler.alert.plugin;
 import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
 
-import org.junit.After;
+import java.util.Objects;
+
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -31,25 +30,16 @@ import com.google.common.collect.ImmutableList;
 /**
  * DolphinPluginLoader Tester.
  */
-@Ignore
 public class DolphinPluginLoaderTest {
-
-    @Before
-    public void before() throws Exception {
-    }
-
-    @After
-    public void after() throws Exception {
-    }
 
     /**
      * Method: loadPlugins()
      */
     @Test
-    public void testLoadPlugins() throws Exception {
+    public void testLoadPlugins() {
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
-        String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
+        String path = Objects.requireNonNull(DolphinPluginLoader.class.getClassLoader().getResource("")).getPath();
         alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
         DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
         try {
