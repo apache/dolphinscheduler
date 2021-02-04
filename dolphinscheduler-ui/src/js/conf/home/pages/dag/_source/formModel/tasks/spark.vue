@@ -50,7 +50,7 @@
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
-      <div slot="text">{{$t('Main class')}}</div>
+      <div slot="text">{{$t('Main Class')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
@@ -62,7 +62,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Main package')}}</div>
+      <div slot="text">{{$t('Main Package')}}</div>
       <div slot="content">
         <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
@@ -81,89 +81,89 @@
     </m-list-box>
     <div class="list-box-4p">
       <div class="clearfix list">
-        <span class="sp1">{{$t('Driver core number')}}</span>
+        <span class="sp1">{{$t('Driver Cores')}}</span>
         <span class="sp2">
           <x-input
                   :disabled="isDetails"
                   type="input"
                   v-model="driverCores"
-                  :placeholder="$t('Please enter driver core number')"
+                  :placeholder="$t('Please enter Driver cores')"
                   style="width: 200px;"
                   autocomplete="off">
         </x-input>
         </span>
-        <span class="sp1 sp3">{{$t('Driver memory use')}}</span>
+        <span class="sp1 sp3">{{$t('Driver Memory')}}</span>
         <span class="sp2">
           <x-input
                   :disabled="isDetails"
                   type="input"
                   v-model="driverMemory"
-                  :placeholder="$t('Please enter driver memory use')"
+                  :placeholder="$t('Please enter Driver memory')"
                   style="width: 186px;"
                   autocomplete="off">
         </x-input>
         </span>
       </div>
       <div class="clearfix list">
-        <span class="sp1">{{$t('Number of Executors')}}</span>
-        <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="numExecutors"
-                  :placeholder="$t('Please enter the number of Executor')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
-        </span>
-        <span class="sp1 sp3">{{$t('Executor memory')}}</span>
-        <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="executorMemory"
-                  :placeholder="$t('Please enter the Executor memory')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
-        </span>
-      </div>
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Executor core number')}}</span>
+        <span class="sp1">{{$t('Executor Cores')}}</span>
         <span class="sp2">
           <x-input
                   :disabled="isDetails"
                   type="input"
                   v-model="executorCores"
-                  :placeholder="$t('Please enter Executor core number')"
+                  :placeholder="$t('Please enter Executor cores')"
                   style="width: 200px;"
                   autocomplete="off">
           </x-input>
         </span>
+        <span class="sp1 sp3">{{$t('Executor Memory')}}</span>
+        <span class="sp2">
+          <x-input
+                  :disabled="isDetails"
+                  type="input"
+                  v-model="executorMemory"
+                  :placeholder="$t('Please enter Executor memory')"
+                  style="width: 186px;"
+                  autocomplete="off">
+        </x-input>
+        </span>
+      </div>
+      <div class="clearfix list">
+        <span class="sp1">{{$t('Executor Number')}}</span>
+        <span class="sp2">
+          <x-input
+                  :disabled="isDetails"
+                  type="input"
+                  v-model="numExecutors"
+                  :placeholder="$t('Please enter Executor number')"
+                  style="width: 200px;"
+                  autocomplete="off">
+        </x-input>
+        </span>
       </div>
     </div>
     <m-list-box>
-      <div slot="text">{{$t('Command-line parameters')}}</div>
+      <div slot="text">{{$t('Main Arguments')}}</div>
       <div slot="content">
         <x-input
                 :autosize="{minRows:2}"
                 :disabled="isDetails"
                 type="textarea"
                 v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')"
+                :placeholder="$t('Please enter main arguments')"
                 autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Other parameters')}}</div>
+      <div slot="text">{{$t('Option Parameters')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
                 :autosize="{minRows:2}"
                 type="textarea"
                 v-model="others"
-                :placeholder="$t('Please enter other parameters')">
+                :placeholder="$t('Please enter option parameters')">
         </x-input>
       </div>
     </m-list-box>
@@ -231,19 +231,19 @@
         cacheResourceList: [],
         // Custom function
         localParams: [],
-        // Driver Number of cores
+        // Driver cores
         driverCores: 1,
-        // Driver Number of memory
+        // Driver memory
         driverMemory: '512M',
-        // Executor Number
+        // Executor number
         numExecutors: 2,
-        // Executor Number of memory
+        // Executor memory
         executorMemory: '2G',
-        // Executor Number of cores
+        // Executor cores
         executorCores: 2,
-        // Command line argument
+        // Main arguments
         mainArgs: '',
-        // Other parameters
+        // Option parameters
         others: '',
         // Program type
         programType: 'SCALA',
@@ -394,8 +394,53 @@
           return false
         }
 
+        if (!this.driverCores) {
+          this.$message.warning(`${i18n.$t('Please enter Driver cores')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.driverCores))) {
+          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
+          return false
+        }
+
+        if (!this.driverMemory) {
+          this.$message.warning(`${i18n.$t('Please enter Driver memory')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.driverMemory))) {
+          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
+          return false
+        }
+
+        if (!this.executorCores) {
+          this.$message.warning(`${i18n.$t('Please enter Executor cores')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.executorCores))) {
+          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
+          return false
+        }
+
+        if (!this.executorMemory) {
+          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.executorMemory))) {
+          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
+          return false
+        }
+
         if (!this.numExecutors) {
-          this.$message.warning(`${i18n.$t('Please enter the number of Executor')}`)
+          this.$message.warning(`${i18n.$t('Please enter Executor number')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.numExecutors))) {
+          this.$message.warning(`${i18n.$t('The Executor number should be a positive integer')}`)
           return false
         }
 
@@ -405,35 +450,6 @@
           return false
         }
 
-        if (!Number.isInteger(parseInt(this.numExecutors))) {
-          this.$message.warning(`${i18n.$t('The number of Executors should be a positive integer')}`)
-          return false
-        }
-
-        if (!this.executorMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
-          return false
-        }
-
-        if (!this.executorMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
-          return false
-        }
-
-        if (!_.isNumber(parseInt(this.executorMemory))) {
-          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
-          return false
-        }
-
-        if (!this.executorCores) {
-          this.$message.warning(`${i18n.$t('Please enter ExecutorPlease enter Executor core number')}`)
-          return false
-        }
-
-        if (!Number.isInteger(parseInt(this.executorCores))) {
-          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
-          return false
-        }
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
