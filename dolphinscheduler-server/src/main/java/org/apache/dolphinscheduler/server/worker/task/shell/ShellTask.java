@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.shell;
 
-import static java.util.Calendar.DAY_OF_MONTH;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Direct;
@@ -34,6 +32,7 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -44,7 +43,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 
-import org.slf4j.Logger;
+import static java.util.Calendar.DAY_OF_MONTH;
 
 /**
  * shell task
@@ -183,12 +182,12 @@ public class ShellTask extends AbstractTask {
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }
 
-    public void setResultString(String result){
+    public void setResultString(String result) {
         Map<String, Property> localParams = shellParameters.getLocalParametersMap();
         List<Map<String, String>> outProperties = new ArrayList<>();
         Map<String, String> p = new HashMap<>();
-        localParams.forEach((k ,v) ->{
-            if(v.getDirect() == Direct.OUT){
+        localParams.forEach((k,v) -> {
+            if (v.getDirect() == Direct.OUT) {
                 p.put(k, result);
             }
         });
