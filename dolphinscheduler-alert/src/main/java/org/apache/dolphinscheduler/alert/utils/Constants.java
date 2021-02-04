@@ -44,6 +44,7 @@ public class Constants {
     public static final String ZOOKEEPER_DIGEST = "zookeeper.connection.digest";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERTS = "/lock/alerts";
     public static final String ZOOKEEPER_ROOT = "zookeeper.dolphinscheduler.root";
+    public static final String ZOOKEEPER_ABNORMAL_TOLERATING_NUMBER = "zookeeper.abnormal.tolerating.number";
 
     private Constants() {
         throw new IllegalStateException("Constants class");
