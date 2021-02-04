@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +51,12 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
 
+    /**
+     * k->pluginDefineId v->pluginDefineName
+     */
+    private final Map<Integer, String> pluginDefineMap = new HashMap<>();
+
+    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
     private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     private void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
@@ -88,6 +95,10 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
         return alertChannelMap;
     }
 
+    public String getPluginNameById(int id) {
+        return pluginDefineMap.get(id);
+    }
+
     @Override
     public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
         for (AlertChannelFactory alertChannelFactory : dolphinSchedulerPlugin.getAlertChannelFactorys()) {
@@ -98,7 +109,8 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
             PluginDefine pluginDefine = new PluginDefine(nameEn, PluginType.ALERT.getDesc(), paramsJson);
-            pluginDao.addOrUpdatePluginDefine(pluginDefine);
+            int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
+            pluginDefineMap.put(id, pluginDefine.getPluginName());
         }
     }
 }

@@ -138,7 +138,7 @@ public class EmailAlertPluginTest {
         alertPluginInstance.setPluginInstanceParams(getEmailAlertParams());
         alertDao.getAlertPluginInstanceMapper().insert(alertPluginInstance);
 
-        AlertSender alertSender = new AlertSender(alertList, alertDao, alertPluginManager, pluginDao);
+        AlertSender alertSender = new AlertSender(alertList, alertDao, alertPluginManager);
         alertSender.run();
 
         Alert alertResult = alertDao.getAlertMapper().selectById(alert1.getId());

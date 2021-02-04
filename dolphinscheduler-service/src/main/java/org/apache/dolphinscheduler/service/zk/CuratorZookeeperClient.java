@@ -14,9 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
+
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
@@ -25,17 +30,15 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 /**
  * Shared Curator zookeeper client
@@ -48,7 +51,6 @@ public class CuratorZookeeperClient implements InitializingBean {
     private ZookeeperConfig zookeeperConfig;
 
     private CuratorFramework zkClient;
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -91,7 +93,7 @@ public class CuratorZookeeperClient implements InitializingBean {
             zkClient.blockUntilConnected(30, TimeUnit.SECONDS);
 
         } catch (final Exception ex) {
-            throw new RuntimeException(ex);
+            throw new ServiceException(ex);
         }
         return zkClient;
     }

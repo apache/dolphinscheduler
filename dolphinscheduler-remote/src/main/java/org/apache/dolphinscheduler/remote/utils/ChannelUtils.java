@@ -14,43 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.remote.utils;
 
-import io.netty.channel.Channel;
+package org.apache.dolphinscheduler.remote.utils;
 
 import java.net.InetSocketAddress;
 
+import io.netty.channel.Channel;
+
 /**
- *  channel utils
+ * channel utils
  */
 public class ChannelUtils {
 
+    private ChannelUtils() {
+        throw new IllegalStateException(ChannelUtils.class.getName());
+    }
+
     /**
-     *  get local address
+     * get local address
      *
      * @param channel channel
      * @return local address
      */
-    public static String getLocalAddress(Channel channel){
-        return ((InetSocketAddress)channel.localAddress()).getAddress().getHostAddress();
+    public static String getLocalAddress(Channel channel) {
+        return ((InetSocketAddress) channel.localAddress()).getAddress().getHostAddress();
     }
 
     /**
-     *  get remote address
+     * get remote address
+     *
      * @param channel channel
      * @return remote address
      */
-    public static String getRemoteAddress(Channel channel){
-        return ((InetSocketAddress)channel.remoteAddress()).getAddress().getHostAddress();
+    public static String getRemoteAddress(Channel channel) {
+        return ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
     }
 
     /**
-     *  channel to address
+     * channel to address
+     *
      * @param channel channel
      * @return address
      */
-    public static Host toAddress(Channel channel){
-        InetSocketAddress socketAddress = ((InetSocketAddress)channel.remoteAddress());
+    public static Host toAddress(Channel channel) {
+        InetSocketAddress socketAddress = ((InetSocketAddress) channel.remoteAddress());
         return new Host(socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
     }
 
