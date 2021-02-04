@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -159,7 +160,7 @@ public class SqlTask extends AbstractTask {
                     logger);
 
             // execute sql task
-            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs, sqlParameters.getLocalParams());
 
             setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
 
@@ -248,7 +249,8 @@ public class SqlTask extends AbstractTask {
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
-                                  List<String> createFuncs) {
+                                  List<String> createFuncs,
+                                  List<Property> properties) {
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
@@ -266,18 +268,30 @@ public class SqlTask extends AbstractTask {
             preSql(connection, preStatementsBinds);
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
 
+            String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
                 resultSet = stmt.executeQuery();
-                resultProcess(resultSet);
+                result = resultProcess(resultSet);
 
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
-                stmt.executeUpdate();
+                String updateResult = String.valueOf(stmt.executeUpdate());
+                for(Property info :properties){
+                    if(Direct.OUT == info.getDirect()){
+                        List<Map<String,String>> updateRL = new ArrayList<>();
+                        Map<String,String> updateRM = new HashMap<>();
+                        updateRM.put(info.getProp(),updateResult);
+                        updateRL.add(updateRM);
+                        result = JSONUtils.toJsonString(updateRL);
+                        break;
+                    }
+                }
             }
 
             postSql(connection, postStatementsBinds);
+            this.setResultString(result);
 
         } catch (Exception e) {
             logger.error("execute sql error", e);
@@ -293,7 +307,7 @@ public class SqlTask extends AbstractTask {
      * @param resultSet resultSet
      * @throws Exception Exception
      */
-    private void resultProcess(ResultSet resultSet) throws Exception {
+    private String resultProcess(ResultSet resultSet) throws Exception {
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
@@ -313,6 +327,7 @@ public class SqlTask extends AbstractTask {
 
         sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
                 JSONUtils.toJsonString(resultJSONArray));
+        return result;
     }
 
     /**

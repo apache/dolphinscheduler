@@ -219,5 +219,7 @@
         </foreach>
         order by id asc
     </select>
-
+    <update id="updateGlobalParamById" >
+            update t_ds_process_instance set global_params = #{globalParams} where id = #{id}
+    </update>
 </mapper>

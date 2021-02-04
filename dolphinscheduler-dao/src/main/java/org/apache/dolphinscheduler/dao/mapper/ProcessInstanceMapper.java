@@ -221,4 +221,5 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
             @Param("processDefinitionId") int processDefinitionId,
             @Param("states") int[] states);
 
+    int updateGlobalParamById(@Param("globalParams") String globalParams,@Param("id")  int id);
 }

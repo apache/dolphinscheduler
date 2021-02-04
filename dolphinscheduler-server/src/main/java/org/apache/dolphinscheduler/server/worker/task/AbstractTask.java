@@ -176,6 +176,10 @@ public abstract class AbstractTask {
         return resultString;
     }
 
+    public void setResultString(String resultString) {
+        this.resultString = resultString;
+    }
+
     /**
      * get task parameters
      *
