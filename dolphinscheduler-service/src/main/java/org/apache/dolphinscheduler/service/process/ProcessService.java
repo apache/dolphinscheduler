@@ -1200,10 +1200,10 @@ public class ProcessService {
      */
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
         ExecutionStatus state = taskInstance.getState();
+        // running, delayed or killed
+        // the task already exists in task queue
+        // return state
         if (
-            // running, delayed or killed
-            // the task already exists in task queue
-            // return state
                 state == ExecutionStatus.RUNNING_EXECUTION
                         || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
