@@ -124,8 +124,6 @@ public class AlertServer {
      */
     private void runSender() {
 
-        ZookeeperClient zookeeperClient = new ZookeeperClient();
-        zookeeperClient.init();
         while (Stopper.isRunning()) {
             try {
                 Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
@@ -136,35 +134,30 @@ public class AlertServer {
             if (alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
                 logger.warn("No Alert Plugin . Can not send alert info. ");
             } else {
-                if (zookeeperClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
-                    InterProcessMutex mutex = null;
-                    try {
-                        mutex = zookeeperClient.getAlertLockPath();
-                        mutex.acquire();
-                        List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                        alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
-                        alertSender.run();
-                        zookeeperStateAbnormalToleratingNumber = 0;
-                    } catch (Exception e) {
-                        logger.error("alert server with error : ", e);
-                    } finally {
-                        zookeeperClient.release(mutex);
-
-                    }
-                } else {
-                    try {
-                        if (zookeeperStateAbnormalToleratingNumber > zookeeperClient.checkZkStateAbnormalToleratingNumber()) {
+                try {
+                    ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
+                        @Override
+                        public void handle() {
                             List<Alert> alerts = alertDao.listWaitExecutionAlert();
                             alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
                             alertSender.run();
                             zookeeperStateAbnormalToleratingNumber = 0;
-                        } else {
-                            zookeeperStateAbnormalToleratingNumber++;
                         }
-                    } catch (Exception e) {
-                        logger.error("alert server with error : ", e);
-                    }
+                    });
+                } catch (Exception e) {
+                    logger.error("alert server with error : ", e);
+                    e.printStackTrace();
                 }
+
+                if (zookeeperStateAbnormalToleratingNumber > ZookeeperClient.checkZkStateAbnormalToleratingNumber()) {
+                    List<Alert> alerts = alertDao.listWaitExecutionAlert();
+                    alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
+                    alertSender.run();
+                    zookeeperStateAbnormalToleratingNumber = 0;
+                } else {
+                    zookeeperStateAbnormalToleratingNumber++;
+                }
+
             }
         }
     }

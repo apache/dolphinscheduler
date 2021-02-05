@@ -36,12 +36,6 @@ public class Constants {
     public static final int ALERT_SCAN_INTERVAL = 5000;
 
     public static final String ZOOKEEPER_LIST = "zookeeper.quorum";
-    public static final String ZOOKEEPER_BASE_SLEEP_TIME_MS = "zookeeper.retry.base.sleep";
-    public static final String ZOOKEEPER_MAX_SLEEP_MS = "zookeeper.retry.max.sleep";
-    public static final String ZOOKEEPER_MAX_RETRY = "zookeeper.retry.maxtime";
-    public static final String ZOOKEEPER_SESSION_TIMEOUT_MS = "zookeeper.session.timeout";
-    public static final String ZOOKEEPER_CONNECTION_TIMEOUT_MS = "zookeeper.connection.timeout";
-    public static final String ZOOKEEPER_DIGEST = "zookeeper.connection.digest";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERTS = "/lock/alerts";
     public static final String ZOOKEEPER_ROOT = "zookeeper.dolphinscheduler.root";
     public static final String ZOOKEEPER_ABNORMAL_TOLERATING_NUMBER = "zookeeper.abnormal.tolerating.number";

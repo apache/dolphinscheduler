@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.service.zk.ZKServer;
 
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
-
 import java.io.IOException;
 
 import org.junit.After;
@@ -31,6 +29,8 @@ import org.junit.Test;
 public class ZookeeperClientTest {
 
     private static ZKServer zkServer;
+
+    private static boolean flag;
 
     @Before
     public void before() throws IOException {
@@ -43,18 +43,17 @@ public class ZookeeperClientTest {
     }
 
     @Test
-    public void getZookeeperClient() {
-        ZookeeperClient zookeeperClient = new ZookeeperClient();
-        zookeeperClient.init();
-        InterProcessMutex interProcessMutex = null;
+    public void testConcurrentOperation() {
         try {
-            interProcessMutex = zookeeperClient.getAlertLockPath();
-            interProcessMutex.acquire();
-            Assert.assertNotNull(interProcessMutex);
+            flag = false;
+            ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
+                public void handle() {
+                    flag = true;
+                }
+            });
+            Assert.assertTrue(flag);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            zookeeperClient.release(interProcessMutex);
         }
     }
 
