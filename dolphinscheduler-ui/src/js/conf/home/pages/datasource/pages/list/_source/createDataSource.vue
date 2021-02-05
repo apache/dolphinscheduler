@@ -85,7 +85,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f :class="{hidden:showPrincipal}">
-          <template slot="name"><strong>*</strong>krb5.conf</template>
+          <template slot="name">krb5.conf</template>
           <template slot="content">
             <el-input
               type="input"
@@ -96,7 +96,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f :class="{hidden:showPrincipal}">
-          <template slot="name"><strong>*</strong>keytab.username</template>
+          <template slot="name">keytab.username</template>
           <template slot="content">
             <el-input
               type="input"
@@ -107,7 +107,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f :class="{hidden:showPrincipal}">
-          <template slot="name"><strong>*</strong>keytab.path</template>
+          <template slot="name">keytab.path</template>
           <template slot="content">
             <el-input
               type="input"
@@ -380,6 +380,8 @@
             return false
           }
         }
+
+
 
         return true
       },
