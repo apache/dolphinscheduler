@@ -1559,7 +1559,7 @@ public class ProcessService {
         saveTaskInstance(taskInstance);
     }
 
-    private void changeOutParam(String result, TaskInstance taskInstance) {
+    public void changeOutParam(String result, TaskInstance taskInstance) {
         if (StringUtils.isEmpty(result)) {
             return;
         }
