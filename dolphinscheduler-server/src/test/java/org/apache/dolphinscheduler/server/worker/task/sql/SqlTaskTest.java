@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -29,6 +30,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.Date;
 
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *  sql task test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {SqlTask.class, DriverManager.class})
+@PrepareForTest(value = {SqlTask.class, DriverManager.class, SpringApplicationContext.class})
 public class SqlTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlTaskTest.class);
@@ -85,10 +87,11 @@ public class SqlTaskTest {
         sqlTaskExecutionContext.setConnectionParams(CONNECTION_PARAMS);
         PowerMockito.when(taskExecutionContext.getSqlTaskExecutionContext()).thenReturn(sqlTaskExecutionContext);
 
+        PowerMockito.mockStatic(SpringApplicationContext.class);
+        PowerMockito.when(SpringApplicationContext.getBean(Mockito.any())).thenReturn(new AlertDao());
         alertClientService = PowerMockito.mock(AlertClientService.class);
         sqlTask = new SqlTask(taskExecutionContext, logger, alertClientService);
         sqlTask.init();
-        sqlTask.handle();
     }
 
     @Test
