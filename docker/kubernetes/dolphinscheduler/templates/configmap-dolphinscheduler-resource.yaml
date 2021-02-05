@@ -14,22 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.frontend.persistentVolumeClaim.enabled }}
+{{- if .Values.resource }}
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: ConfigMap
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-frontend
+  name: {{ include "dolphinscheduler.fullname" . }}-resource
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-frontend
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-resource
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-spec:
-  accessModes:
-    {{- range .Values.frontend.persistentVolumeClaim.accessModes }}
-    - {{ . | quote }}
-  {{- end }}
-  storageClassName: {{ .Values.frontend.persistentVolumeClaim.storageClassName | quote }}
-  resources:
-    requests:
-      storage: {{ .Values.frontend.persistentVolumeClaim.storage | quote }}
+data:
+  RESOURCE_STORAGE_TYPE: {{ .Values.resource.resourceStorageType | quote }}
+  RESOURCE_UPLOAD_PATH: {{ .Values.resource.resourceUploadPath | quote }}
+  FS_DEFAULT_FS: {{ .Values.resource.fsDefaultFS | quote }}
+  FS_S3A_ENDPOINT: {{ .Values.resource.fsS3aEndpoint | quote }}
+  FS_S3A_ACCESS_KEY: {{ .Values.resource.fsS3aAccessKey | quote }}
 {{- end }}

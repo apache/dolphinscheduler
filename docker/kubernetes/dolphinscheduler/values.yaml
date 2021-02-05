@@ -55,21 +55,28 @@ externalDatabase:
 # If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
-  taskQueue: "zookeeper"
-  config:
-    ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
+  fourlwCommandsWhitelist: srvr,ruok,wchs,cons
   service:
     port: "2181"
   persistence:
     enabled: false
     size: "20Gi"
     storageClass: "-"
+  zookeeperRoot: /dolphinscheduler
 
 # If exists external zookeeper, and set zookeeper.enable value to false.
 # If zookeeper.enable is false,  Dolphinscheduler's zookeeper will use it.
 externalZookeeper:
-  taskQueue: "zookeeper"
   zookeeperQuorum: "127.0.0.1:2181"
+  zookeeperRoot: /dolphinscheduler
+
+resource:
+  resourceStorageType: "HDFS"
+  resourceUploadPath: "/dolphinscheduler"
+  fsDefaultFS: "file:///"
+  fsS3aEndpoint: "s3.xxx.amazonaws.com"
+  fsS3aAccessKey: "xxxxxxx"
+  fsS3aSecretKey: "xxxxxxx"
 
 master:
   podManagementPolicy: "Parallel"
@@ -85,8 +92,6 @@ master:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
-  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   configmap:
     MASTER_EXEC_THREADS: "100"
     MASTER_EXEC_TASK_NUM: "20"
@@ -96,6 +101,8 @@ master:
     MASTER_MAX_CPULOAD_AVG: "100"
     MASTER_RESERVED_MEMORY: "0.1"
     MASTER_LISTEN_PORT: "5678"
+  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
     enabled: true
     initialDelaySeconds: "30"
@@ -137,6 +144,25 @@ worker:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
+  configmap:
+    WORKER_EXEC_THREADS: "100"
+    WORKER_HEARTBEAT_INTERVAL: "10"
+    WORKER_MAX_CPULOAD_AVG: "100"
+    WORKER_RESERVED_MEMORY: "0.1"
+    WORKER_LISTEN_PORT: "1234"
+    WORKER_GROUP: "default"
+    DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
+    DOLPHINSCHEDULER_ENV:
+    - "export HADOOP_HOME=/opt/soft/hadoop"
+    - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
+    - "export SPARK_HOME1=/opt/soft/spark1"
+    - "export SPARK_HOME2=/opt/soft/spark2"
+    - "export PYTHON_HOME=/usr/bin/python"
+    - "export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk"
+    - "export HIVE_HOME=/opt/soft/hive"
+    - "export FLINK_HOME=/opt/soft/flink"
+    - "export DATAX_HOME=/opt/soft/datax/bin/datax.py"
+    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -155,25 +181,6 @@ worker:
     timeoutSeconds: "5"
     failureThreshold: "3"
     successThreshold: "1"
-  configmap:
-    WORKER_EXEC_THREADS: "100"
-    WORKER_HEARTBEAT_INTERVAL: "10"
-    WORKER_FETCH_TASK_NUM: "3"
-    WORKER_MAX_CPULOAD_AVG: "100"
-    WORKER_RESERVED_MEMORY: "0.1"
-    WORKER_LISTEN_PORT: "1234"
-    WORKER_GROUP: "default"
-    DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-    DOLPHINSCHEDULER_ENV:
-    - "export HADOOP_HOME=/opt/soft/hadoop"
-    - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
-    - "export SPARK_HOME1=/opt/soft/spark1"
-    - "export SPARK_HOME2=/opt/soft/spark2"
-    - "export PYTHON_HOME=/opt/soft/python"
-    - "export JAVA_HOME=/opt/soft/java"
-    - "export HIVE_HOME=/opt/soft/hive"
-    - "export FLINK_HOME=/opt/soft/flink"
-    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
   ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
   ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
   ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
@@ -213,8 +220,6 @@ alert:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
-  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   configmap:
     XLS_FILE_PATH: "/tmp/xls"
     MAIL_SERVER_HOST: ""
@@ -230,6 +235,8 @@ alert:
     ENTERPRISE_WECHAT_SECRET: ""
     ENTERPRISE_WECHAT_AGENT_ID: ""
     ENTERPRISE_WECHAT_USERS: ""
+  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
     enabled: true
     initialDelaySeconds: "30"
@@ -258,53 +265,6 @@ alert:
     storage: "20Gi"
 
 api:
-  strategy:
-    type: "RollingUpdate"
-    rollingUpdate:
-      maxSurge: "25%"
-      maxUnavailable: "25%"
-  replicas: "1"
-  # NodeSelector is a selector which must be true for the pod to fit on a node.
-  # Selector which must match a node's labels for the pod to be scheduled on that node.
-  # More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  nodeSelector: {}
-  # Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
-  # effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
-  tolerations: []
-  # Affinity is a group of affinity scheduling rules.
-  # If specified, the pod's scheduling constraints.
-  # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
-  affinity: {}
-  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: "30"
-    periodSeconds: "30"
-    timeoutSeconds: "5"
-    failureThreshold: "3"
-    successThreshold: "1"
-  ## Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: "30"
-    periodSeconds: "30"
-    timeoutSeconds: "5"
-    failureThreshold: "3"
-    successThreshold: "1"
-  ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
-  ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
-  ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
-  ## A claim in this list takes precedence over any volumes in the template, with the same name.
-  persistentVolumeClaim:
-    enabled: false
-    accessModes:
-    - "ReadWriteOnce"
-    storageClassName: "-"
-    storage: "20Gi"
-
-frontend:
   strategy:
     type: "RollingUpdate"
     rollingUpdate:
