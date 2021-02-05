@@ -22,7 +22,7 @@ const apiPrefix = '/dolphinscheduler'
 const reSlashPrefix = /^\/+/
 
 const resolveURL = (url) => {
-  if (url.indexOf('http') !== 0) {
+  if (url.indexOf('http') === 0) {
     return url
   }
   if (url.charAt(0) !== '/') {
