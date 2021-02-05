@@ -24,13 +24,13 @@ import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.Date;
 
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
