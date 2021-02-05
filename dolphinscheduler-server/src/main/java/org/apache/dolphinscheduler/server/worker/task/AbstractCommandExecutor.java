@@ -232,6 +232,8 @@ public abstract class AbstractCommandExecutor {
         return resultString;
     }
 
+    public void setResultString(String result) { this.resultString = result; }
+
     /**
      * cancel application
      *

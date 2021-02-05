@@ -22,12 +22,15 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -37,7 +40,8 @@ import java.util.Date;
 /**
  *  python shell command executor test
  */
-@Ignore
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ShellCommandExecutor.class})
 public class ShellCommandExecutorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellCommandExecutorTest.class);
