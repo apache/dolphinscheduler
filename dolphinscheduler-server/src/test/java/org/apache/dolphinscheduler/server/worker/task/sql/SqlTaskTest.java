@@ -72,7 +72,9 @@ public class SqlTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(
-                "{\"localParams\":[{\"prop\":\"ret\", \"direct\":\"OUT\", \"type\":\"VARCHAR\", \"value\":\"\"}],\"type\":\"POSTGRESQL\",\"datasource\":1,\"sql\":\"insert into tb_1 values('1','2')\",\"sqlType\":1}");
+                "{\"localParams\":[{\"prop\":\"ret\", \"direct\":\"OUT\", \"type\":\"VARCHAR\", \"value\":\"\"}]," +
+                        "\"type\":\"POSTGRESQL\",\"datasource\":1,\"sql\":\"insert into tb_1 values('1','2')\"," +
+                        "\"sqlType\":1}");
 
         taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         PowerMockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
@@ -99,7 +101,6 @@ public class SqlTaskTest {
         Assert.assertNotNull(sqlTask.getParameters());
     }
 
-//    @Test(expected = Exception.class)
     @Test
     public void testHandle() throws Exception {
         Connection connection = PowerMockito.mock(Connection.class);

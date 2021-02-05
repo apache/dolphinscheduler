@@ -105,7 +105,7 @@ public class ShellTask extends AbstractTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
-            setResultString(shellCommandExecutor.getResultString());
+            setResult(shellCommandExecutor.getResultString());
         } catch (Exception e) {
             logger.error("shell task error", e);
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
@@ -188,7 +188,7 @@ public class ShellTask extends AbstractTask {
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }
 
-    public void setResultString(String result) {
+    public void setResult(String result) {
         Map<String, Property> localParams = shellParameters.getLocalParametersMap();
         List<Map<String, String>> outProperties = new ArrayList<>();
         Map<String, String> p = new HashMap<>();
