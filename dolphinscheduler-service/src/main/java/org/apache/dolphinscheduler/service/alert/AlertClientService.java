@@ -90,6 +90,7 @@ public class AlertClientService {
     public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title, String content) {
         logger.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} ", host, port, groupId, title);
         AlertSendRequestCommand request = new AlertSendRequestCommand(groupId, title, content);
+        AlertSendResponseCommand alertSendResponseCommand = null;
         String[] hosts = host.split(",");
         for (String hostName : hosts) {
             final Host address = new Host(hostName, port);
@@ -97,7 +98,7 @@ public class AlertClientService {
                 Command command = request.convert2Command();
                 Command response = this.client.sendSync(address, command, ALERT_REQUEST_TIMEOUT);
                 if (response != null) {
-                    AlertSendResponseCommand alertSendResponseCommand = JsonSerializer.deserialize(response.getBody(), AlertSendResponseCommand.class);
+                    alertSendResponseCommand = JsonSerializer.deserialize(response.getBody(), AlertSendResponseCommand.class);
                     if (alertSendResponseCommand.getResStatus()) {
                         return alertSendResponseCommand;
                     }
@@ -109,8 +110,8 @@ public class AlertClientService {
             }
 
         }
-
-        return null;
+        //Multiple alert services were sent without success. The latest result is returned
+        return alertSendResponseCommand;
     }
 
     public boolean isRunning() {
