@@ -109,6 +109,7 @@ public class ShellTaskTest {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
+        shellTask.setResultString("good");
         shellTask.handle();
     }
 }

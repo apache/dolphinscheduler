@@ -88,6 +88,7 @@ public class SqlTaskTest {
         alertClientService = PowerMockito.mock(AlertClientService.class);
         sqlTask = new SqlTask(taskExecutionContext, logger, alertClientService);
         sqlTask.init();
+        sqlTask.handle();
     }
 
     @Test
