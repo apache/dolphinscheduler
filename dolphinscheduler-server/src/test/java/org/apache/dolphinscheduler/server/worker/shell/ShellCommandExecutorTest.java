@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -40,8 +41,7 @@ import java.util.Date;
 /**
  *  python shell command executor test
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ShellCommandExecutor.class})
+@Ignore
 public class ShellCommandExecutorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellCommandExecutorTest.class);
