@@ -380,9 +380,6 @@
             return false
           }
         }
-
-
-
         return true
       },
       /**
