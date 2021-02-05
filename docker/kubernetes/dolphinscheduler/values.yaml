@@ -65,7 +65,7 @@ zookeeper:
   zookeeperRoot: /dolphinscheduler
 
 # If exists external zookeeper, and set zookeeper.enable value to false.
-# If zookeeper.enable is false,  Dolphinscheduler's zookeeper will use it.
+# If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
 externalZookeeper:
   zookeeperQuorum: "127.0.0.1:2181"
   zookeeperRoot: /dolphinscheduler
@@ -77,6 +77,14 @@ resource:
   fsS3aEndpoint: "s3.xxx.amazonaws.com"
   fsS3aAccessKey: "xxxxxxx"
   fsS3aSecretKey: "xxxxxxx"
+  # If resourceStorageType is HDFS and fsDefaultFS is file:///, persistentVolumeClaim should be enabled for resource storage
+  persistentVolumeClaim:
+    enabled: false
+    accessModes:
+    - "ReadWriteMany"
+    # storageClassName must support the access mode: ReadWriteMany
+    storageClassName: "-"
+    storage: "20Gi"
 
 master:
   podManagementPolicy: "Parallel"
