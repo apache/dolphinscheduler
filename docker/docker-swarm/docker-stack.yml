@@ -167,6 +167,20 @@ services:
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
+      XLS_FILE_PATH: "/tmp/xls"
+      MAIL_SERVER_HOST: ""
+      MAIL_SERVER_PORT: ""
+      MAIL_SENDER: ""
+      MAIL_USER: ""
+      MAIL_PASSWD: ""
+      MAIL_SMTP_STARTTLS_ENABLE: "false"
+      MAIL_SMTP_SSL_ENABLE: "false"
+      MAIL_SMTP_SSL_TRUST: ""
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
       RESOURCE_STORAGE_TYPE: HDFS
       RESOURCE_UPLOAD_PATH: /dolphinscheduler

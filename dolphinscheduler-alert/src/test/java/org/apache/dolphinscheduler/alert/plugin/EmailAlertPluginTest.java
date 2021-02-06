@@ -75,6 +75,7 @@ public class EmailAlertPluginTest {
         List<String> list = new ArrayList<String>(){{ add("xx@xx.com"); }};
         alertInfo.addProp("receivers", list);
         Map<String, Object> ret = plugin.process(alertInfo);
-        assertFalse(Boolean.parseBoolean(String.valueOf(ret.get(Constants.STATUS))));
+        assertFalse(Boolean.parseBoolean(String.valueOf(ret.get(Constants.MAIL_ENABLED))));
+        assertTrue(Boolean.parseBoolean(String.valueOf(ret.get(Constants.STATUS))));
     }
 }

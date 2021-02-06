@@ -143,6 +143,7 @@ case "$1" in
     ;;
     (worker-server)
         waitZK
+        waitDatabase
         initWorkerServer
         initLoggerServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log

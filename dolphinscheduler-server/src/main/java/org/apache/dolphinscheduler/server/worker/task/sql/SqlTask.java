@@ -49,6 +49,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.apache.dolphinscheduler.alert.utils.Constants.MAIL_ENABLED;
 import static org.apache.dolphinscheduler.common.Constants.*;
 import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
 /**
@@ -452,7 +453,10 @@ public class SqlTask extends AbstractTask {
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
                     receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
-            if(!(boolean) mailResult.get(STATUS)){
+            if(!(boolean) mailResult.get(MAIL_ENABLED)){
+                logger.info("mail info : {} {}", title, content);
+                logger.warn("mail wasn't sent since the mail config isn't set");
+            }else if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{

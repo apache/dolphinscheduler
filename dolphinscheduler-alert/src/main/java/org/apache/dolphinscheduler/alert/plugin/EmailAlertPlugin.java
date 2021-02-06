@@ -96,9 +96,6 @@ public class EmailAlertPlugin implements AlertPlugin {
         retMaps = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
                 alert.getShowType());
 
-        //send flag
-        boolean flag = false;
-
         if (retMaps == null) {
             retMaps = new HashMap<>();
             retMaps.put(Constants.MESSAGE, "alert send error.");
@@ -107,9 +104,12 @@ public class EmailAlertPlugin implements AlertPlugin {
             return retMaps;
         }
 
-        flag = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
-
-        if (flag) {
+        boolean enabled = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.MAIL_ENABLED)));
+        boolean status = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
+        if (!enabled) {
+            logger.warn("mail wasn't sent since the mail config isn't set");
+            retMaps.put(Constants.MESSAGE, "mail wasn't sent since the mail config isn't set");
+        } else if (status) {
             logger.info("alert send success");
             retMaps.put(Constants.MESSAGE, "email send success.");
             if (EnterpriseWeChatUtils.isEnable()) {
@@ -121,7 +121,6 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
-
         } else {
             retMaps.put(Constants.MESSAGE, "alert send error.");
             logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
