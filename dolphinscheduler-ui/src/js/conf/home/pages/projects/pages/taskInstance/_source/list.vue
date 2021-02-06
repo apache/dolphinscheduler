@@ -46,7 +46,7 @@
           <th scope="col" style="min-width: 130px">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th scope="col" style="min-width: 130px">
+          <th scope="col" :style="{'min-width': (Math.max(list.length && list[0].host.length, 22) * 6) + 'px'}">
             <span>{{$t('host')}}</span>
           </th>
           <th scope="col" style="min-width: 70px">

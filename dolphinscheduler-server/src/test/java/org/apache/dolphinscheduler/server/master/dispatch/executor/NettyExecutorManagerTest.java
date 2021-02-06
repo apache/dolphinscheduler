@@ -78,7 +78,7 @@ public class NettyExecutorManagerTest {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(OSUtils.getHost() + ":" + serverConfig.getListenPort()));
+        executionContext.setHost(Host.of(OSUtils.getAddr(OSUtils.getHost(), serverConfig.getListenPort())));
         Boolean execute = nettyExecutorManager.execute(executionContext);
         Assert.assertTrue(execute);
         nettyRemotingServer.close();
@@ -97,7 +97,7 @@ public class NettyExecutorManagerTest {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(OSUtils.getHost() + ":4444"));
+        executionContext.setHost(Host.of(OSUtils.getAddr(OSUtils.getHost(), 4444)));
         nettyExecutorManager.execute(executionContext);
 
     }

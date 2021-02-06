@@ -211,6 +211,10 @@ spec:
             - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
               subPath: "dolphinscheduler_env.sh"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
+            {{- if .Values.resource.persistentVolumeClaim.enabled }}
+            - mountPath: {{ .Values.resource.resourceUploadPath }}
+              name: {{ include "dolphinscheduler.fullname" . }}-resource
+            {{- end }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
@@ -233,6 +237,11 @@ spec:
             items:
               - key: dolphinscheduler_env.sh
                 path: dolphinscheduler_env.sh
+        {{- if .Values.resource.persistentVolumeClaim.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-resource
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-resource
+        {{- end }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}

@@ -166,6 +166,10 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-api
+            {{- if .Values.resource.persistentVolumeClaim.enabled }}
+            - mountPath: {{ .Values.resource.resourceUploadPath }}
+              name: {{ include "dolphinscheduler.fullname" . }}-resource
+            {{- end }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.persistentVolumeClaim.enabled }}
@@ -174,3 +178,8 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if .Values.resource.persistentVolumeClaim.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-resource
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-resource
+        {{- end }}

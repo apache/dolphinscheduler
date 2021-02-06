@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.remote.utils;
 
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+
 import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
@@ -32,7 +34,7 @@ public class ChannelUtils {
      * @return local address
      */
     public static String getLocalAddress(Channel channel){
-        return ((InetSocketAddress)channel.localAddress()).getAddress().getHostAddress();
+        return OSUtils.getHost(((InetSocketAddress)channel.localAddress()).getAddress());
     }
 
     /**
@@ -41,7 +43,7 @@ public class ChannelUtils {
      * @return remote address
      */
     public static String getRemoteAddress(Channel channel){
-        return ((InetSocketAddress)channel.remoteAddress()).getAddress().getHostAddress();
+        return OSUtils.getHost(((InetSocketAddress)channel.remoteAddress()).getAddress());
     }
 
     /**
@@ -51,7 +53,7 @@ public class ChannelUtils {
      */
     public static Host toAddress(Channel channel){
         InetSocketAddress socketAddress = ((InetSocketAddress)channel.remoteAddress());
-        return new Host(socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
+        return new Host(OSUtils.getHost(socketAddress.getAddress()), socketAddress.getPort());
     }
 
 }
