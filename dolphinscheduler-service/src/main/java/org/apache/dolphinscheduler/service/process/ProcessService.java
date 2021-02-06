@@ -116,8 +116,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cronutils.model.Cron;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import javafx.concurrent.Task;
-
 /**
  * process relative dao that some mappers in this.
  */
@@ -373,12 +371,12 @@ public class ProcessService {
      * @return process definition
      */
      public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
-         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
-         if (processDefinition.getVersion() != version) {
-             ProcessDefinitionLog log = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
-             processDefinition = convertFromLog(log);
-         }
-         return processDefinition;
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
+        if (processDefinition.getVersion() != version) {
+            ProcessDefinitionLog log = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
+            processDefinition = convertFromLog(log);
+        }
+        return processDefinition;
      }
 
     /**
