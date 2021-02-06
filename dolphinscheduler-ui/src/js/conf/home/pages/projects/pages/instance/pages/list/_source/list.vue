@@ -55,12 +55,10 @@
           <th scope="col" style="min-width: 135px">
             <span>{{$t('Executor')}}</span>
           </th>
-          <th scope="col" style="min-width: 100px">
-            <div style="width: 100px">
-              <span>{{$t('host')}}</span>
-            </div>
+          <th scope="col" :style="{'min-width': ((Math.max(list.length && list[0].host.length, 22) + 40) * 6) + 'px'}">
+            <span>{{$t('host')}}</span>
           </th>
-          <th scope="col" style="min-width: 210px">
+          <th scope="col" style="min-width: 230px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -95,10 +93,7 @@
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
           </td>
-          <td>
-            <span v-if="item.host" style="word-break: break-all">{{item.host}}</span>
-            <span v-else>-</span>
-          </td>
+          <td><span>{{item.host || '-'}}</span></td>
           <td style="z-index: inherit;">
             <div v-show="item.disabled">
               <x-button type="info"

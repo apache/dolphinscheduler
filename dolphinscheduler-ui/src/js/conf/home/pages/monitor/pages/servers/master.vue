@@ -21,8 +21,8 @@
         <div class="row-box" v-for="(item,$index) in masterList" :key="$index">
           <div class="row-title">
             <div class="left">
-              <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
+              <span class="sp">Host: {{item.host}}</span>
+              <span>{{$t('Zk registration directory')}}: <a href="javascript:" @click="_showZkDirectories(item)" class="links">{{$t('Directory detail')}}</a></span>
             </div>
             <div class="right">
               <span class="sp">{{$t('Create Time')}}: {{item.createTime | formatDate}}</span>
@@ -73,6 +73,7 @@
   import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import zookeeperDirectoriesPopup from './_source/zookeeperDirectories'
 
   export default {
     name: 'servers-master',
@@ -85,7 +86,19 @@
     },
     props: {},
     methods: {
-      ...mapActions('monitor', ['getMasterData'])
+      ...mapActions('monitor', ['getMasterData']),
+      _showZkDirectories (item) {
+        this.$drawer({
+          direction: 'right',
+          render (h) {
+            return h(zookeeperDirectoriesPopup, {
+              props: {
+                zkDirectories: [{ zkDirectory: item.zkDirectory }]
+              }
+            })
+          }
+        })
+      }
     },
     watch: {},
     created () {
@@ -104,7 +117,7 @@
         this.isLoading = false
       })
     },
-    components: { mList, mListConstruction, mSpin, mNoData, mGauge }
+    components: { mList, mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">
