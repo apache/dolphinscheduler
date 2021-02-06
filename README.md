@@ -55,9 +55,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 ![monitor](https://user-images.githubusercontent.com/59273635/75625839-c698a480-5bfc-11ea-8bbe-895b561b337f.png)
 ![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
 ![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
-### Online Demo
 
-- <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
 ### Recent R&D plan
 Work plan of Dolphin Scheduler: [R&D plan](https://github.com/apache/incubator-dolphinscheduler/projects/1), Under the `In Develop` card is what is currently being developed, TODO card is to be done (including feature ideas)
@@ -89,7 +87,7 @@ It is because of the shoulders of these open source projects that the birth of t
 1. Submit an issue
 1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/development/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
 1. Slack channel: [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://join.slack.com/share/zt-do3gvfhj-UUhrAX2GxkVX_~JJt1jpKA)
-1. Contact WeChat(dailidong66). This is just for Mandarin(CN) discussion.
+
 
 ### License
 Please refer to [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
