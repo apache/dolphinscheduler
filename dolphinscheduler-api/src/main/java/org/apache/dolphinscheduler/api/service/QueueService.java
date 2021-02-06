@@ -60,7 +60,7 @@ public class QueueService extends BaseService {
      */
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -75,14 +75,14 @@ public class QueueService extends BaseService {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return queue list
      */
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -105,13 +105,13 @@ public class QueueService extends BaseService {
      * create queue
      *
      * @param loginUser login user
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return create result
      */
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -153,14 +153,14 @@ public class QueueService extends BaseService {
      * update queue
      *
      * @param loginUser login user
-     * @param queue     queue
-     * @param id        queue id
+     * @param queue queue
+     * @param id queue id
      * @param queueName queue name
      * @return update result code
      */
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)) {
+        if (isNotAdmin(loginUser, result)) {
             return result;
         }
 

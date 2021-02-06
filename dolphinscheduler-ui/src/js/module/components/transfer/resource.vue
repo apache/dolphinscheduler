@@ -24,10 +24,10 @@
                 <el-button size="mini" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</el-button>
             </el-button-group>
         </div>
-        <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true"  maxHeight="200" :options="fileList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
+        <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true"  maxHeight="260" :options="fileList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
-        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" maxHeight="200" :options="udfList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
+        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" maxHeight="260" :options="udfList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -74,8 +74,8 @@
       resourceData: Object
     },
     created () {
-      let file = this.fileSourceList
-      let udf = this.udfSourceList
+      let file = this.resourceData.fileSourceList
+      let udf = this.resourceData.udfSourceList
       this.diGuiTree(file)
       this.diGuiTree(udf)
       this.fileList = file
@@ -218,7 +218,6 @@
         delete item.children
       },
       close () {
-        console.log(888)
         this.$emit('closeAuthResource')
       }
     },
@@ -302,5 +301,12 @@
       width: 20px;
       float: left;
     }
+  }
+  .vue-treeselect__menu {
+    max-height: 200px!important;
+  }
+  .vue-treeselect__multi-value {
+    max-height: 260px!important;
+    overflow-y: auto!important;
   }
 </style>

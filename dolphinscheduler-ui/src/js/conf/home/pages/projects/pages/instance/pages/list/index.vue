@@ -18,7 +18,7 @@
   <div class="wrap-table">
     <m-list-construction :title="$t('Process Instance')">
       <template slot="conditions">
-        <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
+        <m-instance-conditions class="searchNav" @on-query="_onQuery"></m-instance-conditions>
       </template>
       <template slot="content">
         <template v-if="processInstanceList.length || total>0">
@@ -95,6 +95,7 @@
        * Query
        */
       _onQuery (o) {
+        this.searchParams.pageNo = 1
         this.searchParams = _.assign(this.searchParams, o)
         setUrlParams(this.searchParams)
         this._debounceGET()
@@ -213,24 +214,18 @@
       .fixed {
         table-layout: auto;
         tr {
-          th:last-child,td:last-child {
-            background: inherit;
-            width: 230px;
-            height: 40px;
-            line-height: 40px;
-            border-left:1px solid #ecf3ff;
-            position: absolute;
-            right: 0;
-            z-index: 2;
-          }
           td:last-child {
-            border-bottom:1px solid #ecf3ff;
-          }
-          th:nth-last-child(2) {
-            padding-right: 260px;
+            .el-button+.el-button {
+              margin-left: 0;
+            }
           }
         }
       }
+    }
+  }
+  @media screen and (max-width: 1246px) {
+    .searchNav {
+      margin-bottom: 30px;
     }
   }
 </style>
