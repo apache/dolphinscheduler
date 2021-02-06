@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_ABNORMAL_TOLERATING_NUMBER;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERTS;
-import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_LIST;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.alert.utils.Constants.ZOOKEEPER_ROOT;
 
@@ -42,31 +41,10 @@ public class ZookeeperClient {
 
     private static final Properties properties = new Properties();
 
-    public static void concurrentOperation(LockCallBall callBall) throws Exception {
-
-        /**
-         * init properties
-         */
-        String[] propertyFiles = new String[]{ZOOKEEPER_PROPERTIES_PATH};
-
-        for (String fileName : propertyFiles) {
-            InputStream fis = null;
-            try {
-                fis = ZookeeperClient.class.getResourceAsStream(fileName);
-                properties.load(fis);
-
-            } catch (IOException e) {
-                if (fis != null) {
-                    IOUtils.closeQuietly(fis);
-                }
-                System.exit(1);
-            } finally {
-                IOUtils.closeQuietly(fis);
-            }
-        }
+    public static void concurrentOperation(LockCallBall callBall,String zookeeperConnectorStr) throws Exception {
 
         RetryPolicy retryPolicy = new RetryOneTime(1000);
-        CuratorFramework zkClient = CuratorFrameworkFactory.newClient(PropertyUtils.getString(ZOOKEEPER_LIST), retryPolicy);
+        CuratorFramework zkClient = CuratorFrameworkFactory.newClient(zookeeperConnectorStr, retryPolicy);
         zkClient.start();
 
         String alertLockPath = PropertyUtils.getString(ZOOKEEPER_ROOT, "/dolphinscheduler") + ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERTS;
@@ -87,8 +65,31 @@ public class ZookeeperClient {
         return PropertyUtils.getInt(ZOOKEEPER_ABNORMAL_TOLERATING_NUMBER, 3);
     }
 
+    public static  Properties getZookeeperProperties () {
+        /**
+         * init properties
+         */
+        String[] propertyFiles = new String[]{ZOOKEEPER_PROPERTIES_PATH};
+
+        for (String fileName : propertyFiles) {
+            InputStream fis = null;
+            try {
+                fis = ZookeeperClient.class.getResourceAsStream(fileName);
+                properties.load(fis);
+
+            } catch (IOException e) {
+                if (fis != null) {
+                    IOUtils.closeQuietly(fis);
+                }
+                System.exit(1);
+            } finally {
+                IOUtils.closeQuietly(fis);
+            }
+        }
+        return properties;
+    }
+
     public abstract static class LockCallBall {
         public abstract void handle();
     }
-
 }

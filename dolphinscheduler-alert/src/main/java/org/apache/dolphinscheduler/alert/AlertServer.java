@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +133,7 @@ public class AlertServer {
                 logger.warn("No Alert Plugin . Can not send alert info. ");
             } else {
                 try {
+                    Properties properties = ZookeeperClient.getZookeeperProperties();
                     ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
                         @Override
                         public void handle() {
@@ -140,10 +142,9 @@ public class AlertServer {
                             alertSender.run();
                             zookeeperStateAbnormalToleratingNumber = 0;
                         }
-                    });
+                    }, properties.getProperty(Constants.ZOOKEEPER_PROPERTIES_PATH));
                 } catch (Exception e) {
                     logger.error("alert server with error : ", e);
-                    e.printStackTrace();
                 }
 
                 if (zookeeperStateAbnormalToleratingNumber > ZookeeperClient.checkZkStateAbnormalToleratingNumber()) {

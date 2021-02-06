@@ -20,20 +20,31 @@ package org.apache.dolphinscheduler.alert.utils;
 import org.apache.dolphinscheduler.service.zk.ZKServer;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.net.ssl.*", "javax.management.*", "javax.security.*", "javax.crypto.*"})
 public class ZookeeperClientTest {
 
     private static ZKServer zkServer;
 
     private static boolean flag;
 
+    Properties properties;
+
     @Before
     public void before() throws IOException {
+
+        properties = PowerMockito.mock(Properties.class);
         new Thread(() -> {
             if (zkServer == null) {
                 zkServer = new ZKServer();
@@ -50,11 +61,32 @@ public class ZookeeperClientTest {
                 public void handle() {
                     flag = true;
                 }
-            });
+            }, "");
+            Assert.assertTrue(flag);
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
+    }
+
+    @Test
+    public void testConcurrentOperationLock() {
+        try {
+            flag = false;
+            ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
+                public void handle() {
+                    flag = true;
+                }
+            }, "127.0.0.1:2181");
             Assert.assertTrue(flag);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testGetZookeeperProperties() {
+        Properties properties = ZookeeperClient.getZookeeperProperties();
+        Assert.assertNotNull(properties);
     }
 
     @After
