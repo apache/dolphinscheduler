@@ -35,6 +35,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>
@@ -51,6 +55,5 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 </project>

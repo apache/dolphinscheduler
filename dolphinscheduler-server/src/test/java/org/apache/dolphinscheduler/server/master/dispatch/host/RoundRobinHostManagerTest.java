@@ -73,6 +73,6 @@ public class RoundRobinHostManagerTest {
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));
-        Assert.assertTrue(host.getAddress().equalsIgnoreCase(OSUtils.getHost() + ":" + workerConfig.getListenPort()));
+        Assert.assertTrue(host.getAddress().equalsIgnoreCase(OSUtils.getAddr(workerConfig.getListenPort())));
     }
 }

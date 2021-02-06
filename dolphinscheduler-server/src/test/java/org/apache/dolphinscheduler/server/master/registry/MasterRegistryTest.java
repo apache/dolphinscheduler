@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
@@ -55,7 +56,7 @@ public class MasterRegistryTest {
         masterRegistry.registry();
         String masterPath = zookeeperRegistryCenter.getMasterPath();
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
-        String masterNodePath = masterPath + "/" + (Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort());
+        String masterNodePath = masterPath + "/" + (OSUtils.getAddr(Constants.LOCAL_ADDRESS, masterConfig.getListenPort()));
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(masterNodePath);
         Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
     }

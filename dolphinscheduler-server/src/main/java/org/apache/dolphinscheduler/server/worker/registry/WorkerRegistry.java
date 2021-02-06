@@ -30,7 +30,6 @@ import javax.annotation.PostConstruct;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -43,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Sets;
 import com.google.common.collect.Sets;
 
 
@@ -164,7 +162,7 @@ public class WorkerRegistry {
      * @return local address
      */
     private String getLocalAddress(){
-        return OSUtils.getHost() + Constants.COLON + workerConfig.getListenPort();
+        return OSUtils.getAddr(workerConfig.getListenPort());
     }
 
 }
