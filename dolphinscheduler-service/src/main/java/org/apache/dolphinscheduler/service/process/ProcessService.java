@@ -2116,6 +2116,7 @@ public class ProcessService {
 
     /**
      * switch process definition version to process definition log version
+     *
      * @param processDefinition
      * @param processDefinitionLog
      * @return
@@ -2145,13 +2146,14 @@ public class ProcessService {
 
     /**
      * update task definition
+     *
      * @param operator
      * @param projectCode
      * @param taskNode
      * @param taskDefinition
      * @return
      */
-    public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition){
+    public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
 
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByDefinitionCode(taskDefinition.getCode());
         int version = taskDefinitionLogs
@@ -2214,7 +2216,6 @@ public class ProcessService {
     }
 
     /**
-     *
      * @param operator
      * @param name
      * @param desc
@@ -2226,7 +2227,7 @@ public class ProcessService {
      * @return
      */
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
-                                      String connects, ProcessData processData, ProcessDefinition processDefinition) {
+                                     String connects, ProcessData processData, ProcessDefinition processDefinition) {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
         for (TaskNode task : taskNodeList) {
             // TODO update by code directly
@@ -2240,7 +2241,6 @@ public class ProcessService {
     }
 
     /**
-     *
      * @param operator
      * @param processDefinitionCode
      * @param processDefinitionName
@@ -2253,7 +2253,7 @@ public class ProcessService {
      */
     public ProcessDefinitionLog updateProcessLog(User operator, Long processDefinitionCode, String processDefinitionName,
                                                  ProcessData processData, Project project,
-                                                 String desc, String locations, String connects){
+                                                 String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         int version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinitionLog.getCode());
         processDefinitionLog.setCode(processDefinitionCode);
@@ -2290,10 +2290,9 @@ public class ProcessService {
     }
 
 
-
-
     /**
      * create task defintion and task relations
+     *
      * @param loginUser
      * @param projectName
      * @param relationName
@@ -2302,8 +2301,8 @@ public class ProcessService {
      * @return
      */
     public void createTaskAndRelation(User loginUser, String projectName, String relationName,
-                                       ProcessDefinition processDefinition,
-                                       ProcessData processData) {
+                                      ProcessDefinition processDefinition,
+                                      ProcessData processData) {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
         for (TaskNode task : taskNodeList) {
             //TODO... task code exists, update task
