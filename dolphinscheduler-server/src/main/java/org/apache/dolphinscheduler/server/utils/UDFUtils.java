@@ -73,13 +73,11 @@ public class UDFUtils {
         String resourceFullName;
         Set<Map.Entry<UdfFunc,String>> entries = udfFuncTenantCodeMap.entrySet();
         for (Map.Entry<UdfFunc,String> entry:entries){
+            String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
             String uploadPath = HadoopUtils.getHdfsUdfDir(entry.getValue());
-            if (!uploadPath.startsWith("hdfs:")) {
-                uploadPath = defaultFS + uploadPath;
-            }
             resourceFullName = entry.getKey().getResourceName();
             resourceFullName = resourceFullName.startsWith("/") ? resourceFullName : String.format("/%s",resourceFullName);
-            sqls.add(String.format("add jar %s%s", uploadPath, resourceFullName));
+            sqls.add(String.format("add jar %s%s%s", prefixPath, uploadPath, resourceFullName));
         }
 
     }
