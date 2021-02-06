@@ -51,11 +51,7 @@ public class MailUtils {
 
     public static final String MAIL_PASSWD = PropertyUtils.getString(Constants.MAIL_PASSWD);
 
-    public static final Boolean MAIL_USE_START_TLS = PropertyUtils.getBoolean(Constants.MAIL_SMTP_STARTTLS_ENABLE);
-
-    public static final Boolean MAIL_USE_SSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
-
-    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH,"/tmp/xls");
+    public static final String XLS_FILE_PATH = PropertyUtils.getString(Constants.XLS_FILE_PATH, "/tmp/xls");
 
     public static final String STARTTLS_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
@@ -89,6 +85,15 @@ public class MailUtils {
      */
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType) {
         Map<String,Object> retMap = new HashMap<>();
+
+        // if mail is default config, no need to process
+        if (StringUtils.isEmpty(MAIL_SERVER_HOST) || "xxx.xxx.com".equals(MAIL_SERVER_HOST)) {
+            retMap.put(Constants.MAIL_ENABLED, false);
+            retMap.put(Constants.STATUS, true);
+            return retMap;
+        }
+
+        retMap.put(Constants.MAIL_ENABLED, true);
         retMap.put(Constants.STATUS, false);
 
         // if there is no receivers && no receiversCc, no need to process
@@ -260,13 +265,13 @@ public class MailUtils {
         part1.setContent(partContent, Constants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        File file = new File(XLS_FILE_PATH + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         // make excel file
 
-        ExcelUtils.genExcelFile(content,title,xlsFilePath);
+        ExcelUtils.genExcelFile(content,title,XLS_FILE_PATH);
 
         part2.attachFile(file);
         part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));

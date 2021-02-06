@@ -28,8 +28,6 @@ public class Constants {
      */
     public static final String ALERT_PROPERTIES_PATH = "/alert.properties";
 
-    public static final String DATA_SOURCE_PROPERTIES_PATH = "/dao/data_source.properties";
-
     public static final String SINGLE_SLASH = "/";
 
     /**
@@ -40,6 +38,8 @@ public class Constants {
     public static final String STATUS = "status";
 
     public static final String MESSAGE = "message";
+
+    public static final String MAIL_ENABLED = "mail.enabled";
 
     public static final String MAIL_PROTOCOL = "mail.protocol";
 
