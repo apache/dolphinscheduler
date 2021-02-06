@@ -99,12 +99,13 @@ public class ProcessUtilsTest {
         try {
             when(OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, 1))).thenReturn("1111");
             when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, 1))).thenReturn("1111");
-            when(OSUtils.exeCmd("sudo kill -9")).thenReturn("1111");
+            when(OSUtils.exeCmd("sudo -u tenantCode kill -9")).thenReturn("1111");
         } catch (Exception e) {
             e.printStackTrace();
         }
         taskExecutionContext.setHost("127.0.0.1:8888");
         taskExecutionContext.setLogPath("/log/1.log");
+        taskExecutionContext.setTenantCode("tenantCode");
         ProcessUtils.kill(taskExecutionContext);
         Assert.assertEquals(1, taskExecutionContext.getProcessId());
     }
