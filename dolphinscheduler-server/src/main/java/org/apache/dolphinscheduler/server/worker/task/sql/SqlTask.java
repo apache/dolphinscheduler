@@ -453,11 +453,11 @@ public class SqlTask extends AbstractTask {
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
                     receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
-            if(!(boolean) mailResult.get(STATUS)){
-                throw new RuntimeException("send mail failed!");
-            }else if(!(boolean) mailResult.get(MAIL_ENABLED)){
+            if(!(boolean) mailResult.get(MAIL_ENABLED)){
                 logger.info("mail info : {} {}", title, content);
                 logger.warn("mail wasn't sent since the mail config isn't set");
+            }else if(!(boolean) mailResult.get(STATUS)){
+                throw new RuntimeException("send mail failed!");
             }
         }else{
             logger.error("showType: {} is not valid "  ,showTypeName);
