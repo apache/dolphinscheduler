@@ -329,7 +329,7 @@ CREATE TABLE t_ds_process_instance (
   start_time timestamp DEFAULT NULL ,
   end_time timestamp DEFAULT NULL ,
   run_times int DEFAULT NULL ,
-  host varchar(150) DEFAULT NULL ,
+  host varchar(135) DEFAULT NULL ,
   command_type int DEFAULT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
