@@ -2140,7 +2140,6 @@ public class ProcessService {
             switchResult = processDefineMapper.updateById(tmpDefinition);
         }
         //TODO... switch task relations
-
         return switchResult;
     }
 
@@ -2189,7 +2188,6 @@ public class ProcessService {
         int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
         return insert & update;
     }
-
 
     /**
      * get resource ids
@@ -2288,7 +2286,6 @@ public class ProcessService {
         }
         return null;
     }
-
 
     /**
      * create task defintion and task relations
