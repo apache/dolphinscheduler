@@ -65,6 +65,8 @@ apache/dolphinscheduler:latest master-server
 ```
 $ docker run -d --name dolphinscheduler-worker \
 -e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 apache/dolphinscheduler:latest worker-server
 ```

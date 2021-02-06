@@ -99,6 +99,51 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
                   key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
+            - name: XLS_FILE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: XLS_FILE_PATH
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SERVER_HOST
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SERVER_PORT
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SENDER
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SENDER
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_USER
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_PASSWD
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_PASSWD
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SMTP_STARTTLS_ENABLE
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SMTP_STARTTLS_ENABLE
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SMTP_SSL_ENABLE
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SMTP_SSL_ENABLE
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SMTP_SSL_TRUST
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SMTP_SSL_TRUST
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
             - name: DATABASE_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}

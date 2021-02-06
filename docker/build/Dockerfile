@@ -53,7 +53,7 @@ RUN dos2unix /root/checkpoint.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
     rm -rf /bin/sh && \
     ln -s /bin/bash /bin/sh && \
-    mkdir -p /tmp/xls && \
+    mkdir -p /var/mail /tmp/xls && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
 # 4. expose port
