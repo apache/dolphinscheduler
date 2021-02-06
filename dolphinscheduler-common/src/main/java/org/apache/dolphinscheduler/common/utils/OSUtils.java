@@ -26,8 +26,6 @@ import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 
-import org.apache.commons.configuration.Configuration;
-
 import java.lang.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -407,18 +405,44 @@ public class OSUtils {
   }
 
   /**
+   * get local addr
+   * @return addr like host:port
+   */
+  public static String getAddr(int port) {
+    return getAddr(getHost(), port);
+  }
+
+  /**
+   * get addr
+   * @return addr like host:port
+   */
+  public static String getAddr(String host, int port) {
+    return String.format("%s:%d", host, port);
+  }
+
+  /**
    * get local host
    * @return host
    */
   public static String getHost(){
     try {
-      return InetAddress.getLocalHost().getHostAddress();
+      return getHost(InetAddress.getLocalHost());
     } catch (UnknownHostException e) {
       logger.error(e.getMessage(),e);
     }
     return null;
   }
 
+  /**
+   * get local host
+   * @return host
+   */
+  public static String getHost(InetAddress inetAddress){
+    if (inetAddress != null) {
+      return Constants.KUBERNETES_MODE ? inetAddress.getHostName() : inetAddress.getHostAddress();
+    }
+    return null;
+  }
 
   /**
    * whether is macOS

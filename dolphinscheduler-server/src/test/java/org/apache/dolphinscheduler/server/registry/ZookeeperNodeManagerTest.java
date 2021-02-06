@@ -74,7 +74,7 @@ public class ZookeeperNodeManagerTest {
         Set<String> masterNodes = zookeeperNodeManager.getMasterNodes();
         Assert.assertTrue(CollectionUtils.isNotEmpty(masterNodes));
         Assert.assertEquals(1, masterNodes.size());
-        Assert.assertEquals(OSUtils.getHost() + ":" + masterConfig.getListenPort(), masterNodes.iterator().next());
+        Assert.assertEquals(OSUtils.getAddr(masterConfig.getListenPort()), masterNodes.iterator().next());
     }
 
     @Test
@@ -102,6 +102,6 @@ public class ZookeeperNodeManagerTest {
         Set<String> workerNodes = zookeeperNodeManager.getWorkerGroupNodes("default");
         Assert.assertTrue(CollectionUtils.isNotEmpty(workerNodes));
         Assert.assertEquals(1, workerNodes.size());
-        Assert.assertEquals(OSUtils.getHost() + ":" + workerConfig.getListenPort(), workerNodes.iterator().next());
+        Assert.assertEquals(OSUtils.getAddr(workerConfig.getListenPort()), workerNodes.iterator().next());
     }
 }

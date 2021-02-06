@@ -88,6 +88,12 @@ public class OSUtilsTest {
         Assert.assertNotEquals(0, processId);
     }
     @Test
+    public void getAddr(){
+        Assert.assertEquals(OSUtils.getHost() + ":5678", OSUtils.getAddr(5678));
+        Assert.assertEquals("127.0.0.1:5678", OSUtils.getAddr("127.0.0.1", 5678));
+        Assert.assertEquals("localhost:1234", OSUtils.getAddr("localhost", 1234));
+    }
+    @Test
     public void getHost(){
         String host = OSUtils.getHost();
         Assert.assertNotNull(host);

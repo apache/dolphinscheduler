@@ -174,7 +174,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
     private void initTaskParameters() {
         taskInstance.setLogPath(getTaskLogPath(taskInstance));
-        taskInstance.setHost(OSUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
+        taskInstance.setHost(OSUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
