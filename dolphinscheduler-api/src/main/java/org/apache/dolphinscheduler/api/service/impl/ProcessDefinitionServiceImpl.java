@@ -73,10 +73,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -158,12 +160,15 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
     /**
      * create process definition
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param name process definition name
+     * @param processDefinitionName process definition name
      * @param processDefinitionJson process definition json
      * @param desc description
      * @param locations locations for nodes
@@ -174,7 +179,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createProcessDefinition(User loginUser,
                                                        String projectName,
-                                                       String name,
+                                                       String processDefinitionName,
                                                        String processDefinitionJson,
                                                        String desc,
                                                        String locations,
@@ -206,74 +211,17 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
             return result;
         }
-
-        processDefinition.setName(name);
-        processDefinition.setVersion(1);
-        processDefinition.setReleaseState(ReleaseState.OFFLINE);
-        processDefinition.setUserId(loginUser.getId());
-        processDefinition.setDescription(desc);
-        processDefinition.setLocations(locations);
-        processDefinition.setConnects(connects);
-        processDefinition.setTimeout(processData.getTimeout());
-        processDefinition.setTenantId(processData.getTenantId());
-        processDefinition.setModifyBy(loginUser.getUserName());
-
-        //custom global params
-        List<Property> globalParamsList = processData.getGlobalParams();
-        if (CollectionUtils.isNotEmpty(globalParamsList)) {
-            Set<Property> globalParamsSet = new HashSet<>(globalParamsList);
-            globalParamsList = new ArrayList<>(globalParamsSet);
-            processDefinition.setGlobalParamList(globalParamsList);
-        }
-        processDefinition.setCreateTime(now);
-        processDefinition.setUpdateTime(now);
-        processDefinition.setFlag(Flag.YES);
-
-        // save the new process definition
-        processDefinitionMapper.insert(processDefinition);
-
-        // parse and save the taskDefinition and processTaskRelation
-        try {
-            List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-
-            for (TaskNode task : taskNodeList) {
-                taskDefinitionService.createTaskDefinition(loginUser, projectName, JSONUtils.toJsonString(task));
-            }
-
-            DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
-            Collection<String> beginNode = dag.getBeginNode();
-            Collection<String> endNode = dag.getEndNode();
-
-            // TODO:  query taskCode by  projectCode and taskName
-
-            processTaskRelationService.createProcessTaskRelation(
-                    loginUser,
-                    name,
-                    projectName,
-                    processDefinitionCode,
-                    0L,
-                    0L,
-                    "0",
-                    "");
-
-        } catch (Exception e) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
-            return result;
-        }
-
-        // save process definition log
-        ProcessDefinitionLog processDefinitionLog = JSONUtils.parseObject(
-                JSONUtils.toJsonString(processDefinition), ProcessDefinitionLog.class);
-
-        processDefinitionLog.setOperator(loginUser.getId());
-        processDefinitionLog.setOperateTime(now);
-        processDefinitionLogMapper.insert(processDefinitionLog);
+        ProcessDefinitionLog processDefinitionLog =  processService.updateProcessLog(loginUser, processDefinitionCode, processDefinitionName, processData,
+                project, desc, locations, connects);
+        processService.switchVersion(processDefinition, processDefinitionLog);
+        processService.createTaskAndRelation(loginUser, projectName, "", processDefinition, processData);
 
         // return processDefinition object with ID
         result.put(Constants.DATA_LIST, processDefinition.getId());
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
 
     /**
      * get resource ids
@@ -475,7 +423,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefinition.getName());
             return result;
         }
-
         if (!name.equals(processDefinition.getName())) {
             // check whether the new process define name exist
             ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getId(), name);
@@ -487,55 +434,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         // get the processdefinitionjson before saving,and then save the name and taskid
         String oldJson = processDefinition.getProcessDefinitionJson();
         processDefinitionJson = processService.changeJson(processData, oldJson);
-
-        // update TaskDefinition
         ProcessData newProcessData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-        List<TaskNode> taskNodeList = (newProcessData.getTasks() == null) ? new ArrayList<>() : newProcessData.getTasks();
+        int saveResult = processService.saveProcessDefinition(loginUser, project, name, desc,
+                locations, connects, newProcessData, processDefinition);
 
-        for (TaskNode task : taskNodeList) {
-            // TODO update by code directly
-            Map<String, Object> stringObjectMap = taskDefinitionService.queryTaskDefinitionByName(loginUser, projectName, task.getName());
-            TaskDefinition taskDefinition = (TaskDefinition) stringObjectMap.get(Constants.DATA_LIST);
-            taskDefinitionService.updateTaskDefinition(loginUser, projectName, taskDefinition.getCode(), JSONUtils.toJsonString(task));
-        }
-
-        List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryByDefinitionCode(processDefinition.getCode());
-        int version = getNextVersion(processDefinitionLogs);
-
-        Date now = new Date();
-        processDefinition.setVersion(version);
-        processDefinition.setName(name);
-        processDefinition.setReleaseState(ReleaseState.OFFLINE);
-        processDefinition.setProjectCode(project.getCode());
-        processDefinition.setDescription(desc);
-        processDefinition.setLocations(locations);
-        processDefinition.setConnects(connects);
-        processDefinition.setTimeout(processData.getTimeout());
-        processDefinition.setTenantId(processData.getTenantId());
-
-        //custom global params
-        List<Property> globalParamsList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(processData.getGlobalParams())) {
-            Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
-            globalParamsList = new ArrayList<>(userDefParamsSet);
-        }
-        processDefinition.setGlobalParamList(globalParamsList);
-        processDefinition.setUpdateTime(now);
-        processDefinition.setFlag(Flag.YES);
-
-
-        processDefinition.setVersion(version);
-        int update = processDefinitionMapper.updateById(processDefinition);
-
-        // save processDefinitionLog
-        ProcessDefinitionLog processDefinitionLog = JSONUtils.parseObject(
-                JSONUtils.toJsonString(processDefinition), ProcessDefinitionLog.class);
-
-        processDefinitionLog.setOperator(loginUser.getId());
-        processDefinitionLog.setOperateTime(now);
-        int insert = processDefinitionLogMapper.insert(processDefinitionLog);
-
-        if (update > 0 && insert > 0) {
+        if (saveResult > 0) {
             putMsg(result, Status.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
         } else {
@@ -544,13 +447,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
     }
 
-    private int getNextVersion(List<ProcessDefinitionLog>  processDefinitionLogs) {
-        return processDefinitionLogs
-                .stream()
-                .map(ProcessDefinitionLog::getVersion)
-                .max((x, y) -> x > y ? x : y)
-                .orElse(0) + 1;
-    }
 
     /**
      * verify process definition name unique
@@ -1732,18 +1628,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     , version);
             return result;
         }
-
-        processDefinition.setVersion(processDefinitionLog.getVersion());
-        processDefinition.setDescription(processDefinitionLog.getDescription());
-        processDefinition.setLocations(processDefinitionLog.getLocations());
-        processDefinition.setConnects(processDefinitionLog.getConnects());
-        processDefinition.setTimeout(processDefinitionLog.getTimeout());
-        processDefinition.setGlobalParams(processDefinitionLog.getGlobalParams());
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setWarningGroupId(processDefinitionLog.getWarningGroupId());
-        processDefinition.setResourceIds(processDefinitionLog.getResourceIds());
-
-        if (processDefinitionMapper.updateById(processDefinition) > 0) {
+        int switchVersion = processService.switchVersion(processDefinition, processDefinitionLog);
+        if (switchVersion > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);

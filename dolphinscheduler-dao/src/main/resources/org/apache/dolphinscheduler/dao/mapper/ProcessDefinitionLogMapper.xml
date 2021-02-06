@@ -25,7 +25,6 @@
          warning_group_id, timeout, tenant_id,operator, operate_time, create_time,
           update_time
     </sql>
-
     <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select pd.id, pd.code, pd.name, pd.version, pd.description, pd.project_code,
         pd.release_state, pd.user_id,pd.global_params, pd.flag, pd.locations, pd.connects,
@@ -37,15 +36,13 @@
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>
-
     <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select
         <include refid="baseSql"/>
         from t_ds_process_definition_log
         WHERE pd.code = #{processDefinitionCode}
     </select>
-
-    <select id="queryByProcessDefinitionCodeAndVersion"
+    <select id="queryByDefinitionCodeAndVersion"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select
         <include refid="baseSql"/>
@@ -53,5 +50,10 @@
         where code = #{processDefinitionCode}
         and version = #{version}
     </select>
+    <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
+        select max(version)
+        from t_ds_process_definition_log
+        where code = #{processDefinitionCode}
 
+    </select>
 </mapper>

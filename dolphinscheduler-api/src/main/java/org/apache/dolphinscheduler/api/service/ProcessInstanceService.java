@@ -52,12 +52,15 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.poi.ddf.DefaultEscherRecordFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -407,45 +410,45 @@ public class ProcessInstanceService extends BaseService {
                                                      Flag flag, String locations, String connects) throws ParseException {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
-
         //check project permission
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-
         //check process instance exists
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
         if (processInstance == null) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
-
         //check process instance status
         if (!processInstance.getState().typeIsFinished()) {
             putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR,
                     processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
-        Date schedule = processInstance.getScheduleTime();
-        if (scheduleTime != null) {
-            schedule = DateUtils.getScheduleDate(scheduleTime);
-        }
-
-        ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
         ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
         //check workflow json is valid
         result = processDefinitionService.checkProcessNodeList(processData, processInstanceJson);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        setProcessInstance(processInstance, processDefinition, schedule, locations,
+        Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
+                processDefinition.getUserId());
+        // get the processinstancejson before saving,and then save the name and taskid
+        String oldJson = processInstance.getProcessInstanceJson();
+        if (StringUtils.isNotEmpty(oldJson)) {
+            processInstanceJson = processService.changeJson(processData, oldJson);
+        }
+        setProcessInstance(processInstance, tenant, scheduleTime, locations,
                 connects, processInstanceJson, processData);
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
-            updateDefine = syncDefinition(processInstanceJson, locations, connects,
+            updateDefine = syncDefinition(loginUser, project, processInstanceJson, locations, connects,
                     processInstance, processDefinition, processData);
         }
         if (update > 0 && updateDefine > 0) {
@@ -453,14 +456,14 @@ public class ProcessInstanceService extends BaseService {
         } else {
             putMsg(result, Status.UPDATE_PROCESS_INSTANCE_ERROR);
         }
-
         return result;
-
     }
 
     /**
      * sync definition according process instance
      *
+     * @param  loginUser
+     * @param project
      * @param processInstanceJson
      * @param locations
      * @param connects
@@ -469,9 +472,10 @@ public class ProcessInstanceService extends BaseService {
      * @param processData
      * @return
      */
-    private int syncDefinition(String processInstanceJson, String locations, String connects,
+    private int syncDefinition(User loginUser, Project project, String processInstanceJson, String locations, String connects,
                                ProcessInstance processInstance, ProcessDefinition processDefinition,
                                ProcessData processData) {
+
         String originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
         processDefinition.setProcessDefinitionJson(processInstanceJson);
         processDefinition.setGlobalParams(originDefParams);
@@ -479,10 +483,10 @@ public class ProcessInstanceService extends BaseService {
         processDefinition.setConnects(connects);
         processDefinition.setTimeout(processInstance.getTimeout());
         processDefinition.setUpdateTime(new Date());
-        // add process definition version
-        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
-        processDefinition.setVersion(version);
-        int updateDefine = processDefineMapper.updateById(processDefinition);
+
+        int updateDefine = processService.saveProcessDefinition(loginUser, project, processDefinition.getName(),
+                processDefinition.getDescription(), locations, connects,
+                processData, processDefinition);
         return updateDefine;
     }
 
@@ -490,17 +494,22 @@ public class ProcessInstanceService extends BaseService {
      * update process instance attributes
      *
      * @param processInstance
-     * @param processDefinition
-     * @param schedule
+     * @param tenant
+     * @param scheduleTime
      * @param locations
      * @param connects
      * @param processInstanceJson
      * @param processData
      * @return false if check failed or
      */
-    private void setProcessInstance(ProcessInstance processInstance, ProcessDefinition processDefinition,
-                                    Date schedule, String locations, String connects, String processInstanceJson,
+    private void setProcessInstance(ProcessInstance processInstance, Tenant tenant,
+                                    String scheduleTime, String locations, String connects, String processInstanceJson,
                                     ProcessData processData) {
+
+        Date schedule = processInstance.getScheduleTime();
+        if (scheduleTime != null) {
+            schedule = DateUtils.getScheduleDate(scheduleTime);
+        }
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
         processInstance.setConnects(connects);
@@ -513,15 +522,8 @@ public class ProcessInstanceService extends BaseService {
                 processInstance.getCmdTypeIfComplement(), schedule);
         int timeout = processData.getTimeout();
         processInstance.setTimeout(timeout);
-        Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
-                processDefinition.getUserId());
         if (tenant != null) {
             processInstance.setTenantCode(tenant.getTenantCode());
-        }
-        // get the processinstancejson before saving,and then save the name and taskid
-        String oldJson = processInstance.getProcessInstanceJson();
-        if (StringUtils.isNotEmpty(oldJson)) {
-            processInstanceJson = processService.changeJson(processData, oldJson);
         }
         processInstance.setProcessInstanceJson(processInstanceJson);
         processInstance.setGlobalParams(globalParams);
@@ -739,13 +741,9 @@ public class ProcessInstanceService extends BaseService {
     private static DAG<String, TaskNode, TaskNodeRelation> processInstance2DAG(ProcessInstance processInstance) {
 
         String processDefinitionJson = processInstance.getProcessInstanceJson();
-
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
         List<TaskNode> taskNodeList = processData.getTasks();
-
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
-
         return DagHelper.buildDagGraph(processDag);
     }
 
