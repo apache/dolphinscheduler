@@ -30,11 +30,11 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 
 ```
 $ docker run -d --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
-dolphinscheduler all
+apache/dolphinscheduler:latest all
 ```
 
 访问前端界面：http://192.168.xx.xx:12345
@@ -43,33 +43,41 @@ dolphinscheduler all
 
 你能够运行dolphinscheduler中的部分服务。
 
+* 创建一个 **本地卷** 用于资源存储，如下:
+
+```
+docker volume create dolphinscheduler-resource-local
+```
+
 * 启动一个 **master server**, 如下:
 
 ```
 $ docker run -d --name dolphinscheduler-master \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
-dolphinscheduler master-server
+apache/dolphinscheduler:latest master-server
 ```
 
 * 启动一个 **worker server**, 如下:
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
-dolphinscheduler worker-server
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
+-v dolphinscheduler-resource-local:/dolphinscheduler \
+apache/dolphinscheduler:latest worker-server
 ```
 
 * 启动一个 **api server**, 如下:
 
 ```
 $ docker run -d --name dolphinscheduler-api \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
-dolphinscheduler api-server
+apache/dolphinscheduler:latest api-server
 ```
 
 * 启动一个 **alert server**, 如下:
@@ -78,7 +86,7 @@ dolphinscheduler api-server
 $ docker run -d --name dolphinscheduler-alert \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
-dolphinscheduler alert-server
+apache/dolphinscheduler:latest alert-server
 ```
 
 **注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM`。
