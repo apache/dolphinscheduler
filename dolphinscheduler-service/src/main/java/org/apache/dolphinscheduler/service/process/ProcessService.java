@@ -370,14 +370,14 @@ public class ProcessService {
      * @param processDefinitionCode processDefinitionCode
      * @return process definition
      */
-     public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
+    public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
         if (processDefinition.getVersion() != version) {
             ProcessDefinitionLog log = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
             processDefinition = convertFromLog(log);
         }
         return processDefinition;
-     }
+    }
 
     /**
      * covert log to process definition
@@ -2303,20 +2303,7 @@ public class ProcessService {
             //TODO... task code exists, update task
             //createTaskDefinition(loginUser, projectName, JSONUtils.toJsonString(task));
         }
-//        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
-//        Collection<String> beginNode = dag.getBeginNode();
-//        Collection<String> endNode = dag.getEndNode();
-
         // TODO:  query taskCode by  projectCode and taskName
-//        processTaskRelationService.createProcessTaskRelation(
-//                loginUser,
-//                relationName,
-//                projectName,
-//                processDefinition.getCode(),
-//                0L,
-//                0L,
-//                "0",
-//                "");
     }
 
 }
