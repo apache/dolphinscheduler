@@ -691,14 +691,6 @@ public class ProcessService {
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
                 // Recalculate global parameters after rerun.
-                //if the CommandType is start from fail task note,the globalparam can't be cover
-                if (commandType != CommandType.START_FAILURE_TASK_PROCESS) {
-                    processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                            processDefinition.getGlobalParamMap(),
-                            processDefinition.getGlobalParamList(),
-                            getCommandTypeIfComplement(processInstance, command),
-                            processInstance.getScheduleTime()));
-                }
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
