@@ -92,6 +92,10 @@ public class TaskResponseEvent {
      * channel
      */
     private Channel channel;
+    /**
+     * task return result
+     */
+    private String result;
     
     public static TaskResponseEvent newAck(ExecutionStatus state,
                                            Date startTime,
@@ -118,7 +122,8 @@ public class TaskResponseEvent {
                                               String appIds,
                                               int taskInstanceId,
                                               String varPool,
-                                              Channel channel) {
+                                              Channel channel,
+                                              String result) {
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
         event.setEndTime(endTime);
@@ -128,6 +133,7 @@ public class TaskResponseEvent {
         event.setEvent(Event.RESULT);
         event.setVarPool(varPool);
         event.setChannel(channel);
+        event.setResult(result);
         return event;
     }
 
@@ -225,5 +231,13 @@ public class TaskResponseEvent {
 
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

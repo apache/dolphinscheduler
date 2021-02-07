@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import static org.apache.dolphinscheduler.common.Constants.HIVE_CONF;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SEMICOLON;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
@@ -34,7 +28,6 @@ import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -51,7 +44,6 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -62,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -136,8 +127,6 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getConnParams());
         try {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
-            // load class
-            DataSourceFactory.loadClass(DbType.valueOf(sqlParameters.getType()));
 
             // get datasource
             baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(sqlParameters.getType()),
@@ -255,10 +244,8 @@ public class SqlTask extends AbstractTask {
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
         try {
-            // if upload resource is HDFS and kerberos startup
-            CommonUtils.loadKerberosConf();
             // create connection
-            connection = createConnection();
+            connection = baseDataSource.getConnection();
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -383,34 +370,6 @@ public class SqlTask extends AbstractTask {
                 funcStmt.execute(createFunc);
             }
         }
-    }
-
-    /**
-     * create connection
-     *
-     * @return connection
-     * @throws Exception Exception
-     */
-    private Connection createConnection() throws Exception {
-        // if hive , load connection params if exists
-        Connection connection = null;
-        if (HIVE == DbType.valueOf(sqlParameters.getType())) {
-            Properties paramProp = new Properties();
-            paramProp.setProperty(USER, baseDataSource.getUser());
-            paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
-            Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
-                    SEMICOLON,
-                    HIVE_CONF);
-            paramProp.putAll(connParamMap);
-
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    paramProp);
-        } else {
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    baseDataSource.getUser(),
-                    baseDataSource.getPassword());
-        }
-        return connection;
     }
 
     /**
