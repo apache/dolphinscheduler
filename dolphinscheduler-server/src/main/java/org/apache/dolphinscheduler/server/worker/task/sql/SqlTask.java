@@ -144,9 +144,9 @@ public class SqlTask extends AbstractTask {
                     .collect(Collectors.toList());
 
             // handle preSql of query type
-            if(preStatementSqlBinds.size()>0){
-            	handlePreQuerySql(sqlParameters.getPreStatements());
-			      }
+            if (preStatementSqlBinds.size() > 0) {
+                handlePreQuerySql(sqlParameters.getPreStatements());
+            }
 
             List<SqlBinds> postStatementSqlBinds = Optional.ofNullable(sqlParameters.getPostStatements())
                     .orElse(new ArrayList<>())
@@ -169,50 +169,50 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-	private void handlePreQuerySql(List<String> preStatements) {
-    	try(Connection con = baseDataSource.getConnection()) {
-			for (String preSql : preStatements) {
-				if (!isQuerySql(preSql)) {
-					continue;
-				}
-				SqlBinds sqlBind = getSqlAndSqlParamsMap(preSql);
-				extractPreQuerySqlParams(con,sqlBind);
-			}
-		} catch (Exception e) {
-			logger.error("execute pre-query-sql error",e);
-			throw new RuntimeException(e);
-		}
-	}
+    private void handlePreQuerySql(List<String> preStatements) {
+        try (Connection con = baseDataSource.getConnection()) {
+            for (String preSql : preStatements) {
+                if (!isQuerySql(preSql)) {
+                    continue;
+                }
+                SqlBinds sqlBind = getSqlAndSqlParamsMap(preSql);
+                extractPreQuerySqlParams(con, sqlBind);
+            }
+        } catch (Exception e) {
+            logger.error("execute pre-query-sql error", e);
+            throw new RuntimeException(e);
+        }
+    }
 
-	private boolean isQuerySql(String preSql) {
-    	if(Objects.nonNull(preSql) && preSql.trim().toLowerCase().startsWith("select ")){
-    		return true;
-		}
-    	return false;
-	}
+    private boolean isQuerySql(String preSql) {
+        if (Objects.nonNull(preSql) && preSql.trim().toLowerCase().startsWith("select ")) {
+            return true;
+        }
+        return false;
+    }
 
-	private void extractPreQuerySqlParams(Connection connection, SqlBinds sqlBind) throws Exception{
-		Map<String,Property> nodeParams =  sqlParameters.getLocalParametersMap();
-		if(nodeParams == null){
-			nodeParams = new HashMap<>();
-		}
-		try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind);
-				ResultSet rs =pstmt.executeQuery(sqlBind.getSql())){
-			ResultSetMetaData metaData = rs.getMetaData();
-			// get only 1 row
-			if (rs.next()){
-				for (int i = 0; i < metaData.getColumnCount(); i++) {
-					String key = metaData.getColumnName(i);
-					Property p = new Property(key, Direct.IN, DataType.VARCHAR,rs.getString(i));
-					nodeParams.put(key,p);
-				}
-			}
-			logger.info("pre statement execute result: {}, for sql: {}",rs.getRow(),sqlBind.getSql());
-		}
-		sqlParameters.setLocalParams(nodeParams.values().stream().collect(Collectors.toList()));
-	}
+    private void extractPreQuerySqlParams(Connection connection, SqlBinds sqlBind) throws Exception {
+        Map<String, Property> nodeParams = sqlParameters.getLocalParametersMap();
+        if (nodeParams == null) {
+            nodeParams = new HashMap<>();
+        }
+        try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind);
+             ResultSet rs = pstmt.executeQuery(sqlBind.getSql())) {
+            ResultSetMetaData metaData = rs.getMetaData();
+            // get only 1 row
+            if (rs.next()) {
+                for (int i = 0; i < metaData.getColumnCount(); i++) {
+                    String key = metaData.getColumnName(i);
+                    Property p = new Property(key, Direct.IN, DataType.VARCHAR, rs.getString(i));
+                    nodeParams.put(key, p);
+                }
+            }
+            logger.info("pre statement execute result: {}, for sql: {}", rs.getRow(), sqlBind.getSql());
+        }
+        sqlParameters.setLocalParams(nodeParams.values().stream().collect(Collectors.toList()));
+    }
 
-	/**
+    /**
      * ready to execute SQL and parameter entity Map
      *
      * @return SqlBinds
@@ -362,12 +362,12 @@ public class SqlTask extends AbstractTask {
      * @param preStatementsBinds preStatementsBinds
      */
     private void preSql(Connection connection,
-        List<SqlBinds> preStatementsBinds) throws Exception{
-        for (SqlBinds sqlBind: preStatementsBinds) {
-            if(isQuerySql(sqlBind.getSql())){
+                        List<SqlBinds> preStatementsBinds) throws Exception {
+        for (SqlBinds sqlBind : preStatementsBinds) {
+            if (isQuerySql(sqlBind.getSql())) {
                 continue;
             }
-            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)){
+            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
                 int result = pstmt.executeUpdate();
                 logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
 
