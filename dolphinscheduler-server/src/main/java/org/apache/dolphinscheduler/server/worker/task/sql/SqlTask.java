@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -52,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -167,7 +170,7 @@ public class SqlTask extends AbstractTask {
     }
 
 	private void handlePreQuerySql(List<String> preStatements) {
-    	try(Connection con = createConnection()) {
+    	try(Connection con = baseDataSource.getConnection()) {
 			for (String preSql : preStatements) {
 				if (!isQuerySql(preSql)) {
 					continue;
@@ -200,7 +203,7 @@ public class SqlTask extends AbstractTask {
 			if (rs.next()){
 				for (int i = 0; i < metaData.getColumnCount(); i++) {
 					String key = metaData.getColumnName(i);
-					Property p = new Property(key,Direct.IN,DataType.VARCHAR,rs.getString(i));
+					Property p = new Property(key, Direct.IN, DataType.VARCHAR,rs.getString(i));
 					nodeParams.put(key,p);
 				}
 			}
@@ -362,9 +365,9 @@ public class SqlTask extends AbstractTask {
     private void preSql(Connection connection,
         List<SqlBinds> preStatementsBinds) throws Exception{
         for (SqlBinds sqlBind: preStatementsBinds) {
-        	  if(isQuerySql(sqlBind.getSql())){
-        		  continue;
-			      }
+            if(isQuerySql(sqlBind.getSql())){
+                continue;
+            }
             try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)){
                 int result = pstmt.executeUpdate();
                 logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
