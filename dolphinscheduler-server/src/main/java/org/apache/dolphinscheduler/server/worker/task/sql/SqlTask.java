@@ -144,7 +144,7 @@ public class SqlTask extends AbstractTask {
                     .collect(Collectors.toList());
 
             // handle preSql of query type
-            if (preStatementSqlBinds.size() > 0) {
+            if (preStatementSqlBinds.isEmpty()) {
                 handlePreQuerySql(sqlParameters.getPreStatements());
             }
 
@@ -180,15 +180,12 @@ public class SqlTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.error("execute pre-query-sql error", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("execute pre-query-sql error",e);
         }
     }
 
     private boolean isQuerySql(String preSql) {
-        if (Objects.nonNull(preSql) && preSql.trim().toLowerCase().startsWith("select ")) {
-            return true;
-        }
-        return false;
+        return  (Objects.nonNull(preSql) && preSql.trim().toLowerCase().startsWith("select "));
     }
 
     private void extractPreQuerySqlParams(Connection connection, SqlBinds sqlBind) throws Exception {
