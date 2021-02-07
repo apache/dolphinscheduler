@@ -170,7 +170,7 @@ public class TaskManagerTest {
 
     @Test
     public void testSqlTaskReturnString() {
-        String CONNECTION_PARAMS = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\","
+        String params = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\","
                 + "\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"}";
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskParams("{\"localParams\":[{\"prop\":\"ret\", \"direct\":\"OUT\", \"type\":\"VARCHAR\", \"value\":\"\"}],"
@@ -184,7 +184,7 @@ public class TaskManagerTest {
         taskExecutionContext.setLogPath("/tmp/dx");
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
-        sqlTaskExecutionContext.setConnectionParams(CONNECTION_PARAMS);
+        sqlTaskExecutionContext.setConnectionParams(params);
         taskExecutionContext.setSqlTaskExecutionContext(sqlTaskExecutionContext);
         SqlTask sqlTask = new SqlTask(taskExecutionContext, logger, null);
         SqlParameters sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
