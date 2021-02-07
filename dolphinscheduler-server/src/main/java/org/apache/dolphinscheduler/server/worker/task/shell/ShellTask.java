@@ -84,7 +84,6 @@ public class ShellTask extends AbstractTask {
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
             taskExecutionContext,
             logger);
-        shellParameters = null;
     }
 
     @Override

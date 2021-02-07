@@ -278,16 +278,7 @@ public class SqlTask extends AbstractTask {
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
                 String updateResult = String.valueOf(stmt.executeUpdate());
-                for (Property info :properties) {
-                    if (Direct.OUT == info.getDirect()) {
-                        List<Map<String,String>> updateRL = new ArrayList<>();
-                        Map<String,String> updateRM = new HashMap<>();
-                        updateRM.put(info.getProp(),updateResult);
-                        updateRL.add(updateRM);
-                        result = JSONUtils.toJsonString(updateRL);
-                        break;
-                    }
-                }
+                result = setNonQuerySqlReturn(updateResult, properties);
             }
 
             postSql(connection, postStatementsBinds);
@@ -299,6 +290,21 @@ public class SqlTask extends AbstractTask {
         } finally {
             close(resultSet, stmt, connection);
         }
+    }
+
+    public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
+        String result = null;
+        for (Property info :properties) {
+            if (Direct.OUT == info.getDirect()) {
+                List<Map<String,String>> updateRL = new ArrayList<>();
+                Map<String,String> updateRM = new HashMap<>();
+                updateRM.put(info.getProp(),updateResult);
+                updateRL.add(updateRM);
+                result = JSONUtils.toJsonString(updateRL);
+                break;
+            }
+        }
+        return result;
     }
 
     /**
