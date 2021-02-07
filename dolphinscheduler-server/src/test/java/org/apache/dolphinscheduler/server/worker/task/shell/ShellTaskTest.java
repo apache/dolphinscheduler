@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
@@ -34,8 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
-import org.apache.dolphinscheduler.server.worker.task.sql.SqlTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.junit.Before;
 import org.junit.Test;
