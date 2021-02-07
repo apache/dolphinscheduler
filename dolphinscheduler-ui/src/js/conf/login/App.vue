@@ -32,7 +32,7 @@
                   @on-enterkey="_ok">
           </x-input>
         </div>
-        <p class="error" v-if="isUserPassword">
+        <p class="error" v-if="isUserName">
           {{userNameText}}
         </p>
       </div>
@@ -90,7 +90,7 @@
                 sessionStorage.setItem("sessionId", sessionId)
                 cookies.set('sessionId', sessionId,{ path: '/' })
               }
-              
+
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {
