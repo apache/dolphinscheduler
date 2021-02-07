@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.api.utils.exportprocess.TaskNodeParamFactory;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -48,7 +47,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -66,7 +64,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
@@ -85,7 +82,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -195,8 +191,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
 
         ProcessDefinition processDefinition = new ProcessDefinition();
-        Date now = new Date();
-
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
         Map<String, Object> checkProcessJson = checkProcessNodeList(processData, processDefinitionJson);
         if (checkProcessJson.get(Constants.STATUS) != Status.SUCCESS) {
@@ -211,7 +205,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
             return result;
         }
-        ProcessDefinitionLog processDefinitionLog =  processService.updateProcessLog(loginUser, processDefinitionCode, processDefinitionName, processData,
+        ProcessDefinitionLog processDefinitionLog =  processService.insertProcessDefinitionLog(loginUser, processDefinitionCode, processDefinitionName, processData,
                 project, desc, locations, connects);
         processService.switchVersion(processDefinition, processDefinitionLog);
         processService.createTaskAndRelation(loginUser, projectName, "", processDefinition, processData);

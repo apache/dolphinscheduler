@@ -2231,7 +2231,7 @@ public class ProcessService {
             updateTaskDefinition(operator, project.getCode(), task, taskDefinition);
         }
         createTaskAndRelation(operator, project.getName(), "", processDefinition, processData);
-        ProcessDefinitionLog processDefinitionLog = updateProcessLog(operator, processDefinition.getCode(),
+        ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
         return switchVersion(processDefinition, processDefinitionLog);
     }
@@ -2247,9 +2247,9 @@ public class ProcessService {
      * @param connects
      * @return
      */
-    public ProcessDefinitionLog updateProcessLog(User operator, Long processDefinitionCode, String processDefinitionName,
-                                                 ProcessData processData, Project project,
-                                                 String desc, String locations, String connects) {
+    public ProcessDefinitionLog insertProcessDefinitionLog(User operator, Long processDefinitionCode, String processDefinitionName,
+                                                           ProcessData processData, Project project,
+                                                           String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         int version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinitionLog.getCode());
         processDefinitionLog.setCode(processDefinitionCode);
@@ -2265,6 +2265,7 @@ public class ProcessService {
         processDefinitionLog.setOperator(operator.getId());
         Date updateTime = new Date();
         processDefinitionLog.setOperateTime(updateTime);
+        processDefinitionLog.setUpdateTime(updateTime);
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
@@ -2273,11 +2274,7 @@ public class ProcessService {
             globalParamsList = new ArrayList<>(userDefParamsSet);
         }
         processDefinitionLog.setGlobalParamList(globalParamsList);
-        processDefinitionLog.setUpdateTime(updateTime);
         processDefinitionLog.setFlag(Flag.YES);
-
-        processDefinitionLog.setOperator(operator.getId());
-        processDefinitionLog.setOperateTime(processDefinitionLog.getUpdateTime());
         int insert = processDefinitionLogMapper.insert(processDefinitionLog);
         if (insert > 0) {
             return processDefinitionLog;
