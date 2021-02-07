@@ -23,9 +23,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -69,11 +67,6 @@ public class FeiShuSender {
             password = config.get(FeiShuParamsConstants.NAME_FEI_SHU_PASSWORD);
         }
 
-    }
-
-    private static RequestConfig getProxyConfig(String proxy, int port) {
-        HttpHost httpProxy = new HttpHost(proxy, port);
-        return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
     private static String textToJsonString(AlertData alertData) {
@@ -168,7 +161,7 @@ public class FeiShuSender {
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
-                logger.error("send feishu message error, return http status code: " + statusCode);
+                logger.error("send feishu message error, return http status code: {} ", statusCode);
             }
             String resp;
             try {
@@ -178,7 +171,7 @@ public class FeiShuSender {
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
+            logger.info("Fei Shu send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(), resp);
             return resp;
         } finally {
             httpClient.close();
