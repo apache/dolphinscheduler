@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -546,35 +547,39 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
             //get process global
-            String globalParams = this.processInstance.getGlobalParams();
-            if (StringUtils.isNotEmpty(globalParams)) {
-                Map<String, String> globalMap = getGlobalParamMap(globalParams);
-                if (globalMap != null) {
-                    // the param save in localParams
-                    Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
-                    Object localParams = result.get("localParams");
-                    if (localParams != null) {
-                        List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
-                        for (Property info : allParam) {
-                            if (info.getDirect().equals(Direct.IN)) {
-                                String paramName = info.getProp();
-                                String value = globalMap.get(paramName);
-                                if (StringUtils.isNotEmpty(value)) {
-                                    info.setValue(value);
-                                }
-                            }
-                        }
-                        result.put("localParams", allParam);
-                        taskNode.setParams(JSONUtils.toJsonString(result));
-                        // task instance node json
-                        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
-                    }
-                }
-            }
+            setProcessGlobal(taskNode, taskInstance);
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
         return taskInstance;
+    }
+
+    private void setProcessGlobal(TaskNode taskNode, TaskInstance taskInstance) {
+        String globalParams = this.processInstance.getGlobalParams();
+        if (StringUtils.isNotEmpty(globalParams)) {
+            Map<String, String> globalMap = getGlobalParamMap(globalParams);
+            if (globalMap != null) {
+                // the param save in localParams
+                Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+                Object localParams = result.get(LOCAL_PARAMS);
+                if (localParams != null) {
+                    List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+                    for (Property info : allParam) {
+                        if (info.getDirect().equals(Direct.IN)) {
+                            String paramName = info.getProp();
+                            String value = globalMap.get(paramName);
+                            if (StringUtils.isNotEmpty(value)) {
+                                info.setValue(value);
+                            }
+                        }
+                    }
+                    result.put(LOCAL_PARAMS, allParam);
+                    taskNode.setParams(JSONUtils.toJsonString(result));
+                    // task instance node json
+                    taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+                }
+            }
+        }
     }
 
     public Map<String, String> getGlobalParamMap(String globalParams) {

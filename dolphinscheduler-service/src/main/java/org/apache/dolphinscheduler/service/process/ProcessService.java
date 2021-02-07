@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PRO
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
@@ -1574,7 +1575,7 @@ public class ProcessService {
         }
         TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
         Map<String, Object> taskParams = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
-        Object localParams = taskParams.get("localParams");
+        Object localParams = taskParams.get(LOCAL_PARAMS);
         if (localParams == null) {
             return;
         }
@@ -1597,24 +1598,24 @@ public class ProcessService {
                 }
             }
         }
-        taskParams.put("localParams", allParam);
+        taskParams.put(LOCAL_PARAMS, allParam);
         taskNode.setParams(JSONUtils.toJsonString(taskParams));
         // task instance node json
         taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         String params4ProcessString = JSONUtils.toJsonString(params4Process);
-        int i = this.processInstanceMapper.updateGlobalParamById(params4ProcessString, processInstance.getId());
-        logger.info("i:{}, params4Process:{}, processInstanceId:{}", i, params4ProcessString, processInstance.getId());
+        int updateCount = this.processInstanceMapper.updateGlobalParamById(params4ProcessString, processInstance.getId());
+        logger.info("updateCount:{}, params4Process:{}, processInstanceId:{}", updateCount, params4ProcessString, processInstance.getId());
     }
 
     public List<Map<String, String>> getListMapByString(String json) {
-        List<Map<String, String>> result1 = new ArrayList<>();
-        ArrayNode result = JSONUtils.parseArray(json);
-        Iterator<JsonNode> listIterator = result.iterator();
+        List<Map<String, String>> allParams = new ArrayList<>();
+        ArrayNode paramsByJson = JSONUtils.parseArray(json);
+        Iterator<JsonNode> listIterator = paramsByJson.iterator();
         while (listIterator.hasNext()) {
-            Map<String, String> ii = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
-            result1.add(ii);
+            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
+            allParams.add(param);
         }
-        return result1;
+        return allParams;
     }
 
     /**
