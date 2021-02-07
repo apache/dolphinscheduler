@@ -203,19 +203,8 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds is empty, single resourcemanager enabled
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
-        String appUrl = "";
-
-        if (StringUtils.isEmpty(rmHaIds)) {
-            //single resourcemanager enabled
-            appUrl = appAddress;
-            yarnEnabled = true;
-        } else {
-            //resourcemanager HA enabled
-            appUrl = getAppAddress(appAddress, rmHaIds);
-            yarnEnabled = true;
-            logger.info("application url : {}", appUrl);
-        }
-
+        String appUrl = StringUtils.isEmpty(rmHaIds) ? appAddress : getAppAddress(appAddress, rmHaIds);
+        yarnEnabled = true;
         if (StringUtils.isBlank(appUrl)) {
             throw new Exception("application url is blank");
         }
@@ -425,8 +414,9 @@ public class HadoopUtils implements Closeable {
 
         String result = Constants.FAILED;
         String applicationUrl = getApplicationUrl(applicationId);
-        logger.info("applicationUrl={}", applicationUrl);
-
+        if (logger.isDebugEnabled()) {
+            logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
+        }
         String responseContent;
         if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
             responseContent = KerberosHttpClient.get(applicationUrl);
@@ -443,7 +433,9 @@ public class HadoopUtils implements Closeable {
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            logger.info("jobHistoryUrl={}", jobHistoryUrl);
+            if (logger.isDebugEnabled()) {
+                logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
+            }
             responseContent = HttpUtils.get(jobHistoryUrl);
             if (null != responseContent) {
                 ObjectNode jsonObject = JSONUtils.parseObject(responseContent);

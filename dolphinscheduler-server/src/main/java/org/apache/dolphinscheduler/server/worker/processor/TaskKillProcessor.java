@@ -108,6 +108,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         try {
             int taskInstanceId = killCommand.getTaskInstanceId();
             TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+
             Integer processId = taskExecutionContext.getProcessId();
             if (processId.equals(0)) {
                 taskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
@@ -115,17 +116,15 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 return Pair.of(true, appIds);
             }
 
-            String cmd = String.format("kill -9 %s", ProcessUtils.getPidsStr(taskExecutionContext.getProcessId()));
-            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
-            logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
-
-            OSUtils.exeCmd(cmd);
-
+            String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
+            if (StringUtils.isNotEmpty(pidsStr)) {
+                String cmd = String.format("kill -9 %s", pidsStr);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+                logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
+                OSUtils.exeCmd(cmd);
+            }
             // find log and kill yarn job
-            appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
+            appIds = ProcessUtils.killYarnJob(taskExecutionContext);
 
             return Pair.of(true, appIds);
         } catch (Exception e) {
@@ -154,42 +153,4 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         }
         return taskKillResponseCommand;
     }
-
-    /**
-     * kill yarn job
-     *
-     * @param host        host
-     * @param logPath     logPath
-     * @param executePath executePath
-     * @param tenantCode  tenantCode
-     * @return List<String> appIds
-     */
-    private List<String> killYarnJob(String host, String logPath, String executePath, String tenantCode) {
-        LogClientService logClient = null;
-        try {
-            logClient = new LogClientService();
-            logger.info("view log host : {},logPath : {}", host, logPath);
-            String log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
-
-            if (StringUtils.isNotEmpty(log)) {
-                List<String> appIds = LoggerUtils.getAppIds(log, logger);
-                if (StringUtils.isEmpty(executePath)) {
-                    logger.error("task instance execute path is empty");
-                    throw new RuntimeException("task instance execute path is empty");
-                }
-                if (appIds.size() > 0) {
-                    ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
-                    return appIds;
-                }
-            }
-        } catch (Exception e) {
-            logger.error("kill yarn job error", e);
-        } finally {
-            if (logClient != null) {
-                logClient.close();
-            }
-        }
-        return Collections.EMPTY_LIST;
-    }
-
 }
