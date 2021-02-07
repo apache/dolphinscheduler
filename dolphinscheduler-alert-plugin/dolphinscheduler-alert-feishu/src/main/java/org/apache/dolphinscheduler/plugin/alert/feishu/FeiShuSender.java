@@ -121,7 +121,7 @@ public class FeiShuSender {
                 list = JSONUtils.toList(alertData.getContent(), Map.class);
             } catch (Exception e) {
                 logger.error("json format exception", e);
-                return null;
+                return alertData.getTitle() + alertData.getContent();
             }
 
             StringBuilder contents = new StringBuilder(100);
