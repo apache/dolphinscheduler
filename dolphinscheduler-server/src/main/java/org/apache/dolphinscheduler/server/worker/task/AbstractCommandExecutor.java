@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
+
 /**
  * abstract command executor
  */
@@ -83,6 +84,11 @@ public abstract class AbstractCommandExecutor {
      * log list
      */
     protected final List<String> logBuffer;
+
+    /**
+     * SHELL result string
+     */
+    protected String resultString;
 
     /**
      * taskExecutionContext
@@ -223,6 +229,14 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
+    public String getResultString() {
+        return resultString;
+    }
+
+    public void setResultString(String result) {
+        this.resultString = result;
+    }
+
     /**
      * cancel application
      *
@@ -355,6 +369,7 @@ public abstract class AbstractCommandExecutor {
                             varPool.append("$VarPool$");
                         } else {
                             logBuffer.add(line);
+                            resultString = line;
                             lastFlushTime = flush(lastFlushTime);
                         }
                     }
