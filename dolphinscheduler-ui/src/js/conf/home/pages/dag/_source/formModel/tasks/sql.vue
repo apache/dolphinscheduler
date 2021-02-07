@@ -30,16 +30,7 @@
       <div slot="text">{{$t('SQL Type')}}</div>
       <div slot="content">
         <div style="display: inline-block;">
-          <m-sql-type
-                  @on-sqlType="_onSqlType"
-                  :sql-type="sqlType">
-          </m-sql-type>
-        </div>
-        <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
-          <el-checkbox-group v-model="showType" size="small">
-            <el-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</el-checkbox>
-            <el-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</el-checkbox>
-          </el-checkbox-group>
+          <m-sql-type @on-sqlType="_onSqlType" :sql-type="sqlType"></m-sql-type>
         </div>
       </div>
     </m-list-box>
@@ -51,20 +42,15 @@
             type="input"
             size="small"
             v-model="title"
+            :disabled="isDetails"
             :placeholder="$t('Please enter the title of email')">
           </el-input>
         </div>
       </m-list-box>
       <m-list-box>
-        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Recipient')}}</div>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Alarm group')}}</div>
         <div slot="content">
-          <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
-        </div>
-      </m-list-box>
-      <m-list-box>
-        <div slot="text">{{$t('Cc')}}</div>
-        <div slot="content">
-          <m-email ref="refCc" v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
+          <m-warning-groups v-model="groupId"></m-warning-groups>
         </div>
       </m-list-box>
     </template>
@@ -154,8 +140,8 @@
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
+  import mWarningGroups from './_source/warningGroups'
   import disabledState from '@/module/mixin/disabledState'
-  import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
   let editor
@@ -180,20 +166,15 @@
         sqlType: '0',
         // Email title
         title: '',
-        // Form/attachment
-        showType: ['TABLE'],
         // Sql parameter
         connParams: '',
         // Pre statements
         preStatements: [],
         // Post statements
         postStatements: [],
-        // recipients
-        receivers: [],
-        // copy to
-        receiversCc: [],
         item: '',
-        scriptBoxDialog: false
+        scriptBoxDialog: false,
+        groupId: null
       }
     },
     mixins: [disabledState],
@@ -214,9 +195,6 @@
        */
       _onSqlType (a) {
         this.sqlType = a
-        if (a === 0) {
-          this.showType = ['TABLE']
-        }
       },
       /**
        * return udfs
@@ -262,24 +240,12 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType === 0 && !this.showType.length) {
-          this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
-          return false
-        }
-        if (this.sqlType === 0 && !this.title) {
+        if (this.sqlType === '0' && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType === 0 && !this.receivers.length) {
-          this.$message.warning(`${i18n.$t('Recipient required')}`)
-          return false
-        }
-        // receivers Subcomponent verification
-        if (this.sqlType === 0 && !this.$refs.refEmail._manualEmail()) {
-          return false
-        }
-        // receiversCc Subcomponent verification
-        if (this.sqlType === 0 && !this.$refs.refCc._manualEmail()) {
+        if (this.sqlType === '0' && (this.groupId === '' || this.groupId === null)) {
+          this.$message.warning(`${i18n.$t('Alarm group required')}`)
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -312,20 +278,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
-          showType: (() => {
-            /**
-             * Special processing return order TABLE,ATTACHMENT
-             * Handling checkout sequence
-             */
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
+          groupId: this.groupId,
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -366,19 +319,6 @@
 
         return editor
       },
-      _getReceiver () {
-        let param = {}
-        let current = this.router.history.current
-        if (current.name === 'projects-definition-details') {
-          param.processDefinitionId = current.params.id
-        } else {
-          param.processInstanceId = current.params.id
-        }
-        this.store.dispatch('dag/getReceiver', param).then(res => {
-          this.receivers = res.receivers && res.receivers.split(',') || []
-          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
-        })
-      },
       _cacheParams () {
         this.$emit('on-cache-params', {
           type: this.type,
@@ -387,16 +327,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
+          groupId: this.groupId,
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -414,13 +345,9 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val === 0) {
-          this.showType = []
-        }
         if (val !== 0) {
           this.title = ''
-          this.receivers = []
-          this.receiversCc = []
+          this.groupId = null
         }
       },
       // Listening data source
@@ -447,21 +374,10 @@
         this.sqlType = o.params.sqlType
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
-        if (o.params.showType === '') {
-          this.showType = []
-        } else {
-          this.showType = o.params.showType.split(',') || []
-        }
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''
-        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
-        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
-      }
-      // read tasks from cache
-      if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
-        this.router.history.current.name !== 'definition-create') {
-        this._getReceiver()
+        this.groupId = o.params.groupId
       }
     },
     mounted () {
@@ -487,16 +403,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
+          groupId: this.groupId,
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
@@ -504,6 +411,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox, mWarningGroups }
   }
 </script>

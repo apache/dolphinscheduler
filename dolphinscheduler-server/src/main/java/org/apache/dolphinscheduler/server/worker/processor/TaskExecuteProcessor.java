@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCache
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -72,6 +73,11 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private final TaskCallbackService taskCallbackService;
 
     /**
+     *  alert client service
+     */
+    private AlertClientService alertClientService;
+
+    /**
      * taskExecutionContextCacheManager
      */
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
@@ -92,6 +98,15 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         TaskExecutionContext preTaskCache = new TaskExecutionContext();
         preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+    }
+
+    public TaskExecuteProcessor(AlertClientService alertClientService) {
+        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
+        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
+        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+
+        this.alertClientService = alertClientService;
     }
 
     @Override
@@ -150,7 +165,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.doAck(taskExecutionContext);
 
         // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService));
     }
 
     private void doAck(TaskExecutionContext taskExecutionContext) {
@@ -162,7 +177,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     /**
      * build ack command
-     *
      * @param taskExecutionContext taskExecutionContext
      * @return TaskExecuteAckCommand
      */

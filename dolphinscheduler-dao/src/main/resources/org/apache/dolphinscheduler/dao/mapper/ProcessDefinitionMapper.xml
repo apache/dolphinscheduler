@@ -19,13 +19,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper">
     <sql id="baseSql">
-        id, name, version, release_state, project_id, user_id, process_definition_json, description,
-        global_params, flag, locations, connects, receivers, receivers_cc, create_time, timeout,
+        id
+        , name, version, release_state, project_id, user_id, process_definition_json, description,
+        global_params, flag, locations, connects, warning_group_id, create_time, timeout,
         tenant_id, update_time, modify_by, resource_ids
     </sql>
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
-        pd.global_params, pd.flag, pd.locations, pd.connects, pd.receivers, pd.receivers_cc, pd.create_time, pd.timeout,
+        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
         pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids
         from t_ds_process_definition pd
         WHERE pd.project_id = #{projectId}
@@ -33,7 +34,7 @@
     </select>
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
-        pd.global_params, pd.flag, pd.locations, pd.connects, pd.receivers, pd.receivers_cc, pd.create_time, pd.timeout,
+        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
         pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids,
         u.user_name,p.name as project_name,t.tenant_code,q.queue,q.queue_name
         from t_ds_process_definition pd
@@ -47,7 +48,7 @@
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT td.id, td.name, td.version, td.release_state, td.project_id, td.user_id, td.description,
         td.global_params,
-        td.flag, td.receivers, td.receivers_cc, td.timeout, td.tenant_id, td.modify_by, td.update_time, td.create_time,
+        td.flag, td.warning_group_id, td.timeout, td.tenant_id, td.modify_by, td.update_time, td.create_time,
         sc.schedule_release_state, tu.user_name
         FROM t_ds_process_definition td
         left join (select process_definition_id,release_state as schedule_release_state from t_ds_schedules group by
@@ -101,7 +102,7 @@
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT
             pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
-            pd.global_params, pd.flag, pd.locations, pd.connects, pd.receivers, pd.receivers_cc, pd.create_time, pd.timeout,
+            pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
             pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids,
             u.user_name,
             p.name AS project_name
@@ -126,6 +127,12 @@
         FROM t_ds_process_definition
         WHERE user_id = #{userId} and release_state = 1 and resource_ids is not null and resource_ids != ''
     </select>
+
+    <select id="listProjectIds" resultType="java.lang.Integer">
+        SELECT DISTINCT(project_id) as project_id
+        FROM t_ds_process_definition
+    </select>
+
 
     <update id="updateVersionByProcessDefinitionId">
         update  t_ds_process_definition

@@ -110,6 +110,15 @@ const menu = {
       children: []
     },
     {
+      name: `${i18n.$t('Warning instance manage')}`,
+      id: 2,
+      path: 'warning-instance-manage',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-warning-outline',
+      children: []
+    },
+    {
       name: `${i18n.$t('Worker group manage')}`,
       id: 4,
       path: 'worker-groups-manage',
@@ -124,7 +133,7 @@ const menu = {
       path: 'queue-manage',
       isOpen: true,
       enabled: true,
-      icon: 'ri-group-line',
+      icon: 'el-icon-s-grid',
       children: []
     },
     {

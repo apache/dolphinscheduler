@@ -20,14 +20,10 @@ package org.apache.dolphinscheduler.dao.datasource;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-
 import java.sql.Connection;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * data source of hive
@@ -73,12 +69,8 @@ public class HiveDataSource extends BaseDataSource {
 
         String[] otherArray = otherParams.split(";", -1);
 
-        // get the default hive conf var name
-        Set<String> hiveConfSet = Stream.of(ConfVars.values()).map(confVars -> confVars.varname)
-            .collect(Collectors.toSet());
-
         for (String conf : otherArray) {
-            if (hiveConfSet.contains(conf.split("=")[0])) {
+            if (HiveConfUtils.isHiveConfVar(conf)) {
                 hiveConfListSb.append(conf).append(";");
             } else {
                 sessionVarListSb.append(conf).append(";");
@@ -104,7 +96,8 @@ public class HiveDataSource extends BaseDataSource {
      */
     @Override
     public Connection getConnection() throws Exception {
-        CommonUtils.loadKerberosConf();
+        CommonUtils.loadKerberosConf(getJavaSecurityKrb5Conf(), getLoginUserKeytabUsername(), getLoginUserKeytabPath());
         return super.getConnection();
     }
+
 }
