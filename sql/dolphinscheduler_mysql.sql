@@ -810,11 +810,11 @@ DROP TABLE IF EXISTS `t_ds_task_instance`;
 CREATE TABLE `t_ds_task_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(255) DEFAULT NULL COMMENT 'task name',
-  `task_definition_version` int(11) DEFAULT NULL COMMENT 'task definition version',
   `task_type` varchar(64) DEFAULT NULL COMMENT 'task type',
+  `task_code` bigint(20) NOT NULL COMMENT 'task definition code',
+  `task_definition_version` int(11) DEFAULT NULL COMMENT 'task definition version',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
-  `task_json` longtext COMMENT 'task content json',
   `state` tinyint(4) DEFAULT NULL COMMENT 'Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
   `start_time` datetime DEFAULT NULL COMMENT 'task start time',
