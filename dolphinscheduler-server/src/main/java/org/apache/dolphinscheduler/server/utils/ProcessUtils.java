@@ -449,6 +449,6 @@ public class ProcessUtils {
         } catch (Exception e) {
             logger.error("kill yarn job failure", e);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 }

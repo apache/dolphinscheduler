@@ -73,11 +73,11 @@ public class StringUtils {
         return str1 == null ? str2 == null : str1.equalsIgnoreCase(str2);
     }
 
-    public static String join(Collection collection, String separator) {
+    public static String join(Collection<?> collection, String separator) {
         return collection == null ? null : join(collection.iterator(), separator);
     }
 
-    public static String join(Iterator iterator, String separator) {
+    public static String join(Iterator<?> iterator, String separator) {
         if (iterator == null) {
             return null;
         } else if (!iterator.hasNext()) {
