@@ -88,7 +88,7 @@ public class FeiShuSender {
         return JSONUtils.toJsonString(items);
     }
 
-    private static AlertResult checkSendFeiShuSendMsgResult(String result) {
+    public static AlertResult checkSendFeiShuSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
 
@@ -116,9 +116,8 @@ public class FeiShuSender {
 
     public static String formatContent(AlertData alertData) {
         if (alertData.getContent() != null) {
-            List<Map> list;
 
-            list = JSONUtils.toList(alertData.getContent(), Map.class);
+            List<Map> list = JSONUtils.toList(alertData.getContent(), Map.class);
             if (list.isEmpty()) {
                 return alertData.getTitle() + alertData.getContent();
             }
