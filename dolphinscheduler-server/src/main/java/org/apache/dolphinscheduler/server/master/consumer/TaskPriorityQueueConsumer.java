@@ -222,7 +222,6 @@ public class TaskPriorityQueueConsumer extends Thread {
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        taskInstance.setExecutePath(getExecLocalPath(taskInstance));
         taskInstance.setResources(getResourceFullNames(taskNode));
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
@@ -361,18 +360,6 @@ public class TaskPriorityQueueConsumer extends Thread {
 
             sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
         }
-    }
-
-    /**
-     * get execute local path
-     *
-     * @return execute local path
-     */
-    private String getExecLocalPath(TaskInstance taskInstance) {
-        return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
-            taskInstance.getProcessDefine().getId(),
-            taskInstance.getProcessInstance().getId(),
-            taskInstance.getId());
     }
 
     /**
