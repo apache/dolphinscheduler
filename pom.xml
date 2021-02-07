@@ -856,7 +856,7 @@
                         <include>**/plugin/model/AlertInfoTest.java</include>
                         <!-- <include>**/plugin/utils/PropertyUtilsTest.java</include> -->
                     </includes>
-                    <!-- <skip>true</skip> -->
+                    <skip>true</skip>
                 </configuration>
             </plugin>
 
