@@ -72,4 +72,14 @@ public class FeiShuSenderTest {
         alertData.setContent(alertMsg);
         Assert.assertNotNull(FeiShuSender.formatContent(alertData));
     }
+
+    @Test
+    public void testSendWithFormatException() {
+        AlertData alertData = new AlertData();
+        alertData.setTitle("feishu test title");
+        alertData.setContent("feishu test content");
+        FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
+        String alertResult = feiShuSender.formatContent(alertData);
+        Assert.assertEquals(alertResult, alertData.getTitle() + alertData.getContent());
+    }
 }

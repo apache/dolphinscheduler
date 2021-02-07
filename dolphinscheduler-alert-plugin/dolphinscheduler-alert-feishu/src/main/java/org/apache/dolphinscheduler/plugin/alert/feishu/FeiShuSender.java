@@ -117,10 +117,9 @@ public class FeiShuSender {
     public static String formatContent(AlertData alertData) {
         if (alertData.getContent() != null) {
             List<Map> list;
-            try {
-                list = JSONUtils.toList(alertData.getContent(), Map.class);
-            } catch (Exception e) {
-                logger.error("json format exception", e);
+
+            list = JSONUtils.toList(alertData.getContent(), Map.class);
+            if (list.isEmpty()) {
                 return alertData.getTitle() + alertData.getContent();
             }
 
