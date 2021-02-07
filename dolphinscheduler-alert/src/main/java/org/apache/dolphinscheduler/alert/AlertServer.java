@@ -142,7 +142,7 @@ public class AlertServer {
                             alertSender.run();
                             zookeeperStateAbnormalToleratingNumber = 0;
                         }
-                    }, properties.getProperty(Constants.ZOOKEEPER_PROPERTIES_PATH));
+                    }, properties.getProperty(Constants.ZOOKEEPER_LIST));
                 } catch (Exception e) {
                     logger.error("alert server with error : ", e);
                 }
