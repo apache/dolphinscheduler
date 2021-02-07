@@ -390,6 +390,16 @@ public class OSUtils {
     }
 
     /**
+     *  get sudo command
+     * @param tenantCode tenantCode
+     * @param command command
+     * @return result of sudo execute command
+     */
+    public static String getSudoCmd(String tenantCode, String command) {
+        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
+    }
+
+    /**
      * Execute the corresponding command of Linux or Windows
      *
      * @param command command
