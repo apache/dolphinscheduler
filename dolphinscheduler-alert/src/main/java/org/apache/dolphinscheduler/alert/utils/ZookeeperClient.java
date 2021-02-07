@@ -81,7 +81,6 @@ public class ZookeeperClient {
                 if (fis != null) {
                     IOUtils.closeQuietly(fis);
                 }
-                System.exit(1);
             } finally {
                 IOUtils.closeQuietly(fis);
             }

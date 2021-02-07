@@ -58,6 +58,7 @@ public class ZookeeperClientTest {
         try {
             flag = false;
             ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
+                @Override
                 public void handle() {
                     flag = true;
                 }
@@ -73,6 +74,7 @@ public class ZookeeperClientTest {
         try {
             flag = false;
             ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
+                @Override
                 public void handle() {
                     flag = true;
                 }
