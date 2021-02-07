@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -87,6 +88,9 @@ public class TaskDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private ProcessService processService;
 
     /**
      * create task definition
@@ -144,7 +148,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
                 taskNode.getTaskTimeoutParameter().getInterval(),
                 now,
                 now);
-        taskDefinition.setResourceIds(getResourceIds(taskDefinition));
+        taskDefinition.setResourceIds(processService.getResourceIds(taskDefinition));
         // save the new task definition
         taskDefinitionMapper.insert(taskDefinition);
         // save task definition log
@@ -157,30 +161,6 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         result.put(Constants.DATA_LIST, code);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * get resource ids
-     *
-     * @param taskDefinition taskDefinition
-     * @return resource ids
-     */
-    private String getResourceIds(TaskDefinition taskDefinition) {
-        Set<Integer> resourceIds = null;
-        // TODO modify taskDefinition.getTaskType()
-        AbstractParameters params = TaskParametersUtils.getParameters(taskDefinition.getTaskType().getDescp(), taskDefinition.getTaskParams());
-
-        if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceIds = params.getResourceFilesList().
-                    stream()
-                    .filter(t -> t.getId() != 0)
-                    .map(ResourceInfo::getId)
-                    .collect(Collectors.toSet());
-        }
-        if (CollectionUtils.isEmpty(resourceIds)) {
-            return StringUtils.EMPTY;
-        }
-        return StringUtils.join(resourceIds, ",");
     }
 
     /**
@@ -276,38 +256,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
             return result;
         }
 
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByDefinitionCode(taskCode);
-        int version = taskDefinitionLogs
-                .stream()
-                .map(TaskDefinitionLog::getVersion)
-                .max((x, y) -> x > y ? x : y)
-                .orElse(0) + 1;
-        Date now = new Date();
-        taskDefinition.setVersion(version);
-        taskDefinition.setCode(taskCode);
-        taskDefinition.setName(taskNode.getName());
-        taskDefinition.setDescription(taskNode.getDesc());
-        taskDefinition.setProjectCode(project.getCode());
-        taskDefinition.setUserId(loginUser.getId());
-        taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
-        taskDefinition.setTaskParams(taskNode.getParams());
-        taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
-        taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
-        taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
-        taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
-        taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
-        taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
-        taskDefinition.setTaskTimeoutStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
-        taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
-        taskDefinition.setUpdateTime(now);
-        taskDefinition.setResourceIds(getResourceIds(taskDefinition));
-        taskDefinitionMapper.updateById(taskDefinition);
-        // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-        taskDefinitionLog.set(taskDefinition);
-        taskDefinitionLog.setOperator(loginUser.getId());
-        taskDefinitionLog.setOperateTime(now);
-        taskDefinitionLogMapper.insert(taskDefinitionLog);
+        processService.updateTaskDefinition(loginUser, project.getCode(), taskNode, taskDefinition);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;

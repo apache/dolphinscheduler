@@ -184,6 +184,8 @@ public class ProcessDefinition {
     @TableField(exist = false)
     private int warningGroupId;
 
+    public ProcessDefinition(){}
+
     public String getName() {
         return name;
     }

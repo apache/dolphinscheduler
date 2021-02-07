@@ -58,13 +58,30 @@ public class TaskInstance implements Serializable {
 
     /**
      * process definition id
+     * TODO delete
      */
+    @TableField(exist = false)
     private int processDefinitionId;
 
     /**
      * process instance id
      */
     private int processInstanceId;
+
+    /**
+     * task code
+     */
+    private long taskCode;
+
+    /**
+     *  process definition code
+     */
+    private long processDefinitionCode;
+
+    /**
+     * task defintion version
+     */
+    private String taskDefinitionVersion;
 
     /**
      * process instance name
@@ -74,7 +91,9 @@ public class TaskInstance implements Serializable {
 
     /**
      * task json
+     * TODO delete
      */
+    @TableField(exist = false)
     private String taskJson;
 
     /**
@@ -600,5 +619,29 @@ public class TaskInstance implements Serializable {
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime
                 + '}';
+    }
+
+    public long getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(long taskCode) {
+        this.taskCode = taskCode;
+    }
+
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
+    }
+
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
+    }
+
+    public String getTaskDefinitionVersion() {
+        return taskDefinitionVersion;
+    }
+
+    public void setTaskDefinitionVersion(String taskDefinitionVersion) {
+        this.taskDefinitionVersion = taskDefinitionVersion;
     }
 }
