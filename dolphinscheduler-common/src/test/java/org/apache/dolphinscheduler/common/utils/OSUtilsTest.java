@@ -76,6 +76,13 @@ public class OSUtilsTest {
     }
 
     @Test
+    public void testGetSudoCmd() {
+        String cmd = "kill -9 1234";
+        String sudoCmd = OSUtils.getSudoCmd("test123", cmd);
+        Assert.assertEquals("sudo -u test123 " + cmd, sudoCmd);
+    }
+
+    @Test
     public void exeCmd() {
         if(OSUtils.isMacOS() || !OSUtils.isWindows()){
             try {
