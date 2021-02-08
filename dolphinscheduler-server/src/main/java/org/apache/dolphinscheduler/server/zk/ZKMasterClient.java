@@ -307,7 +307,10 @@ public class ZKMasterClient extends AbstractZKClient {
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
         logger.info("start worker[{}] failover ...", workerHost);
 
-        List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
+         //将zookeeper注册地址转换为IP地址，与数据库进行匹配
+        String host=workerHost.substring(0, workerHost.indexOf(":",workerHost.indexOf(":")+1 ));
+        List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(host);
+     
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
             if (needCheckWorkerAlive) {
                 if (!checkTaskInstanceNeedFailover(taskInstance)) {
