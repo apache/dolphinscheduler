@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -132,7 +133,14 @@ public class SqlTask extends AbstractTask {
                     sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
-            SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
+            List<SqlBinds> mainSqlBinds = Arrays.asList(sqlParameters.getSql().split(";"))
+                    .stream()
+                    .filter(o -> {
+                        if( o == null || o.toString().trim().length() < 1) return false;
+                        else return true;
+                    })
+                    .map(this::getSqlAndSqlParamsMap)
+                    .collect(Collectors.toList());
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
                     .orElse(new ArrayList<>())
                     .stream()
@@ -234,10 +242,10 @@ public class SqlTask extends AbstractTask {
      * @param postStatementsBinds post statements binds
      * @param createFuncs create functions
      */
-    public void executeFuncAndSql(SqlBinds mainSqlBinds,
-                                  List<SqlBinds> preStatementsBinds,
-                                  List<SqlBinds> postStatementsBinds,
-                                  List<String> createFuncs) {
+    public void executeFuncAndSql(List<SqlBinds> mainSqlBinds,
+                                        List<SqlBinds> preStatementsBinds,
+                                        List<SqlBinds> postStatementsBinds,
+                                        List<String> createFuncs){
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
@@ -250,18 +258,18 @@ public class SqlTask extends AbstractTask {
             }
 
             // pre sql
-            preSql(connection, preStatementsBinds);
-            stmt = prepareStatementAndBind(connection, mainSqlBinds);
+            preSql(connection,preStatementsBinds);
 
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
+                stmt = prepareStatementAndBind(connection, mainSqlBinds.get(0));
                 resultSet = stmt.executeQuery();
                 resultProcess(resultSet);
 
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
-                // non query statement
-                stmt.executeUpdate();
+                // non query statement => run with hive style
+                mainSql(connection, mainSqlBinds);
             }
 
             postSql(connection, postStatementsBinds);
@@ -318,6 +326,23 @@ public class SqlTask extends AbstractTask {
             try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)) {
                 int result = pstmt.executeUpdate();
                 logger.info("pre statement execute result: {}, for sql: {}", result, sqlBind.getSql());
+
+            }
+        }
+    }
+
+    /**
+     *  pre sql
+     *
+     * @param connection connection
+     * @param mainStatementsBinds preStatementsBinds
+     */
+    private void mainSql(Connection connection,
+                        List<SqlBinds> mainStatementsBinds) throws Exception{
+        for (SqlBinds sqlBind: mainStatementsBinds) {
+            try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)){
+                int result = stmt.executeUpdate();
+                logger.info("pre statement execute result: {}, for sql: {}",result,sqlBind.getSql());
 
             }
         }
