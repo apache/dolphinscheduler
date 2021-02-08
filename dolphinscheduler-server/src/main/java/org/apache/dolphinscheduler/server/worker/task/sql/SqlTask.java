@@ -179,7 +179,7 @@ public class SqlTask extends AbstractTask {
                 extractPreQuerySqlParams(con, sqlBind);
             }
         } catch (Exception e) {
-            logger.error("execute pre-query-sql error", e);
+            logger.error("execute pre-query-sql error:{}",preStatements.toString(), e);
             throw new RuntimeException("execute pre-query-sql error", e);
         }
     }
@@ -278,10 +278,10 @@ public class SqlTask extends AbstractTask {
     /**
      * execute function and sql
      *
-     * @param mainSqlBinds main sql binds
-     * @param preStatementsBinds pre statements binds
+     * @param mainSqlBinds        main sql binds
+     * @param preStatementsBinds  pre statements binds
      * @param postStatementsBinds post statements binds
-     * @param createFuncs create functions
+     * @param createFuncs         create functions
      */
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                   List<SqlBinds> preStatementsBinds,
@@ -355,7 +355,7 @@ public class SqlTask extends AbstractTask {
     /**
      * pre sql
      *
-     * @param connection connection
+     * @param connection         connection
      * @param preStatementsBinds preStatementsBinds
      */
     private void preSql(Connection connection,
@@ -375,7 +375,7 @@ public class SqlTask extends AbstractTask {
     /**
      * post sql
      *
-     * @param connection connection
+     * @param connection          connection
      * @param postStatementsBinds postStatementsBinds
      */
     private void postSql(Connection connection,
@@ -391,7 +391,7 @@ public class SqlTask extends AbstractTask {
     /**
      * create temp function
      *
-     * @param connection connection
+     * @param connection  connection
      * @param createFuncs createFuncs
      */
     private void createTempFunction(Connection connection,
@@ -407,8 +407,8 @@ public class SqlTask extends AbstractTask {
     /**
      * close jdbc resource
      *
-     * @param resultSet resultSet
-     * @param pstmt pstmt
+     * @param resultSet  resultSet
+     * @param pstmt      pstmt
      * @param connection connection
      */
     private void close(ResultSet resultSet,
@@ -443,7 +443,7 @@ public class SqlTask extends AbstractTask {
      * preparedStatement bind
      *
      * @param connection connection
-     * @param sqlBinds sqlBinds
+     * @param sqlBinds   sqlBinds
      * @return PreparedStatement
      * @throws Exception Exception
      */
@@ -469,7 +469,7 @@ public class SqlTask extends AbstractTask {
     /**
      * send mail as an attachment
      *
-     * @param title title
+     * @param title   title
      * @param content content
      */
     public void sendAttachment(int groupId, String title, String content) {
@@ -482,9 +482,9 @@ public class SqlTask extends AbstractTask {
     /**
      * regular expressions match the contents between two specified strings
      *
-     * @param content content
-     * @param rgex rgex
-     * @param sqlParamsMap sql params map
+     * @param content        content
+     * @param rgex           rgex
+     * @param sqlParamsMap   sql params map
      * @param paramsPropsMap params props map
      */
     public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsPropsMap) {
@@ -504,9 +504,9 @@ public class SqlTask extends AbstractTask {
     /**
      * print replace sql
      *
-     * @param content content
-     * @param formatSql format sql
-     * @param rgex rgex
+     * @param content      content
+     * @param formatSql    format sql
+     * @param rgex         rgex
      * @param sqlParamsMap sql params map
      */
     public void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
