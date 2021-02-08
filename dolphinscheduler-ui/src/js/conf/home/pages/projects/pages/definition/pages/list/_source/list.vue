@@ -19,7 +19,7 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
         <el-table-column type="selection" width="50" :selectable="selectable"></el-table-column>
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
@@ -129,6 +129,7 @@
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
+      v-if="startDialog"
       :visible.sync="startDialog"
       width="auto">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>

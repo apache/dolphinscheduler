@@ -61,28 +61,28 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
      * @param processDefinition the process definition that need to record version
      * @return the newest version number of this process definition
      */
-    public long addProcessDefinitionVersion(ProcessDefinition processDefinition) {
+    public int addProcessDefinitionVersion(ProcessDefinition processDefinition) {
 
         long version = this.queryMaxVersionByProcessDefinitionId(processDefinition.getId()) + 1;
 
         ProcessDefinitionVersion processDefinitionVersion = ProcessDefinitionVersion
-            .newBuilder()
-            .processDefinitionId(processDefinition.getId())
-            .version(version)
-            .processDefinitionJson(processDefinition.getProcessDefinitionJson())
-            .description(processDefinition.getDescription())
-            .locations(processDefinition.getLocations())
-            .connects(processDefinition.getConnects())
-            .timeout(processDefinition.getTimeout())
-            .globalParams(processDefinition.getGlobalParams())
-            .createTime(processDefinition.getUpdateTime())
-            .warningGroupId(processDefinition.getWarningGroupId())
+                .newBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .version(version)
+                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
+                .description(processDefinition.getDescription())
+                .locations(processDefinition.getLocations())
+                .connects(processDefinition.getConnects())
+                .timeout(processDefinition.getTimeout())
+                .globalParams(processDefinition.getGlobalParams())
+                .createTime(processDefinition.getUpdateTime())
+                .warningGroupId(processDefinition.getWarningGroupId())
                 .resourceIds(processDefinition.getResourceIds())
                 .build();
 
         processDefinitionVersionMapper.insert(processDefinitionVersion);
 
-        return version;
+        return Integer.parseInt(String.valueOf(version));
     }
 
     /**

@@ -20,29 +20,40 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper">
 
     <sql id="baseSql">
-       pd.id, pd.code, pd.name, pd.version, pd.description, pd.project_code,
-        pd.release_state, pd.user_id,pd.global_params, pd.flag, pd.locations, pd.connects,
-         pd.warning_group_id, pd.timeout, pd.tenant_id,pd.operator, pd.operate_time, pd.create_time,
-          pd.update_time, u.user_name,p.name as project_name
+       id, code, name, version, description, project_code,
+        release_state, user_id,global_params, flag, locations, connects,
+         warning_group_id, timeout, tenant_id,operator, operate_time, create_time,
+          update_time
     </sql>
-
     <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
-        select
-        <include refid="baseSql"/>
+        select pd.id, pd.code, pd.name, pd.version, pd.description, pd.project_code,
+        pd.release_state, pd.user_id,pd.global_params, pd.flag, pd.locations, pd.connects,
+        pd.warning_group_id, pd.timeout, pd.tenant_id,pd.operator, pd.operate_time, pd.create_time,
+        pd.update_time, u.user_name,p.name as project_name
         from t_ds_process_definition_log pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>
-
     <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select
         <include refid="baseSql"/>
-        from t_ds_process_definition_log pd
-        JOIN t_ds_user u ON pd.user_id = u.id
-        JOIN  t_ds_project p ON pd.project_code = p.code
+        from t_ds_process_definition_log
         WHERE pd.code = #{processDefinitionCode}
     </select>
+    <select id="queryByDefinitionCodeAndVersion"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition_log
+        where code = #{processDefinitionCode}
+        and version = #{version}
+    </select>
+    <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
+        select max(version)
+        from t_ds_process_definition_log
+        where code = #{processDefinitionCode}
 
+    </select>
 </mapper>

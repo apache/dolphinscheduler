@@ -23,30 +23,21 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -86,7 +77,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private ProcessService processService;
 
     /**
      * create task definition
@@ -95,7 +86,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
      * @param projectName project name
      * @param taskDefinitionJson task definition json
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> createTaskDefinition(User loginUser,
                                                     String projectName,
@@ -115,9 +106,11 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
+        TaskDefinition taskDefinition = new TaskDefinition();
         long code = 0L;
         try {
             code = SnowFlakeUtils.getInstance().nextId();
+            taskDefinition.setCode(code);
         } catch (SnowFlakeException e) {
             logger.error("Task code get error, ", e);
         }
@@ -125,62 +118,11 @@ public class TaskDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
             return result;
         }
-        Date now = new Date();
-        TaskDefinition taskDefinition = new TaskDefinition(code,
-                taskNode.getName(),
-                1,
-                taskNode.getDesc(),
-                project.getCode(),
-                loginUser.getId(),
-                TaskType.of(taskNode.getType()),
-                taskNode.getParams(),
-                taskNode.isForbidden() ? Flag.NO : Flag.YES,
-                taskNode.getTaskInstancePriority(),
-                taskNode.getWorkerGroup(),
-                taskNode.getMaxRetryTimes(),
-                taskNode.getRetryInterval(),
-                taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE,
-                taskNode.getTaskTimeoutParameter().getStrategy(),
-                taskNode.getTaskTimeoutParameter().getInterval(),
-                now,
-                now);
-        taskDefinition.setResourceIds(getResourceIds(taskDefinition));
-        // save the new task definition
-        taskDefinitionMapper.insert(taskDefinition);
-        // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-        taskDefinitionLog.set(taskDefinition);
-        taskDefinitionLog.setOperator(loginUser.getId());
-        taskDefinitionLog.setOperateTime(now);
-        taskDefinitionLogMapper.insert(taskDefinitionLog);
+        int insert = processService.saveTaskDefinition(loginUser, project.getCode(), taskNode, taskDefinition);
         // return taskDefinition object with code
         result.put(Constants.DATA_LIST, code);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, Status.SUCCESS, insert);
         return result;
-    }
-
-    /**
-     * get resource ids
-     *
-     * @param taskDefinition taskDefinition
-     * @return resource ids
-     */
-    private String getResourceIds(TaskDefinition taskDefinition) {
-        Set<Integer> resourceIds = null;
-        // TODO modify taskDefinition.getTaskType()
-        AbstractParameters params = TaskParametersUtils.getParameters(taskDefinition.getTaskType().getDescp(), taskDefinition.getTaskParams());
-
-        if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceIds = params.getResourceFilesList().
-                    stream()
-                    .filter(t -> t.getId() != 0)
-                    .map(ResourceInfo::getId)
-                    .collect(Collectors.toSet());
-        }
-        if (CollectionUtils.isEmpty(resourceIds)) {
-            return StringUtils.EMPTY;
-        }
-        return StringUtils.join(resourceIds, ",");
     }
 
     /**
@@ -229,16 +171,20 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        checkTaskRelation(result, taskCode);
-        resultEnum = (Status) result.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (!processTaskRelationList.isEmpty()) {
+            Set<Long> processDefinitionCodes = processTaskRelationList
+                    .stream()
+                    .map(ProcessTaskRelation::getProcessDefinitionCode)
+                    .collect(Collectors.toSet());
+            putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, StringUtils.join(processDefinitionCodes, ","));
             return result;
         }
         int delete = taskDefinitionMapper.deleteByCode(taskCode);
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+            putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
         }
         return result;
     }
@@ -251,6 +197,7 @@ public class TaskDefinitionServiceImpl extends BaseService implements
      * @param taskCode task code
      * @param taskDefinitionJson task definition json
      */
+    @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> updateTaskDefinition(User loginUser, String projectName, Long taskCode, String taskDefinitionJson) {
         Map<String, Object> result = new HashMap<>(5);
@@ -261,8 +208,8 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        checkTaskRelation(result, taskCode);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (processService.isTaskOnline(taskCode)) {
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskCode);
@@ -275,61 +222,12 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByDefinitionCode(taskCode);
-        int version = taskDefinitionLogs
-                .stream()
-                .map(TaskDefinitionLog::getVersion)
-                .max((x, y) -> x > y ? x : y)
-                .orElse(0) + 1;
-        Date now = new Date();
-        taskDefinition.setVersion(version);
-        taskDefinition.setCode(taskCode);
-        taskDefinition.setName(taskNode.getName());
-        taskDefinition.setDescription(taskNode.getDesc());
-        taskDefinition.setProjectCode(project.getCode());
-        taskDefinition.setUserId(loginUser.getId());
-        taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
-        taskDefinition.setTaskParams(taskNode.getParams());
-        taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
-        taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
-        taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
-        taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
-        taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
-        taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
-        taskDefinition.setTaskTimeoutStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
-        taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
-        taskDefinition.setUpdateTime(now);
-        taskDefinition.setResourceIds(getResourceIds(taskDefinition));
-        taskDefinitionMapper.updateById(taskDefinition);
-        // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-        taskDefinitionLog.set(taskDefinition);
-        taskDefinitionLog.setOperator(loginUser.getId());
-        taskDefinitionLog.setOperateTime(now);
-        taskDefinitionLogMapper.insert(taskDefinitionLog);
+        int update = processService.updateTaskDefinition(loginUser, project.getCode(), taskNode, taskDefinition);
         result.put(Constants.DATA_LIST, taskCode);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, Status.SUCCESS, update);
         return result;
     }
 
-    public void checkTaskRelation(Map<String, Object> result, Long taskCode) {
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode, taskCode);
-        if (!processTaskRelationList.isEmpty()) {
-            Set<Long> processDefinitionCodes = processTaskRelationList
-                    .stream()
-                    .map(ProcessTaskRelation::getProcessDefinitionCode)
-                    .collect(Collectors.toSet());
-            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(processDefinitionCodes);
-            // check process definition is already online
-            for (ProcessDefinition processDefinition : processDefinitionList) {
-                if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-                    putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinition.getCode());
-                    return;
-                }
-            }
-        }
-    }
 
     public void checkTaskNode(Map<String, Object> result, TaskNode taskNode, String taskDefinitionJson) {
         if (taskNode == null) {
@@ -361,8 +259,8 @@ public class TaskDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        checkTaskRelation(result, taskCode);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (processService.isTaskOnline(taskCode)) {
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskCode);

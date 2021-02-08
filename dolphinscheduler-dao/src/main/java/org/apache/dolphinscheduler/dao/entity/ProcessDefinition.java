@@ -61,7 +61,7 @@ public class ProcessDefinition {
     /**
      * version
      */
-    private long version;
+    private int version;
 
     /**
      * release state : online/offline
@@ -184,6 +184,8 @@ public class ProcessDefinition {
     @TableField(exist = false)
     private int warningGroupId;
 
+    public ProcessDefinition(){}
+
     public String getName() {
         return name;
     }
@@ -192,11 +194,11 @@ public class ProcessDefinition {
         this.name = name;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
