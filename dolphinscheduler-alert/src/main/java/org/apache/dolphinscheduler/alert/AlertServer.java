@@ -137,9 +137,7 @@ public class AlertServer {
                     ZookeeperClient.concurrentOperation(new ZookeeperClient.LockCallBall() {
                         @Override
                         public void handle() {
-                            List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                            alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
-                            alertSender.run();
+                            senderRunner();
                             zookeeperStateAbnormalToleratingNumber = 0;
                         }
                     }, properties.getProperty(Constants.ZOOKEEPER_LIST));
@@ -148,9 +146,7 @@ public class AlertServer {
                 }
 
                 if (zookeeperStateAbnormalToleratingNumber > ZookeeperClient.checkZkStateAbnormalToleratingNumber()) {
-                    List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                    alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
-                    alertSender.run();
+                    senderRunner();
                     zookeeperStateAbnormalToleratingNumber = 0;
                 } else {
                     zookeeperStateAbnormalToleratingNumber++;
@@ -158,6 +154,12 @@ public class AlertServer {
 
             }
         }
+    }
+
+    private void senderRunner() {
+        List<Alert> alerts = alertDao.listWaitExecutionAlert();
+        alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
+        alertSender.run();
     }
 
     /**
