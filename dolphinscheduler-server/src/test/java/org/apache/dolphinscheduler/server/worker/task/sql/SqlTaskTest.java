@@ -120,7 +120,7 @@ public class SqlTaskTest {
     }
 
     @Test(expected = Exception.class)
-    public void testPreQuerySql() throws Exception {
+    public void testHandlePreQuerySql() throws Exception {
         Connection connection = PowerMockito.mock(Connection.class);
         PowerMockito.mockStatic(DriverManager.class);
         PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(connection);
@@ -143,11 +143,29 @@ public class SqlTaskTest {
     }
 
     @Test
-    public void testQuerySql() {
+    public void testIsQuerySql() {
         SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
         parameters.setPreStatements(Arrays.asList("select aa1,aa2 from dual", "SELECT xy from dual"));
         Assert.assertTrue(sqlTask.isQuerySql(parameters.getPreStatements().get(0)));
         Assert.assertTrue(sqlTask.isQuerySql(parameters.getPreStatements().get(1)));
+    }
+
+    @Test
+    public void testIsQuerySqlFail() {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("update xxaa1,aa2 from dual", "SELECT1 xy from dual"));
+        Assert.assertTrue(!sqlTask.isQuerySql(parameters.getPreStatements().get(0)));
+        Assert.assertTrue(!sqlTask.isQuerySql(parameters.getPreStatements().get(1)));
+    }
+
+    @Test
+    public void testIsQuerySqlOne() {
+        Assert.assertTrue(sqlTask.isQuerySql("select a,bc,d from dual"));
+    }
+
+    @Test
+    public void testIsQuerySql2() {
+        Assert.assertTrue(!sqlTask.isQuerySql("update a,bc,d from dual"));
     }
 
     @Test(expected = Exception.class)
