@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
@@ -52,6 +53,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
+
 
 /**
  * abstract command executor
@@ -82,6 +84,11 @@ public abstract class AbstractCommandExecutor {
      * log list
      */
     protected final List<String> logBuffer;
+
+    /**
+     * SHELL result string
+     */
+    protected String resultString;
 
     /**
      * taskExecutionContext
@@ -222,6 +229,14 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
+    public String getResultString() {
+        return resultString;
+    }
+
+    public void setResultString(String result) {
+        this.resultString = result;
+    }
+
     /**
      * cancel application
      *
@@ -265,8 +280,8 @@ public abstract class AbstractCommandExecutor {
         if (processId != 0 && process.isAlive()) {
             try {
                 // sudo -u user command to run command
-                String cmd = String.format("sudo kill %d", processId);
-
+                String cmd = String.format("kill %d", processId);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("soft kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -286,8 +301,8 @@ public abstract class AbstractCommandExecutor {
     private void hardKill(int processId) {
         if (processId != 0 && process.isAlive()) {
             try {
-                String cmd = String.format("sudo kill -9 %d", processId);
-
+                String cmd = String.format("kill -9 %d", processId);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -354,6 +369,7 @@ public abstract class AbstractCommandExecutor {
                             varPool.append("$VarPool$");
                         } else {
                             logBuffer.add(line);
+                            resultString = line;
                             lastFlushTime = flush(lastFlushTime);
                         }
                     }

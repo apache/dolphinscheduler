@@ -17,15 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import static org.apache.dolphinscheduler.common.Constants.HIVE_CONF;
-import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.Constants.SEMICOLON;
-import static org.apache.dolphinscheduler.common.Constants.USER;
-import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -33,7 +28,6 @@ import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -50,7 +44,6 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -61,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -135,8 +127,6 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getConnParams());
         try {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
-            // load class
-            DataSourceFactory.loadClass(DbType.valueOf(sqlParameters.getType()));
 
             // get datasource
             baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(sqlParameters.getType()),
@@ -159,7 +149,7 @@ public class SqlTask extends AbstractTask {
                     logger);
 
             // execute sql task
-            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs, sqlParameters.getLocalParams());
 
             setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
 
@@ -248,15 +238,14 @@ public class SqlTask extends AbstractTask {
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
-                                  List<String> createFuncs) {
+                                  List<String> createFuncs,
+                                  List<Property> properties) {
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
         try {
-            // if upload resource is HDFS and kerberos startup
-            CommonUtils.loadKerberosConf();
             // create connection
-            connection = createConnection();
+            connection = baseDataSource.getConnection();
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -266,18 +255,21 @@ public class SqlTask extends AbstractTask {
             preSql(connection, preStatementsBinds);
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
 
+            String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
                 resultSet = stmt.executeQuery();
-                resultProcess(resultSet);
+                result = resultProcess(resultSet);
 
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
-                stmt.executeUpdate();
+                String updateResult = String.valueOf(stmt.executeUpdate());
+                result = setNonQuerySqlReturn(updateResult, properties);
             }
 
             postSql(connection, postStatementsBinds);
+            this.setResultString(result);
 
         } catch (Exception e) {
             logger.error("execute sql error", e);
@@ -287,13 +279,28 @@ public class SqlTask extends AbstractTask {
         }
     }
 
+    public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
+        String result = null;
+        for (Property info :properties) {
+            if (Direct.OUT == info.getDirect()) {
+                List<Map<String,String>> updateRL = new ArrayList<>();
+                Map<String,String> updateRM = new HashMap<>();
+                updateRM.put(info.getProp(),updateResult);
+                updateRL.add(updateRM);
+                result = JSONUtils.toJsonString(updateRL);
+                break;
+            }
+        }
+        return result;
+    }
+
     /**
      * result process
      *
      * @param resultSet resultSet
      * @throws Exception Exception
      */
-    private void resultProcess(ResultSet resultSet) throws Exception {
+    private String resultProcess(ResultSet resultSet) throws Exception {
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
@@ -313,6 +320,7 @@ public class SqlTask extends AbstractTask {
 
         sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
                 JSONUtils.toJsonString(resultJSONArray));
+        return result;
     }
 
     /**
@@ -362,34 +370,6 @@ public class SqlTask extends AbstractTask {
                 funcStmt.execute(createFunc);
             }
         }
-    }
-
-    /**
-     * create connection
-     *
-     * @return connection
-     * @throws Exception Exception
-     */
-    private Connection createConnection() throws Exception {
-        // if hive , load connection params if exists
-        Connection connection = null;
-        if (HIVE == DbType.valueOf(sqlParameters.getType())) {
-            Properties paramProp = new Properties();
-            paramProp.setProperty(USER, baseDataSource.getUser());
-            paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
-            Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
-                    SEMICOLON,
-                    HIVE_CONF);
-            paramProp.putAll(connParamMap);
-
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    paramProp);
-        } else {
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    baseDataSource.getUser(),
-                    baseDataSource.getPassword());
-        }
-        return connection;
     }
 
     /**

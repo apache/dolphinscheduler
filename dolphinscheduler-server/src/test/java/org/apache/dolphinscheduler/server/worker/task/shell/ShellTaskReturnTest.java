@@ -19,15 +19,12 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.DriverManager;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,12 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * shell task test.
+ * shell task return test.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {ShellTask.class, DriverManager.class, SpringApplicationContext.class, ParameterUtils.class})
-public class ShellTaskTest {
-
+@PrepareForTest({ShellTask.class})
+public class ShellTaskReturnTest {
     private static final Logger logger = LoggerFactory.getLogger(ShellTaskTest.class);
 
     private ShellTask shellTask;
@@ -60,7 +56,6 @@ public class ShellTaskTest {
         System.setProperty("log4j2.disable.jmx", Boolean.TRUE.toString());
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
         PowerMockito.whenNew(ShellCommandExecutor.class).withAnyArguments().thenReturn(shellCommandExecutor);
-        shellCommandExecutor.setResultString("shellReturn");
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
@@ -69,13 +64,19 @@ public class ShellTaskTest {
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");
         taskExecutionContext.setTaskJson(
-            "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\",\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,\"id\":\""
-                +
-                "tasks-16849\",\"maxRetryTimes\":0,\"name\":\"shell test 001\",\"params\":\"{\\\"rawScript\\\":\\\"#!/bin/sh\\\\necho $[yyyy-MM-dd HH:mm:ss +3]\\\\necho \\\\\\\" ?? "
-                + "${time1} \\\\\\\"\\\\necho \\\\\\\" ????? ${time2}\\\\\\\"\\\\n\\\",\\\"localParams\\\":[{\\\"prop\\\":\\\"time1\\\",\\\"direct\\\":\\\"OUT\\\",\\\"type\\\":"
-                + "\\\"VARCHAR\\\",\\\"value\\\":\\\"$[yyyy-MM-dd HH:mm:ss]\\\"},{\\\"prop\\\":\\\"time2\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${time_gb}\\\"}"
-                + "],\\\"resourceList\\\":[]}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\",\"taskTimeoutParameter\":"
-                + "{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}");
+                "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
+                        + "\\\"failedNode\\\":[\\\"\\\"]}\",\"conditionsTask\":false,"
+                        + "\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,\"id\":\""
+                        + "tasks-16849\",\"maxRetryTimes\":0,\"name\":\"shell test 001\","
+                        + "\"params\":\"{\\\"rawScript\\\":\\\"#!/bin/sh\\\\necho $[yyyy-MM-dd HH:mm:ss +3]\\\\necho \\\\\\\" ?? "
+                        + "${time1} \\\\\\\"\\\\necho \\\\\\\" ????? ${time2}\\\\\\\"\\\\n\\\","
+                        + "\\\"localParams\\\":[{\\\"prop\\\":\\\"time1\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":"
+                        + "\\\"VARCHAR\\\",\\\"value\\\":\\\"$[yyyy-MM-dd HH:mm:ss]\\\"},"
+                        + "{\\\"prop\\\":\\\"time2\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${time_gb}\\\"}"
+                        + "],\\\"resourceList\\\":[]}\",\"preTasks\":\"[]\",\"retryInterval\":1,"
+                        + "\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\",\"taskTimeoutParameter\":"
+                        + "{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\","
+                        + "\"type\":\"SHELL\",\"workerGroup\":\"default\"}");
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setGlobalParams("[{\"direct\":\"IN\",\"prop\":\"time_gb\",\"type\":\"VARCHAR\",\"value\":\"2020-12-16 17:18:33\"}]");
         taskExecutionContext.setExecutorId(1);
@@ -84,10 +85,10 @@ public class ShellTaskTest {
         taskExecutionContext.setScheduleTime(new Date());
         taskExecutionContext.setQueue("default");
         taskExecutionContext.setTaskParams(
-            "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
-                +
-                "[{\"prop\":\"time1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"$[yyyy-MM-dd HH:mm:ss]\"},{\"prop\":\"time2\",\"direct\":\"IN\",\"type\":\"VARCHAR"
-                + "\",\"value\":\"${time_gb}\"}],\"resourceList\":[]}");
+                "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
+                        +
+                        "[{\"prop\":\"time1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"$[yyyy-MM-dd HH:mm:ss]\"},{\"prop\":\"time2\",\"direct\":\"IN\",\"type\":\"VARCHAR"
+                        + "\",\"value\":\"${time_gb}\"}],\"resourceList\":[]}");
         Map<String, String> definedParams = new HashMap<>();
         definedParams.put("time_gb", "2020-12-16 00:00:00");
         taskExecutionContext.setDefinedParams(definedParams);
@@ -100,27 +101,15 @@ public class ShellTaskTest {
     }
 
     @Test
-    public void testComplementData() throws Exception {
+    public void testShellReturnString() {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
-        PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
-        shellTask.handle();
-    }
-
-    @Test
-    public void testStartProcess() throws Exception {
-        taskExecutionContext.setCmdTypeIfComplement(0);
-        shellTask = new ShellTask(taskExecutionContext, logger);
-        shellTask.init();
-        PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
-        shellTask.handle();
-    }
-
-    @Test
-    public void testSetResult() {
-        shellTask = new ShellTask(taskExecutionContext, logger);
-        shellTask.init();
-        String r = "return";
-        shellTask.setResult(r);
+        try {
+            PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        shellTask.setResult("shell return string");
+        logger.info("shell return string:{}", shellTask.getResultString());
     }
 }
