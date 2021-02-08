@@ -178,7 +178,7 @@
         :title="$t('Set the DAG diagram name')"
         :visible.sync="dialogVisible"
         width="auto">
-        <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
+        <m-udp ref="mUdp" @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
       </el-dialog>
       <el-dialog
         :title="$t('Please set the parameters before starting')"
@@ -559,7 +559,11 @@
           this.$message.warning(`${i18n.$t('Failed to create node to save')}`)
           return
         }
+
         this.dialogVisible = true
+        this.$nextTick(() => {
+          this.$refs.mUdp.reloadParam()
+        })
       },
       /**
        * Return to the previous child node
