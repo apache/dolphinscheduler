@@ -43,6 +43,7 @@ public class ScriptSender {
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
 
+    //fixme
     AlertResult sendScriptAlert(String msg) {
         AlertResult alertResult = new AlertResult();
         if (ScriptType.of(scriptType).equals(ScriptType.SHELL)) {
