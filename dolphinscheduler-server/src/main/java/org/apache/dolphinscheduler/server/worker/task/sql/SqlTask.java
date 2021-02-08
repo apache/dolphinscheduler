@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -179,8 +180,8 @@ public class SqlTask extends AbstractTask {
                 extractPreQuerySqlParams(con, sqlBind);
             }
         } catch (Exception e) {
-            logger.error("execute pre-query-sql error:{}", preStatements.toString(), e);
-            throw new RuntimeException("execute pre-query-sql error", e);
+            logger.error("execute pre-query-sql error:{}", preStatements, e);
+            throw new ServiceException("execute pre-query-sql error", e);
         }
     }
 
