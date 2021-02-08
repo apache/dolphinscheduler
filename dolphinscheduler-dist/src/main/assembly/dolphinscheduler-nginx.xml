@@ -150,7 +150,7 @@
 			</includes>
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
-		<!-- alert plugin -->
+		<!--alert plugin-->
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-dist/target/dolphinscheduler-dist-${project.version}</directory>
 			<includes>
