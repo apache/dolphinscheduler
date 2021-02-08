@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -96,6 +97,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -1259,9 +1261,9 @@ public class ProcessService {
             // running, delayed or killed
             // the task already exists in task queue
             // return state
-                state == ExecutionStatus.RUNNING_EXECUTION
-                        || state == ExecutionStatus.DELAY_EXECUTION
-                        || state == ExecutionStatus.KILL
+           state == ExecutionStatus.RUNNING_EXECUTION
+                   || state == ExecutionStatus.DELAY_EXECUTION
+                   || state == ExecutionStatus.KILL
         ) {
             return state;
         }
@@ -2308,9 +2310,8 @@ public class ProcessService {
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(projectCode, processDefinition.getCode());
         }
-        // TODO:  query taskCode by  projectCode and taskName
-//        DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(DagHelper.getProcessDag(taskNodeList));
         // TODO parse taskNodeList for preTaskCode and postTaskCode
+        List<TaskNodeRelation> taskNodeRelationList = DagHelper.getProcessDag(taskNodeList).getEdges();
         Date now = new Date();
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation("",// todo relation name
                 processDefinition.getVersion(),
