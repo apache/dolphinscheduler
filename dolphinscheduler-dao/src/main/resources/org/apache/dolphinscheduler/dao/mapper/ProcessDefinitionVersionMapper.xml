@@ -19,8 +19,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionVersionMapper">
     <sql id="baseSql">
-        id, process_definition_id, version, process_definition_json, description, global_params,locations,connects, receivers,
-        receivers_cc, create_time, timeout, resource_ids
+        id
+        , process_definition_id, version, process_definition_json, description, global_params,locations,connects,
+        warning_group_id, create_time, timeout, resource_ids
     </sql>
     <select id="queryMaxVersionByProcessDefinitionId" resultType="java.lang.Long">
         select max(version)

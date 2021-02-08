@@ -21,13 +21,11 @@ import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
@@ -36,8 +34,11 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -47,44 +48,74 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import io.netty.channel.Channel;
 
 /**
- *  worker request processor
+ * worker request processor
  */
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
 
     /**
-     *  thread executor service
+     * thread executor service
      */
     private final ExecutorService workerExecService;
 
     /**
-     *  worker config
+     * worker config
      */
     private final WorkerConfig workerConfig;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private final TaskCallbackService taskCallbackService;
+
+    /**
+     *  alert client service
+     */
+    private AlertClientService alertClientService;
+
+    /**
+     * taskExecutionContextCacheManager
+     */
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+    }
+
+    /**
+     * Pre-cache task to avoid extreme situations when kill task. There is no such task in the cache
+     *
+     * @param taskExecutionContext task
+     */
+    private void setTaskCache(TaskExecutionContext taskExecutionContext) {
+        TaskExecutionContext preTaskCache = new TaskExecutionContext();
+        preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+    }
+
+    public TaskExecuteProcessor(AlertClientService alertClientService) {
+        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
+        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
+        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+
+        this.alertClientService = alertClientService;
     }
 
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
-                command.getBody(), TaskExecuteRequestCommand.class);
+            command.getBody(), TaskExecuteRequestCommand.class);
 
         logger.info("received command : {}", taskRequestCommand);
 
@@ -100,11 +131,13 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
+
+        setTaskCache(taskExecutionContext);
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineId(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId()));
+            taskExecutionContext.getProcessDefineId(),
+            taskExecutionContext.getProcessInstanceId(),
+            taskExecutionContext.getTaskInstanceId()));
 
         taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
         taskExecutionContext.setStartTime(new Date());
@@ -117,27 +150,28 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
-            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
+            FileUtils.createWorkDirIfAbsent(execLocalPath);
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
-            LoggerUtils.logError(Optional.ofNullable(logger), errorLog, ex);
+            LoggerUtils.logError(Optional.of(logger), errorLog, ex);
             LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog, ex);
+            taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         }
         FileUtils.taskLoggerThreadLocal.remove();
 
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
+            new NettyRemoteChannel(channel, command.getOpaque()));
 
         this.doAck(taskExecutionContext);
 
         // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService));
     }
 
-    private void doAck(TaskExecutionContext taskExecutionContext){
+    private void doAck(TaskExecutionContext taskExecutionContext) {
         // tell master that task is in executing
         TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),ackCommand.convert2Command(),Event.ACK);
+        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command(), Event.ACK);
         taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
     }
 
@@ -164,13 +198,14 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     /**
      * get execute local path
+     *
      * @param taskExecutionContext taskExecutionContext
      * @return execute local path
      */
     private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
-                taskExecutionContext.getProcessDefineId(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+            taskExecutionContext.getProcessDefineId(),
+            taskExecutionContext.getProcessInstanceId(),
+            taskExecutionContext.getTaskInstanceId());
     }
 }

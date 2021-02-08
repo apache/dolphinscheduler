@@ -75,6 +75,9 @@ export default {
   setDesc (state, payload) {
     state.description = payload
   },
+  setReleaseState (state, payload) {
+    state.releaseState = payload
+  },
   /**
    * Whether to update the process definition
    */
@@ -140,9 +143,9 @@ export default {
       y: parseInt(dom.css('top'), 10)
     })
   },
-  addConnects(state, payload) {
+  addConnects (state, payload) {
     state.connects = _.map(state.connects, v => {
-      if(v.endPointSourceId===payload.sourceId && v.endPointTargetId===payload.targetId) {
+      if (v.endPointSourceId === payload.sourceId && v.endPointTargetId === payload.targetId) {
         v.label = payload.labelName
       }
       return v

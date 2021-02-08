@@ -61,29 +61,25 @@ public class ParameterUtils {
      * @return convert parameters place holders
      */
     public static String convertParameterPlaceholders(String parameterString, Map<String, String> parameterMap) {
-        if (StringUtils.isEmpty(parameterString) || parameterMap == null) {
+        if (StringUtils.isEmpty(parameterString)) {
             return parameterString;
         }
-
-        //Get current time, schedule execute time
-        String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
-
         Date cronTime;
-
-        if (StringUtils.isNotEmpty(cronTimeStr)) {
+        if (parameterMap != null && !parameterMap.isEmpty()) {
+            // replace variable ${} form,refers to the replacement of system variables and custom variables
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
+        if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
+            //Get current time, schedule execute time
+            String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME);
         } else {
             cronTime = new Date();
         }
-
-        // replace variable ${} form,refers to the replacement of system variables and custom variables
-        parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
-
         // replace time $[...] form, eg. $[yyyyMMdd]
         if (cronTime != null) {
             return dateTemplateParse(parameterString, cronTime);
         }
-
         return parameterString;
     }
 
@@ -111,7 +107,9 @@ public class ParameterUtils {
         }
 
         // replace variable ${} form,refers to the replacement of system variables and custom variables
-        parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        if (!parameterMap.isEmpty()) {
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         if (cronTime != null) {
