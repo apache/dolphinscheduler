@@ -31,7 +31,7 @@
                   @keyup.enter.native="_ok">
           </el-input>
         </div>
-        <p class="error" v-if="isUserPassword">
+        <p class="error" v-if="isUserName">
           {{userNameText}}
         </p>
       </div>
