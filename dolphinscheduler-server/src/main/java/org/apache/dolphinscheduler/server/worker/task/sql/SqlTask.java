@@ -169,7 +169,7 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-    private void handlePreQuerySql(List<String> preStatements) {
+    public void handlePreQuerySql(List<String> preStatements) {
         try (Connection con = baseDataSource.getConnection()) {
             for (String preSql : preStatements) {
                 if (!isQuerySql(preSql)) {
@@ -179,16 +179,16 @@ public class SqlTask extends AbstractTask {
                 extractPreQuerySqlParams(con, sqlBind);
             }
         } catch (Exception e) {
-            logger.error("execute pre-query-sql error:{}",preStatements.toString(), e);
+            logger.error("execute pre-query-sql error:{}", preStatements.toString(), e);
             throw new RuntimeException("execute pre-query-sql error", e);
         }
     }
 
-    private boolean isQuerySql(String preSql) {
+    public boolean isQuerySql(String preSql) {
         return (Objects.nonNull(preSql) && preSql.trim().toLowerCase().startsWith("select "));
     }
 
-    private void extractPreQuerySqlParams(Connection connection, SqlBinds sqlBind) throws Exception {
+    public void extractPreQuerySqlParams(Connection connection, SqlBinds sqlBind) throws Exception {
         Map<String, Property> nodeParams = sqlParameters.getLocalParametersMap();
         if (nodeParams == null) {
             nodeParams = new HashMap<>();
@@ -214,7 +214,7 @@ public class SqlTask extends AbstractTask {
      *
      * @return SqlBinds
      */
-    private SqlBinds getSqlAndSqlParamsMap(String sql) {
+    public SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
 

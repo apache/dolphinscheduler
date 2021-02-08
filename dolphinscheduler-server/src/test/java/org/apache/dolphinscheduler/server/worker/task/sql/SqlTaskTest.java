@@ -135,10 +135,35 @@ public class SqlTaskTest {
 
         SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
         parameters.setPreStatements(Arrays.asList("select aa1,aa2 from dual", "SELECT xy from dual"));
-
-        sqlTask.handle();
+        //sqlTask.handle();
+        sqlTask.handlePreQuerySql(parameters.getPreStatements());
         System.out.println(sqlTask.getParameters().getLocalParams().toString());
         Assert.assertTrue(sqlTask.getParameters().getLocalParametersMap()
                 .keySet().containsAll(Arrays.asList("aa1", "aa2", "xy")));
     }
+
+    @Test
+    public void testQuerySql() {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("select aa1,aa2 from dual", "SELECT xy from dual"));
+        Assert.assertTrue(sqlTask.isQuerySql(parameters.getPreStatements().get(0)));
+        Assert.assertTrue(sqlTask.isQuerySql(parameters.getPreStatements().get(1)));
+    }
+
+    @Test(expected = Exception.class)
+    public void testExtractPreQuerySqlParams() throws Exception {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("select aa1,aa2,xy from dual"));
+        Connection connection = PowerMockito.mock(Connection.class);
+        PowerMockito.mockStatic(DriverManager.class);
+        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(connection);
+
+        PreparedStatement preparedStatement = PowerMockito.mock(PreparedStatement.class);
+        PowerMockito.when(connection.prepareStatement(Mockito.any())).thenReturn(preparedStatement);
+
+        sqlTask.extractPreQuerySqlParams(connection, sqlTask.getSqlAndSqlParamsMap(parameters.getPreStatements().get(0)));
+        Assert.assertTrue(sqlTask.getParameters().getLocalParametersMap()
+                .keySet().containsAll(Arrays.asList("aa1", "aa2", "xy")));
+    }
+
 }
