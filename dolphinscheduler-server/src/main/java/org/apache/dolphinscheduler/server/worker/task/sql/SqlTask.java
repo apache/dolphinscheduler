@@ -204,7 +204,7 @@ public class SqlTask extends AbstractTask {
                     nodeParams.put(key, p);
                 }
             }
-            logger.info("pre statement execute result: {}, for sql: {}", rs.getRow(), sqlBind.getSql());
+            logger.info("pre statement execute result: {}, for sql: {}", nodeParams.values(), sqlBind.getSql());
         }
         sqlParameters.setLocalParams(nodeParams.values().stream().collect(Collectors.toList()));
     }
