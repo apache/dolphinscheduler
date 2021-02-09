@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -26,4 +30,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRelationLog> {
 
+    /**
+     * query process task relation log
+     *
+     * @param processCode process definition code
+     * @param processVersion process version
+     * @return process task relation log
+     */
+    List<ProcessTaskRelationLog> queryByProcessCodeAndVersion(@Param("processCode") long processCode,
+                                                              @Param("processVersion") int processVersion);
 }

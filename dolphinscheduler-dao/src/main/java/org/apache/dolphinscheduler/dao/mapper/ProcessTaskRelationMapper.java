@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -31,20 +32,38 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelation> {
 
     /**
-     * process task relation by processDefinitionCode
+     * process task relation by projectCode and processCode
      *
-     * @param processDefinitionCode processDefinitionCode
-     * @return ProcessTaskRelation
+     * @param projectCode projectCode
+     * @param processCode processCode
+     * @return ProcessTaskRelation list
      */
-    List<ProcessTaskRelation> queryByProcessDefinitionCode(@Param("processDefinitionCode") String processDefinitionCode);
+    List<ProcessTaskRelation> queryByProcessCode(@Param("projectCode") Long projectCode,
+                                                 @Param("processCode") Long processCode);
 
     /**
      * process task relation by taskCode
      *
-     * @param preTaskCode preTaskCode
-     * @param postTaskCode postTaskCode
+     * @param taskCodes taskCode list
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryByTaskCode(@Param("preTaskCode") Long preTaskCode,
-                                              @Param("postTaskCode") Long postTaskCode);
+    List<ProcessTaskRelation> queryByTaskCodes(@Param("taskCodes") Collection<Long> taskCodes);
+
+    /**
+     * process task relation by taskCode
+     *
+     * @param taskCode taskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryByTaskCode(@Param("taskCode") Long taskCode);
+
+    /**
+     * delete process task relation by processCode
+     *
+     * @param projectCode projectCode
+     * @param processCode processCode
+     * @return int
+     */
+    int deleteByCode(@Param("projectCode") Long projectCode,
+                     @Param("processCode") Long processCode);
 }
