@@ -692,7 +692,7 @@ DROP TABLE IF EXISTS `t_ds_relation_project_user`;
 CREATE TABLE `t_ds_relation_project_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
-  `project_code` int(11) DEFAULT NULL COMMENT 'project code',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
   `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
