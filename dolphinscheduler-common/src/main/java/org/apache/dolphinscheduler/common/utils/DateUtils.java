@@ -275,11 +275,13 @@ public class DateUtils {
         long minutes = MILLISECONDS.toDurationMinutes(ms);
         long seconds = MILLISECONDS.toDurationSeconds(ms);
 
-        String duration = days > 0 ? String.format("%dd %dh %dm %ds", days, hours, minutes, seconds) :
-                (hours > 0 ? String.format("%dh %dm %ds", hours, minutes, seconds) :
-                        (minutes > 0 ? String.format("%dm %ds", minutes, seconds) :
-                                String.format("%ds", seconds)));
-        return duration;
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder = days > 0 ? strBuilder.append(days).append("d").append(" ") : strBuilder;
+        strBuilder = hours > 0 ? strBuilder.append(hours).append("h").append(" ") : strBuilder;
+        strBuilder = minutes > 0 ? strBuilder.append(minutes).append("m").append(" ") : strBuilder;
+        strBuilder = seconds > 0 ? strBuilder.append(seconds).append("s") : strBuilder;
+
+        return strBuilder.toString();
 
     }
 

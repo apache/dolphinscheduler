@@ -184,6 +184,16 @@ public class DateUtilsTest {
         duration = DateUtils.format2Duration(d2, d1);
         Assert.assertEquals("10s", duration);
 
+        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
+        d2 = DateUtils.stringToDate("2020-01-21 11:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("1d 10s", duration);
+
+        d1 = DateUtils.stringToDate("2020-01-20 11:10:00");
+        d2 = DateUtils.stringToDate("2020-01-20 16:10:10");
+        duration = DateUtils.format2Duration(d2, d1);
+        Assert.assertEquals("5h 10s", duration);
+
     }
 
 }
