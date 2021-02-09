@@ -388,7 +388,7 @@ const router = new Router({
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
             title: `${i18n.$t('User Manage')}`,
-            refresh_in_switched_tab: false
+            refresh_in_switched_tab: true
           }
         },
         {
@@ -557,6 +557,11 @@ const router = new Router({
     }
   ]
 })
+
+const VueRouterPush = Router.prototype.push
+Router.prototype.push = function push (to) {
+  return VueRouterPush.call(this, to).catch(err => err)
+}
 
 router.beforeEach((to, from, next) => {
   const $body = $('body')

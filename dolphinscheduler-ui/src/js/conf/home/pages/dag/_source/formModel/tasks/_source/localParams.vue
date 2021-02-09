@@ -59,7 +59,7 @@
         </el-select>
       </template>
       <el-input
-              :disabled="isDetails && !isStartProcess"
+              :disabled="isDetails"
               type="text"
               size="small"
               v-model="localParamsList[$index].value"
@@ -68,18 +68,18 @@
               @blur="_handleValue()"
               :style="inputStyle">
       </el-input>
-      <span class="lt-add" v-show="!isStartProcess">
+      <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
           <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
         </a>
       </span>
-      <span class="add" v-if="$index === (localParamsList.length - 1)" v-show="!isStartProcess">
+      <span class="add" v-if="$index === (localParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
           <em class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
-    <span class="add-dp" v-if="!localParamsList.length" v-show="!isStartProcess">
+    <span class="add-dp" v-if="!localParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
         <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
@@ -112,10 +112,6 @@
       hide: {
         type: Boolean,
         default: true
-      },
-      isStartProcess: {
-        type: Boolean,
-        default: false
       }
     },
     methods: {

@@ -25,6 +25,10 @@ import java.nio.charset.StandardCharsets;
  */
 public class Constants {
 
+    private Constants() {
+        throw new IllegalStateException(Constants.class.getName());
+    }
+
     public static final String COMMA = ",";
 
     public static final String SLASH = "/";

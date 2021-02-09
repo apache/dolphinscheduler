@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
@@ -35,18 +34,16 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 
 /**
- *  alert request processor
+ * alert request processor
  */
 public class AlertRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(AlertRequestProcessor.class);
     private AlertDao alertDao;
-    private PluginDao pluginDao;
     private AlertPluginManager alertPluginManager;
 
-    public AlertRequestProcessor(AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
+    public AlertRequestProcessor(AlertDao alertDao, AlertPluginManager alertPluginManager) {
         this.alertDao = alertDao;
-        this.pluginDao = pluginDao;
         this.alertPluginManager = alertPluginManager;
     }
 
@@ -59,7 +56,7 @@ public class AlertRequestProcessor implements NettyRequestProcessor {
                 command.getBody(), AlertSendRequestCommand.class);
         logger.info("received command : {}", alertSendRequestCommand);
 
-        AlertSender alertSender = new AlertSender(alertDao, alertPluginManager, pluginDao);
+        AlertSender alertSender = new AlertSender(alertDao, alertPluginManager);
         AlertSendResponseCommand alertSendResponseCommand = alertSender.syncHandler(alertSendRequestCommand.getGroupId(), alertSendRequestCommand.getTitle(), alertSendRequestCommand.getContent());
         channel.writeAndFlush(alertSendResponseCommand.convert2Command(command.getOpaque()));
 

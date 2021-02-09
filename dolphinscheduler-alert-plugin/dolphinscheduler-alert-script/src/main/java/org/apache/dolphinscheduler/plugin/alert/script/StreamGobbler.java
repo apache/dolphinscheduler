@@ -51,11 +51,11 @@ public class StreamGobbler extends Thread {
                 output.append(System.getProperty("line.separator"));
             }
             if (output.length() > 0) {
-                logger.info("out put msg is{}",output.toString());
+                logger.info("out put msg is{}", output);
             }
         } catch (IOException e) {
             logger.error("I/O error occurs {}", e.getMessage());
         }
     }
 
-}  
+}

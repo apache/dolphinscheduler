@@ -22,6 +22,9 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
  */
 public class WeChatAlertParamsConstants {
 
+    private WeChatAlertParamsConstants() {
+        throw new IllegalStateException(WeChatAlertParamsConstants.class.getName());
+    }
 
     static final String ENTERPRISE_WE_CHAT_CORP_ID = "corp.id";
 

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.alert;
 
+import java.util.Map;
+
 /**
  * AlertInfo
  */
@@ -25,18 +27,18 @@ public class AlertInfo {
     /**
      * all params this plugin need is in alertProps
      */
-    private String alertParams;
+    private Map<String,String> alertParams;
 
     /**
      * the alert content
      */
     private AlertData alertData;
 
-    public String getAlertParams() {
+    public Map<String, String> getAlertParams() {
         return alertParams;
     }
 
-    public void setAlertParams(String alertParams) {
+    public void setAlertParams(Map<String, String> alertParams) {
         this.alertParams = alertParams;
     }
 

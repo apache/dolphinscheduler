@@ -18,7 +18,7 @@
   <m-conditions>
     <template slot="search-group">
       <div class="list">
-        <el-button type="primary" size="small" @click="_ckQuery" icon="el-icon-search"></el-button>
+        <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
       </div>
       <div class="list">
         <el-date-picker

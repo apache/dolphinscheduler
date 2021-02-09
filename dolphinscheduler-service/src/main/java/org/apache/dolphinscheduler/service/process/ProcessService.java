@@ -37,10 +37,12 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -84,6 +86,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -110,11 +113,11 @@ public class ProcessService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final int[] stateArray = new int[] {ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal()};
+    private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.DELAY_EXECUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
     private UserMapper userMapper;
@@ -158,16 +161,16 @@ public class ProcessService {
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
-     * @param logger         logger
-     * @param host           host
+     * @param logger logger
+     * @param host host
      * @param validThreadNum validThreadNum
-     * @param command        found command
+     * @param command found command
      * @return process instance
      */
     @Transactional(rollbackFor = Exception.class)
     public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
-        //cannot construct process instance, return null;
+        // cannot construct process instance, return null
         if (processInstance == null) {
             logger.error("scan command, command parameter is error: {}", command);
             moveToErrorCommand(command, "process instance is null");
@@ -201,7 +204,7 @@ public class ProcessService {
     /**
      * set process waiting thread
      *
-     * @param command         command
+     * @param command command
      * @param processInstance processInstance
      * @return process instance
      */
@@ -219,7 +222,7 @@ public class ProcessService {
     /**
      * check thread num
      *
-     * @param command        command
+     * @param command command
      * @param validThreadNum validThreadNum
      * @return if thread is enough
      */
@@ -259,7 +262,7 @@ public class ProcessService {
      */
     public Boolean verifyIsNeedCreateCommand(Command command) {
         Boolean isNeedCreate = true;
-        Map<CommandType, Integer> cmdTypeMap = new HashMap<CommandType, Integer>();
+        EnumMap<CommandType, Integer> cmdTypeMap = new EnumMap<>(CommandType.class);
         cmdTypeMap.put(CommandType.REPEAT_RUNNING, 1);
         cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, 1);
         cmdTypeMap.put(CommandType.START_FAILURE_TASK_PROCESS, 1);
@@ -296,9 +299,6 @@ public class ProcessService {
 
     /**
      * get task node list by definitionId
-     *
-     * @param defineId
-     * @return
      */
     public List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId) {
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
@@ -425,7 +425,7 @@ public class ProcessService {
      * recursive query sub process definition id by parent id.
      *
      * @param parentId parentId
-     * @param ids      ids
+     * @param ids ids
      */
     public void recurseFindSubProcessId(int parentId, List<Integer> ids) {
         ProcessDefinition processDefinition = processDefineMapper.selectById(parentId);
@@ -435,7 +435,7 @@ public class ProcessService {
 
         List<TaskNode> taskNodeList = processData.getTasks();
 
-        if (taskNodeList != null && taskNodeList.size() > 0) {
+        if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
             for (TaskNode taskNode : taskNodeList) {
                 String parameter = taskNode.getParams();
@@ -456,7 +456,7 @@ public class ProcessService {
      * create recovery waiting thread  command and delete origin command at the same time.
      * if the recovery command is exists, only update the field update_time
      *
-     * @param originCommand   originCommand
+     * @param originCommand originCommand
      * @param processInstance processInstance
      */
     public void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance) {
@@ -473,17 +473,17 @@ public class ProcessService {
         // process instance quit by "waiting thread" state
         if (originCommand == null) {
             Command command = new Command(
-                CommandType.RECOVER_WAITTING_THREAD,
-                processInstance.getTaskDependType(),
-                processInstance.getFailureStrategy(),
-                processInstance.getExecutorId(),
-                processInstance.getProcessDefinitionId(),
-                JSONUtils.toJsonString(cmdParam),
-                processInstance.getWarningType(),
-                processInstance.getWarningGroupId(),
-                processInstance.getScheduleTime(),
-                processInstance.getWorkerGroup(),
-                processInstance.getProcessInstancePriority()
+                    CommandType.RECOVER_WAITTING_THREAD,
+                    processInstance.getTaskDependType(),
+                    processInstance.getFailureStrategy(),
+                    processInstance.getExecutorId(),
+                    processInstance.getProcessDefinitionId(),
+                    JSONUtils.toJsonString(cmdParam),
+                    processInstance.getWarningType(),
+                    processInstance.getWarningGroupId(),
+                    processInstance.getScheduleTime(),
+                    processInstance.getWorkerGroup(),
+                    processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
             return;
@@ -508,16 +508,14 @@ public class ProcessService {
     /**
      * get schedule time from command
      *
-     * @param command  command
+     * @param command command
      * @param cmdParam cmdParam map
      * @return date
      */
     private Date getScheduleTime(Command command, Map<String, String> cmdParam) {
         Date scheduleTime = command.getScheduleTime();
-        if (scheduleTime == null) {
-            if (cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-                scheduleTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-            }
+        if (scheduleTime == null && cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+            scheduleTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
         }
         return scheduleTime;
     }
@@ -526,8 +524,8 @@ public class ProcessService {
      * generate a new work process instance from command.
      *
      * @param processDefinition processDefinition
-     * @param command           command
-     * @param cmdParam          cmdParam map
+     * @param command command
+     * @param cmdParam cmdParam map
      * @return process instance
      */
     private ProcessInstance generateNewProcessInstance(ProcessDefinition processDefinition,
@@ -580,10 +578,10 @@ public class ProcessService {
 
         // curing global params
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-            processDefinition.getGlobalParamMap(),
-            processDefinition.getGlobalParamList(),
-            getCommandTypeIfComplement(processInstance, command),
-            processInstance.getScheduleTime()));
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                getCommandTypeIfComplement(processInstance, command),
+                processInstance.getScheduleTime()));
 
         //copy process define json to process instance
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
@@ -603,7 +601,7 @@ public class ProcessService {
      * use definition creator's tenant.
      *
      * @param tenantId tenantId
-     * @param userId   userId
+     * @param userId userId
      * @return tenant
      */
     public Tenant getTenantForProcess(int tenantId, int userId) {
@@ -626,15 +624,15 @@ public class ProcessService {
     /**
      * check command parameters is valid
      *
-     * @param command  command
+     * @param command command
      * @param cmdParam cmdParam map
      * @return whether command param is valid
      */
     private Boolean checkCmdParam(Command command, Map<String, String> cmdParam) {
         if (command.getTaskDependType() == TaskDependType.TASK_ONLY || command.getTaskDependType() == TaskDependType.TASK_PRE) {
             if (cmdParam == null
-                || !cmdParam.containsKey(Constants.CMD_PARAM_START_NODE_NAMES)
-                || cmdParam.get(Constants.CMD_PARAM_START_NODE_NAMES).isEmpty()) {
+                    || !cmdParam.containsKey(Constants.CMD_PARAM_START_NODE_NAMES)
+                    || cmdParam.get(Constants.CMD_PARAM_START_NODE_NAMES).isEmpty()) {
                 logger.error("command node depend type is {}, but start nodes is null ", command.getTaskDependType());
                 return false;
             }
@@ -646,7 +644,7 @@ public class ProcessService {
      * construct process instance according to one command.
      *
      * @param command command
-     * @param host    host
+     * @param host host
      * @return process instance
      */
     private ProcessInstance constructProcessInstance(Command command, String host) {
@@ -714,7 +712,7 @@ public class ProcessService {
             // generate one new process instance
             processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
         }
-        if (!checkCmdParam(command, cmdParam)) {
+        if (Boolean.FALSE.equals(checkCmdParam(command, cmdParam))) {
             logger.error("command parameter check failed!");
             return null;
         }
@@ -742,7 +740,7 @@ public class ProcessService {
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                    String.join(Constants.COMMA, convertIntListToString(failedList)));
+                        String.join(Constants.COMMA, convertIntListToString(failedList)));
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
                 break;
@@ -755,7 +753,7 @@ public class ProcessService {
                 cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
                 List<Integer> suspendedNodeList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.PAUSE);
                 List<Integer> stopNodeList = findTaskIdByInstanceState(processInstance.getId(),
-                    ExecutionStatus.KILL);
+                        ExecutionStatus.KILL);
                 suspendedNodeList.addAll(stopNodeList);
                 for (Integer taskId : suspendedNodeList) {
                     // initialize the pause state
@@ -809,7 +807,7 @@ public class ProcessService {
      * return complement data if the process start with complement data
      *
      * @param processInstance processInstance
-     * @param command         command
+     * @param command command
      * @return command type
      */
     private CommandType getCommandTypeIfComplement(ProcessInstance processInstance, Command command) {
@@ -824,8 +822,8 @@ public class ProcessService {
      * initialize complement data parameters
      *
      * @param processDefinition processDefinition
-     * @param processInstance   processInstance
-     * @param cmdParam          cmdParam
+     * @param processInstance processInstance
+     * @param cmdParam cmdParam
      */
     private void initComplementDataParam(ProcessDefinition processDefinition,
                                          ProcessInstance processInstance,
@@ -835,14 +833,14 @@ public class ProcessService {
         }
 
         Date startComplementTime = DateUtils.parse(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE),
-            YYYY_MM_DD_HH_MM_SS);
+                YYYY_MM_DD_HH_MM_SS);
         if (Flag.NO == processInstance.getIsSubProcess()) {
             processInstance.setScheduleTime(startComplementTime);
         }
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-            processDefinition.getGlobalParamMap(),
-            processDefinition.getGlobalParamList(),
-            CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
 
     }
 
@@ -862,7 +860,7 @@ public class ProcessService {
         Map<String, String> paramMap = JSONUtils.toMap(cmdParam);
         // write sub process id into cmd param.
         if (paramMap.containsKey(CMD_PARAM_SUB_PROCESS)
-            && CMD_PARAM_EMPTY_SUB_PROCESS.equals(paramMap.get(CMD_PARAM_SUB_PROCESS))) {
+                && CMD_PARAM_EMPTY_SUB_PROCESS.equals(paramMap.get(CMD_PARAM_SUB_PROCESS))) {
             paramMap.remove(CMD_PARAM_SUB_PROCESS);
             paramMap.put(CMD_PARAM_SUB_PROCESS, String.valueOf(subProcessInstance.getId()));
             subProcessInstance.setCommandParam(JSONUtils.toJsonString(paramMap));
@@ -875,7 +873,7 @@ public class ProcessService {
             ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId));
             if (parentInstance != null) {
                 subProcessInstance.setGlobalParams(
-                    joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
+                        joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
                 this.saveProcessInstance(subProcessInstance);
             } else {
                 logger.error("sub process command params error, cannot find parent instance: {} ", cmdParam);
@@ -897,7 +895,7 @@ public class ProcessService {
      * only the keys doesn't in sub process global would be joined.
      *
      * @param parentGlobalParams parentGlobalParams
-     * @param subGlobalParams    subGlobalParams
+     * @param subGlobalParams subGlobalParams
      * @return global params join
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams) {
@@ -922,12 +920,11 @@ public class ProcessService {
      */
     private void initTaskInstance(TaskInstance taskInstance) {
 
-        if (!taskInstance.isSubProcess()) {
-            if (taskInstance.getState().typeIsCancel() || taskInstance.getState().typeIsFailure()) {
-                taskInstance.setFlag(Flag.NO);
-                updateTaskInstance(taskInstance);
-                return;
-            }
+        if (!taskInstance.isSubProcess()
+                && (taskInstance.getState().typeIsCancel() || taskInstance.getState().typeIsFailure())) {
+            taskInstance.setFlag(Flag.NO);
+            updateTaskInstance(taskInstance);
+            return;
         }
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         updateTaskInstance(taskInstance);
@@ -944,12 +941,12 @@ public class ProcessService {
     public TaskInstance submitTask(TaskInstance taskInstance) {
         ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         logger.info("start submit task : {}, instance id:{}, state: {}",
-            taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
+                taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
         //submit to db
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
         if (task == null) {
             logger.error("end submit task to db error, task name:{}, process id:{} state: {} ",
-                taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
+                    taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
             return task;
         }
         if (!task.getState().typeIsFinished()) {
@@ -957,7 +954,7 @@ public class ProcessService {
         }
 
         logger.info("end submit task to db successfully:{} state:{} complete, instance id:{} state: {}  ",
-            taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
+                taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
         return task;
     }
 
@@ -968,7 +965,7 @@ public class ProcessService {
      * set map {parent instance id, task instance id, 0(child instance id)}
      *
      * @param parentInstance parentInstance
-     * @param parentTask     parentTask
+     * @param parentTask parentTask
      * @return process instance map
      */
     private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask) {
@@ -997,7 +994,7 @@ public class ProcessService {
      * find previous task work process map.
      *
      * @param parentProcessInstance parentProcessInstance
-     * @param parentTask            parentTask
+     * @param parentTask parentTask
      * @return process instance map
      */
     private ProcessInstanceMap findPreviousTaskProcessMap(ProcessInstance parentProcessInstance,
@@ -1015,7 +1012,7 @@ public class ProcessService {
             }
         }
         logger.info("sub process instance is not found,parent task:{},parent instance:{}",
-            parentTask.getId(), parentProcessInstance.getId());
+                parentTask.getId(), parentProcessInstance.getId());
         return null;
     }
 
@@ -1049,10 +1046,6 @@ public class ProcessService {
 
     /**
      * complement data needs transform parent parameter to child.
-     *
-     * @param instanceMap
-     * @param parentProcessInstance
-     * @return
      */
     private String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance) {
         // set sub work process command
@@ -1071,11 +1064,6 @@ public class ProcessService {
 
     /**
      * create sub work process command
-     *
-     * @param parentProcessInstance
-     * @param childInstance
-     * @param instanceMap
-     * @param task
      */
     public Command createSubProcessCommand(ProcessInstance parentProcessInstance,
                                            ProcessInstance childInstance,
@@ -1088,25 +1076,23 @@ public class ProcessService {
         String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance);
 
         return new Command(
-            commandType,
-            TaskDependType.TASK_POST,
-            parentProcessInstance.getFailureStrategy(),
-            parentProcessInstance.getExecutorId(),
-            childDefineId,
-            processParam,
-            parentProcessInstance.getWarningType(),
-            parentProcessInstance.getWarningGroupId(),
-            parentProcessInstance.getScheduleTime(),
-            task.getWorkerGroup(),
-            parentProcessInstance.getProcessInstancePriority()
+                commandType,
+                TaskDependType.TASK_POST,
+                parentProcessInstance.getFailureStrategy(),
+                parentProcessInstance.getExecutorId(),
+                childDefineId,
+                processParam,
+                parentProcessInstance.getWarningType(),
+                parentProcessInstance.getWarningGroupId(),
+                parentProcessInstance.getScheduleTime(),
+                task.getWorkerGroup(),
+                parentProcessInstance.getProcessInstancePriority()
         );
     }
 
     /**
      * initialize sub work flow state
      * child instance state would be initialized when 'recovery from pause/stop/failure'
-     *
-     * @param childInstance
      */
     private void initSubInstanceState(ProcessInstance childInstance) {
         if (childInstance != null) {
@@ -1119,9 +1105,6 @@ public class ProcessService {
      * get sub work flow command type
      * child instance exist: child command = fatherCommand
      * child instance not exists: child command = fatherCommand[0]
-     *
-     * @param parentProcessInstance
-     * @return
      */
     private CommandType getSubCommandType(ProcessInstance parentProcessInstance, ProcessInstance childInstance) {
         CommandType commandType = parentProcessInstance.getCommandType();
@@ -1136,7 +1119,7 @@ public class ProcessService {
      * update sub process definition
      *
      * @param parentProcessInstance parentProcessInstance
-     * @param childDefinitionId     childDefinitionId
+     * @param childDefinitionId childDefinitionId
      */
     private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
         ProcessDefinition fatherDefinition = this.findProcessDefineById(parentProcessInstance.getProcessDefinitionId());
@@ -1150,7 +1133,7 @@ public class ProcessService {
     /**
      * submit task to mysql
      *
-     * @param taskInstance    taskInstance
+     * @param taskInstance taskInstance
      * @param processInstance processInstance
      * @return task instance
      */
@@ -1163,7 +1146,7 @@ public class ProcessService {
             } else {
 
                 if (processInstanceState != ExecutionStatus.READY_STOP
-                    && processInstanceState != ExecutionStatus.READY_PAUSE) {
+                        && processInstanceState != ExecutionStatus.READY_PAUSE) {
                     // failure task set invalid
                     taskInstance.setFlag(Flag.NO);
                     updateTaskInstance(taskInstance);
@@ -1204,19 +1187,19 @@ public class ProcessService {
      * return stop if work process state is ready stop
      * if all of above are not satisfied, return submit success
      *
-     * @param taskInstance         taskInstance
+     * @param taskInstance taskInstance
      * @param processInstanceState processInstanceState
      * @return process instance state
      */
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
         ExecutionStatus state = taskInstance.getState();
         if (
-            // running, delayed or killed
-            // the task already exists in task queue
-            // return state
-            state == ExecutionStatus.RUNNING_EXECUTION
-                || state == ExecutionStatus.DELAY_EXECUTION
-                || state == ExecutionStatus.KILL
+                // running, delayed or killed
+                // the task already exists in task queue
+                // return state
+                state == ExecutionStatus.RUNNING_EXECUTION
+                        || state == ExecutionStatus.DELAY_EXECUTION
+                        || state == ExecutionStatus.KILL
         ) {
             return state;
         }
@@ -1225,7 +1208,7 @@ public class ProcessService {
         if (processInstanceState == ExecutionStatus.READY_PAUSE) {
             state = ExecutionStatus.PAUSE;
         } else if (processInstanceState == ExecutionStatus.READY_STOP
-            || !checkProcessStrategy(taskInstance)) {
+                || !checkProcessStrategy(taskInstance)) {
             state = ExecutionStatus.KILL;
         } else {
             state = ExecutionStatus.SUBMITTED_SUCCESS;
@@ -1380,7 +1363,7 @@ public class ProcessService {
      * get id list by task state
      *
      * @param instanceId instanceId
-     * @param state      state
+     * @param state state
      * @return task instance states
      */
     public List<Integer> findTaskIdByInstanceState(int instanceId, ExecutionStatus state) {
@@ -1435,7 +1418,7 @@ public class ProcessService {
      * find work process map by parent process id and parent task id.
      *
      * @param parentWorkProcessId parentWorkProcessId
-     * @param parentTaskId        parentTaskId
+     * @param parentTaskId parentTaskId
      * @return process instance map
      */
     public ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId) {
@@ -1457,7 +1440,7 @@ public class ProcessService {
      * find sub process instance
      *
      * @param parentProcessId parentProcessId
-     * @param parentTaskId    parentTaskId
+     * @param parentTaskId parentTaskId
      * @return process instance
      */
     public ProcessInstance findSubProcessInstance(Integer parentProcessId, Integer parentTaskId) {
@@ -1489,12 +1472,12 @@ public class ProcessService {
     /**
      * change task state
      *
-     * @param state       state
-     * @param startTime   startTime
-     * @param host        host
+     * @param state state
+     * @param startTime startTime
+     * @param host host
      * @param executePath executePath
-     * @param logPath     logPath
-     * @param taskInstId  taskInstId
+     * @param logPath logPath
+     * @param taskInstId taskInstId
      */
     public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state, Date startTime, String host,
                                 String executePath,
@@ -1522,12 +1505,12 @@ public class ProcessService {
      * update the process instance
      *
      * @param processInstanceId processInstanceId
-     * @param processJson       processJson
-     * @param globalParams      globalParams
-     * @param scheduleTime      scheduleTime
-     * @param flag              flag
-     * @param locations         locations
-     * @param connects          connects
+     * @param processJson processJson
+     * @param globalParams globalParams
+     * @param scheduleTime scheduleTime
+     * @param flag flag
+     * @param locations locations
+     * @param connects connects
      * @return update process instance result
      */
     public int updateProcessInstance(Integer processInstanceId, String processJson,
@@ -1548,10 +1531,10 @@ public class ProcessService {
     /**
      * change task state
      *
-     * @param state      state
-     * @param endTime    endTime
+     * @param state state
+     * @param endTime endTime
      * @param taskInstId taskInstId
-     * @param varPool    varPool
+     * @param varPool varPool
      */
     public void changeTaskState(TaskInstance taskInstance, ExecutionStatus state,
                                 Date endTime,
@@ -1577,7 +1560,7 @@ public class ProcessService {
         if (intList == null) {
             return new ArrayList<>();
         }
-        List<String> result = new ArrayList<String>(intList.size());
+        List<String> result = new ArrayList<>(intList.size());
         for (Integer intVar : intList) {
             result.add(String.valueOf(intVar));
         }
@@ -1642,7 +1625,7 @@ public class ProcessService {
      */
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host) {
         return taskInstanceMapper.queryByHostAndStatus(host,
-            stateArray);
+                stateArray);
     }
 
     /**
@@ -1659,7 +1642,7 @@ public class ProcessService {
      * update process instance state by id
      *
      * @param processInstanceId processInstanceId
-     * @param executionStatus   executionStatus
+     * @param executionStatus executionStatus
      * @return update process result
      */
     public int updateProcessInstanceState(Integer processInstanceId, ExecutionStatus executionStatus) {
@@ -1696,7 +1679,7 @@ public class ProcessService {
     /**
      * find tenant code by resource name
      *
-     * @param resName      resource name
+     * @param resName resource name
      * @param resourceType resource type
      * @return tenant code
      */
@@ -1714,35 +1697,35 @@ public class ProcessService {
      */
     public List<Schedule> selectAllByProcessDefineId(int[] ids) {
         return scheduleMapper.selectAllByProcessDefineArray(
-            ids);
+                ids);
     }
 
     /**
      * get dependency cycle by work process define id and scheduler fire time
      *
-     * @param masterId            masterId
+     * @param masterId masterId
      * @param processDefinitionId processDefinitionId
-     * @param scheduledFireTime   the time the task schedule is expected to trigger
+     * @param scheduledFireTime the time the task schedule is expected to trigger
      * @return CycleDependency
      * @throws Exception if error throws Exception
      */
     public CycleDependency getCycleDependency(int masterId, int processDefinitionId, Date scheduledFireTime) throws Exception {
-        List<CycleDependency> list = getCycleDependencies(masterId, new int[] {processDefinitionId}, scheduledFireTime);
-        return list.size() > 0 ? list.get(0) : null;
+        List<CycleDependency> list = getCycleDependencies(masterId, new int[]{processDefinitionId}, scheduledFireTime);
+        return !list.isEmpty() ? list.get(0) : null;
 
     }
 
     /**
      * get dependency cycle list by work process define id list and scheduler fire time
      *
-     * @param masterId          masterId
-     * @param ids               ids
+     * @param masterId masterId
+     * @param ids ids
      * @param scheduledFireTime the time the task schedule is expected to trigger
      * @return CycleDependency list
      * @throws Exception if error throws Exception
      */
     public List<CycleDependency> getCycleDependencies(int masterId, int[] ids, Date scheduledFireTime) throws Exception {
-        List<CycleDependency> cycleDependencyList = new ArrayList<CycleDependency>();
+        List<CycleDependency> cycleDependencyList = new ArrayList<>();
         if (null == ids || ids.length == 0) {
             logger.warn("ids[] is empty!is invalid!");
             return cycleDependencyList;
@@ -1769,14 +1752,10 @@ public class ProcessService {
             }
             Calendar calendar = Calendar.getInstance();
             switch (cycleEnum) {
-                /*case MINUTE:
-                    calendar.add(Calendar.MINUTE,-61);*/
                 case HOUR:
                     calendar.add(Calendar.HOUR, -25);
                     break;
                 case DAY:
-                    calendar.add(Calendar.DATE, -32);
-                    break;
                 case WEEK:
                     calendar.add(Calendar.DATE, -32);
                     break;
@@ -1784,7 +1763,8 @@ public class ProcessService {
                     calendar.add(Calendar.MONTH, -13);
                     break;
                 default:
-                    logger.warn("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum.name());
+                    String cycleName = cycleEnum.name();
+                    logger.warn("Dependent process definition's  cycleEnum is {},not support!!", cycleName);
                     continue;
             }
             Date start = calendar.getTime();
@@ -1794,7 +1774,7 @@ public class ProcessService {
             } else {
                 list = CronUtils.getFireDateList(start, scheduledFireTime, depCronExpression);
             }
-            if (list.size() >= 1) {
+            if (!list.isEmpty()) {
                 start = list.get(list.size() - 1);
                 CycleDependency dependency = new CycleDependency(depSchedule.getProcessDefinitionId(), start, CronUtils.getExpirationTime(start, cycleEnum), cycleEnum);
                 cycleDependencyList.add(dependency);
@@ -1813,8 +1793,8 @@ public class ProcessService {
      */
     public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastSchedulerProcess(definitionId,
-            dateInterval.getStartTime(),
-            dateInterval.getEndTime());
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime());
     }
 
     /**
@@ -1826,23 +1806,23 @@ public class ProcessService {
      */
     public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastManualProcess(definitionId,
-            dateInterval.getStartTime(),
-            dateInterval.getEndTime());
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime());
     }
 
     /**
      * find last running process instance
      *
      * @param definitionId process definition id
-     * @param startTime    start time
-     * @param endTime      end time
+     * @param startTime start time
+     * @param endTime end time
      * @return process instance
      */
     public ProcessInstance findLastRunningProcess(int definitionId, Date startTime, Date endTime) {
         return processInstanceMapper.queryLastRunningProcess(definitionId,
-            startTime,
-            endTime,
-            stateArray);
+                startTime,
+                endTime,
+                stateArray);
     }
 
     /**
@@ -1867,6 +1847,7 @@ public class ProcessService {
 
     /**
      * query project name and user name by processInstanceId.
+     *
      * @param processInstanceId processInstanceId
      * @return projectName and userName
      */
@@ -1934,35 +1915,32 @@ public class ProcessService {
     /**
      * list unauthorized udf function
      *
-     * @param userId     user id
+     * @param userId user id
      * @param needChecks data source id array
      * @return unauthorized udf function list
      */
     public <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType) {
-        List<T> resultList = new ArrayList<T>();
+        List<T> resultList = new ArrayList<>();
 
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
-            Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
+            Set<T> originResSet = new HashSet<>(Arrays.asList(needChecks));
 
             switch (authorizationType) {
                 case RESOURCE_FILE_ID:
-                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                case UDF_FILE:
+                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(Resource::getId).collect(toSet());
                     originResSet.removeAll(authorizedResourceFiles);
                     break;
                 case RESOURCE_FILE_NAME:
-                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getFullName()).collect(toSet());
+                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(Resource::getFullName).collect(toSet());
                     originResSet.removeAll(authorizedResources);
                     break;
-                case UDF_FILE:
-                    Set<Integer> authorizedUdfFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
-                    originResSet.removeAll(authorizedUdfFiles);
-                    break;
                 case DATASOURCE:
-                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks).stream().map(DataSource::getId).collect(toSet());
                     originResSet.removeAll(authorizedDatasources);
                     break;
                 case UDF:
-                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(UdfFunc::getId).collect(toSet());
                     originResSet.removeAll(authorizedUdfs);
                     break;
                 default:
@@ -2007,9 +1985,6 @@ public class ProcessService {
 
     /**
      * format task app id in task instance
-     *
-     * @param taskInstance
-     * @return
      */
     public String formatTaskAppId(TaskInstance taskInstance) {
         ProcessDefinition definition = this.findProcessDefineById(taskInstance.getProcessDefinitionId());
@@ -2019,9 +1994,65 @@ public class ProcessService {
             return "";
         }
         return String.format("%s_%s_%s",
-            definition.getId(),
-            processInstanceById.getId(),
-            taskInstance.getId());
+                definition.getId(),
+                processInstanceById.getId(),
+                taskInstance.getId());
     }
 
+    /**
+     * solve the branch rename bug
+     *
+     * @param processData
+     * @param oldJson
+     * @return String
+     */
+    public String changeJson(ProcessData processData, String oldJson) {
+        ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
+        HashMap<String, String> oldNameTaskId = new HashMap<>();
+        List<TaskNode> oldTasks = oldProcessData.getTasks();
+        for (int i = 0; i < oldTasks.size(); i++) {
+            TaskNode taskNode = oldTasks.get(i);
+            String oldName = taskNode.getName();
+            String oldId = taskNode.getId();
+            oldNameTaskId.put(oldName, oldId);
+        }
+
+        // take the processdefinitionjson saved this time, and then save the taskid and name
+        HashMap<String, String> newNameTaskId = new HashMap<>();
+        List<TaskNode> newTasks = processData.getTasks();
+        for (int i = 0; i < newTasks.size(); i++) {
+            TaskNode taskNode = newTasks.get(i);
+            String newId = taskNode.getId();
+            String newName = taskNode.getName();
+            newNameTaskId.put(newId, newName);
+        }
+
+        // replace the previous conditionresult with a new one
+        List<TaskNode> tasks = processData.getTasks();
+        for (int i = 0; i < tasks.size(); i++) {
+            TaskNode taskNode = newTasks.get(i);
+            String type = taskNode.getType();
+            if (TaskType.CONDITIONS.getDescp().equalsIgnoreCase(type)) {
+                ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
+                String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
+                String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
+                String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
+                String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
+                if (newSuccessNodeName != null) {
+                    ArrayList<String> successNode = new ArrayList<>();
+                    successNode.add(newSuccessNodeName);
+                    conditionsParameters.setSuccessNode(successNode);
+                }
+                if (newFailedNodeName != null) {
+                    ArrayList<String> failedNode = new ArrayList<>();
+                    failedNode.add(newFailedNodeName);
+                    conditionsParameters.setFailedNode(failedNode);
+                }
+                String conditionResultStr = conditionsParameters.getConditionResult();
+                taskNode.setConditionResult(conditionResultStr);
+                tasks.set(i, taskNode);
+            }
+        }
+        return JSONUtils.toJsonString(processData);
+    }
 }

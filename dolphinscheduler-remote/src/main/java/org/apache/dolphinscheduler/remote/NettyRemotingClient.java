@@ -55,7 +55,6 @@ import org.slf4j.LoggerFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -84,7 +83,7 @@ public class NettyRemotingClient {
     /**
      * channels
      */
-    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap(128);
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
     /**
      * started flag
@@ -130,7 +129,7 @@ public class NettyRemotingClient {
         this.clientConfig = clientConfig;
         if (NettyUtils.useEpoll()) {
             this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -139,7 +138,7 @@ public class NettyRemotingClient {
             });
         } else {
             this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-                private AtomicInteger threadIndex = new AtomicInteger(0);
+                private final AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
@@ -148,8 +147,8 @@ public class NettyRemotingClient {
             });
         }
         this.callbackExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.MINUTES,
-            new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
-            new CallerThreadExecutePolicy());
+                new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
+                new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
 
         this.responseFutureExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ResponseFutureExecutor"));
@@ -163,40 +162,32 @@ public class NettyRemotingClient {
     private void start() {
 
         this.bootstrap
-            .group(this.workerGroup)
-            .channel(NettyUtils.getSocketChannelClass())
-            .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
-            .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
-            .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
-            .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
-            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
-            .handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) {
-                    ch.pipeline()
-                        .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
-                        .addLast(new NettyDecoder(), clientHandler, encoder);
-                }
-            });
-        this.responseFutureExecutor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                ResponseFuture.scanFutureTable();
-            }
-        }, 5000, 1000, TimeUnit.MILLISECONDS);
-        //
+                .group(this.workerGroup)
+                .channel(NettyUtils.getSocketChannelClass())
+                .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
+                .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
+                .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
+                .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) {
+                        ch.pipeline()
+                                .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
+                                .addLast(new NettyDecoder(), clientHandler, encoder);
+                    }
+                });
+        this.responseFutureExecutor.scheduleAtFixedRate(ResponseFuture::scanFutureTable, 5000, 1000, TimeUnit.MILLISECONDS);
         isStarted.compareAndSet(false, true);
     }
 
     /**
      * async send
      *
-     * @param host           host
-     * @param command        command
-     * @param timeoutMillis  timeoutMillis
+     * @param host host
+     * @param command command
+     * @param timeoutMillis timeoutMillis
      * @param invokeCallback callback function
-     * @throws InterruptedException
-     * @throws RemotingException
      */
     public void sendAsync(final Host host, final Command command,
                           final long timeoutMillis,
@@ -205,53 +196,49 @@ public class NettyRemotingClient {
         if (channel == null) {
             throw new RemotingException("network error");
         }
-        /**
+        /*
          * request unique identification
          */
         final long opaque = command.getOpaque();
-        /**
+        /*
          *  control concurrency number
          */
         boolean acquired = this.asyncSemaphore.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {
             final ReleaseSemaphore releaseSemaphore = new ReleaseSemaphore(this.asyncSemaphore);
 
-            /**
+            /*
              *  response future
              */
             final ResponseFuture responseFuture = new ResponseFuture(opaque,
-                timeoutMillis,
-                invokeCallback,
-                releaseSemaphore);
+                    timeoutMillis,
+                    invokeCallback,
+                    releaseSemaphore);
             try {
-                channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
-
-                    @Override
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        if (future.isSuccess()) {
-                            responseFuture.setSendOk(true);
-                            return;
-                        } else {
-                            responseFuture.setSendOk(false);
-                        }
-                        responseFuture.setCause(future.cause());
-                        responseFuture.putResponse(null);
-                        try {
-                            responseFuture.executeInvokeCallback();
-                        } catch (Throwable ex) {
-                            logger.error("execute callback error", ex);
-                        } finally {
-                            responseFuture.release();
-                        }
+                channel.writeAndFlush(command).addListener(future -> {
+                    if (future.isSuccess()) {
+                        responseFuture.setSendOk(true);
+                        return;
+                    } else {
+                        responseFuture.setSendOk(false);
+                    }
+                    responseFuture.setCause(future.cause());
+                    responseFuture.putResponse(null);
+                    try {
+                        responseFuture.executeInvokeCallback();
+                    } catch (Exception ex) {
+                        logger.error("execute callback error", ex);
+                    } finally {
+                        responseFuture.release();
                     }
                 });
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 responseFuture.release();
                 throw new RemotingException(String.format("send command to host: %s failed", host), ex);
             }
         } else {
             String message = String.format("try to acquire async semaphore timeout: %d, waiting thread num: %d, total permits: %d",
-                timeoutMillis, asyncSemaphore.getQueueLength(), asyncSemaphore.availablePermits());
+                    timeoutMillis, asyncSemaphore.getQueueLength(), asyncSemaphore.availablePermits());
             throw new RemotingTooMuchRequestException(message);
         }
     }
@@ -259,12 +246,10 @@ public class NettyRemotingClient {
     /**
      * sync send
      *
-     * @param host          host
-     * @param command       command
+     * @param host host
+     * @param command command
      * @param timeoutMillis timeoutMillis
      * @return command
-     * @throws InterruptedException
-     * @throws RemotingException
      */
     public Command sendSync(final Host host, final Command command, final long timeoutMillis) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(host);
@@ -273,21 +258,18 @@ public class NettyRemotingClient {
         }
         final long opaque = command.getOpaque();
         final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
-        channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (future.isSuccess()) {
-                    responseFuture.setSendOk(true);
-                    return;
-                } else {
-                    responseFuture.setSendOk(false);
-                }
-                responseFuture.setCause(future.cause());
-                responseFuture.putResponse(null);
-                logger.error("send command {} to host {} failed", command, host);
+        channel.writeAndFlush(command).addListener(future -> {
+            if (future.isSuccess()) {
+                responseFuture.setSendOk(true);
+                return;
+            } else {
+                responseFuture.setSendOk(false);
             }
+            responseFuture.setCause(future.cause());
+            responseFuture.putResponse(null);
+            logger.error("send command {} to host {} failed", command, host);
         });
-        /**
+        /*
          * sync wait for result
          */
         Command result = responseFuture.waitResponse();
@@ -304,9 +286,8 @@ public class NettyRemotingClient {
     /**
      * send task
      *
-     * @param host    host
+     * @param host host
      * @param command command
-     * @throws RemotingException
      */
     public void send(final Host host, final Command command) throws RemotingException {
         Channel channel = getChannel(host);
@@ -332,7 +313,7 @@ public class NettyRemotingClient {
      * register processor
      *
      * @param commandType command type
-     * @param processor   processor
+     * @param processor processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
@@ -342,8 +323,8 @@ public class NettyRemotingClient {
      * register processor
      *
      * @param commandType command type
-     * @param processor   processor
-     * @param executor    thread executor
+     * @param processor processor
+     * @param executor thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         this.clientHandler.registerProcessor(commandType, processor, executor);
@@ -351,9 +332,6 @@ public class NettyRemotingClient {
 
     /**
      * get channel
-     *
-     * @param host
-     * @return
      */
     public Channel getChannel(Host host) {
         Channel channel = channels.get(host);
@@ -366,7 +344,7 @@ public class NettyRemotingClient {
     /**
      * create channel
      *
-     * @param host   host
+     * @param host host
      * @param isSync sync flag
      * @return channel
      */

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 import static java.util.Objects.requireNonNull;
 
+import org.apache.dolphinscheduler.plugin.alert.wechat.exception.WeChatAlertException;
 import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
@@ -59,8 +60,6 @@ public class WeChatSender {
 
     private String weChatUsers;
 
-    private String weChatTeamSendMsg;
-
     private String weChatUserSendMsg;
 
     private String weChatTokenUrlReplace;
@@ -70,14 +69,14 @@ public class WeChatSender {
     private String showType;
 
 
-    private static final String agentIdRegExp = "{agentId}";
-    private static final String msgRegExp = "{msg}";
-    private static final String userRegExp = "{toUser}";
-    private static final String corpIdRegex = "{corpId}";
-    private static final String secretRegex = "{secret}";
-    private static final String toPartyRegex = "{toParty}";
-    private static final String toUserRegex = "{toUser}";
-    private static final String tokenRegex = "{token}";
+    private static final String MUST_NOT_NULL = " must not null";
+    private static final String ALERT_STATUS = "false";
+    private static final String AGENT_ID_REG_EXP = "{agentId}";
+    private static final String MSG_REG_EXP = "{msg}";
+    private static final String USER_REG_EXP = "{toUser}";
+    private static final String CORP_ID_REGEX = "{corpId}";
+    private static final String SECRET_REGEX = "{secret}";
+    private static final String TOKEN_REGEX = "{token}";
 
     WeChatSender(Map<String, String> config) {
         weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
@@ -85,13 +84,12 @@ public class WeChatSender {
         String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
         String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
-        weChatTeamSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG);
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
         showType = config.get(AlertConstants.SHOW_TYPE);
-        requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
+        requireNonNull(showType, AlertConstants.SHOW_TYPE + MUST_NOT_NULL);
         weChatTokenUrlReplace = weChatTokenUrl
-            .replace(corpIdRegex, weChatCorpId)
-            .replace(secretRegex, weChatSecret);
+            .replace(CORP_ID_REGEX, weChatCorpId)
+            .replace(SECRET_REGEX, weChatSecret);
         weChatToken = getToken();
     }
 
@@ -105,16 +103,15 @@ public class WeChatSender {
      */
     private String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = mkString(toUser);
-        return weChatUserSendMsg.replace(userRegExp, listUser)
-            .replace(agentIdRegExp, agentId)
-            .replace(msgRegExp, msg);
+        return weChatUserSendMsg.replace(USER_REG_EXP, listUser)
+            .replace(AGENT_ID_REG_EXP, agentId)
+            .replace(MSG_REG_EXP, msg);
     }
 
     /**
      * send Enterprise WeChat
      *
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
-     * @throws Exception the Exception
      */
     public AlertResult sendEnterpriseWeChat(String title, String content) {
         AlertResult alertResult;
@@ -124,10 +121,10 @@ public class WeChatSender {
         if (null == weChatToken) {
             alertResult = new AlertResult();
             alertResult.setMessage("send we chat alert fail,get weChat token error");
-            alertResult.setStatus("false");
+            alertResult.setStatus(ALERT_STATUS);
             return alertResult;
         }
-        String enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(tokenRegex, weChatToken);
+        String enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
 
         try {
             return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));
@@ -135,7 +132,7 @@ public class WeChatSender {
             logger.info("send we chat alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
             alertResult.setMessage("send we chat alert fail");
-            alertResult.setStatus("false");
+            alertResult.setStatus(ALERT_STATUS);
         }
         return alertResult;
     }
@@ -170,7 +167,7 @@ public class WeChatSender {
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         if (null == mapItemsList || mapItemsList.isEmpty()) {
             logger.error("itemsList is null");
-            throw new RuntimeException("itemsList is null");
+            throw new WeChatAlertException("itemsList is null");
         }
         StringBuilder contents = new StringBuilder(200);
         for (LinkedHashMap mapItems : mapItemsList) {
@@ -259,7 +256,7 @@ public class WeChatSender {
                 EntityUtils.consume(entity);
             }
 
-            HashMap map = JSONUtils.parseObject(resp, HashMap.class);
+            HashMap<String, Object> map = JSONUtils.parseObject(resp, HashMap.class);
             if (map != null && null != map.get("access_token")) {
                 return map.get("access_token").toString();
             } else {
@@ -310,7 +307,7 @@ public class WeChatSender {
 
     private static AlertResult checkWeChatSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setStatus(ALERT_STATUS);
 
         if (null == result) {
             alertResult.setMessage("we chat send fail");
@@ -328,7 +325,7 @@ public class WeChatSender {
             alertResult.setMessage("we chat alert send success");
             return alertResult;
         }
-        alertResult.setStatus("false");
+        alertResult.setStatus(ALERT_STATUS);
         alertResult.setMessage(sendMsgResponse.getErrmsg());
         return alertResult;
     }

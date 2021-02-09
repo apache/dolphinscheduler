@@ -71,7 +71,7 @@
         }
       }
     },
-    components: { }
+    components: {}
   }
 </script>
 

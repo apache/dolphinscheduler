@@ -15,26 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.manager;
+package org.apache.dolphinscheduler.plugin.alert.feishu;
 
-import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.spi.alert.AlertChannel;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
 
-/**
- * SMS send manager
- */
-public class MsgManager {
+public class FeiShuAlertChannel implements AlertChannel {
+    @Override
+    public AlertResult process(AlertInfo alertInfo) {
 
-    private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
-
-    /**
-     * SMS send
-     *
-     * @param alert the alert
-     */
-    public void send(Alert alert) {
-        logger.info("send message {}", alert);
+        AlertData alertData = alertInfo.getAlertData();
+        Map<String, String> paramsMap = alertInfo.getAlertParams();
+        if (null == paramsMap) {
+            return new AlertResult("false", "fei shu params is null");
+        }
+        return new FeiShuSender(paramsMap).sendFeiShuMsg(alertData);
     }
 }
