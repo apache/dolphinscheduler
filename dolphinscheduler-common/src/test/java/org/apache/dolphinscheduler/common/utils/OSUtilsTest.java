@@ -99,12 +99,6 @@ public class OSUtilsTest {
         Assert.assertNotEquals(0, processId);
     }
     @Test
-    public void getHost(){
-        String host = NetUtils.getHost();
-        Assert.assertNotNull(host);
-        Assert.assertNotEquals("", host);
-    }
-    @Test
     public void checkResource(){
         boolean resource = OSUtils.checkResource(100,0);
         Assert.assertTrue(resource);
