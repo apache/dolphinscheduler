@@ -41,7 +41,7 @@ public class ScriptSenderTest {
     public void initScriptConfig() {
 
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getCode()));
-        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "userParams");
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "test user params");
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, shellFilPath);
     }
 
@@ -49,9 +49,9 @@ public class ScriptSenderTest {
     public void testScriptSenderTest() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
-        alertResult = scriptSender.sendScriptAlert("success");
+        alertResult = scriptSender.sendScriptAlert("testtitleKrisKi", "testcontent");
         Assert.assertEquals("true", alertResult.getStatus());
-        alertResult = scriptSender.sendScriptAlert("errorMsg");
+        alertResult = scriptSender.sendScriptAlert("errorMsgtitle ", "testcontent");
         Assert.assertEquals("false", alertResult.getStatus());
     }
 

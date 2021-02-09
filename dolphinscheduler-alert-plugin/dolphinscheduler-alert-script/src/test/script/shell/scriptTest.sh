@@ -15,10 +15,24 @@
 # limitations under the License.
 #
 
-msg=$1
+title=$1
 content=$2
+userParams=$3
 
-if  [ $msg = errorMsg ]
+echo title
+
+echo "last"
+
+echo $title
+
+echo $content
+
+echo $userParams
+
+
+done
+
+if  [ $title = errorMsg ]
    then
      exit 12
 fi
