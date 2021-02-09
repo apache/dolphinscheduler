@@ -36,6 +36,6 @@ public class ScriptAlertChannel implements AlertChannel {
         if (null == paramsMap) {
             return new AlertResult("false", "ding talk params is null");
         }
-        return new ScriptSender(paramsMap).sendScriptAlert(alertData.getTitle());
+        return new ScriptSender(paramsMap).sendScriptAlert(alertData.getTitle(),alertData.getContent());
     }
 }

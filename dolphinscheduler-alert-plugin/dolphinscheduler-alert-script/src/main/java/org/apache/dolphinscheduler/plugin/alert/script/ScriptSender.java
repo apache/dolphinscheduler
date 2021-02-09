@@ -43,23 +43,22 @@ public class ScriptSender {
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
 
-    //fixme
-    AlertResult sendScriptAlert(String msg) {
+    AlertResult sendScriptAlert(String title, String content) {
         AlertResult alertResult = new AlertResult();
         if (ScriptType.of(scriptType).equals(ScriptType.SHELL)) {
-            return executeShellScript(msg);
+            return executeShellScript(title, content);
         }
         return alertResult;
     }
 
-    private AlertResult executeShellScript(String msg) {
+    private AlertResult executeShellScript(String title, String content) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
         if (Boolean.TRUE.equals(OSUtils.isWindows())) {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
-        String[] cmd = {"/bin/sh", "-c", scriptPath + " " + msg + " " + userParams};
+        String[] cmd = {"/bin/sh", "-c", scriptPath + " -alertTitle " + title+" -alertContent " + content + " alertUserParams " + userParams};
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {
