@@ -54,12 +54,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,15 +252,22 @@ public class ExecutorService extends BaseService {
             putMsg(result, Status.TENANT_NOT_SUITABLE);
         }
 
+        //get the startParams user specified at the first starting while repeat running is needed
+        Map<String, Object> commandMap = JSONUtils.toMap(processInstance.getCommandParam(), String.class, Object.class);
+        String startParams = null;
+        if (CollectionUtils.isNotEmpty((Collection) commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
+            startParams = JSONUtils.toJsonString(commandMap.get(Constants.CMD_PARAM_START_PARAMS));
+        }
+
         switch (executeType) {
             case REPEAT_RUNNING:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.REPEAT_RUNNING);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.REPEAT_RUNNING, startParams);
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RECOVER_SUSPENDED_PROCESS);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RECOVER_SUSPENDED_PROCESS,startParams);
                 break;
             case START_FAILURE_TASK_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.START_FAILURE_TASK_PROCESS);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.START_FAILURE_TASK_PROCESS,startParams);
                 break;
             case STOP:
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
@@ -382,13 +384,20 @@ public class ExecutorService extends BaseService {
      * @param commandType command type
      * @return insert result code
      */
-    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType) {
+    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType, String startParams) {
         Map<String, Object> result = new HashMap<>();
+
+        //To add startParams only when repeat running is needed
+        Map<String, Object> cmdParam = new HashMap<>();
+        cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId);
+        if (StringUtils.isNotEmpty(startParams)){
+            cmdParam.put(CMD_PARAM_START_PARAMS, startParams);
+        }
+
         Command command = new Command();
         command.setCommandType(commandType);
         command.setProcessDefinitionId(processDefinitionId);
-        command.setCommandParam(String.format("{\"%s\":%d}",
-                CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId));
+        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
 
         if (!processService.verifyIsNeedCreateCommand(command)) {
