@@ -180,7 +180,7 @@ public class SqlTask extends AbstractTask {
                 extractPreQuerySqlParams(con, sqlBind);
             }
         } catch (Exception e) {
-            logger.error("execute pre-query-sql error:{}", preStatements, e);
+            //logger.error("execute pre-query-sql error:{}", preStatements, e);
             throw new ServiceException("execute pre-query-sql error", e);
         }
     }
