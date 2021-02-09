@@ -14,6 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- ----------------------------
+-- Table structure for t_ds_plugin_define
+-- ----------------------------
 DROP TABLE IF EXISTS t_ds_plugin_define;
 CREATE TABLE t_ds_plugin_define (
 	id serial NOT NULL,
@@ -26,7 +30,9 @@ CREATE TABLE t_ds_plugin_define (
 	CONSTRAINT t_ds_plugin_define_un UNIQUE (plugin_name, plugin_type)
 );
 
-
+-- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
 DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
 CREATE TABLE t_ds_alert_plugin_instance (
                                             id                     serial NOT NULL,
@@ -38,28 +44,92 @@ CREATE TABLE t_ds_alert_plugin_instance (
                                             CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
-ALTER TABLE t_ds_process_definition
-    ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+-- uc_dolphin_T_t_ds_process_definition_A_warning_group_id
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_warning_group_id() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='warning_group_id')
+      THEN
+         ALTER TABLE t_ds_process_definition ADD COLUMN warning_group_id int4 DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_process_definition.warning_group_id IS 'alert group id';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
 
-ALTER TABLE t_ds_process_definition_version
-    ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_A_warning_group_id();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_warning_group_id();
 
-ALTER TABLE t_ds_alertgroup
-    ADD COLUMN `alert_instance_ids` int4 DEFAULT NULL COMMENT 'alert instance ids' AFTER `id`;
-    ADD COLUMN `create_user_id` varchar(255) DEFAULT NULL COMMENT 'create user id' AFTER `alert_instance_ids`,
+-- uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition_version'
+                            AND COLUMN_NAME ='warning_group_id')
+      THEN
+         ALTER TABLE t_ds_process_definition_version ADD COLUMN warning_group_id int4 DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_process_definition_version.warning_group_id IS 'alert group id';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
 
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_version_A_warning_group_id();
+
+-- uc_dolphin_T_t_ds_alertgroup_A_alert_instance_ids
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_alertgroup_A_alert_instance_ids() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_alertgroup'
+                            AND COLUMN_NAME ='alert_instance_ids')
+      THEN
+         ALTER TABLE t_ds_alertgroup ADD COLUMN alert_instance_ids varchar (255) DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_alertgroup.alert_instance_ids IS 'alert instance ids';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_alertgroup_A_alert_instance_ids();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_alertgroup_A_alert_instance_ids();
+
+-- uc_dolphin_T_t_ds_alertgroup_A_create_user_id
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_alertgroup_A_create_user_id() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_alertgroup'
+                            AND COLUMN_NAME ='create_user_id')
+      THEN
+         ALTER TABLE t_ds_alertgroup ADD COLUMN create_user_id int4 DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_alertgroup.create_user_id IS 'create user id';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_alertgroup_A_create_user_id();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_alertgroup_A_create_user_id();
 
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
-/*
-ALTER TABLE t_ds_process_definition DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
-ALTER TABLE t_ds_process_definition_version DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
+-- ALTER TABLE t_ds_process_definition DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
-ALTER TABLE  t_ds_alert DROP COLUMN "show_type",DROP COLUMN "alert_type",DROP COLUMN "receivers",DROP COLUMN "receivers_cc";
+-- ALTER TABLE t_ds_process_definition_version DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
-ALTER TABLE  t_ds_alertgroup DROP COLUMN "group_type";
+-- ALTER TABLE  t_ds_alert DROP COLUMN "show_type",DROP COLUMN "alert_type",DROP COLUMN "receivers",DROP COLUMN "receivers_cc";
 
-DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
-*/
+-- ALTER TABLE  t_ds_alertgroup DROP COLUMN "group_type";
+
+-- DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
