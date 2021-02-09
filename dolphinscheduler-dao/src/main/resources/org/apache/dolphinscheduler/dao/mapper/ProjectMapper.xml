@@ -25,6 +25,26 @@
     <sql id="baseSqlV2">
         ${alias}.id, ${alias}.name, ${alias}.code, ${alias}.description, ${alias}.user_id, ${alias}.flag, ${alias}.create_time, ${alias}.update_time
     </sql>
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSql"/>
+        from t_ds_project
+        where code = #{code}
+    </select>
+
+    <select id="queryDetailByCode" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name
+        from t_ds_project p
+        join t_ds_user u on p.user_id = u.id
+        where p.code = #{projectCode}
+    </select>
+
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
         <include refid="baseSqlV2">
@@ -100,12 +120,12 @@
 
     <select id="queryProjectWithUserByProcessInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
         select
-            dp.id projectId,
+            dp.code projectCode,
             dp.name projectName,
             u.user_name userName
         from t_ds_process_instance di
-        join t_ds_process_definition dpd on di.process_definition_id = dpd.id
-        join t_ds_project dp on dpd.project_id = dp.id
+        join t_ds_process_definition dpd on di.process_definition_code = dpd.code
+        join t_ds_project dp on dpd.project_code = dp.code
         join t_ds_user u on dp.user_id = u.id
         where di.id = #{processInstanceId};
     </select>

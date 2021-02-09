@@ -37,6 +37,9 @@ public class ProjectUser {
     @TableField("project_id")
     private int projectId;
 
+    @TableField("project_code")
+    private int projectCode;
+
     /**
      * project name
      */
@@ -59,6 +62,14 @@ public class ProjectUser {
 
     @TableField("update_time")
     private Date updateTime;
+
+    public int getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(int projectCode) {
+        this.projectCode = projectCode;
+    }
 
     public int getId() {
         return id;

@@ -1505,6 +1505,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return checkResult;
         }
 
+        // TODO:
+        //  Project targetProject = projectMapper.queryDetailByCode(targetProjectCode);
         Project targetProject = projectMapper.queryDetailById(targetProjectId);
         if (targetProject == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);
@@ -1553,6 +1555,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return result;
         }
 
+        // TODO :
+        //  Project targetProject = projectMapper.queryDetailByCode(targetProjectCode);
         Project targetProject = projectMapper.queryDetailById(targetProjectId);
         if (targetProject == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);
