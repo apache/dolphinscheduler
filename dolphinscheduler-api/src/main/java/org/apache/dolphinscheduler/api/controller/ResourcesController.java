@@ -323,8 +323,9 @@ public class ResourcesController extends BaseController {
     ) {
         String programTypeName = programType == null ? "" : programType.name();
         String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query resource list, login user:{}, resource type:{}, program type:{}", userName,programTypeName);
+        // Logging should not be vulnerable to injection attacks: replace pattern-breaking characters
+        logger.info("query resource list, login user:{}, resource type:{}, program type:{}",
+                userName.replaceAll("[\n|\r|\t]", "_"), programTypeName);
         Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type,programType);
         return returnDataList(result);
     }
@@ -642,8 +643,8 @@ public class ResourcesController extends BaseController {
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type) {
         String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query udf func list, user:{}, type:{}", userName, type);
+        // Logging should not be vulnerable to injection attacks: replace pattern-breaking characters
+        logger.info("query udf func list, user:{}, type:{}", userName.replaceAll("[\n|\r|\t]", "_"), type);
         Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
     }
