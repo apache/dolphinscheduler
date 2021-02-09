@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.processInstanceName }}</p>
               <div slot="reference" class="name-wrapper">
-                <a href="javascript:" class="links" @click="_go(scope.row)"><span class="ellipsis" :title="scope.row.processInstanceName">{{scope.row.processInstanceName}}</span></a>
+                <a href="javascript:" class="links" @click="_go(scope.row)"><span class="ellipsis">{{scope.row.processInstanceName}}</span></a>
               </div>
             </el-popover>
           </template>

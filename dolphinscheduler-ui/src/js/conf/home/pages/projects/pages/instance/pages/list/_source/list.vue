@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links" :title="scope.row.name">{{scope.row.name}}</router-link>
+                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -78,13 +78,12 @@
                 </span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">
-                <span><el-button type="warning" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
+                <span><el-button type="danger" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
-                <span><el-button type="error" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
+                <span><el-button type="warning" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
               <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
                 <el-popconfirm
                   :confirmButtonText="$t('Confirm')"
                   :cancelButtonText="$t('Cancel')"
@@ -92,7 +91,7 @@
                   iconColor="red"
                   :title="$t('Delete?')"
                   @onConfirm="_delete(scope.row,scope.row.id)">
-                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.releaseState === 'ONLINE'" circle slot="reference"></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP' && scope.row.state !== 'PAUSE'" circle slot="reference"></el-button>
                 </el-popconfirm>
               </el-tooltip>
               <el-tooltip :content="$t('Gantt')" placement="top" :enterable="false">
@@ -438,22 +437,9 @@
         })
         this._arrDelChange()
       },
-      // _arrDelChange (v) {
-      //   let arr = []
-      //   this.list.forEach((item)=>{
-      //     if (item.isCheck) {
-      //       arr.push(item.id)
-      //     }
-      //   })
-      //   this.strDelete = _.join(arr, ',')
-      //   if (v === false) {
-      //     this.checkAll = false
-      //   }
-      // },
       _arrDelChange (v) {
         let arr = []
         arr = _.map(v, 'id')
-        console.log(arr)
         this.strDelete = _.join(arr, ',')
       },
       _batchDelete () {

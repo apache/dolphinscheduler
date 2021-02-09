@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "A vue.js project",
   "author": "DolphinScheduler",
+  "repository": "https://github.com/apache/incubator-dolphinscheduler",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
@@ -39,6 +41,7 @@
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
+    "acorn": "^7.4.1",
     "autoprefixer": "^9.1.0",
     "babel-core": "^6.25.0",
     "babel-helper-vue-jsx-merge-props": "^2.0.2",
