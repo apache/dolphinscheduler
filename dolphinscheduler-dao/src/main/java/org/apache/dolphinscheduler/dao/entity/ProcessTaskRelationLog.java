@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -32,6 +26,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * process task relation log
@@ -51,9 +52,9 @@ public class ProcessTaskRelationLog {
     private String name;
 
     /**
-     * version
+     * process version
      */
-    private int version;
+    private int processDefinitionVersion;
 
     /**
      * project code
@@ -187,12 +188,12 @@ public class ProcessTaskRelationLog {
         this.conditionParamMap = conditionParamMap;
     }
 
-    public int getVersion() {
-        return version;
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
     }
 
     public long getProjectCode() {
@@ -253,7 +254,7 @@ public class ProcessTaskRelationLog {
 
     public void set(ProcessTaskRelation processTaskRelation) {
         this.name = processTaskRelation.getName();
-        this.version = processTaskRelation.getVersion();
+        this.processDefinitionVersion = processTaskRelation.getProcessDefinitionVersion();
         this.projectCode = processTaskRelation.getProjectCode();
         this.processDefinitionCode = processTaskRelation.getProcessDefinitionCode();
         this.preTaskCode = processTaskRelation.getPreTaskCode();

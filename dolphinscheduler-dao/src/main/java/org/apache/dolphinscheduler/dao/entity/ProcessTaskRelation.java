@@ -51,9 +51,9 @@ public class ProcessTaskRelation {
     private String name;
 
     /**
-     * version
+     * process version
      */
-    private int version;
+    private int processDefinitionVersion;
 
     /**
      * project code
@@ -113,7 +113,7 @@ public class ProcessTaskRelation {
     }
 
     public ProcessTaskRelation(String name,
-                               int version,
+                               int processDefinitionVersion,
                                long projectCode,
                                long processDefinitionCode,
                                long preTaskCode,
@@ -123,7 +123,7 @@ public class ProcessTaskRelation {
                                Date createTime,
                                Date updateTime) {
         this.name = name;
-        this.version = version;
+        this.processDefinitionVersion = processDefinitionVersion;
         this.projectCode = projectCode;
         this.processDefinitionCode = processDefinitionCode;
         this.preTaskCode = preTaskCode;
@@ -201,12 +201,12 @@ public class ProcessTaskRelation {
         this.conditionParamMap = conditionParamMap;
     }
 
-    public int getVersion() {
-        return version;
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
     }
 
     public long getProjectCode() {

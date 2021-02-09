@@ -18,5 +18,15 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper">
-
+    <sql id="baseSql">
+        id, `name`, process_definition_version, project_code, process_definition_code, pre_task_code, post_task_code,
+        condition_type, condition_params, operator, operate_time, create_time, update_time
+    </sql>
+    <select id="queryByProcessCodeAndVersion" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation_log
+        WHERE process_definition_code = #{processCode}
+        and process_definition_version = #{processVersion}
+    </select>
 </mapper>

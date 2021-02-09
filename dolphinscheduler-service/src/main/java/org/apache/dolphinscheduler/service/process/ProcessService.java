@@ -31,6 +31,7 @@ import static java.util.stream.Collectors.toSet;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -43,6 +44,7 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -52,6 +54,8 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -63,6 +67,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -80,6 +86,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -89,6 +97,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -139,8 +148,6 @@ public class ProcessService {
     @Autowired
     private ProcessDefinitionLogMapper processDefineLogMapper;
 
-
-
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
 
@@ -181,7 +188,10 @@ public class ProcessService {
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -381,8 +391,6 @@ public class ProcessService {
 
     /**
      * covert log to process definition
-     * @param processDefinitionLog
-     * @return
      */
     public ProcessDefinition convertFromLog(ProcessDefinitionLog processDefinitionLog) {
         ProcessDefinition definition = null;
@@ -743,10 +751,10 @@ public class ProcessService {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
                 // Recalculate global parameters after rerun.
                 processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    getCommandTypeIfComplement(processInstance, command),
-                    processInstance.getScheduleTime()));
+                        processDefinition.getGlobalParamMap(),
+                        processDefinition.getGlobalParamList(),
+                        getCommandTypeIfComplement(processInstance, command),
+                        processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
@@ -1249,14 +1257,12 @@ public class ProcessService {
      */
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
         ExecutionStatus state = taskInstance.getState();
-        if (
-                // running, delayed or killed
-                // the task already exists in task queue
-                // return state
-                state == ExecutionStatus.RUNNING_EXECUTION
-                        || state == ExecutionStatus.DELAY_EXECUTION
-                        || state == ExecutionStatus.KILL
-        ) {
+        // running, delayed or killed
+        // the task already exists in task queue
+        // return state
+        if (state == ExecutionStatus.RUNNING_EXECUTION
+                || state == ExecutionStatus.DELAY_EXECUTION
+                || state == ExecutionStatus.KILL) {
             return state;
         }
         //return pasue /stop if process instance state is ready pause / stop
@@ -2058,8 +2064,6 @@ public class ProcessService {
     /**
      * solve the branch rename bug
      *
-     * @param processData
-     * @param oldJson
      * @return String
      */
     public String changeJson(ProcessData processData, String oldJson) {
@@ -2114,10 +2118,6 @@ public class ProcessService {
 
     /**
      * switch process definition version to process definition log version
-     *
-     * @param processDefinition
-     * @param processDefinitionLog
-     * @return
      */
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         if (null == processDefinition || null == processDefinitionLog) {
@@ -2132,23 +2132,29 @@ public class ProcessService {
 
         int switchResult = 0;
         if (0 == processDefinition.getId()) {
-
             switchResult = processDefineMapper.insert(tmpDefinition);
         } else {
             switchResult = processDefineMapper.updateById(tmpDefinition);
         }
-        //TODO... switch task relations
+        switchProcessTaskRelationVersion(processDefinition);
         return switchResult;
+    }
+
+    public void switchProcessTaskRelationVersion(ProcessDefinition processDefinition) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        if (!processTaskRelationList.isEmpty()) {
+            processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        }
+        List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogList) {
+            ProcessTaskRelation processTaskRelation = JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog),
+                    ProcessTaskRelation.class);
+            processTaskRelationMapper.insert(processTaskRelation);
+        }
     }
 
     /**
      * update task definition
-     *
-     * @param operator
-     * @param projectCode
-     * @param taskNode
-     * @param taskDefinition
-     * @return
      */
     public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
 
@@ -2159,12 +2165,24 @@ public class ProcessService {
                 .max((x, y) -> x > y ? x : y)
                 .orElse(0) + 1;
         Date now = new Date();
-        taskDefinition.setVersion(version);
-        taskDefinition.setCode(taskDefinition.getCode());
-        taskDefinition.setName(taskNode.getName());
-        taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setUserId(operator.getId());
+        taskDefinition.setVersion(version);
+        taskDefinition.setUpdateTime(now);
+        setTaskFromTaskNode(taskNode, taskDefinition);
+        int update = taskDefinitionMapper.updateById(taskDefinition);
+        // save task definition log
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.set(taskDefinition);
+        taskDefinitionLog.setOperator(operator.getId());
+        taskDefinitionLog.setOperateTime(now);
+        int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
+        return insert & update;
+    }
+
+    private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
+        taskDefinition.setName(taskNode.getName());
+        taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
         taskDefinition.setTaskParams(taskNode.getParams());
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
@@ -2175,16 +2193,7 @@ public class ProcessService {
         taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
         taskDefinition.setTaskTimeoutStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
         taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
-        taskDefinition.setUpdateTime(now);
         taskDefinition.setResourceIds(getResourceIds(taskDefinition));
-        int update = taskDefinitionMapper.updateById(taskDefinition);
-        // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-        taskDefinitionLog.set(taskDefinition);
-        taskDefinitionLog.setOperator(operator.getId());
-        taskDefinitionLog.setOperateTime(now);
-        int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
-        return insert & update;
     }
 
     /**
@@ -2212,15 +2221,7 @@ public class ProcessService {
     }
 
     /**
-     * @param operator
-     * @param name
-     * @param desc
-     * @param locations
-     * @param connects
-     * @param project
-     * @param processData
-     * @param processDefinition
-     * @return
+     *
      */
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
                                      String connects, ProcessData processData, ProcessDefinition processDefinition) {
@@ -2230,28 +2231,20 @@ public class ProcessService {
             TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(project.getCode(), task.getName());
             updateTaskDefinition(operator, project.getCode(), task, taskDefinition);
         }
-        createTaskAndRelation(operator, project.getName(), "", processDefinition, processData);
+        createTaskAndRelation(operator, project.getCode(), processDefinition, processData);
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
         return switchVersion(processDefinition, processDefinitionLog);
     }
 
     /**
-     * @param operator
-     * @param processDefinitionCode
-     * @param processDefinitionName
-     * @param processData
-     * @param project
-     * @param desc
-     * @param locations
-     * @param connects
-     * @return
+     *
      */
     public ProcessDefinitionLog insertProcessDefinitionLog(User operator, Long processDefinitionCode, String processDefinitionName,
                                                            ProcessData processData, Project project,
                                                            String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
-        int version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinitionLog.getCode());
+        int version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionLog.getCode());
         processDefinitionLog.setCode(processDefinitionCode);
         processDefinitionLog.setVersion(version);
         processDefinitionLog.setName(processDefinitionName);
@@ -2275,7 +2268,7 @@ public class ProcessService {
         }
         processDefinitionLog.setGlobalParamList(globalParamsList);
         processDefinitionLog.setFlag(Flag.YES);
-        int insert = processDefinitionLogMapper.insert(processDefinitionLog);
+        int insert = processDefineLogMapper.insert(processDefinitionLog);
         if (insert > 0) {
             return processDefinitionLog;
         }
@@ -2283,24 +2276,96 @@ public class ProcessService {
     }
 
     /**
-     * create task defintion and task relations
-     *
-     * @param loginUser
-     * @param projectName
-     * @param relationName
-     * @param processDefinition
-     * @param processData
-     * @return
+     * create task definition and task relations
      */
-    public void createTaskAndRelation(User loginUser, String projectName, String relationName,
-                                      ProcessDefinition processDefinition,
-                                      ProcessData processData) {
+    public int createTaskAndRelation(User operator,
+                                     Long projectCode,
+                                     ProcessDefinition processDefinition,
+                                     ProcessData processData) {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-        for (TaskNode task : taskNodeList) {
-            //TODO... task code exists, update task
-            //createTaskDefinition(loginUser, projectName, JSONUtils.toJsonString(task));
+        for (TaskNode taskNode : taskNodeList) {
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(projectCode, taskNode.getName());
+            if (taskDefinition == null) {
+                long code;
+                try {
+                    code = SnowFlakeUtils.getInstance().nextId();
+                    taskDefinition = new TaskDefinition();
+                    taskDefinition.setCode(code);
+                } catch (SnowFlakeException e) {
+                    logger.error("Task code get error, ", e);
+                    return -1;
+                }
+                saveTaskDefinition(operator, projectCode, taskNode, taskDefinition);
+            } else {
+                if (isTaskOnline(taskDefinition.getCode())) {
+                    // TODO return something for fail
+                    return -1;
+                }
+                updateTaskDefinition(operator, projectCode, taskNode, taskDefinition);
+            }
         }
-        // TODO:  query taskCode by  projectCode and taskName
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
+        if (!processTaskRelationList.isEmpty()) {
+            processTaskRelationMapper.deleteByCode(projectCode, processDefinition.getCode());
+        }
+        // TODO parse taskNodeList for preTaskCode and postTaskCode
+        List<TaskNodeRelation> taskNodeRelationList = DagHelper.getProcessDag(taskNodeList).getEdges();
+        Date now = new Date();
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation("",// todo relation name
+                processDefinition.getVersion(),
+                projectCode,
+                processDefinition.getCode(),
+                0L,  // todo pre task code
+                0L, // todo post task code
+                ConditionType.of(""), // todo conditionType
+                "", // todo conditionParams
+                now,
+                now);
+        // save process task relation
+        int insert = processTaskRelationMapper.insert(processTaskRelation);
+        // save process task relation log
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.set(processTaskRelation);
+        processTaskRelationLog.setOperator(operator.getId());
+        processTaskRelationLog.setOperateTime(now);
+        int logInsert = processTaskRelationLogMapper.insert(processTaskRelationLog);
+        return insert & logInsert;
     }
 
+    public int saveTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
+        Date now = new Date();
+        taskDefinition.setProjectCode(projectCode);
+        taskDefinition.setUserId(operator.getId());
+        taskDefinition.setVersion(1);
+        taskDefinition.setUpdateTime(now);
+        taskDefinition.setCreateTime(now);
+        setTaskFromTaskNode(taskNode, taskDefinition);
+        // save the new task definition
+        int insert = taskDefinitionMapper.insert(taskDefinition);
+        // save task definition log
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.set(taskDefinition);
+        taskDefinitionLog.setOperator(operator.getId());
+        taskDefinitionLog.setOperateTime(now);
+        int logInsert = taskDefinitionLogMapper.insert(taskDefinitionLog);
+        return insert & logInsert;
+    }
+
+    public boolean isTaskOnline(Long taskCode) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
+        if (!processTaskRelationList.isEmpty()) {
+            Set<Long> processDefinitionCodes = processTaskRelationList
+                    .stream()
+                    .map(ProcessTaskRelation::getProcessDefinitionCode)
+                    .collect(Collectors.toSet());
+            List<ProcessDefinition> processDefinitionList = processDefineMapper.queryByCodes(processDefinitionCodes);
+            // check process definition is already online
+            for (ProcessDefinition processDefinition : processDefinitionList) {
+                if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

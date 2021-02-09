@@ -167,47 +167,6 @@ public class TaskDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    public TaskDefinition() {
-    }
-
-    public TaskDefinition(long code,
-                          String name,
-                          int version,
-                          String description,
-                          long projectCode,
-                          int userId,
-                          TaskType taskType,
-                          String taskParams,
-                          Flag flag,
-                          Priority taskPriority,
-                          String workerGroup,
-                          int failRetryTimes,
-                          int failRetryInterval,
-                          TimeoutFlag timeoutFlag,
-                          TaskTimeoutStrategy taskTimeoutStrategy,
-                          int timeout,
-                          Date createTime,
-                          Date updateTime) {
-        this.code = code;
-        this.name = name;
-        this.version = version;
-        this.description = description;
-        this.projectCode = projectCode;
-        this.userId = userId;
-        this.taskType = taskType;
-        this.taskParams = taskParams;
-        this.flag = flag;
-        this.taskPriority = taskPriority;
-        this.workerGroup = workerGroup;
-        this.failRetryTimes = failRetryTimes;
-        this.failRetryInterval = failRetryInterval;
-        this.timeoutFlag = timeoutFlag;
-        this.taskTimeoutStrategy = taskTimeoutStrategy;
-        this.timeout = timeout;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
-
     public String getName() {
         return name;
     }

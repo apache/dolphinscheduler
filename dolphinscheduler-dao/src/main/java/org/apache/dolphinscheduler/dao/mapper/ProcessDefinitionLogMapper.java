@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+
 import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -35,7 +38,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @return process definition log list
      */
     List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") Long projectCode,
-                                        @Param("processDefinitionName") String name);
+                                                     @Param("processDefinitionName") String name);
 
     /**
      * query process definition log list
@@ -47,8 +50,6 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
 
     /**
      * query max version for definition
-     * @param processDefinitionCode
-     * @return
      */
     int queryMaxVersionForDefinition(@Param("processDefinitionCode") long processDefinitionCode);
 

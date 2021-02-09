@@ -59,7 +59,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -459,16 +458,6 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * sync definition according process instance
-     *
-     * @param  loginUser
-     * @param project
-     * @param processInstanceJson
-     * @param locations
-     * @param connects
-     * @param processInstance
-     * @param processDefinition
-     * @param processData
-     * @return
      */
     private int syncDefinition(User loginUser, Project project, String processInstanceJson, String locations, String connects,
                                ProcessInstance processInstance, ProcessDefinition processDefinition,
@@ -491,13 +480,6 @@ public class ProcessInstanceService extends BaseService {
     /**
      * update process instance attributes
      *
-     * @param processInstance
-     * @param tenant
-     * @param scheduleTime
-     * @param locations
-     * @param connects
-     * @param processInstanceJson
-     * @param processData
      * @return false if check failed or
      */
     private void setProcessInstance(ProcessInstance processInstance, Tenant tenant,
@@ -747,6 +729,7 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * query process instance by processDefinitionId and stateArray
+     *
      * @param processDefinitionId processDefinitionId
      * @param states states array
      * @return process instance list
@@ -757,11 +740,12 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * query process instance by processDefinitionId
+     *
      * @param processDefinitionId processDefinitionId
      * @param size size
      * @return process instance list
      */
-    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size) {
+    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId, int size) {
         return processInstanceMapper.queryByProcessDefineId(processDefinitionId, size);
     }
 

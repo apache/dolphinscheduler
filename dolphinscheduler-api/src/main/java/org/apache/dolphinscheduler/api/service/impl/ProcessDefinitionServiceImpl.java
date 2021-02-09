@@ -26,10 +26,8 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
-import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
-import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -68,14 +66,13 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -133,12 +130,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     private ProjectService projectService;
 
     @Autowired
-    private TaskDefinitionService taskDefinitionService;
-
-    @Autowired
-    private ProcessTaskRelationService processTaskRelationService;
-
-    @Autowired
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Autowired
@@ -157,7 +148,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     private ProcessService processService;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * create process definition
@@ -205,10 +196,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
             return result;
         }
-        ProcessDefinitionLog processDefinitionLog =  processService.insertProcessDefinitionLog(loginUser, processDefinitionCode, processDefinitionName, processData,
+        ProcessDefinitionLog processDefinitionLog = processService.insertProcessDefinitionLog(loginUser, processDefinitionCode, processDefinitionName, processData,
                 project, desc, locations, connects);
         processService.switchVersion(processDefinition, processDefinitionLog);
-        processService.createTaskAndRelation(loginUser, projectName, "", processDefinition, processData);
+        // TODO relationName have ?
+        processService.createTaskAndRelation(loginUser, project.getCode(), processDefinition, processData);
 
         // return processDefinition object with ID
         result.put(Constants.DATA_LIST, processDefinition.getId());
@@ -538,7 +530,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         // TODO: replace id to code
         // ProcessDefinition processDefinition = processDefineMapper.deleteByCode(processDefinitionCode);
         int delete = processDefinitionMapper.deleteById(processDefinitionId);
-
+        processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -1613,7 +1605,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
 
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-                .queryByDefinitionCodeAndVersion(processDefinition.getCode(),version);
+                .queryByDefinitionCodeAndVersion(processDefinition.getCode(), version);
 
         if (Objects.isNull(processDefinitionLog)) {
             putMsg(result

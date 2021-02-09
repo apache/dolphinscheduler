@@ -509,7 +509,7 @@ DROP TABLE IF EXISTS `t_ds_process_task_relation`;
 CREATE TABLE `t_ds_process_task_relation` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
-  `version` int(11) DEFAULT NULL COMMENT 'relation version',
+  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process version',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
@@ -528,7 +528,7 @@ DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
 CREATE TABLE `t_ds_process_task_relation_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
-  `version` int(11) DEFAULT NULL COMMENT 'relation version',
+  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process version',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
