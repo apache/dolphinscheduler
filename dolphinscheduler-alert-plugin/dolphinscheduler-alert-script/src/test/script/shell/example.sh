@@ -16,8 +16,15 @@
 #
 
 
-msg=$1
+title=$1
 content=$2
+userParams=$3
+
+echo "$title"
+
+echo "$content"
+
+echo "$userParams"
 
 # Write your specific logic here
 
