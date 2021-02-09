@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
  */
 public class WeChatAlertConstants {
 
+    private WeChatAlertConstants() {
+        throw new IllegalStateException(WeChatAlertConstants.class.getName());
+    }
+
     static final String MARKDOWN_QUOTE = ">";
 
     static final String MARKDOWN_ENTER = "\n";

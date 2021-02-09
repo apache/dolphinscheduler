@@ -146,7 +146,7 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties";
+    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -956,7 +956,9 @@ public final class Constants {
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
-
+    public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
+    public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
+    public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 
     /**
      * session timeout

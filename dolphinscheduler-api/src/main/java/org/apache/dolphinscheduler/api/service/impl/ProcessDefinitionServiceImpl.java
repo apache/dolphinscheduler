@@ -429,11 +429,13 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             // check whether the new process define name exist
             ProcessDefinition definition = processDefineMapper.verifyByDefineName(project.getId(), name);
             if (definition != null) {
-                putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+                putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
             }
         }
-
+        // get the processdefinitionjson before saving,and then save the name and taskid
+        String oldJson = processDefine.getProcessDefinitionJson();
+        processDefinitionJson = processService.changeJson(processData,oldJson);
         Date now = new Date();
 
         processDefine.setId(id);
@@ -495,7 +497,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
         }
         return result;
     }
