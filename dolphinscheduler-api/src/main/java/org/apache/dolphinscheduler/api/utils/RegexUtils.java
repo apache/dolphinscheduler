@@ -44,4 +44,13 @@ public class RegexUtils {
         Matcher isNum = pattern.matcher(str);
         return isNum.matches();
     }
+
+    public static String escapeLogging(String str) {
+        // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
+        if (str != null) {
+            return str.replaceAll("[\n|\r|\t]", "_");
+        }
+        return null;
+    }
+
 }

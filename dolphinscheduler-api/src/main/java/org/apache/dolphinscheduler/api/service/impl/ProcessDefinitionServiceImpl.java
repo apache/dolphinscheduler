@@ -146,6 +146,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Autowired
     private ProcessService processService;
 
+    @Autowired
+    private SchedulerService schedulerService;
+
     /**
      * create process definition
      *
@@ -634,7 +637,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
                     scheduleMapper.updateById(schedule);
-                    SchedulerService.deleteSchedule(project.getId(), schedule.getId());
+                    schedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             default:
