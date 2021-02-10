@@ -158,6 +158,7 @@
           }
         })
       },
+
       close () {
         this.$emit('close')
       }
