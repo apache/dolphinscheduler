@@ -41,6 +41,11 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-data-quality</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>

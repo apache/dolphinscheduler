@@ -53,13 +53,13 @@ public class DataQualityApplication {
 
         DataQualityConfiguration dataQualityConfiguration = JsonUtil.fromJson(dataQualityParameter,DataQualityConfiguration.class);
         if (dataQualityConfiguration == null) {
+            logger.info("DataQualityConfiguration is null");
             System.exit(-1);
         } else {
             dataQualityConfiguration.validate();
         }
 
         SparkConf conf = new SparkConf().setAppName(dataQualityConfiguration.getName());
-
         conf.set("spark.sql.crossJoin.enabled", "true");
         SparkSession sparkSession = SparkSession.builder().config(conf).enableHiveSupport().getOrCreate();
 
