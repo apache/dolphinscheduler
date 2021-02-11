@@ -169,7 +169,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
             throw new RuntimeException("resource already exists, can't recreate");
         }
         //create directory in hdfs
-        createDirecotry(loginUser,fullName,type,result);
+        createDirectory(loginUser,fullName,type,result);
         return result;
     }
 
@@ -212,7 +212,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
             return result;
         }
 
-        // check resoure name exists
+        // check resource name exists
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         if (checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", RegexUtils.escapeLogging(name));
@@ -302,7 +302,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
             return result;
         }
 
-        //check resource aleady exists
+        //check resource already exists
         String originFullName = resource.getFullName();
         String originResourceName = resource.getAlias();
 
@@ -519,7 +519,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @param pageSize page size
      * @return resource list page
      */
-    public Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
+    public Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>(5);
         Page<Resource> page = new Page(pageNo, pageSize);
@@ -527,8 +527,8 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         if (isAdmin(loginUser)) {
             userId = 0;
         }
-        if (direcotryId != -1) {
-            Resource directory = resourcesMapper.selectById(direcotryId);
+        if (directoryId != -1) {
+            Resource directory = resourcesMapper.selectById(directoryId);
             if (directory == null) {
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
@@ -536,7 +536,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         }
 
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
-                userId,direcotryId, type.ordinal(), searchVal);
+                userId,directoryId, type.ordinal(), searchVal);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
@@ -546,13 +546,13 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
     }
 
     /**
-     * create direcoty
+     * create directory
      * @param loginUser login user
      * @param fullName  full name
      * @param type      resource type
      * @param result    Result
      */
-    private void createDirecotry(User loginUser,String fullName,ResourceType type,Result result) {
+    private void createDirectory(User loginUser,String fullName,ResourceType type,Result result) {
         // query tenant
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
         String directoryName = HadoopUtils.getHdfsFileName(type,tenantCode,fullName);
@@ -715,7 +715,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         List<Integer> allChildren = listAllChildren(resource,true);
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
 
-        //if resource type is UDF,need check whether it is bound by UDF functon
+        //if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
             List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
@@ -928,7 +928,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.error("resouce suffix {} not support create", nameSuffix);
+                logger.error("resource suffix {} not support create", nameSuffix);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
@@ -1108,7 +1108,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         }
         if (resource.isDirectory()) {
             logger.error("resource id {} is directory,can't download it", resourceId);
-            throw new RuntimeException("cant't download directory");
+            throw new RuntimeException("can't download directory");
         }
 
         int userId = resource.getUserId();
@@ -1326,9 +1326,9 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      */
     void listAllChildren(int resourceId,List<Integer> childList) {
         List<Integer> children = resourcesMapper.listChildren(resourceId);
-        for (int chlidId:children) {
-            childList.add(chlidId);
-            listAllChildren(chlidId,childList);
+        for (int childId : children) {
+            childList.add(childId);
+            listAllChildren(childId, childList);
         }
     }
 
