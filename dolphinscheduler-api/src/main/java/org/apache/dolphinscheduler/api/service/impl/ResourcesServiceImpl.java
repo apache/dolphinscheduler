@@ -134,22 +134,9 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
-        result = verifyResourceName(fullName,type,loginUser);
+        result = verifyResource(loginUser, type, fullName, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
-        }
-        if (pid != -1) {
-            Resource parentResource = resourcesMapper.selectById(pid);
-
-            if (parentResource == null) {
-                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
-                return result;
-            }
-
-            if (!hasPerm(loginUser, parentResource.getUserId())) {
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
         }
 
         if (checkResourceExists(fullName, 0, type.ordinal())) {
@@ -164,7 +151,6 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
 
         try {
             resourcesMapper.insert(resource);
-
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -216,48 +202,13 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
             return result;
         }
 
-        if (pid != -1) {
-            Resource parentResource = resourcesMapper.selectById(pid);
-
-            if (parentResource == null) {
-                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
-                return result;
-            }
-
-            if (!hasPerm(loginUser, parentResource.getUserId())) {
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
-        }
-
-        // file is empty
-        if (file.isEmpty()) {
-            logger.error("file is empty: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
-            putMsg(result, Status.RESOURCE_FILE_IS_EMPTY);
+        result = verifyPid(loginUser, pid);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        // file suffix
-        String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-        String nameSuffix = FileUtils.suffix(name);
-
-        // determine file suffix
-        if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
-            // rename file suffix and original suffix must be consistent
-            logger.error("rename file suffix and original suffix must be consistent: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
-            putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
-            return result;
-        }
-
-        //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
-        if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
-            logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
-            putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
-            return result;
-        }
-        if (file.getSize() > Constants.MAX_FILE_SIZE) {
-            logger.error("file size is too large: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
-            putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
+        result = verifyFile(name, type, file);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -274,7 +225,6 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
 
         try {
             resourcesMapper.insert(resource);
-
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<>();
@@ -363,37 +313,9 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
             return result;
         }
 
-        if (file != null) {
-            // file is empty
-            if (file.isEmpty()) {
-                logger.error("file is empty: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
-                putMsg(result, Status.RESOURCE_FILE_IS_EMPTY);
-                return result;
-            }
-
-            // file suffix
-            String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-            String nameSuffix = FileUtils.suffix(name);
-
-            // determine file suffix
-            if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
-                // rename file suffix and original suffix must be consistent
-                logger.error("rename file suffix and original suffix must be consistent: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
-                putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
-                return result;
-            }
-
-            //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
-            if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(FileUtils.suffix(originFullName))) {
-                logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
-                putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
-                return result;
-            }
-            if (file.getSize() > Constants.MAX_FILE_SIZE) {
-                logger.error("file size is too large: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
-                putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
-                return result;
-            }
+        result = verifyFile(name, type, file);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
         }
 
         // query tenant by user id
@@ -547,7 +469,44 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         }
 
         return result;
+    }
 
+    private Result verifyFile(String name, ResourceType type, MultipartFile file) {
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        if (file != null) {
+            // file is empty
+            if (file.isEmpty()) {
+                logger.error("file is empty: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
+                putMsg(result, Status.RESOURCE_FILE_IS_EMPTY);
+                return result;
+            }
+
+            // file suffix
+            String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
+            String nameSuffix = FileUtils.suffix(name);
+
+            // determine file suffix
+            if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
+                // rename file suffix and original suffix must be consistent
+                logger.error("rename file suffix and original suffix must be consistent: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
+                putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
+                return result;
+            }
+
+            //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
+            if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
+                logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
+                putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
+                return result;
+            }
+            if (file.getSize() > Constants.MAX_FILE_SIZE) {
+                logger.error("file size is too large: {}", RegexUtils.escapeLogging(file.getOriginalFilename()));
+                putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
+                return result;
+            }
+        }
+        return result;
     }
 
     /**
@@ -977,23 +936,9 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
 
         String name = fileName.trim() + "." + nameSuffix;
         String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name) : String.format("%s/%s",currentDirectory,name);
-
-        result = verifyResourceName(fullName,type,loginUser);
+        result = verifyResource(loginUser, type, fullName, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
-        }
-        if (pid != -1) {
-            Resource parentResource = resourcesMapper.selectById(pid);
-
-            if (parentResource == null) {
-                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
-                return result;
-            }
-
-            if (!hasPerm(loginUser, parentResource.getUserId())) {
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
         }
 
         // save data
@@ -1017,6 +962,31 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         result = uploadContentToHdfs(fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
+        }
+        return result;
+    }
+
+    private Result verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
+        Result result = verifyResourceName(fullName, type, loginUser);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
+        return verifyPid(loginUser, pid);
+    }
+
+    private Result verifyPid(User loginUser, int pid) {
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
         }
         return result;
     }
