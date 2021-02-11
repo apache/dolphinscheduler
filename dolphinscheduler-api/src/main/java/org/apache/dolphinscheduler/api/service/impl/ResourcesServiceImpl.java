@@ -126,11 +126,8 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
                                   ResourceType type,
                                   int pid,
                                   String currentDir) {
-        Result result = new Result();
-        // if hdfs not startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
@@ -193,12 +190,8 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
                                  MultipartFile file,
                                  int pid,
                                  String currentDir) {
-        Result result = new Result();
-
-        // if hdfs not startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -258,7 +251,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      */
     private boolean checkResourceExists(String fullName, int userId, int type) {
         List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        return resources != null && resources.size() > 0;
+        return resources != null && !resources.isEmpty();
     }
 
     /**
@@ -278,12 +271,8 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
                                  String desc,
                                  ResourceType type,
                                  MultipartFile file) {
-        Result result = new Result();
-
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -653,7 +642,6 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         if (programType != null) {
             switch (programType) {
                 case JAVA:
-                    break;
                 case SCALA:
                     break;
                 case PYTHON:
@@ -681,16 +669,12 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      */
     @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int resourceId) throws Exception {
-        Result result = new Result();
-
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
-        //get resource and  hdfs path
+        // get resource by id
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             logger.error("resource file not exist,  resource id {}", resourceId);
@@ -843,12 +827,8 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @return resource content
      */
     public Result readResource(int resourceId, int skipLineNum, int limit) {
-        Result result = new Result();
-
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -910,15 +890,14 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @param fileSuffix file suffix
      * @param desc description
      * @param content content
+     * @param pid pid
+     * @param currentDir current directory
      * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
-    public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory) {
-        Result result = new Result();
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+    public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDir) {
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -935,7 +914,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         }
 
         String name = fileName.trim() + "." + nameSuffix;
-        String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name) : String.format("%s/%s",currentDirectory,name);
+        String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -962,6 +941,18 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         result = uploadContentToHdfs(fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
+        }
+        return result;
+    }
+
+    private Result checkResourceUploadStartupState() {
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()) {
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            putMsg(result, Status.HDFS_NOT_STARTUP);
+            return result;
         }
         return result;
     }
@@ -1000,12 +991,8 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      */
     @Transactional(rollbackFor = Exception.class)
     public Result updateResourceContent(int resourceId, String content) {
-        Result result = new Result();
-
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
+        Result result = checkResourceUploadStartupState();
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
@@ -1177,7 +1164,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
         List<Resource> list;
-        if (resourceList != null && resourceList.size() > 0) {
+        if (resourceList != null && !resourceList.isEmpty()) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
 
@@ -1208,7 +1195,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
 
         List<UdfFunc> udfFuncList = udfFunctionMapper.queryUdfFuncExceptUserId(userId);
         List<UdfFunc> resultList = new ArrayList<>();
-        Set<UdfFunc> udfFuncSet = null;
+        Set<UdfFunc> udfFuncSet;
         if (CollectionUtils.isNotEmpty(udfFuncList)) {
             udfFuncSet = new HashSet<>(udfFuncList);
 
@@ -1270,7 +1257,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @param authedResourceList authorized resource list
      */
     private void getAuthorizedResourceList(Set<?> resourceSet, List<?> authedResourceList) {
-        Set<?> authedResourceSet = null;
+        Set<?> authedResourceSet;
         if (CollectionUtils.isNotEmpty(authedResourceList)) {
             authedResourceSet = new HashSet<>(authedResourceList);
             resourceSet.removeAll(authedResourceSet);
@@ -1282,7 +1269,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      *
      * @param userId user id
      * @param result return result
-     * @return
+     * @return tenant code
      */
     private String getTenantCode(int userId,Result result) {
         User user = userMapper.selectById(userId);
