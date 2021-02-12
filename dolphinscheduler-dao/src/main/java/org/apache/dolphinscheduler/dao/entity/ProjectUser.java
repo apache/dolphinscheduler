@@ -37,6 +37,9 @@ public class ProjectUser {
     @TableField("project_id")
     private int projectId;
 
+    @TableField("project_code")
+    private int projectCode;
+
     /**
      * project name
      */
@@ -59,6 +62,14 @@ public class ProjectUser {
 
     @TableField("update_time")
     private Date updateTime;
+
+    public int getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(int projectCode) {
+        this.projectCode = projectCode;
+    }
 
     public int getId() {
         return id;
@@ -123,17 +134,19 @@ public class ProjectUser {
     public void setPerm(int perm) {
         this.perm = perm;
     }
+
     @Override
     public String toString() {
-        return "ProjectUser{" +
-                "id=" + id +
-                ", projectId=" + projectId +
-                ", projectName='" + projectName + '\'' +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", perm=" + perm +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "ProjectUser{"
+               + "id=" + id
+               + ", userId=" + userId
+               + ", projectId=" + projectId
+               + ", projectCode=" + projectCode
+               + ", projectName='" + projectName + '\''
+               + ", userName='" + userName + '\''
+               + ", perm=" + perm
+               + ", createTime=" + createTime
+               + ", updateTime=" + updateTime
+               + '}';
     }
 }
