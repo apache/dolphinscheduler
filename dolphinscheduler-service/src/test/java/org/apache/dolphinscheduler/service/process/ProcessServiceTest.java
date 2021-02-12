@@ -439,7 +439,7 @@ public class ProcessServiceTest {
         String expect = JSONUtils.toJsonString(exceptProcessData);
         String oldJson = JSONUtils.toJsonString(oldProcessData);
 
-        Assert.assertEquals(expect, processService.changeJson(newProcessData,oldJson));
+        Assert.assertEquals(expect, processService.changeJson(newProcessData, oldJson));
 
     }
 }
