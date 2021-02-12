@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParamete
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
@@ -222,7 +221,6 @@ public class TaskPriorityQueueConsumer extends Thread {
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        taskInstance.setExecutePath(getExecLocalPath(taskInstance));
         taskInstance.setResources(getResourceFullNames(taskNode));
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
@@ -361,18 +359,6 @@ public class TaskPriorityQueueConsumer extends Thread {
 
             sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
         }
-    }
-
-    /**
-     * get execute local path
-     *
-     * @return execute local path
-     */
-    private String getExecLocalPath(TaskInstance taskInstance) {
-        return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
-            taskInstance.getProcessDefine().getId(),
-            taskInstance.getProcessInstance().getId(),
-            taskInstance.getId());
     }
 
     /**
