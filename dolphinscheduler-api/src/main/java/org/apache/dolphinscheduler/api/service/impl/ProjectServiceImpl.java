@@ -100,7 +100,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
                 .updateTime(now)
                 .build();
         } catch (SnowFlakeException e) {
-            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+            putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
         }
 
