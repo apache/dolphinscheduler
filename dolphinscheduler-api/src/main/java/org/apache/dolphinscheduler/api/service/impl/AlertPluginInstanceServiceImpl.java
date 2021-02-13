@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.service.BaseService;
@@ -245,7 +248,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
      * @return k, v(json string)
      */
     private String parsePluginParamsMap(String pluginParams) {
-        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginParams);
+        Map<String, Object> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginParams);
         return JSONUtils.toJsonString(paramsMap);
     }
 
@@ -257,19 +260,8 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
      * @return Complete parameters list(include ui)
      */
     private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {
-        Map<String, String> paramsMap = JSONUtils.toMap(pluginParamsMapString);
-        if (MapUtils.isEmpty(paramsMap)) {
-            return null;
-        }
-        List<PluginParams> pluginParamsList = JSONUtils.toList(pluginUiParams, PluginParams.class);
-        List<PluginParams> newPluginParamsList = new ArrayList<>(pluginParamsList.size());
-        pluginParamsList.forEach(pluginParams -> {
-            pluginParams.setValue(paramsMap.get(pluginParams.getName()));
-            newPluginParamsList.add(pluginParams);
-
-        });
-
-        return JSONUtils.toJsonString(newPluginParamsList);
+        List<Map<String, Object>> pluginParamsList = PluginParamsTransfer.generatePluginParams(pluginParamsMapString, pluginUiParams);
+        return JSONUtils.toJsonString(pluginParamsList);
     }
 
     private boolean checkHasAssociatedAlertGroup(String id) {

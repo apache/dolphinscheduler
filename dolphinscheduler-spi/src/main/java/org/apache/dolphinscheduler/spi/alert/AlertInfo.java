@@ -27,18 +27,18 @@ public class AlertInfo {
     /**
      * all params this plugin need is in alertProps
      */
-    private Map<String,String> alertParams;
+    private Map<String,Object> alertParams;
 
     /**
      * the alert content
      */
     private AlertData alertData;
 
-    public Map<String, String> getAlertParams() {
+    public Map<String, Object> getAlertParams() {
         return alertParams;
     }
 
-    public void setAlertParams(Map<String, String> alertParams) {
+    public void setAlertParams(Map<String, Object> alertParams) {
         this.alertParams = alertParams;
     }
 

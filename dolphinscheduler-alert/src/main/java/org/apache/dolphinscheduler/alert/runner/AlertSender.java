@@ -155,7 +155,7 @@ public class AlertSender {
 
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
+        Map<String, Object> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
         alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult;
         try {

@@ -217,13 +217,13 @@ public class JSONUtils {
      * @param json json
      * @return json to map
      */
-    public static Map<String, String> toMap(String json) {
+    public static <K, V> Map<K, V> toMap(String json) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
+            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
             });
         } catch (Exception e) {
             logger.error("json to map exception!", e);
@@ -257,6 +257,20 @@ public class JSONUtils {
         return null;
     }
 
+    public static <K, V> List<Map<K, V>> toMapList(String json) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<Map<K, V>>>() {
+            });
+        } catch (Exception e) {
+            logger.error("json to map exception!", e);
+        }
+
+        return null;
+    }
     /**
      * object to json string
      *

@@ -40,12 +40,26 @@ public class PluginParamsTransfer {
     /**
      * return the plugin params map
      */
-    public static Map<String, String> getPluginParamsMap(String paramsJsonStr) {
+    public static Map<String, Object> getPluginParamsMap(String paramsJsonStr) {
         List<PluginParams> pluginParams = transferJsonToParamsList(paramsJsonStr);
-        Map<String, String> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         for (PluginParams param : pluginParams) {
-            paramsMap.put(param.getName(), null != param.getValue() ? param.getValue().toString() : null);
+            paramsMap.put(param.getName(), param.getValue());
         }
         return paramsMap;
+    }
+
+    public static List<Map<String, Object>> generatePluginParams(String paramsJsonStr, String pluginParamsTemplate) {
+        Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr);
+        return generatePluginParams(paramsMap, pluginParamsTemplate);
+    }
+
+    public static List<Map<String, Object>> generatePluginParams(Map<String, Object> paramsMap, String pluginParamsTemplate) {
+        if (paramsMap == null || paramsMap.isEmpty()) {
+            return null;
+        }
+        List<Map<Object, Object>> pluginParamsList = JSONUtils.toMapList(pluginParamsTemplate);
+        pluginParamsList.forEach(pluginParams -> pluginParams.put("value", paramsMap.get(pluginParams.get("field"))));
+        return pluginParamsList;
     }
 }
