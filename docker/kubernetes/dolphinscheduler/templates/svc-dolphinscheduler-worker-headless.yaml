@@ -30,9 +30,9 @@ spec:
       protocol: TCP
       name: worker-port
     - port: 50051
-      targetPort: logs-port
+      targetPort: logger-port
       protocol: TCP
-      name: logs-port
+      name: logger-port
   selector:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
     app.kubernetes.io/instance: {{ .Release.Name }}
