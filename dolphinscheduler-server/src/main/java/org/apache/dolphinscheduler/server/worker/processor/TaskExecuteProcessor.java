@@ -139,7 +139,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             taskExecutionContext.getProcessInstanceId(),
             taskExecutionContext.getTaskInstanceId()));
 
-        taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
+        taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
