@@ -177,7 +177,6 @@ public class StringUtils {
                         buf.append(obj);
                     }
                 }
-
                 return buf.toString();
             }
         }
