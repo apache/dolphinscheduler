@@ -21,7 +21,7 @@
         <div class="row-box" v-for="(item,$index) in workerList" :key="$index">
           <div class="row-title">
             <div class="left">
-              <span class="sp">IP: {{item.host}}</span>
+              <span class="sp">Host: {{item.host}}</span>
               <span>{{$t('Zk registration directory')}}: <a href="javascript:" @click="_showZkDirectories(item)" class="links">{{$t('Directory detail')}}</a></span>
             </div>
             <div class="right">

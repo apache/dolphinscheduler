@@ -178,7 +178,7 @@ public class MasterSchedulerService extends Thread {
         }
     }
 
-    private String getLocalAddress(){
-        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
+    private String getLocalAddress() {
+        return NetUtils.getAddr(masterConfig.getListenPort());
     }
 }

@@ -30,7 +30,7 @@ spec:
       paths:
         - path: {{ .Values.ingress.path }}
           backend:
-            serviceName: {{ include "dolphinscheduler.fullname" . }}-frontend
+            serviceName: {{ include "dolphinscheduler.fullname" . }}-api
             servicePort: tcp-port
   {{- if .Values.ingress.tls.enabled }}
   tls:

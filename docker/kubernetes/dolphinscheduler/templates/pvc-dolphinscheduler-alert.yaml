@@ -25,7 +25,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   accessModes:
-    {{- range .Values.alert.persistentVolumeClaim.accessModes }}
+  {{- range .Values.alert.persistentVolumeClaim.accessModes }}
     - {{ . | quote }}
   {{- end }}
   storageClassName: {{ .Values.alert.persistentVolumeClaim.storageClassName | quote }}
