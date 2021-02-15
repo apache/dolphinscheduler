@@ -41,4 +41,13 @@ public class DependentTaskModel {
     public void setRelation(DependentRelation relation) {
         this.relation = relation;
     }
+
+    @Override
+    public String toString() {
+        return "DependTasks{"
+                + "relation=" + relation
+                + ", dependItemList=" + dependItemList
+                + '}';
+    }
+
 }

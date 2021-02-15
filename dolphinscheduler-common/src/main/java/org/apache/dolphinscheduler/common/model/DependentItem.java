@@ -87,4 +87,15 @@ public class DependentItem {
     public void setStatus(ExecutionStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "DependItems{"
+                + "definitionId=" + definitionId
+                + ", depTasks=" + depTasks
+                + ", cycle=" + cycle
+                + ", dateValue=" + dateValue
+                + '}';
+    }
+
 }
