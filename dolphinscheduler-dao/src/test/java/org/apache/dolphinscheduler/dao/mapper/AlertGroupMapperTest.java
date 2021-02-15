@@ -164,7 +164,7 @@ public class AlertGroupMapperTest {
     /**
      * test query all group list
      */
-    @Test(expected = Exception.class)
+    @Test
     public void testQueryAllGroupList() {
         Integer count = 4;
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count);
