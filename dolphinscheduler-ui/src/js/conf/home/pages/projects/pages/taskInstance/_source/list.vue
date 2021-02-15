@@ -76,7 +76,7 @@
       :show-close="false"
       :visible.sync="logDialog"
       width="auto">
-      <m-log :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
+      <m-log :key="logId" :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
   </div>
 </template>
