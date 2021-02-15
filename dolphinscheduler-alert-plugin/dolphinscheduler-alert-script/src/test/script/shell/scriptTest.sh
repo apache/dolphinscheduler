@@ -18,8 +18,8 @@
 title=$1
 content=$2
 userParams=$3
-
-echo title
+echo "last"
+echo $alertTitle
 
 echo "last"
 
