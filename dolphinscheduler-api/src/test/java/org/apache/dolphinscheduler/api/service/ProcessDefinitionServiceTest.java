@@ -110,6 +110,95 @@ public class ProcessDefinitionServiceTest {
     @Mock
     private ProcessDefinitionVersionService processDefinitionVersionService;
 
+    private static final String DEPENDENT_JSON = "{\n"
+            + "    \"globalParams\": [\n"
+            + "        \n"
+            + "    ],\n"
+            + "    \"tasks\": [\n"
+            + "        {\n"
+            + "            \"type\": \"SQL\",\n"
+            + "            \"id\": \"tasks-27297\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"type\": \"MYSQL\",\n"
+            + "                \"datasource\": 1,\n"
+            + "                \"sql\": \"select * from test\",\n"
+            + "                \"udfs\": \"\",\n"
+            + "                \"sqlType\": \"1\",\n"
+            + "                \"title\": \"\",\n"
+            + "                \"receivers\": \"\",\n"
+            + "                \"receiversCc\": \"\",\n"
+            + "                \"showType\": \"TABLE\",\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"connParams\": \"\",\n"
+            + "                \"preStatements\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"postStatements\": [\n"
+            + "                    \n"
+            + "                ]\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"dependent\"\n"
+            + "            ]\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"type\": \"DEPENDENT\",\n"
+            + "            \"id\": \"tasks-33787\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \"relation\": \"AND\",\n"
+            + "                \"dependTaskList\": [\n"
+            + "                    {\n"
+            + "                        \"relation\": \"AND\",\n"
+            + "                        \"dependItemList\": [\n"
+            + "                            {\n"
+            + "                                \"projectId\": 2,\n"
+            + "                                \"definitionId\": 46,\n"
+            + "                                \"depTasks\": \"ALL\",\n"
+            + "                                \"cycle\": \"day\",\n"
+            + "                                \"dateValue\": \"today\"\n"
+            + "                            }\n"
+            + "                        ]\n"
+            + "                    }\n"
+            + "                ]\n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \n"
+            + "            ]\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"tenantId\": 1,\n"
+            + "    \"timeout\": 0\n"
+            + "}";
     private static final String SHELL_JSON = "{\n"
             + "    \"globalParams\": [\n"
             + "        \n"
@@ -1181,5 +1270,47 @@ public class ProcessDefinitionServiceTest {
         } else {
             result.put(Constants.MSG, status.getMsg());
         }
+    }
+
+    @Test
+    public void  testQueryUpstreamTaskDependencies() {
+        //process definition not exist
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(null);
+        Map<String, Object> processDefinitionNullRes = processDefinitionService.queryUpstreamTaskDependencies(46, "shell-1");
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
+
+        //process data null
+        ProcessDefinition processDefinition = getProcessDefinition();
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Map<String, Object> dataNotValidRes = processDefinitionService.queryUpstreamTaskDependencies(46, "shell-1");
+        Assert.assertEquals(Status.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
+
+        //success
+        processDefinition.setProcessDefinitionJson(CYCLE_SHELL_JSON);
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Map<String, Object> successRes = processDefinitionService.queryUpstreamTaskDependencies(46, "shell-1");
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+    }
+
+    @Test
+    public void  testQueryDownstreamTaskDependencies() {
+        //process definition not exist
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(null);
+        Map<String, Object> processDefinitionNullRes = processDefinitionService.queryDownstreamTaskDependencies(46, "shell-1");
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
+
+        //process data null
+        ProcessDefinition processDefinition = getProcessDefinition();
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Map<String, Object> dataNotValidRes = processDefinitionService.queryDownstreamTaskDependencies(46, "shell-1");
+        Assert.assertEquals(Status.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
+
+        //success
+        processDefinition.setProcessDefinitionJson(DEPENDENT_JSON);
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Map<String, Object> successRes = processDefinitionService.queryDownstreamTaskDependencies(46, "shell-1");
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
     }
 }

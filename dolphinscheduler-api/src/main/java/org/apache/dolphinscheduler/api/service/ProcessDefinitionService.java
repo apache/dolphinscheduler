@@ -260,5 +260,23 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
             , int processDefinitionId, long version);
+
+    /**
+     * query upstream task dependencies by task name
+     *
+     * @param processId process id
+     * @param taskName task name
+     * @return task dependencies list
+     */
+    Map<String, Object> queryUpstreamTaskDependencies(Integer processId, String taskName);
+
+    /**
+     * query downstream task dependencies by task name
+     *
+     * @param processId process id
+     * @param taskName task name
+     * @return task dependencies list
+     */
+    Map<String, Object> queryDownstreamTaskDependencies(Integer processId, String taskName);
 }
 
