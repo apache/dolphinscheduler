@@ -113,7 +113,7 @@ public class WorkerRegistryTest {
 
         int i = 0;
         for (String workerGroup : workerConfig.getWorkerGroups()) {
-            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
+            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getAddr(workerConfig.getListenPort()));
             String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(workerZkPath);
             if (0 == i) {
                 Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/test/"));
