@@ -135,7 +135,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Create a default dolphinscheduler worker base dir.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "dolphinscheduler.worker.base.dir" -}}
-{{- $name := default "/tmp/dolphinscheduler" .Values.worker.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH -}}
+{{- define "dolphinscheduler.data.basedir.path" -}}
+{{- $name := default "/tmp/dolphinscheduler" .Values.common.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH -}}
 {{- printf "%s" $name | trunc 63 | trimSuffix "/" -}}
 {{- end -}}

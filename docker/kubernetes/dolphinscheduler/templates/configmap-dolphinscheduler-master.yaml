@@ -24,6 +24,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
+  DOLPHINSCHEDULER_OPTS: {{ .Values.master.configmap.DOLPHINSCHEDULER_OPTS | quote }}
   MASTER_EXEC_THREADS: {{ .Values.master.configmap.MASTER_EXEC_THREADS | quote }}
   MASTER_EXEC_TASK_NUM: {{ .Values.master.configmap.MASTER_EXEC_TASK_NUM | quote }}
   MASTER_HEARTBEAT_INTERVAL: {{ .Values.master.configmap.MASTER_HEARTBEAT_INTERVAL | quote }}
@@ -32,5 +33,4 @@ data:
   MASTER_MAX_CPULOAD_AVG: {{ .Values.master.configmap.MASTER_MAX_CPULOAD_AVG | quote }}
   MASTER_RESERVED_MEMORY: {{ .Values.master.configmap.MASTER_RESERVED_MEMORY | quote }}
   MASTER_LISTEN_PORT: {{ .Values.master.configmap.MASTER_LISTEN_PORT | quote }}
-  DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
 {{- end }}

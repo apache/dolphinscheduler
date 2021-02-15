@@ -15,9 +15,9 @@
 # limitations under the License.
 #
 
-** Please be patient while the chart is being deployed **
+** Please be patient while the chart Dolphinscheduler {{ .Chart.AppVersion }} is being deployed **
 
-1. Get the Dolphinscheduler URL by running:
+Get the Dolphinscheduler URL by running:
 
 {{- if .Values.ingress.enabled }}
 
@@ -26,6 +26,6 @@
 
 {{- else }}
 
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-frontend 8888:8888
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-api 12345:12345
 
 {{- end }}
