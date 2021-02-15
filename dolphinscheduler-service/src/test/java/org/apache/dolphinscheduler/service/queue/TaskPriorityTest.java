@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package queue;
-
-import org.apache.dolphinscheduler.service.queue.TaskPriority;
+package org.apache.dolphinscheduler.service.queue;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -15,11 +15,8 @@
  * limitations under the License.
  */
 
-package queue;
+package org.apache.dolphinscheduler.service.queue;
 
-import org.apache.dolphinscheduler.service.queue.TaskPriority;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
