@@ -32,11 +32,11 @@ import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
@@ -216,14 +216,14 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             logger.info("task ready to submit: {}", taskInstance);
 
             /**
-             *  taskPriorityInfo
+             *  taskPriority
              */
-            String taskPriorityInfo = buildTaskPriorityInfo(processInstance.getProcessInstancePriority().getCode(),
+            TaskPriority taskPriority = buildTaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(),
                     taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(),
                     org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
-            taskUpdateQueue.put(taskPriorityInfo);
+            taskUpdateQueue.put(taskPriority);
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
             return true;
         }catch (Exception e){
@@ -234,33 +234,27 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
     /**
-     *  buildTaskPriorityInfo
+     * buildTaskPriority
      *
      * @param processInstancePriority processInstancePriority
      * @param processInstanceId processInstanceId
      * @param taskInstancePriority taskInstancePriority
      * @param taskInstanceId taskInstanceId
      * @param workerGroup workerGroup
-     * @return TaskPriorityInfo
+     * @return TaskPriority
      */
-    private String buildTaskPriorityInfo(int processInstancePriority,
+    private TaskPriority buildTaskPriority(int processInstancePriority,
                                          int processInstanceId,
                                          int taskInstancePriority,
                                          int taskInstanceId,
                                          String workerGroup){
-        return processInstancePriority +
-                UNDERLINE +
-                processInstanceId +
-                UNDERLINE +
-                taskInstancePriority +
-                UNDERLINE +
-                taskInstanceId +
-                UNDERLINE +
-                workerGroup;
+        return new TaskPriority(processInstancePriority, processInstanceId,
+                taskInstancePriority, taskInstanceId, workerGroup);
     }
 
     /**
      * submit wait complete
+     *
      * @return true
      */
     protected Boolean submitWaitComplete(){
