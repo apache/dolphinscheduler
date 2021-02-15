@@ -169,7 +169,7 @@ public class WorkerRegistry {
      * get local address
      */
     private String getLocalAddress() {
-        return NetUtils.getHost() + COLON + workerConfig.getListenPort();
+        return NetUtils.getAddr(workerConfig.getListenPort());
     }
 
     /**

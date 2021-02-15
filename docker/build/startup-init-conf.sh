@@ -39,9 +39,9 @@ export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 export DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_ENV_PATH:-"/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"}
 export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
 export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-""}
-export RESOURCE_STORAGE_TYPE=${RESOURCE_STORAGE_TYPE:-"NONE"}
-export RESOURCE_UPLOAD_PATH=${RESOURCE_UPLOAD_PATH:-"/ds"}
-export FS_DEFAULT_FS=${FS_DEFAULT_FS:-"s3a://xxxx"}
+export RESOURCE_STORAGE_TYPE=${RESOURCE_STORAGE_TYPE:-"HDFS"}
+export RESOURCE_UPLOAD_PATH=${RESOURCE_UPLOAD_PATH:-"/dolphinscheduler"}
+export FS_DEFAULT_FS=${FS_DEFAULT_FS:-"file:///"}
 export FS_S3A_ENDPOINT=${FS_S3A_ENDPOINT:-"s3.xxx.amazonaws.com"}
 export FS_S3A_ACCESS_KEY=${FS_S3A_ACCESS_KEY:-"xxxxxxx"}
 export FS_S3A_SECRET_KEY=${FS_S3A_SECRET_KEY:-"xxxxxxx"}
@@ -81,7 +81,7 @@ export WORKER_WEIGHT=${WORKER_WEIGHT:-"100"}
 #============================================================================
 # alert plugin dir
 export ALERT_PLUGIN_DIR=${ALERT_PLUGIN_DIR:-"/opt/dolphinscheduler"}
-# XLS FILE
+# xls file
 export XLS_FILE_PATH=${XLS_FILE_PATH:-"/tmp/xls"}
 # mail
 export MAIL_SERVER_HOST=${MAIL_SERVER_HOST:-""}
@@ -99,12 +99,6 @@ export ENTERPRISE_WECHAT_SECRET=${ENTERPRISE_WECHAT_SECRET:-""}
 export ENTERPRISE_WECHAT_AGENT_ID=${ENTERPRISE_WECHAT_AGENT_ID:-""}
 export ENTERPRISE_WECHAT_USERS=${ENTERPRISE_WECHAT_USERS:-""}
 
-#============================================================================
-# Frontend
-#============================================================================
-export FRONTEND_API_SERVER_HOST=${FRONTEND_API_SERVER_HOST:-"127.0.0.1"}
-export FRONTEND_API_SERVER_PORT=${FRONTEND_API_SERVER_PORT:-"12345"}
-
 echo "generate app config"
 ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
@@ -112,7 +106,3 @@ $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
 EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
-
-echo "generate nginx config"
-sed -i "s/FRONTEND_API_SERVER_HOST/${FRONTEND_API_SERVER_HOST}/g" /etc/nginx/conf.d/dolphinscheduler.conf
-sed -i "s/FRONTEND_API_SERVER_PORT/${FRONTEND_API_SERVER_PORT}/g" /etc/nginx/conf.d/dolphinscheduler.conf
