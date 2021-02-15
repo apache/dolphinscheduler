@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.WebUtils;
 
 /**
  * session service implement
@@ -61,7 +60,7 @@ public class SessionServiceImpl extends BaseService implements SessionService {
         String sessionId = request.getHeader(Constants.SESSION_ID);
 
         if (StringUtils.isBlank(sessionId)) {
-            Cookie cookie = WebUtils.getCookie(request, Constants.SESSION_ID);
+            Cookie cookie = getCookie(request, Constants.SESSION_ID);
 
             if (cookie != null) {
                 sessionId = cookie.getValue();

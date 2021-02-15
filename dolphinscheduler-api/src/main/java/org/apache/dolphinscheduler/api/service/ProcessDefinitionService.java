@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -191,7 +190,7 @@ public interface ProcessDefinitionService {
     Map<String, Object> releaseProcessDefinition(User loginUser,
                                                  String projectName,
                                                  int id,
-                                                 ReleaseState releaseState);
+                                                 int releaseState);
 
     /**
      * batch export process definition by ids

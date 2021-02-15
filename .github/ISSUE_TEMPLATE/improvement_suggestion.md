@@ -2,6 +2,7 @@
 name: Improvement suggestion
 about: Improvement suggestion for this project
 title: "[Improvement][Module Name] Improvement title"
+labels: improvement
 assignees: ''
 
 ---

@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.dao.datasource;
-
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-
+import java.sql.SQLException;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,221 +30,194 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class BaseDataSource {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseDataSource.class);
+  private static final Logger logger = LoggerFactory.getLogger(BaseDataSource.class);
 
-    /**
-     * user name
-     */
-    protected String user;
+  /**
+   * user name
+   */
+  protected String user;
 
-    /**
-     * user password
-     */
-    protected String password;
+  /**
+   * user password
+   */
+  protected String password;
 
-    /**
-     * data source address
-     */
-    private String address;
+  /**
+   * data source address
+   */
+  private String address;
 
-    /**
-     * database name
-     */
-    private String database;
+  /**
+   * database name
+   */
+  private String database;
 
-    /**
-     * other connection parameters for the data source
-     */
-    private String other;
+  /**
+   * other connection parameters for the data source
+   */
+  private String other;
 
-    /**
-     * principal
-     */
-    private String principal;
+  /**
+   * principal
+   */
+  private String principal;
 
-    /**
-     * java.security.krb5.conf
-     */
-    private String javaSecurityKrb5Conf;
+  public String getPrincipal() {
+    return principal;
+  }
 
-    /**
-     * login.user.keytab.username
-     */
-    private String loginUserKeytabUsername;
+  public void setPrincipal(String principal) {
+    this.principal = principal;
+  }
 
-    /**
-     * login.user.keytab.path
-     */
-    private String loginUserKeytabPath;
+  /**
+   * @return driver class
+   */
+  public abstract String driverClassSelector();
 
-    public String getPrincipal() {
-        return principal;
+  /**
+   * @return db type
+   */
+  public abstract DbType dbTypeSelector();
+
+  /**
+   * gets the JDBC url for the data source connection
+   * @return getJdbcUrl
+   */
+  public String getJdbcUrl() {
+    StringBuilder jdbcUrl = new StringBuilder(getAddress());
+
+    appendDatabase(jdbcUrl);
+    appendPrincipal(jdbcUrl);
+    appendOther(jdbcUrl);
+
+    return jdbcUrl.toString();
+  }
+
+  /**
+   * append database
+   * @param jdbcUrl jdbc url
+   */
+  protected void appendDatabase(StringBuilder jdbcUrl) {
+    if (dbTypeSelector() == DbType.SQLSERVER) {
+      jdbcUrl.append(";databaseName=").append(getDatabase());
+    } else {
+      if (getAddress().lastIndexOf('/') != (jdbcUrl.length() - 1)) {
+        jdbcUrl.append("/");
+      }
+      jdbcUrl.append(getDatabase());
     }
+  }
 
-    public void setPrincipal(String principal) {
-        this.principal = principal;
+  /**
+   * append principal
+   * @param jdbcUrl jdbc url
+   */
+  private void appendPrincipal(StringBuilder jdbcUrl) {
+    boolean tag = dbTypeSelector() == DbType.HIVE || dbTypeSelector() == DbType.SPARK;
+    if (tag && StringUtils.isNotEmpty(getPrincipal())) {
+      jdbcUrl.append(";principal=").append(getPrincipal());
     }
+  }
 
-    /**
-     * @return driver class
-     */
-    public abstract String driverClassSelector();
-
-    /**
-     * @return db type
-     */
-    public abstract DbType dbTypeSelector();
-
-    /**
-     * gets the JDBC url for the data source connection
-     * @return getJdbcUrl
-     */
-    public String getJdbcUrl() {
-        StringBuilder jdbcUrl = new StringBuilder(getAddress());
-
-        appendDatabase(jdbcUrl);
-        appendPrincipal(jdbcUrl);
-        appendOther(jdbcUrl);
-
-        return jdbcUrl.toString();
+  /**
+   * append other
+   * @param jdbcUrl jdbc url
+   */
+  private void appendOther(StringBuilder jdbcUrl) {
+    String otherParams = filterOther(getOther());
+    if (StringUtils.isNotEmpty(otherParams)) {
+      String separator = "";
+      switch (dbTypeSelector()) {
+        case CLICKHOUSE:
+        case MYSQL:
+        case ORACLE:
+        case POSTGRESQL:
+        case PRESTO:
+          separator = "?";
+          break;
+        case DB2:
+          separator = ":";
+          break;
+        case HIVE:
+        case SPARK:
+        case SQLSERVER:
+          separator = ";";
+          break;
+        default:
+          logger.error("Db type mismatch!");
+      }
+      jdbcUrl.append(separator).append(otherParams);
     }
+  }
 
-    /**
-     * append database
-     * @param jdbcUrl jdbc url
-     */
-    protected void appendDatabase(StringBuilder jdbcUrl) {
-        if (dbTypeSelector() == DbType.SQLSERVER) {
-            jdbcUrl.append(";databaseName=").append(getDatabase());
-        } else {
-            if (getAddress().lastIndexOf('/') != (jdbcUrl.length() - 1)) {
-                jdbcUrl.append("/");
-            }
-            jdbcUrl.append(getDatabase());
+  protected String filterOther(String otherParams){
+    return otherParams;
+  }
+
+  /**
+   * test whether the data source can be connected successfully
+   */
+  public void isConnectable() {
+    Connection con = null;
+    try {
+      Class.forName(driverClassSelector());
+      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+    } catch (ClassNotFoundException | SQLException e) {
+      logger.error("Get connection error: {}", e.getMessage());
+    } finally {
+      if (con != null) {
+        try {
+          con.close();
+        } catch (SQLException e) {
+          logger.error(e.getMessage(), e);
         }
+      }
     }
+  }
 
-    /**
-     * append principal
-     * @param jdbcUrl jdbc url
-     */
-    private void appendPrincipal(StringBuilder jdbcUrl) {
-        boolean tag = dbTypeSelector() == DbType.HIVE || dbTypeSelector() == DbType.SPARK;
-        if (tag && StringUtils.isNotEmpty(getPrincipal())) {
-            jdbcUrl.append(";principal=").append(getPrincipal());
-        }
-    }
+  public String getUser() {
+    return user;
+  }
 
-    /**
-     * append other
-     * @param jdbcUrl jdbc url
-     */
-    private void appendOther(StringBuilder jdbcUrl) {
-        String otherParams = filterOther(getOther());
-        if (StringUtils.isNotEmpty(otherParams)) {
-            String separator = "";
-            switch (dbTypeSelector()) {
-                case CLICKHOUSE:
-                case MYSQL:
-                case ORACLE:
-                case POSTGRESQL:
-                case PRESTO:
-                    separator = "?";
-                    break;
-                case DB2:
-                    separator = ":";
-                    break;
-                case HIVE:
-                case SPARK:
-                case SQLSERVER:
-                    separator = ";";
-                    break;
-                default:
-                    logger.error("Db type mismatch!");
-            }
-            jdbcUrl.append(separator).append(otherParams);
-        }
-    }
+  public void setUser(String user) {
+    this.user = user;
+  }
 
-    /**
-     * the data source test connection
-     * @return Connection Connection
-     * @throws Exception Exception
-     */
-    public Connection getConnection() throws Exception {
-        Class.forName(driverClassSelector());
-        return DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
-    }
+  /**
+   * password need decode
+   * @return
+   */
+  public String getPassword() {
+    return CommonUtils.decodePassword(password);
+  }
 
-    protected String filterOther(String otherParams) {
-        return otherParams;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public String getUser() {
-        return user;
-    }
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
+  public String getAddress() {
+    return address;
+  }
 
-    /**
-     * password need decode
-     * @return
-     */
-    public String getPassword() {
-        return CommonUtils.decodePassword(password);
-    }
+  public String getDatabase() {
+    return database;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setDatabase(String database) {
+    this.database = database;
+  }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+  public String getOther() {
+    return other;
+  }
 
-    public String getAddress() {
-        return address;
-    }
+  public void setOther(String other) {
+    this.other = other;
+  }
 
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public String getOther() {
-        return other;
-    }
-
-    public void setOther(String other) {
-        this.other = other;
-    }
-
-    public String getJavaSecurityKrb5Conf() {
-        return javaSecurityKrb5Conf;
-    }
-
-    public void setJavaSecurityKrb5Conf(String javaSecurityKrb5Conf) {
-        this.javaSecurityKrb5Conf = javaSecurityKrb5Conf;
-    }
-
-    public String getLoginUserKeytabUsername() {
-        return loginUserKeytabUsername;
-    }
-
-    public void setLoginUserKeytabUsername(String loginUserKeytabUsername) {
-        this.loginUserKeytabUsername = loginUserKeytabUsername;
-    }
-
-    public String getLoginUserKeytabPath() {
-        return loginUserKeytabPath;
-    }
-
-    public void setLoginUserKeytabPath(String loginUserKeytabPath) {
-        this.loginUserKeytabPath = loginUserKeytabPath;
-    }
 }

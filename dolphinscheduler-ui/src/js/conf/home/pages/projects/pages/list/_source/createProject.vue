@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popover ref="popover" :nameText="item ? $t('Edit') : $t('Create Project')" :ok-text="item ? $t('Edit') : $t('Submit')"
+  <m-popup ref="popup" :nameText="item ? $t('Edit') : $t('Create Project')" :ok-text="item ? $t('Edit') : $t('Submit')"
            @close="_close" @ok="_ok">
     <template slot="content">
       <div class="projects-create-model">
@@ -44,13 +44,13 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popover>
+  </m-popup>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopover from '@/module/components/popup/popover'
+  import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -81,7 +81,7 @@
           param.projectId = this.item.id
         }
 
-        this.$refs.popover.spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
 
         this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
           this.$emit('_onUpdate')
@@ -90,10 +90,12 @@
             type: 'success',
             offset: 70
           })
-          this.$refs.popover.spinnerLoading = false
+          setTimeout(() => {
+            this.$refs.popup.spinnerLoading = false
+          }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popover.spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
       _close () {
@@ -116,6 +118,6 @@
     },
     mounted () {
     },
-    components: { mPopover, mListBoxF }
+    components: { mPopup, mListBoxF }
   }
 </script>

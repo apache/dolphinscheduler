@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.*;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -25,33 +25,29 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 /**
  * alert group service
  */
 @Service
-public class AlertGroupService extends BaseService {
+public class AlertGroupService extends BaseService{
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupService.class);
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
 
+    @Autowired
+    private UserAlertGroupService userAlertGroupService;
     /**
      * query alert group list
      *
@@ -79,15 +75,15 @@ public class AlertGroupService extends BaseService {
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)) {
             return result;
         }
 
         Page<AlertGroup> page = new Page(pageNo, pageSize);
         IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
-            page, searchVal);
+                page, searchVal);
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) alertGroupIPage.getTotal());
+        pageInfo.setTotalCount((int)alertGroupIPage.getTotal());
         pageInfo.setLists(alertGroupIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -100,14 +96,14 @@ public class AlertGroupService extends BaseService {
      *
      * @param loginUser login user
      * @param groupName group name
+     * @param groupType group type
      * @param desc description
-     * @param alertInstanceIds alertInstanceIds
      * @return create result code
      */
-    public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
+    public Map<String, Object> createAlertgroup(User loginUser, String groupName, AlertType groupType, String desc) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)){
             return result;
         }
 
@@ -115,11 +111,10 @@ public class AlertGroupService extends BaseService {
         Date now = new Date();
 
         alertGroup.setGroupName(groupName);
-        alertGroup.setAlertInstanceIds(alertInstanceIds);
+        alertGroup.setGroupType(groupType);
         alertGroup.setDescription(desc);
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
-        alertGroup.setCreateUserId(loginUser.getId());
 
         // insert
         int insert = alertGroupMapper.insert(alertGroup);
@@ -138,16 +133,17 @@ public class AlertGroupService extends BaseService {
      * @param loginUser login user
      * @param id alert group id
      * @param groupName group name
+     * @param groupType group type
      * @param desc description
-     * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
-    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
+    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, AlertType groupType, String desc) {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)){
             return result;
         }
+
 
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
 
@@ -162,10 +158,12 @@ public class AlertGroupService extends BaseService {
         if (StringUtils.isNotEmpty(groupName)) {
             alertGroup.setGroupName(groupName);
         }
+
+        if (groupType != null) {
+            alertGroup.setGroupType(groupType);
+        }
         alertGroup.setDescription(desc);
         alertGroup.setUpdateTime(now);
-        alertGroup.setCreateUserId(loginUser.getId());
-        alertGroup.setAlertInstanceIds(alertInstanceIds);
         // updateProcessInstance
         alertGroupMapper.updateById(alertGroup);
         putMsg(result, Status.SUCCESS);
@@ -185,7 +183,7 @@ public class AlertGroupService extends BaseService {
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)){
             return result;
         }
         //check exist
@@ -194,7 +192,53 @@ public class AlertGroupService extends BaseService {
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
         }
+
+        userAlertGroupService.deleteByAlertGroupId(id);
         alertGroupMapper.deleteById(id);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+
+    /**
+     * grant user
+     *
+     * @param loginUser login user
+     * @param alertgroupId alert group id
+     * @param userIds user id list
+     * @return grant result code
+     */
+    public Map<String, Object> grantUser(User loginUser, int alertgroupId, String userIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        //only admin can operate
+        if (checkAdmin(loginUser, result)){
+            return result;
+        }
+
+        userAlertGroupService.deleteByAlertGroupId(alertgroupId);
+        if (StringUtils.isEmpty(userIds)) {
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+
+        String[] userIdsArr = userIds.split(",");
+        Date now = new Date();
+        List<UserAlertGroup> alertGroups = new ArrayList<>(userIds.length());
+        for (String userId : userIdsArr) {
+            UserAlertGroup userAlertGroup = new UserAlertGroup();
+            userAlertGroup.setAlertgroupId(alertgroupId);
+            userAlertGroup.setUserId(Integer.parseInt(userId));
+            userAlertGroup.setCreateTime(now);
+            userAlertGroup.setUpdateTime(now);
+            alertGroups.add(userAlertGroup);
+        }
+
+        if (CollectionUtils.isNotEmpty(alertGroups)) {
+            userAlertGroupService.saveBatch(alertGroups);
+        }
+
         putMsg(result, Status.SUCCESS);
         return result;
     }

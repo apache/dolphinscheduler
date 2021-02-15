@@ -18,14 +18,14 @@
   <div class="list-model">
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
-        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="name" :label="$t('Name')"></el-table-column>
         <el-table-column :label="$t('Process Instance')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.processInstanceName }}</p>
               <div slot="reference" class="name-wrapper">
-                <a href="javascript:" class="links" @click="_go(scope.row)"><span class="ellipsis">{{scope.row.processInstanceName}}</span></a>
+                <a href="javascript:" class="links" @click="_go(scope.row)"><span class="ellipsis" :title="scope.row.processInstanceName">{{scope.row.processInstanceName}}</span></a>
               </div>
             </el-popover>
           </template>
@@ -117,23 +117,21 @@
         this.logDialog = true
       },
       ok () {},
+
       close () {
         this.logDialog = false
       },
+
       _forceSuccess (item) {
         this.forceTaskSuccess({ taskInstanceId: item.id }).then(res => {
           if (res.code === 0) {
             this.$message.success(res.msg)
-            setTimeout(this._onUpdate, 1000)
           } else {
             this.$message.error(res.msg)
           }
         }).catch(e => {
           this.$message.error(e.msg)
         })
-      },
-      _onUpdate () {
-        this.$emit('on-update')
       },
       _go (item) {
         this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })

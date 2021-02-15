@@ -46,13 +46,13 @@ public class BaseService {
     }
 
     /**
-     * isNotAdmin
+     * check admin
      *
      * @param loginUser login user
      * @param result result code
-     * @return true if not administrator, otherwise false
+     * @return true if administrator, otherwise false
      */
-    protected boolean isNotAdmin(User loginUser, Map<String, Object> result) {
+    protected boolean checkAdmin(User loginUser, Map<String, Object> result) {
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -111,6 +111,27 @@ public class BaseService {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * get cookie info by name
+     *
+     * @param request request
+     * @param name 'sessionId'
+     * @return get cookie info
+     */
+    public static Cookie getCookie(HttpServletRequest request, String name) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if (StringUtils.isNotEmpty(name) && name.equalsIgnoreCase(cookie.getName())) {
+                    return cookie;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

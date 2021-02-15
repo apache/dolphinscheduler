@@ -18,9 +18,7 @@
   <m-list-construction :title="$t('Cron Manage')">
     <template slot="operation">
       <span style=" float: right; padding-right:50px">
-        <el-tooltip :content="$t('Return')" placement="top">
-          <el-button type="primary" icon="el-icon-back" size="mini" @click="_close()"></el-button>
-        </el-tooltip>
+        <em class="el-icon-circle-close" style="font-size:20px " data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="_close()"></em>
       </span>
     </template>
     <template slot="content">

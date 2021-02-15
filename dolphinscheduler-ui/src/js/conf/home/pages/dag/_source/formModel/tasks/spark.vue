@@ -51,7 +51,7 @@
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
-      <div slot="text">{{$t('Main Class')}}</div>
+      <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
         <el-input
             :disabled="isDetails"
@@ -63,7 +63,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Main Jar Package')}}</div>
+      <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
         <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
@@ -81,7 +81,7 @@
       </div>
     </m-list-box>
     <m-list-4-box>
-      <div slot="text">{{$t('Driver Cores')}}</div>
+      <div slot="text">{{$t('Driver cores')}}</div>
       <div slot="content">
         <el-input
           :disabled="isDetails"
@@ -91,7 +91,7 @@
           :placeholder="$t('Please enter Driver cores')">
         </el-input>
       </div>
-      <div slot="text-2">{{$t('Driver Memory')}}</div>
+      <div slot="text-2">{{$t('Driver memory')}}</div>
       <div slot="content-2">
         <el-input
           :disabled="isDetails"
@@ -113,7 +113,7 @@
           :placeholder="$t('Please enter Executor number')">
         </el-input>
       </div>
-      <div slot="text-2">{{$t('Executor Memory')}}</div>
+      <div slot="text-2">{{$t('Executor memory')}}</div>
       <div slot="content-2">
         <el-input
           :disabled="isDetails"
@@ -125,7 +125,7 @@
       </div>
     </m-list-4-box>
     <m-list-4-box>
-      <div slot="text">{{$t('Executor Cores')}}</div>
+      <div slot="text">{{$t('Executor cores')}}</div>
       <div slot="content">
         <el-input
           :disabled="isDetails"
@@ -137,7 +137,7 @@
       </div>
     </m-list-4-box>
     <m-list-box>
-      <div slot="text">{{$t('Main Arguments')}}</div>
+      <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
         <el-input
             :autosize="{minRows:2}"
@@ -145,12 +145,12 @@
             type="textarea"
             size="small"
             v-model="mainArgs"
-            :placeholder="$t('Please enter main arguments')">
+            :placeholder="$t('Please enter Command-line parameters')">
         </el-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Option Parameters')}}</div>
+      <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
         <el-input
             :disabled="isDetails"
@@ -158,7 +158,7 @@
             type="textarea"
             size="small"
             v-model="others"
-            :placeholder="$t('Please enter option parameters')">
+            :placeholder="$t('Please enter other parameters')">
         </el-input>
       </div>
     </m-list-box>
@@ -213,19 +213,19 @@
         cacheResourceList: [],
         // Custom function
         localParams: [],
-        // Driver cores
+        // Driver Number of cores
         driverCores: 1,
-        // Driver memory
+        // Driver Number of memory
         driverMemory: '512M',
-        // Executor number
+        // Executor Number
         numExecutors: 2,
-        // Executor memory
+        // Executor Number of memory
         executorMemory: '2G',
-        // Executor cores
+        // Executor Number of cores
         executorCores: 2,
-        // Main arguments
+        // Command line argument
         mainArgs: '',
-        // Option parameters
+        // Other parameters
         others: '',
         // Program type
         programType: 'SCALA',
@@ -367,22 +367,33 @@
           return false
         }
 
-        if (!this.driverCores) {
-          this.$message.warning(`${i18n.$t('Please enter Driver cores')}`)
+        if (!this.numExecutors) {
+          this.$message.warning(`${i18n.$t('Please enter Executor number')}`)
           return false
         }
 
-        if (!Number.isInteger(parseInt(this.driverCores))) {
-          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
+        // noRes
+        if (this.noRes.length > 0) {
+          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
           return false
         }
 
-        if (!this.driverMemory) {
-          this.$message.warning(`${i18n.$t('Please enter Driver memory')}`)
+        if (!Number.isInteger(parseInt(this.numExecutors))) {
+          this.$message.warning(`${i18n.$t('The Executor Number should be a positive integer')}`)
           return false
         }
 
-        if (!Number.isInteger(parseInt(this.driverMemory))) {
+        if (!this.executorMemory) {
+          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
+          return false
+        }
+
+        if (!this.executorMemory) {
+          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
+          return false
+        }
+
+        if (!_.isNumber(parseInt(this.executorMemory))) {
           this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
           return false
         }
@@ -396,33 +407,6 @@
           this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
           return false
         }
-
-        if (!this.executorMemory) {
-          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
-          return false
-        }
-
-        if (!Number.isInteger(parseInt(this.executorMemory))) {
-          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
-          return false
-        }
-
-        if (!this.numExecutors) {
-          this.$message.warning(`${i18n.$t('Please enter Executor number')}`)
-          return false
-        }
-
-        if (!Number.isInteger(parseInt(this.numExecutors))) {
-          this.$message.warning(`${i18n.$t('The Executor number should be a positive integer')}`)
-          return false
-        }
-
-        // noRes
-        if (this.noRes.length > 0) {
-          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
-          return false
-        }
-
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false

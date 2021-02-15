@@ -21,8 +21,6 @@
         <template slot="button-group" v-if="isADMIN">
           <el-button size="mini" @click="_create('')">{{$t('Create queue')}}</el-button>
           <el-dialog
-            :title="item ? $t('Edit queue') : $t('Create queue')"
-            :v-if="createQueueDialog"
             :visible.sync="createQueueDialog"
             width="auto">
             <m-create-queue :item="item" @onUpdate="onUpdate" @close="close"></m-create-queue>

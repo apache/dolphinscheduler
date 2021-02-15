@@ -20,11 +20,12 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="groupName" :label="$t('Group Name')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Remarks')" width="200">
+        <el-table-column :label="$t('Group Type')" width="100">
           <template slot-scope="scope">
-            <span>{{scope.row.description | filterNull}}</span>
+            {{scope.row.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}
           </template>
         </el-table-column>
+        <el-table-column prop="description" :label="$t('Remarks')" width="200"></el-table-column>
         <el-table-column :label="$t('Create Time')" width="140">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
@@ -37,6 +38,9 @@
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="130">
           <template slot-scope="scope">
+            <el-tooltip :content="$t('Managing Users')" placement="top">
+              <el-button type="primary" size="mini" icon="el-icon-user" @click="_mangeUser(scope.row, scope.$index)" circle></el-button>
+            </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
@@ -49,17 +53,25 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" :disabled="scope.row.id==1?true: false"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="transferDialog"
+      width="auto">
+      <m-transfer :transferData="transferData" @onUpdate="onUpdate" @close="close"></m-transfer>
+    </el-dialog>
   </div>
 </template>
 <script>
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
+  import mTransfer from '@/module/components/transfer/transfer'
 
   export default {
     name: 'user-list',
@@ -67,7 +79,14 @@
       return {
         list: [],
         transferDialog: false,
-        item: {}
+        item: {},
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: `${i18n.$t('Managing Users')}`
+          }
+        }
       }
     },
     props: {
@@ -76,7 +95,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteAlertgrou', 'grantAuthorization']),
+      ...mapActions('security', ['deleteAlertgrou', 'getAuthList', 'grantAuthorization']),
       _delete (item, i) {
         this.deleteAlertgrou({
           id: item.id
@@ -89,6 +108,30 @@
       },
       _edit (item) {
         this.$emit('on-edit', item)
+      },
+      _mangeUser (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'user',
+          category: 'users'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.userName
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.userName
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferDialog = true
+        })
       },
       onUpdate (userIds) {
         this._grantAuthorization('alert-group/grant-user', {
@@ -125,6 +168,6 @@
     },
     mounted () {
     },
-    components: {}
+    components: { mTransfer }
   }
 </script>

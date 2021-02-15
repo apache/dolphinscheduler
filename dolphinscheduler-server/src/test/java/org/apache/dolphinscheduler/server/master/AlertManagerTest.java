@@ -19,11 +19,9 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.junit.Ignore;
@@ -52,9 +50,6 @@ public class AlertManagerTest {
 
     @Autowired
     TaskInstanceMapper taskInstanceMapper;
-
-    @Autowired
-    ProjectMapper projectMapper;
 
     AlertManager alertManager;
 
@@ -95,6 +90,7 @@ public class AlertManagerTest {
         ProcessDefinition processDefinition = processDefinitionMapper.selectById(47);
         processInstance.setProcessDefinition(processDefinition);
 
+
         // fault task instance
         TaskInstance toleranceTask1 = taskInstanceMapper.selectById(5038);
         toleranceTask1.setState(ExecutionStatus.FAILURE);
@@ -105,9 +101,7 @@ public class AlertManagerTest {
         toleranceTaskList.add(toleranceTask1);
         toleranceTaskList.add(toleranceTask2);
 
-        ProjectUser projectUser = projectMapper.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-
-        alertManager.sendAlertProcessInstance(processInstance, toleranceTaskList, projectUser);
+        alertManager.sendAlertProcessInstance(processInstance, toleranceTaskList);
     }
 
 }

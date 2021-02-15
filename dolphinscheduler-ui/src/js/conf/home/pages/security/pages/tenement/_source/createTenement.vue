@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 <template>
-  <m-popover
-          ref="popover"
+  <m-popup
+          ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
+          :nameText="item ? $t('Edit Tenant') : $t('Create Tenant')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -61,13 +62,13 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popover>
+  </m-popup>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopover from '@/module/components/popup/popover'
+  import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   export default {
     name: 'create-tenement',
@@ -140,14 +141,16 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs.popover.spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         this.store.dispatch(`security/${this.item ? 'updateQueue' : 'createQueue'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          this.$refs.popover.spinnerLoading = false
+          setTimeout(() => {
+            this.$refs.popup.spinnerLoading = false
+          }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popover.spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
       close () {
@@ -169,6 +172,6 @@
     },
     mounted () {
     },
-    components: { mPopover, mListBoxF }
+    components: { mPopup, mListBoxF }
   }
 </script>

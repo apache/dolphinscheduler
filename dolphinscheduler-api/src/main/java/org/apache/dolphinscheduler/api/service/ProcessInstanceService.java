@@ -66,13 +66,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -189,7 +187,8 @@ public class ProcessInstanceService extends BaseService {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
 
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
-        processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
+        processInstance.setReceivers(processDefinition.getReceivers());
+        processInstance.setReceiversCc(processDefinition.getReceiversCc());
         result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
@@ -428,9 +427,10 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
         Date schedule = null;
-        schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
+        } else {
+            schedule = processInstance.getScheduleTime();
         }
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
@@ -449,7 +449,7 @@ public class ProcessInstanceService extends BaseService {
 
             originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
             List<Property> globalParamList = processData.getGlobalParams();
-            Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
                     processInstance.getCmdTypeIfComplement(), schedule);
             timeout = processData.getTimeout();
@@ -459,18 +459,13 @@ public class ProcessInstanceService extends BaseService {
             if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
-            // get the processinstancejson before saving,and then save the name and taskid
-            String oldJson = processInstance.getProcessInstanceJson();
-            if (StringUtils.isNotEmpty(oldJson)) {
-                processInstanceJson = processService.changeJson(processData,oldJson);
-            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
 
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
-        if (Boolean.TRUE.equals(syncDefine)) {
+        if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);
