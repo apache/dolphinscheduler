@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 <template>
-  <m-popover
-          ref="popover"
+  <m-popup
+          ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
+          :nameText="item ? $t('Edit User') : $t('Create User')"
           @ok="_ok"
           @close="close">
     <template slot="content">
@@ -29,7 +30,6 @@
                     type="input"
                     v-model="userName"
                     maxlength="60"
-                    size="small"
                     :placeholder="$t('Please enter user name')">
             </el-input>
           </template>
@@ -40,7 +40,6 @@
             <el-input
                     type="password"
                     v-model="userPassword"
-                    size="small"
                     :placeholder="$t('Please enter your password')">
             </el-input>
           </template>
@@ -81,7 +80,6 @@
             <el-input
                     type="input"
                     v-model="email"
-                    size="small"
                     :placeholder="$t('Please enter email')">
             </el-input>
           </template>
@@ -92,7 +90,6 @@
             <el-input
                     type="input"
                     v-model="phone"
-                    size="small"
                     :placeholder="$t('Please enter phone number')">
             </el-input>
           </template>
@@ -108,14 +105,14 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popover>
+  </m-popup>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import router from '@/conf/home/router'
-  import mPopover from '@/module/components/popup/popover'
+  import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -239,16 +236,14 @@
               }
             })
             this.$nextTick(() => {
-              if (this.tenantList.length) {
-                this.tenantId = this.tenantList[0].id
-              }
+              this.tenantId = this.tenantList[0].id
             })
             resolve()
           })
         })
       },
       _submit () {
-        this.$refs.popover.spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
 
         let queueCode = ''
         // get queue code
@@ -270,12 +265,14 @@
         }
 
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
-          this.$refs.popover.spinnerLoading = false
+          setTimeout(() => {
+            this.$refs.popup.spinnerLoading = false
+          }, 800)
           this.$emit('onUpdate', param)
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popover.spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
       close () {
@@ -293,14 +290,9 @@
             this.email = this.item.email
             this.phone = this.item.phone
             this.userState = this.item.state + '' || '1'
-            if (this.item.tenantName) {
-              this.tenantId = this.item.tenantId
-            }
+            this.tenantId = this.item.tenantId
             this.$nextTick(() => {
-              let queue = _.find(this.queueList, ['code', this.item.queue])
-              if (queue) {
-                this.queueName = queue.id || ''
-              }
+              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id || ''
             })
           }
         })
@@ -311,14 +303,9 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.userState = this.state + '' || '1'
-          if (this.item.tenantName) {
-            this.tenantId = this.item.tenantId
-          }
+          this.tenantId = this.item.tenantId
           if (this.queueList.length > 0) {
-            let queue = _.find(this.queueList, ['code', this.item.queue])
-            if (queue) {
-              this.queueName = queue.id || ''
-            }
+            this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
           } else {
             this.queueName = ''
           }
@@ -328,6 +315,6 @@
     mounted () {
 
     },
-    components: { mPopover, mListBoxF }
+    components: { mPopup, mListBoxF }
   }
 </script>

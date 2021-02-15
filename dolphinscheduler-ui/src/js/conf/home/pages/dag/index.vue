@@ -41,7 +41,7 @@
     methods: {
       ...mapMutations('dag', ['resetParams']),
       ...mapActions('dag', ['getProcessList', 'getProjectList', 'getResourcesList', 'getResourcesListJar', 'getResourcesListJar']),
-      ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll', 'getAlarmGroupsAll']),
+      ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll']),
       /**
        * init
        */
@@ -63,8 +63,6 @@
           this.getResourcesListJar(),
           // get worker group list
           this.getWorkerGroupsAll(),
-          // get alarm group list
-          this.getAlarmGroupsAll(),
           this.getTenantList()
         ]).then((data) => {
           this.isLoading = false

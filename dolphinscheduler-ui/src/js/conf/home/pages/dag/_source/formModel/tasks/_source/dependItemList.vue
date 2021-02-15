@@ -16,21 +16,26 @@
  */
 <template>
   <div class="dep-list-model">
-    <div v-for="(el,$index) in dependItemList" :key='$index' @click="itemIndex = $index">
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectId" @change="_onChangeProjectId" size="small">
-        <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+    <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
+      <el-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.projectId" @change="_onChangeProjectId" size="small">
+        <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
       </el-select>
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionId" @change="_onChangeDefinitionId" size="small">
-        <el-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      <el-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.definitionId" @change="_onChangeDefinitionId" size="small">
+        <el-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
       </el-select>
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.depTasks" size="small">
-        <el-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item"></el-option>
+      <el-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.depTasks" size="small">
+        <el-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item">
+        </el-option>
       </el-select>
-      <el-select v-model="el.cycle" :disabled="isDetails" @change="_onChangeCycle" size="small">
-        <el-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      <el-select style="width: 150px;" v-model="el.cycle" :disabled="isDetails" @change="_onChangeCycle">
+        <el-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
       </el-select>
-      <el-select v-model="el.dateValue" :disabled="isDetails" size="small">
-        <el-option v-for="item in el.dateValueList || []" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      <el-select style="width: 116px;" v-model="el.dateValue" :disabled="isDetails">
+        <el-option v-for="item in el.dateValueList || []" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
       </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
@@ -50,7 +55,6 @@
     </div>
   </div>
 </template>
-
 <script>
   import _ from 'lodash'
   import { cycleList, dateValueList } from './commcon'
@@ -105,7 +109,6 @@
        * remove task
        */
       _remove (i) {
-        // this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
@@ -291,7 +294,6 @@
     .list {
       margin-bottom: 6px;
       .operation {
-        width: 80px;
         padding-left: 4px;
         a {
           i {

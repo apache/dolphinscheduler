@@ -81,28 +81,24 @@
       </el-table>
     </div>
     <el-dialog
-      v-if="authProjectDialog"
       :visible.sync="authProjectDialog"
       width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthProject="onUpdateAuthProject" @closeAuthProject="closeAuthProject"></m-transfer>
     </el-dialog>
 
     <el-dialog
-      v-if="authDataSourceDialog"
       :visible.sync="authDataSourceDialog"
       width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthDataSource="onUpdateAuthDataSource" @closeAuthDataSource="closeAuthDataSource"></m-transfer>
     </el-dialog>
 
     <el-dialog
-      v-if="authUdfFuncDialog"
       :visible.sync="authUdfFuncDialog"
       width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthUdfFunc="onUpdateAuthUdfFunc" @closeAuthUdfFunc="closeAuthUdfFunc"></m-transfer>
     </el-dialog>
 
     <el-dialog
-      v-if="resourceDialog"
       :visible.sync="resourceDialog"
       width="auto">
       <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>

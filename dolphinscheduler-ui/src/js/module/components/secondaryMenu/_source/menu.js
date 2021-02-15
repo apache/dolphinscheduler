@@ -26,7 +26,7 @@ const menu = {
       id: 0,
       path: 'projects-index',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'ri-home-4-line',
       children: []
     },
@@ -35,7 +35,7 @@ const menu = {
       id: 1,
       path: 'projects-kinship',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'ri-node-tree',
       children: []
     },
@@ -44,38 +44,38 @@ const menu = {
       id: 2,
       path: '',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-s-tools',
       children: [
         {
           name: `${i18n.$t('Process definition')}`,
           path: 'definition',
           id: 0,
-          enabled: true
+          disabled: true
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 1,
-          enabled: true
+          disabled: true
         },
         {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
           id: 2,
-          enabled: true
+          disabled: true
         },
         {
           name: `${i18n.$t('Task record')}`,
           path: 'task-record',
           id: 3,
-          enabled: config.recordSwitch
+          disabled: config.recordSwitch
         },
         {
           name: `${i18n.$t('History task record')}`,
           path: 'history-task-record',
           id: 4,
-          enabled: config.recordSwitch
+          disabled: config.recordSwitch
         }
       ]
     }
@@ -87,7 +87,7 @@ const menu = {
       id: 0,
       path: 'tenement-manage',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-user-solid',
       children: []
     },
@@ -96,7 +96,7 @@ const menu = {
       id: 1,
       path: 'users-manage',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-user-solid',
       children: []
     },
@@ -105,17 +105,8 @@ const menu = {
       id: 2,
       path: 'warning-groups-manage',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-warning',
-      children: []
-    },
-    {
-      name: `${i18n.$t('Warning instance manage')}`,
-      id: 2,
-      path: 'warning-instance-manage',
-      isOpen: true,
-      enabled: true,
-      icon: 'el-icon-warning-outline',
       children: []
     },
     {
@@ -123,7 +114,7 @@ const menu = {
       id: 4,
       path: 'worker-groups-manage',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-s-custom',
       children: []
     },
@@ -132,8 +123,8 @@ const menu = {
       id: 3,
       path: 'queue-manage',
       isOpen: true,
-      enabled: true,
-      icon: 'el-icon-s-grid',
+      disabled: true,
+      icon: 'ri-group-line',
       children: []
     },
     {
@@ -143,7 +134,7 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-document',
       children: [],
-      enabled: true
+      disabled: true
     }
   ],
   resource: [
@@ -154,7 +145,7 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-document-copy',
       children: [],
-      enabled: true
+      disabled: true
     },
     {
       name: `${i18n.$t('UDF manage')}`,
@@ -162,19 +153,19 @@ const menu = {
       path: '',
       isOpen: true,
       icon: 'el-icon-document',
-      enabled: true,
+      disabled: true,
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
           path: 'resource-udf',
           id: 0,
-          enabled: true
+          disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
           path: 'resource-func',
           id: 1,
-          enabled: true
+          disabled: true
         }
       ]
     }
@@ -187,7 +178,7 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-user-solid',
       children: [],
-      enabled: true
+      disabled: true
     },
     {
       name: `${i18n.$t('Edit password')}`,
@@ -196,7 +187,7 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-key',
       children: [],
-      enabled: true
+      disabled: true
     },
     {
       name: `${i18n.$t('Token manage')}`,
@@ -205,7 +196,7 @@ const menu = {
       isOpen: true,
       icon: 'el-icon-s-custom',
       children: [],
-      enabled: Permissions.getAuth()
+      disabled: Permissions.getAuth()
     }
   ],
   monitor: [
@@ -214,32 +205,32 @@ const menu = {
       id: 1,
       path: '',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-menu',
       children: [
         {
           name: 'Master',
           path: 'servers-master',
           id: 0,
-          enabled: true
+          disabled: true
         },
         {
           name: 'Worker',
           path: 'servers-worker',
           id: 1,
-          enabled: true
+          disabled: true
         },
         {
           name: 'Zookeeper',
           path: 'servers-zookeeper',
           id: 4,
-          enabled: true
+          disabled: true
         },
         {
           name: 'DB',
           path: 'servers-db',
           id: 6,
-          enabled: true
+          disabled: true
         }
       ]
     },
@@ -248,14 +239,14 @@ const menu = {
       id: 0,
       path: '',
       isOpen: true,
-      enabled: true,
+      disabled: true,
       icon: 'el-icon-menu',
       children: [
         {
           name: 'Statistics',
           path: 'statistics',
           id: 0,
-          enabled: true
+          disabled: true
         }
       ]
     }

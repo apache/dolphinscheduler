@@ -77,22 +77,4 @@ public class StringUtilsTest {
         String result4 = StringUtils.replaceNRTtoUnderline(null);
         Assert.assertNull(result4);
     }
-
-    @Test
-    public void testTrim() {
-        String trim = StringUtils.trim(null);
-        Assert.assertNull(trim);
-
-        trim = StringUtils.trim(" test ");
-        Assert.assertEquals("test", trim);
-    }
-
-    @Test
-    public void testDefaultIfBlank() {
-        String defaultStr = StringUtils.defaultIfBlank("", "defaultStr");
-        Assert.assertEquals("defaultStr", defaultStr);
-
-        defaultStr = StringUtils.defaultIfBlank("test", "defaultStr");
-        Assert.assertEquals("test", defaultStr);
-    }
 }

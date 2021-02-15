@@ -21,11 +21,9 @@
         <template slot="button-group" v-if="isADMIN">
           <el-button size="mini" @click="_create('')">{{$t('Create alarm group')}}</el-button>
           <el-dialog
-            :title="item ? $t('Edit alarm group') : $t('Create alarm group')"
-            v-if="createWarningDialog"
             :visible.sync="createWarningDialog"
             width="auto">
-            <m-create-warning :item="item" :allAlertPluginInstance="allAlertPluginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning>
+            <m-create-warning :item="item" @onUpdate="onUpdate" @close="close"></m-create-warning>
           </el-dialog>
         </template>
       </m-conditions>
@@ -85,14 +83,13 @@
         isLeft: true,
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
         createWarningDialog: false,
-        item: {},
-        allAlertPluginInstance: []
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['queryAlertGroupListPaging', 'queryAllAlertPluginInstance']),
+      ...mapActions('security', ['getAlertgroupP']),
       /**
        * Inquire
        */
@@ -113,11 +110,6 @@
         this._create(item)
       },
       _create (item) {
-        this.queryAllAlertPluginInstance().then(res => {
-          this.allAlertPluginInstance = res
-        }).catch(e => {
-          this.$message.error(e.msg)
-        })
         this.item = item
         this.createWarningDialog = true
       },
@@ -138,7 +130,7 @@
           this.isLeft = true
         }
         this.isLoading = !flag
-        this.queryAlertGroupListPaging(this.searchParams).then(res => {
+        this.getAlertgroupP(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {

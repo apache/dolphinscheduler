@@ -89,7 +89,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
 
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)) {
             return result;
         }
 
@@ -134,14 +134,14 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)) {
             return result;
         }
 
@@ -174,7 +174,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)) {
             return result;
         }
 
@@ -227,7 +227,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * delete tenant
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      * @throws Exception exception
      */
@@ -235,7 +235,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
 
-        if (isNotAdmin(loginUser, result)) {
+        if (checkAdmin(loginUser, result)) {
             return result;
         }
 

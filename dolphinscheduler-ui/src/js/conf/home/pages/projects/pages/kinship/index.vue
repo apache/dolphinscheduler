@@ -99,10 +99,11 @@
         })
       },
       async onChange (item) {
+        const { value, label } = item || {}
         this.isLoading = true
-        this.currentItemName = item
+        this.currentItemName = label
         try {
-          await this.getWorkFlowDAG(item)
+          await this.getWorkFlowDAG(value)
         } catch (error) {
           this.$message.error(error.msg || '')
         }

@@ -21,8 +21,6 @@
         <template slot="button-group" v-if="userList.length">
           <el-button size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
           <el-dialog
-            :title="item ? $t('Edit User') : $t('Create User')"
-            v-if="createUserDialog"
             :visible.sync="createUserDialog"
             width="auto">
             <m-create-user :item="item" @onUpdate="onUpdate" @close="close"></m-create-user>

@@ -35,8 +35,7 @@ const router = new Router({
       name: 'home',
       component: resolve => require(['../pages/home/index'], resolve),
       meta: {
-        title: `${i18n.$t('Home')} - DolphinScheduler`,
-        refresh_in_switched_tab: true
+        title: `${i18n.$t('Home')} - DolphinScheduler`
       }
     },
     {
@@ -55,8 +54,7 @@ const router = new Router({
           name: 'projects-index',
           component: resolve => require(['../pages/projects/pages/index/index'], resolve),
           meta: {
-            title: `${i18n.$t('Project Home')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Project Home')}`
           }
         },
         {
@@ -64,8 +62,7 @@ const router = new Router({
           name: 'projects-kinship',
           component: resolve => require(['../pages/projects/pages/kinship/index'], resolve),
           meta: {
-            title: `${i18n.$t('Kinship')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Kinship')}`
           }
         },
         {
@@ -73,8 +70,7 @@ const router = new Router({
           name: 'projects-list',
           component: resolve => require(['../pages/projects/pages/list/index'], resolve),
           meta: {
-            title: `${i18n.$t('Project')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Project')}`
           }
         },
         {
@@ -82,8 +78,7 @@ const router = new Router({
           name: 'definition',
           component: resolve => require(['../pages/projects/pages/definition/index'], resolve),
           meta: {
-            title: `${i18n.$t('Process definition')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Process definition')}`
           },
           redirect: {
             name: 'projects-definition-list'
@@ -94,8 +89,7 @@ const router = new Router({
               name: 'projects-definition-list',
               component: resolve => require(['../pages/projects/pages/definition/pages/list/index'], resolve),
               meta: {
-                title: `${i18n.$t('Process definition')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('Process definition')}`
               }
             },
             {
@@ -103,8 +97,7 @@ const router = new Router({
               name: 'projects-definition-details',
               component: resolve => require(['../pages/projects/pages/definition/pages/details/index'], resolve),
               meta: {
-                title: `${i18n.$t('Process definition details')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('Process definition details')}`
               }
             },
             {
@@ -120,8 +113,7 @@ const router = new Router({
               name: 'definition-tree-view-index',
               component: resolve => require(['../pages/projects/pages/definition/pages/tree/index'], resolve),
               meta: {
-                title: `${i18n.$t('TreeView')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('TreeView')}`
               }
             },
             {
@@ -129,8 +121,7 @@ const router = new Router({
               name: 'definition-timing-details',
               component: resolve => require(['../pages/projects/pages/definition/timing/index'], resolve),
               meta: {
-                title: `${i18n.$t('Scheduled task list')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('Scheduled task list')}`
               }
             }
           ]
@@ -151,8 +142,7 @@ const router = new Router({
               name: 'projects-instance-list',
               component: resolve => require(['../pages/projects/pages/instance/pages/list/index'], resolve),
               meta: {
-                title: `${i18n.$t('Process Instance')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('Process Instance')}`
               }
             },
             {
@@ -160,8 +150,7 @@ const router = new Router({
               name: 'projects-instance-details',
               component: resolve => require(['../pages/projects/pages/instance/pages/details/index'], resolve),
               meta: {
-                title: `${i18n.$t('Process instance details')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('Process instance details')}`
               }
             },
             {
@@ -169,8 +158,7 @@ const router = new Router({
               name: 'instance-gantt-index',
               component: resolve => require(['../pages/projects/pages/instance/pages/gantt/index'], resolve),
               meta: {
-                title: `${i18n.$t('Gantt')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('Gantt')}`
               }
             }
           ]
@@ -180,8 +168,7 @@ const router = new Router({
           name: 'task-instance',
           component: resolve => require(['../pages/projects/pages/taskInstance'], resolve),
           meta: {
-            title: `${i18n.$t('Task Instance')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Task Instance')}`
           }
 
         },
@@ -190,8 +177,7 @@ const router = new Router({
           name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),
           meta: {
-            title: `${i18n.$t('Task record')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Task record')}`
           }
         },
         {
@@ -199,8 +185,7 @@ const router = new Router({
           name: 'history-task-record',
           component: resolve => require(['../pages/projects/pages/historyTaskRecord'], resolve),
           meta: {
-            title: `${i18n.$t('History task record')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('History task record')}`
           }
 
         }
@@ -214,8 +199,7 @@ const router = new Router({
         name: 'file'
       },
       meta: {
-        title: `${i18n.$t('Resources')}`,
-        refresh_in_switched_tab: true
+        title: `${i18n.$t('Resources')}`
       },
       children: [
         {
@@ -223,8 +207,7 @@ const router = new Router({
           name: 'file',
           component: resolve => require(['../pages/resource/pages/file/pages/list/index'], resolve),
           meta: {
-            title: `${i18n.$t('File Manage')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -248,8 +231,7 @@ const router = new Router({
           name: 'resource-file-subFileFolder',
           component: resolve => require(['../pages/resource/pages/file/pages/subFileFolder/index'], resolve),
           meta: {
-            title: `${i18n.$t('Create Resource')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Create Resource')}`
           }
         },
         {
@@ -257,8 +239,7 @@ const router = new Router({
           name: 'resource-file-subFile',
           component: resolve => require(['../pages/resource/pages/file/pages/subFile/index'], resolve),
           meta: {
-            title: `${i18n.$t('Create Resource')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Create Resource')}`
           }
         },
         {
@@ -266,8 +247,7 @@ const router = new Router({
           name: 'resource-file-details',
           component: resolve => require(['../pages/resource/pages/file/pages/details/index'], resolve),
           meta: {
-            title: `${i18n.$t('File Details')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('File Details')}`
           }
         },
         {
@@ -275,8 +255,7 @@ const router = new Router({
           name: 'resource-file-subdirectory',
           component: resolve => require(['../pages/resource/pages/file/pages/subdirectory/index'], resolve),
           meta: {
-            title: `${i18n.$t('File Manage')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -292,8 +271,7 @@ const router = new Router({
           name: 'udf',
           component: resolve => require(['../pages/resource/pages/udf/index'], resolve),
           meta: {
-            title: `${i18n.$t('UDF manage')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('UDF manage')}`
           },
           children: [
             {
@@ -301,8 +279,7 @@ const router = new Router({
               name: 'resource-udf',
               component: resolve => require(['../pages/resource/pages/udf/pages/resource/index'], resolve),
               meta: {
-                title: `${i18n.$t('UDF Resources')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('UDF Resources')}`
               }
             },
             {
@@ -310,8 +287,7 @@ const router = new Router({
               name: 'resource-udf-subUdfDirectory',
               component: resolve => require(['../pages/resource/pages/udf/pages/subUdfDirectory/index'], resolve),
               meta: {
-                title: `${i18n.$t('UDF Resources')}`,
-                refresh_in_switched_tab: true
+                title: `${i18n.$t('UDF Resources')}`
               }
             },
             {
@@ -387,8 +363,7 @@ const router = new Router({
           name: 'users-manage',
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
-            title: `${i18n.$t('User Manage')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('User Manage')}`
           }
         },
         {
@@ -397,14 +372,6 @@ const router = new Router({
           component: resolve => require(['../pages/security/pages/warningGroups/index'], resolve),
           meta: {
             title: `${i18n.$t('Warning group manage')}`
-          }
-        },
-        {
-          path: '/security/warning-instance',
-          name: 'warning-instance-manage',
-          component: resolve => require(['../pages/security/pages/warningInstance/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Warning instance manage')}`
           }
         },
         {
@@ -486,8 +453,7 @@ const router = new Router({
           name: 'servers-master',
           component: resolve => require(['../pages/monitor/pages/servers/master'], resolve),
           meta: {
-            title: `${i18n.$t('Service-Master')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Service-Master')}`
           }
         },
         {
@@ -495,8 +461,7 @@ const router = new Router({
           name: 'servers-worker',
           component: resolve => require(['../pages/monitor/pages/servers/worker'], resolve),
           meta: {
-            title: `${i18n.$t('Service-Worker')}`,
-            refresh_in_switched_tab: true
+            title: `${i18n.$t('Service-Worker')}`
           }
         },
         {
@@ -504,8 +469,7 @@ const router = new Router({
           name: 'servers-alert',
           component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
           meta: {
-            title: 'Alert',
-            refresh_in_switched_tab: true
+            title: 'Alert'
           }
         },
         {
@@ -513,8 +477,7 @@ const router = new Router({
           name: 'servers-rpcserver',
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
-            title: 'Rpcserver',
-            refresh_in_switched_tab: true
+            title: 'Rpcserver'
           }
         },
         {
@@ -522,8 +485,7 @@ const router = new Router({
           name: 'servers-zookeeper',
           component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
           meta: {
-            title: 'Zookeeper',
-            refresh_in_switched_tab: true
+            title: 'Zookeeper'
           }
         },
         {
@@ -531,8 +493,7 @@ const router = new Router({
           name: 'servers-apiserver',
           component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
           meta: {
-            title: 'Apiserver',
-            refresh_in_switched_tab: true
+            title: 'Apiserver'
           }
         },
         {
@@ -540,8 +501,7 @@ const router = new Router({
           name: 'servers-db',
           component: resolve => require(['../pages/monitor/pages/servers/db'], resolve),
           meta: {
-            title: 'DB',
-            refresh_in_switched_tab: true
+            title: 'DB'
           }
         },
         {
@@ -549,19 +509,13 @@ const router = new Router({
           name: 'statistics',
           component: resolve => require(['../pages/monitor/pages/servers/statistics'], resolve),
           meta: {
-            title: 'statistics',
-            refresh_in_switched_tab: true
+            title: 'statistics'
           }
         }
       ]
     }
   ]
 })
-
-const VueRouterPush = Router.prototype.push
-Router.prototype.push = function push (to) {
-  return VueRouterPush.call(this, to).catch(err => err)
-}
 
 router.beforeEach((to, from, next) => {
   const $body = $('body')

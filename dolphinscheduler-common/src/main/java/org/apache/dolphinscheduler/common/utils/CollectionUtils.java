@@ -263,13 +263,13 @@ public class CollectionUtils {
         }
         Map<String, Object> instanceMap;
         for (T instance : originList) {
-            BeanMap beanMap = new BeanMap(instance);
+            Map<String, Object> dataMap = new BeanMap(instance);
             instanceMap = new LinkedHashMap<>(16, 0.75f, true);
-            for (Map.Entry<Object, Object> entry : beanMap.entrySet()) {
+            for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
                 if (exclusionSet.contains(entry.getKey())) {
                     continue;
                 }
-                instanceMap.put((String) entry.getKey(), entry.getValue());
+                instanceMap.put(entry.getKey(), entry.getValue());
             }
             instanceList.add(instanceMap);
         }

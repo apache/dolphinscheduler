@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.service.quartz;
+
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -25,9 +25,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.Date;
-
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -36,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.Date;
 
 /**
  * process schedule job
@@ -47,7 +46,7 @@ public class ProcessScheduleJob implements Job {
      */
     private static final Logger logger = LoggerFactory.getLogger(ProcessScheduleJob.class);
 
-    public ProcessService getProcessService() {
+    public ProcessService getProcessService(){
         return SpringApplicationContext.getBean(ProcessService.class);
     }
 
@@ -67,7 +66,9 @@ public class ProcessScheduleJob implements Job {
         int projectId = dataMap.getInt(Constants.PROJECT_ID);
         int scheduleId = dataMap.getInt(Constants.SCHEDULE_ID);
 
+
         Date scheduledFireTime = context.getScheduledFireTime();
+
 
         Date fireTime = context.getFireTime();
 
@@ -81,10 +82,11 @@ public class ProcessScheduleJob implements Job {
             return;
         }
 
+
         ProcessDefinition processDefinition = getProcessService().findProcessDefineById(schedule.getProcessDefinitionId());
         // release state : online/offline
         ReleaseState releaseState = processDefinition.getReleaseState();
-        if (releaseState == ReleaseState.OFFLINE) {
+        if (processDefinition == null || releaseState == ReleaseState.OFFLINE) {
             logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processId:{}", projectId, scheduleId);
             return;
         }
@@ -104,6 +106,7 @@ public class ProcessScheduleJob implements Job {
 
         getProcessService().createCommand(command);
     }
+
 
     /**
      * delete job
