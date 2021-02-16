@@ -257,6 +257,11 @@ public class JSONUtils {
         return null;
     }
 
+    /**
+     *  json to List<Map<K, V>>
+     * @param json json string
+     * @return
+     */
     public static <K, V> List<Map<K, V>> toMapList(String json) {
         if (StringUtils.isEmpty(json)) {
             return null;
@@ -271,6 +276,7 @@ public class JSONUtils {
 
         return null;
     }
+
     /**
      * object to json string
      *

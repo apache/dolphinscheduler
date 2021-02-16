@@ -253,7 +253,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     }
 
     /**
-     * parseToPluginUiParams
+     * parse To Plugin Ui Params
      *
      * @param pluginParamsMapString k-v data
      * @param pluginUiParams Complete parameters(include ui)

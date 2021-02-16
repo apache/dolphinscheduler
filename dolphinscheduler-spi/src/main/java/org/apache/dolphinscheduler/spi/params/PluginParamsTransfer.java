@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
+
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -49,17 +52,31 @@ public class PluginParamsTransfer {
         return paramsMap;
     }
 
+    /**
+     * generate Plugin Params
+     *
+     * @param paramsJsonStr paramsJsonStr value
+     * @param pluginParamsTemplate pluginParamsTemplate
+     * @return return plugin params value
+     */
     public static List<Map<String, Object>> generatePluginParams(String paramsJsonStr, String pluginParamsTemplate) {
         Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr);
         return generatePluginParams(paramsMap, pluginParamsTemplate);
     }
 
+    /**
+     * generate Plugin Params
+     *
+     * @param paramsMap paramsMap
+     * @param pluginParamsTemplate pluginParamsTemplate
+     * @return return plugin params value
+     */
     public static List<Map<String, Object>> generatePluginParams(Map<String, Object> paramsMap, String pluginParamsTemplate) {
         if (paramsMap == null || paramsMap.isEmpty()) {
             return null;
         }
-        List<Map<Object, Object>> pluginParamsList = JSONUtils.toMapList(pluginParamsTemplate);
-        pluginParamsList.forEach(pluginParams -> pluginParams.put("value", paramsMap.get(pluginParams.get("field"))));
+        List<Map<String, Object>> pluginParamsList = JSONUtils.toMapList(pluginParamsTemplate);
+        pluginParamsList.forEach(pluginParams -> pluginParams.put(STRING_PLUGIN_PARAM_VALUE, paramsMap.get(pluginParams.get(STRING_PLUGIN_PARAM_FIELD))));
         return pluginParamsList;
     }
 }

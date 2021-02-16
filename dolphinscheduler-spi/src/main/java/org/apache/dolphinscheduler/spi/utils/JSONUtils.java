@@ -24,11 +24,13 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -122,6 +124,48 @@ public class JSONUtils {
         }
 
         return Collections.emptyList();
+    }
+
+    /**
+     * json to map
+     * <p>
+     *
+     * @param json json
+     * @return json to map
+     */
+    public static <K, V> Map<K, V> toMap(String json) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
+            });
+        } catch (Exception e) {
+            logger.error("json to map exception!", e);
+        }
+
+        return null;
+    }
+
+    /**
+     *  json to List<Map<K, V>>
+     * @param json json string
+     * @return
+     */
+    public static <K, V> List<Map<K, V>> toMapList(String json) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<Map<K, V>>>() {
+            });
+        } catch (Exception e) {
+            logger.error("json to map exception!", e);
+        }
+
+        return null;
     }
 
     /**
