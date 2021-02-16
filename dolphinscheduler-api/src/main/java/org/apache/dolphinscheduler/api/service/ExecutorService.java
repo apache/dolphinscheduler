@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
@@ -261,8 +262,8 @@ public class ExecutorService extends BaseService {
         //get the startParams user specified at the first starting while repeat running is needed
         Map<String, Object> commandMap = JSONUtils.toMap(processInstance.getCommandParam(), String.class, Object.class);
         String startParams = null;
-        if (CollectionUtils.isNotEmpty((Collection) commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
-            startParams = JSONUtils.toJsonString(commandMap.get(Constants.CMD_PARAM_START_PARAMS));
+        if (MapUtils.isNotEmpty(commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
+            startParams = (commandMap.get(Constants.CMD_PARAM_START_PARAMS)).toString();
         }
 
         switch (executeType) {
