@@ -582,7 +582,7 @@ CREATE TABLE `t_ds_process_instance` (
   `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
   `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',
   `run_times` int(11) DEFAULT NULL COMMENT 'process instance run times',
-  `host` varchar(45) DEFAULT NULL COMMENT 'process instance host',
+  `host` varchar(135) DEFAULT NULL COMMENT 'process instance host',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type. 0: only current node,1:before the node,2:later nodes',
@@ -692,7 +692,7 @@ DROP TABLE IF EXISTS `t_ds_relation_project_user`;
 CREATE TABLE `t_ds_relation_project_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
-  `project_id` int(11) DEFAULT NULL COMMENT 'project id',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
   `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
@@ -819,7 +819,7 @@ CREATE TABLE `t_ds_task_instance` (
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
   `start_time` datetime DEFAULT NULL COMMENT 'task start time',
   `end_time` datetime DEFAULT NULL COMMENT 'task end time',
-  `host` varchar(45) DEFAULT NULL COMMENT 'host of task running on',
+  `host` varchar(135) DEFAULT NULL COMMENT 'host of task running on',
   `execute_path` varchar(200) DEFAULT NULL COMMENT 'task execute path in the host',
   `log_path` varchar(200) DEFAULT NULL COMMENT 'task log path',
   `alert_flag` tinyint(4) DEFAULT NULL COMMENT 'whether alert',
@@ -933,8 +933,8 @@ VALUES ('1', '1.3.0');
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
-INSERT INTO `t_ds_alertgroup`
-VALUES (1,"1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
+INSERT INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
 -- ----------------------------
