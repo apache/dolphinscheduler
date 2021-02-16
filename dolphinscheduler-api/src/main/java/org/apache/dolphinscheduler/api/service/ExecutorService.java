@@ -95,21 +95,21 @@ public class ExecutorService extends BaseService {
     /**
      * execute process instance
      *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process Definition Id
-     * @param cronTime cron time
-     * @param commandType command type
-     * @param failureStrategy failuer strategy
-     * @param startNodeList start nodelist
-     * @param taskDependType node dependency type
-     * @param warningType warning type
-     * @param warningGroupId notify group id
+     * @param loginUser               login user
+     * @param projectName             project name
+     * @param processDefinitionId     process Definition Id
+     * @param cronTime                cron time
+     * @param commandType             command type
+     * @param failureStrategy         failuer strategy
+     * @param startNodeList           start nodelist
+     * @param taskDependType          node dependency type
+     * @param warningType             warning type
+     * @param warningGroupId          notify group id
      * @param processInstancePriority process instance priority
-     * @param workerGroup worker group name
-     * @param runMode run mode
-     * @param timeout timeout
-     * @param startParams the global param values which pass to new process instance
+     * @param workerGroup             worker group name
+     * @param runMode                 run mode
+     * @param timeout                 timeout
+     * @param startParams             the global param values which pass to new process instance
      * @return execute process instance code
      * @throws ParseException Parse Exception
      */
@@ -190,7 +190,7 @@ public class ExecutorService extends BaseService {
      * check whether the process definition can be executed
      *
      * @param processDefinition process definition
-     * @param processDefineId process definition id
+     * @param processDefineId   process definition id
      * @return check result code
      */
     public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId) {
@@ -210,10 +210,10 @@ public class ExecutorService extends BaseService {
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser login user
-     * @param projectName project name
+     * @param loginUser         login user
+     * @param projectName       project name
      * @param processInstanceId process instance id
-     * @param executeType execute type
+     * @param executeType       execute type
      * @return execute result code
      */
     public Map<String, Object> execute(User loginUser, String projectName, Integer processInstanceId, ExecuteType executeType) {
@@ -267,10 +267,10 @@ public class ExecutorService extends BaseService {
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.REPEAT_RUNNING, startParams);
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RECOVER_SUSPENDED_PROCESS,startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
                 break;
             case START_FAILURE_TASK_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.START_FAILURE_TASK_PROCESS,startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
                 break;
             case STOP:
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
@@ -312,7 +312,7 @@ public class ExecutorService extends BaseService {
      * Check the state of process instance and the type of operation match
      *
      * @param processInstance process instance
-     * @param executeType execute type
+     * @param executeType     execute type
      * @return check result code
      */
     private Map<String, Object> checkExecuteType(ProcessInstance processInstance, ExecuteType executeType) {
@@ -357,7 +357,7 @@ public class ExecutorService extends BaseService {
      * prepare to update process instance command type and status
      *
      * @param processInstance process instance
-     * @param commandType command type
+     * @param commandType     command type
      * @param executionStatus execute status
      * @return update result
      */
@@ -381,10 +381,10 @@ public class ExecutorService extends BaseService {
     /**
      * insert command, used in the implementation of the page, re run, recovery (pause / failure) execution
      *
-     * @param loginUser login user
-     * @param instanceId instance id
+     * @param loginUser           login user
+     * @param instanceId          instance id
      * @param processDefinitionId process definition id
-     * @param commandType command type
+     * @param commandType         command type
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType, String startParams) {
@@ -393,7 +393,7 @@ public class ExecutorService extends BaseService {
         //To add startParams only when repeat running is needed
         Map<String, Object> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId);
-        if (StringUtils.isNotEmpty(startParams)){
+        if (StringUtils.isNotEmpty(startParams)) {
             cmdParam.put(CMD_PARAM_START_PARAMS, startParams);
         }
 
@@ -458,18 +458,18 @@ public class ExecutorService extends BaseService {
     /**
      * create command
      *
-     * @param commandType commandType
-     * @param processDefineId processDefineId
-     * @param nodeDep nodeDep
-     * @param failureStrategy failureStrategy
-     * @param startNodeList startNodeList
-     * @param schedule schedule
-     * @param warningType warningType
-     * @param executorId executorId
-     * @param warningGroupId warningGroupId
-     * @param runMode runMode
+     * @param commandType             commandType
+     * @param processDefineId         processDefineId
+     * @param nodeDep                 nodeDep
+     * @param failureStrategy         failureStrategy
+     * @param startNodeList           startNodeList
+     * @param schedule                schedule
+     * @param warningType             warningType
+     * @param executorId              executorId
+     * @param warningGroupId          warningGroupId
+     * @param runMode                 runMode
      * @param processInstancePriority processInstancePriority
-     * @param workerGroup workerGroup
+     * @param workerGroup             workerGroup
      * @return command id
      */
     private int createCommand(CommandType commandType, int processDefineId,
