@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
@@ -27,6 +28,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.ZkPathUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -154,10 +156,13 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = String.format("%s/%s", workerPath, workerGroup);
+            String workerGroupPath = workerPath + SLASH + workerGroup;
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
             String timeStamp = "";
             for (int i = 0; i < childrenNodes.size(); i++) {
+                ZkPathUtils.WorkerZkNode workerZkNodeName = ZkPathUtils.getWorkerZkNodeName(childrenNodes.get(i));
+
+
                 String ip = childrenNodes.get(i);
                 childrenNodes.set(i, ip.substring(0, ip.lastIndexOf(":")));
                 timeStamp = ip.substring(ip.lastIndexOf(":"));
@@ -167,7 +172,7 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
                 wg.setName(workerGroup);
                 if (isPaging) {
                     wg.setIpList(childrenNodes);
-                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0) + timeStamp);
+                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + childrenNodes.get(0) + timeStamp);
                     wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
                     wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
                 }
