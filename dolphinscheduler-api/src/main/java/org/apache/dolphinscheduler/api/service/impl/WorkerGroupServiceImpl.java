@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.model.WorkerZkNode;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.service.zk.ZookeeperNodeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -136,6 +138,7 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
      * @return WorkerGroup list
      */
     private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
+
         String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
         List<WorkerGroup> workerGroups = new ArrayList<>();
         List<String> workerGroupList;
@@ -143,13 +146,15 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
             if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
-                if (!isPaging) {
+                if (isPaging) {
+                    return workerGroups;
+                } else {
                     //ignore noNodeException return Default
                     WorkerGroup wg = new WorkerGroup();
                     wg.setName(DEFAULT_WORKER_GROUP);
                     workerGroups.add(wg);
+                    return workerGroups;
                 }
-                return workerGroups;
             } else {
                 throw e;
             }
@@ -160,12 +165,9 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
             String timeStamp = "";
             for (int i = 0; i < childrenNodes.size(); i++) {
-                ZkPathUtils.WorkerZkNode workerZkNodeName = ZkPathUtils.getWorkerZkNodeName(childrenNodes.get(i));
-
-
-                String ip = childrenNodes.get(i);
-                childrenNodes.set(i, ip.substring(0, ip.lastIndexOf(":")));
-                timeStamp = ip.substring(ip.lastIndexOf(":"));
+                WorkerZkNode workerZkNodeName = ZookeeperNodeHandler.getWorkerZkNodeName(childrenNodes.get(i));
+                childrenNodes.set(i, ZookeeperNodeHandler.getWorkerAddressAndWeight(workerZkNodeName));
+                timeStamp = ZookeeperNodeHandler.getWorkerStartTime(workerZkNodeName);
             }
             if (CollectionUtils.isNotEmpty(childrenNodes)) {
                 WorkerGroup wg = new WorkerGroup();
