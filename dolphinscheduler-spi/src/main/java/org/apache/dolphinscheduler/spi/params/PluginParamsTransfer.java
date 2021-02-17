@@ -43,11 +43,11 @@ public class PluginParamsTransfer {
     /**
      * return the plugin params map
      */
-    public static Map<String, Object> getPluginParamsMap(String paramsJsonStr) {
+    public static Map<String, String> getPluginParamsMap(String paramsJsonStr) {
         List<PluginParams> pluginParams = transferJsonToParamsList(paramsJsonStr);
-        Map<String, Object> paramsMap = new HashMap<>();
+        Map<String, String> paramsMap = new HashMap<>();
         for (PluginParams param : pluginParams) {
-            paramsMap.put(param.getName(), param.getValue());
+            paramsMap.put(param.getName(), param.getValue() == null ? null : param.getValue().toString());
         }
         return paramsMap;
     }

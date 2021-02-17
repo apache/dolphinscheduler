@@ -242,7 +242,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
      * @return k, v(json string)
      */
     private String parsePluginParamsMap(String pluginParams) {
-        Map<String, Object> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginParams);
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginParams);
         return JSONUtils.toJsonString(paramsMap);
     }
 

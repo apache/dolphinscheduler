@@ -68,7 +68,7 @@ public class EmailAlertChannelTest {
                 .setTitle("test");
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        Map<String, Object> paramsMap = PluginParamsTransfer.getPluginParamsMap(getEmailAlertParams());
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getEmailAlertParams());
 
         alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = emailAlertChannel.process(alertInfo);
