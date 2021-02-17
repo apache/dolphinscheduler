@@ -64,6 +64,21 @@ public abstract class BaseDataSource {
      */
     private String principal;
 
+    /**
+     * java.security.krb5.conf
+     */
+    private String javaSecurityKrb5Conf;
+
+    /**
+     * login.user.keytab.username
+     */
+    private String loginUserKeytabUsername;
+
+    /**
+     * login.user.keytab.path
+     */
+    private String loginUserKeytabPath;
+
     public String getPrincipal() {
         return principal;
     }
@@ -211,4 +226,27 @@ public abstract class BaseDataSource {
         this.other = other;
     }
 
+    public String getJavaSecurityKrb5Conf() {
+        return javaSecurityKrb5Conf;
+    }
+
+    public void setJavaSecurityKrb5Conf(String javaSecurityKrb5Conf) {
+        this.javaSecurityKrb5Conf = javaSecurityKrb5Conf;
+    }
+
+    public String getLoginUserKeytabUsername() {
+        return loginUserKeytabUsername;
+    }
+
+    public void setLoginUserKeytabUsername(String loginUserKeytabUsername) {
+        this.loginUserKeytabUsername = loginUserKeytabUsername;
+    }
+
+    public String getLoginUserKeytabPath() {
+        return loginUserKeytabPath;
+    }
+
+    public void setLoginUserKeytabPath(String loginUserKeytabPath) {
+        this.loginUserKeytabPath = loginUserKeytabPath;
+    }
 }

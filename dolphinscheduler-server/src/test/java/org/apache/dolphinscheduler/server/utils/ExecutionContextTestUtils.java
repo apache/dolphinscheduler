@@ -47,7 +47,7 @@ public class ExecutionContextTestUtils {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(NetUtils.getHost() + ":" + port));
+        executionContext.setHost(Host.of(NetUtils.getAddr(port)));
 
         return executionContext;
     }

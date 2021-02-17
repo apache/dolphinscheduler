@@ -20,7 +20,11 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="groupName" :label="$t('Group Name')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Remarks')" width="200"></el-table-column>
+        <el-table-column prop="description" :label="$t('Remarks')" width="200">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Create Time')" width="140">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
