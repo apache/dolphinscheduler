@@ -33,13 +33,13 @@ public class ScriptSender {
 
     private String scriptPath;
 
-    private Integer scriptType;
+    private String scriptType;
 
     private String userParams;
 
     ScriptSender(Map<String, String> config) {
         scriptPath = config.get(ScriptParamsConstants.NAME_SCRIPT_PATH);
-        scriptType = Integer.parseInt(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE));
+        scriptType = config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE);
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
 
