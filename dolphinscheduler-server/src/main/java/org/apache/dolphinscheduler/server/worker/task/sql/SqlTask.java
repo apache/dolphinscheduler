@@ -53,7 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.*;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -136,7 +136,7 @@ public class SqlTask extends AbstractTask {
             List<SqlBinds> mainSqlBinds = Arrays.asList(sqlParameters.getSql().split(";"))
                     .stream()
                     .filter(o -> {
-                        if( o == null || o.toString().trim().length() < 1) return false;
+                        if( o == null || o.trim().length() < 1) return false;
                         else return true;
                     })
                     .map(this::getSqlAndSqlParamsMap)
@@ -332,10 +332,10 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     *  pre sql
+     *  main sql
      *
      * @param connection connection
-     * @param mainStatementsBinds preStatementsBinds
+     * @param mainStatementsBinds mainStatementsBinds
      */
     private void mainSql(Connection connection,
                         List<SqlBinds> mainStatementsBinds) throws Exception{
