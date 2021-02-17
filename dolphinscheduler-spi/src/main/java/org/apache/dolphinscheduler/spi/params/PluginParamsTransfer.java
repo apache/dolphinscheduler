@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 /**
  * plugin params pojo and json transfer tool
  */
@@ -75,7 +77,7 @@ public class PluginParamsTransfer {
         if (paramsMap == null || paramsMap.isEmpty()) {
             return null;
         }
-        List<Map<String, Object>> pluginParamsList = JSONUtils.toMapList(pluginParamsTemplate);
+        List<Map<String, Object>> pluginParamsList = JSONUtils.parseObject(pluginParamsTemplate, new TypeReference<List<Map<String, Object>>>() {});
         pluginParamsList.forEach(pluginParams -> pluginParams.put(STRING_PLUGIN_PARAM_VALUE, paramsMap.get(pluginParams.get(STRING_PLUGIN_PARAM_FIELD))));
         return pluginParamsList;
     }

@@ -133,33 +133,24 @@ public class JSONUtils {
      * @return json to map
      */
     public static <K, V> Map<K, V> toMap(String json) {
-        if (StringUtils.isEmpty(json)) {
-            return null;
-        }
-
-        try {
-            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
-            });
-        } catch (Exception e) {
-            logger.error("json to map exception!", e);
-        }
-
-        return null;
+        return parseObject(json, new TypeReference<Map<K, V>>() {});
     }
 
     /**
-     *  json to List<Map<K, V>>
+     * json to object
+     *
      * @param json json string
-     * @return
+     * @param type type reference
+     * @param <T>
+     * @return return parse object
      */
-    public static <K, V> List<Map<K, V>> toMapList(String json) {
+    public static <T> T parseObject(String json, TypeReference<T> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(json, new TypeReference<List<Map<K, V>>>() {
-            });
+            return objectMapper.readValue(json, type);
         } catch (Exception e) {
             logger.error("json to map exception!", e);
         }
