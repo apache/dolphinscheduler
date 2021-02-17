@@ -42,4 +42,14 @@ public class Constants {
     /** alert plugin param options string **/
     public static final String STRING_PLUGIN_PARAM_OPTIONS = "options";
 
+
+    /** string true */
+    public static final String STRING_TRUE = "true";
+    /** string false */
+    public static final String STRING_FALSE = "false";
+    /** string yes */
+    public static final String STRING_YES = "YES";
+    /** string no */
+    public static final String STRING_NO = "NO";
+
 }
