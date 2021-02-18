@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -39,7 +40,7 @@ public class ExecutorServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
 
     @Autowired
-    private ExecutorService executorService;
+    private ExecutorServiceImpl executorService;
 
     @Ignore
     @Test
