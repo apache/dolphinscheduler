@@ -158,7 +158,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
         }
         Date end = DateUtils.stringToDate(endTime);
         if (start == null || end == null) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             return result;
         }
         if (start.getTime() > end.getTime()) {
@@ -244,7 +244,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
                 end = DateUtils.getScheduleDate(endDate);
             }
         } catch (Exception e) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             return result;
         }
 
@@ -310,7 +310,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
         for (TaskInstance taskInstance : taskInstanceList) {
             if (taskInstance.getTaskType().equalsIgnoreCase(TaskType.DEPENDENT.toString())) {
                 Result<String> logResult = loggerService.queryLog(
-                        taskInstance.getId(), 0, 4098);
+                        taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {
                     String log = logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
@@ -383,7 +383,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
             return result;
         }
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("subProcessInstanceId", subWorkflowInstance.getId());
+        dataMap.put(Constants.SUBPROCESS_INSTANCE_ID, subWorkflowInstance.getId());
         result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -530,7 +530,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
             return result;
         }
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("parentWorkflowInstance", parentWorkflowInstance.getId());
+        dataMap.put(Constants.PARENT_WORKFLOW_INSTANCE, parentWorkflowInstance.getId());
         result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -630,8 +630,8 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
                 Map<String, Object> localParamsMap = new HashMap<>();
-                localParamsMap.put("taskType", taskNode.getType());
-                localParamsMap.put("localParamsList", localParamsList);
+                localParamsMap.put(Constants.TASK_TYPE, taskNode.getType());
+                localParamsMap.put(Constants.LOCAL_PARAMS_LIST, localParamsList);
                 if (CollectionUtils.isNotEmpty(localParamsList)) {
                     localUserDefParams.put(taskNode.getName(), localParamsMap);
                 }
