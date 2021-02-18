@@ -59,10 +59,10 @@ public class TaskRecordServiceImpl extends BaseService implements TaskRecordServ
                                                         String taskDate, String sourceTable,
                                                         String destTable, String endDate,
                                                         String state, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(10);
+        Map<String, Object> result = new HashMap<>();
         PageInfo<TaskRecord> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        Map<String, String> map = new HashMap<>(10);
+        Map<String, String> map = new HashMap<>();
         map.put("taskName", taskName);
         map.put("taskDate", taskDate);
         map.put("state", state);

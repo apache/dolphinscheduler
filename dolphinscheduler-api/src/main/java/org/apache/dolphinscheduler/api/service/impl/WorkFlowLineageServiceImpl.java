@@ -45,14 +45,14 @@ public class WorkFlowLineageServiceImpl extends BaseService implements WorkFlowL
     private WorkFlowLineageMapper workFlowLineageMapper;
 
     public Map<String, Object> queryWorkFlowLineageByName(String workFlowName, int projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByName(workFlowName, projectId);
         result.put(Constants.DATA_LIST, workFlowLineageList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    private List<WorkFlowRelation> getWorkFlowRelationRecursion(Set<Integer> ids, List<WorkFlowRelation> workFlowRelations,Set<Integer> sourceIds) {
+    private void getWorkFlowRelationRecursion(Set<Integer> ids, List<WorkFlowRelation> workFlowRelations, Set<Integer> sourceIds) {
         for (int id : ids) {
             sourceIds.addAll(ids);
             List<WorkFlowRelation> workFlowRelationsTmp = workFlowLineageMapper.querySourceTarget(id);
@@ -67,13 +67,12 @@ public class WorkFlowLineageServiceImpl extends BaseService implements WorkFlowL
                 getWorkFlowRelationRecursion(idsTmp, workFlowRelations,sourceIds);
             }
         }
-        return workFlowRelations;
     }
 
     public Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids,int projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByIds(ids, projectId);
-        Map<String, Object> workFlowLists = new HashMap<>(5);
+        Map<String, Object> workFlowLists = new HashMap<>();
         Set<Integer> idsV = new HashSet<>();
         if (ids == null || ids.isEmpty()) {
             for (WorkFlowLineage workFlowLineage:workFlowLineageList) {
@@ -100,8 +99,8 @@ public class WorkFlowLineageServiceImpl extends BaseService implements WorkFlowL
             }
         }
 
-        workFlowLists.put("workFlowList",workFlowLineageList);
-        workFlowLists.put("workFlowRelationList",workFlowRelations);
+        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineageList);
+        workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
         result.put(Constants.DATA_LIST, workFlowLists);
         putMsg(result, Status.SUCCESS);
         return result;

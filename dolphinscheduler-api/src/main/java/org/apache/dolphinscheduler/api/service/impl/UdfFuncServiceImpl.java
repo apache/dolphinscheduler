@@ -149,7 +149,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @return udf function detail
      */
     public Map<String, Object> queryUdfFuncDetail(int id) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -244,7 +244,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @return udf function list page
      */
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
         pageInfo.setTotalCount((int)udfFuncList.getTotal());
@@ -280,7 +280,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @return udf func list
      */
     public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId = 0;

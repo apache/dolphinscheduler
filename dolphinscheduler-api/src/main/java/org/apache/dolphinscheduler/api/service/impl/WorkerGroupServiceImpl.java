@@ -68,9 +68,9 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
      */
     public Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
         // list from index
-        Integer fromIndex = (pageNo - 1) * pageSize;
+        int fromIndex = (pageNo - 1) * pageSize;
         // list to index
-        Integer toIndex = (pageNo - 1) * pageSize + pageSize;
+        int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -141,15 +141,13 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
             if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
-                if (isPaging) {
-                    return workerGroups;
-                } else {
+                if (!isPaging) {
                     //ignore noNodeException return Default
                     WorkerGroup wg = new WorkerGroup();
                     wg.setName(DEFAULT_WORKER_GROUP);
                     workerGroups.add(wg);
-                    return workerGroups;
                 }
+                return workerGroups;
             } else {
                 throw e;
             }
