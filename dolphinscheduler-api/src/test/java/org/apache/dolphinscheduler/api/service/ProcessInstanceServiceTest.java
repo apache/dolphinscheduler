@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProcessInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -68,7 +69,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class ProcessInstanceServiceTest {
 
     @InjectMocks
-    ProcessInstanceService processInstanceService;
+    ProcessInstanceServiceImpl processInstanceService;
 
     @Mock
     ProjectMapper projectMapper;
