@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -189,7 +190,7 @@ public class TaskInstance implements Serializable {
      * duration
      */
     @TableField(exist = false)
-    private Long duration;
+    private String duration;
 
     /**
      * max retry times
@@ -456,11 +457,11 @@ public class TaskInstance implements Serializable {
         this.processInstanceName = processInstanceName;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -523,7 +524,6 @@ public class TaskInstance implements Serializable {
     public boolean isConditionsTask() {
         return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
     }
-
 
     /**
      * determine if you can try again
