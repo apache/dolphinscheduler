@@ -184,6 +184,12 @@ public class SqlTask extends AbstractTask {
         }
     }
 
+    /**
+     * check whether preSql is a query type sql or not
+     *
+     * @param preSql
+     * @return
+     */
     public boolean isQuerySql(String preSql) {
         return (Objects.nonNull(preSql) && preSql.trim().toLowerCase().startsWith("select "));
     }
