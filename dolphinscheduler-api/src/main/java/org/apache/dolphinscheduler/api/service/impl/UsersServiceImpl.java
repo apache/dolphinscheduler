@@ -131,7 +131,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws Exception {
+                                          int state) throws IOException {
 
         Map<String, Object> result = new HashMap<>(5);
 
@@ -301,7 +301,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
             return result;
         }
 
-        Page<User> page = new Page(pageNo, pageSize);
+        Page<User> page = new Page<>(pageNo, pageSize);
 
         IPage<User> scheduleList = userMapper.queryUserPaging(page, searchVal);
 
@@ -336,7 +336,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws Exception {
+                                          int state) throws IOException {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
@@ -460,7 +460,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
-    public Map<String, Object> deleteUserById(User loginUser, int id) throws Exception {
+    public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (!isAdmin(loginUser)) {
@@ -561,7 +561,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
             return result;
         }
 
-        Set<Integer> needAuthorizeResIds = new HashSet();
+        Set<Integer> needAuthorizeResIds = new HashSet<>();
         if (StringUtils.isNotBlank(resourceIds)) {
             String[] resourceFullIdArr = resourceIds.split(",");
             // need authorize resource id set
@@ -576,8 +576,8 @@ public class UsersServiceImpl extends BaseService implements UsersService {
 
         //get the authorized resource id list by user id
         List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
-        //if resource type is UDF,need check whether it is bound by UDF functon
-        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
+        //if resource type is UDF,need check whether it is bound by UDF function
+        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 
         //get the unauthorized resource id list
         oldAuthorizedResIds.removeAll(needAuthorizeResIds);
@@ -810,9 +810,9 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param userName user name
      * @return true if user name not exists, otherwise return false
      */
-    public Result verifyUserName(String userName) {
+    public Result<Object> verifyUserName(String userName) {
 
-        Result result = new Result();
+        Result<Object> result = new Result<>();
         User user = userMapper.queryByUserNameAccurately(userName);
         if (user != null) {
             putMsg(result, Status.USER_NAME_EXIST);

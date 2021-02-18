@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> createUser(User loginUser, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws Exception;
+                                   int tenantId, String phone, String queue, int state) throws IOException;
 
     User createUser(String userName, String userPassword, String email,
                     int tenantId, String phone, String queue, int state);
@@ -121,7 +122,7 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws Exception;
+                                   int tenantId, String phone, String queue, int state) throws IOException;
 
     /**
      * delete user
@@ -131,7 +132,7 @@ public interface UsersService {
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
-    Map<String, Object> deleteUserById(User loginUser, int id) throws Exception;
+    Map<String, Object> deleteUserById(User loginUser, int id) throws IOException;
 
     /**
      * grant project
@@ -207,7 +208,7 @@ public interface UsersService {
      * @param userName user name
      * @return true if user name not exists, otherwise return false
      */
-    Result verifyUserName(String userName);
+    Result<Object> verifyUserName(String userName);
 
 
     /**

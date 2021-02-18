@@ -33,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +45,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 public class AlertGroupServiceImpl extends BaseService implements AlertGroupService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertGroupServiceImpl.class);
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
@@ -84,7 +80,7 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
             return result;
         }
 
-        Page<AlertGroup> page = new Page(pageNo, pageSize);
+        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
         IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
                 page, searchVal);
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -167,7 +163,6 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
         alertGroup.setUpdateTime(now);
         alertGroup.setCreateUserId(loginUser.getId());
         alertGroup.setAlertInstanceIds(alertInstanceIds);
-        // updateProcessInstance
         alertGroupMapper.updateById(alertGroup);
         putMsg(result, Status.SUCCESS);
         return result;
