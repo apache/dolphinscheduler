@@ -163,23 +163,23 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
         for (String workerGroup : workerGroupList) {
             String workerGroupPath = workerPath + SLASH + workerGroup;
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
-            String timeStamp = "";
+            if (CollectionUtils.isEmpty(childrenNodes)) {
+                continue;
+            }
+            String timeStamp = childrenNodes.get(0);
             for (int i = 0; i < childrenNodes.size(); i++) {
-                WorkerZkNode workerZkNodeName = ZookeeperNodeHandler.getWorkerZkNodeName(childrenNodes.get(i));
-                childrenNodes.set(i, ZookeeperNodeHandler.getWorkerAddressAndWeight(workerZkNodeName));
-                timeStamp = ZookeeperNodeHandler.getWorkerStartTime(workerZkNodeName);
+                childrenNodes.set(i, ZookeeperNodeHandler.getWorkerAddressAndWeight(childrenNodes.get(i)));
             }
-            if (CollectionUtils.isNotEmpty(childrenNodes)) {
-                WorkerGroup wg = new WorkerGroup();
-                wg.setName(workerGroup);
-                if (isPaging) {
-                    wg.setIpList(childrenNodes);
-                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + childrenNodes.get(0) + timeStamp);
-                    wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
-                    wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
-                }
-                workerGroups.add(wg);
+
+            WorkerGroup wg = new WorkerGroup();
+            wg.setName(workerGroup);
+            if (isPaging) {
+                wg.setIpList(childrenNodes);
+                String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + timeStamp);
+                wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
+                wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
             }
+            workerGroups.add(wg);
         }
         return workerGroups;
     }

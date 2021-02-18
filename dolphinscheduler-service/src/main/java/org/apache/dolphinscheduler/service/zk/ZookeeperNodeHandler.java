@@ -93,6 +93,16 @@ public class ZookeeperNodeHandler {
     }
 
     /**
+     * get worker address and weight
+     *
+     * @param zkNode zookeeper node
+     * @return worker address:weight
+     */
+    public static String getWorkerAddressAndWeight(String zkNode) {
+        return getWorkerAddressAndWeight(getWorkerZkNodeName(zkNode));
+    }
+
+    /**
      * get worker startTime
      * @param workerZkNode worker zookeeper node
      * @return worker startTime
