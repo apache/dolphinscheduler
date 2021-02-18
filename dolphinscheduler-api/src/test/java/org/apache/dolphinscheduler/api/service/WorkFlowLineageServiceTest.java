@@ -16,11 +16,20 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import static org.mockito.Mockito.when;
+
+import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,15 +37,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.*;
-
-import static org.mockito.Mockito.when;
-
 @RunWith(MockitoJUnitRunner.class)
 public class WorkFlowLineageServiceTest {
 
     @InjectMocks
-    private WorkFlowLineageService workFlowLineageService;
+    private WorkFlowLineageServiceImpl workFlowLineageService;
 
     @Mock
     private WorkFlowLineageMapper workFlowLineageMapper;
