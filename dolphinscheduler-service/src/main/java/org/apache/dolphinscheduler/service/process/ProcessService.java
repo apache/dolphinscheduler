@@ -2400,12 +2400,9 @@ public class ProcessService {
         List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
                 processDefinition.getCode(),
                 processDefinition.getVersion());
-
-
-
         List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
         List<TaskDefinition> taskDefinitions = new ArrayList<>();
-        for(ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs){
+        for (ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs) {
             processTaskRelations.add(JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class));
 
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
