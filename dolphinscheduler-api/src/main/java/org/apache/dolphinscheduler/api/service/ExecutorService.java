@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.text.ParseException;
 import java.util.Map;
 
 /**
@@ -54,7 +53,6 @@ public interface ExecutorService {
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
-     * @throws ParseException Parse Exception
      */
     Map<String, Object> execProcessInstance(User loginUser, String projectName,
                                             int processDefinitionId, String cronTime, CommandType commandType,
@@ -62,7 +60,7 @@ public interface ExecutorService {
                                             TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Integer timeout,
-                                            Map<String, String> startParams) throws ParseException;
+                                            Map<String, String> startParams);
 
     /**
      * check whether the process definition can be executed

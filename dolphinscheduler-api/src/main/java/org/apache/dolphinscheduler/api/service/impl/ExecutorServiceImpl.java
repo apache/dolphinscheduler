@@ -57,7 +57,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -117,7 +116,6 @@ public class ExecutorServiceImpl extends BaseService implements ExecutorService 
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
-     * @throws ParseException Parse Exception
      */
     public Map<String, Object> execProcessInstance(User loginUser, String projectName,
                                                    int processDefinitionId, String cronTime, CommandType commandType,
@@ -125,7 +123,7 @@ public class ExecutorServiceImpl extends BaseService implements ExecutorService 
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout,
-                                                   Map<String, String> startParams) throws ParseException {
+                                                   Map<String, String> startParams) {
         Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
@@ -185,7 +183,7 @@ public class ExecutorServiceImpl extends BaseService implements ExecutorService 
         List<Server> masterServers = monitorService.getServerListFromZK(true);
 
         // no master
-        if (masterServers.size() == 0) {
+        if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
             return false;
         }
@@ -301,7 +299,6 @@ public class ExecutorServiceImpl extends BaseService implements ExecutorService 
      * @return true if tenant suitable, otherwise return false
      */
     private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
-        // checkTenantExists();
         Tenant tenant = processService.getTenantForProcess(processDefinition.getTenantId(),
                 processDefinition.getUserId());
         return tenant != null;
@@ -469,7 +466,7 @@ public class ExecutorServiceImpl extends BaseService implements ExecutorService 
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup,
-                              Map<String, String> startParams) throws ParseException {
+                              Map<String, String> startParams) {
 
         /**
          * instantiate command schedule instance
@@ -556,9 +553,7 @@ public class ExecutorServiceImpl extends BaseService implements ExecutorService 
                     }
                 }
             } else {
-                // Logging should not be vulnerable to injection attacks: replace pattern-breaking characters
-                logger.error("there is not valid schedule date for the process definition: id:{},date:{}",
-                        processDefineId, schedule.replaceAll("[\n|\r|\t]", "_"));
+                logger.error("there is not valid schedule date for the process definition: id:{}", processDefineId);
             }
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));

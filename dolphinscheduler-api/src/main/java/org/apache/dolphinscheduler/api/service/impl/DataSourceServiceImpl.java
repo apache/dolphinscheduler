@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
@@ -185,7 +184,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
 
     private boolean checkName(String name) {
         List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
-        return queryDataSource != null && queryDataSource.size() > 0;
+        return queryDataSource != null && !queryDataSource.isEmpty();
     }
 
     /**
@@ -196,7 +195,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      */
     public Map<String, Object> queryDataSource(int id) {
 
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>();
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -249,7 +248,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
                 break;
         }
 
-        Map<String, String> otherMap = new LinkedHashMap<String, String>();
+        Map<String, String> otherMap = new LinkedHashMap<>();
         if (other != null) {
             String[] configs = other.split(separator);
             for (String config : configs) {
@@ -258,7 +257,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
 
         }
 
-        Map<String, Object> map = new HashMap<>(10);
+        Map<String, Object> map = new HashMap<>();
         map.put(NAME, dataSourceName);
         map.put(NOTE, desc);
         map.put(TYPE, dataSourceType);
@@ -291,8 +290,8 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      */
     public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
-        IPage<DataSource> dataSourceList = null;
-        Page<DataSource> dataSourcePage = new Page(pageNo, pageSize);
+        IPage<DataSource> dataSourceList;
+        Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
 
         if (isAdmin(loginUser)) {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
@@ -302,7 +301,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
         pageInfo.setLists(dataSources);
         result.put(Constants.DATA_LIST, pageInfo);
@@ -438,7 +437,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
                                  String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) {
 
         String address = buildAddress(type, host, port, connectType);
-        Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
+        Map<String, Object> parameterMap = new LinkedHashMap<>();
         String jdbcUrl;
         if (DbType.SQLSERVER == type) {
             jdbcUrl = address + ";databaseName=" + database;
@@ -597,13 +596,13 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
         List<DataSource> resultList = new ArrayList<>();
         List<DataSource> datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
         Set<DataSource> datasourceSet = null;
-        if (datasourceList != null && datasourceList.size() > 0) {
+        if (datasourceList != null && !datasourceList.isEmpty()) {
             datasourceSet = new HashSet<>(datasourceList);
 
             List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
 
             Set<DataSource> authedDataSourceSet = null;
-            if (authedDataSourceList != null && authedDataSourceList.size() > 0) {
+            if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
                 authedDataSourceSet = new HashSet<>(authedDataSourceList);
                 datasourceSet.removeAll(authedDataSourceSet);
 
@@ -634,16 +633,6 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * get host and port by address
-     *
-     * @param address address
-     * @return sting array: [host,port]
-     */
-    private String[] getHostsAndPort(String address) {
-        return getHostsAndPort(address, Constants.DOUBLE_SLASH);
     }
 
     /**
