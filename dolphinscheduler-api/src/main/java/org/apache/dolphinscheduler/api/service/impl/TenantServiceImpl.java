@@ -87,7 +87,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
                                             int queueId,
                                             String desc) throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -140,7 +140,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      */
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
@@ -171,7 +171,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         if (isNotAdmin(loginUser, result)) {
@@ -233,7 +233,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -291,7 +291,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      */
     public Map<String, Object> queryTenantList(String tenantCode) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
         if (CollectionUtils.isNotEmpty(resourceList)) {
@@ -311,7 +311,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      */
     public Map<String, Object> queryTenantList(User loginUser) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         List<Tenant> resourceList = tenantMapper.selectList(null);
         result.put(Constants.DATA_LIST, resourceList);
