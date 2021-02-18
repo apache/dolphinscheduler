@@ -323,6 +323,7 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             logger.warn("sql task sendAttachment error! msg : {} ", e.getMessage());
         }
+        return result;
     }
 
     /**
