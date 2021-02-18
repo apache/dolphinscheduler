@@ -179,10 +179,12 @@
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateFileUpdate')
+            this.reset()
           }, e => {
             reject(e)
             self.$emit('closeFileUpdate')
             this.$message.error(e.msg || '')
+            this.reset()
           }, {
             data: formData,
             emulateJSON: false,
@@ -206,6 +208,15 @@
       },
       close () {
         this.$emit('closeFileUpdate')
+      },
+      reset () {
+        this.name = ''
+        this.description = ''
+        this.progress = 0
+        this.file = ''
+        this.currentDir = '/'
+        this.pid = -1
+        this.dragOver = false
       },
       /**
        * Drag and drop upload
