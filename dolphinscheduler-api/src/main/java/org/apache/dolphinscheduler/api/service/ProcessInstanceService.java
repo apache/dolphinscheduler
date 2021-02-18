@@ -635,7 +635,6 @@ public class ProcessInstanceService extends BaseService {
             globalParams = JSONUtils.toList(userDefinedParams, Property.class);
         }
 
-
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(processInstance, timeParams);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -650,6 +649,7 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * get local params
+     *
      * @param processInstance
      * @param timeParams
      * @return
@@ -657,7 +657,7 @@ public class ProcessInstanceService extends BaseService {
     private Map<String, Map<String, Object>> getLocalParams(ProcessInstance processInstance, Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         List<TaskInstance> taskInstanceList = taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES);
-        for(TaskInstance taskInstance : taskInstanceList){
+        for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
             String parameter = taskDefinitionLog.getTaskParams();
