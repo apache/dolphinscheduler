@@ -56,7 +56,7 @@
     </parent>
 
     <properties>
-        <revision>1.4.0-SNAPSHOT</revision>
+        <revision>1.3.6-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
