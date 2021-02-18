@@ -41,14 +41,14 @@ public interface UdfFuncService {
      * @param className class name
      * @return create result code
      */
-    Result createUdfFunction(User loginUser,
-                             String funcName,
-                             String className,
-                             String argTypes,
-                             String database,
-                             String desc,
-                             UdfType type,
-                             int resourceId);
+    Result<Object> createUdfFunction(User loginUser,
+                                     String funcName,
+                                     String className,
+                                     String argTypes,
+                                     String database,
+                                     String desc,
+                                     UdfType type,
+                                     int resourceId);
 
     /**
      * query udf function
@@ -106,7 +106,7 @@ public interface UdfFuncService {
      * @param id udf function id
      * @return delete result code
      */
-    Result delete(int id);
+    Result<Object> delete(int id);
 
     /**
      * verify udf function by name
@@ -114,6 +114,6 @@ public interface UdfFuncService {
      * @param name name
      * @return true if the name can user, otherwise return false
      */
-    Result verifyUdfFuncByName(String name);
+    Result<Object> verifyUdfFuncByName(String name);
 
 }

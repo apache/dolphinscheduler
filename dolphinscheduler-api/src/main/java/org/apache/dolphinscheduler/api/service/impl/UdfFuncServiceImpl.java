@@ -77,15 +77,15 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param className class name
      * @return create result code
      */
-    public Result createUdfFunction(User loginUser,
-                                    String funcName,
-                                    String className,
-                                    String argTypes,
-                                    String database,
-                                    String desc,
-                                    UdfType type,
-                                    int resourceId) {
-        Result result = new Result();
+    public Result<Object> createUdfFunction(User loginUser,
+                                            String funcName,
+                                            String className,
+                                            String argTypes,
+                                            String database,
+                                            String desc,
+                                            UdfType type,
+                                            int resourceId) {
+        Result<Object> result = new Result<>();
 
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
@@ -96,8 +96,6 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
 
         // verify udf func name exist
         if (checkUdfFuncNameExists(funcName)) {
-            // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-            logger.error("udf func {} has exist, can't recreate", funcName.replaceAll("[\n|\r|\t]", "_"));
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
             return result;
         }
@@ -141,7 +139,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      */
     private boolean checkUdfFuncNameExists(String name) {
         List<UdfFunc> resource = udfFuncMapper.queryUdfByIdStr(null, name);
-        return resource != null && resource.size() > 0;
+        return resource != null && !resource.isEmpty();
     }
 
     /**
@@ -247,7 +245,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      */
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
         pageInfo.setTotalCount((int)udfFuncList.getTotal());
         pageInfo.setLists(udfFuncList.getRecords());
@@ -270,7 +268,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
         if (isAdmin(loginUser)) {
             userId = 0;
         }
-        Page<UdfFunc> page = new Page(pageNo, pageSize);
+        Page<UdfFunc> page = new Page<>(pageNo, pageSize);
         return udfFuncMapper.queryUdfFuncPaging(page, userId, searchVal);
     }
 
@@ -301,8 +299,8 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @return delete result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public Result delete(int id) {
-        Result result = new Result();
+    public Result<Object> delete(int id) {
+        Result<Object> result = new Result<>();
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
         putMsg(result, Status.SUCCESS);
@@ -315,11 +313,9 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param name name
      * @return true if the name can user, otherwise return false
      */
-    public Result verifyUdfFuncByName(String name) {
-        Result result = new Result();
+    public Result<Object> verifyUdfFuncByName(String name) {
+        Result<Object> result = new Result<>();
         if (checkUdfFuncNameExists(name)) {
-            // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-            logger.error("UDF function name:{} has exist, can't create again.", name.replaceAll("[\n|\r|\t]", "_"));
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
         } else {
             putMsg(result, Status.SUCCESS);

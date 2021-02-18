@@ -120,7 +120,7 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
         List<WorkerGroup> workerGroups = getWorkerGroups(false);
 
         Set<String> availableWorkerGroupSet = workerGroups.stream()
-                .map(workerGroup -> workerGroup.getName())
+                .map(WorkerGroup::getName)
                 .collect(Collectors.toSet());
         result.put(Constants.DATA_LIST, availableWorkerGroupSet);
         putMsg(result, Status.SUCCESS);
@@ -156,7 +156,7 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + "/" + workerGroup;
+            String workerGroupPath = String.format("%s/%s", workerPath, workerGroup);
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
             String timeStamp = "";
             for (int i = 0; i < childrenNodes.size(); i++) {
