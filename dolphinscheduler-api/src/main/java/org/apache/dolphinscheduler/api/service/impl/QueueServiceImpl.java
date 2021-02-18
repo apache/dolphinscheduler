@@ -244,15 +244,11 @@ public class QueueServiceImpl extends BaseService implements QueueService {
         }
 
         if (checkQueueNameExist(queueName)) {
-            String strQueueName = StringUtils.replaceNRTtoUnderline(queueName);
-            logger.error("queue name {} has exist, can't create again.", strQueueName);
             putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
 
         if (checkQueueExist(queue)) {
-            String strQueue = StringUtils.replaceNRTtoUnderline(queue);
-            logger.error("queue value {} has exist, can't create again.", strQueue);
             putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
             return result;
         }
