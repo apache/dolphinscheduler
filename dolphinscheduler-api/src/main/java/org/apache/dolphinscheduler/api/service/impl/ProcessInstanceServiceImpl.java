@@ -249,7 +249,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
         }
 
         Page<ProcessInstance> page = new Page<>(pageNo, pageSize);
-        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
+        PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<ProcessInstance> processInstanceList =

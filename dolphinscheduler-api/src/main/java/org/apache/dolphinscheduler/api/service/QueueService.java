@@ -74,6 +74,6 @@ public interface QueueService {
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
-    Result verifyQueue(String queue, String queueName);
+    Result<Object> verifyQueue(String queue, String queueName);
 
 }

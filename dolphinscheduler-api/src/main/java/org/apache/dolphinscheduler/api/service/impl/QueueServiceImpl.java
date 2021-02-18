@@ -91,7 +91,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
             return result;
         }
 
-        Page<Queue> page = new Page(pageNo, pageSize);
+        Page<Queue> page = new Page<>(pageNo, pageSize);
 
         IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
 
@@ -230,8 +230,8 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
-    public Result verifyQueue(String queue, String queueName) {
-        Result result = new Result();
+    public Result<Object> verifyQueue(String queue, String queueName) {
+        Result<Object> result = new Result<>();
 
         if (StringUtils.isEmpty(queue)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
@@ -244,15 +244,15 @@ public class QueueServiceImpl extends BaseService implements QueueService {
         }
 
         if (checkQueueNameExist(queueName)) {
-            // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-            logger.error("queue name {} has exist, can't create again.", queueName.replaceAll("[\n|\r|\t]", "_"));
+            String strQueueName = StringUtils.replaceNRTtoUnderline(queueName);
+            logger.error("queue name {} has exist, can't create again.", strQueueName);
             putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
 
         if (checkQueueExist(queue)) {
-            // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-            logger.error("queue value {} has exist, can't create again.", queue.replaceAll("[\n|\r|\t]", "_"));
+            String strQueue = StringUtils.replaceNRTtoUnderline(queue);
+            logger.error("queue value {} has exist, can't create again.", strQueue);
             putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
             return result;
         }
