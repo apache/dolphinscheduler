@@ -410,7 +410,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<>(5);
+            Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
                 if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
                     resultMap.put(entry.getKey().toString(), entry.getValue());
@@ -510,7 +510,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      */
     public Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
-        HashMap<String, Object> result = new HashMap<>(5);
+        HashMap<String, Object> result = new HashMap<>();
         Page<Resource> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
@@ -608,8 +608,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @return resource list
      */
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
-
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
@@ -631,8 +630,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @return resource list
      */
     public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
-
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         String suffix = ".jar";
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
@@ -1180,7 +1178,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @return unauthorized result code
      */
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -1228,7 +1226,7 @@ public class ResourcesServiceImpl extends BaseService implements ResourcesServic
      * @return authorized result
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
         }

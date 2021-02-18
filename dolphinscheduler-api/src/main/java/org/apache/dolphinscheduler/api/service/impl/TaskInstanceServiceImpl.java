@@ -159,7 +159,7 @@ public class TaskInstanceServiceImpl extends BaseService implements TaskInstance
      * @return the result code and msg
      */
     public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         // check user auth

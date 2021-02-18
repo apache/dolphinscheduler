@@ -276,7 +276,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Override
     public Map<String, Object> queryProcessDefinitionList(User loginUser, String projectName) {
 
-        HashMap<String, Object> result = new HashMap<>(5);
+        HashMap<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -402,7 +402,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                                                        String desc,
                                                        String locations,
                                                        String connects) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         Project project = projectMapper.queryByName(projectName);
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -517,7 +517,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -826,7 +826,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         String processMetaJson = FileUtils.file2String(file);
         List<ProcessMeta> processMetaList = JSONUtils.toList(processMetaJson, ProcessMeta.class);
 
@@ -995,7 +995,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
 
         //recursive sub-process parameter correction map key for old process id value for new process id
-        Map<Integer, Integer> subProcessIdMap = new HashMap<>(20);
+        Map<Integer, Integer> subProcessIdMap = new HashMap<>();
 
         List<Object> subProcessList = StreamUtils.asStream(jsonArray.elements())
                 .filter(elem -> checkTaskHasSubProcess(JSONUtils.parseObject(elem.toString()).path("type").asText()))
@@ -1286,7 +1286,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Override
     public Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId) {
 
-        HashMap<String, Object> result = new HashMap<>(5);
+        HashMap<String, Object> result = new HashMap<>();
 
         List<ProcessDefinition> resourceList = processDefineMapper.queryAllDefinitionList(projectId);
         result.put(Constants.DATA_LIST, resourceList);
@@ -1497,7 +1497,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                                                       Integer processId,
                                                       Project targetProject) throws JsonProcessingException {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {

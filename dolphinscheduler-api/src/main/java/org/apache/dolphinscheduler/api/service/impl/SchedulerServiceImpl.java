@@ -209,7 +209,7 @@ public class SchedulerServiceImpl extends BaseService implements SchedulerServic
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
                                               String workerGroup) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -303,8 +303,7 @@ public class SchedulerServiceImpl extends BaseService implements SchedulerServic
                                                 String projectName,
                                                 Integer id,
                                                 ReleaseState scheduleStatus) {
-
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         Project project = projectMapper.queryByName(projectName);
         // check project auth
