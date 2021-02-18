@@ -54,7 +54,7 @@
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
   import mNoData from '@/module/components/noData/noData'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
 
   export default {
     name: 'task-status-count',
@@ -74,7 +74,7 @@
         this.$router.push({
           name: 'task-instance',
           query: {
-            stateType: _.find(stateType, ['label', name])['code'],
+            stateType: _.find(stateType, ['label', name]).code,
             startDate: this.searchParams.startDate,
             endDate: this.searchParams.endDate
           }
@@ -85,7 +85,7 @@
         this.taskStatusList = _.map(data, v => {
           return {
             // CHECK!!
-            key: _.find(stateType, ['code', v.taskStateType])['label'],
+            key: _.find(stateType, ['code', v.taskStateType]).label,
             value: v.count,
             type: 'type'
           }
@@ -102,7 +102,7 @@
       }
     },
     watch: {
-      'searchParams': {
+      searchParams: {
         deep: true,
         immediate: true,
         handler (o) {
@@ -139,9 +139,3 @@
     components: { mNoData }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .task-status-count-model {
-
-  }
-</style>

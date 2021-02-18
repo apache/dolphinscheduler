@@ -20,12 +20,22 @@
       <template slot="conditions">
         <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
       </template>
+
       <template slot="content">
         <template v-if="taskInstanceList.length">
-          <m-list :task-instance-list="taskInstanceList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+          <m-list :task-instance-list="taskInstanceList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
           </m-list>
           <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+            <el-pagination
+              background
+              @current-change="_page"
+              @size-change="_pageSize"
+              :page-size="searchParams.pageSize"
+              :current-page.sync="searchParams.pageNo"
+              :page-sizes="[10, 30, 50]"
+              layout="sizes, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
           </div>
         </template>
         <template v-if="!taskInstanceList.length">
@@ -43,9 +53,8 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/instanceConditions'
+  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
 
   export default {
     name: 'task-instance-list-index',
@@ -72,7 +81,8 @@
           // end date
           endDate: '',
           // Exectuor Name
-          executorName: ''
+          executorName: '',
+          processInstanceName: ''
         },
         isLeft: true
       }
@@ -95,7 +105,7 @@
       _page (val) {
         this.searchParams.pageNo = val
       },
-      _pageSize(val) {
+      _pageSize (val) {
         this.searchParams.pageSize = val
       },
       /**
@@ -103,8 +113,8 @@
        */
       _getList (flag) {
         this.isLoading = !flag
-        if(this.searchParams.pageNo == undefined) {
-          this.$router.push({ path: `/projects/index` })
+        if (this.searchParams.pageNo === undefined) {
+          this.$router.push({ path: '/projects/index' })
           return false
         }
         this.getTaskInstanceList(this.searchParams).then(res => {
@@ -117,19 +127,25 @@
         })
       },
       /**
+       * update
+       */
+      _onUpdate () {
+        this._debounceGET()
+      },
+      /**
        * Anti shake request interface
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this._getList(flag)
       }, 100, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       })
     },
     watch: {
@@ -145,7 +161,6 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
       // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
@@ -154,9 +169,9 @@
     beforeDestroy () {
       // Destruction wheel
       clearInterval(this.setIntervalP)
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
   }
 </script>
 
@@ -186,6 +201,11 @@
             padding-right: 90px;
           }
         }
+      }
+    }
+    .list-model {
+      .el-dialog__header, .el-dialog__body {
+        padding: 0;
       }
     }
   }

@@ -16,45 +16,45 @@
  */
 <template>
   <div class="minute-model">
-    <div class="v-crontab-from-model">
-      <x-radio-group v-model="radioMinute" vertical>
+    <div class="v-crontab-form-model">
+      <el-radio-group v-model="radioMinute" vertical size="mini">
         <div class="list-box">
-          <x-radio label="everyMinute">
+          <el-radio label="everyMinute">
             <span class="text">{{$t('每一分钟')}}</span>
-          </x-radio>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="intervalMinute">
+          <el-radio label="intervalMinute" size="mini">
             <span class="text">{{$t('每隔')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
-            <span class="text">{{$t('分执行 从')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('分执行 从')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
-            <span class="text">{{$t('分开始')}}</span>
-          </x-radio>
+            <span class="text" style="margin-left: 65px;">{{$t('分开始')}}</span>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="specificMinute">
+          <el-radio label="specificMinute" size="mini">
             <span class="text">{{$t('具体分钟数(可多选)')}}</span>
-            <x-select multiple :placeholder="$t('请选择具体分钟数')" v-model="specificMinutesVal" @on-change="onspecificMinutes">
-              <x-option
+            <el-select multiple :placeholder="$t('请选择具体分钟数')" size="mini" v-model="specificMinutesVal" @change="onspecificMinutes">
+              <el-option
                       v-for="item in selectMinuteList"
                       :key="item.value"
                       :value="item.value"
                       :label="item.label">
-              </x-option>
-            </x-select>
-          </x-radio>
+              </el-option>
+            </el-select>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="cycleMinute">
+          <el-radio label="cycleMinute" size="mini">
             <span class="text">{{$t('周期从')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(cycleStartVal)" @on-number="onCycleStart"></m-input-number>
-            <span class="text">{{$t('到')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('到')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(cycleEndVal)" @on-number="onCycleEnd"></m-input-number>
-            <span class="text">{{$t('分')}}</span>
-          </x-radio>
+            <span class="text" style="margin-left: 65px;">{{$t('分')}}</span>
+          </el-radio>
         </div>
-      </x-radio-group>
+      </el-radio-group>
     </div>
   </div>
 </template>

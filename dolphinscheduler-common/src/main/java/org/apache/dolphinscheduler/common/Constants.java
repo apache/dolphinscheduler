@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -146,7 +147,7 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties";
+    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -222,6 +223,11 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
+     * SPACE " "
+     */
+    public static final String SPACE = " ";
+
+    /**
      * SINGLE_SLASH /
      */
     public static final String SINGLE_SLASH = "/";
@@ -230,6 +236,15 @@ public final class Constants {
      * DOUBLE_SLASH //
      */
     public static final String DOUBLE_SLASH = "//";
+
+    /**
+     * SINGLE_QUOTES "'"
+     */
+    public static final String SINGLE_QUOTES = "'";
+    /**
+     * DOUBLE_QUOTES "\""
+     */
+    public static final String DOUBLE_QUOTES = "\"";
 
     /**
      * SEMICOLON ;
@@ -387,12 +402,16 @@ public final class Constants {
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
-
     /***
      *
      * rpc port
      */
     public static final int RPC_PORT = 50051;
+
+    /***
+     * alert rpc port
+     */
+    public static final int ALERT_RPC_PORT = 50052;
 
     /**
      * forbid running task
@@ -428,21 +447,23 @@ public final class Constants {
     /**
      * command parameter keys
      */
-    public static final String CMDPARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
+    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
 
-    public static final String CMDPARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
+    public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
 
-    public static final String CMDPARAM_RECOVERY_WAITTING_THREAD = "WaittingThreadInstanceId";
+    public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS = "processInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
 
-    public static final String CMDPARAM_EMPTY_SUB_PROCESS = "0";
+    public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
 
-    public static final String CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
+    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
-    public static final String CMDPARAM_START_NODE_NAMES = "StartNodeNameList";
+    public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
+
+    public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
     /**
      * complement data start date
@@ -523,10 +544,9 @@ public final class Constants {
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
 
 
+
     /**
-     * hadoop params constant
-     */
-    /**
+     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -589,12 +609,6 @@ public final class Constants {
      * --queue QUEUE
      */
     public static final String SPARK_QUEUE = "--queue";
-
-
-    /**
-     * --queue --qu
-     */
-    public static final String FLINK_QUEUE = "--qu";
 
 
     /**
@@ -825,6 +839,7 @@ public final class Constants {
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
     public static final String FLINK_APP_NAME = "-ynm";
+    public static final String FLINK_QUEUE = "-yqu";
     public static final String FLINK_TASK_MANAGE = "-yn";
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
@@ -833,15 +848,15 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
 
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITTING_THREAD.ordinal(),
-            ExecutionStatus.WAITTING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[] {
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.DELAY_EXECUTION.ordinal(),
+        ExecutionStatus.READY_PAUSE.ordinal(),
+        ExecutionStatus.READY_STOP.ordinal(),
+        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+        ExecutionStatus.WAITTING_THREAD.ordinal(),
+        ExecutionStatus.WAITTING_DEPEND.ordinal()
     };
 
     /**
@@ -893,6 +908,11 @@ public final class Constants {
     public static final String PASSWORD_DEFAULT = "******";
 
     /**
+     * locale
+     */
+    public static final String LOCALE_LANGUAGE = "language";
+
+    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
@@ -937,7 +957,9 @@ public final class Constants {
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
-
+    public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
+    public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
+    public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 
     /**
      * session timeout
@@ -998,6 +1020,8 @@ public final class Constants {
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
 
+    public static final String EXCEL_SUFFIX_XLS = ".xls";
+
     /**
      * datasource encryption salt
      */
@@ -1009,4 +1033,21 @@ public final class Constants {
      * Network IP gets priority, default inner outer
      */
     public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+
+    /**
+     * exec shell scripts
+     */
+    public static final String SH = "sh";
+
+    /**
+     * pstree, get pud and sub pid
+     */
+    public static final String PSTREE = "pstree";
+
+    /**
+     * docker & kubernetes
+     */
+    public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
+    public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+
 }

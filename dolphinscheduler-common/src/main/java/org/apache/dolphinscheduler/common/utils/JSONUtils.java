@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
@@ -127,6 +129,22 @@ public class JSONUtils {
     }
 
     /**
+     *  deserialize
+     *
+     * @param src byte array
+     * @param clazz class
+     * @param <T> deserialize type
+     * @return deserialize type
+     */
+    public static <T> T parseObject(byte[] src, Class<T> clazz) {
+        if (src == null) {
+            return null;
+        }
+        String json = new String(src, UTF_8);
+        return parseObject(json, clazz);
+    }
+
+    /**
      * json to list
      *
      * @param json json string
@@ -193,25 +211,13 @@ public class JSONUtils {
 
     /**
      * json to map
-     * <p>
      * {@link #toMap(String, Class, Class)}
      *
      * @param json json
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        if (StringUtils.isEmpty(json)) {
-            return null;
-        }
-
-        try {
-            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
-            });
-        } catch (Exception e) {
-            logger.error("json to map exception!", e);
-        }
-
-        return null;
+        return parseObject(json, new TypeReference<Map<String, String>>() {});
     }
 
     /**
@@ -225,13 +231,24 @@ public class JSONUtils {
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
+        return parseObject(json, new TypeReference<Map<K, V>>() {});
+    }
+
+    /**
+     * json to object
+     *
+     * @param json json string
+     * @param type type reference
+     * @param <T>
+     * @return return parse object
+     */
+    public static <T> T parseObject(String json, TypeReference<T> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
-            });
+            return objectMapper.readValue(json, type);
         } catch (Exception e) {
             logger.error("json to map exception!", e);
         }
@@ -253,9 +270,34 @@ public class JSONUtils {
         }
     }
 
+    /**
+     * serialize to json byte
+     *
+     * @param obj object
+     * @param <T> object type
+     * @return byte array
+     */
+    public static <T> byte[] toJsonByteArray(T obj)  {
+        if (obj == null) {
+            return null;
+        }
+        String json = "";
+        try {
+            json = toJsonString(obj);
+        } catch (Exception e) {
+            logger.error("json serialize exception.", e);
+        }
+
+        return json.getBytes(UTF_8);
+    }
+
     public static ObjectNode parseObject(String text) {
         try {
-            return (ObjectNode) objectMapper.readTree(text);
+            if (text.isEmpty()) {
+                return parseObject(text, ObjectNode.class);
+            } else {
+                return (ObjectNode) objectMapper.readTree(text);
+            }
         } catch (Exception e) {
             throw new RuntimeException("String json deserialization exception.", e);
         }

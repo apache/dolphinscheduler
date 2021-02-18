@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
-
     /**
      * dependent parameters
      */
@@ -126,14 +125,13 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
     private void initTaskParameters() {
         this.taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
-        this.taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
+        this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         this.processService.saveTaskInstance(taskInstance);
 
         this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(), DependentParameters.class);
     }
-
 
     /**
      * depend result for depend item
@@ -157,6 +155,5 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
                 Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
         return dependResult;
     }
-
 
 }

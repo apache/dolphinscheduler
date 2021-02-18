@@ -23,8 +23,8 @@
       <slot name="content"></slot>
     </div>
     <div class="bottom-p">
-      <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? 'Loading...' : okText}} </x-button>
+      <el-button type="text" size="mini" round @click="close()" :disabled="disabled"> {{$t('Cancel')}} </el-button>
+      <el-button type="primary" size="mini" round :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? 'Loading...' : okText}} </el-button>
     </div>
   </div>
 </template>
@@ -59,7 +59,6 @@
     methods: {
       close () {
         this.$emit('close')
-        this.$modal.destroy()
       },
       ok () {
         if (this.asynLoading) {
@@ -72,7 +71,7 @@
         }
       }
     },
-    components: { }
+    components: {}
   }
 </script>
 

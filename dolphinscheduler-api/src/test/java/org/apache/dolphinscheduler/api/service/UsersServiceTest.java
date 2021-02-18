@@ -14,11 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,7 +33,19 @@ import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,20 +58,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UsersServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceTest.class);
 
     @InjectMocks
-    private UsersService usersService;
+    private UsersServiceImpl usersService;
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -73,30 +84,34 @@ public class UsersServiceTest {
     @Mock
     private ResourceMapper resourceMapper;
 
-    private String queueName ="UsersServiceTestQueue";
-
+    private String queueName = "UsersServiceTestQueue";
 
     @Before
-    public void before(){
-
-
+    public void before() {
     }
+
     @After
-    public  void after(){
+    public void after() {
 
     }
-
 
     @Test
-    public void testCreateUser(){
+    public void testCreateUserForLdap() {
+        String userName = "user1";
+        String email = "user1@ldap.com";
+        User user = usersService.createUser(UserType.ADMIN_USER, userName, email);
+        Assert.assertNotNull(user);
+    }
 
+    @Test
+    public void testCreateUser() {
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         String userName = "userTest0001~";
         String userPassword = "userTest";
         String email = "123@qq.com";
         int tenantId = Integer.MAX_VALUE;
-        String phone= "13456432345";
+        String phone = "13456432345";
         int state = 1;
         try {
             //userName error
@@ -119,7 +134,7 @@ public class UsersServiceTest {
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             email = "122222@qq.com";
-            phone ="2233";
+            phone = "2233";
             //phone error
             result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
@@ -137,20 +152,19 @@ public class UsersServiceTest {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
-            logger.error(Status.CREATE_USER_ERROR.getMsg(),e);
+            logger.error(Status.CREATE_USER_ERROR.getMsg(), e);
             Assert.assertTrue(false);
         }
     }
 
     @Test
-    public void testQueryUser(){
-
+    public void testQueryUser() {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
-        when(userMapper.queryUserByNamePassword(userName,EncryptionUtils.getMd5(userPassword))).thenReturn(getGeneralUser());
-        User queryUser = usersService.queryUser(userName,  userPassword);
+        when(userMapper.queryUserByNamePassword(userName, EncryptionUtils.getMd5(userPassword))).thenReturn(getGeneralUser());
+        User queryUser = usersService.queryUser(userName, userPassword);
         logger.info(queryUser.toString());
-        Assert.assertTrue(queryUser!=null);
+        Assert.assertTrue(queryUser != null);
     }
 
     @Test
@@ -176,11 +190,8 @@ public class UsersServiceTest {
     }
 
 
-
     @Test
-    public void testQueryUserList(){
-
-
+    public void testQueryUserList() {
         User user = new User();
 
         //no operate
@@ -190,93 +201,88 @@ public class UsersServiceTest {
 
         //success
         user.setUserType(UserType.ADMIN_USER);
-        when(userMapper.selectList(null )).thenReturn(getUserList());
+        when(userMapper.selectList(null)).thenReturn(getUserList());
         result = usersService.queryUserList(user);
         List<User> userList = (List<User>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(userList.size()>0);
+        Assert.assertTrue(userList.size() > 0);
     }
 
     @Test
-    public void testQueryUserListPage(){
-
-
+    public void testQueryUserListPage() {
         User user = new User();
-        IPage<User> page = new Page<>(1,10);
+        IPage<User> page = new Page<>(1, 10);
         page.setRecords(getUserList());
         when(userMapper.queryUserPaging(any(Page.class), eq("userTest"))).thenReturn(page);
 
         //no operate
-        Map<String, Object> result = usersService.queryUserList(user,"userTest",1,10);
+        Map<String, Object> result = usersService.queryUserList(user, "userTest", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         //success
         user.setUserType(UserType.ADMIN_USER);
-        result = usersService.queryUserList(user,"userTest",1,10);
+        result = usersService.queryUserList(user, "userTest", 1, 10);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        PageInfo<User> pageInfo  = (PageInfo<User>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(pageInfo.getLists().size()>0);
+        PageInfo<User> pageInfo = (PageInfo<User>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(pageInfo.getLists().size() > 0);
     }
 
     @Test
-    public void testUpdateUser(){
-
+    public void testUpdateUser() {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
         try {
             //user not exist
-            Map<String, Object> result = usersService.updateUser(0,userName,userPassword,"3443@qq.com",1,"13457864543","queue", 1);
+            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0,userName,userPassword,"3443@qq.com",1,"13457864543","queue", 1);
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
             logger.info(result.toString());
 
             //success
             when(userMapper.selectById(1)).thenReturn(getUser());
-            result = usersService.updateUser(1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue", 1);
+            result = usersService.updateUser(getLoginUser(), 1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue", 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
-            logger.error("update user error",e);
+            logger.error("update user error", e);
             Assert.assertTrue(false);
         }
     }
 
     @Test
-    public void testDeleteUserById(){
-
+    public void testDeleteUserById() {
         User loginUser = new User();
         try {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
 
             //no operate
-            Map<String, Object> result = usersService.deleteUserById(loginUser,3);
+            Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
             Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
             // user not exist
             loginUser.setUserType(UserType.ADMIN_USER);
-            result = usersService.deleteUserById(loginUser,3);
+            result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
 
             //success
-            result = usersService.deleteUserById(loginUser,1);
+            result = usersService.deleteUserById(loginUser, 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
-           logger.error("delete user error",e);
-           Assert.assertTrue(false);
+            logger.error("delete user error", e);
+            Assert.assertTrue(false);
         }
 
 
     }
 
     @Test
-    public void testGrantProject(){
-
+    public void testGrantProject() {
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
-        String  projectIds= "100000,120000";
+        String projectIds = "100000,120000";
         Map<String, Object> result = usersService.grantProject(loginUser, 1, projectIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
@@ -292,8 +298,7 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testGrantResources(){
-
+    public void testGrantResources() {
         String resourceIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
@@ -317,8 +322,7 @@ public class UsersServiceTest {
 
 
     @Test
-    public void testGrantUDFFunction(){
-
+    public void testGrantUDFFunction() {
         String udfIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
@@ -337,8 +341,7 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testGrantDataSource(){
-
+    public void testGrantDataSource() {
         String datasourceIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
         User loginUser = new User();
@@ -357,10 +360,15 @@ public class UsersServiceTest {
 
     }
 
+    private User getLoginUser(){
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        return loginUser;
+    }
 
     @Test
-    public void getUserInfo(){
-
+    public void getUserInfo() {
         User loginUser = new User();
         loginUser.setUserName("admin");
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -370,7 +378,7 @@ public class UsersServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         User tempUser = (User) result.get(Constants.DATA_LIST);
         //check userName
-        Assert.assertEquals("admin",tempUser.getUserName());
+        Assert.assertEquals("admin", tempUser.getUserName());
 
         //get general user
         loginUser.setUserType(null);
@@ -381,13 +389,12 @@ public class UsersServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         tempUser = (User) result.get(Constants.DATA_LIST);
         //check userName
-        Assert.assertEquals("userTest0001",tempUser.getUserName());
+        Assert.assertEquals("userTest0001", tempUser.getUserName());
     }
 
 
     @Test
-    public void testQueryAllGeneralUsers(){
-
+    public void testQueryAllGeneralUsers() {
         User loginUser = new User();
         //no operate
         Map<String, Object> result = usersService.queryAllGeneralUsers(loginUser);
@@ -404,8 +411,7 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testVerifyUserName(){
-
+    public void testVerifyUserName() {
         //not exist user
         Result result = usersService.verifyUserName("admin89899");
         logger.info(result.toString());
@@ -418,11 +424,10 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testUnauthorizedUser(){
-
+    public void testUnauthorizedUser() {
         User loginUser = new User();
-        when(userMapper.selectList(null )).thenReturn(getUserList());
-        when( userMapper.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
+        when(userMapper.selectList(null)).thenReturn(getUserList());
+        when(userMapper.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
         //no operate
         Map<String, Object> result = usersService.unauthorizedUser(loginUser, 2);
         logger.info(result.toString());
@@ -436,8 +441,7 @@ public class UsersServiceTest {
 
 
     @Test
-    public void testAuthorizedUser(){
-
+    public void testAuthorizedUser() {
         User loginUser = new User();
         when(userMapper.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
         //no operate
@@ -565,10 +569,8 @@ public class UsersServiceTest {
 
     /**
      * get disabled user
-     * @return
      */
     private User getDisabledUser() {
-
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
         user.setUserName("userTest0001");
@@ -580,10 +582,8 @@ public class UsersServiceTest {
 
     /**
      * get user
-     * @return
      */
-    private User getGeneralUser(){
-
+    private User getGeneralUser() {
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
         user.setUserName("userTest0001");
@@ -591,8 +591,7 @@ public class UsersServiceTest {
         return user;
     }
 
-
-    private List<User> getUserList(){
+    private List<User> getUserList() {
         List<User> userList = new ArrayList<>();
         userList.add(getGeneralUser());
         return userList;
@@ -601,8 +600,7 @@ public class UsersServiceTest {
     /**
      * get user
      */
-    private User getUser(){
-
+    private User getUser() {
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         user.setUserName("userTest0001");
@@ -613,9 +611,10 @@ public class UsersServiceTest {
 
     /**
      * get tenant
+     *
      * @return tenant
      */
-    private Tenant getTenant(){
+    private Tenant getTenant() {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         return tenant;
@@ -623,10 +622,10 @@ public class UsersServiceTest {
 
     /**
      * get resource
+     *
      * @return resource
      */
-    private Resource getResource(){
-
+    private Resource getResource() {
         Resource resource = new Resource();
         resource.setPid(-1);
         resource.setUserId(1);

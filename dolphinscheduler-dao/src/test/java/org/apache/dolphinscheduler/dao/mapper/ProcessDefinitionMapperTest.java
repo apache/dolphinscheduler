@@ -77,8 +77,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-
         processDefinitionMapper.insert(processDefinition);
         return processDefinition;
     }
@@ -135,6 +133,43 @@ public class ProcessDefinitionMapperTest {
     }
 
     /**
+     * test verifyByDefineName
+     */
+    @Test
+    public void testVerifyByDefineName() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(4);
+        projectMapper.insert(project);
+        Queue queue = new Queue();
+        queue.setQueue("queue");
+        queue.setQueueName("queue name");
+        queueMapper.insert(queue);
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("tenant");
+        tenant.setQueueId(queue.getId());
+        tenant.setDescription("t");
+        tenantMapper.insert(tenant);
+        User user = new User();
+        user.setUserName("hello");
+        user.setUserPassword("pwd");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setTenantId(tenant.getId());
+        userMapper.insert(user);
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(project.getId());
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(tenant.getId());
+        processDefinition.setUserId(user.getId());
+        processDefinitionMapper.insert(processDefinition);
+        ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(10, "xxx");
+        Assert.assertEquals(definition, null);
+    }
+
+    /**
      * test query by definition name
      */
     @Test
@@ -170,12 +205,68 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setCreateTime(new Date());
         processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-//
         processDefinitionMapper.insert(processDefinition);
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getId(), "def 1");
         Assert.assertNotEquals(processDefinition1, null);
+    }
+
+    /**
+     * test queryDefinitionListByTenant
+     */
+    @Test
+    public void testQueryDefinitionListByTenant() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(888);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(999);
+        processDefinition.setUserId(1234);
+        processDefinitionMapper.insert(processDefinition);
+        List<ProcessDefinition> definitions = processDefinitionMapper.queryDefinitionListByTenant(999);
+        Assert.assertNotEquals(definitions.size(), 0);
+    }
+
+    /**
+     * test queryByDefineId
+     */
+    @Test
+    public void testQueryByDefineId() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(4);
+        projectMapper.insert(project);
+
+        Queue queue = new Queue();
+        queue.setQueue("queue");
+        queue.setQueueName("queue name");
+        queueMapper.insert(queue);
+
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("tenant");
+        tenant.setQueueId(queue.getId());
+        tenant.setDescription("t");
+        tenantMapper.insert(tenant);
+
+        User user = new User();
+        user.setUserName("hello");
+        user.setUserPassword("pwd");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setTenantId(tenant.getId());
+        userMapper.insert(user);
+
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(project.getId());
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(tenant.getId());
+        processDefinition.setUserId(user.getId());
+        processDefinitionMapper.insert(processDefinition);
+        ProcessDefinition definition = processDefinitionMapper.queryByDefineId(333);
+        Assert.assertEquals(definition, null);
     }
 
     /**
@@ -275,4 +366,12 @@ public class ProcessDefinitionMapperTest {
         ProcessDefinition processDefinition1 = processDefinitionMapper.selectById(processDefinition.getId());
         Assert.assertEquals(expectedVersion, processDefinition1.getVersion());
     }
+
+    @Test
+    public void listProjectIds() {
+        ProcessDefinition processDefinition = insertOne();
+        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
+        Assert.assertNotNull(projectIds);
+    }
+
 }

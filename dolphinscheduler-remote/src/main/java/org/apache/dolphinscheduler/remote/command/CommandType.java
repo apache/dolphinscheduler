@@ -79,6 +79,16 @@ public enum CommandType {
     TASK_EXECUTE_RESPONSE,
 
     /**
+     * db task ack
+     */
+    DB_TASK_ACK,
+
+    /**
+     * db task response
+     */
+    DB_TASK_RESPONSE,
+
+    /**
      * kill task
      */
     TASK_KILL_REQUEST,
@@ -101,5 +111,15 @@ public enum CommandType {
     /**
      *  pong
      */
-    PONG;
+    PONG,
+
+    /**
+     *  alert send request
+     */
+    ALERT_SEND_REQUEST,
+
+    /**
+     *  alert send response
+     */
+    ALERT_SEND_RESPONSE;
 }

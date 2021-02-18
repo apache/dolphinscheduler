@@ -17,289 +17,215 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <table class="fixed">
-        <tr>
-          <th scope="col" style="min-width: 50px">
-            <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
-          </th>
-          <th scope="col" style="min-width: 30px">
-            <span>{{$t('#')}}</span>
-          </th>
-          <th scope="col" style="min-width: 200px;max-width: 300px;">
-            <span>{{$t('Process Name')}}</span>
-          </th>
-          <th scope="col" style="min-width: 30px">
-            <span>{{$t('State')}}</span>
-          </th>
-          <th scope="col" style="min-width: 70px">
-            <span>{{$t('Run Type')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('Scheduling Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('Start Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('End Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 60px">
-            <span>{{$t('Duration')}}s</span>
-          </th>
-          <th scope="col" style="min-width: 60px">
-            <span>{{$t('Run Times')}}</span>
-          </th>
-          <th scope="col" style="min-width: 55px">
-            <span>{{$t('fault-tolerant sign')}}</span>
-          </th>
-          <th scope="col" style="min-width: 135px">
-            <span>{{$t('Executor')}}</span>
-          </th>
-          <th scope="col" style="min-width: 100px">
-            <div style="width: 100px">
-              <span>{{$t('host')}}</span>
+      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
+        <el-table-column type="selection" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column :label="$t('Process Name')" min-width="200">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>{{ scope.row.name }}</p>
+              <div slot="reference" class="name-wrapper">
+                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('State')" width="50">
+          <template slot-scope="scope">
+            <span v-html="_rtState(scope.row.state)" style="cursor: pointer;"></span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Run Type')">
+          <template slot-scope="scope">
+            {{_rtRunningType(scope.row.commandType)}}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Scheduling Time')" width="135">
+          <template slot-scope="scope">
+            <span v-if="scope.row.scheduleTime">{{scope.row.scheduleTime | formatDate}}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Start Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.startTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('End Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.endTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="duration" :label="$t('Duration')"></el-table-column>
+        <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
+        <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
+        <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
+        <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
+        <el-table-column :label="$t('Operation')" width="240" fixed="right">
+          <template slot-scope="scope">
+            <div v-show="scope.row.disabled">
+              <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
+                <span>
+                  <el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'" @click="_reEdit(scope.row)" circle></el-button>
+                </span>
+              </el-tooltip>
+              <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
+                <span><el-button type="primary" size="mini" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'"  icon="el-icon-refresh" @click="_reRun(scope.row,scope.$index)" circle></el-button></span>
+              </el-tooltip>
+              <el-tooltip :content="$t('Recovery Failed')" placement="top" :enterable="false">
+                <span>
+                  <el-button type="success" size="mini" icon="el-icon-circle-close" :disabled="scope.row.state !== 'FAILURE'" @click="_restore(scope.row,scope.$index)" circle></el-button>
+                </span>
+              </el-tooltip>
+              <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">
+                <span><el-button type="danger" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
+              </el-tooltip>
+              <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
+                <span><el-button type="warning" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
+              </el-tooltip>
+              <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+                <el-popconfirm
+                  :confirmButtonText="$t('Confirm')"
+                  :cancelButtonText="$t('Cancel')"
+                  icon="el-icon-info"
+                  iconColor="red"
+                  :title="$t('Delete?')"
+                  @onConfirm="_delete(scope.row,scope.row.id)">
+                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP' && scope.row.state !== 'PAUSE'" circle slot="reference"></el-button>
+                </el-popconfirm>
+              </el-tooltip>
+              <el-tooltip :content="$t('Gantt')" placement="top" :enterable="false">
+                <span><el-button type="primary" size="mini" icon="el-icon-s-operation" @click="_gantt(scope.row)" circle></el-button></span>
+              </el-tooltip>
             </div>
-          </th>
-          <th scope="col" style="min-width: 210px">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
-          <td width="50">
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
-            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id , query:{id: item.processDefinitionId}}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
-          </td>
-          <td>
-            <span v-html="_rtState(item.state)" style="cursor: pointer;"></span>
-          </td>
-          <td><span>{{_rtRunningType(item.commandType)}}</span></td>
-          <td>
-            <span v-if="item.scheduleTime">{{item.scheduleTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.startTime">{{item.startTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td width="70"><span>{{item.duration || '-'}}</span></td>
-          <td width="70"><span>{{item.runTimes}}</span></td>
-          <td><span>{{item.recovery}}</span></td>
-          <td>
-            <span v-if="item.executorName">{{item.executorName}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.host" style="word-break: break-all">{{item.host}}</span>
-            <span v-else>-</span>
-          </td>
-          <td style="z-index: inherit;">
-            <div v-show="item.disabled">
-              <x-button type="info"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('Edit')"
-                        @click="_reEdit(item)"
-                        icon="ans-icon-edit"
-                        :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
-              <x-button type="info"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('Rerun')"
-                        @click="_reRun(item,$index)"
-                        icon="ans-icon-refresh"
-                        :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
-              <x-button type="success"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('Recovery Failed')"
-                        @click="_restore(item,$index)"
-                        icon="ans-icon-fail-empty"
-                        :disabled="item.state !== 'FAILURE'"></x-button>
-              <x-button type="error"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="item.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')"
-                        @click="_stop(item,$index)"
-                        :icon="item.state === 'STOP' ? 'ans-icon-pause-solid' : 'ans-icon-stop'"
-                        :disabled="item.state !== 'RUNNING_EXECUTION' && item.state != 'STOP'"></x-button>
-              <x-button type="warning"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
-                        @click="_suspend(item,$index)"
-                        :icon="item.state === 'PAUSE' ? 'ans-icon-pause-solid' : 'ans-icon-pause'"
-                        :disabled="item.state !== 'RUNNING_EXECUTION' && item.state !== 'PAUSE'"></x-button>
-              <x-poptip
-                      :ref="'poptip-delete-' + $index"
-                      placement="top-end"
-                      width="90">
-                <p>{{$t('Delete?')}}</p>
-                <div style="text-align: right; margin: 0;padding-top: 4px;">
-                  <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                  <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
-                </div>
-                <template slot="reference">
-                  <x-button
-                          icon="ans-icon-trash"
-                          type="error"
-                          shape="circle"
-                          size="xsmall"
-                          data-toggle="tooltip"
-                          :disabled="item.state !== 'SUCCESS' && item.state !== 'FAILURE' && item.state !== 'STOP' && item.state !== 'PAUSE'"
-                          :title="$t('delete')">
-                  </x-button>
-                </template>
-              </x-poptip>
-
-              <x-button type="info"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('Gantt')"
-                        @click="_gantt(item)"
-                        icon="ans-icon-gantt">
-              </x-button>
-
-            </div>
-            <div v-show="!item.disabled">
+            <div v-show="!scope.row.disabled">
               <!--Edit-->
-              <x-button
-                      type="info"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-edit"
-                      disabled="true">
-              </x-button>
+              <el-button
+                  type="info"
+                  size="mini"
+                  icon="el-icon-edit-outline"
+                  disabled="true"
+                  circle>
+              </el-button>
 
               <!--Rerun-->
-              <x-button
-                      v-show="buttonType === 'run'"
-                      type="info"
-                      shape="circle"
-                      size="xsmall"
-                      disabled="true">
-                {{item.count}}
-              </x-button>
-              <x-button
-                      v-show="buttonType !== 'run'"
-                      type="info"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-refresh"
-                      disabled="true">
-              </x-button>
+              <span>
+                <el-button
+                  v-show="buttonType === 'run'"
+                  type="info"
+                  size="mini"
+                  disabled="true"
+                  circle>
+                  <span style="padding: 0 2px">{{scope.row.count}}</span>
+                </el-button>
+              </span>
+              <el-button
+                  v-show="buttonType !== 'run'"
+                  type="info"
+                  size="mini"
+                  icon="el-icon-refresh"
+                  disabled="true"
+                  circle>
+              </el-button>
 
-              <!--Recovery Failed-->
-              <x-button
-                      v-show="buttonType === 'store'"
-                      type="success"
-                      shape="circle"
-                      size="xsmall"
-                      disabled="true">
-                {{item.count}}
-              </x-button>
-              <x-button
-                      v-show="buttonType !== 'store'"
-                      type="success"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-fail-empty"
-                      disabled="true">
-              </x-button>
+              <!--Store-->
+              <span>
+                <el-button
+                  v-show="buttonType === 'store'"
+                  type="success"
+                  size="mini"
+                  circle
+                  disabled="true">
+                  <span style="padding: 0 3px">{{scope.row.count}}</span>
+                </el-button>
+              </span>
+              <el-button
+                  v-show="buttonType !== 'store'"
+                  type="success"
+                  size="mini"
+                  circle
+                  icon="el-icon-circle-close"
+                  disabled="true">
+              </el-button>
+
+              <!--Recovery Suspend/Pause-->
+              <span>
+                <el-button
+                  v-show="(scope.row.state === 'PAUSE' || scope.row.state === 'STOP') && buttonType === 'suspend'"
+                  type="warning"
+                  size="mini"
+                  circle
+                  disabled="true">
+                  <span style="padding: 0 3px">{{scope.row.count}}</span>
+                </el-button>
+              </span>
+
+              <!--Recovery Suspend-->
+              <el-button
+                  v-show="(scope.row.state === 'PAUSE' || scope.row.state === 'STOP') && buttonType !== 'suspend'"
+                  type="warning"
+                  size="mini"
+                  circle
+                  icon="el-icon-video-play"
+                  disabled="true">
+              </el-button>
+
+              <!--Pause-->
+              <span>
+                <el-button
+                  v-show="scope.row.state !== 'PAUSE'"
+                  type="warning"
+                  size="mini"
+                  circle
+                  icon="el-icon-close"
+                  disabled="true">
+                </el-button>
+              </span>
 
               <!--Stop-->
-              <!--<x-button-->
-                      <!--type="error"-->
-                      <!--shape="circle"-->
-                      <!--size="xsmall"-->
-                      <!--icon="ans-icon-pause"-->
-                      <!--disabled="true">-->
-              <!--</x-button>-->
+              <span>
+                <el-button
+                  v-show="scope.row.state !== 'STOP'"
+                  type="warning"
+                  size="mini"
+                  circle
+                  icon="el-icon-video-pause"
+                  disabled="true">
+                </el-button>
+              </span>
 
-              <!--倒计时 => Recovery Suspend/Pause-->
-              <x-button
-                      v-show="(item.state === 'PAUSE' || item.state == 'STOP') && buttonType === 'suspend'"
-                      type="warning"
-                      shape="circle"
-                      size="xsmall"
-                      disabled="true">
-                {{item.count}}
-              </x-button>
-              <!--Recovery Suspend-->
-              <x-button
-                      v-show="(item.state === 'PAUSE' || item.state == 'STOP') && buttonType !== 'suspend'"
-                      type="warning"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-pause-solid"
-                      disabled="true">
-              </x-button>
-              <!--Pause-->
-              <x-button
-                      v-show="item.state !== 'PAUSE'"
-                      type="warning"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-stop"
-                      disabled="true">
-              </x-button>
-            <!--Stop-->
-              <x-button
-                      v-show="item.state !== 'STOP'"
-                      type="warning"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-pause"
-                      disabled="true">
-              </x-button>
-
-              <!--delete-->
-              <x-button
-                      type="error"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-trash"
-                      :disabled="true">
-              </x-button>
+              <!--Delete-->
+              <el-button
+                  type="danger"
+                  circle
+                  size="mini"
+                  icon="el-icon-delete"
+                  :disabled="true">
+              </el-button>
 
               <!--Gantt-->
-              <x-button
-                      type="info"
-                      shape="circle"
-                      size="xsmall"
-                      icon="ans-icon-gantt"
-                      disabled="true">
-              </x-button>
+              <el-button
+                  type="success"
+                  circle
+                  size="mini"
+                  icon="el-icon-s-operation"
+                  disabled="true">
+              </el-button>
             </div>
-          </td>
-        </tr>
-      </table>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
-    <x-poptip
-            ref="poptipDeleteAll"
-            placement="bottom-start"
-            width="90">
-      <p>{{$t('Delete?')}}</p>
-      <div style="text-align: right; margin: 0;padding-top: 4px;">
-        <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
-        <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
-      </div>
-      <template slot="reference">
-        <x-button size="xsmall" :disabled="!strDelete" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
-      </template>
-    </x-poptip>
+    <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+      <el-popconfirm
+        :confirmButtonText="$t('Confirm')"
+        :cancelButtonText="$t('Cancel')"
+        :title="$t('Delete?')"
+        @onConfirm="_delete({},-1)"
+      >
+        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strDelete" slot="reference">{{$t('Delete')}}</el-button>
+      </el-popconfirm>
+    </el-tooltip>
   </div>
 </template>
 <script>
@@ -337,19 +263,7 @@
        */
       _rtState (code) {
         let o = tasksState[code]
-        return `<em class="ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
-      },
-      /**
-       * Close the delete layer
-       */
-      _closeDelete (i) {
-        // close batch
-        if (i < 0) {
-          this.$refs['poptipDeleteAll'].doClose()
-          return
-        }
-        // close one
-        this.$refs[`poptip-delete-${i}`][0].doClose()
+        return `<em class="fa ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       /**
        * delete
@@ -364,11 +278,9 @@
         this.deleteInstance({
           processInstanceId: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this._onUpdate()
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
@@ -408,7 +320,7 @@
        * @param STOP
        */
       _stop (item, index) {
-        if(item.state == 'STOP') {
+        if (item.state === 'STOP') {
           this._countDownFn({
             id: item.id,
             executeType: 'RECOVER_SUSPENDED_PROCESS',
@@ -527,18 +439,10 @@
       },
       _arrDelChange (v) {
         let arr = []
-        this.list.forEach((item)=>{
-          if (item.isCheck) {
-            arr.push(item.id)
-          }
-        })
+        arr = _.map(v, 'id')
         this.strDelete = _.join(arr, ',')
-        if (v === false) {
-          this.checkAll = false
-        }
       },
       _batchDelete () {
-        this.$refs['poptipDeleteAll'].doClose()
         this.batchDeleteInstance({
           processInstanceIds: this.strDelete
         }).then(res => {

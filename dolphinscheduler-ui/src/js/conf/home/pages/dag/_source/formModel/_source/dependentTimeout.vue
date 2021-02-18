@@ -23,7 +23,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding-top: 5px;">
-            <x-switch v-model="enable" @on-click="_onSwitch(0, $event)" :disabled="isDetails"></x-switch>
+            <el-switch v-model="enable" size="small" @change="_onSwitch(0, $event)" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -35,7 +35,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding: 5px 0;">
-            <x-switch v-model="waitStartTimeout.enable" @on-click="_onSwitch(1, $event)" :disabled="isDetails"></x-switch>
+            <el-switch v-model="waitStartTimeout.enable" size="small" @change="_onSwitch(1, $event)" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -46,22 +46,22 @@
           <span class="text-box">
             <span>{{$t('Timeout period')}}</span>
           </span>
-          <x-input v-model="waitStartTimeout.interval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="waitStartTimeout.interval" size="small" style="width: 100px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
           <span class="text-box">
             <span>{{$t('Check interval')}}</span>
           </span>
-          <x-input v-model="waitStartTimeout.checkInterval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="waitStartTimeout.checkInterval" size="small" style="width: 100px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
           <span class="text-box">
             <span>{{$t('Timeout strategy')}}</span>
           </span>
           <div style="padding-top: 6px;">
-            <x-checkbox-group v-model="waitStartTimeout.strategy">
-              <x-checkbox label="FAILED" :disabled="true">{{$t('Timeout failure')}}</x-checkbox>
-            </x-checkbox-group>
+            <el-checkbox-group size="small" v-model="waitStartTimeout.strategy">
+              <el-checkbox label="FAILED" :disabled="true">{{$t('Timeout failure')}}</el-checkbox>
+            </el-checkbox-group>
           </div>
         </label>
       </div>
@@ -73,7 +73,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding: 5px 0;">
-            <x-switch v-model="waitCompleteTimeout.enable" @on-click="_onSwitch(2, $event)" :disabled="isDetails"></x-switch>
+            <el-switch v-model="waitCompleteTimeout.enable" size="small" @change="_onSwitch(2, $event)" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -84,17 +84,17 @@
           <span class="text-box">
             <span>{{$t('Timeout period')}}</span>
           </span>
-          <x-input v-model="waitCompleteTimeout.interval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="waitCompleteTimeout.interval" size="small" style="width: 100px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
           <span class="text-box">
             <span>{{$t('Timeout strategy')}}</span>
           </span>
           <div style="padding-top: 6px;">
-            <x-checkbox-group v-model="waitCompleteTimeout.strategy">
-              <x-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</x-checkbox>
-              <x-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</x-checkbox>
-            </x-checkbox-group>
+            <el-checkbox-group size="small" v-model="waitCompleteTimeout.strategy">
+              <el-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</el-checkbox>
+              <el-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</el-checkbox>
+            </el-checkbox-group>
           </div>
         </label>
       </div>
@@ -143,21 +143,21 @@
         if (p === 2 || p === 0) {
           this.waitCompleteTimeout.strategy = is ? ['WARN'] : []
           this.waitCompleteTimeout.interval = is ? 30 : null
-        }        
+        }
       },
       _verification () {
         // Verification timeout policy
-        if (this.enable 
-          && (this.waitCompleteTimeout.enable && !this.waitCompleteTimeout.strategy.length)
-          || (this.waitStartTimeout.enable && !this.waitStartTimeout.strategy.length)) {
+        if (this.enable &&
+          (this.waitCompleteTimeout.enable && !this.waitCompleteTimeout.strategy.length) ||
+          (this.waitStartTimeout.enable && !this.waitStartTimeout.strategy.length)) {
           this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
           return false
         }
         // Verify timeout duration Non 0 positive integer
         const reg = /^[1-9]\d*$/
-        if (this.enable 
-          && (this.waitCompleteTimeout.enable && !reg.test(this.waitCompleteTimeout.interval))
-          || (this.waitStartTimeout.enable && (!reg.test(this.waitStartTimeout.interval || !reg.test(this.waitStartTimeout.checkInterval))))) {
+        if (this.enable &&
+          (this.waitCompleteTimeout.enable && !reg.test(this.waitCompleteTimeout.interval)) ||
+          (this.waitStartTimeout.enable && (!reg.test(this.waitStartTimeout.interval || !reg.test(this.waitStartTimeout.checkInterval))))) {
           this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }
@@ -175,16 +175,16 @@
           },
           waitCompleteTimeout: {
             strategy: (() => {
-            // Handling checkout sequence
-            let strategy = this.waitCompleteTimeout.strategy
-            if (strategy.length === 2 && strategy[0] === 'FAILED') {
-              return [strategy[1], strategy[0]].join(',')
-            } else {
-              return strategy.join(',')
-            }
-          })(),
-          interval: parseInt(this.waitCompleteTimeout.interval),
-          enable: this.waitCompleteTimeout.enable
+              // Handling checkout sequence
+              let strategy = this.waitCompleteTimeout.strategy
+              if (strategy.length === 2 && strategy[0] === 'FAILED') {
+                return [strategy[1], strategy[0]].join(',')
+              } else {
+                return strategy.join(',')
+              }
+            })(),
+            interval: parseInt(this.waitCompleteTimeout.interval),
+            enable: this.waitCompleteTimeout.enable
           }
         })
         return true

@@ -15,54 +15,56 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit token') : $t('Create token')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-token-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Failure time')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Expiration time')}}</template>
           <template slot="content">
-            <x-datepicker
-                    :disabled-date="disabledDate"
-                    v-model="expireTime"
-                    @on-change="_onChange"
-                    format="YYYY-MM-DD HH:mm:ss"
-                    :panelNum="1">
-            </x-datepicker>
+            <el-date-picker
+                type="datetime"
+                :picker-options="pickerOptions"
+                v-model="expireTime"
+                @on-change="_onChange"
+                format="yyyy-MM-dd HH:mm:ss"
+                size="small">
+            </el-date-picker>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="auth">
           <template slot="name"><strong>*</strong>{{$t('User')}}</template>
           <template slot="content">
-            <x-select v-model="userId" @on-change="_onChange">
-              <x-option
+            <el-select v-model="userId" @change="_onChange" size="small">
+              <el-option
                       v-for="city in userIdList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.userName">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">Token</template>
           <template slot="content">
-            <x-input
+            <el-input
                     readonly
                     style="width: 306px;"
                     type="input"
+                    size="small"
                     v-model="token"
                     :placeholder="$t('Please enter token')">
-            </x-input>
-            <x-button type="ghost" @click="_generateToken" :loading="tokenLoading">{{$t('Generate token')}}</x-button>
+            </el-input>
+            <el-button size="small" @click="_generateToken" :loading="tokenLoading">{{$t('Generate token')}}</el-button>
           </template>
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import _ from 'lodash'
@@ -70,7 +72,7 @@
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import Permissions from '@/module/permissions'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -84,7 +86,12 @@
         token: '',
         userIdList: [],
         tokenLoading: false,
-        auth: !Permissions.getAuth()
+        auth: !Permissions.getAuth(),
+        pickerOptions: {
+          disabledDate (time) {
+            return time.getTime() < Date.now() - 8.64e7 // 当前时间以后可以选择当前时间
+          }
+        }
       }
     },
     props: {
@@ -112,21 +119,19 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
         this.store.dispatch(`user/${this.item ? 'updateToken' : 'createToken'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
       },
       _generateToken () {
         this.tokenLoading = true
-        this.store.dispatch(`user/generateToken`, {
+        this.store.dispatch('user/generateToken', {
           userId: this.userId,
           expireTime: this.expireTime
         }).then(res => {
@@ -142,6 +147,9 @@
       },
       _onChange () {
         this.token = ''
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},
@@ -156,7 +164,7 @@
         }
       }
       if (this.auth) {
-        this.store.dispatch(`security/getUsersAll`).then(res => {
+        this.store.dispatch('security/getUsersAll').then(res => {
           this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
           d(this.userIdList[0].id)
         })
@@ -166,7 +174,7 @@
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>
 

@@ -15,34 +15,34 @@
  * limitations under the License.
  */
 <template>
-  <div class="form-model-model" v-clickoutside="_handleClose">
+  <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
       <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log :item="backfillItem">
-          <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon ans-icon-timer"></em><em>{{$t('View history')}}</em></a></template>
-          <template slot="log"><a href="javascript:"><em class="ansicon ans-icon-log"></em><em>{{$t('View log')}}</em></a></template>
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon el-icon-alarm-clock"></em><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><em class="ansicon el-icon-document"></em><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ans-icon-node"></em><em>{{$t('Enter this child node')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ri-node-tree"></em><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
-      <div class="from-model">
+      <div class="form-model">
         <!-- Node name -->
         <div class="clearfix list">
           <div class="text-box"><span>{{$t('Node name')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <x-input
+              <el-input
                 type="text"
                 v-model="name"
+                size="small"
                 :disabled="isDetails"
                 :placeholder="$t('Please enter name (required)')"
                 maxlength="100"
-                @on-blur="_verifName()"
-                autocomplete="off">
-              </x-input>
+                @blur="_verifName()">
+              </el-input>
             </label>
           </div>
         </div>
@@ -52,10 +52,10 @@
           <div class="text-box"><span>{{$t('Run flag')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <x-radio-group v-model="runFlag" >
-                <x-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</x-radio>
-                <x-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</x-radio>
-              </x-radio-group>
+              <el-radio-group v-model="runFlag" size="small">
+                <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
+                <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
+              </el-radio-group>
             </label>
           </div>
         </div>
@@ -67,15 +67,13 @@
           </div>
           <div class="cont-box">
             <label class="label-box">
-              <x-input
-                resize
-                :autosize="{minRows:2}"
+              <el-input
+                :rows="2"
                 type="textarea"
                 :disabled="isDetails"
                 v-model="description"
-                :placeholder="$t('Please enter description')"
-                autocomplete="off">
-              </x-input>
+                :placeholder="$t('Please enter description')">
+              </el-input>
             </label>
           </div>
         </div>
@@ -95,81 +93,74 @@
         </div>
 
         <!-- Number of failed retries -->
-        <div class="clearfix list" v-if="taskType !== 'SUB_PROCESS'">
+        <div class="clearfix list" v-if="nodeData.taskType !== 'SUB_PROCESS'">
           <div class="text-box">
             <span>{{$t('Number of failed retries')}}</span>
           </div>
           <div class="cont-box">
-            <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]">
-            </m-select-input>
+            <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]"></m-select-input>
             <span>({{$t('Times')}})</span>
             <span class="text-b">{{$t('Failed retry interval')}}</span>
-            <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]">
-            </m-select-input>
+            <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]"></m-select-input>
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
 
         <!-- Delay execution time -->
-        <div class="clearfix list" v-if="taskType !== 'SUB_PROCESS' && taskType !== 'CONDITIONS' && taskType !== 'DEPENDENT'">
+        <div class="clearfix list" v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'">
           <div class="text-box">
             <span>{{$t('Delay execution time')}}</span>
           </div>
           <div class="cont-box">
-            <m-select-input v-model="delayTime" :list="[0,1,5,10]">
-            </m-select-input>
+            <m-select-input v-model="delayTime" :list="[0,1,5,10]"></m-select-input>
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
 
         <!-- Branch flow -->
-        <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
+        <div class="clearfix list" v-if="nodeData.taskType === 'CONDITIONS'">
           <div class="text-box">
             <span>{{$t('State')}}</span>
           </div>
           <div class="cont-box">
             <span class="label-box" style="width: 193px;display: inline-block;">
-              <x-select style="width: 157px;" v-model="successNode" :disabled="true">
-              <x-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+              <el-select style="width: 157px;" size="small" v-model="successNode" :disabled="true">
+                <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+              </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <x-select style="width: 157px;" v-model="successBranch" clearable>
-              <x-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable>
+              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            </el-select>
           </div>
         </div>
-        <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
+        <div class="clearfix list" v-if="nodeData.taskType === 'CONDITIONS'">
           <div class="text-box">
             <span>{{$t('State')}}</span>
           </div>
           <div class="cont-box">
             <span class="label-box" style="width: 193px;display: inline-block;">
-              <x-select style="width: 157px;" v-model="failedNode" :disabled="true">
-              <x-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+              <el-select style="width: 157px;" size="small" v-model="failedNode" :disabled="true">
+                <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+              </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <x-select style="width: 157px;" v-model="failedBranch" clearable>
-              <x-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable>
+              <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            </el-select>
           </div>
         </div>
 
         <!-- Task timeout alarm -->
         <m-timeout-alarm
-          v-if="taskType !== 'DEPENDENT'"
+          v-if="nodeData.taskType !== 'DEPENDENT'"
           ref="timeout"
           :backfill-item="backfillItem"
           @on-timeout="_onTimeout">
         </m-timeout-alarm>
         <!-- Dependent timeout alarm -->
         <m-dependent-timeout
-          v-if="taskType === 'DEPENDENT'"
+          v-if="nodeData.taskType === 'DEPENDENT'"
           ref="dependentTimeout"
           :backfill-item="backfillItem"
           @on-timeout="_onDependentTimeout">
@@ -177,7 +168,7 @@
 
         <!-- shell node -->
         <m-shell
-          v-if="taskType === 'SHELL'"
+          v-if="nodeData.taskType === 'SHELL'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="SHELL"
@@ -185,7 +176,7 @@
         </m-shell>
         <!-- waterdrop node -->
         <m-waterdrop
-          v-if="taskType === 'WATERDROP'"
+          v-if="nodeData.taskType === 'WATERDROP'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="WATERDROP"
@@ -193,7 +184,7 @@
         </m-waterdrop>
         <!-- sub_process node -->
         <m-sub-process
-          v-if="taskType === 'SUB_PROCESS'"
+          v-if="nodeData.taskType === 'SUB_PROCESS'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           @on-set-process-name="_onSetProcessName"
@@ -202,7 +193,7 @@
         </m-sub-process>
         <!-- procedure node -->
         <m-procedure
-          v-if="taskType === 'PROCEDURE'"
+          v-if="nodeData.taskType === 'PROCEDURE'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="PROCEDURE"
@@ -210,23 +201,23 @@
         </m-procedure>
         <!-- sql node -->
         <m-sql
-          v-if="taskType === 'SQL'"
+          v-if="nodeData.taskType === 'SQL'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="SQL"
-          :create-node-id="id"
+          :create-node-id="nodeData.id"
           :backfill-item="backfillItem">
         </m-sql>
         <!-- spark node -->
         <m-spark
-          v-if="taskType === 'SPARK'"
+          v-if="nodeData.taskType === 'SPARK'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="SPARK"
           :backfill-item="backfillItem">
         </m-spark>
         <m-flink
-          v-if="taskType === 'FLINK'"
+          v-if="nodeData.taskType === 'FLINK'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="FLINK"
@@ -234,7 +225,7 @@
         </m-flink>
         <!-- mr node -->
         <m-mr
-          v-if="taskType === 'MR'"
+          v-if="nodeData.taskType === 'MR'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="MR"
@@ -242,7 +233,7 @@
         </m-mr>
         <!-- python node -->
         <m-python
-          v-if="taskType === 'PYTHON'"
+          v-if="nodeData.taskType === 'PYTHON'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="PYTHON"
@@ -250,44 +241,44 @@
         </m-python>
         <!-- dependent node -->
         <m-dependent
-          v-if="taskType === 'DEPENDENT'"
+          v-if="nodeData.taskType === 'DEPENDENT'"
           @on-dependent="_onDependent"
           @on-cache-dependent="_onCacheDependent"
           ref="DEPENDENT"
           :backfill-item="backfillItem">
         </m-dependent>
         <m-http
-          v-if="taskType === 'HTTP'"
+          v-if="nodeData.taskType === 'HTTP'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="HTTP"
           :backfill-item="backfillItem">
         </m-http>
         <m-datax
-          v-if="taskType === 'DATAX'"
+          v-if="nodeData.taskType === 'DATAX'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="DATAX"
           :backfill-item="backfillItem">
         </m-datax>
         <m-sqoop
-          v-if="taskType === 'SQOOP'"
+          v-if="nodeData.taskType === 'SQOOP'"
           @on-params="_onParams"
           @on-cache-params="_onCacheParams"
           ref="SQOOP"
           :backfill-item="backfillItem">
         </m-sqoop>
         <m-conditions
-          v-if="taskType === 'CONDITIONS'"
+          v-if="nodeData.taskType === 'CONDITIONS'"
           ref="CONDITIONS"
           @on-dependent="_onDependent"
           @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
-          :pre-node="preNode">
+          :pre-node="nodeData.preNode">
         </m-conditions>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(taskType) > -1"
+          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
           @on-pre-tasks="_onPreTasks"
           ref="PRE_TASK"
           :backfill-item="backfillItem"></m-pre-tasks>
@@ -295,8 +286,8 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" id="cancelBtn"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
+        <el-button type="text" size="small" id="cancelBtn"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>
@@ -351,8 +342,8 @@
         successBranch: '',
         failedBranch: '',
         conditionResult: {
-          'successNode': [],
-          'failedNode': []
+          successNode: [],
+          failedNode: []
         },
         // dependence
         dependence: {},
@@ -378,7 +369,7 @@
         taskInstancePriority: 'MEDIUM',
         // worker group id
         workerGroup: 'default',
-        stateList:[
+        stateList: [
           {
             value: 'success',
             label: `${i18n.$t('success')}`
@@ -390,8 +381,8 @@
         ],
         // preTasks
         preTaskIdsInWorkflow: [],
-        preTasksToAdd: [],    // pre-taskIds to add, used in jsplumb connects
-        preTasksToDelete: [], // pre-taskIds to delete, used in jsplumb connects
+        preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
+        preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
       }
     },
     /**
@@ -400,12 +391,7 @@
     directives: { clickoutside },
     mixins: [disabledState],
     props: {
-      id: Number,
-      taskType: String,
-      self: Object,
-      preNode: Array,
-      rearList: Array,
-      instanceId: Number
+      nodeData: Object
     },
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
@@ -452,14 +438,7 @@
        * Jump to task instance
        */
       _seeHistory () {
-        this.self.$router.push({
-          name: 'task-instance',
-          query: {
-            processInstanceId: this.self.$route.params.id,
-            taskName: this.backfillItem.name
-          }
-        })
-        this.$modal.destroy()
+        this.$emit('seeHistory', this.backfillItem.name)
       },
       /**
        * Enter the child node to judge the process instance or the process definition
@@ -471,19 +450,19 @@
           return
         }
         if (this.router.history.current.name === 'projects-instance-details') {
-          let stateId = $(`#${this.id}`).attr('data-state-id') || null
+          let stateId = $(`#${this.nodeData.id}`).attr('data-state-id') || null
           if (!stateId) {
             this.$message.warning(`${i18n.$t('The task has not been executed and cannot enter the sub-Process')}`)
             return
           }
           this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
             this.$emit('onSubProcess', {
-            subProcessId: res.data.subProcessInstanceId,
-            fromThis: this
-          })
-        }).catch(e => {
+              subProcessId: res.data.subProcessInstanceId,
+              fromThis: this
+            })
+          }).catch(e => {
             this.$message.error(e.msg || '')
-        })
+          })
         } else {
           this.$emit('onSubProcess', {
             subProcessId: this.backfillItem.params.processDefinitionId,
@@ -508,8 +487,8 @@
         this.conditionResult.failedNode[0] = this.failedBranch
         this.$emit('cacheTaskInfo', {
           item: {
-            type: this.taskType,
-            id: this.id,
+            type: this.nodeData.taskType,
+            id: this.nodeData.id,
             name: this.name,
             params: this.params,
             description: this.description,
@@ -537,7 +516,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
+        if (this.successBranch !== '' && this.successBranch !== null && this.successBranch === this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -551,13 +530,13 @@
         }
         return true
       },
-      _verifWorkGroup() {
+      _verifWorkGroup () {
         let item = this.store.state.security.workerGroupsListAll.find(item => {
-          return item.id == this.workerGroup;
-        });
-        if(item==undefined) {
+          return item.id === this.workerGroup
+        })
+        if (item === undefined) {
           this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
-          return false;
+          return false
         }
         return true
       },
@@ -570,37 +549,36 @@
           return
         }
         // verif workGroup
-        if(!this._verifWorkGroup()) {
+        if (!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
-        if (this.taskType === 'DEPENDENT') {
-          if (!this.$refs['dependentTimeout']._verification()) {
+        if (this.nodeData.taskType === 'DEPENDENT') {
+          if (!this.$refs.dependentTimeout._verification()) {
             return
           }
         } else {
-          if (!this.$refs['timeout']._verification()) {
+          if (!this.$refs.timeout._verification()) {
             return
           }
         }
-        
+
         // Verify node parameters
-        if (!this.$refs[this.taskType]._verification()) {
+        if (!this.$refs[this.nodeData.taskType]._verification()) {
           return
         }
         // Verify preTasks and update dag-things
-        if (this.$refs['PRE_TASK']) {
-          if (!this.$refs['PRE_TASK']._verification()) {
+        if (this.$refs.PRE_TASK) {
+          if (!this.$refs.PRE_TASK._verification()) {
             return
-          }
-          else {
+          } else {
             // Sync data-targetarr
-            $(`#${this.id}`).attr(
+            $(`#${this.nodeData.id}`).attr(
               'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
 
             // Update JSP connections
             let plumbIns = JSP.JspInstance
-            var targetId = this.id
+            let targetId = this.nodeData.id
 
             // Update new connections
             this.preTasksToAdd.map(sourceId => {
@@ -609,7 +587,7 @@
                 target: targetId,
                 type: 'basic',
                 paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-                HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
+                HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
               })
             })
 
@@ -617,7 +595,7 @@
             let currentConnects = plumbIns.getAllConnections()
             let len = currentConnects.length
             for (let i = 0; i < len; i++) {
-              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId == targetId) {
+              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
                 plumbIns.deleteConnection(currentConnects[i])
                 i -= 1
                 len -= 1
@@ -626,14 +604,14 @@
           }
         }
 
-        $(`#${this.id}`).find('span').text(this.name)
+        $(`#${this.nodeData.id}`).find('span').text(this.name)
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
         // Store the corresponding node data structure
         this.$emit('addTaskInfo', {
           item: {
-            type: this.taskType,
-            id: this.id,
+            type: this.nodeData.taskType,
+            id: this.nodeData.id,
             name: this.name,
             params: this.params,
             description: this.description,
@@ -666,7 +644,7 @@
        *  set run flag
        */
       _setRunFlag () {
-        let dom = $(`#${this.id}`).find('.ban-p')
+        let dom = $(`#${this.nodeData.id}`).find('.ban-p')
         dom.html('')
         if (this.runFlag === 'FORBIDDEN') {
           dom.append(rtBantpl())
@@ -695,7 +673,7 @@
           fromThis: this
         })
       }
-    }, 
+    },
     watch: {
       /**
        * Watch the item change, cache the value it changes
@@ -710,16 +688,16 @@
       // Backfill data
       let taskList = this.store.state.dag.tasks
 
-      //fillback use cacheTasks
+      // fillback use cacheTasks
       let cacheTasks = this.store.state.dag.cacheTasks
       let o = {}
-      if (cacheTasks[this.id]) {
-        o = cacheTasks[this.id]
-        this.backfillItem = cacheTasks[this.id]
+      if (cacheTasks[this.nodeData.id]) {
+        o = cacheTasks[this.nodeData.id]
+        this.backfillItem = cacheTasks[this.nodeData.id]
       } else {
         if (taskList.length) {
           taskList.forEach(v => {
-            if (v.id === this.id) {
+            if (v.id === this.nodeData.id) {
               o = v
               this.backfillItem = v
             }
@@ -735,22 +713,20 @@
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
         this.delayTime = o.delayTime
-        if(o.conditionResult) {
+        if (o.conditionResult) {
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
         }
-          // If the workergroup has been deleted, set the default workergroup
-        var hasMatch = false;
+        // If the workergroup has been deleted, set the default workergroup
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-          var workerGroup = this.store.state.security.workerGroupsListAll[i].id
-          if (o.workerGroup == workerGroup) {
-            hasMatch = true;
-            break;
+          let workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          if (o.workerGroup === workerGroup) {
+            break
           }
         }
-        if(o.workerGroup == undefined) {
-          this.store.dispatch('dag/getTaskInstanceList',{
-            pageSize: 10, pageNo: 1, processInstanceId: this.instanceId, name: o.name
+        if (o.workerGroup === undefined) {
+          this.store.dispatch('dag/getTaskInstanceList', {
+            pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
           }).then(res => {
             this.workerGroup = res.totalList[0].workerGroup
           })
@@ -761,7 +737,6 @@
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
-
       } else {
         this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
@@ -769,7 +744,7 @@
       this.isContentBox = true
 
       // Init value of preTask selector
-      let preTaskIds = $(`#${this.id}`).attr('data-targetarr')
+      let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
       if (!_.isEmpty(this.backfillItem)) {
         if (preTaskIds && preTaskIds.length) {
           this.backfillItem.preTasks = preTaskIds.split(',')
@@ -780,10 +755,10 @@
     },
     mounted () {
       let self = this
-      $("#cancelBtn").mousedown(function(event){
-        event.preventDefault();
+      $('#cancelBtn').mousedown(function (event) {
+        event.preventDefault()
         self.close()
-      });
+      })
     },
     updated () {
     },
@@ -796,14 +771,14 @@
        * Child workflow entry show/hide
        */
       _isGoSubProcess () {
-        return this.taskType === 'SUB_PROCESS' && this.name
+        return this.nodeData.taskType === 'SUB_PROCESS' && this.name
       },
 
-      //Define the item model
+      // Define the item model
       _item () {
         return {
-          type: this.taskType,
-          id: this.id,
+          type: this.nodeData.taskType,
+          id: this.nodeData.id,
           name: this.name,
           description: this.description,
           runFlag: this.runFlag,
@@ -841,7 +816,7 @@
       mDependentTimeout,
       mPriority,
       mWorkerGroups,
-      mPreTasks,
+      mPreTasks
     }
   }
 </script>
