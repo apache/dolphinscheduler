@@ -71,9 +71,19 @@ public class ProcessTaskRelation {
     private long preTaskCode;
 
     /**
+     * pre node version
+     */
+    private int preNodeVersion;
+
+    /**
      * post task code
      */
     private long postTaskCode;
+
+    /**
+     * post node version
+     */
+    private int postNodeVersion;
 
     /**
      * condition type
@@ -247,5 +257,21 @@ public class ProcessTaskRelation {
 
     public void setConditionType(ConditionType conditionType) {
         this.conditionType = conditionType;
+    }
+
+    public int getPreNodeVersion() {
+        return preNodeVersion;
+    }
+
+    public void setPreNodeVersion(int preNodeVersion) {
+        this.preNodeVersion = preNodeVersion;
+    }
+
+    public int getPostNodeVersion() {
+        return postNodeVersion;
+    }
+
+    public void setPostNodeVersion(int postNodeVersion) {
+        this.postNodeVersion = postNodeVersion;
     }
 }
