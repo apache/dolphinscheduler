@@ -513,7 +513,9 @@ CREATE TABLE `t_ds_process_task_relation` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
+  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
+  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
   `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
   `condition_params` text COMMENT 'condition params(json)',
   `create_time` datetime NOT NULL COMMENT 'create time',
@@ -532,7 +534,9 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
   `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
+  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
   `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
+  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
   `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
   `condition_params` text COMMENT 'condition params(json)',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
@@ -582,7 +586,7 @@ CREATE TABLE `t_ds_process_instance` (
   `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
   `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',
   `run_times` int(11) DEFAULT NULL COMMENT 'process instance run times',
-  `host` varchar(45) DEFAULT NULL COMMENT 'process instance host',
+  `host` varchar(135) DEFAULT NULL COMMENT 'process instance host',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type. 0: only current node,1:before the node,2:later nodes',
@@ -819,7 +823,7 @@ CREATE TABLE `t_ds_task_instance` (
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
   `start_time` datetime DEFAULT NULL COMMENT 'task start time',
   `end_time` datetime DEFAULT NULL COMMENT 'task end time',
-  `host` varchar(45) DEFAULT NULL COMMENT 'host of task running on',
+  `host` varchar(135) DEFAULT NULL COMMENT 'host of task running on',
   `execute_path` varchar(200) DEFAULT NULL COMMENT 'task execute path in the host',
   `log_path` varchar(200) DEFAULT NULL COMMENT 'task log path',
   `alert_flag` tinyint(4) DEFAULT NULL COMMENT 'whether alert',
@@ -933,8 +937,8 @@ VALUES ('1', '1.3.0');
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
-INSERT INTO `t_ds_alertgroup`
-VALUES (1,"1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
+INSERT INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
 -- ----------------------------

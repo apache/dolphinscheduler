@@ -42,9 +42,11 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -99,6 +101,7 @@ import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
@@ -2278,11 +2281,12 @@ public class ProcessService {
     /**
      * create task definition and task relations
      */
-    public int createTaskAndRelation(User operator,
-                                     Long projectCode,
-                                     ProcessDefinition processDefinition,
-                                     ProcessData processData) {
+    public void createTaskAndRelation(User operator,
+                                      Long projectCode,
+                                      ProcessDefinition processDefinition,
+                                      ProcessData processData) {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
+        Map<String, Long> taskNameAndCode = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
             TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(projectCode, taskNode.getName());
             if (taskDefinition == null) {
@@ -2292,44 +2296,60 @@ public class ProcessService {
                     taskDefinition = new TaskDefinition();
                     taskDefinition.setCode(code);
                 } catch (SnowFlakeException e) {
-                    logger.error("Task code get error, ", e);
-                    return -1;
+                    throw new ServiceException("Task code get error", e);
                 }
                 saveTaskDefinition(operator, projectCode, taskNode, taskDefinition);
             } else {
                 if (isTaskOnline(taskDefinition.getCode())) {
-                    // TODO return something for fail
-                    return -1;
+                    throw new ServiceException(String.format("The task %s is on line in process", taskNode.getName()));
                 }
                 updateTaskDefinition(operator, projectCode, taskNode, taskDefinition);
             }
+            taskNameAndCode.put(taskNode.getName(), taskDefinition.getCode());
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(projectCode, processDefinition.getCode());
         }
-        // TODO parse taskNodeList for preTaskCode and postTaskCode
-        List<TaskNodeRelation> taskNodeRelationList = DagHelper.getProcessDag(taskNodeList).getEdges();
+        List<ProcessTaskRelation> builderRelationList = new ArrayList<>();
         Date now = new Date();
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation("",// todo relation name
-                processDefinition.getVersion(),
-                projectCode,
-                processDefinition.getCode(),
-                0L,  // todo pre task code
-                0L, // todo post task code
-                ConditionType.of(""), // todo conditionType
-                "", // todo conditionParams
-                now,
-                now);
-        // save process task relation
-        int insert = processTaskRelationMapper.insert(processTaskRelation);
-        // save process task relation log
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
-        processTaskRelationLog.set(processTaskRelation);
-        processTaskRelationLog.setOperator(operator.getId());
-        processTaskRelationLog.setOperateTime(now);
-        int logInsert = processTaskRelationLogMapper.insert(processTaskRelationLog);
-        return insert & logInsert;
+        for (TaskNode taskNode : taskNodeList) {
+            List<String> depList = taskNode.getDepList();
+            if (CollectionUtils.isNotEmpty(depList)) {
+                for (String preTaskName : depList) {
+                    builderRelationList.add(new ProcessTaskRelation("",// todo relation name
+                            processDefinition.getVersion(),
+                            projectCode,
+                            processDefinition.getCode(),
+                            taskNameAndCode.get(preTaskName),
+                            taskNameAndCode.get(taskNode.getName()),
+                            ConditionType.of("none"), // todo conditionType
+                            taskNode.getConditionResult(),
+                            now,
+                            now));
+                }
+            } else {
+                builderRelationList.add(new ProcessTaskRelation("",// todo relation name
+                        processDefinition.getVersion(),
+                        projectCode,
+                        processDefinition.getCode(),
+                        0L,
+                        taskNameAndCode.get(taskNode.getName()),
+                        ConditionType.of("none"), // todo conditionType
+                        taskNode.getConditionResult(),
+                        now,
+                        now));
+            }
+        }
+        for (ProcessTaskRelation processTaskRelation : builderRelationList) {
+            processTaskRelationMapper.insert(processTaskRelation);
+            // save process task relation log
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+            processTaskRelationLog.set(processTaskRelation);
+            processTaskRelationLog.setOperator(operator.getId());
+            processTaskRelationLog.setOperateTime(now);
+            processTaskRelationLogMapper.insert(processTaskRelationLog);
+        }
     }
 
     public int saveTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
@@ -2368,4 +2388,32 @@ public class ProcessService {
         }
         return false;
     }
+
+    /**
+     * Generate the DAG Graph based on the process definition id
+     *
+     * @param processDefinition process definition
+     * @return dag graph
+     */
+    public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
+
+        List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
+                processDefinition.getCode(),
+                processDefinition.getVersion());
+        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
+        List<TaskDefinition> taskDefinitions = new ArrayList<>();
+        for (ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs) {
+            processTaskRelations.add(JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class));
+
+            TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                    processTaskRelationLog.getPostTaskCode(),
+                    processTaskRelationLog.getPostNodeVersion());
+            taskDefinitions.add(JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinitionLog), TaskDefinition.class));
+        }
+
+        ProcessDag processDag = DagHelper.getProcessDag(taskDefinitions, processTaskRelations);
+        // Generate concrete Dag to be executed
+        return DagHelper.buildDagGraph(processDag);
+    }
+
 }

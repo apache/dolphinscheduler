@@ -398,7 +398,9 @@ CREATE TABLE t_ds_process_task_relation (
   project_code bigint DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   pre_task_code bigint DEFAULT NULL ,
+  pre_task_version int DEFAULT 0 ,
   post_task_code bigint DEFAULT NULL ,
+  post_task_version int DEFAULT 0 ,
   condition_type int DEFAULT NULL ,
   condition_params text ,
   create_time timestamp DEFAULT NULL ,
@@ -414,7 +416,9 @@ CREATE TABLE t_ds_process_task_relation_log (
   project_code bigint DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   pre_task_code bigint DEFAULT NULL ,
+  pre_task_version int DEFAULT 0 ,
   post_task_code bigint DEFAULT NULL ,
+  post_task_version int DEFAULT 0 ,
   condition_type int DEFAULT NULL ,
   condition_params text ,
   operator int DEFAULT NULL ,
@@ -462,7 +466,7 @@ CREATE TABLE t_ds_process_instance (
   start_time timestamp DEFAULT NULL ,
   end_time timestamp DEFAULT NULL ,
   run_times int DEFAULT NULL ,
-  host varchar(45) DEFAULT NULL ,
+  host varchar(135) DEFAULT NULL ,
   command_type int DEFAULT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
@@ -678,7 +682,7 @@ CREATE TABLE t_ds_task_instance (
   submit_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   end_time timestamp DEFAULT NULL ,
-  host varchar(45) DEFAULT NULL ,
+  host varchar(135) DEFAULT NULL ,
   execute_path varchar(200) DEFAULT NULL ,
   log_path varchar(200) DEFAULT NULL ,
   alert_flag int DEFAULT NULL ,
@@ -898,9 +902,9 @@ INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_
 VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50',
         '2018-10-24 17:40:22');
 
--- Records of t_ds_alertgroup，dolphinscheduler warning group
-INSERT INTO t_ds_alertgroup(id,alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (1, '1,2','dolphinscheduler warning group', 'dolphinscheduler warning group', '2018-11-29 10:20:39',
+-- Records of t_ds_alertgroup, default admin warning group
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
