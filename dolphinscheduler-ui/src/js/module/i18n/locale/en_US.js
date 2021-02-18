@@ -222,6 +222,7 @@ export default {
   'Alarm instance name': 'Alarm instance name',
   'Select plugin': 'Select plugin',
   'Please enter group name': 'Please enter group name',
+  'Instance parameter exception': 'Instance parameter exception',
   'Group Type': 'Group Type',
   'Alarm plugin instance': 'Alarm plugin instance',
   Remarks: 'Remarks',
