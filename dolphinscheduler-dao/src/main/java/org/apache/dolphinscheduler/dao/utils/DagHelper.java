@@ -475,18 +475,17 @@ public class DagHelper {
      */
     public static ProcessDag getProcessDag(List<TaskDefinition> taskDefinitions,
                                            List<ProcessTaskRelation> processTaskRelations) {
-
-        Map<Long, TaskNode>  taskNodeMap = new HashMap<>();
+        Map<Long, TaskNode> taskNodeMap = new HashMap<>();
         List<TaskNode> taskNodeList = new ArrayList<>();
-        for(TaskDefinition taskDefinition : taskDefinitions){
+        for (TaskDefinition taskDefinition : taskDefinitions) {
             TaskNode taskNode = JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinition), TaskNode.class);
             taskNodeMap.put(taskDefinition.getCode(), taskNode);
             taskNodeList.add(taskNode);
         }
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
-        for(ProcessTaskRelation processTaskRelation : processTaskRelations){
-            if(processTaskRelation.getPreTaskCode() != 0){
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPreTaskCode() != 0) {
                 TaskNode preNode = taskNodeMap.get(processTaskRelation.getPreTaskCode());
                 TaskNode postNode = taskNodeMap.get(processTaskRelation.getPostTaskCode());
                 taskNodeRelations.add(new TaskNodeRelation(preNode.getName(), postNode.getName()));
