@@ -899,6 +899,12 @@ public final class Constants {
     public static final String TOTAL = "total";
 
     /**
+     * workflow
+     */
+    public static final String WORKFLOW_LIST = "workFlowList";
+    public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
+
+    /**
      * session user
      */
     public static final String SESSION_USER = "session.user";
