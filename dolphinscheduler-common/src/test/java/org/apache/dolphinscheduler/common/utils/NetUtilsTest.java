@@ -30,6 +30,13 @@ import static org.mockito.Mockito.when;
 public class NetUtilsTest {
 
     @Test
+    public void testGetAddr() {
+        assertEquals(NetUtils.getHost() + ":5678", NetUtils.getAddr(5678));
+        assertEquals("127.0.0.1:5678", NetUtils.getAddr("127.0.0.1", 5678));
+        assertEquals("localhost:1234", NetUtils.getAddr("localhost", 1234));
+    }
+
+    @Test
     public void testGetLocalHost() {
         assertNotNull(NetUtils.getHost());
     }
@@ -45,9 +52,11 @@ public class NetUtilsTest {
         assertFalse(NetUtils.isValidV4Address(address));
         address = mock(InetAddress.class);
         when(address.getHostAddress()).thenReturn("0.0.0.0");
+        when(address.isAnyLocalAddress()).thenReturn(true);
         assertFalse(NetUtils.isValidV4Address(address));
         address = mock(InetAddress.class);
         when(address.getHostAddress()).thenReturn("127.0.0.1");
+        when(address.isLoopbackAddress()).thenReturn(true);
         assertFalse(NetUtils.isValidV4Address(address));
         address = mock(InetAddress.class);
         when(address.getHostAddress()).thenReturn("1.2.3.4");
