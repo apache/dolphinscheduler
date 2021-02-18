@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -65,7 +66,7 @@ public class UsersServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceTest.class);
 
     @InjectMocks
-    private UsersService usersService;
+    private UsersServiceImpl usersService;
     @Mock
     private UserMapper userMapper;
     @Mock
