@@ -752,9 +752,17 @@ public final class Constants {
     public static final String SUBTRACT_STRING = "-";
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
+    public static final String LOCAL_PARAMS_LIST = "localParamsList";
+    public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
+    public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
+    public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
     public static final String RWXR_XR_X = "rwxr-xr-x";
+    public static final String QUEUE = "queue";
+    public static final String QUEUE_NAME = "queueName";
+    public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
+    public static final int LOG_QUERY_LIMIT = 4096;
 
     /**
      * master/worker server use for zk
@@ -1010,11 +1018,13 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
-    public static final int NORAML_NODE_STATUS = 0;
+    public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
+    public static final String START_END_DATE = "startDate,endDate";
+
     /**
      * system line separator
      */
