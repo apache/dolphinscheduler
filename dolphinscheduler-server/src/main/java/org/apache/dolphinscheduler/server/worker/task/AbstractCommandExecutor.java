@@ -339,50 +339,40 @@ public abstract class AbstractCommandExecutor {
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
         ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
-        getOutputLogService.submit(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader inReader = null;
+        getOutputLogService.submit(() -> {
+            BufferedReader inReader = null;
 
-                try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
-                    while ((line = inReader.readLine()) != null) {
-                        if (line.startsWith("${setValue(")) {
-                            varPool.append(line.substring("${setValue(".length(), line.length() - 2));
-                            varPool.append("$VarPool$");
-                        } else {
-                            logBuffer.add(line);
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    logOutputIsScuccess = true;
-                    close(inReader);
+            try {
+                inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                logBuffer.add("welcome to use bigdata scheduling system...");
+                while ((line = inReader.readLine()) != null) {
+                    logBuffer.add(line);
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                logOutputIsScuccess = true;
+                close(inReader);
             }
         });
         getOutputLogService.shutdown();
 
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    long lastFlushTime = System.currentTimeMillis();
-                    while (logBuffer.size() > 0 || !logOutputIsScuccess) {
-                        if (logBuffer.size() > 0) {
-                            lastFlushTime = flush(lastFlushTime);
-                        } else {
-                            Thread.sleep(Constants.DEFAULT_LOG_FLUSH_INTERVAL);
-                        }
+        parseProcessOutputExecutorService.submit(() -> {
+            try {
+                long lastFlushTime = System.currentTimeMillis();
+                while (logBuffer.size() > 0 || !logOutputIsScuccess) {
+                    if (logBuffer.size() > 0) {
+                        lastFlushTime = flush(lastFlushTime);
+                    } else {
+                        Thread.sleep(Constants.DEFAULT_LOG_FLUSH_INTERVAL);
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    clear();
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                clear();
             }
         });
         parseProcessOutputExecutorService.shutdown();
