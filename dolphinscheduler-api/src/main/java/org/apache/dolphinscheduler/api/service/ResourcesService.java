@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -42,12 +43,12 @@ public interface ResourcesService {
      * @param currentDir current directory
      * @return create directory result
      */
-    Result createDirectory(User loginUser,
-                           String name,
-                           String description,
-                           ResourceType type,
-                           int pid,
-                           String currentDir);
+    Result<Object> createDirectory(User loginUser,
+                                   String name,
+                                   String description,
+                                   ResourceType type,
+                                   int pid,
+                                   String currentDir);
 
     /**
      * create resource
@@ -61,13 +62,13 @@ public interface ResourcesService {
      * @param currentDir current directory
      * @return create result code
      */
-    Result createResource(User loginUser,
-                          String name,
-                          String desc,
-                          ResourceType type,
-                          MultipartFile file,
-                          int pid,
-                          String currentDir);
+    Result<Object> createResource(User loginUser,
+                                  String name,
+                                  String desc,
+                                  ResourceType type,
+                                  MultipartFile file,
+                                  int pid,
+                                  String currentDir);
 
     /**
      * update resource
@@ -79,12 +80,12 @@ public interface ResourcesService {
      * @param file          resource file
      * @return  update result code
      */
-    Result updateResource(User loginUser,
-                          int resourceId,
-                          String name,
-                          String desc,
-                          ResourceType type,
-                          MultipartFile file);
+    Result<Object> updateResource(User loginUser,
+                                  int resourceId,
+                                  String name,
+                                  String desc,
+                                  ResourceType type,
+                                  MultipartFile file);
 
     /**
      * query resources list paging
@@ -96,7 +97,7 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query resource list
@@ -122,9 +123,9 @@ public interface ResourcesService {
      * @param loginUser login user
      * @param resourceId resource id
      * @return delete result code
-     * @throws Exception exception
+     * @throws IOException exception
      */
-    Result delete(User loginUser, int resourceId) throws Exception;
+    Result<Object> delete(User loginUser, int resourceId) throws IOException;
 
     /**
      * verify resource by name and type
@@ -133,7 +134,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    Result verifyResourceName(String fullName, ResourceType type,User loginUser);
+    Result<Object> verifyResourceName(String fullName, ResourceType type,User loginUser);
 
     /**
      * verify resource by full name or pid and type
@@ -142,7 +143,7 @@ public interface ResourcesService {
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    Result queryResource(String fullName,Integer id,ResourceType type);
+    Result<Object> queryResource(String fullName,Integer id,ResourceType type);
 
     /**
      * view resource file online
@@ -152,7 +153,7 @@ public interface ResourcesService {
      * @param limit limit
      * @return resource content
      */
-    Result readResource(int resourceId, int skipLineNum, int limit);
+    Result<Object> readResource(int resourceId, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -165,7 +166,7 @@ public interface ResourcesService {
      * @param content content
      * @return create result code
      */
-    Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory);
+    Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory);
 
     /**
      * updateProcessInstance resource
@@ -174,16 +175,16 @@ public interface ResourcesService {
      * @param content content
      * @return update result cod
      */
-    Result updateResourceContent(int resourceId, String content);
+    Result<Object> updateResourceContent(int resourceId, String content);
 
     /**
      * download file
      *
      * @param resourceId resource id
      * @return resource content
-     * @throws Exception exception
+     * @throws IOException exception
      */
-    org.springframework.core.io.Resource downloadResource(int resourceId) throws Exception;
+    org.springframework.core.io.Resource downloadResource(int resourceId) throws IOException;
 
     /**
      * list all file

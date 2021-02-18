@@ -45,9 +45,9 @@ public class RegexUtils {
         return isNum.matches();
     }
 
-    public static String escapeLogging(String str) {
+    public static String escapeNRT(String str) {
         // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-        if (str != null) {
+        if (str != null && !str.isEmpty()) {
             return str.replaceAll("[\n|\r|\t]", "_");
         }
         return null;

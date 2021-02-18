@@ -123,8 +123,8 @@ public class TaskInstanceServiceImpl extends BaseService implements TaskInstance
             }
         }
 
-        Page<TaskInstance> page = new Page(pageNo, pageSize);
-        PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
+        Page<TaskInstance> page = new Page<>(pageNo, pageSize);
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
