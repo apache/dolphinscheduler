@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.TaskInstanceServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -62,7 +63,7 @@ public class TaskInstanceServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceTest.class);
 
     @InjectMocks
-    private TaskInstanceService taskInstanceService;
+    private TaskInstanceServiceImpl taskInstanceService;
 
     @Mock
     ProjectMapper projectMapper;
