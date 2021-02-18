@@ -52,7 +52,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskInstanceCacheManager taskInstanceCacheManager;
 
-
+    /**
+     *  netty executor manager
+     */
     private NettyExecutorManager nettyExecutorManager;
 
 

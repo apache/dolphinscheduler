@@ -22,36 +22,24 @@ package org.apache.dolphinscheduler.plugin.alert.dingtalk;
  */
 public class DingTalkParamsConstants {
 
+
+    static final String DING_TALK_PROXY_ENABLE = "isEnableProxy";
+    static final String DING_TALK_WEB_HOOK = "webhook";
+    static final String NAME_DING_TALK_WEB_HOOK = "WebHook";
+    static final String DING_TALK_KEYWORD = "keyword";
+    static final String NAME_DING_TALK_KEYWORD = "Keyword";
+    static final String NAME_DING_TALK_PROXY_ENABLE = "IsEnableProxy";
+    static final String DING_TALK_PROXY = "proxy";
+    static final String NAME_DING_TALK_PROXY = "Proxy";
+    static final String DING_TALK_PORT = "port";
+    static final String NAME_DING_TALK_PORT = "Port";
+    static final String DING_TALK_USER = "user";
+    static final String NAME_DING_TALK_USER = "User";
+    static final String DING_TALK_PASSWORD = "password";
+    static final String NAME_DING_TALK_PASSWORD = "Password";
+
     private DingTalkParamsConstants() {
         throw new IllegalStateException("Utility class");
     }
-
-    static final String DING_TALK_WEB_HOOK = "dingtalk.webhook";
-
-    static final String NAME_DING_TALK_WEB_HOOK = "dingTalkWebHook";
-
-    static final String DING_TALK_KEYWORD = "dingtalk.keyword";
-
-    static final String NAME_DING_TALK_KEYWORD = "dingTalkKeyword";
-
-    public static final String DING_TALK_PROXY_ENABLE = "dingtalk.isEnableProxy";
-
-    static final String NAME_DING_TALK_PROXY_ENABLE = "dingTalkIsEnableProxy";
-
-    static final String DING_TALK_PROXY = "dingtalk.proxy";
-
-    static final String NAME_DING_TALK_PROXY = "dingTalkProxy";
-
-    static final String DING_TALK_PORT = "dingtalk.port";
-
-    static final String NAME_DING_TALK_PORT = "dingTalkPort";
-
-    static final String DING_TALK_USER = "dingtalk.user";
-
-    static final String NAME_DING_TALK_USER = "dingTalkUser";
-
-    static final String DING_TALK_PASSWORD = "dingtalk.password";
-
-    static final String NAME_DING_TALK_PASSWORD = "dingTalkPassword";
 
 }

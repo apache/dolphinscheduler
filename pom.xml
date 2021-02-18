@@ -787,6 +787,7 @@
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/BaseServiceTest.java</include>
                         <include>**/api/service/DataAnalysisServiceTest.java</include>
+                        <include>**/api/service/AlertPluginInstanceServiceTest.java</include>
                         <include>**/api/service/DataSourceServiceTest.java</include>
                         <include>**/api/service/ExecutorService2Test.java</include>
                         <include>**/api/service/ExecutorServiceTest.java</include>
@@ -838,6 +839,7 @@
                         <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
+                        <include>**/common/utils/NetUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
                         <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
@@ -972,6 +974,8 @@
                         <include>**/plugin/alert/script/ScriptSenderTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertChannelTest.java</include>
+                        <include>**/plugin/alert/feishu/FeiShuAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/feishu/FeiShuSenderTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>

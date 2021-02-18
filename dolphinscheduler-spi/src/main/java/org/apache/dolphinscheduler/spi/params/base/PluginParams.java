@@ -165,6 +165,10 @@ public class PluginParams {
     public List<Validate> getValidateList() {
         return validateList;
     }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 }
 
 

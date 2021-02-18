@@ -256,7 +256,7 @@ public class ProcessInstanceService extends BaseService {
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
         for (ProcessInstance processInstance : processInstances) {
-            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(), processInstance.getEndTime()));
+            processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
             User executor = usersService.queryUser(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
@@ -428,10 +428,9 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
         Date schedule = null;
+        schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
-        } else {
-            schedule = processInstance.getScheduleTime();
         }
         processInstance.setScheduleTime(schedule);
         processInstance.setLocations(locations);
@@ -460,13 +459,18 @@ public class ProcessInstanceService extends BaseService {
             if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
+            // get the processinstancejson before saving,and then save the name and taskid
+            String oldJson = processInstance.getProcessInstanceJson();
+            if (StringUtils.isNotEmpty(oldJson)) {
+                processInstanceJson = processService.changeJson(processData,oldJson);
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
 
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
-        if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
+        if (Boolean.TRUE.equals(syncDefine)) {
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);

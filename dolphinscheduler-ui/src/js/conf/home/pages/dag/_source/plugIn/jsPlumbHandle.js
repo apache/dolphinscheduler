@@ -573,7 +573,7 @@ JSP.prototype.copyNodes = function ($id) {
 JSP.prototype.handleEventScreen = function ({ item, is }) {
   let screenOpen = true
   if (is) {
-    item.icon = 'el-icon-minus'
+    item.icon = 'el-icon-aim'
     screenOpen = true
   } else {
     item.icon = 'el-icon-full-screen'

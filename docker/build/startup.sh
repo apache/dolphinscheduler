@@ -22,8 +22,8 @@ DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
 DOLPHINSCHEDULER_SCRIPT=${DOLPHINSCHEDULER_HOME}/script
 DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
 
-# start database
-initDatabase() {
+# wait database
+waitDatabase() {
     echo "test ${DATABASE_TYPE} service"
     while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
         counter=$((counter+1))
@@ -43,19 +43,22 @@ initDatabase() {
             exit 1
         fi
     else
-        v=$(sudo -u postgres PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
+        v=$(PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
         if [ "$(echo ${v} | grep 'FATAL' | wc -l)" -eq 1 ]; then
             echo "Error: Can't connect to database...${v}"
             exit 1
         fi
     fi
+}
 
+# init database
+initDatabase() {
     echo "import sql data"
     ${DOLPHINSCHEDULER_SCRIPT}/create-dolphinscheduler.sh
 }
 
-# start zk
-initZK() {
+# wait zk
+waitZK() {
     echo "connect remote zookeeper"
     echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
         while ! nc -z ${line%:*} ${line#*:}; do
@@ -68,12 +71,6 @@ initZK() {
             sleep 5
         done
     done
-}
-
-# start nginx
-initNginx() {
-    echo "start nginx"
-    nginx &
 }
 
 # start master-server
@@ -115,58 +112,53 @@ initAlertServer() {
 printUsage() {
     echo -e "Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system,"
     echo -e "dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.\n"
-    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server | frontend ]\n"
-    printf "%-13s:  %s\n" "all"           "Run master-server, worker-server, api-server, alert-server and frontend."
+    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server ]\n"
+    printf "%-13s:  %s\n" "all"           "Run master-server, worker-server, api-server and alert-server"
     printf "%-13s:  %s\n" "master-server" "MasterServer is mainly responsible for DAG task split, task submission monitoring."
-    printf "%-13s:  %s\n" "worker-server" "WorkerServer is mainly responsible for task execution and providing log services.."
-    printf "%-13s:  %s\n" "api-server"    "ApiServer is mainly responsible for processing requests from the front-end UI layer."
+    printf "%-13s:  %s\n" "worker-server" "WorkerServer is mainly responsible for task execution and providing log services."
+    printf "%-13s:  %s\n" "api-server"    "ApiServer is mainly responsible for processing requests and providing the front-end UI layer."
     printf "%-13s:  %s\n" "alert-server"  "AlertServer mainly include Alarms."
-    printf "%-13s:  %s\n" "frontend"      "Frontend mainly provides various visual operation interfaces of the system."
 }
 
 # init config file
 source /root/startup-init-conf.sh
 
-LOGFILE=/var/log/nginx/access.log
 case "$1" in
     (all)
-        initZK
+        waitZK
+        waitDatabase
         initDatabase
         initMasterServer
         initWorkerServer
         initApiServer
         initAlertServer
         initLoggerServer
-        initNginx
-        LOGFILE=/var/log/nginx/access.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (master-server)
-        initZK
-        initDatabase
+        waitZK
+        waitDatabase
         initMasterServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
     ;;
     (worker-server)
-        initZK
-        initDatabase
+        waitZK
+        waitDatabase
         initWorkerServer
         initLoggerServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
     ;;
     (api-server)
-        initZK
+        waitZK
+        waitDatabase
         initDatabase
         initApiServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (alert-server)
-        initDatabase
+        waitDatabase
         initAlertServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
-    ;;
-    (frontend)
-        initNginx
-        LOGFILE=/var/log/nginx/access.log
     ;;
     (help)
         printUsage
@@ -179,8 +171,7 @@ case "$1" in
 esac
 
 # init directories and log files
-mkdir -p ${DOLPHINSCHEDULER_LOGS} && mkdir -p /var/log/nginx/ && cat /dev/null >> ${LOGFILE}
+mkdir -p ${DOLPHINSCHEDULER_LOGS} && cat /dev/null >> ${LOGFILE}
 
 echo "tail begin"
 exec bash -c "tail -n 1 -f ${LOGFILE}"
-

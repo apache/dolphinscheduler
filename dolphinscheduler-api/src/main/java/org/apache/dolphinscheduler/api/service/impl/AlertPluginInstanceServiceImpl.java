@@ -24,16 +24,25 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +65,9 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
+    @Autowired
+    private AlertGroupMapper alertGroupMapper;
+
     /**
      * creat alert plugin instance
      *
@@ -67,7 +79,8 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     @Override
     public Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams) {
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
-        alertPluginInstance.setPluginInstanceParams(pluginInstanceParams);
+        String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
+        alertPluginInstance.setPluginInstanceParams(paramsMapJson);
         alertPluginInstance.setInstanceName(instanceName);
         alertPluginInstance.setPluginDefineId(pluginDefineId);
 
@@ -82,7 +95,9 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
 
         if (i > 0) {
             putMsg(result, Status.SUCCESS);
+            return result;
         }
+        putMsg(result, Status.SAVE_ERROR);
         return result;
     }
 
@@ -98,7 +113,8 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     public Map<String, Object> update(User loginUser, int pluginInstanceId, String instanceName, String pluginInstanceParams) {
 
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
-        alertPluginInstance.setPluginInstanceParams(pluginInstanceParams);
+        String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
+        alertPluginInstance.setPluginInstanceParams(paramsMapJson);
         alertPluginInstance.setInstanceName(instanceName);
         alertPluginInstance.setId(pluginInstanceId);
         Map<String, Object> result = new HashMap<>();
@@ -106,8 +122,9 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
 
         if (i > 0) {
             putMsg(result, Status.SUCCESS);
+            return result;
         }
-
+        putMsg(result, Status.SAVE_ERROR);
         return result;
     }
 
@@ -121,6 +138,13 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     @Override
     public Map<String, Object> delete(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
+        //check if there is an associated alert group
+        boolean hasAssociatedAlertGroup = checkHasAssociatedAlertGroup(String.valueOf(id));
+        if (hasAssociatedAlertGroup) {
+            putMsg(result, Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
+            return result;
+        }
+
         int i = alertPluginInstanceMapper.deleteById(id);
         if (i > 0) {
             putMsg(result, Status.SUCCESS);
@@ -188,21 +212,73 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
         if (CollectionUtils.isEmpty(pluginDefineList)) {
             return null;
         }
-        Map<Integer, String> pluginDefineMap = pluginDefineList.stream().collect(Collectors.toMap(PluginDefine::getId, PluginDefine::getPluginName));
+        Map<Integer, PluginDefine> pluginDefineMap = pluginDefineList.stream().collect(Collectors.toMap(PluginDefine::getId, Function.identity()));
         List<AlertPluginInstanceVO> alertPluginInstanceVOS = new ArrayList<>();
         alertPluginInstances.forEach(alertPluginInstance -> {
             AlertPluginInstanceVO alertPluginInstanceVO = new AlertPluginInstanceVO();
-            alertPluginInstanceVO.setAlertPluginName(pluginDefineMap.get(alertPluginInstance.getPluginDefineId()));
+
             alertPluginInstanceVO.setCreateTime(alertPluginInstance.getCreateTime());
             alertPluginInstanceVO.setUpdateTime(alertPluginInstance.getUpdateTime());
             alertPluginInstanceVO.setPluginDefineId(alertPluginInstance.getPluginDefineId());
             alertPluginInstanceVO.setInstanceName(alertPluginInstance.getInstanceName());
             alertPluginInstanceVO.setId(alertPluginInstance.getId());
+            PluginDefine pluginDefine = pluginDefineMap.get(alertPluginInstance.getPluginDefineId());
+            //FIXME When the user removes the plug-in, this will happen. At this time, maybe we should add a new field to indicate that the plug-in has expired?
+            if (null == pluginDefine) {
+                return;
+            }
+            alertPluginInstanceVO.setAlertPluginName(pluginDefine.getPluginName());
             //todo List pages do not recommend returning this parameter
-            alertPluginInstanceVO.setPluginInstanceParams(alertPluginInstance.getPluginInstanceParams());
+            String pluginParamsMapString = alertPluginInstance.getPluginInstanceParams();
+            String uiPluginParams = parseToPluginUiParams(pluginParamsMapString, pluginDefine.getPluginParams());
+            alertPluginInstanceVO.setPluginInstanceParams(uiPluginParams);
             alertPluginInstanceVOS.add(alertPluginInstanceVO);
         });
         return alertPluginInstanceVOS;
 
     }
+
+    /**
+     * Get the parameters actually needed by the plugin
+     *
+     * @param pluginParams Complete parameters(include ui)
+     * @return k, v(json string)
+     */
+    private String parsePluginParamsMap(String pluginParams) {
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginParams);
+        return JSONUtils.toJsonString(paramsMap);
+    }
+
+    /**
+     * parseToPluginUiParams
+     *
+     * @param pluginParamsMapString k-v data
+     * @param pluginUiParams Complete parameters(include ui)
+     * @return Complete parameters list(include ui)
+     */
+    private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {
+        Map<String, String> paramsMap = JSONUtils.toMap(pluginParamsMapString);
+        if (MapUtils.isEmpty(paramsMap)) {
+            return null;
+        }
+        List<PluginParams> pluginParamsList = JSONUtils.toList(pluginUiParams, PluginParams.class);
+        List<PluginParams> newPluginParamsList = new ArrayList<>(pluginParamsList.size());
+        pluginParamsList.forEach(pluginParams -> {
+            pluginParams.setValue(paramsMap.get(pluginParams.getName()));
+            newPluginParamsList.add(pluginParams);
+
+        });
+
+        return JSONUtils.toJsonString(newPluginParamsList);
+    }
+
+    private boolean checkHasAssociatedAlertGroup(String id) {
+        List<String> idsList = alertGroupMapper.queryInstanceIdsList();
+        if (CollectionUtils.isEmpty(idsList)) {
+            return false;
+        }
+        Optional<String> first = idsList.stream().filter(k -> null != k && Arrays.asList(k.split(",")).contains(id)).findFirst();
+        return first.isPresent();
+    }
+
 }
