@@ -124,11 +124,13 @@
           this.spinnerLoading = false
           this.progress = 0
           this.$emit('on-update', res.data)
+          this.reset()
         }, e => {
           this.spinnerLoading = false
           this.progress = 0
           this.$message.error(e.msg || '')
           this.$emit('on-update', e)
+          this.reset()
         }, {
           data: formData,
           emulateJSON: false,
@@ -148,6 +150,15 @@
             this._formDataUpdate()
           })
         }
+      },
+      reset () {
+        this.udfName = ''
+        this.udfDesc = ''
+        this.file = ''
+        this.progress = 0
+        this.spinnerLoading = false
+        this.pid = null
+        this.currentDir = ''
       }
     },
     watch: {},
