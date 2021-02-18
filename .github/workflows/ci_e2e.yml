@@ -33,7 +33,7 @@ jobs:
         with:
           submodule: true
       - name: Check License Header
-        uses: apache/skywalking-eyes@9bd5feb
+        uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
