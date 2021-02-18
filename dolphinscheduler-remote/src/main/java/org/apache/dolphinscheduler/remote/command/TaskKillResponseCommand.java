@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- *  kill task response command
+ * kill task response command
  */
 public class TaskKillResponseCommand implements Serializable {
 
@@ -51,7 +51,7 @@ public class TaskKillResponseCommand implements Serializable {
     /**
      * other resource manager appId , for example : YARN etc
      */
-    protected List<String> appIds;
+    private List<String> appIds;
 
     public int getTaskInstanceId() {
         return taskInstanceId;
@@ -94,7 +94,7 @@ public class TaskKillResponseCommand implements Serializable {
     }
 
     /**
-     *  package request command
+     * package request command
      *
      * @return command
      */

@@ -14,22 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+{{- if .Values.api.configmap }}
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-frontend
+  name: {{ include "dolphinscheduler.fullname" . }}-api
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-frontend
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-spec:
-  ports:
-    - port: 8888
-      targetPort: tcp-port
-      protocol: TCP
-      name: tcp-port
-  selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-frontend
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: frontend
+data:
+  DOLPHINSCHEDULER_OPTS: {{ .Values.api.configmap.DOLPHINSCHEDULER_OPTS | quote }}
+{{- end }}

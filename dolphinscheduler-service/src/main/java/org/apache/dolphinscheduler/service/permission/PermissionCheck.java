@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.permission;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -21,10 +22,12 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
 
 import java.util.List;
+
+import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
     /**
@@ -58,8 +61,9 @@ public class PermissionCheck<T> {
 
     /**
      * permission check
+     *
      * @param authorizationType authorization type
-     * @param processService        process dao
+     * @param processService process dao
      */
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService) {
         this.authorizationType = authorizationType;
@@ -68,10 +72,6 @@ public class PermissionCheck<T> {
 
     /**
      * permission check
-     * @param authorizationType
-     * @param processService
-     * @param needChecks
-     * @param userId
      */
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId) {
         this.authorizationType = authorizationType;
@@ -82,11 +82,6 @@ public class PermissionCheck<T> {
 
     /**
      * permission check
-     * @param authorizationType
-     * @param processService
-     * @param needChecks
-     * @param userId
-     * @param logger
      */
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId, Logger logger) {
         this.authorizationType = authorizationType;
@@ -98,13 +93,8 @@ public class PermissionCheck<T> {
 
     /**
      * permission check
-     * @param logger
-     * @param authorizationType
-     * @param processService
-     * @param resourceList
-     * @param userId
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId,Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.resourceList = resourceList;
@@ -154,9 +144,10 @@ public class PermissionCheck<T> {
 
     /**
      * has permission
+     *
      * @return true if has permission
      */
-    public boolean hasPermission(){
+    public boolean hasPermission() {
         try {
             checkPermission();
             return true;
@@ -167,23 +158,24 @@ public class PermissionCheck<T> {
 
     /**
      * check permission
-     * @throws Exception exception
+     *
+     * @throws ServiceException exception
      */
-    public void checkPermission() throws Exception{
-        if(this.needChecks.length > 0){
+    public void checkPermission() throws ServiceException {
+        if (this.needChecks.length > 0) {
 
             // get user type in order to judge whether the user is admin
             User user = processService.getUserById(userId);
             if (user == null) {
-                logger.error("user id {} didn't exist",userId);
-                throw new RuntimeException(String.format("user %s didn't exist",userId));
+                logger.error("user id {} doesn't exist", userId);
+                throw new ServiceException(String.format("user %s doesn't exist", userId));
             }
-            if (user.getUserType() != UserType.ADMIN_USER){
-                List<T> unauthorizedList = processService.listUnauthorized(userId,needChecks,authorizationType);
+            if (user.getUserType() != UserType.ADMIN_USER) {
+                List<T> unauthorizedList = processService.listUnauthorized(userId, needChecks, authorizationType);
                 // if exist unauthorized resource
-                if(CollectionUtils.isNotEmpty(unauthorizedList)){
-                    logger.error("user {} didn't has permission of {}: {}", user.getUserName(), authorizationType.getDescp(),unauthorizedList);
-                    throw new RuntimeException(String.format("user %s didn't has permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
+                if (CollectionUtils.isNotEmpty(unauthorizedList)) {
+                    logger.error("user {} doesn't have permission of {}: {}", user.getUserName(), authorizationType.getDescp(), unauthorizedList);
+                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }
         }

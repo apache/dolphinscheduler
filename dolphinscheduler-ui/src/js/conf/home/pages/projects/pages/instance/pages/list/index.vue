@@ -18,7 +18,7 @@
   <div class="wrap-table">
     <m-list-construction :title="$t('Process Instance')">
       <template slot="conditions">
-        <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
+        <m-instance-conditions class="searchNav" @on-query="_onQuery"></m-instance-conditions>
       </template>
       <template slot="content">
         <template v-if="processInstanceList.length || total>0">
@@ -221,6 +221,11 @@
           }
         }
       }
+    }
+  }
+  @media screen and (max-width: 1246px) {
+    .searchNav {
+      margin-bottom: 30px;
     }
   }
 </style>

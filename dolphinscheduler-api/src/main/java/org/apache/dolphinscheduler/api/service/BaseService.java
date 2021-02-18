@@ -113,27 +113,6 @@ public class BaseService {
         return false;
     }
 
-
-    /**
-     * get cookie info by name
-     *
-     * @param request request
-     * @param name 'sessionId'
-     * @return get cookie info
-     */
-    public static Cookie getCookie(HttpServletRequest request, String name) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                if (StringUtils.isNotEmpty(name) && name.equalsIgnoreCase(cookie.getName())) {
-                    return cookie;
-                }
-            }
-        }
-
-        return null;
-    }
-
     /**
      * create tenant dir if not exists
      *

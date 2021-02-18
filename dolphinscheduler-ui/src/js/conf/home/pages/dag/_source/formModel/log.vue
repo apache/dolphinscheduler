@@ -38,7 +38,7 @@
                 <em class="el-icon-full-screen"></em>
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('Cancel full screen')">
-                <em class="el-icon-minus"></em>
+                <em class="el-icon-aim"></em>
               </a>
             </div>
           </div>

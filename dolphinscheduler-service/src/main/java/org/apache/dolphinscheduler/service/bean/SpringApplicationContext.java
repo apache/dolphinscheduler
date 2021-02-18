@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.bean;
 
 import org.springframework.beans.BeansException;
@@ -31,9 +32,7 @@ public class SpringApplicationContext implements ApplicationContextAware {
         SpringApplicationContext.applicationContext = applicationContext;
     }
 
-    public static <T> T getBean(Class<T> requiredType){
+    public static <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);
     }
-
-
 }

@@ -52,7 +52,8 @@ BEGIN
           WHERE TABLE_NAME='t_ds_process_definition'
                             AND COLUMN_NAME ='warning_group_id')
       THEN
-         ALTER TABLE t_ds_process_definition ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+         ALTER TABLE t_ds_process_definition ADD COLUMN warning_group_id int4 DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_process_definition.warning_group_id IS 'alert group id';
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -70,7 +71,8 @@ BEGIN
           WHERE TABLE_NAME='t_ds_process_definition_version'
                             AND COLUMN_NAME ='warning_group_id')
       THEN
-         ALTER TABLE t_ds_process_definition_version ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+         ALTER TABLE t_ds_process_definition_version ADD COLUMN warning_group_id int4 DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_process_definition_version.warning_group_id IS 'alert group id';
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -88,7 +90,8 @@ BEGIN
           WHERE TABLE_NAME='t_ds_alertgroup'
                             AND COLUMN_NAME ='alert_instance_ids')
       THEN
-         ALTER TABLE t_ds_alertgroup ADD COLUMN `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids' AFTER `id`;
+         ALTER TABLE t_ds_alertgroup ADD COLUMN alert_instance_ids varchar (255) DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_alertgroup.alert_instance_ids IS 'alert instance ids';
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -106,7 +109,8 @@ BEGIN
           WHERE TABLE_NAME='t_ds_alertgroup'
                             AND COLUMN_NAME ='create_user_id')
       THEN
-         ALTER TABLE t_ds_alertgroup ADD COLUMN `create_user_id` int4 DEFAULT NULL COMMENT 'create user id' AFTER `alert_instance_ids`;
+         ALTER TABLE t_ds_alertgroup ADD COLUMN create_user_id int4 DEFAULT NULL;
+         COMMENT ON COLUMN t_ds_alertgroup.create_user_id IS 'create user id';
        END IF;
 END;
 $$ LANGUAGE plpgsql;

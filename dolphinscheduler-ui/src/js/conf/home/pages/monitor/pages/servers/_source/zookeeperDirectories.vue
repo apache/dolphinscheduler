@@ -15,13 +15,9 @@
 * limitations under the License.
 */
 <template>
-  <div class="container">
-    <div class="title-box">
-      <span class="name">{{$t('zkDirectory')}}</span>
-    </div>
-
+  <div>
     <div class="table-box" v-if="zkDirectories.length > 0">
-      <el-table :data="zkDirectories" size="mini" style="width: 100%">
+      <el-table :data="zkDirectories" size="mini" style="width: 100%;">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="zkDirectory" :label="$t('zkDirectory')"></el-table-column>
       </el-table>
