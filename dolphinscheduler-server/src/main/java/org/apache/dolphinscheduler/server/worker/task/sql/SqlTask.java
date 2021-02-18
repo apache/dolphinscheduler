@@ -135,7 +135,7 @@ public class SqlTask extends AbstractTask {
             // ready to execute SQL and parameter entity Map
             List<SqlBinds> mainSqlBinds = Arrays.asList(sqlParameters.getSql().split(";"))
                     .stream()
-                    .filter(o -> (o == null || o.trim().length() < 1) ? false :  true)
+                    .filter(o -> o != null && o.trim().length() >= 1)
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
