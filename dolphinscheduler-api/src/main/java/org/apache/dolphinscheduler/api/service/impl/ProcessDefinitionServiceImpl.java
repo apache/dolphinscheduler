@@ -1300,7 +1300,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineId(processId, limit);
 
         for (ProcessInstance processInstance : processInstanceList) {
-            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(), processInstance.getEndTime()));
+            processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
         }
 
         if (limit > processInstanceList.size()) {
