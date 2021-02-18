@@ -44,7 +44,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -66,11 +65,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -149,6 +149,12 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+
+    @Autowired
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     /**
      * create process definition
@@ -1275,7 +1281,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition);
             return result;
         }
-        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
+        DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
         /**
          * nodes that is running
          */
@@ -1385,30 +1391,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
     }
 
-    /**
-     * Generate the DAG Graph based on the process definition id
-     *
-     * @param processDefinition process definition
-     * @return dag graph
-     */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-
-        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        //check process data
-        if (null != processData) {
-            List<TaskNode> taskNodeList = processData.getTasks();
-            processDefinition.setGlobalParamList(processData.getGlobalParams());
-            ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
-
-            // Generate concrete Dag to be executed
-            return DagHelper.buildDagGraph(processDag);
-        }
-
-        return new DAG<>();
-    }
 
     /**
      * whether the graph has a ring
