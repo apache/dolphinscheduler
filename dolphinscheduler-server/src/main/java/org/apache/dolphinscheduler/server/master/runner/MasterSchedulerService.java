@@ -114,7 +114,6 @@ public class MasterSchedulerService extends Thread {
     public void run() {
         logger.info("master scheduler started");
         while (Stopper.isRunning()){
-            InterProcessMutex mutex = null;
             try {
                 boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
                 if(!runCheckFlag) {
@@ -122,7 +121,17 @@ public class MasterSchedulerService extends Thread {
                     continue;
                 }
                 if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
+                    scheduleProcess();
+                }
+            } catch (Exception e) {
+                logger.error("master scheduler thread error", e);
+            }
+        }
+    }
 
+    private void scheduleProcess() throws Exception {
+        InterProcessMutex mutex = null;
+        try {
                     mutex = zkMasterClient.blockAcquireMutex();
 
                     int activeCount = masterExecService.getActiveCount();
@@ -138,7 +147,12 @@ public class MasterSchedulerService extends Thread {
                                     this.masterConfig.getMasterExecThreads() - activeCount, command);
                             if (processInstance != null) {
                                 logger.info("start master exec thread , split DAG ...");
-                                masterExecService.execute(new MasterExecThread(processInstance, processService, nettyRemotingClient));
+                                masterExecService.execute(
+                                new MasterExecThread(
+                                        processInstance
+                                        , processService
+                                        , nettyRemotingClient
+                                        ));
                             }
                         }catch (Exception e){
                             logger.error("scan command error ", e);
@@ -148,14 +162,10 @@ public class MasterSchedulerService extends Thread {
                         //indicate that no command ,sleep for 1s
                         Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
-                }
-            } catch (Exception e){
-                logger.error("master scheduler thread error",e);
             } finally{
                 zkMasterClient.releaseMutex(mutex);
             }
         }
-    }
 
     private String getLocalAddress(){
         return OSUtils.getAddr(masterConfig.getListenPort());

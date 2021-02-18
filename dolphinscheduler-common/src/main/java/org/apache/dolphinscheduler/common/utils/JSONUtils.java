@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -91,6 +93,21 @@ public class JSONUtils {
     return null;
   }
 
+    /**
+     *  deserialize
+     *
+     * @param src byte array
+     * @param clazz class
+     * @param <T> deserialize type
+     * @return deserialize type
+     */
+    public static <T> T parseObject(byte[] src, Class<T> clazz) {
+        if (src == null) {
+            return null;
+        }
+        String json = new String(src, UTF_8);
+        return parseObject(json, clazz);
+    }
 
   /**
    * json to list
@@ -114,6 +131,26 @@ public class JSONUtils {
   }
 
 
+  /**
+   * serialize to json byte
+   *
+   * @param obj object
+   * @param <T> object type
+   * @return byte array
+   */
+  public static <T> byte[] toJsonByteArray(T obj)  {
+    if (obj == null) {
+      return null;
+    }
+    String json = "";
+    try {
+      json = toJsonString(obj);
+    } catch (Exception e) {
+      logger.error("json serialize exception.", e);
+    }
+
+    return json.getBytes(UTF_8);
+  }
 
   /**
    * check json object valid

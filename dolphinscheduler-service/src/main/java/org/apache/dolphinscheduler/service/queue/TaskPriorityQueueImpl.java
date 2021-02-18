@@ -16,21 +16,16 @@
  */
 package org.apache.dolphinscheduler.service.queue;
 
-
-import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import static org.apache.dolphinscheduler.common.Constants.TASK_INFO_LENGTH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+import org.springframework.stereotype.Service;
 
 /**
  * A singleton of a task queue implemented with zookeeper
  * tasks queue implementation
  */
 @Service
-public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
+public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
     /**
      * queue size
      */
@@ -39,67 +34,35 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
     /**
      * queue
      */
-    private PriorityBlockingQueue<String> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE, new TaskInfoComparator());
+    private PriorityBlockingQueue<TaskPriority> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE);
 
     /**
      * put task takePriorityInfo
      *
      * @param taskPriorityInfo takePriorityInfo
-     * @throws Exception
      */
     @Override
-    public void put(String taskPriorityInfo) throws Exception {
+    public void put(TaskPriority taskPriorityInfo) {
         queue.put(taskPriorityInfo);
     }
 
     /**
      * take taskInfo
+     *
      * @return taskInfo
-     * @throws Exception
      */
     @Override
-    public String take() throws Exception {
+    public TaskPriority take() throws InterruptedException {
         return queue.take();
     }
 
     /**
      * queue size
+     *
      * @return size
-     * @throws Exception
      */
     @Override
-    public int size() throws Exception {
+    public int size() {
         return queue.size();
-    }
-
-    /**
-     * TaskInfoComparator
-     */
-    private class TaskInfoComparator implements Comparator<String>{
-
-        /**
-         * compare o1 o2
-         * @param o1 o1
-         * @param o2 o2
-         * @return compare result
-         */
-        @Override
-        public int compare(String o1, String o2) {
-            String s1 = o1;
-            String s2 = o2;
-            String[] s1Array = s1.split(UNDERLINE);
-            if(s1Array.length > TASK_INFO_LENGTH){
-                // warning: if this length > 5, need to be changed
-                s1 = s1.substring(0, s1.lastIndexOf(UNDERLINE) );
-            }
-
-            String[] s2Array = s2.split(UNDERLINE);
-            if(s2Array.length > TASK_INFO_LENGTH){
-                // warning: if this length > 5, need to be changed
-                s2 = s2.substring(0, s2.lastIndexOf(UNDERLINE) );
-            }
-
-            return s1.compareTo(s2);
-        }
     }
 }

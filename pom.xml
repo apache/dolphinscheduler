@@ -830,6 +830,7 @@
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
+                        <include>**/service/queue/TaskPriorityTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <include>**/dao/mapper/ErrorCommandMapperTest.java</include>
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
