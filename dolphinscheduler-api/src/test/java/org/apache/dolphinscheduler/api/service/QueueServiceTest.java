@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.QueueServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -50,7 +51,7 @@ public class QueueServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(QueueServiceTest.class);
 
     @InjectMocks
-    private QueueService queueService;
+    private QueueServiceImpl queueService;
     @Mock
     private QueueMapper queueMapper;
     @Mock
