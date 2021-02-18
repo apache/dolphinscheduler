@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import org.slf4j.Logger;
@@ -459,6 +461,36 @@ public class DagHelper {
             }
         }
 
+        ProcessDag processDag = new ProcessDag();
+        processDag.setEdges(taskNodeRelations);
+        processDag.setNodes(taskNodeList);
+        return processDag;
+    }
+
+    /**
+     * get process dag
+     *
+     * @param taskDefinitions task definition
+     * @return Process dag
+     */
+    public static ProcessDag getProcessDag(List<TaskDefinition> taskDefinitions,
+                                           List<ProcessTaskRelation> processTaskRelations) {
+        Map<Long, TaskNode> taskNodeMap = new HashMap<>();
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        for (TaskDefinition taskDefinition : taskDefinitions) {
+            TaskNode taskNode = JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinition), TaskNode.class);
+            taskNodeMap.put(taskDefinition.getCode(), taskNode);
+            taskNodeList.add(taskNode);
+        }
+
+        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPreTaskCode() != 0) {
+                TaskNode preNode = taskNodeMap.get(processTaskRelation.getPreTaskCode());
+                TaskNode postNode = taskNodeMap.get(processTaskRelation.getPostTaskCode());
+                taskNodeRelations.add(new TaskNodeRelation(preNode.getName(), postNode.getName()));
+            }
+        }
         ProcessDag processDag = new ProcessDag();
         processDag.setEdges(taskNodeRelations);
         processDag.setNodes(taskNodeList);
