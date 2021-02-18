@@ -42,8 +42,11 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -96,6 +99,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
@@ -2384,4 +2388,35 @@ public class ProcessService {
         }
         return false;
     }
+
+    /**
+     * Generate the DAG Graph based on the process definition id
+     *
+     * @param processDefinition process definition
+     * @return dag graph
+     */
+    public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
+
+        List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
+                processDefinition.getCode(),
+                processDefinition.getVersion());
+
+
+
+        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
+        List<TaskDefinition> taskDefinitions = new ArrayList<>();
+        for(ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs){
+            processTaskRelations.add(JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class));
+
+            TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                    processTaskRelationLog.getPostTaskCode(),
+                    processTaskRelationLog.getPostNodeVersion());
+            taskDefinitions.add(JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinitionLog), TaskDefinition.class));
+        }
+
+        ProcessDag processDag = DagHelper.getProcessDag(taskDefinitions, processTaskRelations);
+        // Generate concrete Dag to be executed
+        return DagHelper.buildDagGraph(processDag);
+    }
+
 }

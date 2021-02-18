@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -60,19 +61,28 @@ import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.tools.ant.taskdefs.Taskdef;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -149,6 +159,12 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+
+    @Autowired
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     /**
      * create process definition
@@ -1275,7 +1291,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition);
             return result;
         }
-        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
+        DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
         /**
          * nodes that is running
          */
@@ -1385,30 +1401,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
     }
 
-    /**
-     * Generate the DAG Graph based on the process definition id
-     *
-     * @param processDefinition process definition
-     * @return dag graph
-     */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-
-        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        //check process data
-        if (null != processData) {
-            List<TaskNode> taskNodeList = processData.getTasks();
-            processDefinition.setGlobalParamList(processData.getGlobalParams());
-            ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
-
-            // Generate concrete Dag to be executed
-            return DagHelper.buildDagGraph(processDag);
-        }
-
-        return new DAG<>();
-    }
 
     /**
      * whether the graph has a ring

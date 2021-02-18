@@ -81,7 +81,7 @@ public class TaskInstance implements Serializable {
     /**
      * task defintion version
      */
-    private String taskDefinitionVersion;
+    private int taskDefinitionVersion;
 
     /**
      * process instance name
@@ -637,11 +637,11 @@ public class TaskInstance implements Serializable {
         this.processDefinitionCode = processDefinitionCode;
     }
 
-    public String getTaskDefinitionVersion() {
+    public int getTaskDefinitionVersion() {
         return taskDefinitionVersion;
     }
 
-    public void setTaskDefinitionVersion(String taskDefinitionVersion) {
+    public void setTaskDefinitionVersion(int taskDefinitionVersion) {
         this.taskDefinitionVersion = taskDefinitionVersion;
     }
 }
