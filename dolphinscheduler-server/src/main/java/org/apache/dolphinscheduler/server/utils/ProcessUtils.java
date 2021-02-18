@@ -344,10 +344,7 @@ public class ProcessUtils {
             }
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
-            if (StringUtils.isNotEmpty(tenantCode)) {
-                runCmd = "sudo -u " + tenantCode + " " + runCmd;
-            }
-
+            runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
             logger.info("kill cmd:{}", runCmd);
             OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
@@ -369,8 +366,8 @@ public class ProcessUtils {
                 return;
             }
 
-            String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
-
+            String cmd = String.format("kill -9 %s", getPidsStr(processId));
+            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);

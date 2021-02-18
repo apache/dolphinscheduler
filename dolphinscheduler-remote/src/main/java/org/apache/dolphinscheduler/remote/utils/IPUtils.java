@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.remote.utils;
 
+import org.apache.dolphinscheduler.remote.exceptions.RemoteException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +30,24 @@ import java.util.regex.Pattern;
 
 public class IPUtils {
 
+    private IPUtils() {
+        throw new IllegalStateException(IPUtils.class.getName());
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(IPUtils.class);
 
-    private static String IP_REGEX = "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}";
-
-    private static String LOCAL_HOST = "unknown";
+    private static String localHost = "unknown";
 
     static {
         String host = System.getenv("HOSTNAME");
         if (isNotEmpty(host)) {
-            LOCAL_HOST = host;
+            localHost = host;
         } else {
 
             try {
                 String hostName = InetAddress.getLocalHost().getHostName();
                 if (isNotEmpty(hostName)) {
-                    LOCAL_HOST = hostName;
+                    localHost = hostName;
                 }
             } catch (UnknownHostException e) {
                 logger.error("get hostName error!", e);
@@ -52,7 +56,7 @@ public class IPUtils {
     }
 
     public static String getLocalHost() {
-        return LOCAL_HOST;
+        return localHost;
     }
 
 
@@ -100,7 +104,7 @@ public class IPUtils {
 
             return addresses;
         } catch (SocketException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e);
         }
     }
 
@@ -131,12 +135,11 @@ public class IPUtils {
             return false;
         }
 
-        Pattern pat = Pattern.compile(IP_REGEX);
+        String ipRegex = "([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}";
+        Pattern pat = Pattern.compile(ipRegex);
 
         Matcher mat = pat.matcher(addr);
 
-        boolean ipAddress = mat.find();
-
-        return ipAddress;
+        return mat.find();
     }
 }
