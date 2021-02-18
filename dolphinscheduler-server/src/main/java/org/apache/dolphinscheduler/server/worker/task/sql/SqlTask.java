@@ -135,10 +135,7 @@ public class SqlTask extends AbstractTask {
             // ready to execute SQL and parameter entity Map
             List<SqlBinds> mainSqlBinds = Arrays.asList(sqlParameters.getSql().split(";"))
                     .stream()
-                    .filter(o -> {
-                        if( o == null || o.trim().length() < 1) return false;
-                        else return true;
-                    })
+                    .filter(o -> (o == null || o.trim().length() < 1) ? false :  true)
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
@@ -243,9 +240,9 @@ public class SqlTask extends AbstractTask {
      * @param createFuncs create functions
      */
     public void executeFuncAndSql(List<SqlBinds> mainSqlBinds,
-                                        List<SqlBinds> preStatementsBinds,
-                                        List<SqlBinds> postStatementsBinds,
-                                        List<String> createFuncs){
+                                  List<SqlBinds> preStatementsBinds,
+                                  List<SqlBinds> postStatementsBinds,
+                                  List<String> createFuncs) {
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
@@ -338,12 +335,11 @@ public class SqlTask extends AbstractTask {
      * @param mainStatementsBinds mainStatementsBinds
      */
     private void mainSql(Connection connection,
-                        List<SqlBinds> mainStatementsBinds) throws Exception{
+                        List<SqlBinds> mainStatementsBinds) throws Exception {
         for (SqlBinds sqlBind: mainStatementsBinds) {
-            try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)){
+            try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)) {
                 int result = stmt.executeUpdate();
                 logger.info("pre statement execute result: {}, for sql: {}",result,sqlBind.getSql());
-
             }
         }
     }
