@@ -28,9 +28,11 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -68,6 +70,11 @@ public class TaskExecuteProcessorTest {
 
     private TaskExecuteRequestCommand taskRequestCommand;
 
+    private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+
+    private AlertClientService alertClientService;
+
+
     @Before
     public void before() throws Exception {
         // init task execution context
@@ -79,7 +86,7 @@ public class TaskExecuteProcessorTest {
         command.setType(CommandType.TASK_EXECUTE_REQUEST);
         ackCommand = new TaskExecuteAckCommand().convert2Command();
         taskRequestCommand = new TaskExecuteRequestCommand();
-
+        alertClientService = PowerMockito.mock(AlertClientService.class);
         workerExecService = PowerMockito.mock(ExecutorService.class);
         PowerMockito.when(workerExecService.submit(Mockito.any(TaskExecuteThread.class)))
                 .thenReturn(null);
@@ -87,6 +94,7 @@ public class TaskExecuteProcessorTest {
         PowerMockito.mockStatic(ChannelUtils.class);
         PowerMockito.when(ChannelUtils.toAddress(null)).thenReturn(null);
 
+        taskExecutionContextCacheManager = PowerMockito.mock(TaskExecutionContextCacheManagerImpl.class);
         taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
         PowerMockito.doNothing().when(taskCallbackService).sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
 
@@ -97,6 +105,9 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(workerConfig);
         PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
                 .thenReturn(null);
+        PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
+                .thenReturn(taskExecutionContextCacheManager);
+
 
         PowerMockito.mockStatic(ThreadUtils.class);
         PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads()))
@@ -107,6 +118,8 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(taskRequestCommand);
 
         PowerMockito.mockStatic(JSONUtils.class);
+        PowerMockito.when(JSONUtils.parseObject(command.getBody(), TaskExecuteRequestCommand.class))
+                .thenReturn(taskRequestCommand);
         PowerMockito.when(JSONUtils.parseObject(taskRequestCommand.getTaskExecutionContext(), TaskExecutionContext.class))
                 .thenReturn(taskExecutionContext);
 
@@ -116,9 +129,9 @@ public class TaskExecuteProcessorTest {
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()))
                 .thenReturn(taskExecutionContext.getExecutePath());
-        PowerMockito.doNothing().when(FileUtils.class, "createWorkDirAndUserIfAbsent", taskExecutionContext.getExecutePath(), taskExecutionContext.getTenantCode());
+        PowerMockito.doNothing().when(FileUtils.class, "createWorkDirIfAbsent", taskExecutionContext.getExecutePath());
 
-        SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(null, null, null);
+        SimpleTaskExecuteThread simpleTaskExecuteThread = new SimpleTaskExecuteThread(null, null, null, alertClientService);
         PowerMockito.whenNew(TaskExecuteThread.class).withAnyArguments()
                 .thenReturn(simpleTaskExecuteThread);
     }
@@ -157,8 +170,8 @@ public class TaskExecuteProcessorTest {
 
     private static class SimpleTaskExecuteThread extends TaskExecuteThread {
 
-        public SimpleTaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService, Logger taskLogger) {
-            super(taskExecutionContext, taskCallbackService, taskLogger, );
+        public SimpleTaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService, Logger taskLogger, AlertClientService alertClientService) {
+            super(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         }
 
         @Override

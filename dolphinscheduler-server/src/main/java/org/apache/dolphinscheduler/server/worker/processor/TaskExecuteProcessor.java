@@ -87,6 +87,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.taskDelayExecManager = new TaskDelayExecManagerThread(this.workerExecService);
+        this.workerExecService.submit(this.taskDelayExecManager);
     }
 
     /**
