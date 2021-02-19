@@ -51,16 +51,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * task instance service test
+ */
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class TaskInstanceServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceTest.class);
 
     @InjectMocks
     private TaskInstanceServiceImpl taskInstanceService;

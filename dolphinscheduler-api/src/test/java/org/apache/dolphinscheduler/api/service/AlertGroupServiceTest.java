@@ -47,6 +47,9 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * alert group service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class AlertGroupServiceTest {
 
@@ -54,6 +57,7 @@ public class AlertGroupServiceTest {
 
     @InjectMocks
     private AlertGroupServiceImpl alertGroupService;
+
     @Mock
     private AlertGroupMapper alertGroupMapper;
 

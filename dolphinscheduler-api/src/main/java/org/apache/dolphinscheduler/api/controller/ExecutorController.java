@@ -57,9 +57,9 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * execute process controller
+ * executor controller
  */
-@Api(tags = "PROCESS_INSTANCE_EXECUTOR_TAG", position = 1)
+@Api(tags = "EXECUTOR_TAG")
 @RestController
 @RequestMapping("projects/{projectName}/executors")
 public class ExecutorController extends BaseController {
