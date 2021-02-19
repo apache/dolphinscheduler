@@ -51,16 +51,20 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+/**
+ * data source service test
+ */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
 @PrepareForTest({DataSourceFactory.class, CommonUtils.class})
 public class DataSourceServiceTest {
 
-
     @InjectMocks
     private DataSourceServiceImpl dataSourceService;
+
     @Mock
     private DataSourceMapper dataSourceMapper;
+
     @Mock
     private DataSourceUserMapper datasourceUserMapper;
 

@@ -65,6 +65,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * process instance service test
+ */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessInstanceServiceTest {
 
@@ -91,9 +94,6 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     ProcessDefinitionVersionService processDefinitionVersionService;
-
-    @Mock
-    ExecutorService execService;
 
     @Mock
     TaskInstanceMapper taskInstanceMapper;

@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
@@ -60,7 +60,7 @@ import org.springframework.stereotype.Service;
  * data analysis service impl
  */
 @Service
-public class DataAnalysisServiceImpl extends BaseService implements DataAnalysisService {
+public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     @Autowired
     private ProjectMapper projectMapper;

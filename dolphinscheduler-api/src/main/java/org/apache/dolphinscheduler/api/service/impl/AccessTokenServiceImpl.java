@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -44,7 +44,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * access token service impl
  */
 @Service
-public class AccessTokenServiceImpl extends BaseService implements AccessTokenService {
+public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 

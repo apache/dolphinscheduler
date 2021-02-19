@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Map;
 
 /**
- * udf function service
+ * udf func service
  */
 public interface UdfFuncService {
 

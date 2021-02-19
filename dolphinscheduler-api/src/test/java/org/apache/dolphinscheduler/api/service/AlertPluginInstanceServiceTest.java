@@ -43,6 +43,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+/**
+ * alert plugin instance service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class AlertPluginInstanceServiceTest {
 

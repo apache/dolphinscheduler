@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -44,7 +43,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * alert group service impl
  */
 @Service
-public class AlertGroupServiceImpl extends BaseService implements AlertGroupService {
+public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroupService {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;

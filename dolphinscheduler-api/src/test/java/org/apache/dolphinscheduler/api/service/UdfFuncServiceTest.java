@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -53,20 +54,26 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * udf func service test
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(PropertyUtils.class)
 public class UdfFuncServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceTest.class);
 
     @InjectMocks
     private UdfFuncServiceImpl udfFuncService;
+
     @Mock
     private ResourceMapper resourceMapper;
+
     @Mock
     private UdfFuncMapper udfFuncMapper;
+
     @Mock
     private UDFUserMapper udfUserMapper;
-
 
     @Before
     public void setUp() {
@@ -165,6 +172,8 @@ public class UdfFuncServiceTest {
 
     @Test
     public  void testDelete(){
+        Mockito.when(udfFuncMapper.deleteById(Mockito.anyInt())).thenReturn(1);
+        Mockito.when(udfUserMapper.deleteByUdfFuncId(Mockito.anyInt())).thenReturn(1);
         Result result= udfFuncService.delete(122);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
@@ -39,7 +38,7 @@ import org.springframework.stereotype.Service;
  * work flow lineage service impl
  */
 @Service
-public class WorkFlowLineageServiceImpl extends BaseService implements WorkFlowLineageService {
+public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkFlowLineageService {
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -57,10 +56,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * datasource service impl
+ * data source service impl
  */
 @Service
-public class DataSourceServiceImpl extends BaseService implements DataSourceService {
+public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceImpl.class);
 

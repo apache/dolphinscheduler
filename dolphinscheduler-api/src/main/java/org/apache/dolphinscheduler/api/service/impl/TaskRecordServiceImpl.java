@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.Constants.TASK_RECORD_TABLE_HIS
 import static org.apache.dolphinscheduler.common.Constants.TASK_RECORD_TABLE_HIVE_LOG;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.TaskRecordService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -38,7 +37,7 @@ import org.springframework.stereotype.Service;
  * task record service impl
  */
 @Service
-public class TaskRecordServiceImpl extends BaseService implements TaskRecordService {
+public class TaskRecordServiceImpl extends BaseServiceImpl implements TaskRecordService {
 
     /**
      * query task record list paging

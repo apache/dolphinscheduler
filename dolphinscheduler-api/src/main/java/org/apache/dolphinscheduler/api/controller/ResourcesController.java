@@ -82,7 +82,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * resources controller
  */
-@Api(tags = "RESOURCES_TAG", position = 1)
+@Api(tags = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
 public class ResourcesController extends BaseController {

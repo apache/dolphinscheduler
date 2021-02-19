@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -47,7 +46,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * queue service impl
  */
 @Service
-public class QueueServiceImpl extends BaseService implements QueueService {
+public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     private static final Logger logger = LoggerFactory.getLogger(QueueServiceImpl.class);
 

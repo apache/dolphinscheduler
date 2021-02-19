@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -69,7 +68,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * scheduler service impl
  */
 @Service
-public class SchedulerServiceImpl extends BaseService implements SchedulerService {
+public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 

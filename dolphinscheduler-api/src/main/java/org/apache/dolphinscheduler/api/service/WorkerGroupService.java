@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Map;
 
 /**
- * work group service
+ * worker group service
  */
 public interface WorkerGroupService {
 
