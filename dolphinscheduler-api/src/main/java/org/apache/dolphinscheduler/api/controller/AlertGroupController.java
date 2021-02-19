@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -111,7 +110,7 @@ public class AlertGroupController extends BaseController {
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login  user {}, query all alertGroup",
                 loginUser.getUserName());
-        HashMap<String, Object> result = alertGroupService.queryAlertgroup();
+        Map<String, Object> result = alertGroupService.queryAlertgroup();
         return returnDataList(result);
     }
 
