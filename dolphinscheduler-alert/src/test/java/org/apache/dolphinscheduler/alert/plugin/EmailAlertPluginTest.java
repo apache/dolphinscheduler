@@ -127,7 +127,7 @@ public class EmailAlertPluginTest {
         alertPluginInstance.setCreateTime(new Date());
         alertPluginInstance.setInstanceName("test email alert");
 
-        List<PluginDefine> pluginDefineList = pluginDao.getPluginDefineMapper().queryByNameAndType("email alert", "alert");
+        List<PluginDefine> pluginDefineList = pluginDao.getPluginDefineMapper().queryByNameAndType("Email", "alert");
         if (pluginDefineList == null || pluginDefineList.size() == 0) {
             throw new RuntimeException("no alert plugin be load");
         }
