@@ -14,11 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,43 +36,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * executor service test
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class ExecutorServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
 
     @Autowired
-    private ExecutorService executorService;
+    private ExecutorServiceImpl executorService;
 
     @Ignore
     @Test
     public void startCheckByProcessDefinedId(){
-
         Map<String, Object> map = executorService.startCheckByProcessDefinedId(1234);
         Assert.assertNull(map);
-
     }
-
 
     @Test
     public void putMsgWithParamsTest() {
-
         Map<String,Object> map = new HashMap<>();
         putMsgWithParams(map, Status.PROJECT_ALREADY_EXISTS);
-
         logger.info(map.toString());
     }
 
-
     void putMsgWithParams(Map<String, Object> result, Status status,Object ... statusParams) {
         result.put(Constants.STATUS, status);
-        if(statusParams != null && statusParams.length > 0){
+        if (statusParams != null && statusParams.length > 0) {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        }else {
+        } else {
             result.put(Constants.MSG, status.getMsg());
         }
     }
