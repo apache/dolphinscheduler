@@ -196,10 +196,12 @@
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdate')
+            this.reset()
           }, e => {
             reject(e)
             self.$emit('close')
             this.$message.error(e.msg || '')
+            this.reset()
           }, {
             data: formData,
             emulateJSON: false,
@@ -220,6 +222,14 @@
       _ckArchive () {
         $('.update-file-modal').hide()
         this.$emit('onArchive')
+      },
+      reset () {
+        this.name = ''
+        this.description = ''
+        this.progress = 0
+        this.file = null
+        this.currentDir = localStore.getItem('currentDir')
+        this.dragOver = false
       },
       /**
        * Drag and drop upload

@@ -62,7 +62,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * data source controller
  */
-@Api(tags = "DATA_SOURCE_TAG", position = 3)
+@Api(tags = "DATA_SOURCE_TAG")
 @RestController
 @RequestMapping("datasources")
 public class DataSourceController extends BaseController {

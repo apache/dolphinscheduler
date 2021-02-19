@@ -33,7 +33,7 @@ public class ScriptSender {
 
     private String scriptPath;
 
-    private Integer scriptType;
+    private String scriptType;
 
     private String userParams;
 
@@ -45,13 +45,13 @@ public class ScriptSender {
 
     ScriptSender(Map<String, String> config) {
         scriptPath = config.get(ScriptParamsConstants.NAME_SCRIPT_PATH);
-        scriptType = Integer.parseInt(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE));
+        scriptType = config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE);
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
 
     AlertResult sendScriptAlert(String title, String content) {
         AlertResult alertResult = new AlertResult();
-        if (ScriptType.of(scriptType).equals(ScriptType.SHELL)) {
+        if (ScriptType.SHELL.getDescp().equals(scriptType)) {
             return executeShellScript(title, content);
         }
         return alertResult;

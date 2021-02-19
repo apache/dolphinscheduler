@@ -46,12 +46,12 @@ import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * UiPluginController
+ * ui plugin controller
  * Some plugins (such as alert plugin) need to provide UI interfaces to users.
  * We use from-creat to dynamically generate UI interfaces. Related parameters are mainly provided by pluginParams.
  * From-create can generate dynamic ui based on this parameter.
  */
-@Api(tags = "UI_PLUGINS", position = 1)
+@Api(tags = "UI_PLUGINS_TAG")
 @RestController
 @RequestMapping("ui-plugins")
 public class UiPluginController extends BaseController {
