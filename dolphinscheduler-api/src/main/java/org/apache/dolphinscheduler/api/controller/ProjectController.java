@@ -30,10 +30,10 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -255,8 +255,8 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}, query authorized and user created project by user id: {}.",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
+                RegexUtils.escapeNRT(loginUser.getUserName()),
+                RegexUtils.escapeNRT(String.valueOf(loginUser.getId())));
         Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return returnDataList(result);
     }

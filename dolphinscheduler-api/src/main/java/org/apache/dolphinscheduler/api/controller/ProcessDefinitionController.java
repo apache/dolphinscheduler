@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -153,10 +154,10 @@ public class ProcessDefinitionController extends BaseController {
                                         @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                         @RequestParam(value = "targetProjectId", required = true) int targetProjectId) {
         logger.info("batch copy process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-            StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-            StringUtils.replaceNRTtoUnderline(projectName),
-            StringUtils.replaceNRTtoUnderline(processDefinitionIds),
-            StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
+            RegexUtils.escapeNRT(loginUser.getUserName()),
+            RegexUtils.escapeNRT(projectName),
+            RegexUtils.escapeNRT(processDefinitionIds),
+            RegexUtils.escapeNRT(String.valueOf(targetProjectId)));
 
         return returnDataList(
             processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
@@ -184,10 +185,10 @@ public class ProcessDefinitionController extends BaseController {
                                         @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                         @RequestParam(value = "targetProjectId", required = true) int targetProjectId) {
         logger.info("batch move process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-            StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-            StringUtils.replaceNRTtoUnderline(projectName),
-            StringUtils.replaceNRTtoUnderline(processDefinitionIds),
-            StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
+            RegexUtils.escapeNRT(loginUser.getUserName()),
+            RegexUtils.escapeNRT(projectName),
+            RegexUtils.escapeNRT(processDefinitionIds),
+            RegexUtils.escapeNRT(String.valueOf(targetProjectId)));
 
         return returnDataList(
             processDefinitionService.batchMoveProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
