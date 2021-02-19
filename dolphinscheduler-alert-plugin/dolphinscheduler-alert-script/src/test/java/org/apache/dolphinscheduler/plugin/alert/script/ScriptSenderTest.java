@@ -49,9 +49,9 @@ public class ScriptSenderTest {
     public void testScriptSenderTest() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
-        alertResult = scriptSender.sendScriptAlert("testtitleKrisKi", "testcontent");
+        alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
         Assert.assertEquals("true", alertResult.getStatus());
-        alertResult = scriptSender.sendScriptAlert("errorMsgtitle ", "testcontent");
+        alertResult = scriptSender.sendScriptAlert("error msg title", "test content");
         Assert.assertEquals("false", alertResult.getStatus());
     }
 
