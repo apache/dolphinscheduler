@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -48,10 +47,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * project service implement
+ * project service impl
  **/
 @Service
-public class ProjectServiceImpl extends BaseService implements ProjectService {
+public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
 
     @Autowired
     private ProjectMapper projectMapper;

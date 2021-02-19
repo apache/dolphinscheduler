@@ -143,10 +143,12 @@
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateDefinition')
+            this.reset()
           }, e => {
             reject(e)
             self.$emit('closeDefinition')
             this.$message.error(e.msg || '')
+            this.reset()
           }, {
             data: formData,
             emulateJSON: false,
@@ -170,6 +172,13 @@
       },
       close () {
         this.$emit('closeDefinition')
+      },
+      reset () {
+        this.name = ''
+        this.description = ''
+        this.progress = 0
+        this.file = ''
+        this.dragOver = false
       },
       /**
        * Drag and drop upload

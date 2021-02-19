@@ -19,12 +19,13 @@ package org.apache.dolphinscheduler.server.registry;
 
 import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
 
-import java.util.Date;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+
+import java.util.Date;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public class HeartBeatTask extends Thread {
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
 
-            int status = Constants.NORAML_NODE_STATUS;
+            int status = Constants.NORMAL_NODE_STATUS;
 
             if (availablePhysicalMemorySize < reservedMemory
                     || loadAverage > maxCpuloadAvg) {

@@ -17,6 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.controller.BaseController;
+import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Session;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -24,15 +33,6 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.api.controller.BaseController;
-import org.apache.dolphinscheduler.api.service.BaseService;
-import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.dao.entity.Session;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ import org.springframework.web.util.WebUtils;
  * session service implement
  */
 @Service
-public class SessionServiceImpl extends BaseService implements SessionService {
+public class SessionServiceImpl extends BaseServiceImpl implements SessionService {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 

@@ -181,10 +181,12 @@
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateFileChildUpdate')
+            this.reset()
           }, e => {
             reject(e)
             self.$emit('close')
             this.$message.error(e.msg || '')
+            this.reset()
           }, {
             data: formData,
             emulateJSON: false,
@@ -217,6 +219,15 @@
       },
       close () {
         this.$emit('closeFileChildUpdate')
+      },
+      reset () {
+        this.name = ''
+        this.description = ''
+        this.progress = 0
+        this.file = ''
+        this.currentDir = localStore.getItem('currentDir')
+        this.pid = -1
+        this.dragOver = false
       }
     },
     mounted () {
