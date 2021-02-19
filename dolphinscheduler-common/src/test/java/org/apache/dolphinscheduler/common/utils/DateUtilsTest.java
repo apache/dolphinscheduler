@@ -201,7 +201,7 @@ public class DateUtilsTest {
         // days hours minutes seconds
         Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
         Date d2 = null;
-        Assert.assertEquals("", DateUtils.format2Duration(d1, d2));
+        Assert.assertNull(DateUtils.format2Duration(d1, d2));
     }
 
 }
