@@ -76,6 +76,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return create result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
@@ -133,6 +134,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param pageSize page size
      * @return tenant list page
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
@@ -163,6 +165,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return update result code
      * @throws Exception exception
      */
+    @Override
     public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
@@ -226,6 +229,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return delete result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -304,6 +308,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param loginUser login user
      * @return tenant list
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -321,6 +326,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
+    @Override
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {

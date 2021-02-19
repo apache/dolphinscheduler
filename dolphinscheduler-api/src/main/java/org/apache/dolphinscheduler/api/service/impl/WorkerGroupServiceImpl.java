@@ -65,6 +65,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @param pageSize page size
      * @return worker group list page
      */
+    @Override
     public Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
@@ -113,6 +114,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      *
      * @return all worker group list
      */
+    @Override
     public Map<String, Object> queryAllGroup() {
         Map<String, Object> result = new HashMap<>();
 

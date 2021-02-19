@@ -62,6 +62,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param loginUser login user
      * @return queue list
      */
+    @Override
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -84,6 +85,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param pageSize page size
      * @return queue list
      */
+    @Override
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -112,6 +114,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param queueName queue name
      * @return create result
      */
+    @Override
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -161,6 +164,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param queueName queue name
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -229,6 +233,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
+    @Override
     public Result<Object> verifyQueue(String queue, String queueName) {
         Result<Object> result = new Result<>();
 

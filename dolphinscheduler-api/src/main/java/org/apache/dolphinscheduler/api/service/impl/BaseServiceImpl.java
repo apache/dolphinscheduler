@@ -40,6 +40,7 @@ public class BaseServiceImpl implements BaseService {
      * @param user input user
      * @return ture if administrator, otherwise return false
      */
+    @Override
     public boolean isAdmin(User user) {
         return user.getUserType() == UserType.ADMIN_USER;
     }
@@ -51,6 +52,7 @@ public class BaseServiceImpl implements BaseService {
      * @param result result code
      * @return true if not administrator, otherwise false
      */
+    @Override
     public boolean isNotAdmin(User loginUser, Map<String, Object> result) {
         //only admin can operate
         if (!isAdmin(loginUser)) {
@@ -67,6 +69,7 @@ public class BaseServiceImpl implements BaseService {
      * @param status status
      * @param statusParams status message
      */
+    @Override
     public void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
         result.put(Constants.STATUS, status);
         if (statusParams != null && statusParams.length > 0) {
@@ -83,6 +86,7 @@ public class BaseServiceImpl implements BaseService {
      * @param status status
      * @param statusParams status message
      */
+    @Override
     public void putMsg(Result result, Status status, Object... statusParams) {
         result.setCode(status.getCode());
         if (statusParams != null && statusParams.length > 0) {
@@ -100,6 +104,7 @@ public class BaseServiceImpl implements BaseService {
      * @param userNoOperationPerm status
      * @return check result
      */
+    @Override
     public boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
         // only admin can operate
         if (bool) {
@@ -116,6 +121,7 @@ public class BaseServiceImpl implements BaseService {
      * @param tenantCode tenant code
      * @throws IOException if hdfs operation exception
      */
+    @Override
     public void createTenantDirIfNotExists(String tenantCode) throws IOException {
         String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
         String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
@@ -130,6 +136,7 @@ public class BaseServiceImpl implements BaseService {
      * @param operateUser operate user
      * @param createUserId create user id
      */
+    @Override
     public boolean hasPerm(User operateUser, int createUserId) {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }

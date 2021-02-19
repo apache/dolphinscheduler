@@ -43,6 +43,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
 
+    @Override
     public Map<String, Object> queryWorkFlowLineageByName(String workFlowName, int projectId) {
         Map<String, Object> result = new HashMap<>();
         List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByName(workFlowName, projectId);
@@ -68,7 +69,8 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         }
     }
 
-    public Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids,int projectId) {
+    @Override
+    public Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids, int projectId) {
         Map<String, Object> result = new HashMap<>();
         List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByIds(ids, projectId);
         Map<String, Object> workFlowLists = new HashMap<>();

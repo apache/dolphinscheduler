@@ -107,6 +107,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param workerGroup worker group
      * @return create result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName,
                                               Integer processDefineId,
@@ -197,6 +198,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param scheduleStatus schedule status
      * @return update result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> updateSchedule(User loginUser,
                                               String projectName,
@@ -297,6 +299,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param scheduleStatus schedule status
      * @return publish result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> setScheduleState(User loginUser,
                                                 String projectName,
@@ -409,6 +412,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param searchVal search value
      * @return schedule list page
      */
+    @Override
     public Map<String, Object> querySchedule(User loginUser, String projectName, Integer processDefineId, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>();
@@ -447,6 +451,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param projectName project name
      * @return schedule list
      */
+    @Override
     public Map<String, Object> queryScheduleList(User loginUser, String projectName) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -489,6 +494,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param scheduleId schedule id
      * @throws RuntimeException runtime exception
      */
+    @Override
     public void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
@@ -527,6 +533,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param scheduleId scheule id
      * @return delete result code
      */
+    @Override
     public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -576,6 +583,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param schedule schedule expression
      * @return the next five fire time
      */
+    @Override
     public Map<String, Object> previewSchedule(User loginUser, String projectName, String schedule) {
         Map<String, Object> result = new HashMap<>();
         CronExpression cronExpression;
