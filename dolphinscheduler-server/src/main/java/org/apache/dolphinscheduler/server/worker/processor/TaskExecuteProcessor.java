@@ -139,7 +139,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             taskExecutionContext.getProcessInstanceId(),
             taskExecutionContext.getTaskInstanceId()));
 
-        taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
+        taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
@@ -147,6 +147,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
         logger.info("task instance  local execute path : {} ", execLocalPath);
+        taskExecutionContext.setExecutePath(execLocalPath);
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {

@@ -267,6 +267,9 @@ public class DataSourceService extends BaseService {
         map.put(HOST, host);
         map.put(PORT, port);
         map.put(PRINCIPAL, datasourceForm.getPrincipal());
+        map.put(Constants.KERBEROS_KRB5_CONF_PATH, datasourceForm.getJavaSecurityKrb5Conf());
+        map.put(Constants.KERBEROS_KEY_TAB_USERNAME, datasourceForm.getLoginUserKeytabUsername());
+        map.put(Constants.KERBEROS_KEY_TAB_PATH, datasourceForm.getLoginUserKeytabPath());
         map.put(DATABASE, database);
         map.put(USER_NAME, datasourceForm.getUser());
         map.put(OTHER, otherMap);
@@ -424,7 +427,8 @@ public class DataSourceService extends BaseService {
      */
     public String buildParameter(DbType type, String host,
                                  String port, String database, String principal, String userName,
-                                 String password, DbConnectType connectType, String other) {
+                                 String password, DbConnectType connectType, String other,
+                                 String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) {
 
         String address = buildAddress(type, host, port, connectType);
         Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
@@ -467,6 +471,9 @@ public class DataSourceService extends BaseService {
         if (CommonUtils.getKerberosStartupState()
                 && (type == DbType.HIVE || type == DbType.SPARK)) {
             parameterMap.put(Constants.PRINCIPAL, principal);
+            parameterMap.put(Constants.KERBEROS_KRB5_CONF_PATH, javaSecurityKrb5Conf);
+            parameterMap.put(Constants.KERBEROS_KEY_TAB_USERNAME, loginUserKeytabUsername);
+            parameterMap.put(Constants.KERBEROS_KEY_TAB_PATH, loginUserKeytabPath);
         }
 
         Map<String, String> map = JSONUtils.toMap(other);
