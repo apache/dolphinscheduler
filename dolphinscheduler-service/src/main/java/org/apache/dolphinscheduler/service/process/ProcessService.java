@@ -345,16 +345,19 @@ public class ProcessService {
             return null;
         }
 
-        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        //process data check
-        if (null == processData) {
-            logger.error("process data is null");
-            return new ArrayList<>();
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(),
+                processDefinition.getCode());
+        Map<Long, TaskDefinition> taskDefinitionMap = new HashMap<>();
+        for(ProcessTaskRelation processTaskRelation : processTaskRelations){
+            if(taskDefinitionMap.containsKey(processTaskRelation.getPostTaskCode())){
+                TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(processTaskRelation.getPostTaskCode());
+                taskDefinitionMap.put(processTaskRelation.getPostTaskCode(), taskDefinition);
+            }
         }
-
-        return processData.getTasks();
+        return taskDefinitionMap.entrySet()
+                                .stream()
+                                .map(e -> JSONUtils.parseObject(JSONUtils.toJsonString(e.getValue()), TaskNode.class))
+                                .collect(Collectors.toList());
     }
 
     /**
