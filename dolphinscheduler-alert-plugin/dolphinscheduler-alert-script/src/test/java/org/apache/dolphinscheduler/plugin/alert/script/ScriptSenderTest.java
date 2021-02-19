@@ -47,7 +47,6 @@ public class ScriptSenderTest {
 
     @Test
     public void testScriptSenderTest() {
-
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
