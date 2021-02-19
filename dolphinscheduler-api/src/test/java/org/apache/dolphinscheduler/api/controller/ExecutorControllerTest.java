@@ -77,9 +77,23 @@ public class ExecutorControllerTest extends AbstractControllerTest {
     @Ignore
     @Test
     public void testExecute() throws Exception {
+        execute(ExecuteType.NONE);
+    }
+    @Ignore
+    @Test
+    public void testExecuteRepeatRun() throws Exception {
+        execute(ExecuteType.REPEAT_RUNNING);
+    }
+    @Ignore
+    @Test
+    public void testExecuteRestartFailed() throws Exception {
+        execute(ExecuteType.START_FAILURE_TASK_PROCESS);
+    }
+
+    private void execute(ExecuteType executeType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processInstanceId", "40");
-        paramsMap.add("executeType", String.valueOf(ExecuteType.NONE));
+        paramsMap.add("executeType", String.valueOf(executeType));
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute", "cxc_1113")
             .header("sessionId", sessionId)
