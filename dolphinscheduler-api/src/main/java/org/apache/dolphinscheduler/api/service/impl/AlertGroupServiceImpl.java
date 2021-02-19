@@ -53,6 +53,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      *
      * @return alert group list
      */
+    @Override
     public Map<String, Object> queryAlertgroup() {
 
         HashMap<String, Object> result = new HashMap<>();
@@ -72,6 +73,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param pageSize page size
      * @return alert group list page
      */
+    @Override
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
@@ -100,6 +102,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param alertInstanceIds alertInstanceIds
      * @return create result code
      */
+    @Override
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -138,6 +141,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
@@ -174,6 +178,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param id alert group id
      * @return delete result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
@@ -200,6 +205,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @param groupName group name
      * @return check result code
      */
+    @Override
     public boolean existGroupName(String groupName) {
         List<AlertGroup> alertGroup = alertGroupMapper.queryByGroupName(groupName);
         return CollectionUtils.isNotEmpty(alertGroup);
