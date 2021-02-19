@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,18 +15,13 @@
 # limitations under the License.
 #
 
-while getopts t:c:p: opts; do
+while getopts t: opts; do
     case $opts in
         t) t=$OPTARG ;;
-        c) c=$OPTARG ;;
-        p) p=$OPTARG ;;
         ?) ;;
     esac
 done
 
-if  [ "$t" = "error msg title" ]
-   then
-     exit 12
-fi
-exit 0
+echo "$t"
+
 exit 0

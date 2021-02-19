@@ -35,7 +35,7 @@ public class ScriptSenderTest {
 
     private static final String rootPath = System.getProperty("user.dir");
 
-    private static final String shellFilPath = rootPath + "/src/test/script/shell/scriptTest.sh";
+    private static final String shellFilPath = rootPath + "/src/test/script/shell/scriptExample.sh";
 
     @Before
     public void initScriptConfig() {
