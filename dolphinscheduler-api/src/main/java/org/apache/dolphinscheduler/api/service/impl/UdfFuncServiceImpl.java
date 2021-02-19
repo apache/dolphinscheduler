@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -48,10 +47,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * udf function service impl
+ * udf func service impl
  */
 @Service
-public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
+public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncService {
 
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceImpl.class);
 

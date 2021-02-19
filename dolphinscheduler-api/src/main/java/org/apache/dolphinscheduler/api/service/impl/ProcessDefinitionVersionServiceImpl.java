@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -42,9 +41,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.ImmutableMap;
 
+/**
+ * process definition version service impl
+ */
 @Service
-public class ProcessDefinitionVersionServiceImpl extends BaseService implements
-        ProcessDefinitionVersionService {
+public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl implements ProcessDefinitionVersionService {
 
     @Autowired
     private ProcessDefinitionVersionMapper processDefinitionVersionMapper;

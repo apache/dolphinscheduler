@@ -60,7 +60,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * test for ExecutorService
+ * executor service 2 test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExecutorService2Test {

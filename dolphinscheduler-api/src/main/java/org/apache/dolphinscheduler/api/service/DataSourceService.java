@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Map;
 
 /**
- * datasource service
+ * data source service
  */
 public interface DataSourceService {
 

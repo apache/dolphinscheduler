@@ -41,13 +41,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * worker group service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupServiceTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceTest.class);
 
     @InjectMocks
     private WorkerGroupServiceImpl workerGroupService;

@@ -50,10 +50,6 @@ public class StringUtils {
         return !isBlank(s);
     }
 
-    public static String replaceNRTtoUnderline(String str) {
-        return isBlank(str) ? str : str.replaceAll("[\n|\r|\t]", "_");
-    }
-
     public static String trim(String str) {
         return str == null ? null : str.trim();
     }

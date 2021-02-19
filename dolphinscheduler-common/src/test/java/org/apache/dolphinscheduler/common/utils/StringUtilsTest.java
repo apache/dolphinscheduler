@@ -64,21 +64,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testreplaceNRTtoUnderline() {
-        String result1 = StringUtils.replaceNRTtoUnderline("abc\n");
-        Assert.assertEquals("abc_", result1);
-
-        String result2 = StringUtils.replaceNRTtoUnderline("abc\r");
-        Assert.assertEquals("abc_", result2);
-
-        String result3 = StringUtils.replaceNRTtoUnderline("abc\t");
-        Assert.assertEquals("abc_", result3);
-
-        String result4 = StringUtils.replaceNRTtoUnderline(null);
-        Assert.assertNull(result4);
-    }
-
-    @Test
     public void testTrim() {
         String trim = StringUtils.trim(null);
         Assert.assertNull(trim);

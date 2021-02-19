@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -73,7 +72,7 @@ import org.springframework.stereotype.Service;
  * executor service impl
  */
 @Service
-public class ExecutorServiceImpl extends BaseService implements ExecutorService {
+public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceImpl.class);
 

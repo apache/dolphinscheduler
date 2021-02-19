@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -86,7 +85,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * resources service impl
  */
 @Service
-public class ResourcesServiceImpl extends BaseService implements ResourcesService {
+public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesService {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceImpl.class);
 
