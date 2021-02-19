@@ -50,6 +50,9 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * project service test
+ **/
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
 
@@ -66,7 +69,6 @@ public class ProjectServiceTest {
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
-
 
     private String projectName = "ProjectServiceTest";
 
