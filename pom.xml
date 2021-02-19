@@ -976,7 +976,7 @@
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
-                        <!--<include>**/alert/plugin/EmailAlertPluginTest.java</include>-->
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>
