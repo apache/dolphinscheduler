@@ -62,6 +62,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
      * @param processDefinition the process definition that need to record version
      * @return the newest version number of this process definition
      */
+    @Override
     public long addProcessDefinitionVersion(ProcessDefinition processDefinition) {
 
         long version = this.queryMaxVersionByProcessDefinitionId(processDefinition.getId()) + 1;
@@ -111,6 +112,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
      * @param processDefinitionId process definition id
      * @return the pagination process definition versions info of the certain process definition
      */
+    @Override
     public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, int processDefinitionId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -152,6 +154,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
      * @param version version number
      * @return the process definition version info
      */
+    @Override
     public ProcessDefinitionVersion queryByProcessDefinitionIdAndVersion(int processDefinitionId, long version) {
         return processDefinitionVersionMapper.queryByProcessDefinitionIdAndVersion(processDefinitionId, version);
     }
@@ -165,6 +168,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
      * @param version version number
      * @return delele result code
      */
+    @Override
     public Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName, int processDefinitionId, long version) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);

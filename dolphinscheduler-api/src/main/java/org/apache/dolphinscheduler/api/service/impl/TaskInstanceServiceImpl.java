@@ -89,6 +89,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @param pageSize page size
      * @return task list page
      */
+    @Override
     public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
                                                    Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
                                                    String endDate, String searchVal, ExecutionStatus stateType, String host,
@@ -157,6 +158,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
+    @Override
     public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);

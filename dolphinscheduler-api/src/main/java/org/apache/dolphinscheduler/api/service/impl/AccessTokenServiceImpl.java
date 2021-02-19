@@ -60,6 +60,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param pageSize page size
      * @return token list for page number and page size
      */
+    @Override
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
 
@@ -86,6 +87,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param token token string
      * @return create result code
      */
+    @Override
     public Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>();
 
@@ -123,6 +125,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param expireTime token expire time
      * @return token string
      */
+    @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
         if (!hasPerm(loginUser,userId)){
@@ -142,6 +145,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param id token id
      * @return delete result code
      */
+    @Override
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
 
@@ -173,6 +177,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param token token string
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>();
         if (!hasPerm(loginUser,userId)){

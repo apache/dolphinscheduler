@@ -57,6 +57,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * @param request request
      * @return session
      */
+    @Override
     public Session getSession(HttpServletRequest request) {
         String sessionId = request.getHeader(Constants.SESSION_ID);
 
@@ -85,6 +86,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * @param ip ip
      * @return session string
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public String createSession(User user, String ip) {
         Session session = null;
@@ -142,6 +144,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * @param ip no use
      * @param loginUser login user
      */
+    @Override
     public void signOut(String ip, User loginUser) {
         try {
             /**
