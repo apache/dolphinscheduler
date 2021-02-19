@@ -562,12 +562,12 @@ CREATE TABLE t_ds_task_instance (
   alert_flag int DEFAULT NULL ,
   retry_times int DEFAULT '0' ,
   pid int DEFAULT NULL ,
-  app_link varchar(255) DEFAULT NULL ,
+  app_link text ,
   flag int DEFAULT '1' ,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
-   worker_group varchar(64),
+  worker_group varchar(64),
   executor_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
@@ -761,4 +761,4 @@ INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,upda
 INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('1.3.3');
+INSERT INTO t_ds_version(version) VALUES ('1.3.6');

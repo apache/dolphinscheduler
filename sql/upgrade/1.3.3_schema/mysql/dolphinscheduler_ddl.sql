@@ -38,6 +38,3 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_resources_un();
 DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
-
-
-
