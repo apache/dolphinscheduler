@@ -213,10 +213,10 @@
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {
-        if (dag.tenantId === -1) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        } else {
+        if (dag.tenantId > -1) {
           this.tenantId = dag.tenantId
+        } else if (this.store.state.user.userInfo.tenantId) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
         }
       })
     },
