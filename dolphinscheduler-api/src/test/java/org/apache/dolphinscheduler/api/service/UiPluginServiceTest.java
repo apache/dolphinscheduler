@@ -36,7 +36,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * UiPluginServiceTest
+ * ui plugin service test
  */
 @RunWith(MockitoJUnitRunner.class)
 public class UiPluginServiceTest {
