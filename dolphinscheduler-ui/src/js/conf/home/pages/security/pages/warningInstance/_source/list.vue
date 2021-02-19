@@ -20,6 +20,7 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="instanceName" :label="$t('Alarm instance name')"></el-table-column>
+        <el-table-column prop="alertPluginName" :label="$t('Alarm plugin name')"></el-table-column>
         <el-table-column :label="$t('Create Time')">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
