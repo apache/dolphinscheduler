@@ -91,7 +91,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private ProjectUserMapper projectUserMapper;
 
     @Autowired
-    private ResourceUserMapper resourcesUserMapper;
+    private ResourceUserMapper resourceUserMapper;
 
     @Autowired
     private ResourceMapper resourceMapper;
@@ -599,7 +599,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         }
 
-        resourcesUserMapper.deleteResourceUser(userId, 0);
+        resourceUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
@@ -624,7 +624,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             resourcesUser.setCreateTime(now);
             resourcesUser.setUpdateTime(now);
-            resourcesUserMapper.insert(resourcesUser);
+            resourceUserMapper.insert(resourcesUser);
 
         }
 

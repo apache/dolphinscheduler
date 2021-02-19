@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 
 import java.util.ArrayList;
@@ -70,6 +71,9 @@ public class UdfFuncServiceTest {
 
     @Mock
     private UdfFuncMapper udfFuncMapper;
+
+    @Mock
+    private UDFUserMapper udfUserMapper;
 
     @Before
     public void setUp() {
@@ -168,6 +172,8 @@ public class UdfFuncServiceTest {
 
     @Test
     public  void testDelete(){
+        Mockito.when(udfFuncMapper.deleteById(Mockito.anyInt())).thenReturn(1);
+        Mockito.when(udfUserMapper.deleteByUdfFuncId(Mockito.anyInt())).thenReturn(1);
         Result result= udfFuncService.delete(122);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());

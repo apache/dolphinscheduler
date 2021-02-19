@@ -62,7 +62,7 @@ public interface BaseService {
      * @param status status
      * @param statusParams status message
      */
-    void putMsg(Result result, Status status, Object... statusParams);
+    void putMsg(Result<Object> result, Status status, Object... statusParams);
 
     /**
      * check

@@ -32,13 +32,16 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,6 +90,12 @@ public class ResourcesServiceTest {
 
     @Mock
     private UdfFuncMapper udfFunctionMapper;
+
+    @Mock
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
+    private ResourceUserMapper resourceUserMapper;
 
     @Before
     public void setUp() {
@@ -317,6 +326,9 @@ public class ResourcesServiceTest {
             //SUCCESS
             loginUser.setTenantId(1);
             Mockito.when(hadoopUtils.delete(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(true);
+            Mockito.when(processDefinitionMapper.listResources()).thenReturn(getResources());
+            Mockito.when(resourcesMapper.deleteIds(Mockito.any())).thenReturn(1);
+            Mockito.when(resourceUserMapper.deleteResourceUserArray(Mockito.anyInt(), Mockito.any())).thenReturn(1);
             result = resourcesService.delete(loginUser, 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
@@ -690,5 +702,14 @@ public class ResourcesServiceTest {
         List<String> contentList = new ArrayList<>();
         contentList.add("test");
         return contentList;
+    }
+
+    private List<Map<String, Object>> getResources() {
+        List<Map<String, Object>> resources = new ArrayList<>();
+        Map<String, Object> resource = new HashMap<>();
+        resource.put("id", 1);
+        resource.put("resource_ids", "1");
+        resources.add(resource);
+        return resources;
     }
 }
