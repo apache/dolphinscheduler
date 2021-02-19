@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
@@ -60,7 +60,7 @@ import org.springframework.stereotype.Service;
  * data analysis service impl
  */
 @Service
-public class DataAnalysisServiceImpl extends BaseService implements DataAnalysisService {
+public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -130,7 +130,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
 
     private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
             , TriFunction<Date, Date, Integer[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
             return result;
@@ -193,7 +193,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      */
     public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
             return result;
@@ -264,7 +264,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @return queue state count data
      */
     public Map<String, Object> countQueueState(User loginUser, int projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
