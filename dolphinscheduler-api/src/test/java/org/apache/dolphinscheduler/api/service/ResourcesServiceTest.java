@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -68,7 +69,7 @@ public class ResourcesServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceTest.class);
 
     @InjectMocks
-    private ResourcesService resourcesService;
+    private ResourcesServiceImpl resourcesService;
     @Mock
     private ResourceMapper resourcesMapper;
     @Mock

@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -43,7 +44,8 @@ public class MonitorServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(MonitorServiceTest.class);
 
     @InjectMocks
-    private MonitorService monitorService;
+    private MonitorServiceImpl monitorService;
+
     @Mock
     private MonitorDBDao monitorDBDao;
 
