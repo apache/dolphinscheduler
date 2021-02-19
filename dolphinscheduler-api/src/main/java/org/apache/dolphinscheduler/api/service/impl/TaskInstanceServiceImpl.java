@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -54,7 +53,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * task instance service impl
  */
 @Service
-public class TaskInstanceServiceImpl extends BaseService implements TaskInstanceService {
+public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
 
     @Autowired
     ProjectMapper projectMapper;

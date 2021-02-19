@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -94,7 +93,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * process instance service impl
  */
 @Service
-public class ProcessInstanceServiceImpl extends BaseService implements ProcessInstanceService {
+public class ProcessInstanceServiceImpl extends BaseServiceImpl implements ProcessInstanceService {
 
     @Autowired
     ProjectMapper projectMapper;

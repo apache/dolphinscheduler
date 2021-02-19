@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -44,10 +43,10 @@ import org.springframework.stereotype.Service;
 
 
 /**
- * work group service impl
+ * worker group service impl
  */
 @Service
-public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupService {
+public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
 
     private static final String NO_NODE_EXCEPTION_REGEX = "KeeperException$NoNodeException";
 

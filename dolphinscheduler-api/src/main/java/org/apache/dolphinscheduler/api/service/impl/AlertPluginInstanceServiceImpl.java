@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
@@ -57,7 +56,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 @Lazy
-public class AlertPluginInstanceServiceImpl extends BaseService implements AlertPluginInstanceService {
+public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements AlertPluginInstanceService {
 
     @Autowired
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
