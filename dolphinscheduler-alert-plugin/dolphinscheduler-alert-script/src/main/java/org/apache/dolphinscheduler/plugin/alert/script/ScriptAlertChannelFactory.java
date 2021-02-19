@@ -56,8 +56,8 @@ public class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         RadioParam scriptTypeParams = RadioParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_TYPE, ScriptParamsConstants.SCRIPT_TYPE)
-                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getCode(), false))
-                .setValue(ScriptType.SHELL.getCode())
+                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getDescp(), false))
+                .setValue(ScriptType.SHELL.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
