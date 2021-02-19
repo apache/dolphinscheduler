@@ -14,6 +14,7 @@ apacheds-kerberos-codec-2.0.0-M15.jar
 api-asn1-api-1.0.0-M20.jar
 api-util-1.0.0-M20.jar
 asm-3.1.jar
+asm-6.2.1.jar
 aspectjweaver-1.9.6.jar
 async-http-client-1.6.5.jar
 audience-annotations-0.5.0.jar
