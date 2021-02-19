@@ -1,5 +1,6 @@
 HikariCP-3.2.0.jar
 activation-1.1.jar
+aether-api-1.13.1.jar
 aether-connector-asynchttpclient-1.13.1.jar
 aether-connector-file-1.13.1.jar
 aether-impl-1.13.1.jar
@@ -192,6 +193,7 @@ presto-jdbc-0.238.1.jar
 protobuf-java-2.5.0.jar
 quartz-2.3.0.jar
 quartz-jobs-2.3.0.jar
+resolver-1.5.jar
 slf4j-api-1.7.5.jar
 snakeyaml-1.23.jar
 snappy-0.2.jar
