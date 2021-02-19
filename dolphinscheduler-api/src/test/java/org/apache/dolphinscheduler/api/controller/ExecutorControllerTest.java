@@ -74,26 +74,45 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
     @Test
     public void testExecute() throws Exception {
-        execute(ExecuteType.NONE);
-    }
-    @Ignore
-    @Test
-    public void testExecuteRepeatRun() throws Exception {
-        execute(ExecuteType.REPEAT_RUNNING);
-    }
-    @Ignore
-    @Test
-    public void testExecuteRestartFailed() throws Exception {
-        execute(ExecuteType.START_FAILURE_TASK_PROCESS);
-    }
-
-    private void execute(ExecuteType executeType) throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processInstanceId", "40");
-        paramsMap.add("executeType", String.valueOf(executeType));
+        paramsMap.add("executeType", String.valueOf(ExecuteType.NONE));
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute", "cxc_1113")
+            .header("sessionId", sessionId)
+            .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testExecuteRepeatRun() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processInstanceId", "40");
+        paramsMap.add("executeType", String.valueOf(ExecuteType.REPEAT_RUNNING));
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute", "cxc_1113")
+            .header("sessionId", sessionId)
+            .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testExecuteRestartFailed() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("processInstanceId", "40");
+        paramsMap.add("executeType", String.valueOf(ExecuteType.START_FAILURE_TASK_PROCESS));
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute", "cxc_1113")
             .header("sessionId", sessionId)
