@@ -296,8 +296,13 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-
-        Map<String, Object> result = processDefinitionVersionService.queryProcessDefinitionVersions(loginUser
+        logger.info("query process definition versions, login user {}, project name: {}, process define id: {}, list paging, pageNo: {}, pageSize: {}",
+                loginUser.getUserName(), projectName, processDefinitionId, pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
+        result = processDefinitionVersionService.queryProcessDefinitionVersions(loginUser
             , projectName, pageNo, pageSize, processDefinitionId);
         return returnDataList(result);
     }

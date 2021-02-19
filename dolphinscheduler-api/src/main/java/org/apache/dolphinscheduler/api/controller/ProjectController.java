@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -172,8 +173,12 @@ public class ProjectController extends BaseController {
     ) {
 
         logger.info("login user {}, query project list paging", loginUser.getUserName());
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        Map<String, Object> result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
+        result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
         return returnDataListPaging(result);
     }
 
