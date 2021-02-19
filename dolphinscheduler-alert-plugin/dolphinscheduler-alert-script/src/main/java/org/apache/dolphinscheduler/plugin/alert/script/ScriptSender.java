@@ -37,6 +37,12 @@ public class ScriptSender {
 
     private String userParams;
 
+    private static final String ALERT_TITLE_OPTION = " -t ";
+
+    private static final String ALERT_CONTENT_OPTION = " -c ";
+
+    private static final String ALERT_USER_PARAMS_OPTION = " -p ";
+
     ScriptSender(Map<String, String> config) {
         scriptPath = config.get(ScriptParamsConstants.NAME_SCRIPT_PATH);
         scriptType = Integer.parseInt(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE));
@@ -58,7 +64,7 @@ public class ScriptSender {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
-        String[] cmd = {"/bin/sh", "-c", scriptPath + " -alertTitle " + title+" -alertContent " + content + " alertUserParams " + userParams};
+        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {
