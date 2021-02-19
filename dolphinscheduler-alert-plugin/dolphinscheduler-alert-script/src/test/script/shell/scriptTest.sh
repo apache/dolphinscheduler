@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -15,25 +16,18 @@
 # limitations under the License.
 #
 
-title=$1
-content=$2
-userParams=$3
-echo "last"
-echo $alertTitle
-
-echo "last"
-
-echo $title
-
-echo $content
-
-echo $userParams
-
-
+while getopts t:c:p: opts; do
+    case $opts in
+        t) t=$OPTARG ;;
+        c) c=$OPTARG ;;
+        p) p=$OPTARG ;;
+        ?) ;;
+    esac
 done
 
-if  [ $title = errorMsg ]
+if  [ "$t" = "error msg title" ]
    then
      exit 12
 fi
+exit 0
 exit 0
