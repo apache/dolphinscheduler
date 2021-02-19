@@ -60,6 +60,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @param loginUser login user
      * @return data base state
      */
+    @Override
     public Map<String,Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
@@ -78,6 +79,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @param loginUser login user
      * @return master information list
      */
+    @Override
     public Map<String,Object> queryMaster(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -95,6 +97,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @param loginUser login user
      * @return zookeeper information list
      */
+    @Override
     public Map<String,Object> queryZookeeperState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
@@ -113,6 +116,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @param loginUser login user
      * @return worker information list
      */
+    @Override
     public Map<String,Object> queryWorker(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -150,6 +154,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
         return result;
     }
 
+    @Override
     public List<Server> getServerListFromZK(boolean isMaster) {
 
         checkNotNull(zookeeperMonitor);

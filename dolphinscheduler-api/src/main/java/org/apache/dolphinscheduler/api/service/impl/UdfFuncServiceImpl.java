@@ -76,6 +76,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param className class name
      * @return create result code
      */
+    @Override
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
@@ -147,6 +148,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param id  udf function id
      * @return udf function detail
      */
+    @Override
     public Map<String, Object> queryUdfFuncDetail(int id) {
         Map<String, Object> result = new HashMap<>();
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
@@ -172,6 +174,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param className class name
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateUdfFunc(int udfFuncId,
                                              String funcName,
                                              String className,
@@ -242,6 +245,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param searchVal search value
      * @return udf function list page
      */
+    @Override
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -278,6 +282,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param type  udf type
      * @return udf func list
      */
+    @Override
     public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>();
         int userId = loginUser.getId();
@@ -297,6 +302,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param id udf function id
      * @return delete result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Result<Object> delete(int id) {
         Result<Object> result = new Result<>();
@@ -312,6 +318,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param name name
      * @return true if the name can user, otherwise return false
      */
+    @Override
     public Result<Object> verifyUdfFuncByName(String name) {
         Result<Object> result = new Result<>();
         if (checkUdfFuncNameExists(name)) {

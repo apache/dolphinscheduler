@@ -122,6 +122,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return create result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createUser(User loginUser,
                                           String userName,
@@ -168,6 +169,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     }
 
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public User createUser(String userName,
                            String userPassword,
@@ -202,6 +204,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /***
      * create User for ldap login
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public User createUser(UserType userType, String userId, String email) {
         User user = new User();
@@ -226,6 +229,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userName user name
      * @return exist user or null
      */
+    @Override
     public User getUserByUserName(String userName) {
         return userMapper.queryByUserNameAccurately(userName);
     }
@@ -236,6 +240,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param id id
      * @return user info
      */
+    @Override
     public User queryUser(int id) {
         return userMapper.selectById(id);
     }
@@ -246,6 +251,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param name name
      * @return user info
      */
+    @Override
     public User queryUser(String name) {
         return userMapper.queryByUserNameAccurately(name);
     }
@@ -257,6 +263,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param password password
      * @return user info
      */
+    @Override
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
         return userMapper.queryUserByNamePassword(name, md5);
@@ -268,6 +275,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param name user name
      * @return if name empty 0, user not exists -1, user exist user id
      */
+    @Override
     public int getUserIdByName(String name) {
         //executor name query
         int executorId = 0;
@@ -292,6 +300,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param pageSize page size
      * @return user list page
      */
+    @Override
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
 
@@ -327,6 +336,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return update result code
      * @throws Exception exception
      */
+    @Override
     public Map<String, Object> updateUser(User loginUser, int userId,
                                           String userName,
                                           String userPassword,
@@ -458,6 +468,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
+    @Override
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -497,6 +508,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param projectIds project id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>();
@@ -546,6 +558,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param resourceIds resource id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>();
@@ -641,6 +654,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param udfIds udf id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>();
@@ -687,6 +701,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param datasourceIds data source id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>();
@@ -733,6 +748,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param loginUser login user
      * @return user info
      */
+    @Override
     public Map<String, Object> getUserInfo(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -768,6 +784,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param loginUser login user
      * @return user list
      */
+    @Override
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -788,6 +805,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param loginUser login user
      * @return user list
      */
+    @Override
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -808,6 +826,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userName user name
      * @return true if user name not exists, otherwise return false
      */
+    @Override
     public Result<Object> verifyUserName(String userName) {
 
         Result<Object> result = new Result<>();
@@ -828,6 +847,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
+    @Override
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -864,6 +884,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param alertgroupId alert group id
      * @return authorized result code
      */
+    @Override
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -955,6 +976,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return register result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
         Map<String, Object> result = new HashMap<>();
@@ -984,6 +1006,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userName user name
      * @return create result code
      */
+    @Override
     public Map<String, Object> activateUser(User loginUser, String userName) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -1027,6 +1050,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @param userNames user name
      * @return create result code
      */
+    @Override
     public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
         Map<String, Object> result = new HashMap<>();
 

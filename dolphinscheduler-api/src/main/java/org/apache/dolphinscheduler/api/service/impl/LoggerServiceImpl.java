@@ -78,6 +78,7 @@ public class LoggerServiceImpl implements LoggerService {
      * @param limit limit
      * @return log string data
      */
+    @Override
     @SuppressWarnings("unchecked")
     public Result<String> queryLog(int taskInstId, int skipLineNum, int limit) {
 
@@ -117,6 +118,7 @@ public class LoggerServiceImpl implements LoggerService {
      * @param taskInstId task instance id
      * @return log byte array
      */
+    @Override
     public byte[] getLogBytes(int taskInstId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
