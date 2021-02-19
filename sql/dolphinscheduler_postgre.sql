@@ -187,14 +187,10 @@ DROP TABLE IF EXISTS t_ds_alert;
 CREATE TABLE t_ds_alert (
   id int NOT NULL  ,
   title varchar(64) DEFAULT NULL ,
-  show_type int DEFAULT NULL ,
   content text ,
-  alert_type int DEFAULT NULL ,
   alert_status int DEFAULT '0' ,
   log text ,
   alertgroup_id int DEFAULT NULL ,
-  receivers text ,
-  receivers_cc text ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
@@ -204,13 +200,14 @@ CREATE TABLE t_ds_alert (
 --
 
 DROP TABLE IF EXISTS t_ds_alertgroup;
-CREATE TABLE t_ds_alertgroup (
-  id int NOT NULL  ,
-  group_name varchar(255) DEFAULT NULL ,
-  group_type int DEFAULT NULL ,
-  description varchar(255) DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
+CREATE TABLE t_ds_alertgroup(
+  id             int NOT NULL,
+  alert_instance_ids varchar (255) DEFAULT NULL,
+  create_user_id int4         DEFAULT NULL,
+  group_name     varchar(255) DEFAULT NULL,
+  description    varchar(255) DEFAULT NULL,
+  create_time    timestamp    DEFAULT NULL,
+  update_time    timestamp    DEFAULT NULL,
   PRIMARY KEY (id)
 ) ;
 
@@ -301,8 +298,7 @@ CREATE TABLE t_ds_process_definition (
   flag int DEFAULT NULL ,
   locations text ,
   connects text ,
-  receivers text ,
-  receivers_cc text ,
+  warning_group_id int4 DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
@@ -314,6 +310,29 @@ CREATE TABLE t_ds_process_definition (
 ) ;
 
 create index process_definition_index on t_ds_process_definition (project_id,id);
+
+--
+-- Table structure for table t_ds_process_definition_version
+--
+
+DROP TABLE IF EXISTS t_ds_process_definition_version;
+CREATE TABLE t_ds_process_definition_version (
+  id int NOT NULL  ,
+  process_definition_id int NOT NULL  ,
+  version int DEFAULT NULL ,
+  process_definition_json text ,
+  description text ,
+  global_params text ,
+  locations text ,
+  connects text ,
+  warning_group_id int4 DEFAULT NULL,
+  create_time timestamp DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  resource_ids varchar(64),
+  PRIMARY KEY (id)
+) ;
+
+create index process_definition_id_and_version on t_ds_process_definition_version (process_definition_id,version);
 
 --
 -- Table structure for table t_ds_process_instance
@@ -353,6 +372,7 @@ CREATE TABLE t_ds_process_instance (
   worker_group varchar(64) ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
   create index process_instance_index on t_ds_process_instance (process_definition_id,id);
@@ -468,20 +488,6 @@ CREATE TABLE t_ds_relation_udfs_user (
 ;
 
 --
--- Table structure for table t_ds_relation_user_alertgroup
---
-
-DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
-CREATE TABLE t_ds_relation_user_alertgroup (
-  id int NOT NULL,
-  alertgroup_id int DEFAULT NULL,
-  user_id int DEFAULT NULL,
-  create_time timestamp DEFAULT NULL,
-  update_time timestamp DEFAULT NULL,
-  PRIMARY KEY (id)
-);
-
---
 -- Table structure for table t_ds_resources
 --
 
@@ -569,6 +575,9 @@ CREATE TABLE t_ds_task_instance (
   task_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
   executor_id int DEFAULT NULL ,
+  first_submit_time timestamp DEFAULT NULL ,
+  delay_time int DEFAULT '0' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
 
@@ -580,7 +589,6 @@ DROP TABLE IF EXISTS t_ds_tenant;
 CREATE TABLE t_ds_tenant (
   id int NOT NULL  ,
   tenant_code varchar(64) DEFAULT NULL ,
-  tenant_name varchar(64) DEFAULT NULL ,
   description varchar(256) DEFAULT NULL ,
   queue_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
@@ -625,8 +633,10 @@ CREATE TABLE t_ds_user (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   queue varchar(64) DEFAULT NULL ,
+  state int DEFAULT 1 ,
   PRIMARY KEY (id)
 );
+comment on column t_ds_user.state is 'state 0:disable 1:enable';
 
 --
 -- Table structure for table t_ds_version
@@ -690,6 +700,9 @@ ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource
 DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
 CREATE SEQUENCE  t_ds_process_definition_id_sequence;
 ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_definition_version_id_sequence;
+CREATE SEQUENCE  t_ds_process_definition_version_id_sequence;
+ALTER TABLE t_ds_process_definition_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_version_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
 CREATE SEQUENCE  t_ds_process_instance_id_sequence;
 ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
@@ -715,9 +728,6 @@ ALTER TABLE t_ds_relation_resources_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_
 DROP SEQUENCE IF EXISTS t_ds_relation_udfs_user_id_sequence;
 CREATE SEQUENCE  t_ds_relation_udfs_user_id_sequence;
 ALTER TABLE t_ds_relation_udfs_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_udfs_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_relation_user_alertgroup_id_sequence;
-CREATE SEQUENCE  t_ds_relation_user_alertgroup_id_sequence;
-ALTER TABLE t_ds_relation_user_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_user_alertgroup_id_sequence');
 
 DROP SEQUENCE IF EXISTS t_ds_resources_id_sequence;
 CREATE SEQUENCE  t_ds_resources_id_sequence;
@@ -746,19 +756,50 @@ DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
 ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
-CREATE SEQUENCE  t_ds_worker_server_id_sequence;
+CREATE SEQUENCE t_ds_worker_server_id_sequence;
 ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
-INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time)
+VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
--- Records of t_ds_alertgroup，dolphinscheduler warning group
-INSERT INTO t_ds_alertgroup(group_name,group_type,description,create_time,update_time)  VALUES ('dolphinscheduler warning group', '0', 'dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
-INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,update_time) VALUES ( '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
-
--- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
+-- Records of t_ds_alertgroup, default admin warning group
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('1.3.5');
+INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
+VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
+
+-- Records of t_ds_queue,default queue name : default
+INSERT INTO t_ds_version(version) VALUES ('1.4.0');
+
+--
+-- Table structure for table t_ds_plugin_define
+--
+DROP TABLE IF EXISTS t_ds_plugin_define;
+CREATE TABLE t_ds_plugin_define (
+  id serial NOT NULL,
+  plugin_name varchar(100) NOT NULL,
+  plugin_type varchar(100) NOT NULL,
+  plugin_params text NULL,
+  create_time timestamp NULL,
+  update_time timestamp NULL,
+  CONSTRAINT t_ds_plugin_define_pk PRIMARY KEY (id),
+  CONSTRAINT t_ds_plugin_define_un UNIQUE (plugin_name, plugin_type)
+);
+
+--
+-- Table structure for table t_ds_alert_plugin_instance
+--
+DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
+CREATE TABLE t_ds_alert_plugin_instance (
+  id serial NOT NULL,
+  plugin_define_id int4 NOT NULL,
+  plugin_instance_params text NULL,
+  create_time timestamp NULL,
+  update_time timestamp NULL,
+  instance_name varchar(200) NULL,
+  CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
+);
