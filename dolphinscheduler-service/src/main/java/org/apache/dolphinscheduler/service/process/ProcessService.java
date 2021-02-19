@@ -166,10 +166,10 @@ public class ProcessService {
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
-     * @param logger         logger
-     * @param host           host
+     * @param logger logger
+     * @param host host
      * @param validThreadNum validThreadNum
-     * @param command        found command
+     * @param command found command
      * @return process instance
      */
     @Transactional(rollbackFor = Exception.class)
@@ -209,7 +209,7 @@ public class ProcessService {
     /**
      * set process waiting thread
      *
-     * @param command         command
+     * @param command command
      * @param processInstance processInstance
      * @return process instance
      */
@@ -227,7 +227,7 @@ public class ProcessService {
     /**
      * check thread num
      *
-     * @param command        command
+     * @param command command
      * @param validThreadNum validThreadNum
      * @return if thread is enough
      */
@@ -1572,8 +1572,8 @@ public class ProcessService {
             return;
         }
         ProcessInstance processInstance = this.processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId());
-        List<Property> params4Process = JSONUtils.toList(processInstance.getGlobalParams(), Property.class);
-        Map<String, Property> allParamMap = params4Process.stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+        List<Property> params4Property = JSONUtils.toList(processInstance.getGlobalParams(), Property.class);
+        Map<String, Property> allParamMap = params4Property.stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
 
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
         for (Property info : allParam) {
@@ -1594,8 +1594,8 @@ public class ProcessService {
         taskNode.setParams(JSONUtils.toJsonString(taskParams));
         // task instance node json
         taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
-        String params4ProcessString = JSONUtils.toJsonString(params4Process);
-        int updateCount = this.processInstanceMapper.updateGlobalParamById(params4ProcessString, processInstance.getId());
+        String params4ProcessString = JSONUtils.toJsonString(params4Property);
+        int updateCount = this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId());
         logger.info("updateCount:{}, params4Process:{}, processInstanceId:{}", updateCount, params4ProcessString, processInstance.getId());
     }
 

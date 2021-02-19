@@ -558,7 +558,7 @@ public class MasterExecThread implements Runnable {
         String globalParams = this.processInstance.getGlobalParams();
         if (StringUtils.isNotEmpty(globalParams)) {
             Map<String, String> globalMap = getGlobalParamMap(globalParams);
-            if (globalMap != null) {
+            if (globalMap != null && globalMap.size() != 0) {
                 // the param save in localParams
                 Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
                 Object localParams = result.get(LOCAL_PARAMS);
@@ -997,8 +997,8 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
-                    processInstance.setVarPool(task.getVarPool());
                     processInstance = processService.findProcessInstanceById(processInstance.getId());
+                    processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());
