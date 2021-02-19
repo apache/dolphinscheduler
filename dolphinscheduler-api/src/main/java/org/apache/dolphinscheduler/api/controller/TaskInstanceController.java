@@ -22,11 +22,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGIN
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -54,7 +54,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * task instance controller
  */
-@Api(tags = "TASK_INSTANCE_TAG", position = 11)
+@Api(tags = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/task-instance")
 public class TaskInstanceController extends BaseController {
@@ -63,7 +63,6 @@ public class TaskInstanceController extends BaseController {
 
     @Autowired
     TaskInstanceService taskInstanceService;
-
 
     /**
      * query task list paging
@@ -113,16 +112,16 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam("pageSize") Integer pageSize) {
 
         logger.info("query task instance list, projectName:{}, processInstanceId:{}, processInstanceName:{}, search value:{}, taskName:{}, executorName: {}, stateType:{}, host:{}, start:{}, end:{}",
-                StringUtils.replaceNRTtoUnderline(projectName),
+                RegexUtils.escapeNRT(projectName),
                 processInstanceId,
-                StringUtils.replaceNRTtoUnderline(processInstanceName),
-                StringUtils.replaceNRTtoUnderline(searchVal),
-                StringUtils.replaceNRTtoUnderline(taskName),
-                StringUtils.replaceNRTtoUnderline(executorName),
+                RegexUtils.escapeNRT(processInstanceName),
+                RegexUtils.escapeNRT(searchVal),
+                RegexUtils.escapeNRT(taskName),
+                RegexUtils.escapeNRT(executorName),
                 stateType,
-                StringUtils.replaceNRTtoUnderline(host),
-                StringUtils.replaceNRTtoUnderline(startTime),
-                StringUtils.replaceNRTtoUnderline(endTime));
+                RegexUtils.escapeNRT(host),
+                RegexUtils.escapeNRT(startTime),
+                RegexUtils.escapeNRT(endTime));
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                 loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
