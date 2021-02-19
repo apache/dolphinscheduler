@@ -124,11 +124,11 @@ public class ShellTaskTest {
         shellTask.setResult(r);
     }
     @Test
-    public void testSetTaskResultString(){
+    public void testSetTaskResultString() {
         shellCommandExecutor.setTaskResultString("shellReturn");
     }
     @Test
-    public void testGetTaskResultString(){
+    public void testGetTaskResultString() {
         logger.info(shellCommandExecutor.getTaskResultString());
     }
 }
