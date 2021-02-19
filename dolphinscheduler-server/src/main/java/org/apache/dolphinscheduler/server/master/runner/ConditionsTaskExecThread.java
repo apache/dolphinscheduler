@@ -125,7 +125,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
     private void initTaskParameters() {
         this.taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
-        this.taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
+        this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         this.processService.saveTaskInstance(taskInstance);

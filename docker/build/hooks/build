@@ -48,7 +48,12 @@ echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubati
 mv "$(pwd)"/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-"${VERSION}"-dolphinscheduler-bin.tar.gz $(pwd)/docker/build/
 
 # docker build
-echo -e "docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/docker/build/\n"
-sudo docker build --build-arg VERSION="${VERSION}" -t $DOCKER_REPO:"${VERSION}" "$(pwd)/docker/build/"
+BUILD_COMMAND="docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/docker/build/"
+echo -e "$BUILD_COMMAND\n"
+if (docker info 2> /dev/null | grep -i "ERROR"); then
+    sudo $BUILD_COMMAND
+else
+    $BUILD_COMMAND
+fi
 
 echo "------ dolphinscheduler end   - build -------"

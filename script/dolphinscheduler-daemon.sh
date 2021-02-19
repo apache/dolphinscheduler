@@ -54,6 +54,12 @@ fi
 log=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command-$HOSTNAME.out
 pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
 
+# print logs to /dev/null in docker
+if [ "$DOCKER" = "true" ]; then
+  echo "start in docker"
+  log=/dev/null
+fi
+
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then

@@ -15,9 +15,9 @@ Official Website: https://dolphinscheduler.apache.org
 
 #### 你可以运行一个dolphinscheduler实例
 ```
-$ docker run -dit --name dolphinscheduler \ 
+$ docker run -dit --name dolphinscheduler \
 -e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
--p 8888:8888 \
+-p 12345:12345 \
 dolphinscheduler all
 ```
 
@@ -33,7 +33,7 @@ dolphinscheduler all
 $ docker run -dit --name dolphinscheduler \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
--p 8888:8888 \
+-p 12345:12345 \
 dolphinscheduler all
 ```
 
@@ -43,7 +43,7 @@ dolphinscheduler all
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
--p 8888:8888 \
+-p 12345:12345 \
 dolphinscheduler all
 ```
 
@@ -88,15 +88,6 @@ $ docker run -dit --name dolphinscheduler \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler alert-server
-```
-
-* 启动一个 **frontend**, 如下:
-
-```
-$ docker run -dit --name dolphinscheduler \
--e FRONTEND_API_SERVER_HOST="192.168.x.x" -e FRONTEND_API_SERVER_PORT="12345" \
--p 8888:8888 \
-dolphinscheduler frontend
 ```
 
 **注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM`。
@@ -306,18 +297,6 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`alert-server`的邮件服务企业微信`USERS`，默认值 `空`。
 
-**`FRONTEND_API_SERVER_HOST`**
-
-配置`frontend`的连接`api-server`的地址，默认值 `127.0.0.1`。
-
-**Note**: 当单独运行`api-server`时，你应该指定`api-server`这个值。
-
-**`FRONTEND_API_SERVER_PORT`**
-
-配置`frontend`的连接`api-server`的端口，默认值 `12345`。
-
-**Note**: 当单独运行`api-server`时，你应该指定`api-server`这个值。
-
 ## 初始化脚本
 
 如果你想在编译的时候或者运行的时候附加一些其它的操作及新增一些环境变量，你可以在`/root/start-init-conf.sh`文件中进行修改，同时如果涉及到配置文件的修改，请在`/opt/dolphinscheduler/conf/*.tpl`中修改相应的配置文件
@@ -326,7 +305,7 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 ```
 export API_SERVER_PORT=5555
-``` 
+```
 
 当添加以上环境变量后，你应该在相应的模板文件`/opt/dolphinscheduler/conf/application-api.properties.tpl`中添加这个环境变量配置:
 ```
@@ -343,8 +322,4 @@ $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
 EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
-
-echo "generate nginx config"
-sed -i "s/FRONTEND_API_SERVER_HOST/${FRONTEND_API_SERVER_HOST}/g" /etc/nginx/conf.d/dolphinscheduler.conf
-sed -i "s/FRONTEND_API_SERVER_PORT/${FRONTEND_API_SERVER_PORT}/g" /etc/nginx/conf.d/dolphinscheduler.conf
 ```

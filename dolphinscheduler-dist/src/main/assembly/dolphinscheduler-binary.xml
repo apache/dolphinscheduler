@@ -151,6 +151,15 @@
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
+		<!--alert plugin-->
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-dist/target/dolphinscheduler-dist-${project.version}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-ui/dist</directory>
 			<includes>
