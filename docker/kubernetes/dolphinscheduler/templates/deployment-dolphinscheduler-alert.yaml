@@ -57,35 +57,6 @@ spec:
       {{- if .Values.alert.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
-      initContainers:
-        - name: init-database
-          image: busybox:1.31.0
-          command:
-            - /bin/sh
-            - -ec
-            - |
-              while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
-                  counter=$((counter+1))
-                  if [ $counter == 5 ]; then
-                      echo "Error: Couldn't connect to database."
-                      exit 1
-                  fi
-                  echo "Trying to connect to database at ${DATABASE_HOST}:${DATABASE_PORT}. Attempt $counter."
-                  sleep 60
-              done
-          env:
-            - name: DATABASE_HOST
-              {{- if .Values.postgresql.enabled }}
-              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
-              {{- else }}
-              value: {{ .Values.externalDatabase.host | quote }}
-            {{- end }}
-            - name: DATABASE_PORT
-              {{- if .Values.postgresql.enabled }}
-              value: "5432"
-              {{- else }}
-              value: {{ .Values.externalDatabase.port | quote }}
-              {{- end }}
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
       - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
@@ -93,14 +64,17 @@ spec:
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
           image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "alert-server"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: DOLPHINSCHEDULER_OPTS
-              value: {{ default "" .Values.alert.jvmOptions }}
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: DOLPHINSCHEDULER_OPTS
+              valueFrom:
+                configMapKeyRef:
+                  key: DOLPHINSCHEDULER_OPTS
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
             - name: ALERT_PLUGIN_DIR
               valueFrom:
                 configMapKeyRef:
@@ -228,36 +202,6 @@ spec:
               {{- else }}
               value: {{ .Values.externalDatabase.params | quote }}
               {{- end }}
-            - name: RESOURCE_STORAGE_TYPE
-              valueFrom:
-                configMapKeyRef:
-                  key: RESOURCE_STORAGE_TYPE
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: RESOURCE_UPLOAD_PATH
-              valueFrom:
-                configMapKeyRef:
-                  key: RESOURCE_UPLOAD_PATH
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_DEFAULT_FS
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_DEFAULT_FS
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_S3A_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_S3A_ENDPOINT
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_S3A_ACCESS_KEY
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_S3A_ACCESS_KEY
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
-            - name: FS_S3A_SECRET_KEY
-              valueFrom:
-                configMapKeyRef:
-                  key: FS_S3A_SECRET_KEY
-                  name: {{ include "dolphinscheduler.fullname" . }}-common
           {{- if .Values.alert.resources }}
           resources:
             limits:
