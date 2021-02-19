@@ -35,12 +35,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,14 +112,16 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Date end = null;
         if (StringUtils.isNotEmpty(startDate)) {
             start = DateUtils.getScheduleDate(startDate);
-            if (start == null) {
-                return generateInvalidParamRes(result, "startDate");
+            if (Objects.isNull(start)) {
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
             }
         }
         if (StringUtils.isNotEmpty(endDate)) {
             end = DateUtils.getScheduleDate(endDate);
-            if (end == null) {
-                return generateInvalidParamRes(result, "endDate");
+            if (Objects.isNull(end)) {
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
             }
         }
 
@@ -192,18 +194,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
 
-        return result;
-    }
-
-    /***
-     * generate {@link org.apache.dolphinscheduler.api.enums.Status#REQUEST_PARAMS_NOT_VALID_ERROR} res with  param name
-     * @param result exist result map
-     * @param params invalid params name
-     * @return update result map
-     */
-    private Map<String, Object> generateInvalidParamRes(Map<String, Object> result, String params) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), params));
         return result;
     }
 }
