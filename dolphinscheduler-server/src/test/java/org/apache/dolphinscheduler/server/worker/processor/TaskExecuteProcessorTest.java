@@ -33,6 +33,10 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.util.Date;
+import java.util.concurrent.ExecutorService;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +46,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
-
-import java.util.Date;
-import java.util.concurrent.ExecutorService;
 
 /**
  * test task execute processor
@@ -71,7 +72,6 @@ public class TaskExecuteProcessorTest {
     private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
 
     private AlertClientService alertClientService;
-
 
     @Before
     public void before() throws Exception {
@@ -105,7 +105,6 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(null);
         PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
                 .thenReturn(taskExecutionContextCacheManager);
-
 
         PowerMockito.mockStatic(ThreadUtils.class);
         PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads()))
