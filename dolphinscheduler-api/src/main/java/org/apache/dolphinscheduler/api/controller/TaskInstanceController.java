@@ -54,7 +54,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * task instance controller
  */
-@Api(tags = "TASK_INSTANCE_TAG", position = 11)
+@Api(tags = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/task-instance")
 public class TaskInstanceController extends BaseController {

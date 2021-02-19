@@ -32,9 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -62,28 +60,33 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * resources service test
+ */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
 @PrepareForTest({HadoopUtils.class, PropertyUtils.class, FileUtils.class, org.apache.dolphinscheduler.api.utils.FileUtils.class})
 public class ResourcesServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceTest.class);
 
     @InjectMocks
     private ResourcesServiceImpl resourcesService;
+
     @Mock
     private ResourceMapper resourcesMapper;
+
     @Mock
     private TenantMapper tenantMapper;
-    @Mock
-    private ResourceUserMapper resourceUserMapper;
+
     @Mock
     private HadoopUtils hadoopUtils;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private UdfFuncMapper udfFunctionMapper;
-    @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
 
     @Before
     public void setUp() {

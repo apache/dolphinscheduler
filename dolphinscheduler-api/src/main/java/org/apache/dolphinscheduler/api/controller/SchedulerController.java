@@ -61,9 +61,9 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * schedule controller
+ * scheduler controller
  */
-@Api(tags = "SCHEDULER_TAG", position = 13)
+@Api(tags = "SCHEDULER_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/schedule")
 public class SchedulerController extends BaseController {

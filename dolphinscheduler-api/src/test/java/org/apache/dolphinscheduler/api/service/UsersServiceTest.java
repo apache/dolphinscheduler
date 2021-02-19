@@ -33,13 +33,8 @@ import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
@@ -61,26 +56,23 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * users service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class UsersServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceTest.class);
 
     @InjectMocks
     private UsersServiceImpl usersService;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private TenantMapper tenantMapper;
-    @Mock
-    private ProjectUserMapper projectUserMapper;
-    @Mock
-    private ResourceUserMapper resourcesUserMapper;
-    @Mock
-    private UDFUserMapper udfUserMapper;
-    @Mock
-    private DataSourceUserMapper datasourceUserMapper;
-    @Mock
-    private AlertGroupMapper alertGroupMapper;
+
     @Mock
     private ResourceMapper resourceMapper;
 

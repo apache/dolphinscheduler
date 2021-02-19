@@ -55,7 +55,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * alert group controller
  */
-@Api(tags = "ALERT_GROUP_TAG", position = 1)
+@Api(tags = "ALERT_GROUP_TAG")
 @RestController
 @RequestMapping("alert-group")
 public class AlertGroupController extends BaseController {

@@ -53,11 +53,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-
 /**
  * tenant controller
  */
-@Api(tags = "TENANT_TAG", position = 1)
+@Api(tags = "TENANT_TAG")
 @RestController
 @RequestMapping("/tenant")
 public class TenantController extends BaseController {

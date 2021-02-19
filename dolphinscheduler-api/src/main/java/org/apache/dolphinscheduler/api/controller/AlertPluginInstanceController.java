@@ -55,7 +55,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * alert plugin instance controller
  */
-@Api(tags = "ALERT_PLUGIN_INSTANCE_TAG", position = 1)
+@Api(tags = "ALERT_PLUGIN_INSTANCE_TAG")
 @RestController
 @RequestMapping("alert-plugin-instance")
 public class AlertPluginInstanceController extends BaseController {

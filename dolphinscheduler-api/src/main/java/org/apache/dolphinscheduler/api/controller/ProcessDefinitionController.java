@@ -76,11 +76,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-
 /**
  * process definition controller
  */
-@Api(tags = "PROCESS_DEFINITION_TAG", position = 2)
+@Api(tags = "PROCESS_DEFINITION_TAG")
 @RestController
 @RequestMapping("projects/{projectName}/process")
 public class ProcessDefinitionController extends BaseController {
