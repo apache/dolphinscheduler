@@ -128,8 +128,7 @@
 
 
         <fileSet>
-            <directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}
-            </directory>
+            <directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -233,9 +232,6 @@
                 <exclude>javax.servlet:servlet-api</exclude>
                 <exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
                 <exclude>org.slf4j:slf4j-log4j12</exclude>
-                <exclude>org.sonatype.aether:aether-api</exclude>
-                <exclude>io.airlift.resolver:resolver</exclude>
-                <exclude>org.ow2.asm:asm</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
