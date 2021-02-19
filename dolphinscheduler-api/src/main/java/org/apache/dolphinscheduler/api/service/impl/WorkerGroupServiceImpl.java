@@ -146,13 +146,14 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
             if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
                 if (isPaging) {
                     return workerGroups;
-                } else {
-                    //ignore noNodeException return Default
-                    WorkerGroup wg = new WorkerGroup();
-                    wg.setName(DEFAULT_WORKER_GROUP);
-                    workerGroups.add(wg);
-                    return workerGroups;
                 }
+
+                //ignore noNodeException return Default
+                WorkerGroup wg = new WorkerGroup();
+                wg.setName(DEFAULT_WORKER_GROUP);
+                workerGroups.add(wg);
+                return workerGroups;
+
             } else {
                 throw e;
             }
