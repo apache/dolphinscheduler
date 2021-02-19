@@ -40,8 +40,8 @@ public class ScriptSenderTest {
     @Before
     public void initScriptConfig() {
 
-        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getCode()));
-        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "test user params");
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getDescp()));
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "userParams");
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, shellFilPath);
     }
 

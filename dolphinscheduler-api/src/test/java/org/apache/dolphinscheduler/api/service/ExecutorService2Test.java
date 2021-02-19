@@ -22,6 +22,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -59,13 +60,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * test for ExecutorService
+ * executor service 2 test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExecutorService2Test {
 
     @InjectMocks
-    private ExecutorService executorService;
+    private ExecutorServiceImpl executorService;
 
     @Mock
     private ProcessService processService;
