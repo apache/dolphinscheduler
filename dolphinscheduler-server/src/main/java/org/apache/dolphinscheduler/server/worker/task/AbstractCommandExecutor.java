@@ -110,6 +110,10 @@ public abstract class AbstractCommandExecutor {
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
     }
 
+    protected AbstractCommandExecutor(List<String> logBuffer) {
+        this.logBuffer = logBuffer;
+    }
+
     /**
      * build process
      *

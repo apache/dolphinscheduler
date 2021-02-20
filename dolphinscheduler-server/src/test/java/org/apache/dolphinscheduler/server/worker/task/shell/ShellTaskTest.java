@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -53,7 +52,6 @@ public class ShellTaskTest {
 
     private ShellTask shellTask;
     private ShellCommandExecutor shellCommandExecutor;
-    private AbstractCommandExecutor abstractCommandExecutor;
     private TaskExecutionContext taskExecutionContext;
     private CommandExecuteResult commandExecuteResult;
 
@@ -61,8 +59,6 @@ public class ShellTaskTest {
     public void before() throws Exception {
         System.setProperty("log4j2.disable.jmx", Boolean.TRUE.toString());
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
-        abstractCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
-        abstractCommandExecutor.setTaskResultString("shellReturn");
         PowerMockito.whenNew(ShellCommandExecutor.class).withAnyArguments().thenReturn(shellCommandExecutor);
         shellCommandExecutor.setTaskResultString("shellReturn");
         taskExecutionContext = new TaskExecutionContext();
@@ -128,13 +124,4 @@ public class ShellTaskTest {
         shellTask.setResult(r);
     }
 
-    @Test
-    public void testSetTaskResultString() {
-        abstractCommandExecutor.setTaskResultString("shellReturn");
-    }
-
-    @Test
-    public void testGetTaskResultString() {
-        logger.info(abstractCommandExecutor.getTaskResultString());
-    }
 }
