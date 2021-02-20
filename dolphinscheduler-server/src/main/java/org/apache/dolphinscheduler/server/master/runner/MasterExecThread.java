@@ -558,27 +558,31 @@ public class MasterExecThread implements Runnable {
         String globalParams = this.processInstance.getGlobalParams();
         if (StringUtils.isNotEmpty(globalParams)) {
             Map<String, String> globalMap = getGlobalParamMap(globalParams);
-            if (globalMap != null) {
-                // the param save in localParams
-                Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
-                Object localParams = result.get(LOCAL_PARAMS);
-                if (localParams != null) {
-                    List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
-                    for (Property info : allParam) {
-                        if (info.getDirect().equals(Direct.IN)) {
-                            String paramName = info.getProp();
-                            String value = globalMap.get(paramName);
-                            if (StringUtils.isNotEmpty(value)) {
-                                info.setValue(value);
-                            }
-                        }
+            if (globalMap != null && globalMap.size() != 0) {
+                setGlobalMapToTask(taskNode, taskInstance, globalMap);
+            }
+        }
+    }
+
+    private void setGlobalMapToTask(TaskNode taskNode, TaskInstance taskInstance, Map<String, String> globalMap) {
+        // the param save in localParams
+        Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+        Object localParams = result.get(LOCAL_PARAMS);
+        if (localParams != null) {
+            List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+            for (Property info : allParam) {
+                if (info.getDirect().equals(Direct.IN)) {
+                    String paramName = info.getProp();
+                    String value = globalMap.get(paramName);
+                    if (StringUtils.isNotEmpty(value)) {
+                        info.setValue(value);
                     }
-                    result.put(LOCAL_PARAMS, allParam);
-                    taskNode.setParams(JSONUtils.toJsonString(result));
-                    // task instance node json
-                    taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
                 }
             }
+            result.put(LOCAL_PARAMS, allParam);
+            taskNode.setParams(JSONUtils.toJsonString(result));
+            // task instance node json
+            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         }
     }
 
@@ -997,8 +1001,8 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
-                    processInstance.setVarPool(task.getVarPool());
                     processInstance = processService.findProcessInstanceById(processInstance.getId());
+                    processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());
