@@ -202,16 +202,20 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
             return result;
         }
-        ProcessDefinitionLog processDefinitionLog = processService.insertProcessDefinitionLog(loginUser, processDefinitionCode, processDefinitionName, processData,
-                project, desc, locations, connects);
-        processService.switchVersion(processDefinition, processDefinitionLog);
-        // TODO relationName have ?
-        processService.createTaskAndRelation(loginUser, project.getCode(), processDefinition, processData);
 
-        // return processDefinition object with ID
-        result.put(Constants.DATA_LIST, processDefinition.getId());
-        putMsg(result, Status.SUCCESS);
+        // TODO relationName have ?
+        int saveResult = processService.saveProcessDefinition(loginUser, project, processDefinitionName, desc,
+                locations, connects, processData, processDefinition);
+
+        if (saveResult > 0) {
+            putMsg(result, Status.SUCCESS);
+            // return processDefinition object with ID
+            result.put(Constants.DATA_LIST, processDefinition.getId());
+        } else {
+            putMsg(result, Status.CREATE_PROCESS_DEFINITION);
+        }
         return result;
+
     }
 
 
