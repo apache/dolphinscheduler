@@ -60,7 +60,7 @@ public class ShellTaskTest {
         System.setProperty("log4j2.disable.jmx", Boolean.TRUE.toString());
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
         PowerMockito.whenNew(ShellCommandExecutor.class).withAnyArguments().thenReturn(shellCommandExecutor);
-        shellCommandExecutor.setResultString("shellReturn");
+        shellCommandExecutor.setTaskResultString("shellReturn");
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
@@ -123,4 +123,5 @@ public class ShellTaskTest {
         String r = "return";
         shellTask.setResult(r);
     }
+
 }

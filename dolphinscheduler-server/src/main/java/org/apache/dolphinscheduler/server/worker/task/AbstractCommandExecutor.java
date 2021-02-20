@@ -88,7 +88,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * SHELL result string
      */
-    protected String resultString;
+    protected String taskResultString;
 
     /**
      * taskExecutionContext
@@ -108,6 +108,10 @@ public abstract class AbstractCommandExecutor {
         this.logger = logger;
         this.logBuffer = Collections.synchronizedList(new ArrayList<>());
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+    }
+
+    protected AbstractCommandExecutor(List<String> logBuffer) {
+        this.logBuffer = logBuffer;
     }
 
     /**
@@ -229,13 +233,6 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String result) {
-        this.resultString = result;
-    }
 
     /**
      * cancel application
@@ -369,7 +366,7 @@ public abstract class AbstractCommandExecutor {
                             varPool.append("$VarPool$");
                         } else {
                             logBuffer.add(line);
-                            resultString = line;
+                            taskResultString = line;
                             lastFlushTime = flush(lastFlushTime);
                         }
                     }
@@ -576,4 +573,12 @@ public abstract class AbstractCommandExecutor {
     protected abstract String commandInterpreter();
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
+
+    public String getTaskResultString() {
+        return taskResultString;
+    }
+
+    public void setTaskResultString(String taskResultString) {
+        this.taskResultString = taskResultString;
+    }
 }

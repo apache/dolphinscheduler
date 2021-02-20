@@ -72,6 +72,7 @@ public class TaskExecuteResponseCommand implements Serializable {
      * task return result
      */
     private String result;
+
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }

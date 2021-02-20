@@ -460,7 +460,7 @@ public class ProcessServiceTest {
         String params4ProcessString = "[{\"prop\":\"sql2\",\"direct\":null,\"type\":null,\"value\":\"\"},{\"prop\":\"out\",\"direct\":null,\"type\":null,\"value\":\"\"},"
                 + "{\"prop\":\"d\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20210203\"}]";
         Mockito.when(processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
-        Mockito.when(this.processInstanceMapper.updateGlobalParamById(params4ProcessString, processInstance.getId())).thenReturn(1);
+        Mockito.when(this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId())).thenReturn(1);
         processService.changeOutParam(result,taskInstance);
     }
 
