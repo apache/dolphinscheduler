@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.zk;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -27,24 +25,27 @@ import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * zookeeper master client
@@ -134,9 +135,9 @@ public class ZKMasterClient extends AbstractZKClient {
             mutex.acquire();
 
             String serverHost = null;
-            if(StringUtils.isNotEmpty(path)){
+            if (StringUtils.isNotEmpty(path)) {
                 serverHost = getHostByEventDataPath(path);
-                if(StringUtils.isEmpty(serverHost)){
+                if (StringUtils.isEmpty(serverHost)) {
                     logger.error("server down error: unknown path: {}", path);
                     return;
                 }
@@ -305,8 +306,8 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
+        workerHost = Host.of(workerHost).getAddress();
         logger.info("start worker[{}] failover ...", workerHost);
-
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
             if (needCheckWorkerAlive) {
