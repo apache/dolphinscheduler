@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.COLON;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -61,13 +63,13 @@ public class Host implements Serializable {
     public Host(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
     public Host(String ip, int port, int weight, long startTime) {
         this.ip = ip;
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
         this.weight = getWarmUpWeight(weight, startTime);
         this.startTime = startTime;
     }
@@ -75,7 +77,7 @@ public class Host implements Serializable {
     public Host(String ip, int port, int weight, long startTime, String workGroup) {
         this.ip = ip;
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
         this.weight = getWarmUpWeight(weight, startTime);
         this.workGroup = workGroup;
         this.startTime = startTime;
@@ -95,7 +97,7 @@ public class Host implements Serializable {
 
     public void setIp(String ip) {
         this.ip = ip;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
     public int getWeight() {
@@ -120,7 +122,7 @@ public class Host implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
     public String getWorkGroup() {
@@ -141,7 +143,7 @@ public class Host implements Serializable {
         if (address == null) {
             throw new IllegalArgumentException("Host : address is null.");
         }
-        String[] parts = address.split(":");
+        String[] parts = address.split(COLON);
         if (parts.length < 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
@@ -162,7 +164,7 @@ public class Host implements Serializable {
      * @return old version is true , otherwise is false
      */
     public static Boolean isOldVersion(String address) {
-        String[] parts = address.split(":");
+        String[] parts = address.split(COLON);
         return parts.length != 2 && parts.length != 3;
     }
 
@@ -186,8 +188,11 @@ public class Host implements Serializable {
     @Override
     public String toString() {
         return "Host{"
-            + "address='" + address + '\''
-            + '}';
+                + "address='" + address + '\''
+                + ", weight=" + weight
+                + ", startTime=" + startTime
+                + ", workGroup='" + workGroup + '\''
+                + '}';
     }
 
     /**
@@ -200,5 +205,14 @@ public class Host implements Serializable {
             return (int) (weight * ((float) uptime / Constants.WARM_UP_TIME));
         }
         return weight;
+    }
+
+    /**
+     * get address and weight
+     *
+     * @return address:weight
+     */
+    public String getAddressAndWeight() {
+        return address + COLON + weight;
     }
 }

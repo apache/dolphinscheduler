@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
-import org.apache.dolphinscheduler.service.zk.ZookeeperNodeHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -167,7 +167,7 @@ public class WorkerGroupServiceImpl extends BaseService implements WorkerGroupSe
             }
             String timeStamp = childrenNodes.get(0);
             for (int i = 0; i < childrenNodes.size(); i++) {
-                childrenNodes.set(i, ZookeeperNodeHandler.getWorkerAddressAndWeight(childrenNodes.get(i)));
+                childrenNodes.set(i, Host.of(childrenNodes.get(i)).getAddressAndWeight());
             }
 
             WorkerGroup wg = new WorkerGroup();
