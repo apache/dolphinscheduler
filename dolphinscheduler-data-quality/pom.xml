@@ -34,7 +34,6 @@
         <scala.binary.version>2.11</scala.binary.version>
         <jackson.version>2.9.0</jackson.version>
         <spark.version>2.4.0</spark.version>
-        <log4j.version>1.2.17</log4j.version>
         <scope>provided</scope>
     </properties>
 
@@ -93,6 +92,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

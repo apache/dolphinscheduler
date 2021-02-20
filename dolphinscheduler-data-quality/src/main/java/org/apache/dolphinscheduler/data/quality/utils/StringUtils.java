@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.data.quality.utils;
 
 public class StringUtils {
+
     public static final String EMPTY = "";
 
     public static boolean isEmpty(final CharSequence cs) {

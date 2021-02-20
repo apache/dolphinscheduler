@@ -35,9 +35,9 @@ public class SparkSqlExecuteTask implements DataQualityTask {
 
     private static final Logger logger = LoggerFactory.getLogger(SparkSqlExecuteTask.class);
 
-    private SparkSession sparkSession;
+    private final SparkSession sparkSession;
 
-    private List<ExecutorParameter> executorParameterList;
+    private final List<ExecutorParameter> executorParameterList;
 
     public SparkSqlExecuteTask(SparkSession sparkSession,List<ExecutorParameter> executorParameterList) {
         this.sparkSession = sparkSession;

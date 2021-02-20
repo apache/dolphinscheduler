@@ -34,9 +34,9 @@ import java.util.Map;
  */
 public class HiveConnector implements IConnector {
 
-    private SparkSession sparkSession;
+    private final SparkSession sparkSession;
 
-    private ConnectorParameter connectorParameter;
+    private final ConnectorParameter connectorParameter;
 
     public HiveConnector(SparkSession sparkSession, ConnectorParameter connectorParameter) {
         this.sparkSession = sparkSession;

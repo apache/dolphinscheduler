@@ -41,9 +41,9 @@ import java.util.Map;
  */
 public class JdbcConnector implements IConnector {
 
-    private SparkSession sparkSession;
+    private final SparkSession sparkSession;
 
-    private ConnectorParameter connectorParameter;
+    private final ConnectorParameter connectorParameter;
 
     public JdbcConnector(SparkSession sparkSession, ConnectorParameter connectorParameter) {
         this.sparkSession = sparkSession;

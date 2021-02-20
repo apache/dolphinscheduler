@@ -43,9 +43,9 @@ import java.util.Map;
  */
 public class JdbcWriter implements IWriter {
 
-    private SparkSession sparkSession;
+    private final SparkSession sparkSession;
 
-    private WriterParameter writerParam;
+    private final WriterParameter writerParam;
 
     public JdbcWriter(SparkSession sparkSession, WriterParameter writerParam) {
         this.sparkSession = sparkSession;
