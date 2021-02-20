@@ -37,7 +37,7 @@ Its main objectives are as follows:
 
 ### What's in DolphinScheduler
 
- Stability | Easy to use | Features | Scalability |
+ Stability | Accessibility | Features | Scalability |
  -- | -- | -- | --
 Decentralized multi-master and multi-worker | Visualization of workflow key information, such as task status, task type, retry times, task operation machine information, visual variables, and so on at a glance.  |  Support pause, recover operation | Support customized task types
 support HA | Visualization of all workflow operations, dragging tasks to draw DAGs, configuring data sources and resources. At the same time, for third-party systems, provide API mode operations. | Users on DolphinScheduler can achieve many-to-one or one-to-one mapping relationship through tenants and Hadoop users, which is very important for scheduling large data jobs.  | The scheduler supports distributed scheduling, and the overall scheduling capability will increase linearly with the scale of the cluster. Master and Worker support dynamic adjustment.
@@ -73,13 +73,19 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release
 ```
 
 ### Thanks
-
 DolphinScheduler is based on a lot of excellent open-source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
 We would like to express our deep gratitude to all the open-source projects used in Dolphin Scheduler. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we hope everyone who have the same enthusiasm and passion for open source could join in and contribute to the open-source community!
 
 ### Get Help
 1. Submit an [[issue](https://github.com/apache/incubator-dolphinscheduler/issues/new/choose)]
-1. Subscribe to the mail list: https://dolphinscheduler.apache.org/en-us/docs/development/subscribe.html, then email dev@dolphinscheduler.apache.org
+1. Subscribe to this mail list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
+
+
+### Community
+You are so much welcomed to communicate with the developers and users of Dolphin Scheduler freely. There are two ways to find them:
+1. Join the slack channel by this invitation link: https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-l8k90ceu-wwUfobaDkJxjzMfZp4y1Ag.
+2. Follow the twitter account of DS and get the latest news just on time: https://twitter.com/dolphinschedule.
+
 
 ### How to Contribute
 The community welcomes everyone to participate in contributing, please refer to this website to find out more: [[How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html)]
