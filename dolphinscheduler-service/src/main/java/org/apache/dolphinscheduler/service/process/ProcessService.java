@@ -2224,16 +2224,11 @@ public class ProcessService {
     }
 
     /**
+     * save processDefinition (including create or update processDefinition)
      *
      */
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
                                      String connects, ProcessData processData, ProcessDefinition processDefinition) {
-        List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-        for (TaskNode task : taskNodeList) {
-            // TODO update by code directly
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(project.getCode(), task.getName());
-            updateTaskDefinition(operator, project.getCode(), task, taskDefinition);
-        }
         createTaskAndRelation(operator, project.getCode(), processDefinition, processData);
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
