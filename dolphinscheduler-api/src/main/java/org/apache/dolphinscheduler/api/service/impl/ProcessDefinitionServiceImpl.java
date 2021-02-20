@@ -1449,6 +1449,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
             return result;
         } else {
+            ProcessData processData = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson(), ProcessData.class);
+            List<TaskNode> taskNodeList = processData.getTasks();
+            taskNodeList.stream().forEach(taskNode -> {
+                taskNode.setCode(0L);
+            });
             return createProcessDefinition(
                     loginUser,
                     targetProject.getName(),
