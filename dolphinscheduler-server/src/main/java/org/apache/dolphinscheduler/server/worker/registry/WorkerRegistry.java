@@ -23,11 +23,11 @@ import static org.apache.dolphinscheduler.common.Constants.SLASH;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.service.zk.ZookeeperNodeHandler;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
@@ -146,7 +146,7 @@ public class WorkerRegistry {
 
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
-        String weight = String.valueOf(workerConfig.getWeight());
+        int weight = workerConfig.getWeight();
         long workerStartTime = System.currentTimeMillis();
 
         for (String workGroup : this.workerGroups) {
@@ -157,7 +157,7 @@ public class WorkerRegistry {
             }
             // trim and lower case is need
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
-            workerZkPathBuilder.append(ZookeeperNodeHandler.generateWorkerZkNodeName(address, weight, workerStartTime));
+            workerZkPathBuilder.append(Host.generate(address, weight, workerStartTime));
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;

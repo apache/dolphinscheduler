@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.common.Constants.COLON;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * server address
@@ -155,6 +156,21 @@ public class Host implements Serializable {
             host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Long.parseLong(parts[3]));
         }
         return host;
+    }
+
+    /**
+     * generate host string
+     * @param address address
+     * @param weight weight
+     * @param startTime startTime
+     * @return address:weight:startTime
+     */
+    public static String generate(String address, int weight, long startTime) {
+        StringJoiner stringJoiner = new StringJoiner(COLON);
+        stringJoiner.add(address)
+                .add(String.valueOf(weight))
+                .add(String.valueOf(startTime));
+        return stringJoiner.toString();
     }
 
     /**
