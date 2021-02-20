@@ -101,8 +101,6 @@ public class TaskExecuteProcessorTest {
         taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
         PowerMockito.doNothing().when(taskCallbackService).sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
 
-
-
         PowerMockito.mockStatic(SpringApplicationContext.class);
         PowerMockito.when(SpringApplicationContext.getBean(TaskCallbackService.class))
                 .thenReturn(taskCallbackService);
