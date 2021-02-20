@@ -85,7 +85,7 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 
 ### 社区
 1. 通过[该申请链接](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-l8k90ceu-wwUfobaDkJxjzMfZp4y1Ag)加入slack channel
-2. 关注[DS的Twitter](https://twitter.com/dolphinschedule)获取实时动态
+2. 关注[Apache Dolphin Scheduler的Twitter账号](https://twitter.com/dolphinschedule)获取实时动态
 
 ### 版权
 请参考 [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) 文件.
