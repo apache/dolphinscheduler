@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.shell;
+package org.apache.dolphinscheduler.server.worker.task;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+import org.apache.dolphinscheduler.server.worker.task.shell.ShellTask;
+import org.apache.dolphinscheduler.server.worker.task.shell.ShellTaskTest;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -111,5 +113,15 @@ public class ShellTaskReturnTest {
         }
         shellTask.setResult("shell return string");
         logger.info("shell return string:{}", shellTask.getResultString());
+    }
+
+    @Test
+    public void testSetTaskResultString() {
+        shellCommandExecutor.setTaskResultString("shellReturn");
+    }
+
+    @Test
+    public void testGetTaskResultString() {
+        logger.info(shellCommandExecutor.getTaskResultString());
     }
 }
