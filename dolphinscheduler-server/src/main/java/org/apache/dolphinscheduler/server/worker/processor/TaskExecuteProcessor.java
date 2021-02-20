@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -38,13 +37,13 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,11 +56,6 @@ import io.netty.channel.Channel;
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
-
-    /**
-     * thread executor service
-     */
-    private final ExecutorService workerExecService;
 
     /**
      * worker config
@@ -81,19 +75,18 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     /**
      * taskExecutionContextCacheManager
      */
-    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+    private final TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+
     /*
-       * task delay execution manager
+     * task execute manager
      */
-    private TaskDelayExecManagerThread taskDelayExecManager;
+    private final TaskExecuteManagerThread taskExecuteManager;
 
     public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
-        this.taskDelayExecManager = new TaskDelayExecManagerThread(this.workerExecService);
-        this.workerExecService.submit(this.taskDelayExecManager);
+        this.taskExecuteManager = SpringApplicationContext.getBean(TaskExecuteManagerThread.class);
     }
 
     /**
@@ -108,13 +101,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     }
 
     public TaskExecuteProcessor(AlertClientService alertClientService) {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
-        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
-        this.taskDelayExecManager = new TaskDelayExecManagerThread(this.workerExecService);
-        this.workerExecService.submit(this.taskDelayExecManager);
-
+        this();
         this.alertClientService = alertClientService;
     }
 
@@ -149,7 +136,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             taskExecutionContext.getTaskInstanceId()));
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
-        taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
         // local execute path
@@ -171,8 +157,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
             new NettyRemoteChannel(channel, command.getOpaque()));
 
+        // delay task process
         long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
         if (remainTime > 0) {
+            logger.info("delay the execution of task instance {}, delay time: {} s", taskExecutionContext.getTaskInstanceId(), remainTime);
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
             taskExecutionContext.setStartTime(null);
         } else {
@@ -182,13 +170,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         this.doAck(taskExecutionContext);
 
-        // submit task
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
-        if (taskExecutionContext.getCurrentExecutionStatus() == ExecutionStatus.DELAY_EXECUTION) {
-            logger.info("delay the execution of task instance {}, delay time: {} s", taskExecutionContext.getTaskInstanceId(), remainTime);
-            taskDelayExecManager.offer(taskExecuteThread);
-        } else {
-            workerExecService.submit(taskExecuteThread);
+        // submit task to manager
+        if (!taskExecuteManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))) {
+            logger.info("submit task to manager error, queue is full, queue size is {}",taskExecuteManager.getQueueSize());
         }
     }
 
