@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -76,7 +76,7 @@ public class TaskExecuteProcessorTest {
 
     private AlertClientService alertClientService;
 
-    private TaskExecuteManagerThread taskExecuteManager;
+    private WorkerManagerThread workerManager;
 
     @Before
     public void before() throws Exception {
@@ -118,11 +118,11 @@ public class TaskExecuteProcessorTest {
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()));
 
-        taskExecuteManager = PowerMockito.mock(TaskExecuteManagerThread.class);
-        PowerMockito.when(taskExecuteManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))).thenReturn(Boolean.TRUE);
+        workerManager = PowerMockito.mock(WorkerManagerThread.class);
+        PowerMockito.when(workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))).thenReturn(Boolean.TRUE);
 
-        PowerMockito.when(SpringApplicationContext.getBean(TaskExecuteManagerThread.class))
-                .thenReturn(taskExecuteManager);
+        PowerMockito.when(SpringApplicationContext.getBean(WorkerManagerThread.class))
+                .thenReturn(workerManager);
 
         PowerMockito.mockStatic(ThreadUtils.class);
         PowerMockito.when(ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads()))

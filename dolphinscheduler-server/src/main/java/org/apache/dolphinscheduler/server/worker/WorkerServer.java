@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
-import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -86,7 +86,7 @@ public class WorkerServer {
     private RetryReportTaskStatusThread retryReportTaskStatusThread;
 
     @Autowired
-    private TaskExecuteManagerThread taskExecuteManagerThread;
+    private WorkerManagerThread workerManagerThread;
 
     /**
      * worker server startup
@@ -124,7 +124,7 @@ public class WorkerServer {
         this.workerRegistry.registry();
 
         // task execute manager
-        this.taskExecuteManagerThread.start();
+        this.workerManagerThread.start();
 
         // retry report task status
         this.retryReportTaskStatusThread.start();

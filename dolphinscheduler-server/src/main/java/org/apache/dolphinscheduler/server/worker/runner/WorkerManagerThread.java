@@ -17,9 +17,17 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.common.enums.Event;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
+import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.concurrent.DelayQueue;
@@ -33,9 +41,9 @@ import org.springframework.stereotype.Component;
  * Manage tasks
  */
 @Component
-public class TaskExecuteManagerThread implements Runnable {
+public class WorkerManagerThread implements Runnable {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteManagerThread.class);
+    private final Logger logger = LoggerFactory.getLogger(WorkerManagerThread.class);
 
     /**
      * task queue
@@ -52,9 +60,21 @@ public class TaskExecuteManagerThread implements Runnable {
      */
     private final ExecutorService workerExecService;
 
-    public TaskExecuteManagerThread() {
+    /**
+     * taskExecutionContextCacheManager
+     */
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+
+    /**
+     * task callback service
+     */
+    private final TaskCallbackService taskCallbackService;
+
+    public WorkerManagerThread() {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", this.workerConfig.getWorkerExecThreads());
+        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
     }
 
     /**
@@ -64,6 +84,31 @@ public class TaskExecuteManagerThread implements Runnable {
      */
     public int getQueueSize() {
         return workerExecuteQueue.size();
+    }
+
+    /**
+     * Kill tasks that have not been executed, like delay task
+     * then send Response to Master, update the execution status of task instance
+     */
+    public void killTaskBeforeExecuteByInstanceId(Integer taskInstanceId) {
+        workerExecuteQueue.stream()
+                .filter(taskExecuteThread -> taskExecuteThread.getTaskExecutionContext().getTaskInstanceId() == taskInstanceId)
+                .forEach(workerExecuteQueue::remove);
+        sendTaskKillResponse(taskInstanceId);
+    }
+
+    /**
+     * kill task before execute , like delay task
+     */
+    private void sendTaskKillResponse(Integer taskInstanceId) {
+        TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        if (taskExecutionContext == null) {
+            return;
+        }
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId());
+        responseCommand.setStatus(ExecutionStatus.KILL.getCode());
+        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
+        taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
     }
 
     /**

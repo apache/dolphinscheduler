@@ -37,8 +37,8 @@ import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -68,7 +68,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private final TaskCallbackService taskCallbackService;
 
     /**
-     *  alert client service
+     * alert client service
      */
     private AlertClientService alertClientService;
 
@@ -80,13 +80,13 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     /*
      * task execute manager
      */
-    private final TaskExecuteManagerThread taskExecuteManager;
+    private final WorkerManagerThread workerManager;
 
     public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
-        this.taskExecuteManager = SpringApplicationContext.getBean(TaskExecuteManagerThread.class);
+        this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
     }
 
     /**
@@ -171,8 +171,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.doAck(taskExecutionContext);
 
         // submit task to manager
-        if (!taskExecuteManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))) {
-            logger.info("submit task to manager error, queue is full, queue size is {}",taskExecuteManager.getQueueSize());
+        if (!workerManager.offer(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService))) {
+            logger.info("submit task to manager error, queue is full, queue size is {}", workerManager.getQueueSize());
         }
     }
 
@@ -185,6 +185,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     /**
      * build ack command
+     *
      * @param taskExecutionContext taskExecutionContext
      * @return TaskExecuteAckCommand
      */

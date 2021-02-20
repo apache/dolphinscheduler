@@ -326,6 +326,14 @@ public class TaskExecuteThread implements Runnable, Delayed {
         return ackCommand;
     }
 
+    /**
+     * get current TaskExecutionContext
+     * @return TaskExecutionContext
+     */
+    public TaskExecutionContext getTaskExecutionContext() {
+        return this.taskExecutionContext;
+    }
+
     @Override
     public long getDelay(TimeUnit unit) {
         return unit.convert(DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
