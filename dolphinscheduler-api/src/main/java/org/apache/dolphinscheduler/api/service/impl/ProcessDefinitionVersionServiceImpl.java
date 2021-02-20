@@ -69,7 +69,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
                 .newBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .version(version)
-                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
+//                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
                 .description(processDefinition.getDescription())
                 .locations(processDefinition.getLocations())
                 .connects(processDefinition.getConnects())

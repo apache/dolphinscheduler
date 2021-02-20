@@ -447,11 +447,6 @@ public class ProcessInstanceService extends BaseService {
         }
         Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
                 processDefinition.getUserId());
-        // get the processinstancejson before saving,and then save the name and taskid
-        String oldJson = processInstance.getProcessInstanceJson();
-        if (StringUtils.isNotEmpty(oldJson)) {
-            processInstanceJson = processService.changeJson(processData, oldJson);
-        }
         setProcessInstance(processInstance, tenant, scheduleTime, locations,
                 connects, processInstanceJson, processData);
         int update = processService.updateProcessInstance(processInstance);
