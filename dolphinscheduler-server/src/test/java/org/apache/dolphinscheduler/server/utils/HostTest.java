@@ -40,4 +40,13 @@ public class HostTest {
         Host host = Host.of("192.158.2.2:22");
         Assert.assertEquals(22, host.getPort());
     }
+
+    @Test
+    public void testGenerate() {
+        String address = "192.158.2.2:22";
+        int weight = 100;
+        long startTime = System.currentTimeMillis();
+        String generateHost = Host.generate(address, weight, startTime);
+        Assert.assertEquals(address + ":" + weight + ":" + startTime, generateHost);
+    }
 }

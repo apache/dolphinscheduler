@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 
 import java.util.ArrayList;
@@ -135,6 +137,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return WorkerGroup list
      */
     private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
+
         String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
         List<WorkerGroup> workerGroups = new ArrayList<>();
         List<String> workerGroupList;
@@ -142,38 +145,41 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
             if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
-                if (!isPaging) {
-                    //ignore noNodeException return Default
-                    WorkerGroup wg = new WorkerGroup();
-                    wg.setName(DEFAULT_WORKER_GROUP);
-                    workerGroups.add(wg);
+                if (isPaging) {
+                    return workerGroups;
                 }
+
+                //ignore noNodeException return Default
+                WorkerGroup wg = new WorkerGroup();
+                wg.setName(DEFAULT_WORKER_GROUP);
+                workerGroups.add(wg);
                 return workerGroups;
+
             } else {
                 throw e;
             }
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = String.format("%s/%s", workerPath, workerGroup);
+            String workerGroupPath = workerPath + SLASH + workerGroup;
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
-            String timeStamp = "";
+            if (CollectionUtils.isEmpty(childrenNodes)) {
+                continue;
+            }
+            String timeStamp = childrenNodes.get(0);
             for (int i = 0; i < childrenNodes.size(); i++) {
-                String ip = childrenNodes.get(i);
-                childrenNodes.set(i, ip.substring(0, ip.lastIndexOf(":")));
-                timeStamp = ip.substring(ip.lastIndexOf(":"));
+                childrenNodes.set(i, Host.of(childrenNodes.get(i)).getAddressAndWeight());
             }
-            if (CollectionUtils.isNotEmpty(childrenNodes)) {
-                WorkerGroup wg = new WorkerGroup();
-                wg.setName(workerGroup);
-                if (isPaging) {
-                    wg.setIpList(childrenNodes);
-                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0) + timeStamp);
-                    wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
-                    wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
-                }
-                workerGroups.add(wg);
+
+            WorkerGroup wg = new WorkerGroup();
+            wg.setName(workerGroup);
+            if (isPaging) {
+                wg.setIpList(childrenNodes);
+                String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + timeStamp);
+                wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
+                wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
             }
+            workerGroups.add(wg);
         }
         return workerGroups;
     }
