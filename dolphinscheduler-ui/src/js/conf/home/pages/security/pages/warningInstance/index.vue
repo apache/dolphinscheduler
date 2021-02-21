@@ -116,7 +116,7 @@
         this.getPlugins({ pluginType: 'ALERT' }).then(res => {
           this.pluginInstance = res
         }).catch(e => {
-          this.$message.error(e.msg)
+          this.$message.error(e.msg || '')
         })
         this.item = item
         this.createWarningDialog = true
@@ -148,6 +148,7 @@
             this.isLoading = false
           }
         }).catch(e => {
+          this.$message.error(e.msg || '')
           this.isLoading = false
         })
       }

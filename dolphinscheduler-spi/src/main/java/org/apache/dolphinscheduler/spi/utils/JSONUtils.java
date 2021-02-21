@@ -24,11 +24,13 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -122,6 +124,38 @@ public class JSONUtils {
         }
 
         return Collections.emptyList();
+    }
+
+    /**
+     * json to map
+     *
+     * @param json json
+     * @return json to map
+     */
+    public static <K, V> Map<K, V> toMap(String json) {
+        return parseObject(json, new TypeReference<Map<K, V>>() {});
+    }
+
+    /**
+     * json to object
+     *
+     * @param json json string
+     * @param type type reference
+     * @param <T>
+     * @return return parse object
+     */
+    public static <T> T parseObject(String json, TypeReference<T> type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(json, type);
+        } catch (Exception e) {
+            logger.error("json to map exception!", e);
+        }
+
+        return null;
     }
 
     /**

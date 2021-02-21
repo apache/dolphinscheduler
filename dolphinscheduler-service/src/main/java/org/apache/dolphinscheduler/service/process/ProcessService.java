@@ -260,8 +260,8 @@ public class ProcessService {
      * @param command command
      * @return create command result
      */
-    public Boolean verifyIsNeedCreateCommand(Command command) {
-        Boolean isNeedCreate = true;
+    public boolean verifyIsNeedCreateCommand(Command command) {
+        boolean isNeedCreate = true;
         EnumMap<CommandType, Integer> cmdTypeMap = new EnumMap<>(CommandType.class);
         cmdTypeMap.put(CommandType.REPEAT_RUNNING, 1);
         cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, 1);

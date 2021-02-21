@@ -35,7 +35,6 @@ public class ResourceProcessDefinitionUtils {
         Map<Integer, Set<Integer>> result = new HashMap<>();
         if (CollectionUtils.isNotEmpty(list)) {
             for (Map<String, Object> tempMap : list) {
-
                 map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
             }
         }

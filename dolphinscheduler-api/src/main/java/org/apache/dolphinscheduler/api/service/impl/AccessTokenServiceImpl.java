@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -44,7 +44,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * access token service impl
  */
 @Service
-public class AccessTokenServiceImpl extends BaseService implements AccessTokenService {
+public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
@@ -60,8 +60,9 @@ public class AccessTokenServiceImpl extends BaseService implements AccessTokenSe
      * @param pageSize page size
      * @return token list for page number and page size
      */
+    @Override
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page<>(pageNo, pageSize);
@@ -86,8 +87,9 @@ public class AccessTokenServiceImpl extends BaseService implements AccessTokenSe
      * @param token token string
      * @return create result code
      */
+    @Override
     public Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (!hasPerm(loginUser,userId)){
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -123,8 +125,9 @@ public class AccessTokenServiceImpl extends BaseService implements AccessTokenSe
      * @param expireTime token expire time
      * @return token string
      */
+    @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (!hasPerm(loginUser,userId)){
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -142,8 +145,9 @@ public class AccessTokenServiceImpl extends BaseService implements AccessTokenSe
      * @param id token id
      * @return delete result code
      */
+    @Override
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
 
@@ -173,8 +177,9 @@ public class AccessTokenServiceImpl extends BaseService implements AccessTokenSe
      * @param token token string
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (!hasPerm(loginUser,userId)){
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
