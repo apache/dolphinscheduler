@@ -259,6 +259,9 @@ public class DateUtils {
      * @return format time
      */
     public static String format2Duration(Date d1, Date d2) {
+        if (d1 == null || d2 == null) {
+            return null;
+        }
         return format2Duration(differMs(d1, d2));
     }
 
