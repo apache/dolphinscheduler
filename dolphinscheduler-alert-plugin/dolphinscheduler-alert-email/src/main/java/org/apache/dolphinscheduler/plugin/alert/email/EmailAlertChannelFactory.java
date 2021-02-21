@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_FALSE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_NO;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_TRUE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_YES;
+
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.alert.AlertConstants;
@@ -72,9 +77,9 @@ public class EmailAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         RadioParam enableSmtpAuth = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_AUTH, MailParamsConstants.MAIL_SMTP_AUTH)
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(true)
+                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_TRUE)
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
@@ -87,16 +92,16 @@ public class EmailAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         RadioParam enableTls = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE, MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE)
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(false)
+                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_FALSE)
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
         RadioParam enableSsl = RadioParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE, MailParamsConstants.MAIL_SMTP_SSL_ENABLE)
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(false)
+                .addParamsOptions(new ParamsOptions(STRING_YES, STRING_TRUE, false))
+                .addParamsOptions(new ParamsOptions(STRING_NO, STRING_FALSE, false))
+                .setValue(STRING_FALSE)
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 

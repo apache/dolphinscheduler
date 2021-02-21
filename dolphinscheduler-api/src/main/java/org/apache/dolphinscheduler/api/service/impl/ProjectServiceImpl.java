@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -48,10 +47,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * project service implement
+ * project service impl
  **/
 @Service
-public class ProjectServiceImpl extends BaseService implements ProjectService {
+public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -70,6 +69,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param desc description
      * @return returns an error if it exists
      */
+    @Override
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
         Map<String, Object> result = new HashMap<>();
@@ -112,6 +112,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param projectId project id
      * @return project detail information
      */
+    @Override
     public Map<String, Object> queryById(Integer projectId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -134,6 +135,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param projectName project name
      * @return true if the login user have permission to see the project
      */
+    @Override
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
@@ -147,6 +149,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
         return result;
     }
 
+    @Override
     public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result) {
         boolean checkResult = false;
         if (project == null) {
@@ -168,6 +171,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param pageNo page number
      * @return project list which the login user have permission to see
      */
+    @Override
     public Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
         Map<String, Object> result = new HashMap<>();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -199,6 +203,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param projectId project id
      * @return delete result code
      */
+    @Override
     public Map<String, Object> deleteProject(User loginUser, Integer projectId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.selectById(projectId);
@@ -253,6 +258,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param desc description
      * @return update result code
      */
+    @Override
     public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
         Map<String, Object> result = new HashMap<>();
 
@@ -292,6 +298,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param userId user id
      * @return the projects which user have not permission to see
      */
+    @Override
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -342,6 +349,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param userId user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
+    @Override
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
@@ -362,6 +370,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param loginUser login user
      * @return projects which the user have permission to see, Except for items created by this user
      */
+    @Override
     public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
@@ -382,6 +391,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * @param loginUser login user
      * @return
      */
+    @Override
     public Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
@@ -441,6 +451,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      *
      * @return project list
      */
+    @Override
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
         List<Project> projects = new ArrayList<>();
