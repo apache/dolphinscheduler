@@ -48,8 +48,8 @@ public class HiveConnector implements IConnector {
         Map<String,Object> config = connectorParameter.getConfig();
         String database = String.valueOf(config.getOrDefault(DATABASE,DEFAULT_DATABASE));
         String table = String.valueOf(config.getOrDefault(TABLE,EMPTY));
-        String fullTableName = database + Constants.DOTS + table;
+        String dbTable = database + Constants.DOTS + table;
 
-        sparkSession.table(fullTableName).createOrReplaceTempView(table);
+        sparkSession.table(dbTable).createOrReplaceTempView(table);
     }
 }
