@@ -112,7 +112,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
         Date start = startDateParameter.getDate();
 
-        DateParameterExt endDateParameter = checkAndParseDateParameter(result, startDate);
+        DateParameterExt endDateParameter = checkAndParseDateParameter(result, endDate);
         if (!endDateParameter.getStatus()) {
             return result;
         }
