@@ -116,7 +116,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (!endDateParameter.getStatus()) {
             return result;
         }
-        Date end = startDateParameter.getDate();
+        Date end = endDateParameter.getDate();
 
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);

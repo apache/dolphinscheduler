@@ -246,7 +246,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (!endDateParameter.getStatus()) {
             return result;
         }
-        Date end = startDateParameter.getDate();
+        Date end = endDateParameter.getDate();
 
         Page<ProcessInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
