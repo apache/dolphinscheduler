@@ -14,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,6 +25,12 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +45,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-
+/**
+ * session service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class SessionServiceTest {
 
@@ -60,7 +64,6 @@ public class SessionServiceTest {
     @Before
     public void setUp() {
     }
-
 
     @After
     public void after(){

@@ -220,6 +220,7 @@ export default {
   'Edit Alarm Instance': '编辑告警实例',
   'Group Name': '组名称',
   'Alarm instance name': '告警实例名称',
+  'Alarm plugin name': '告警插件名称',
   'Select plugin': '选择插件',
   'Please enter group name': '请输入组名称',
   'Instance parameter exception': '实例参数异常',

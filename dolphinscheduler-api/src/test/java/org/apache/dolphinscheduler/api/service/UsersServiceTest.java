@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -61,28 +62,40 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * users service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class UsersServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceTest.class);
 
     @InjectMocks
     private UsersServiceImpl usersService;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private TenantMapper tenantMapper;
-    @Mock
-    private ProjectUserMapper projectUserMapper;
-    @Mock
-    private ResourceUserMapper resourcesUserMapper;
-    @Mock
-    private UDFUserMapper udfUserMapper;
-    @Mock
-    private DataSourceUserMapper datasourceUserMapper;
-    @Mock
-    private AlertGroupMapper alertGroupMapper;
+
     @Mock
     private ResourceMapper resourceMapper;
+
+    @Mock
+    private AlertGroupMapper alertGroupMapper;
+
+    @Mock
+    private DataSourceUserMapper datasourceUserMapper;
+
+    @Mock
+    private ProjectUserMapper projectUserMapper;
+
+    @Mock
+    private ResourceUserMapper resourceUserMapper;
+
+    @Mock
+    private UDFUserMapper udfUserMapper;
 
     private String queueName = "UsersServiceTestQueue";
 
@@ -292,6 +305,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
+        when(projectUserMapper.deleteProjectRelation(Mockito.anyInt(), Mockito.anyInt())).thenReturn(1);
         result = usersService.grantProject(loginUser, 1, projectIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -312,8 +326,8 @@ public class UsersServiceTest {
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
         when(resourceMapper.queryAuthorizedResourceList(1)).thenReturn(new ArrayList<Resource>());
-
         when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
+        when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
         result = usersService.grantResources(loginUser, 1, resourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -335,6 +349,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
+        when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
         result = usersService.grantUDFFunction(loginUser, 1, udfIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -354,6 +369,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
+        when(datasourceUserMapper.deleteByUserId(Mockito.anyInt())).thenReturn(1);
         result = usersService.grantDataSource(loginUser, 1, datasourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -384,6 +400,7 @@ public class UsersServiceTest {
         loginUser.setUserType(null);
         loginUser.setId(1);
         when(userMapper.queryDetailsById(1)).thenReturn(getGeneralUser());
+        when(alertGroupMapper.queryByUserId(1)).thenReturn(getAlertGroups());
         result = usersService.getUserInfo(loginUser);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -634,6 +651,13 @@ public class UsersServiceTest {
         resource.setFullName("/ResourcesServiceTest.jar");
         resource.setType(ResourceType.FILE);
         return resource;
+    }
+
+    private List<AlertGroup> getAlertGroups() {
+        List<AlertGroup> alertGroups = new ArrayList<>();
+        AlertGroup alertGroup = new AlertGroup();
+        alertGroups.add(alertGroup);
+        return alertGroups;
     }
 
 }
