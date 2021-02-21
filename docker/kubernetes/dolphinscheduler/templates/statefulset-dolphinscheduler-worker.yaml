@@ -324,13 +324,17 @@ spec:
             failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
           {{- end }}
           volumeMounts:
-            - mountPath: {{ include "dolphinscheduler.data.basedir.path" . | quote }}
+            - mountPath: {{ .Values.common.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH | quote }}
               name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
             - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
               subPath: "dolphinscheduler_env.sh"
               name: {{ include "dolphinscheduler.fullname" . }}-common-env
+            {{- if .Values.common.fsFileResourcePersistence.enabled }}
+            - mountPath: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
+              name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+            {{- end }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
@@ -353,6 +357,11 @@ spec:
             items:
               - key: DOLPHINSCHEDULER_ENV
                 path: dolphinscheduler_env.sh
+        {{- if .Values.common.fsFileResourcePersistence.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-fs-file
+        {{- end }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
