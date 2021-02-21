@@ -22,12 +22,16 @@ import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * base service impl
@@ -140,4 +144,19 @@ public class BaseServiceImpl implements BaseService {
     public boolean hasPerm(User operateUser, int createUserId) {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
+
+    @Override
+    public DateParameterExt checkAndParseDateParameter(Map<String, Object> result, String dateStr) {
+        boolean check = true;
+        Date date = null;
+        if (StringUtils.isNotEmpty(dateStr)) {
+            date = DateUtils.getScheduleDate(dateStr);
+            if (Objects.isNull(date)) {
+                check = false;
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+            }
+        }
+        return new DateParameterExt(date, check);
+    }
+
 }

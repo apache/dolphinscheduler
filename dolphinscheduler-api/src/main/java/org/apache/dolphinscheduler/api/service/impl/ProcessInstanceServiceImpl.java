@@ -236,22 +236,17 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             statusArray = new int[]{stateType.ordinal()};
         }
 
-        Date start = null;
-        Date end = null;
-        if (StringUtils.isNotEmpty(startDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            if (Objects.isNull(start)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
+        DateParameterExt startDateParameter = checkAndParseDateParameter(result, startDate);
+        if (!startDateParameter.getStatus()) {
+            return result;
         }
-        if (StringUtils.isNotEmpty(endDate)) {
-            end = DateUtils.getScheduleDate(endDate);
-            if (Objects.isNull(end)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
+        Date start = startDateParameter.getDate();
+
+        DateParameterExt endDateParameter = checkAndParseDateParameter(result, startDate);
+        if (!endDateParameter.getStatus()) {
+            return result;
         }
+        Date end = startDateParameter.getDate();
 
         Page<ProcessInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);

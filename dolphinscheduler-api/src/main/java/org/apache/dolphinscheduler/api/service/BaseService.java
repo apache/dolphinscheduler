@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -89,4 +90,36 @@ public interface BaseService {
      * @param createUserId create user id
      */
     boolean hasPerm(User operateUser, int createUserId);
+
+    /**
+     * check and parse data parameter
+     *
+     * @param result result
+     * @param dateStr data string
+     * @return data check and parse result
+     */
+    DateParameterExt checkAndParseDateParameter(Map<String, Object> result, String dateStr);
+
+    /**
+     * data parameter extend
+     */
+    class DateParameterExt {
+        /** parse date */
+        private Date date;
+        /** date check  status */
+        private boolean status;
+
+        public DateParameterExt(Date date, boolean status) {
+            this.date = date;
+            this.status = status;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public boolean getStatus() {
+            return status;
+        }
+    }
 }
