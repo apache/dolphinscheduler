@@ -236,8 +236,8 @@ public class TaskNode {
     }
 
     public Boolean isForbidden() {
-        return (StringUtils.isNotEmpty(this.runFlag) &&
-                this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
+        return (StringUtils.isNotEmpty(this.runFlag)
+                && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
 
     @Override

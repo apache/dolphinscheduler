@@ -71,7 +71,6 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
                 .newBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .version(version)
-//                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
                 .description(processDefinition.getDescription())
                 .locations(processDefinition.getLocations())
                 .connects(processDefinition.getConnects())
