@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.PluginType;
 import java.util.Map;
 
 /**
- * UiPluginService
+ * ui plugin service
  */
 public interface UiPluginService {
 

@@ -14,8 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
+import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -25,28 +29,34 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.*;
+
 import org.apache.commons.httpclient.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import static org.apache.dolphinscheduler.api.enums.Status.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * user login controller
- * <p>
- * swagger bootstrap ui docs refer : https://doc.xiaominfo.com/guide/enh-func.html
+ * login controller
  */
-@Api(tags = "LOGIN_TAG", position = 1)
+@Api(tags = "LOGIN_TAG")
 @RestController
 @RequestMapping("")
 public class LoginController extends BaseController {

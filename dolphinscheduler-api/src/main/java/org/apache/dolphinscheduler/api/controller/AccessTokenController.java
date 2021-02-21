@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.controller;
 
+package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ACCESS_TOKEN_ERROR;
@@ -54,7 +54,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * access token controller
  */
-@Api(tags = "ACCESS_TOKEN_TAG", position = 1)
+@Api(tags = "ACCESS_TOKEN_TAG")
 @RestController
 @RequestMapping("/access-token")
 public class AccessTokenController extends BaseController {
