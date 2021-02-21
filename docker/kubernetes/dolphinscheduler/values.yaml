@@ -94,6 +94,14 @@ common:
     FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
     FS_S3A_ACCESS_KEY: "xxxxxxx"
     FS_S3A_SECRET_KEY: "xxxxxxx"
+  ## If RESOURCE_STORAGE_TYPE is HDFS and FS_DEFAULT_FS is file:///, fsFileResourcePersistence should be enabled for resource storage
+  fsFileResourcePersistence:
+    enabled: false
+    accessModes:
+    - "ReadWriteMany"
+    ## storageClassName must support the access mode: ReadWriteMany
+    storageClassName: "-"
+    storage: "20Gi"
 
 master:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
