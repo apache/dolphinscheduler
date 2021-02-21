@@ -347,16 +347,16 @@ public class ProcessService {
 
         List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
         Map<Long, TaskDefinition> taskDefinitionMap = new HashMap<>();
-        for(ProcessTaskRelation processTaskRelation : processTaskRelations){
-            if(taskDefinitionMap.containsKey(processTaskRelation.getPostTaskCode())){
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (taskDefinitionMap.containsKey(processTaskRelation.getPostTaskCode())) {
                 TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(processTaskRelation.getPostTaskCode());
                 taskDefinitionMap.put(processTaskRelation.getPostTaskCode(), taskDefinition);
             }
         }
         return taskDefinitionMap.entrySet()
-                                .stream()
-                                .map(e -> JSONUtils.parseObject(JSONUtils.toJsonString(e.getValue()), TaskNode.class))
-                                .collect(Collectors.toList());
+                .stream()
+                .map(e -> JSONUtils.parseObject(JSONUtils.toJsonString(e.getValue()), TaskNode.class))
+                .collect(Collectors.toList());
     }
 
     /**

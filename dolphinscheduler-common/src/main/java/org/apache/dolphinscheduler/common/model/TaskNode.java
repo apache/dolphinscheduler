@@ -50,7 +50,6 @@ public class TaskNode {
    */
   private int version;
 
-
   /**
    * task node name
    */
@@ -307,6 +306,54 @@ public class TaskNode {
     this.timeout = timeout;
   }
 
+  public String getWorkerGroup() {
+    return workerGroup;
+  }
+
+  public void setWorkerGroup(String workerGroup) {
+    this.workerGroup = workerGroup;
+  }
+
+  public String getConditionResult() {
+    return conditionResult;
+  }
+
+  public void setConditionResult(String conditionResult) {
+    this.conditionResult = conditionResult;
+  }
+
+  public Integer getWorkerGroupId() {
+    return workerGroupId;
+  }
+
+  public void setWorkerGroupId(Integer workerGroupId) {
+    this.workerGroupId = workerGroupId;
+  }
+
+  public int getDelayTime() {
+    return delayTime;
+  }
+
+  public void setDelayTime(int delayTime) {
+    this.delayTime = delayTime;
+  }
+
+  public Long getCode() {
+    return code;
+  }
+
+  public void setCode(Long code) {
+    this.code = code;
+  }
+
+  public int getVersion() {
+    return version;
+  }
+
+  public void setVersion(int version) {
+    this.version = version;
+  }
+
   /**
    * get task time out parameter
    * @return task time out parameter
@@ -347,51 +394,4 @@ public class TaskNode {
             + '}';
   }
 
-  public String getWorkerGroup() {
-    return workerGroup;
-  }
-
-  public void setWorkerGroup(String workerGroup) {
-    this.workerGroup = workerGroup;
-  }
-
-  public String getConditionResult() {
-    return conditionResult;
-  }
-
-  public void setConditionResult(String conditionResult) {
-    this.conditionResult = conditionResult;
-  }
-
-  public Integer getWorkerGroupId() {
-    return workerGroupId;
-  }
-
-  public void setWorkerGroupId(Integer workerGroupId) {
-    this.workerGroupId = workerGroupId;
-  }
-
-    public int getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(int delayTime) {
-        this.delayTime = delayTime;
-    }
-
-  public Long getCode() {
-    return code;
-  }
-
-  public void setCode(Long code) {
-    this.code = code;
-  }
-
-  public int getVersion() {
-    return version;
-  }
-
-  public void setVersion(int version) {
-    this.version = version;
-  }
 }

@@ -449,11 +449,10 @@ public class DagHelper {
      */
     public static ProcessDag getProcessDag(List<TaskNode> taskNodeList,
                                            List<ProcessTaskRelation> processTaskRelations) {
-
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
 
         taskNodeList.stream().forEach(taskNode -> {
-                taskNodeMap.putIfAbsent(taskNode.getCode(), taskNode);
+            taskNodeMap.putIfAbsent(taskNode.getCode(), taskNode);
         });
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
