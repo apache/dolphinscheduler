@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.controller;
 
+package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
@@ -46,11 +46,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-
 /**
- * log controller
+ * logger controller
  */
-@Api(tags = "LOGGER_TAG", position = 13)
+@Api(tags = "LOGGER_TAG")
 @RestController
 @RequestMapping("/log")
 public class LoggerController extends BaseController {
