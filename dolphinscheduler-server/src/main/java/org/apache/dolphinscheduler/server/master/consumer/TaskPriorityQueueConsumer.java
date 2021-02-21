@@ -58,11 +58,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -124,12 +120,11 @@ public class TaskPriorityQueueConsumer extends Thread {
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
                 failedDispatchTasks.clear();
                 for (int i = 0; i < fetchTaskNum; i++) {
-                    if (taskPriorityQueue.size() <= 0) {
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+                    if (Objects.isNull(taskPriority)) {
                         continue;
                     }
-                    // if not task , blocking here
-                    TaskPriority taskPriority = taskPriorityQueue.take();
+
                     boolean dispatchResult = dispatch(taskPriority);
                     if (!dispatchResult) {
                         failedDispatchTasks.add(taskPriority);
