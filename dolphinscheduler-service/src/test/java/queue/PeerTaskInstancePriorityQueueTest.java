@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,6 +58,21 @@ public class PeerTaskInstancePriorityQueueTest {
         queue.take();
         Assert.assertTrue(queue.size() < peekBeforeLength);
     }
+
+    @Test
+    public void testPoll() throws Exception {
+        PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
+        int peekBeforeLength = queue.size();
+        System.out.println(System.currentTimeMillis());
+        queue.poll(1000, TimeUnit.MILLISECONDS);
+        queue.poll(1000, TimeUnit.MILLISECONDS);
+        System.out.println(System.currentTimeMillis());
+        Assert.assertTrue(queue.size()== 0);
+        queue.poll(1000, TimeUnit.MILLISECONDS);
+        System.out.println(System.currentTimeMillis());
+
+    }
+
 
     /**
      * get queue
