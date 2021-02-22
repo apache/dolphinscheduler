@@ -17,12 +17,13 @@
 
 package queue;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
-import org.junit.Test;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class TaskUpdateQueueTest {
 
@@ -30,7 +31,7 @@ public class TaskUpdateQueueTest {
      * test put
      */
     @Test
-    public void testQueue() throws Exception{
+    public void testQueue() throws Exception {
 
         /**
          * 1_1_2_1_default
