@@ -39,7 +39,7 @@ public class PeerTaskInstancePriorityQueueTest {
         TaskInstance taskInstanceMediumPriority = createTaskInstance("high", Priority.MEDIUM);
         queue.put(taskInstanceHigPriority);
         queue.put(taskInstanceMediumPriority);
-        Assert.assertEquals(2,queue.size());
+        Assert.assertEquals(2, queue.size());
     }
 
     @Test
@@ -47,7 +47,7 @@ public class PeerTaskInstancePriorityQueueTest {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
         int peekBeforeLength = queue.size();
         queue.peek();
-        Assert.assertEquals(peekBeforeLength,queue.size());
+        Assert.assertEquals(peekBeforeLength, queue.size());
 
     }
 
@@ -89,8 +89,8 @@ public class PeerTaskInstancePriorityQueueTest {
     /**
      * create task instance
      *
-     * @param name      name
-     * @param priority  priority
+     * @param name     name
+     * @param priority priority
      * @return
      */
     private TaskInstance createTaskInstance(String name, Priority priority) {
