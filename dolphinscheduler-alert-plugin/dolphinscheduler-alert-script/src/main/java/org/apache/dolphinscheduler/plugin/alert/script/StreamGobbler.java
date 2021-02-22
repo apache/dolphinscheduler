@@ -55,6 +55,13 @@ public class StreamGobbler extends Thread {
             }
         } catch (IOException e) {
             logger.error("I/O error occurs {}", e.getMessage());
+        } finally {
+            try {
+                inputBufferReader.close();
+                inputStreamReader.close();
+            } catch (IOException e) {
+                logger.error("I/O error occurs {}", e.getMessage());
+            }
         }
     }
 
