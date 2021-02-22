@@ -347,7 +347,12 @@ public abstract class AbstractCommandExecutor {
                 String line;
                 logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
-                    logBuffer.add(line);
+                    if (line.startsWith("${setValue(")) {
+                        varPool.append(line.substring("${setValue(".length(), line.length() - 2));
+                        varPool.append("$VarPool$");
+                    } else {
+                        logBuffer.add(line);
+                    }
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
