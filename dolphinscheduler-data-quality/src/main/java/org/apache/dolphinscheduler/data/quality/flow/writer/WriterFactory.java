@@ -56,12 +56,10 @@ public class WriterFactory {
     private IWriter getWriter(SparkSession sparkSession,WriterParameter writerParam) throws Exception {
         WriterType writerType = WriterType.getType(writerParam.getType());
         if (writerType != null) {
-            switch (writerType) {
-                case JDBC:
-                    return new JdbcWriter(sparkSession,writerParam);
-                default:
-                    throw new Exception("writer type $readerType is not supported!");
+            if (writerType == WriterType.JDBC) {
+                return new JdbcWriter(sparkSession, writerParam);
             }
+            throw new Exception("writer type $readerType is not supported!");
         }
 
         return null;

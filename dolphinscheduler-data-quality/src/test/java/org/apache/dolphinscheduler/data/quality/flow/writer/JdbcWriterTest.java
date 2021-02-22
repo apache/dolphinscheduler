@@ -17,18 +17,22 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.writer;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
+import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
+import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.data.quality.Constants.TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.URL;
+import static org.apache.dolphinscheduler.data.quality.Constants.USER;
+
 import org.apache.dolphinscheduler.data.quality.configuration.WriterParameter;
 import org.apache.dolphinscheduler.data.quality.flow.FlowTestBase;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.sql.Connection;
 import java.util.HashMap;
-
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.data.quality.Constants.*;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * JdbcWriterTest
@@ -62,28 +66,28 @@ public class JdbcWriterTest extends FlowTestBase {
         return writerParameter;
     }
 
-    private void createWriterTable(){
-        try{
+    private void createWriterTable() {
+        try {
             Connection connection = getConnection();
             connection.prepareStatement("create schema if not exists test").executeUpdate();
 
             connection.prepareStatement("drop table if exists test.test2").executeUpdate();
             connection
                     .prepareStatement(
-                            "CREATE TABLE test.test2 (\n" +
-                                    "  `id` int(11) NOT NULL AUTO_INCREMENT,\n" +
-                                    "  `company` varchar(255) DEFAULT NULL,\n" +
-                                    "  `date` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c1` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c2` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c3` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c4` int(11) DEFAULT NULL,\n" +
-                                    "  PRIMARY KEY (`id`)\n" +
-                                    ")")
+                            "CREATE TABLE test.test2 (\n"
+                                    + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                                    + "  `company` varchar(255) DEFAULT NULL,\n"
+                                    + "  `date` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c1` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c2` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c3` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c4` int(11) DEFAULT NULL,\n"
+                                    + "  PRIMARY KEY (`id`)\n"
+                                    + ")")
                     .executeUpdate();
             connection.prepareStatement("set schema test").executeUpdate();
             connection.commit();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

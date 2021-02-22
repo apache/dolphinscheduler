@@ -49,7 +49,7 @@ public class DataQualityApplication {
         }
 
         String dataQualityParameter = args[0];
-        logger.info("dataQualityParameter: " + dataQualityParameter);
+        logger.info("DataQualityParameter is {}" + dataQualityParameter);
 
         DataQualityConfiguration dataQualityConfiguration = JsonUtil.fromJson(dataQualityParameter,DataQualityConfiguration.class);
         if (dataQualityConfiguration == null) {

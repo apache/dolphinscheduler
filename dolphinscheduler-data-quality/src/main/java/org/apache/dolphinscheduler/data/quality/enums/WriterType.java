@@ -28,7 +28,7 @@ public enum WriterType {
 
     public static WriterType getType(String name) {
         for (WriterType type: WriterType.values()) {
-            if (type.name().toLowerCase().equals(name.toLowerCase())) {
+            if (type.name().equalsIgnoreCase(name)) {
                 return type;
             }
         }

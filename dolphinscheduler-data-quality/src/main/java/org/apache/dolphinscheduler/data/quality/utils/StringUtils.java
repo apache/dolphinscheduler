@@ -21,6 +21,10 @@ public class StringUtils {
 
     public static final String EMPTY = "";
 
+    private StringUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean isEmpty(final CharSequence cs) {
         return cs == null || cs.length() == 0;
     }

@@ -30,7 +30,7 @@ public enum ConnectorType {
 
     public static ConnectorType getType(String name) {
         for (ConnectorType type: ConnectorType.values()) {
-            if (type.name().toLowerCase().equals(name.toLowerCase())) {
+            if (type.name().equalsIgnoreCase(name)) {
                 return type;
             }
         }

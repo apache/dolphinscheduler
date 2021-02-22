@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.data.quality.SparkApplicationTestBase;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-
 import java.util.Properties;
 
 /**
@@ -30,6 +29,7 @@ import java.util.Properties;
 public class FlowTestBase extends SparkApplicationTestBase {
 
     protected String url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
+
     protected String driver = "org.h2.Driver";
 
     protected Connection getConnection() throws Exception {

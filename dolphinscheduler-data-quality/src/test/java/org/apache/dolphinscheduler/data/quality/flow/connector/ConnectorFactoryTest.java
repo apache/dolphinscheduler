@@ -17,20 +17,23 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.connector;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
+import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
+import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.data.quality.Constants.TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.URL;
+import static org.apache.dolphinscheduler.data.quality.Constants.USER;
+
 import org.apache.dolphinscheduler.data.quality.configuration.ConnectorParameter;
 import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.data.quality.Constants.*;
-import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
-import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * ConnectorFactoryTest
@@ -59,7 +62,7 @@ public class ConnectorFactoryTest {
         int flag = 0;
         try {
             List<IConnector> connectors = ConnectorFactory.getInstance().getConnectors(context);
-            if(connectors != null && connectors.size() >= 1){
+            if (connectors != null && connectors.size() >= 1) {
                 flag = 1;
             }
         } catch (Exception e) {

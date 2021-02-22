@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.data.quality;
 /**
  * Constants
  */
-public class Constants {
+public interface Constants {
 
     public static final String DATABASE = "database";
 

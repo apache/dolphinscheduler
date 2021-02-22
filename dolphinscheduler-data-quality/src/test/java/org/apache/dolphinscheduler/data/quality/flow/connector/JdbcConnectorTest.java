@@ -17,20 +17,22 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.connector;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
+import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
+import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.data.quality.Constants.TABLE;
+import static org.apache.dolphinscheduler.data.quality.Constants.URL;
+import static org.apache.dolphinscheduler.data.quality.Constants.USER;
+
 import org.apache.dolphinscheduler.data.quality.configuration.ConnectorParameter;
 import org.apache.dolphinscheduler.data.quality.flow.FlowTestBase;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.sql.Connection;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.data.quality.Constants.*;
-import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
-import static org.apache.dolphinscheduler.data.quality.Constants.PASSWORD;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * JdbcConnectorTest
@@ -71,24 +73,24 @@ public class JdbcConnectorTest extends FlowTestBase {
             connection.prepareStatement("drop table if exists test.test1").executeUpdate();
             connection
                     .prepareStatement(
-                            "CREATE TABLE test.test1 (\n" +
-                                    "  `id` int(11) NOT NULL AUTO_INCREMENT,\n" +
-                                    "  `company` varchar(255) DEFAULT NULL,\n" +
-                                    "  `date` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c1` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c2` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c3` varchar(255) DEFAULT NULL,\n" +
-                                    "  `c4` int(11) DEFAULT NULL,\n" +
-                                    "  PRIMARY KEY (`id`)\n" +
-                                    ")")
+                            "CREATE TABLE test.test1 (\n"
+                                    + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                                    + "  `company` varchar(255) DEFAULT NULL,\n"
+                                    + "  `date` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c1` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c2` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c3` varchar(255) DEFAULT NULL,\n"
+                                    + "  `c4` int(11) DEFAULT NULL,\n"
+                                    + "  PRIMARY KEY (`id`)\n"
+                                    + ")")
                     .executeUpdate();
-            connection.prepareStatement("INSERT INTO test.test1 (company,`date`,c1,c2,c3,c4) VALUES\n" +
-                    "\t ('1','2019-03-01','11','12','13',1),\n" +
-                    "\t ('2','2019-06-01','21','22','23',1),\n" +
-                    "\t ('3','2019-09-01','31','32','33',1),\n" +
-                    "\t ('4','2019-12-01','41','42','43',1),\n" +
-                    "\t ('5','2013','42','43','54',1),\n" +
-                    "\t ('6','2020','42','43','54',1);").executeUpdate();
+            connection.prepareStatement("INSERT INTO test.test1 (company,`date`,c1,c2,c3,c4) VALUES\n"
+                    + "\t ('1','2019-03-01','11','12','13',1),\n"
+                    + "\t ('2','2019-06-01','21','22','23',1),\n"
+                    + "\t ('3','2019-09-01','31','32','33',1),\n"
+                    + "\t ('4','2019-12-01','41','42','43',1),\n"
+                    + "\t ('5','2013','42','43','54',1),\n"
+                    + "\t ('6','2020','42','43','54',1);").executeUpdate();
             connection.commit();
         } catch (Exception e) {
             e.printStackTrace();

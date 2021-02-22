@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.data.quality.flow.writer;
 import org.apache.dolphinscheduler.data.quality.configuration.WriterParameter;
 import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * WriterFactoryTest
@@ -45,7 +45,7 @@ public class WriterFactoryTest {
         int flag = 0;
         try {
             List<IWriter> writers = WriterFactory.getInstance().getWriters(context);
-            if(writers != null && writers.size() >= 1){
+            if (writers != null && writers.size() >= 1) {
                 flag = 1;
             }
         } catch (Exception e) {
