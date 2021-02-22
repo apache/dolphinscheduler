@@ -298,8 +298,8 @@ public class ProcessService {
      * @param command command
      * @return create command result
      */
-    public Boolean verifyIsNeedCreateCommand(Command command) {
-        Boolean isNeedCreate = true;
+    public boolean verifyIsNeedCreateCommand(Command command) {
+        boolean isNeedCreate = true;
         EnumMap<CommandType, Integer> cmdTypeMap = new EnumMap<>(CommandType.class);
         cmdTypeMap.put(CommandType.REPEAT_RUNNING, 1);
         cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, 1);
@@ -341,20 +341,22 @@ public class ProcessService {
     public List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId) {
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
-            logger.info("process define not exists");
-            return null;
-        }
-
-        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        //process data check
-        if (null == processData) {
-            logger.error("process data is null");
+            logger.error("process define not exists");
             return new ArrayList<>();
         }
 
-        return processData.getTasks();
+        List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
+        Map<Long, TaskDefinition> taskDefinitionMap = new HashMap<>();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (taskDefinitionMap.containsKey(processTaskRelation.getPostTaskCode())) {
+                TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(processTaskRelation.getPostTaskCode());
+                taskDefinitionMap.put(processTaskRelation.getPostTaskCode(), taskDefinition);
+            }
+        }
+        return taskDefinitionMap.entrySet()
+                .stream()
+                .map(e -> JSONUtils.parseObject(JSONUtils.toJsonString(e.getValue()), TaskNode.class))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -495,13 +497,7 @@ public class ProcessService {
      * @param ids ids
      */
     public void recurseFindSubProcessId(int parentId, List<Integer> ids) {
-        ProcessDefinition processDefinition = processDefineMapper.selectById(parentId);
-        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        List<TaskNode> taskNodeList = processData.getTasks();
-
+        List<TaskNode> taskNodeList = this.getTaskNodeListByDefinitionId(parentId);
         if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
             for (TaskNode taskNode : taskNodeList) {
@@ -650,8 +646,6 @@ public class ProcessService {
                 getCommandTypeIfComplement(processInstance, command),
                 processInstance.getScheduleTime()));
 
-        //copy process define json to process instance
-        processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
         String workerGroup = StringUtils.isBlank(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
@@ -2064,60 +2058,6 @@ public class ProcessService {
                 taskInstance.getId());
     }
 
-    /**
-     * solve the branch rename bug
-     *
-     * @return String
-     */
-    public String changeJson(ProcessData processData, String oldJson) {
-        ProcessData oldProcessData = JSONUtils.parseObject(oldJson, ProcessData.class);
-        HashMap<String, String> oldNameTaskId = new HashMap<>();
-        List<TaskNode> oldTasks = oldProcessData.getTasks();
-        for (int i = 0; i < oldTasks.size(); i++) {
-            TaskNode taskNode = oldTasks.get(i);
-            String oldName = taskNode.getName();
-            String oldId = taskNode.getId();
-            oldNameTaskId.put(oldName, oldId);
-        }
-
-        // take the processdefinitionjson saved this time, and then save the taskid and name
-        HashMap<String, String> newNameTaskId = new HashMap<>();
-        List<TaskNode> newTasks = processData.getTasks();
-        for (int i = 0; i < newTasks.size(); i++) {
-            TaskNode taskNode = newTasks.get(i);
-            String newId = taskNode.getId();
-            String newName = taskNode.getName();
-            newNameTaskId.put(newId, newName);
-        }
-
-        // replace the previous conditionresult with a new one
-        List<TaskNode> tasks = processData.getTasks();
-        for (int i = 0; i < tasks.size(); i++) {
-            TaskNode taskNode = newTasks.get(i);
-            String type = taskNode.getType();
-            if (TaskType.CONDITIONS.getDescp().equalsIgnoreCase(type)) {
-                ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
-                String oldSuccessNodeName = conditionsParameters.getSuccessNode().get(0);
-                String oldFailedNodeName = conditionsParameters.getFailedNode().get(0);
-                String newSuccessNodeName = newNameTaskId.get(oldNameTaskId.get(oldSuccessNodeName));
-                String newFailedNodeName = newNameTaskId.get(oldNameTaskId.get(oldFailedNodeName));
-                if (newSuccessNodeName != null) {
-                    ArrayList<String> successNode = new ArrayList<>();
-                    successNode.add(newSuccessNodeName);
-                    conditionsParameters.setSuccessNode(successNode);
-                }
-                if (newFailedNodeName != null) {
-                    ArrayList<String> failedNode = new ArrayList<>();
-                    failedNode.add(newFailedNodeName);
-                    conditionsParameters.setFailedNode(failedNode);
-                }
-                String conditionResultStr = conditionsParameters.getConditionResult();
-                taskNode.setConditionResult(conditionResultStr);
-                tasks.set(i, taskNode);
-            }
-        }
-        return JSONUtils.toJsonString(processData);
-    }
 
     /**
      * switch process definition version to process definition log version
@@ -2391,24 +2331,30 @@ public class ProcessService {
      * @return dag graph
      */
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-
-        List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                processDefinition.getCode(),
-                processDefinition.getVersion());
-        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
-        List<TaskDefinition> taskDefinitions = new ArrayList<>();
-        for (ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs) {
-            processTaskRelations.add(JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class));
-
-            TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                    processTaskRelationLog.getPostTaskCode(),
-                    processTaskRelationLog.getPostNodeVersion());
-            taskDefinitions.add(JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinitionLog), TaskDefinition.class));
-        }
-
-        ProcessDag processDag = DagHelper.getProcessDag(taskDefinitions, processTaskRelations);
+        List<TaskNode> taskNodeList = this.getTaskNodeListByDefinitionId(processDefinition.getId());
+        List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
+        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, processTaskRelations);
         // Generate concrete Dag to be executed
         return DagHelper.buildDagGraph(processDag);
+    }
+
+    /**
+     * get process task relation list
+     * this function can be query relation list from log record
+     *
+     * @param processCode
+     * @param processVersion
+     * @return
+     */
+    public List<ProcessTaskRelation> getProcessTaskRelationList(Long processCode, int processVersion) {
+        List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
+                processCode,
+                processVersion);
+        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
+        for (ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs) {
+            processTaskRelations.add(JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class));
+        }
+        return processTaskRelations;
     }
 
 }

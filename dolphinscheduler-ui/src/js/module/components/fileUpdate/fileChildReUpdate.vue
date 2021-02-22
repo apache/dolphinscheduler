@@ -69,7 +69,7 @@
             <template slot="content">
               <div class="file-update-box">
                 <template v-if="progress === 0">
-                  <input name="file" id="file" type="file" class="file-update">
+                  <input ref="file" name="file" type="file" class="file-update" @change="_onChange">
                   <el-button size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
@@ -239,16 +239,17 @@
         this.file = file
         this.name = file.name
         this.dragOver = false
+      },
+      _onChange () {
+        let file = this.$refs.file.files[0]
+        this.file = file
+        this.name = file.name
+        this.$refs.file.value = null
       }
     },
     mounted () {
       this.name = this.fileName
       this.description = this.desc
-      $('#file').change(() => {
-        let file = $('#file')[0].files[0]
-        this.file = file
-        this.name = file.name
-      })
     },
     components: { mPopup, mListBoxF, mProgressBar }
   }

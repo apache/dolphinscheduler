@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -42,9 +41,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.ImmutableMap;
 
+/**
+ * process definition version service impl
+ */
 @Service
-public class ProcessDefinitionVersionServiceImpl extends BaseService implements
-        ProcessDefinitionVersionService {
+public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl implements ProcessDefinitionVersionService {
 
     @Autowired
     private ProcessDefinitionVersionMapper processDefinitionVersionMapper;
@@ -61,6 +62,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
      * @param processDefinition the process definition that need to record version
      * @return the newest version number of this process definition
      */
+    @Override
     public int addProcessDefinitionVersion(ProcessDefinition processDefinition) {
 
         long version = this.queryMaxVersionByProcessDefinitionId(processDefinition.getId()) + 1;
@@ -69,7 +71,6 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
                 .newBuilder()
                 .processDefinitionId(processDefinition.getId())
                 .version(version)
-                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
                 .description(processDefinition.getDescription())
                 .locations(processDefinition.getLocations())
                 .connects(processDefinition.getConnects())
@@ -110,6 +111,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
      * @param processDefinitionId process definition id
      * @return the pagination process definition versions info of the certain process definition
      */
+    @Override
     public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, int processDefinitionId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -151,6 +153,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
      * @param version version number
      * @return the process definition version info
      */
+    @Override
     public ProcessDefinitionVersion queryByProcessDefinitionIdAndVersion(int processDefinitionId, long version) {
         return processDefinitionVersionMapper.queryByProcessDefinitionIdAndVersion(processDefinitionId, version);
     }
@@ -164,6 +167,7 @@ public class ProcessDefinitionVersionServiceImpl extends BaseService implements
      * @param version version number
      * @return delele result code
      */
+    @Override
     public Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName, int processDefinitionId, long version) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
