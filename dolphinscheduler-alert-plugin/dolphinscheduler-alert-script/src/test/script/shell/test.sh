@@ -15,11 +15,13 @@
 # limitations under the License.
 #
 
-msg=$1
-content=$2
+while getopts t: opts; do
+    case $opts in
+        t) t=$OPTARG ;;
+        ?) ;;
+    esac
+done
 
-if  [ $msg = errorMsg ]
-   then
-     exit 12
-fi
+echo "$t"
+
 exit 0
