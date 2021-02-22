@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Task instances priority queue implementation
@@ -58,6 +59,22 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      */
     @Override
     public TaskInstance take() throws TaskPriorityQueueException {
+        return queue.poll();
+    }
+
+    /**
+     * poll task info with timeout
+     * @param timeout
+     * @param unit
+     * @return
+     * @throws TaskPriorityQueueException
+     * @throws InterruptedException
+     */
+    @Override
+    public TaskInstance poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException, InterruptedException {
+        if (queue.isEmpty()) {
+            unit.sleep(timeout);
+        }
         return queue.poll();
     }
 
