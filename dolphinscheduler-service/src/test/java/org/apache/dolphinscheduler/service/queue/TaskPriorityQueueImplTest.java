@@ -19,12 +19,68 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.common.enums.Priority;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TaskPriorityQueueImplTest {
+
+    @Test
+    public void testSort() {
+        TaskPriority priorityOne = new TaskPriority(1, 0, 0, 0, "default");
+        TaskPriority priorityTwo = new TaskPriority(2, 0, 0, 0, "default");
+        TaskPriority priorityThree = new TaskPriority(3, 0, 0, 0, "default");
+        List<TaskPriority> taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPrioritys);
+        Assert.assertEquals(
+            Arrays.asList(priorityOne, priorityTwo, priorityThree),
+            taskPrioritys
+        );
+
+        priorityOne = new TaskPriority(0, 1, 0, 0, "default");
+        priorityTwo = new TaskPriority(0, 2, 0, 0, "default");
+        priorityThree = new TaskPriority(0, 3, 0, 0, "default");
+        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPrioritys);
+        Assert.assertEquals(
+            Arrays.asList(priorityOne, priorityTwo, priorityThree),
+            taskPrioritys
+        );
+
+        priorityOne = new TaskPriority(0, 0, 1, 0, "default");
+        priorityTwo = new TaskPriority(0, 0, 2, 0, "default");
+        priorityThree = new TaskPriority(0, 0, 3, 0, "default");
+        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPrioritys);
+        Assert.assertEquals(
+            Arrays.asList(priorityOne, priorityTwo, priorityThree),
+            taskPrioritys
+        );
+
+        priorityOne = new TaskPriority(0, 0, 0, 1, "default");
+        priorityTwo = new TaskPriority(0, 0, 0, 2, "default");
+        priorityThree = new TaskPriority(0, 0, 0, 3, "default");
+        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPrioritys);
+        Assert.assertEquals(
+            Arrays.asList(priorityOne, priorityTwo, priorityThree),
+            taskPrioritys
+        );
+
+        priorityOne = new TaskPriority(0, 0, 0, 0, "default_1");
+        priorityTwo = new TaskPriority(0, 0, 0, 0, "default_2");
+        priorityThree = new TaskPriority(0, 0, 0, 0, "default_3");
+        taskPrioritys = Arrays.asList(priorityOne, priorityThree, priorityTwo);
+        Collections.sort(taskPrioritys);
+        Assert.assertEquals(
+            Arrays.asList(priorityOne, priorityTwo, priorityThree),
+            taskPrioritys
+        );
+    }
 
     @Test
     public void put() throws Exception {
