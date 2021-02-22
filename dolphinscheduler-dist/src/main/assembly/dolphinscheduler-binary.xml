@@ -151,13 +151,13 @@
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
-		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-data-quality/target/dolphinscheduler-data-quality-${project.version}</directory>
-			<includes>
-				<include>**/*.*</include>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-data-quality/target/dolphinscheduler-data-quality-${project.version}</directory>
+            <includes>
+                <include>**/*.*</include>
 			</includes>
-			<outputDirectory>.</outputDirectory>
-		</fileSet>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
 
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-ui/dist</directory>
