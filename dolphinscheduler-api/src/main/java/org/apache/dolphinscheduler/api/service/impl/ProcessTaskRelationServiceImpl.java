@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
  * task definition service impl
  */
 @Service
-public class ProcessTaskRelationServiceImpl extends BaseService implements
+public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements
         ProcessTaskRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessTaskRelationServiceImpl.class);

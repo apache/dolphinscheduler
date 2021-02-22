@@ -25,17 +25,13 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * dag tools
@@ -193,24 +189,19 @@ public class DagHelper {
     /**
      * generate dag by start nodes and recovery nodes
      *
-     * @param processDefinitionJson processDefinitionJson
+     * @param totalTaskNodeList     totalTaskNodeList
      * @param startNodeNameList     startNodeNameList
      * @param recoveryNodeNameList  recoveryNodeNameList
      * @param depNodeType           depNodeType
      * @return process dag
      * @throws Exception if error throws Exception
      */
-    public static ProcessDag generateFlowDag(String processDefinitionJson,
+    public static ProcessDag generateFlowDag(List<TaskNode> totalTaskNodeList,
                                              List<String> startNodeNameList,
                                              List<String> recoveryNodeNameList,
                                              TaskDependType depNodeType) throws Exception {
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = new ArrayList<>();
-        if (null != processData) {
-            taskNodeList = processData.getTasks();
-        }
-        List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
+        List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(totalTaskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
         if (destTaskNodeList.isEmpty()) {
             return null;
         }
@@ -220,29 +211,6 @@ public class DagHelper {
         processDag.setNodes(destTaskNodeList);
         return processDag;
     }
-
-    /**
-     * parse the forbidden task nodes in process definition.
-     *
-     * @param processDefinitionJson processDefinitionJson
-     * @return task node map
-     */
-    public static Map<String, TaskNode> getForbiddenTaskNodeMaps(String processDefinitionJson) {
-        Map<String, TaskNode> forbidTaskNodeMap = new ConcurrentHashMap<>();
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        List<TaskNode> taskNodeList = new ArrayList<>();
-        if (null != processData) {
-            taskNodeList = processData.getTasks();
-        }
-        for (TaskNode node : taskNodeList) {
-            if (node.isForbidden()) {
-                forbidTaskNodeMap.putIfAbsent(node.getName(), node);
-            }
-        }
-        return forbidTaskNodeMap;
-    }
-
 
     /**
      * find node by node name
@@ -470,18 +438,16 @@ public class DagHelper {
     /**
      * get process dag
      *
-     * @param taskDefinitions task definition
+     * @param taskNodeList task node list
      * @return Process dag
      */
-    public static ProcessDag getProcessDag(List<TaskDefinition> taskDefinitions,
+    public static ProcessDag getProcessDag(List<TaskNode> taskNodeList,
                                            List<ProcessTaskRelation> processTaskRelations) {
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
-        List<TaskNode> taskNodeList = new ArrayList<>();
-        for (TaskDefinition taskDefinition : taskDefinitions) {
-            TaskNode taskNode = JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinition), TaskNode.class);
-            taskNodeMap.put(taskDefinition.getCode(), taskNode);
-            taskNodeList.add(taskNode);
-        }
+
+        taskNodeList.stream().forEach(taskNode -> {
+            taskNodeMap.putIfAbsent(taskNode.getCode(), taskNode);
+        });
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
         for (ProcessTaskRelation processTaskRelation : processTaskRelations) {

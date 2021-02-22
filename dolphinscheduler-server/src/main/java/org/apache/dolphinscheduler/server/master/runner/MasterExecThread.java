@@ -383,12 +383,17 @@ public class MasterExecThread implements Runnable {
      */
     private void buildFlowDag() throws Exception {
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
-
-        forbiddenTaskList = DagHelper.getForbiddenTaskNodeMaps(processInstance.getProcessInstanceJson());
+        List<TaskNode> taskNodeList = processService.getTaskNodeListByDefinitionId(processInstance.getProcessDefinitionId());
+        forbiddenTaskList.clear();
+        taskNodeList.stream().forEach(taskNode -> {
+            if (taskNode.isForbidden()) {
+                forbiddenTaskList.put(taskNode.getName(), taskNode);
+            }
+        });
         // generate process to get DAG info
         List<String> recoveryNameList = getRecoveryNodeNameList();
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
-        ProcessDag processDag = generateFlowDag(processInstance.getProcessInstanceJson(),
+        ProcessDag processDag = generateFlowDag(taskNodeList,
                 startNodeNameList, recoveryNameList, processInstance.getTaskDependType());
         if (processDag == null) {
             logger.error("processDag is null");
@@ -1229,17 +1234,17 @@ public class MasterExecThread implements Runnable {
     /**
      * generate flow dag
      *
-     * @param processDefinitionJson process definition json
+     * @param totalTaskNodeList     total task node list
      * @param startNodeNameList     start node name list
      * @param recoveryNodeNameList  recovery node name list
      * @param depNodeType           depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */
-    public ProcessDag generateFlowDag(String processDefinitionJson,
+    public ProcessDag generateFlowDag(List<TaskNode> totalTaskNodeList,
                                       List<String> startNodeNameList,
                                       List<String> recoveryNodeNameList,
                                       TaskDependType depNodeType) throws Exception {
-        return DagHelper.generateFlowDag(processDefinitionJson, startNodeNameList, recoveryNodeNameList, depNodeType);
+        return DagHelper.generateFlowDag(totalTaskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
     }
 }

@@ -56,8 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
  * task definition service impl
  */
 @Service
-public class TaskDefinitionServiceImpl extends BaseService implements
-        TaskDefinitionService {
+public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDefinitionServiceImpl.class);
 

@@ -427,9 +427,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
         }
-        // get the processdefinitionjson before saving,and then save the name and taskid
-        String oldJson = processDefinition.getProcessDefinitionJson();
-        processDefinitionJson = processService.changeJson(processData, oldJson);
         ProcessData newProcessData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
         int saveResult = processService.saveProcessDefinition(loginUser, project, name, desc,
                 locations, connects, newProcessData, processDefinition);
@@ -1452,6 +1449,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
             return result;
         } else {
+            ProcessData processData = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson(), ProcessData.class);
+            List<TaskNode> taskNodeList = processData.getTasks();
+            taskNodeList.stream().forEach(taskNode -> {
+                taskNode.setCode(0L);
+            });
             return createProcessDefinition(
                     loginUser,
                     targetProject.getName(),
