@@ -63,16 +63,13 @@ public class PeerTaskInstancePriorityQueueTest {
     public void testPoll() throws Exception {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
         int peekBeforeLength = queue.size();
-        System.out.println(System.currentTimeMillis());
         queue.poll(1000, TimeUnit.MILLISECONDS);
         queue.poll(1000, TimeUnit.MILLISECONDS);
+        Assert.assertTrue(queue.size() == 0);
         System.out.println(System.currentTimeMillis());
-        Assert.assertTrue(queue.size()== 0);
         queue.poll(1000, TimeUnit.MILLISECONDS);
         System.out.println(System.currentTimeMillis());
-
     }
-
 
     /**
      * get queue
