@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class PluginManagerTest extends AbstractDolphinPluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginManagerTest.class);
