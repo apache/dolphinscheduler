@@ -59,8 +59,8 @@ import com.google.common.collect.ImmutableList;
  */
 public class EmailAlertPluginTest {
 
-    AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-    PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     @Test
     public void testRunSend() {

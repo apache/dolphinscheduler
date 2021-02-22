@@ -857,8 +857,7 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/common/plugin/FilePluginManagerTest</include>
-                        <include>**/common/plugin/PluginClassLoaderTest</include>
+                        <include>**/common/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
