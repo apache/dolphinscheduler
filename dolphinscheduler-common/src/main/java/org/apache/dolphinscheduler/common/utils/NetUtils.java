@@ -72,6 +72,17 @@ public class NetUtils {
         return getAddr(getHost(), port);
     }
 
+    /**
+     * get host
+     * @return host
+     */
+    public static String getHost(InetAddress inetAddress) {
+        if (inetAddress != null) {
+            return Constants.KUBERNETES_MODE ? inetAddress.getHostName() : inetAddress.getHostAddress();
+        }
+        return null;
+    }
+
     public static String getHost() {
         if (HOST_ADDRESS != null) {
             return HOST_ADDRESS;
@@ -79,7 +90,7 @@ public class NetUtils {
 
         InetAddress address = getLocalAddress();
         if (address != null) {
-            HOST_ADDRESS = Constants.KUBERNETES_MODE ? address.getHostName() : address.getHostAddress();
+            HOST_ADDRESS = getHost(address);
             return HOST_ADDRESS;
         }
         return Constants.KUBERNETES_MODE ? "localhost" : "127.0.0.1";

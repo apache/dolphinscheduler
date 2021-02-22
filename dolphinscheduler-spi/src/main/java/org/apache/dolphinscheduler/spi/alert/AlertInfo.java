@@ -27,7 +27,7 @@ public class AlertInfo {
     /**
      * all params this plugin need is in alertProps
      */
-    private Map<String,String> alertParams;
+    private Map<String, String> alertParams;
 
     /**
      * the alert content
