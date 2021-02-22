@@ -1,10 +1,7 @@
 package org.apache.dolphinscheduler.service.queue;
 
-import static org.junit.Assert.*;
 
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +13,7 @@ public class TaskPriorityQueueImplTest {
     @Test
     public void put() throws Exception {
         TaskPriorityQueue queue = getPriorityQueue();
-        Assert.assertEquals(2,queue.size());
+        Assert.assertEquals(2, queue.size());
     }
 
     @Test
@@ -41,7 +38,7 @@ public class TaskPriorityQueueImplTest {
 
     @Test
     public void size() throws Exception {
-       Assert.assertTrue( getPriorityQueue().size() == 2);
+        Assert.assertTrue(getPriorityQueue().size() == 2);
     }
 
 
@@ -63,6 +60,7 @@ public class TaskPriorityQueueImplTest {
 
     /**
      * create task priority
+     *
      * @param priority
      * @param processInstanceId
      * @return
