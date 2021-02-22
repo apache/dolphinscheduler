@@ -130,12 +130,3 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $port := default "2181" (.Values.zookeeper.service.port | toString) -}}
 {{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
-
-{{/*
-Create a default dolphinscheduler worker base dir.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "dolphinscheduler.data.basedir.path" -}}
-{{- $name := default "/tmp/dolphinscheduler" .Values.common.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH -}}
-{{- printf "%s" $name | trunc 63 | trimSuffix "/" -}}
-{{- end -}}
