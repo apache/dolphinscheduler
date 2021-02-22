@@ -95,7 +95,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      * @param taskExecutionContext task
      */
     private void setTaskCache(TaskExecutionContext taskExecutionContext) {
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+        TaskExecutionContext preTaskCache = new TaskExecutionContext();
+        preTaskCache.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskExecutionContextCacheManager.cacheTaskExecutionContext(preTaskCache);
     }
 
     public TaskExecuteProcessor(AlertClientService alertClientService) {
