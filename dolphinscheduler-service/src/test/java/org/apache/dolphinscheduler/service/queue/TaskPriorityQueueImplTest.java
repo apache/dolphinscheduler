@@ -1,6 +1,5 @@
 package org.apache.dolphinscheduler.service.queue;
 
-
 import org.apache.dolphinscheduler.common.enums.Priority;
 
 import java.util.concurrent.TimeUnit;
@@ -41,7 +40,6 @@ public class TaskPriorityQueueImplTest {
         Assert.assertTrue(getPriorityQueue().size() == 2);
     }
 
-
     /**
      * get queue
      *
@@ -56,7 +54,6 @@ public class TaskPriorityQueueImplTest {
         queue.put(taskInstanceMediumPriority);
         return queue;
     }
-
 
     /**
      * create task priority
