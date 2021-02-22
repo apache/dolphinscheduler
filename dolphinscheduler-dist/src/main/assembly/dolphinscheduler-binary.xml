@@ -155,7 +155,7 @@
             <directory>${basedir}/../dolphinscheduler-data-quality/target/dolphinscheduler-data-quality-${project.version}</directory>
             <includes>
                 <include>**/*.*</include>
-			</includes>
+            </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
 
