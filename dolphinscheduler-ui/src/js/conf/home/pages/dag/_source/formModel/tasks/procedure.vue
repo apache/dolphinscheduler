@@ -27,23 +27,18 @@
       </div>
     </m-list-box>
     <m-list-box>
-
       <div slot="text">
-        <x-poptip
-          placement="bottom"
-          width="300"
-          trigger="hover"
-          :content="$t('The procedure method script example')">
-          <span type="ghost" slot="reference" >{{$t('SQL Statement')}}<em class="ans-icon-code" /></span>
-        </x-poptip>
+        <el-tooltip :content="$t('The procedure method script example')" placement="top">
+          <span>{{$t('SQL Statement')}}<em class="el-icon-question" /></span>
+        </el-tooltip>
       </div>
       <div slot="content">
         <el-input
-            type="input"
-            size="small"
-            :disabled="isDetails"
-            v-model="method"
-            :placeholder="$t('Please enter the procedure method')">
+          :autosize="{minRows:5}"
+          type="textarea"
+          :disabled="isDetails"
+          v-model="method"
+          :placeholder="$t('Please enter the procedure method')">
         </el-input>
       </div>
     </m-list-box>
