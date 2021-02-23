@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
+import org.apache.dolphinscheduler.dao.datasource.MySQLDataSource;
 import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -83,9 +84,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * create data source
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source type
      * @param parameter datasource parameters
      * @return create result code
      */
@@ -126,11 +127,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source type
      * @param parameter datasource parameters
-     * @param id        data source id
+     * @param id data source id
      * @return update result code
      */
     @Override
@@ -286,8 +287,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return data source list page
      */
     @Override
@@ -315,8 +316,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     /**
      * handle datasource connection password for safety
-     *
-     * @param dataSourceList
      */
     private void handlePasswd(List<DataSource> dataSourceList) {
         for (DataSource dataSource : dataSourceList) {
@@ -340,7 +339,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * query data resource list
      *
      * @param loginUser login user
-     * @param type      data source type
+     * @param type data source type
      * @return data source list page
      */
     @Override
@@ -364,7 +363,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * verify datasource exists
      *
-     * @param name      datasource name
+     * @param name datasource name
      * @return true if data datasource not exists, otherwise return false
      */
     @Override
@@ -383,7 +382,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type      data source type
+     * @param type data source type
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
@@ -404,7 +403,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         } catch (Exception e) {
             logger.error("datasource test connection error, dbType:{}, jdbcUrl:{}, message:{}.", type, datasource.getJdbcUrl(), e.getMessage());
-            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(),e.getMessage());
+            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), e.getMessage());
         }
     }
 
@@ -428,13 +427,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * build paramters
      *
-     * @param type      data source  type
-     * @param host      data source  host
-     * @param port      data source port
-     * @param database  data source database name
-     * @param userName  user name
-     * @param password  password
-     * @param other     other parameters
+     * @param type data source  type
+     * @param host data source  host
+     * @param port data source port
+     * @param database data source database name
+     * @param userName user name
+     * @param password password
+     * @param other other parameters
      * @param principal principal
      * @return datasource parameter
      */
@@ -491,9 +490,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Map<String, String> map = JSONUtils.toMap(other);
+        if (type == DbType.MYSQL) {
+            map = MySQLDataSource.buildOtherParams(other);
+        }
+
         if (map != null) {
             StringBuilder otherSb = new StringBuilder();
-            for (Map.Entry<String, String> entry: map.entrySet()) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
                 otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
             }
             if (!Constants.DB2.equals(type.name())) {
@@ -553,7 +556,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * delete datasource
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param datasourceId data source id
      * @return delete result code
      */
@@ -587,7 +590,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return unauthed data source result code
      */
     @Override
@@ -628,7 +631,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return authorized result code
      */
     @Override
@@ -649,7 +652,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * get host and port by address
      *
-     * @param address   address
+     * @param address address
      * @param separator separator
      * @return sting array: [host,port]
      */

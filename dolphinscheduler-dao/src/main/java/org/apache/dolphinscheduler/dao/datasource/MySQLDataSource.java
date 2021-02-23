@@ -18,7 +18,14 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.collections4.MapUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,67 +34,107 @@ import org.slf4j.LoggerFactory;
  */
 public class MySQLDataSource extends BaseDataSource {
 
-  private final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
+    private final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
 
-  private final String sensitiveParam = "autoDeserialize=true";
+    private final String sensitiveParam = "autoDeserialize=true";
 
-  private final char symbol = '&';
+    private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
 
-  /**
-   * gets the JDBC url for the data source connection
-   * @return jdbc url
-   */
-  @Override
-  public String driverClassSelector() {
-    return Constants.COM_MYSQL_JDBC_DRIVER;
-  }
+    private static final String AUTO_DESERIALIZE = "autoDeserialize";
 
-  /**
-   * @return db type
-   */
-  @Override
-  public DbType dbTypeSelector() {
-    return DbType.MYSQL;
-  }
+    private static final String ALLOW_LOCAL_IN_FILE_NAME = "allowLocalInfile";
 
-  @Override
-  protected String filterOther(String other){
-    if(StringUtils.isBlank(other)){
-        return "";
+    private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
+
+
+    private static boolean checkKeyIsLegitimate(String key) {
+        return !key.contains(ALLOW_LOAD_LOCAL_IN_FILE_NAME) && !key.contains(AUTO_DESERIALIZE) && !key.contains(ALLOW_LOCAL_IN_FILE_NAME) && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
     }
-    if(other.contains(sensitiveParam)){
-      int index = other.indexOf(sensitiveParam);
-      String tmp = sensitiveParam;
-      if(index == 0 || other.charAt(index + 1) == symbol){
-        tmp = tmp + symbol;
-      } else if(other.charAt(index - 1) == symbol){
-        tmp = symbol + tmp;
-      }
-      logger.warn("sensitive param : {} in otherParams field is filtered", tmp);
-      other = other.replace(tmp, "");
-    }
-    logger.debug("other : {}", other);
-    return other;
-  }
 
-  @Override
-  public String getUser() {
-    if(user.contains(sensitiveParam)){
-      logger.warn("sensitive param : {} in username field is filtered", sensitiveParam);
-      user = user.replace(sensitiveParam, "");
-    }
-    logger.debug("username : {}", user);
-    return user;
-  }
+    private final char symbol = '&';
 
-  @Override
-  public String getPassword() {
-    // password need decode
-    password = super.getPassword();
-    if(password.contains(sensitiveParam)){
-      logger.warn("sensitive param : {} in password field is filtered", sensitiveParam);
-      password = password.replace(sensitiveParam, "");
+    /**
+     * gets the JDBC url for the data source connection
+     *
+     * @return jdbc url
+     */
+    @Override
+    public String driverClassSelector() {
+        return Constants.COM_MYSQL_JDBC_DRIVER;
     }
-    return password;
-  }
+
+    /**
+     * @return db type
+     */
+    @Override
+    public DbType dbTypeSelector() {
+        return DbType.MYSQL;
+    }
+
+
+    public static Map<String, String> buildOtherParams(String other) {
+        Map<String, String> newParamMap = new HashMap<>();
+        newParamMap.put(ALLOW_LOAD_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
+        newParamMap.put(AUTO_DESERIALIZE, Boolean.FALSE.toString());
+        newParamMap.put(ALLOW_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
+        newParamMap.put(ALLOW_URL_IN_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
+
+        if (StringUtils.isBlank(other)) {
+            return newParamMap;
+        }
+        Map<String, String> paramMap = JSONUtils.toMap(other);
+        if (MapUtils.isEmpty(paramMap)) {
+            return newParamMap;
+        }
+
+        paramMap.forEach((k, v) -> {
+            if (checkKeyIsLegitimate(k)) {
+                return;
+            }
+            newParamMap.put(k, v);
+
+        });
+        return newParamMap;
+    }
+
+    @Override
+    protected String filterOther(String other) {
+        if (StringUtils.isBlank(other)) {
+            return "";
+        }
+        if (other.contains(sensitiveParam)) {
+            int index = other.indexOf(sensitiveParam);
+            String tmp = sensitiveParam;
+            if (index == 0 || other.charAt(index + 1) == symbol) {
+                tmp = tmp + symbol;
+            } else if (other.charAt(index - 1) == symbol) {
+                tmp = symbol + tmp;
+            }
+            logger.warn("sensitive param : {} in otherParams field is filtered", tmp);
+            other = other.replace(tmp, "");
+        }
+        logger.debug("other : {}", other);
+        return other;
+    }
+
+    @Override
+    public String getUser() {
+        if (user.contains(sensitiveParam)) {
+            logger.warn("sensitive param : {} in username field is filtered", sensitiveParam);
+            user = user.replace(sensitiveParam, "");
+        }
+        logger.debug("username : {}", user);
+        return user;
+    }
+
+    @Override
+    public String getPassword() {
+        // password need decode
+        password = super.getPassword();
+        if (password.contains(sensitiveParam)) {
+            logger.warn("sensitive param : {} in password field is filtered", sensitiveParam);
+            password = password.replace(sensitiveParam, "");
+        }
+        return password;
+    }
 }
