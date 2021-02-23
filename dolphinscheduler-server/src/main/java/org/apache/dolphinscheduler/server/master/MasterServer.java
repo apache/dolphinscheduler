@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
-import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
@@ -73,12 +72,6 @@ public class MasterServer {
      * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
-
-    /**
-     * master registry
-     */
-    @Autowired
-    private MasterRegistry masterRegistry;
 
     /**
      * zk master client
@@ -176,7 +169,6 @@ public class MasterServer {
             //
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-            this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
             //close quartz
             try{

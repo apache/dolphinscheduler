@@ -108,6 +108,7 @@ public class ZKMasterClient extends AbstractZKClient {
     @Override
     public void close() {
         super.close();
+        masterRegistry.unRegistry();
     }
 
     /**
