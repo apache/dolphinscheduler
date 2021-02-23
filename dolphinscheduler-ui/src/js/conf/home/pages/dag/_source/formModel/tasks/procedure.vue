@@ -38,13 +38,13 @@
         </x-poptip>
       </div>
       <div slot="content">
-      <el-input
-          type="input"
-          size="small"
-          :disabled="isDetails"
-          v-model="method"
-          :placeholder="$t('Please enter the procedure method')">
-      </el-input>
+        <el-input
+            type="input"
+            size="small"
+            :disabled="isDetails"
+            v-model="method"
+            :placeholder="$t('Please enter the procedure method')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
