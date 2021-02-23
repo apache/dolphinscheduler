@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
@@ -79,7 +80,8 @@ import io.netty.channel.Channel;
     TaskResponseProcessor.class,
     TaskExecuteProcessor.class,
     CuratorZookeeperClient.class,
-    TaskExecutionContextCacheManagerImpl.class})
+    TaskExecutionContextCacheManagerImpl.class,
+    WorkerManagerThread.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
