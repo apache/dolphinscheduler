@@ -26,7 +26,7 @@ DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
 waitDatabase() {
     echo "test ${DATABASE_TYPE} service"
     while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
-        counter=$((counter+1))
+        local counter=$((counter+1))
         if [ $counter == 30 ]; then
             echo "Error: Couldn't connect to ${DATABASE_TYPE}."
             exit 1
@@ -57,12 +57,41 @@ initDatabase() {
     ${DOLPHINSCHEDULER_SCRIPT}/create-dolphinscheduler.sh
 }
 
+# check ds version
+checkDSVersion() {
+    if [ ${DATABASE_TYPE} = "mysql" ]; then
+        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "SELECT * FROM public.t_ds_version" 2>/dev/null)
+    else
+        v=$(PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "SELECT * FROM public.t_ds_version" 2>/dev/null)
+    fi
+    if [ -n "$v" ]; then
+        echo "ds version: $v"
+        return 0
+    else
+        return 1
+    fi
+}
+
+# check init database
+checkInitDatabase() {
+    echo "check init database"
+    while ! checkDSVersion; do
+        local counter=$((counter+1))
+        if [ $counter == 30 ]; then
+            echo "Error: Couldn't check init database."
+            exit 1
+        fi
+        echo "Trying to check init database. Attempt $counter."
+        sleep 5
+    done
+}
+
 # wait zk
 waitZK() {
     echo "connect remote zookeeper"
     echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
         while ! nc -z ${line%:*} ${line#*:}; do
-            counter=$((counter+1))
+            local counter=$((counter+1))
             if [ $counter == 30 ]; then
                 echo "Error: Couldn't connect to zookeeper."
                 exit 1
@@ -133,7 +162,7 @@ case "$1" in
         initApiServer
         initAlertServer
         initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api.log
     ;;
     (master-server)
         waitZK
@@ -153,10 +182,11 @@ case "$1" in
         waitDatabase
         initDatabase
         initApiServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
+        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api.log
     ;;
     (alert-server)
         waitDatabase
+        checkInitDatabase
         initAlertServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
     ;;
