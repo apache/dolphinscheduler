@@ -106,17 +106,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             statusArray = new int[]{stateType.ordinal()};
         }
 
-        DateParameterExt startDateParameter = checkAndParseDateParameter(result, startDate);
-        if (!startDateParameter.getStatus()) {
-            return result;
+        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
+        if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return checkAndParseDateResult;
         }
-        Date start = startDateParameter.getDate();
-
-        DateParameterExt endDateParameter = checkAndParseDateParameter(result, endDate);
-        if (!endDateParameter.getStatus()) {
-            return result;
-        }
-        Date end = endDateParameter.getDate();
+        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
+        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
 
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);

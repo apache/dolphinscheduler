@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -145,18 +146,38 @@ public class BaseServiceImpl implements BaseService {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
 
+    /**
+     * check and parse date parameters
+     *
+     * @param startDateStr start date string
+     * @param endDateStr end date string
+     * @return map<status,startDate,endDate>
+     */
     @Override
-    public DateParameterExt checkAndParseDateParameter(Map<String, Object> result, String dateStr) {
-        boolean check = true;
-        Date date = null;
-        if (StringUtils.isNotEmpty(dateStr)) {
-            date = DateUtils.getScheduleDate(dateStr);
-            if (Objects.isNull(date)) {
-                check = false;
+    public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {
+        Map<String, Object> result = new HashMap<>();
+        Date start = null;
+        if (StringUtils.isNotEmpty(startDateStr)) {
+            start = DateUtils.getScheduleDate(startDateStr);
+            if (Objects.isNull(start)) {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
             }
         }
-        return new DateParameterExt(date, check);
+        result.put(Constants.START_TIME, start);
+
+        Date end = null;
+        if (StringUtils.isNotEmpty(endDateStr)) {
+            end = DateUtils.getScheduleDate(endDateStr);
+            if (Objects.isNull(end)) {
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
+            }
+        }
+        result.put(Constants.END_TIME, end);
+
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
 }

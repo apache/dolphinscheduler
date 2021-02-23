@@ -92,34 +92,11 @@ public interface BaseService {
     boolean hasPerm(User operateUser, int createUserId);
 
     /**
-     * check and parse data parameter
+     * check and parse date parameters
      *
-     * @param result result
-     * @param dateStr data string
-     * @return data check and parse result
+     * @param startDateStr start date string
+     * @param endDateStr end date string
+     * @return map<status,startDate,endDate>
      */
-    DateParameterExt checkAndParseDateParameter(Map<String, Object> result, String dateStr);
-
-    /**
-     * data parameter extend
-     */
-    class DateParameterExt {
-        /** parse date */
-        private Date date;
-        /** date check  status */
-        private boolean status;
-
-        public DateParameterExt(Date date, boolean status) {
-            this.date = date;
-            this.status = status;
-        }
-
-        public Date getDate() {
-            return date;
-        }
-
-        public boolean getStatus() {
-            return status;
-        }
-    }
+    Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
 }
