@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
 
 /**
