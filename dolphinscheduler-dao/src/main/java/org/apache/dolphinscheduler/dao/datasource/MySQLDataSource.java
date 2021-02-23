@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -46,7 +47,6 @@ public class MySQLDataSource extends BaseDataSource {
 
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
-
     private static boolean checkKeyIsLegitimate(String key) {
         return !key.contains(ALLOW_LOAD_LOCAL_IN_FILE_NAME) && !key.contains(AUTO_DESERIALIZE) && !key.contains(ALLOW_LOCAL_IN_FILE_NAME) && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
     }
@@ -71,7 +71,6 @@ public class MySQLDataSource extends BaseDataSource {
         return DbType.MYSQL;
     }
 
-
     public static Map<String, String> buildOtherParams(String other) {
         Map<String, String> newParamMap = new HashMap<>();
         newParamMap.put(ALLOW_LOAD_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
@@ -95,26 +94,6 @@ public class MySQLDataSource extends BaseDataSource {
 
         });
         return newParamMap;
-    }
-
-    @Override
-    protected String filterOther(String other) {
-        if (StringUtils.isBlank(other)) {
-            return "";
-        }
-        if (other.contains(sensitiveParam)) {
-            int index = other.indexOf(sensitiveParam);
-            String tmp = sensitiveParam;
-            if (index == 0 || other.charAt(index + 1) == symbol) {
-                tmp = tmp + symbol;
-            } else if (other.charAt(index - 1) == symbol) {
-                tmp = symbol + tmp;
-            }
-            logger.warn("sensitive param : {} in otherParams field is filtered", tmp);
-            other = other.replace(tmp, "");
-        }
-        logger.debug("other : {}", other);
-        return other;
     }
 
     @Override
