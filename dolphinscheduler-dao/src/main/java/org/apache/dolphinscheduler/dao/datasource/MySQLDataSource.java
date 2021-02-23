@@ -87,7 +87,7 @@ public class MySQLDataSource extends BaseDataSource {
         }
 
         paramMap.forEach((k, v) -> {
-            if (checkKeyIsLegitimate(k)) {
+            if (!checkKeyIsLegitimate(k)) {
                 return;
             }
             newParamMap.put(k, v);
