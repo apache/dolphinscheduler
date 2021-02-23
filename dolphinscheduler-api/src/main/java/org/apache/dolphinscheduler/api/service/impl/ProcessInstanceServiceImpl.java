@@ -237,7 +237,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        if (checkResult.get(Constants.STATUS) != Status.SUCCESS) {
+        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
             return checkAndParseDateResult;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
