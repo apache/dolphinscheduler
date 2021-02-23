@@ -27,3 +27,4 @@ zookeeper.dolphinscheduler.root=${ZOOKEEPER_ROOT}
 #zookeeper.retry.base.sleep=100
 #zookeeper.retry.max.sleep=30000
 #zookeeper.retry.maxtime=10
+#zookeeper.max.wait.time=10000
