@@ -17,129 +17,135 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <table class="fixed">
-        <tr>
-          <th scope="col" style="min-width: 50px">
-            <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
-          </th>
-          <th scope="col" style="min-width: 40px">
-            <span>{{$t('#')}}</span>
-          </th>
-          <th scope="col" style="min-width: 200px;max-width: 300px;">
-            <span>{{$t('Process Name')}}</span>
-          </th>
-          <th scope="col" style="min-width: 50px">
-            <span>{{$t('State')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('Create Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('Update Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 150px">
-            <span>{{$t('Description')}}</span>
-          </th>
-          <th scope="col" style="min-width: 70px">
-            <span>{{$t('Modify User')}}</span>
-          </th>
-          <th scope="col" style="min-width: 70px">
-            <div style="width: 80px">
-              <span>{{$t('Timing state')}}</span>
-            </div>
-          </th>
-          <th scope="col" style="min-width: 300px">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td width="50"><x-checkbox v-model="item.isCheck" :disabled="item.releaseState === 'ONLINE'" @on-change="_arrDelChange"></x-checkbox></td>
-          <td width="50">
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
-            <span class="ellipsis">
-              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links" :title="item.name">
-                {{item.name}}
-              </router-link>
-            </span>
-          </td>
-          <td><span>{{_rtPublishStatus(item.releaseState)}}</span></td>
-          <td>
-            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.modifyBy">{{item.modifyBy}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
-            <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
-            <span v-if="!item.scheduleReleaseState">-</span>
-          </td>
-          <td style="z-index: inherit;">
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-edit"><!--{{$t('编辑')}}--></x-button>
-            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-play"><!--{{$t('启动')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="ans-icon-timer"><!--{{$t('定时')}}--></x-button>
-            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="ans-icon-upward"><!--{{$t('下线')}}--></x-button>
-            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="ans-icon-downward"><!--{{$t('上线')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Copy Workflow')" @click="_copyProcess(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-copy"><!--{{$t('复制')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-datetime"><!--{{$t('定时管理')}}--></x-button>
-            <x-poptip
-              :ref="'poptip-delete-' + $index"
-              placement="bottom-end"
-              width="90">
-              <p>{{$t('Delete?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+      <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
+        <el-table-column type="selection" width="50" :selectable="selectable"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column :label="$t('Process Name')" min-width="200">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>{{ scope.row.name }}</p>
+              <div slot="reference" class="name-wrapper">
+                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links">
+                  <span class="ellipsis">{{scope.row.name}}</span>
+                </router-link>
               </div>
-              <template slot="reference">
-                <x-button
-                  icon="ans-icon-trash"
-                  type="error"
-                  shape="circle"
-                  size="xsmall"
-                  :disabled="item.releaseState === 'ONLINE'"
-                  data-toggle="tooltip"
-                  :title="$t('delete')">
-                </x-button>
-              </template>
-            </x-poptip>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="ans-icon-node"><!--{{$t('树形图')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="ans-icon-download"><!--{{$t('导出')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Version Info')" @click="_version(item)" :disabled="item.releaseState === 'ONLINE'" icon="ans-icon-dependence"><!--{{$t('版本信息')}}--></x-button>
-
-          </td>
-        </tr>
-      </table>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('State')">
+          <template slot-scope="scope">
+            {{_rtPublishStatus(scope.row.releaseState)}}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Create Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Update Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Description')">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="modifyBy" :label="$t('Modify User')"></el-table-column>
+        <el-table-column :label="$t('Timing state')">
+          <template slot-scope="scope">
+            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
+            <span v-if="!scope.row.scheduleReleaseState">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="335" fixed="right">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.releaseState === 'ONLINE'" @click="_edit(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Start')" placement="top" :enterable="false">
+              <span><el-button type="success" size="mini" :disabled="scope.row.releaseState !== 'ONLINE'"  icon="el-icon-video-play" @click="_start(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Timing')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('online')" placement="top" :enterable="false">
+              <span><el-button type="warning" size="mini" v-if="scope.row.releaseState === 'OFFLINE'"  icon="el-icon-upload2" @click="_poponline(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('offline')" placement="top" :enterable="false">
+              <span><el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Copy Workflow')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" :disabled="scope.row.releaseState === 'ONLINE'"  icon="el-icon-document-copy" @click="_copyProcess(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Cron Manage')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.releaseState === 'ONLINE'" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+            <el-tooltip :content="$t('TreeView')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-s-data" @click="_treeView(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Export')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-s-unfold" @click="_export(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Version Info')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button></span>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
-    <x-poptip
-            ref="poptipDeleteAll"
-            placement="bottom-start"
-            width="90">
-      <p>{{$t('Delete?')}}</p>
-      <div style="text-align: right; margin: 0;padding-top: 4px;">
-        <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
-        <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
-      </div>
-      <template slot="reference">
-        <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
-      </template>
-    </x-poptip>
-    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
-    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</x-button>
-    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</x-button>
-
+    <el-tooltip :content="$t('delete')" placement="top">
+      <el-popconfirm
+        :confirmButtonText="$t('Confirm')"
+        :cancelButtonText="$t('Cancel')"
+        :title="$t('Delete?')"
+        @onConfirm="_delete({},-1)"
+      >
+        <el-button style="position: absolute; bottom: -48px; left: 19px;"  type="primary" size="mini" :disabled="!strSelectIds" slot="reference">{{$t('Delete')}}</el-button>
+      </el-popconfirm>
+    </el-tooltip>
+    <el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</el-button>
+    <span><el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</el-button></span>
+    <el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</el-button>
+    <el-drawer
+      :visible.sync="drawer"
+      size=""
+      :with-header="false">
+      <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
+    </el-drawer>
+    <el-dialog
+      :title="$t('Please set the parameters before starting')"
+      v-if="startDialog"
+      :visible.sync="startDialog"
+      width="auto">
+      <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+    </el-dialog>
+    <el-dialog
+      :title="$t('Set parameters before timing')"
+      :visible.sync="timingDialog"
+      width="auto">
+      <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
+    </el-dialog>
+    <el-dialog
+      :title="$t('Info')"
+      :visible.sync="relatedItemsDialog"
+      width="auto">
+      <m-related-items :tmp="tmp" @onBatchCopy="onBatchCopy" @onBatchMove="onBatchMove" @closeRelatedItems="closeRelatedItems"></m-related-items>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -157,7 +163,24 @@
       return {
         list: [],
         strSelectIds: '',
-        checkAll: false
+        checkAll: false,
+        drawer: false,
+        versionData: {
+          processDefinition: {},
+          processDefinitionVersions: [],
+          total: null,
+          pageNo: null,
+          pageSize: null
+        },
+        startDialog: false,
+        startData: {},
+        timingDialog: false,
+        timingData: {
+          item: {},
+          type: ''
+        },
+        relatedItemsDialog: false,
+        tmp: false
       }
     },
     props: {
@@ -166,8 +189,16 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
+
+      selectable (row, index) {
+        if (row.releaseState === 'ONLINE') {
+          return false
+        } else {
+          return true
+        }
+      },
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
@@ -180,98 +211,39 @@
       _start (item) {
         this.getWorkerGroupsAll()
         this.getStartCheck({ processDefinitionId: item.id }).then(res => {
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mStart, {
-                on: {
-                  onUpdate () {
-                    self._onUpdate()
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: item
-                }
-              })
-            }
-          })
+          this.startData = item
+          this.startDialog = true
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
-      /**
-       * get emial
-       */
-      _getReceiver (id) {
-        return new Promise((resolve, reject) => {
-          this.getReceiver({ processDefinitionId: id }).then(res => {
-            resolve({
-              receivers: res.receivers && res.receivers.split(',') || [],
-              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
-            })
-          })
-        })
+      onUpdateStart () {
+        this._onUpdate()
+        this.startDialog = false
+      },
+      closeStart () {
+        this.startDialog = false
       },
       /**
        * timing
        */
       _timing (item) {
-        let self = this
-        this._getReceiver(item.id).then(res => {
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTiming, {
-                on: {
-                  onUpdate () {
-                    self._onUpdate()
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: item,
-                  receiversD: res.receivers,
-                  receiversCcD: res.receiversCc,
-                  type: 'timing'
-                }
-              })
-            }
-          })
-        })
+        this.timingData.item = item
+        this.timingData.type = 'timing'
+        this.timingDialog = true
+      },
+      onUpdateTiming () {
+        this._onUpdate()
+        this.timingDialog = false
+      },
+      closeTiming () {
+        this.timingDialog = false
       },
       /**
        * Timing manage
        */
       _timingManage (item) {
         this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
-      },
-      /**
-       * Close the delete layer
-       */
-      _closeDelete (i) {
-        // close batch
-        if (i < 0) {
-          this.$refs['poptipDeleteAll'].doClose()
-          return
-        }
-        // close one
-        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
        * delete
@@ -286,11 +258,9 @@
         this.deleteDefinition({
           processDefinitionId: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this._onUpdate()
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
@@ -306,7 +276,7 @@
       _downline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 0
+          releaseState: 'OFFLINE'
         })
       },
       /**
@@ -315,7 +285,7 @@
       _poponline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 1
+          releaseState: 'ONLINE'
         })
       },
       /**
@@ -328,7 +298,7 @@
         }).then(res => {
           this.strSelectIds = ''
           this.$message.success(res.msg)
-          $('body').find('.tooltip.fade.top.in').remove()
+          // $('body').find('.tooltip.fade.top.in').remove()
           this._onUpdate()
         }).catch(e => {
           this.$message.error(e.msg || '')
@@ -360,9 +330,70 @@
           this.$message.error(e.msg || '')
         })
       },
-
+      /**
+        * switch version in process definition version list
+        *
+        * @param version the version user want to change
+        * @param processDefinitionId the process definition id
+        * @param fromThis fromThis
+      */
+      mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.switchProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success($t('Switch Version Successfully'))
+          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
+        * Paging event of process definition versions
+        *
+        * @param pageNo page number
+        * @param pageSize page size
+        * @param processDefinitionId the process definition id of page version
+        * @param fromThis fromThis
+      */
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+        this.getProcessDefinitionVersionsPage({
+          pageNo: pageNo,
+          pageSize: pageSize,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.versionData.processDefinitionVersions = res.data.lists
+          this.versionData.total = res.data.totalCount
+          this.versionData.pageSize = res.data.pageSize
+          this.versionData.pageNo = res.data.currentPage
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
+        * delete one version of process definition
+        *
+        * @param version the version need to delete
+        * @param processDefinitionId the process definition id user want to delete
+        * @param fromThis fromThis
+      */
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.deleteProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success(res.msg || '')
+          this.mVersionGetProcessDefinitionVersionsPage({
+            pageNo: 1,
+            pageSize: 10,
+            processDefinitionId: processDefinitionId,
+            fromThis: fromThis
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
       _version (item) {
-        let self = this
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
@@ -372,118 +403,26 @@
           let total = res.data.totalCount
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
-          if (this.versionsModel) {
-            this.versionsModel.remove()
-          }
-          this.versionsModel = this.$drawer({
-            direction: 'right',
-            closable: true,
-            showMask: true,
-            escClose: true,
-            render (h) {
-              return h(mVersions, {
-                on: {
-                  /**
-                   * switch version in process definition version list
-                   *
-                   * @param version the version user want to change
-                   * @param processDefinitionId the process definition id
-                   * @param fromThis fromThis
-                   */
-                  mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-                    self.switchProcessDefinitionVersion({
-                      version: version,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      self.$message.success($t('Switch Version Successfully'))
-                      setTimeout(() => {
-                        fromThis.$destroy()
-                        self.versionsModel.remove()
-                      }, 0)
-                      self.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
 
-                  /**
-                   * Paging event of process definition versions
-                   *
-                   * @param pageNo page number
-                   * @param pageSize page size
-                   * @param processDefinitionId the process definition id of page version
-                   * @param fromThis fromThis
-                   */
-                  mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
-                    self.getProcessDefinitionVersionsPage({
-                      pageNo: pageNo,
-                      pageSize: pageSize,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      fromThis.processDefinitionVersions = res.data.lists
-                      fromThis.total = res.data.totalCount
-                      fromThis.pageSize = res.data.pageSize
-                      fromThis.pageNo = res.data.currentPage
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * delete one version of process definition
-                   *
-                   * @param version the version need to delete
-                   * @param processDefinitionId the process definition id user want to delete
-                   * @param fromThis fromThis
-                   */
-                  mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-                    self.deleteProcessDefinitionVersion({
-                      version: version,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      self.$message.success(res.msg || '')
-                      fromThis.$emit('mVersionGetProcessDefinitionVersionsPage', {
-                        pageNo: 1,
-                        pageSize: 10,
-                        processDefinitionId: processDefinitionId,
-                        fromThis: fromThis
-                      })
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * remove this drawer
-                   *
-                   * @param fromThis
-                   */
-                  close ({ fromThis }) {
-                    setTimeout(() => {
-                      fromThis.$destroy()
-                      self.versionsModel.remove()
-                    }, 0)
-                  }
-                },
-                props: {
-                  processDefinition: item,
-                  processDefinitionVersions: processDefinitionVersions,
-                  total: total,
-                  pageNo: pageNo,
-                  pageSize: pageSize
-                }
-              })
-            }
-          })
+          this.versionData.processDefinition = item
+          this.versionData.processDefinitionVersions = processDefinitionVersions
+          this.versionData.total = total
+          this.versionData.pageNo = pageNo
+          this.versionData.pageSize = pageSize
+          this.drawer = true
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
 
+      closeVersion () {
+        this.drawer = false
+      },
+
       _batchExport () {
         this.exportDefinition({
           processDefinitionIds: this.strSelectIds,
-          fileName: "process_"+new Date().getTime()
+          fileName: 'process_' + new Date().getTime()
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
@@ -498,59 +437,26 @@
        * Batch Copy
        */
       _batchCopy () {
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mRelatedItems, {
-                on: {
-                  onBatchCopy (item) {
-                    self._copyProcess({id: self.strSelectIds,projectId: item})
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  tmp: false
-                }
-              })
-            }
-          })
+        this.relatedItemsDialog = true
+        this.tmp = false
+      },
+      onBatchCopy (item) {
+        this._copyProcess({ id: this.strSelectIds, projectId: item })
+        this.relatedItemsDialog = false
+      },
+      closeRelatedItems () {
+        this.relatedItemsDialog = false
       },
       /**
        * _batchMove
        */
-      _batchMove() {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mRelatedItems, {
-              on: {
-                onBatchMove (item) {
-                  self._moveProcess({id: self.strSelectIds,projectId: item})
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                tmp: true
-              }
-            })
-          }
-        })
+      _batchMove () {
+        this.tmp = true
+        this.relatedItemsDialog = true
+      },
+      onBatchMove (item) {
+        this._moveProcess({ id: this.strSelectIds, projectId: item })
+        this.relatedItemsDialog = false
       },
       /**
        * Edit state
@@ -568,32 +474,17 @@
         this.$emit('on-update')
       },
       /**
-       * click the select-all checkbox
-       */
-      _topCheckBoxClick (is) {
-        _.map(this.list , v => v.isCheck = v.releaseState === 'ONLINE' ? false : is)
-        this._arrDelChange()
-      },
-      /**
        * the array that to be delete
        */
       _arrDelChange (v) {
         let arr = []
-        this.list.forEach((item)=>{
-          if (item.isCheck) {
-            arr.push(item.id)
-          }
-        })
+        arr = _.map(v, 'id')
         this.strSelectIds = _.join(arr, ',')
-        if (v === false) {
-          this.checkAll = false
-        }
       },
       /**
        * batch delete
        */
       _batchDelete () {
-        this.$refs['poptipDeleteAll'].doClose()
         this.batchDeleteDefinition({
           processDefinitionIds: this.strSelectIds
         }).then(res => {
@@ -628,6 +519,6 @@
     },
     mounted () {
     },
-    components: { mVersions }
+    components: { mVersions, mStart, mTiming, mRelatedItems }
   }
 </script>

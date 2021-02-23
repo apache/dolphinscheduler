@@ -22,14 +22,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_E
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -53,17 +53,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
 
-
 /**
  * tenant controller
  */
-@Api(tags = "TENANT_TAG", position = 1)
+@Api(tags = "TENANT_TAG")
 @RestController
 @RequestMapping("/tenant")
 public class TenantController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(TenantController.class);
-
 
     @Autowired
     private TenantService tenantService;
@@ -91,14 +89,12 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
-        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        String tenantCodeReplace = StringUtils.replaceNRTtoUnderline(tenantCode);
-        String descReplace = StringUtils.replaceNRTtoUnderline(description);
-        logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}", userReplace, tenantCodeReplace, queueId, descReplace);
+        logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}",
+                RegexUtils.escapeNRT(loginUser.getUserName()), RegexUtils.escapeNRT(tenantCode),
+                queueId, RegexUtils.escapeNRT(description));
         Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, description);
         return returnDataList(result);
     }
-
 
     /**
      * query tenant list paging
@@ -119,8 +115,8 @@ public class TenantController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
     public Result queryTenantlistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam(value = "searchVal", required = false) String searchVal,
+                                        @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam("pageSize") Integer pageSize) {
         logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(), pageNo, searchVal, pageSize);
@@ -177,9 +173,9 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
-        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        String tenantCodeReplace = StringUtils.replaceNRTtoUnderline(tenantCode);
-        String descReplace = StringUtils.replaceNRTtoUnderline(description);
+        String userReplace = RegexUtils.escapeNRT(loginUser.getUserName());
+        String tenantCodeReplace = RegexUtils.escapeNRT(tenantCode);
+        String descReplace = RegexUtils.escapeNRT(description);
         logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}", userReplace, tenantCodeReplace, queueId, descReplace);
         Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
         return returnDataList(result);
@@ -220,7 +216,7 @@ public class TenantController extends BaseController {
     })
     @GetMapping(value = "/verify-tenant-code")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_TENANT_CODE_ERROR)
+    @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
     public Result verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "tenantCode") String tenantCode) {
         logger.info("login user {}, verfiy tenant code: {}",

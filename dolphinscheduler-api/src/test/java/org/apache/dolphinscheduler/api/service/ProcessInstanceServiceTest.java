@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProcessInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -64,11 +65,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * process instance service test
+ */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessInstanceServiceTest {
 
     @InjectMocks
-    ProcessInstanceService processInstanceService;
+    ProcessInstanceServiceImpl processInstanceService;
 
     @Mock
     ProjectMapper projectMapper;
@@ -90,9 +94,6 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     ProcessDefinitionVersionService processDefinitionVersionService;
-
-    @Mock
-    ExecutorService execService;
 
     @Mock
     TaskInstanceMapper taskInstanceMapper;
@@ -211,8 +212,6 @@ public class ProcessInstanceServiceTest {
 
         //project auth success
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setReceivers("xxx@qq.com");
-        processInstance.setReceiversCc("xxx@qq.com");
         processInstance.setProcessDefinitionId(46);
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);

@@ -16,45 +16,41 @@
  */
 <template>
   <div class="dep-list-model">
-    <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
-      <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.projectId" @on-change="_onChangeProjectId">
-        <x-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.definitionId" @on-change="_onChangeDefinitionId">
-        <x-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.depTasks">
-        <x-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item">
-        </x-option>
-      </x-select>
-      <x-select style="width: 150px;" v-model="el.cycle" :disabled="isDetails" @on-change="_onChangeCycle">
-        <x-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select style="width: 116px;" v-model="el.dateValue" :disabled="isDetails">
-        <x-option v-for="item in el.dateValueList || []" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
+    <div v-for="(el,$index) in dependItemList" :key='$index' @click="itemIndex = $index">
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectId" @change="_onChangeProjectId" size="small">
+        <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      </el-select>
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionId" @change="_onChangeDefinitionId" size="small">
+        <el-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      </el-select>
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.depTasks" size="small">
+        <el-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item"></el-option>
+      </el-select>
+      <el-select v-model="el.cycle" :disabled="isDetails" @change="_onChangeCycle" size="small">
+        <el-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      </el-select>
+      <el-select v-model="el.dateValue" :disabled="isDetails" size="small">
+        <el-option v-for="item in el.dateValueList || []" :key="item.value" :value="item.value" :label="item.label"></el-option>
+      </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
-          <em class="iconfont ans-icon-success-solid" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
-          <em class="iconfont ans-icon-clock" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
-          <em class="iconfont ans-icon-fail-solid" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
+          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
+          <em class="iconfont el-icon-timer" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
+          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
         </span>
       </template>
       <span class="operation">
         <a href="javascript:" class="delete" @click="!isDetails && _remove($index)">
-          <em class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" ></em>
         </a>
         <a href="javascript:" class="add" @click="!isDetails && _add()" v-if="$index === (dependItemList.length - 1)">
-          <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')"></em>
+          <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
   </div>
 </template>
+
 <script>
   import _ from 'lodash'
   import { cycleList, dateValueList } from './commcon'
@@ -74,7 +70,7 @@
     props: {
       dependItemList: Array,
       index: Number,
-      dependTaskList:Array
+      dependTaskList: Array
     },
     model: {
       prop: 'dependItemList',
@@ -109,7 +105,7 @@
        * remove task
        */
       _remove (i) {
-        this.dependTaskList[this.index].dependItemList.splice(i,1)
+        // this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
@@ -174,20 +170,20 @@
       /**
        * change process get dependItemList
        */
-      _onChangeProjectId ({ value }) {
+      _onChangeProjectId (value) {
         this._getProcessByProjectId(value).then(definitionList => {
-          /*this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item))*/
+          /* this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item)) */
           let definitionId = definitionList[0].value
           this._getDependItemList(definitionId).then(depTasksList => {
             let item = this.dependItemList[this.itemIndex]
             // init set depTasks All
             item.depTasks = 'ALL'
             // set dependItemList item data
-            this.$set(this.dependItemList, this.itemIndex, this._cpOldParams(value,definitionId, definitionList,depTasksList, item))
+            this.$set(this.dependItemList, this.itemIndex, this._cpOldParams(value, definitionId, definitionList, depTasksList, item))
           })
         })
       },
-      _onChangeDefinitionId ({ value }) {
+      _onChangeDefinitionId (value) {
         // get depItem list data
         this._getDependItemList(value).then(depTasksList => {
           let item = this.dependItemList[this.itemIndex]
@@ -197,7 +193,7 @@
           this.$set(this.dependItemList, this.itemIndex, this._rtOldParams(value, item.definitionList, depTasksList, item))
         })
       },
-      _onChangeCycle ({ value }) {
+      _onChangeCycle (value) {
         let list = _.cloneDeep(dateValueList[value])
         this.$set(this.dependItemList[this.itemIndex], 'dateValue', list[0].value)
         this.$set(this.dependItemList[this.itemIndex], 'dateValueList', list)
@@ -212,7 +208,7 @@
           depTasksList: depTasksList,
           cycle: 'day',
           dateValue: 'today',
-          dateValueList: _.cloneDeep(dateValueList['day']),
+          dateValueList: _.cloneDeep(dateValueList.day),
           state: ''
         }
       },
@@ -231,7 +227,7 @@
         }
       },
 
-      _cpOldParams (value,definitionId, definitionList,depTasksList, item) {
+      _cpOldParams (value, definitionId, definitionList, depTasksList, item) {
         return {
           projectId: value,
           definitionList: definitionList,
@@ -295,6 +291,7 @@
     .list {
       margin-bottom: 6px;
       .operation {
+        width: 80px;
         padding-left: 4px;
         a {
           i {

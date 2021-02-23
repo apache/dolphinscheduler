@@ -18,13 +18,22 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper">
+    <sql id="baseSql">
+        id, name, process_definition_id, state, recovery, start_time, end_time, run_times,host,
+        command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
+        warning_group_id, schedule_time, command_start_time, global_params, process_instance_json, flag,
+        update_time, is_sub_process, executor_id, locations, connects, history_cmd, dependence_schedule_times,
+        process_instance_priority, worker_group, timeout, tenant_id, var_pool
+    </sql>
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select inst.*
-        from t_ds_process_instance inst
-        where inst.id = #{processId}
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where id = #{processId}
     </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
         <if test="host != null and host != ''">
@@ -38,7 +47,8 @@
     </select>
 
     <select id="queryTopNProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where state = #{status}
         and start_time between
@@ -48,7 +58,8 @@
     </select>
 
     <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
         <if test="tenantId != -1">
@@ -62,7 +73,8 @@
     </select>
 
     <select id="queryByWorkerGroupIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
         <if test="workerGroupId != -1">
@@ -76,20 +88,18 @@
     </select>
 
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select instance.id,instance.name,instance.process_definition_id,instance.state,instance.recovery,instance.start_time,instance.end_time,instance.run_times,instance.host,instance.command_type,instance.command_param,
-        instance.task_depend_type,instance.max_try_times,instance.failure_strategy,instance.warning_type,instance.warning_group_id,instance.schedule_time,instance.command_start_time,instance.global_params,instance.flag,
-        instance.update_time,instance.is_sub_process,instance.executor_id,instance.locations,instance.connects,instance.history_cmd,instance.dependence_schedule_times,instance.process_instance_priority,instance.worker_group,
-        instance.timeout,instance.tenant_id
+        select instance.id, instance.process_definition_id, instance.command_type, instance.executor_id,
+        instance.name, instance.state, instance.schedule_time, instance.start_time, instance.end_time,
+        instance.run_times, instance.recovery, instance.host
         from t_ds_process_instance instance
         join t_ds_process_definition define ON instance.process_definition_id = define.id
-        where 1=1
-        and instance.is_sub_process=0
+        where instance.is_sub_process=0
         and define.project_id = #{projectId}
         <if test="processDefinitionId != 0">
             and instance.process_definition_id = #{processDefinitionId}
         </if>
         <if test="searchVal != null and searchVal != ''">
-            and  instance.name like concat('%', #{searchVal}, '%')
+            and instance.name like concat('%', #{searchVal}, '%')
         </if>
         <if test="startTime != null ">
             and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
@@ -142,7 +152,7 @@
         where 1 = 1
         and t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
-            and  t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+            and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="projectIds != null and projectIds.length != 0">
             and p.id in
@@ -153,22 +163,25 @@
         group by t.state
     </select>
     <select id="queryByProcessDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         order by start_time desc limit #{size}
     </select>
     <select id="queryLastSchedulerProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         <if test="startTime!=null and endTime != null ">
-            and schedule_time <![CDATA[ >= ]]> #{startTime} and  schedule_time <![CDATA[ <= ]]> #{endTime}
+            and schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>
         order by end_time desc limit 1
     </select>
     <select id="queryLastRunningProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         <if test="states !=null and states.length != 0">
@@ -179,12 +192,13 @@
         </if>
         <if test="startTime!=null and endTime != null ">
             and (schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
-                  or start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime})
+            or start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime})
         </if>
         order by start_time desc limit 1
     </select>
     <select id="queryLastManualProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         and schedule_time is null
@@ -195,7 +209,8 @@
     </select>
     <select id="queryByProcessDefineIdAndStatus"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         and state in
@@ -204,5 +219,9 @@
         </foreach>
         order by id asc
     </select>
-
+    <update id="updateGlobalParamsById">
+        update t_ds_process_instance
+        set global_params = #{globalParams}
+        where id = #{id}
+    </update>
 </mapper>

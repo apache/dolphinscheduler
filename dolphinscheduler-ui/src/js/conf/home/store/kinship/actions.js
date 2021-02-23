@@ -24,18 +24,18 @@ export default {
    * Get workFlow DAG
    */
   getWorkFlowList ({ state }, payload) {
-    const projectId = localStore.getItem('projectId');
+    const projectId = localStore.getItem('projectId')
     return new Promise((resolve, reject) => {
-      const url = `lineages/${projectId}/list-name`;
+      const url = `lineages/${projectId}/list-name`
       io.get(url, {
-        searchVal: payload,
+        searchVal: payload
       }, res => {
-        const workList = [];
+        const workList = []
         if (res.data) {
           _.map(res.data, (item) => {
             workList.push({
               id: `${item.workFlowId}`,
-              name: item.workFlowName,
+              name: item.workFlowName
             })
           })
         }
@@ -50,14 +50,14 @@ export default {
    * Get workFlow DAG
    */
   getWorkFlowDAG ({ state }, payload) {
-    const projectId = localStore.getItem('projectId');
+    const projectId = localStore.getItem('projectId')
     return new Promise((resolve, reject) => {
-      const url = `lineages/${projectId}/list-ids`;
+      const url = `lineages/${projectId}/list-ids`
       io.get(url, {
-        ids: payload,
+        ids: payload
       }, res => {
-        let locations = [];
-        let connects = [];
+        let locations = []
+        let connects = []
         if (res.data.workFlowList) {
           locations = _.uniqBy(res.data.workFlowList, 'workFlowId').map((item) => ({
             id: `${item.workFlowId}`,
@@ -72,10 +72,10 @@ export default {
         if (res.data.workFlowRelationList) {
           connects = _.map(res.data.workFlowRelationList, (item) => ({
             source: `${item.sourceWorkFlowId}`, // should be string, or connects will not show by echarts
-            target: `${item.targetWorkFlowId}`, // should be string, or connects will not show by echarts
+            target: `${item.targetWorkFlowId}` // should be string, or connects will not show by echarts
           }))
         }
-        state.sourceWorkFlowId = payload || '';
+        state.sourceWorkFlowId = payload || ''
         // locations
         state.locations = locations /* JSON.parse(locations) */
         // connects
@@ -85,5 +85,5 @@ export default {
         reject(res)
       })
     })
-  },
+  }
 }

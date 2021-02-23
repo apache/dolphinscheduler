@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
-import javax.servlet.http.HttpServletRequest;
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * session service

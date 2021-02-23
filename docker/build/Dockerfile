@@ -15,55 +15,37 @@
 # limitations under the License.
 #
 
-FROM nginx:alpine
+FROM openjdk:8-jdk-alpine
 
 ARG VERSION
 
 ENV TZ Asia/Shanghai
 ENV LANG C.UTF-8
-ENV DEBIAN_FRONTEND noninteractive
+ENV DOCKER true
 
-#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip tini kazoo.
-#If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
-#RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+# 1. install command/library/software
+# If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
+# RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+# RUN sed -i 's/dl-cdn.alpinelinux.org/mirror.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk update && \
-    apk add --update --no-cache dos2unix shadow bash openrc python2 python3 sudo vim wget iputils net-tools openssh-server py-pip tini && \
-    apk add --update --no-cache procps && \
-    openrc boot && \
-    pip install kazoo
+    apk add --no-cache tzdata dos2unix bash python2 python3 procps sudo shadow tini postgresql-client && \
+    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    apk del tzdata && \
+    rm -rf /var/cache/apk/*
 
-#2. install jdk
-RUN apk add --update --no-cache openjdk8
-ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
-ENV PATH $JAVA_HOME/bin:$PATH
-
-#3. add dolphinscheduler
+# 2. add dolphinscheduler
 ADD ./apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz /opt/
-RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ /opt/dolphinscheduler/
+RUN ln -s /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin /opt/dolphinscheduler
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-#4. install database, if use mysql as your backend database, you should append `mysql-client` at the end of the sentence
-RUN apk add --update --no-cache postgresql postgresql-contrib
-
-#5. modify nginx
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
-    rm -rf /etc/nginx/conf.d/*
-COPY ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
-
-#6. add configuration and modify permissions and set soft links
+# 3. add configuration and modify permissions and set soft links
 COPY ./checkpoint.sh /root/checkpoint.sh
 COPY ./startup-init-conf.sh /root/startup-init-conf.sh
 COPY ./startup.sh /root/startup.sh
 COPY ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
 COPY ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
-COPY conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
-RUN chmod +x /root/checkpoint.sh && \
-    chmod +x /root/startup-init-conf.sh && \
-    chmod +x /root/startup.sh && \
-    chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
-    chmod +x /opt/dolphinscheduler/script/*.sh && \
-    chmod +x /opt/dolphinscheduler/bin/*.sh && \
-    dos2unix /root/checkpoint.sh && \
+COPY ./conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
+RUN dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
     dos2unix /root/startup.sh && \
     dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
@@ -71,13 +53,10 @@ RUN chmod +x /root/checkpoint.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
     rm -rf /bin/sh && \
     ln -s /bin/bash /bin/sh && \
-    mkdir -p /tmp/xls && \
-    #7. remove apk index cache and disable coredup for sudo
-    rm -rf /var/cache/apk/* && \
+    mkdir -p /var/mail /tmp/xls && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
-
-#8. expose port
-EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
+# 4. expose port
+EXPOSE 5678 1234 12345 50051 50052
 
 ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]

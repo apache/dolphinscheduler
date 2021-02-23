@@ -211,25 +211,13 @@ public class JSONUtils {
 
     /**
      * json to map
-     * <p>
      * {@link #toMap(String, Class, Class)}
      *
      * @param json json
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        if (StringUtils.isEmpty(json)) {
-            return null;
-        }
-
-        try {
-            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
-            });
-        } catch (Exception e) {
-            logger.error("json to map exception!", e);
-        }
-
-        return null;
+        return parseObject(json, new TypeReference<Map<String, String>>() {});
     }
 
     /**
@@ -243,13 +231,24 @@ public class JSONUtils {
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
+        return parseObject(json, new TypeReference<Map<K, V>>() {});
+    }
+
+    /**
+     * json to object
+     *
+     * @param json json string
+     * @param type type reference
+     * @param <T>
+     * @return return parse object
+     */
+    public static <T> T parseObject(String json, TypeReference<T> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
 
         try {
-            return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
-            });
+            return objectMapper.readValue(json, type);
         } catch (Exception e) {
             logger.error("json to map exception!", e);
         }
@@ -294,7 +293,11 @@ public class JSONUtils {
 
     public static ObjectNode parseObject(String text) {
         try {
-            return (ObjectNode) objectMapper.readTree(text);
+            if (text.isEmpty()) {
+                return parseObject(text, ObjectNode.class);
+            } else {
+                return (ObjectNode) objectMapper.readTree(text);
+            }
         } catch (Exception e) {
             throw new RuntimeException("String json deserialization exception.", e);
         }

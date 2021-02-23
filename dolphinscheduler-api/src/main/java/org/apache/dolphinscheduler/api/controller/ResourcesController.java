@@ -82,7 +82,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * resources controller
  */
-@Api(tags = "RESOURCES_TAG", position = 1)
+@Api(tags = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
 public class ResourcesController extends BaseController {
@@ -109,7 +109,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/directory/create")
@@ -142,7 +142,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
@@ -226,7 +226,7 @@ public class ResourcesController extends BaseController {
     @ApiOperation(value = "queryResourceListPaging", notes = "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int", example = "10"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
@@ -322,9 +322,7 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "programType",required = false) ProgramType programType
     ) {
         String programTypeName = programType == null ? "" : programType.name();
-        String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query resource list, login user:{}, resource type:{}, program type:{}", userName,programTypeName);
+        logger.info("query resource list, resource type:{}, program type:{}", type, programTypeName);
         Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type,programType);
         return returnDataList(result);
     }
@@ -342,7 +340,7 @@ public class ResourcesController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int")
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int", example = "10")
     })
     @GetMapping(value = "/queryResource")
     @ResponseStatus(HttpStatus.OK)
@@ -405,7 +403,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "suffix", value = "SUFFIX", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
             @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/online-create")
@@ -641,9 +639,7 @@ public class ResourcesController extends BaseController {
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type) {
-        String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query udf func list, user:{}, type:{}", userName, type);
+        logger.info("query udf func list, type:{}", type);
         Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
     }

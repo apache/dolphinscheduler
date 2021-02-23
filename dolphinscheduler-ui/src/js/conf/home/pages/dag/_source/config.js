@@ -29,31 +29,31 @@ const toolOper = (dagThis) => {
   return [
     {
       code: 'pointer',
-      icon: 'ans-icon-pointer',
+      icon: 'el-icon-thumb',
       disable: disabled,
       desc: `${i18n.$t('Drag Nodes and Selected Items')}`
     },
     {
       code: 'line',
-      icon: 'ans-icon-slash',
+      icon: 'el-icon-top-right',
       disable: disabled,
       desc: `${i18n.$t('Select Line Connection')}`
     },
     {
       code: 'remove',
-      icon: 'ans-icon-trash',
+      icon: 'el-icon-delete',
       disable: disabled,
       desc: `${i18n.$t('Delete selected lines or nodes')}`
     },
     {
       code: 'download',
-      icon: 'ans-icon-download',
+      icon: 'el-icon-download',
       disable: !dagThis.type,
       desc: `${i18n.$t('Download')}`
     },
     {
       code: 'screen',
-      icon: 'ans-icon-max',
+      icon: 'el-icon-full-screen',
       disable: false,
       desc: `${i18n.$t('Full Screen')}`
     }
@@ -150,98 +150,98 @@ const tasksState = {
     id: 0,
     desc: `${i18n.$t('Submitted successfully')}`,
     color: '#A9A9A9',
-    icoUnicode: 'ans-icon-dot-circle',
+    icoUnicode: 'ri-record-circle-fill',
     isSpin: false
   },
   RUNNING_EXECUTION: {
     id: 1,
     desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
-    icoUnicode: 'ans-icon-gear',
+    icoUnicode: 'el-icon-s-tools',
     isSpin: true
   },
   READY_PAUSE: {
     id: 2,
     desc: `${i18n.$t('Ready to pause')}`,
     color: '#07b1a3',
-    icoUnicode: 'ans-icon-pause-solid',
+    icoUnicode: 'ri-settings-3-line',
     isSpin: false
   },
   PAUSE: {
     id: 3,
     desc: `${i18n.$t('Pause')}`,
     color: '#057c72',
-    icoUnicode: 'ans-icon-pause',
+    icoUnicode: 'el-icon-video-pause',
     isSpin: false
   },
   READY_STOP: {
     id: 4,
     desc: `${i18n.$t('Ready to stop')}`,
     color: '#FE0402',
-    icoUnicode: 'ans-icon-coin',
+    icoUnicode: 'ri-stop-circle-fill',
     isSpin: false
   },
   STOP: {
     id: 5,
     desc: `${i18n.$t('Stop')}`,
     color: '#e90101',
-    icoUnicode: 'ans-icon-stop',
+    icoUnicode: 'ri-stop-circle-line',
     isSpin: false
   },
   FAILURE: {
     id: 6,
     desc: `${i18n.$t('failed')}`,
     color: '#000000',
-    icoUnicode: 'ans-icon-fail-empty',
+    icoUnicode: 'el-icon-circle-close',
     isSpin: false
   },
   SUCCESS: {
     id: 7,
     desc: `${i18n.$t('success')}`,
     color: '#33cc00',
-    icoUnicode: 'ans-icon-success-empty',
+    icoUnicode: 'el-icon-circle-check',
     isSpin: false
   },
   NEED_FAULT_TOLERANCE: {
     id: 8,
     desc: `${i18n.$t('Need fault tolerance')}`,
     color: '#FF8C00',
-    icoUnicode: 'ans-icon-pen',
+    icoUnicode: 'el-icon-edit',
     isSpin: false
   },
   KILL: {
     id: 9,
     desc: `${i18n.$t('kill')}`,
     color: '#a70202',
-    icoUnicode: 'ans-icon-minus-circle-empty',
+    icoUnicode: 'el-icon-remove-outline',
     isSpin: false
   },
   WAITTING_THREAD: {
     id: 10,
     desc: `${i18n.$t('Waiting for thread')}`,
     color: '#912eed',
-    icoUnicode: 'ans-icon-sand-clock',
+    icoUnicode: 'ri-time-line',
     isSpin: false
   },
   WAITTING_DEPEND: {
     id: 11,
     desc: `${i18n.$t('Waiting for dependence')}`,
     color: '#5101be',
-    icoUnicode: 'ans-icon-dependence',
+    icoUnicode: 'ri-send-to-back',
     isSpin: false
   },
   DELAY_EXECUTION: {
     id: 12,
     desc: `${i18n.$t('Delay execution')}`,
     color: '#5102ce',
-    icoUnicode: 'ans-icon-coin',
+    icoUnicode: 'ri-pause-circle-fill',
     isSpin: false
   },
   FORCED_SUCCESS: {
     id: 13,
     desc: `${i18n.$t('Forced success')}`,
     color: '#5102ce',
-    icoUnicode: 'ans-icon-success-solid',
+    icoUnicode: 'el-icon-success',
     isSpin: false
   }
 }
