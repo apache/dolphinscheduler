@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
@@ -66,6 +67,12 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private ProcessService processService;
 
+    /**
+     * master registry
+     */
+    @Autowired
+    private MasterRegistry masterRegistry;
+
     public void start() {
 
         InterProcessMutex mutex = null;
@@ -74,6 +81,9 @@ public class ZKMasterClient extends AbstractZKClient {
             String znodeLock = getMasterStartUpLockPath();
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
+
+            //  Master registry
+            masterRegistry.registry();
 
             // init system znode
             this.initSystemZNode();
