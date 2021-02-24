@@ -78,15 +78,16 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Notification group')}}
+        {{$t('Alarm group')}}
       </div>
       <div class="cont">
         <el-select
            style="width: 200px;"
+           clearable
            size="small"
            v-model="warningGroupId"
           :disabled="!notifyGroupList.length">
-          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
             <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
             <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
           </el-input>
@@ -106,22 +107,6 @@
       <div class="cont">
         <div style="padding-top: 6px;">
           <el-checkbox v-model="execType" size="small">{{$t('Whether it is a complement process?')}}</el-checkbox>
-        </div>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
-        <span>{{$t('Startup parameter')}}</span>
-      </div>
-      <div class="cont" style="width: 688px;">
-        <div style="padding-top: 6px;">
-          <m-local-params
-                  ref="refLocalParams"
-                  @on-local-params="_onLocalParams"
-                  :udp-list="udpList"
-                  :hide="false"
-                  :isStartProcess="true">
-          </m-local-params>
         </div>
       </div>
     </div>
@@ -156,6 +141,21 @@
         </div>
       </div>
     </template>
+    <div class="clearfix list">
+      <div class="text">
+        <span>{{$t('Startup parameter')}}</span>
+      </div>
+      <div class="cont" style="width: 688px;">
+        <div style="padding-top: 6px;">
+          <m-local-params
+            ref="refLocalParams"
+            @on-local-params="_onLocalParams"
+            :udp-list="udpList"
+            :hide="false">
+          </m-local-params>
+        </div>
+      </div>
+    </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
       <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </el-button>
@@ -263,7 +263,6 @@
         })
       },
       _getGlobalParams () {
-        this.setIsDetails(true)
         this.store.dispatch('dag/getProcessDetails', this.startData.id).then(res => {
           this.definitionGlobalParams = _.cloneDeep(this.store.state.dag.globalParams)
           this.udpList = _.cloneDeep(this.store.state.dag.globalParams)

@@ -35,12 +35,12 @@ public class ScriptSenderTest {
 
     private static final String rootPath = System.getProperty("user.dir");
 
-    private static final String shellFilPath = rootPath + "/src/test/script/shell/scriptTest.sh";
+    private static final String shellFilPath = rootPath + "/src/test/script/shell/scriptExample.sh";
 
     @Before
     public void initScriptConfig() {
 
-        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getCode()));
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, String.valueOf(ScriptType.SHELL.getDescp()));
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "userParams");
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, shellFilPath);
     }
@@ -49,9 +49,9 @@ public class ScriptSenderTest {
     public void testScriptSenderTest() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
-        alertResult = scriptSender.sendScriptAlert("success");
+        alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
         Assert.assertEquals("true", alertResult.getStatus());
-        alertResult = scriptSender.sendScriptAlert("errorMsg");
+        alertResult = scriptSender.sendScriptAlert("error msg title", "test content");
         Assert.assertEquals("false", alertResult.getStatus());
     }
 

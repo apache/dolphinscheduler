@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.alert.processor;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
@@ -37,7 +36,6 @@ import io.netty.channel.Channel;
 public class AlertRequestProcessorTest {
 
     private AlertDao alertDao;
-    private PluginDao pluginDao;
     private AlertPluginManager alertPluginManager;
 
     private AlertRequestProcessor alertRequestProcessor;
@@ -45,17 +43,16 @@ public class AlertRequestProcessorTest {
     @Before
     public void before() {
         alertDao = PowerMockito.mock(AlertDao.class);
-        pluginDao = PowerMockito.mock(PluginDao.class);
         alertPluginManager = PowerMockito.mock(AlertPluginManager.class);
-        alertRequestProcessor = new AlertRequestProcessor(alertDao,alertPluginManager,pluginDao);
+        alertRequestProcessor = new AlertRequestProcessor(alertDao, alertPluginManager);
     }
 
     @Test
     public void testProcess() {
         Channel channel = PowerMockito.mock(Channel.class);
-        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1,"title","content");
+        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1, "title", "content");
         Command reqCommand = alertSendRequestCommand.convert2Command();
-        Assert.assertEquals(CommandType.ALERT_SEND_REQUEST,reqCommand.getType());
-        alertRequestProcessor.process(channel,reqCommand);
+        Assert.assertEquals(CommandType.ALERT_SEND_REQUEST, reqCommand.getType());
+        alertRequestProcessor.process(channel, reqCommand);
     }
 }

@@ -17,41 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 
 /**
- * work group service
+ * worker group service
  */
-@Service
-public class WorkerGroupService extends BaseService {
-
-    private static final  String NO_NODE_EXCEPTION_REGEX = "KeeperException$NoNodeException";
-    @Autowired
-    protected ZookeeperCachedOperator zookeeperCachedOperator;
-    @Autowired
-    ProcessInstanceMapper processInstanceMapper;
+public interface WorkerGroupService {
 
     /**
      * query worker group paging
@@ -62,116 +35,13 @@ public class WorkerGroupService extends BaseService {
      * @param pageSize page size
      * @return worker group list page
      */
-    public Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
-
-        // list from index
-        Integer fromIndex = (pageNo - 1) * pageSize;
-        // list to index
-        Integer toIndex = (pageNo - 1) * pageSize + pageSize;
-
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
-
-        List<WorkerGroup> workerGroups = getWorkerGroups(true);
-
-        List<WorkerGroup> resultDataList = new ArrayList<>();
-
-        if (CollectionUtils.isNotEmpty(workerGroups)) {
-            List<WorkerGroup> searchValDataList = new ArrayList<>();
-
-            if (StringUtils.isNotEmpty(searchVal)) {
-                for (WorkerGroup workerGroup : workerGroups) {
-                    if (workerGroup.getName().contains(searchVal)) {
-                        searchValDataList.add(workerGroup);
-                    }
-                }
-            } else {
-                searchValDataList = workerGroups;
-            }
-
-            if (searchValDataList.size() < pageSize) {
-                toIndex = (pageNo - 1) * pageSize + searchValDataList.size();
-            }
-            resultDataList = searchValDataList.subList(fromIndex, toIndex);
-        }
-
-        PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount(resultDataList.size());
-        pageInfo.setLists(resultDataList);
-
-        result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
+    Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
 
     /**
      * query all worker group
      *
      * @return all worker group list
      */
-    public Map<String, Object> queryAllGroup() {
-        Map<String, Object> result = new HashMap<>();
+    Map<String, Object> queryAllGroup();
 
-        List<WorkerGroup> workerGroups = getWorkerGroups(false);
-
-        Set<String> availableWorkerGroupSet = workerGroups.stream()
-                .map(workerGroup -> workerGroup.getName())
-                .collect(Collectors.toSet());
-        result.put(Constants.DATA_LIST, availableWorkerGroupSet);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * get worker groups
-     *
-     * @param isPaging whether paging
-     * @return WorkerGroup list
-     */
-    private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
-
-        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
-        List<WorkerGroup> workerGroups = new ArrayList<>();
-        List<String> workerGroupList;
-        try {
-            workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
-        } catch (Exception e) {
-            if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
-                if (isPaging) {
-                    return workerGroups;
-                } else {
-                    //ignore noNodeException return Default
-                    WorkerGroup wg = new WorkerGroup();
-                    wg.setName(DEFAULT_WORKER_GROUP);
-                    workerGroups.add(wg);
-                    return workerGroups;
-                }
-            } else {
-                throw e;
-            }
-        }
-
-        // available workerGroup list
-        List<String> availableWorkerGroupList = new ArrayList<>();
-
-        for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + "/" + workerGroup;
-            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
-            if (CollectionUtils.isNotEmpty(childrenNodes)) {
-                availableWorkerGroupList.add(workerGroup);
-                WorkerGroup wg = new WorkerGroup();
-                wg.setName(workerGroup);
-                if (isPaging) {
-                    wg.setIpList(childrenNodes);
-                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
-                    wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
-                    wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
-                }
-                workerGroups.add(wg);
-            }
-        }
-        return workerGroups;
-    }
 }

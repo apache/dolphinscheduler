@@ -2,7 +2,6 @@
 name: Question
 about: Have a question wanted to be help
 title: "[Question] Question title"
-labels: question
 assignees: ''
 
 ---
