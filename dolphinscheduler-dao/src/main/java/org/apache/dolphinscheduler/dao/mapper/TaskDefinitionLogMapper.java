@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -38,7 +40,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @return task definition log list
      */
     List<TaskDefinitionLog> queryByDefinitionName(@Param("projectCode") Long projectCode,
-                                        @Param("taskDefinitionName") String name);
+                                                  @Param("taskDefinitionName") String name);
 
     /**
      * query task definition log list
@@ -57,4 +59,12 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      */
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("taskDefinitionCode") long taskDefinitionCode,
                                                       @Param("version") int version);
+
+    /**
+     * query task definition log
+     *
+     * @param taskDefinitions taskDefinition collection
+     * @return task definition log
+     */
+    List<TaskDefinitionLog> queryByTaskDefinitions(@Param("taskDefinitions") Collection<TaskDefinition> taskDefinitions);
 }
