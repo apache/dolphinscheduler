@@ -70,6 +70,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
 
     /**
      * poll task info with timeout
+     * <p>
      * WARN: Please use PriorityBlockingQueue if you want to use poll(timeout, unit)
      * because this method of override interface used without considering accuracy of timeout
      *
@@ -80,19 +81,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * @throws InterruptedException
      */
     @Override
-    public TaskInstance poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException, InterruptedException {
-        long nanos = unit.toNanos(timeout);
-        final ReentrantLock lock = this.lock;
-        lock.lockInterruptibly();
-        TaskInstance result;
-        try {
-            while ((result = queue.poll()) == null && nanos > 0) {
-                nanos--;
-            }
-        } finally {
-            lock.unlock();
-        }
-        return result;
+    public TaskInstance poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException {
+        throw new TaskPriorityQueueException("This operation is not currently supported," +
+            "and suggest to use PriorityBlockingQueue if you want！");
     }
 
     /**
