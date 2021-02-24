@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
