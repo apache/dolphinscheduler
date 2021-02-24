@@ -110,21 +110,6 @@
         </div>
       </div>
     </div>
-    <div class="clearfix list">
-      <div class="text">
-        <span>{{$t('Startup parameter')}}</span>
-      </div>
-      <div class="cont" style="width: 688px;">
-        <div style="padding-top: 6px;">
-          <m-local-params
-                  ref="refLocalParams"
-                  @on-local-params="_onLocalParams"
-                  :udp-list="udpList"
-                  :hide="false">
-          </m-local-params>
-        </div>
-      </div>
-    </div>
     <template v-if="execType">
       <div class="clearfix list" style="margin:-6px 0 16px 0">
         <div class="text">
@@ -156,6 +141,21 @@
         </div>
       </div>
     </template>
+    <div class="clearfix list">
+      <div class="text">
+        <span>{{$t('Startup parameter')}}</span>
+      </div>
+      <div class="cont" style="width: 688px;">
+        <div style="padding-top: 6px;">
+          <m-local-params
+            ref="refLocalParams"
+            @on-local-params="_onLocalParams"
+            :udp-list="udpList"
+            :hide="false">
+          </m-local-params>
+        </div>
+      </div>
+    </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
       <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </el-button>
