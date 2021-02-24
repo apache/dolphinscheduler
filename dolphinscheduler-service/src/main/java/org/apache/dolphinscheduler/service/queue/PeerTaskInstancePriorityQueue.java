@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -46,11 +45,6 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * Lock used for all public operations
      */
     private final ReentrantLock lock = new ReentrantLock(true);
-
-    /**
-     * Condition for blocking when empty
-     */
-    private final Condition notEmpty = lock.newCondition();
 
     /**
      * put task instance to priority queue
@@ -77,7 +71,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     /**
      * poll task info with timeout
      * WARN: Please use PriorityBlockingQueue if you want to use poll(timeout, unit)
-     *       because this method of override interface used without considering accuracy of timeout
+     * because this method of override interface used without considering accuracy of timeout
      *
      * @param timeout
      * @param unit
