@@ -49,13 +49,38 @@ public class NetUtils {
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
     private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
-    private static final String ANY_HOST_VALUE = "0.0.0.0";
-    private static final String LOCAL_HOST_VALUE = "127.0.0.1";
     private static InetAddress LOCAL_ADDRESS = null;
     private static volatile String HOST_ADDRESS;
 
     private NetUtils() {
         throw new UnsupportedOperationException("Construct NetUtils");
+    }
+
+    /**
+     * get addr like host:port
+     * @return addr
+     */
+    public static String getAddr(String host, int port) {
+        return String.format("%s:%d", host, port);
+    }
+
+    /**
+     * get addr like host:port
+     * @return addr
+     */
+    public static String getAddr(int port) {
+        return getAddr(getHost(), port);
+    }
+
+    /**
+     * get host
+     * @return host
+     */
+    public static String getHost(InetAddress inetAddress) {
+        if (inetAddress != null) {
+            return Constants.KUBERNETES_MODE ? inetAddress.getHostName() : inetAddress.getHostAddress();
+        }
+        return null;
     }
 
     public static String getHost() {
@@ -65,10 +90,10 @@ public class NetUtils {
 
         InetAddress address = getLocalAddress();
         if (address != null) {
-            HOST_ADDRESS = address.getHostAddress();
+            HOST_ADDRESS = getHost(address);
             return HOST_ADDRESS;
         }
-        return LOCAL_HOST_VALUE;
+        return Constants.KUBERNETES_MODE ? "localhost" : "127.0.0.1";
     }
 
     private static InetAddress getLocalAddress() {
@@ -153,8 +178,8 @@ public class NetUtils {
         String name = address.getHostAddress();
         return (name != null
                 && IP_PATTERN.matcher(name).matches()
-                && !ANY_HOST_VALUE.equals(name)
-                && !LOCAL_HOST_VALUE.equals(name));
+                && !address.isAnyLocalAddress()
+                && !address.isLoopbackAddress());
     }
 
     /**

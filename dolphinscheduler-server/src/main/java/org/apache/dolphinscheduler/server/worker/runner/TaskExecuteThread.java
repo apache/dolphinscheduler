@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -51,7 +50,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ import com.github.rholder.retry.RetryException;
 /**
  *  task scheduler thread
  */
-public class TaskExecuteThread implements Runnable {
+public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * logger
@@ -132,7 +133,6 @@ public class TaskExecuteThread implements Runnable {
             // task node
             TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
-            delayExecutionIfNeeded();
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
             }
@@ -174,6 +174,7 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
             responseCommand.setVarPool(task.getVarPool());
+            responseCommand.setResult(task.getResultString());
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
         } catch (Exception e) {
             logger.error("task scheduler failure", e);
@@ -290,24 +291,6 @@ public class TaskExecuteThread implements Runnable {
     }
 
     /**
-     * delay execution if needed.
-     */
-    private void delayExecutionIfNeeded() {
-        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                taskExecutionContext.getDelayTime() * 60L);
-        logger.info("delay execution time: {} s", remainTime < 0 ? 0 : remainTime);
-        if (remainTime > 0) {
-            try {
-                Thread.sleep(remainTime * Constants.SLEEP_TIME_MILLIS);
-            } catch (Exception e) {
-                logger.error("delay task execution failure, the task will be executed directly. process instance id:{}, task instance id:{}",
-                            taskExecutionContext.getProcessInstanceId(),
-                            taskExecutionContext.getTaskInstanceId());
-            }
-        }
-    }
-
-    /**
      * send an ack to change the status of the task.
      */
     private void changeTaskExecutionStatusToRunning() {
@@ -342,5 +325,27 @@ public class TaskExecuteThread implements Runnable {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
         return ackCommand;
+    }
+
+    /**
+     * get current TaskExecutionContext
+     * @return TaskExecutionContext
+     */
+    public TaskExecutionContext getTaskExecutionContext() {
+        return this.taskExecutionContext;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+        return unit.convert(DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
+                taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public int compareTo(Delayed o) {
+        if (o == null) {
+            return 1;
+        }
+        return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
     }
 }
