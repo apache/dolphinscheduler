@@ -7,6 +7,10 @@
 .target
 .idea/
 target/
+dist/
+all-dependencies.txt
+self-modules.txt
+third-party-dependencies.txt
 .settings
 .nbproject
 .classpath

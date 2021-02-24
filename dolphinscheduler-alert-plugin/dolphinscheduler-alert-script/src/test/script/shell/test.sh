@@ -14,22 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.frontend.persistentVolumeClaim.enabled }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-frontend
-  labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-frontend
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-spec:
-  accessModes:
-    {{- range .Values.frontend.persistentVolumeClaim.accessModes }}
-    - {{ . | quote }}
-  {{- end }}
-  storageClassName: {{ .Values.frontend.persistentVolumeClaim.storageClassName | quote }}
-  resources:
-    requests:
-      storage: {{ .Values.frontend.persistentVolumeClaim.storage | quote }}
-{{- end }}
+
+while getopts t: opts; do
+    case $opts in
+        t) t=$OPTARG ;;
+        ?) ;;
+    esac
+done
+
+echo "$t"
+
+exit 0

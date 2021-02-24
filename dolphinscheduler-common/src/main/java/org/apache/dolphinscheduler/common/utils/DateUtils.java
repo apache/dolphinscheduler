@@ -241,12 +241,50 @@ public class DateUtils {
      */
     public static String format2Readable(long ms) {
 
-        long days = ms / (1000 * 60 * 60 * 24);
-        long hours = (ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-        long minutes = (ms % (1000 * 60 * 60)) / (1000 * 60);
-        long seconds = (ms % (1000 * 60)) / 1000;
+        long days = MILLISECONDS.toDays(ms);
+        long hours = MILLISECONDS.toDurationHours(ms);
+        long minutes = MILLISECONDS.toDurationMinutes(ms);
+        long seconds = MILLISECONDS.toDurationSeconds(ms);
 
         return String.format("%02d %02d:%02d:%02d", days, hours, minutes, seconds);
+
+    }
+
+    /**
+     *
+     * format time to duration
+     *
+     * @param d1 d1
+     * @param d2 d2
+     * @return format time
+     */
+    public static String format2Duration(Date d1, Date d2) {
+        if (d1 == null || d2 == null) {
+            return null;
+        }
+        return format2Duration(differMs(d1, d2));
+    }
+
+    /**
+     * format time to duration
+     *
+     * @param ms ms
+     * @return format time
+     */
+    public static String format2Duration(long ms) {
+
+        long days = MILLISECONDS.toDays(ms);
+        long hours = MILLISECONDS.toDurationHours(ms);
+        long minutes = MILLISECONDS.toDurationMinutes(ms);
+        long seconds = MILLISECONDS.toDurationSeconds(ms);
+
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder = days > 0 ? strBuilder.append(days).append("d").append(" ") : strBuilder;
+        strBuilder = hours > 0 ? strBuilder.append(hours).append("h").append(" ") : strBuilder;
+        strBuilder = minutes > 0 ? strBuilder.append(minutes).append("m").append(" ") : strBuilder;
+        strBuilder = seconds > 0 ? strBuilder.append(seconds).append("s") : strBuilder;
+
+        return strBuilder.toString();
 
     }
 
@@ -452,6 +490,49 @@ public class DateUtils {
      */
     public static String getCurrentTimeStamp() {
         return getCurrentTime(Constants.YYYYMMDDHHMMSSSSS);
+    }
+
+    static final long C0 = 1L;
+    static final long C1 = C0 * 1000L;
+    static final long C2 = C1 * 1000L;
+    static final long C3 = C2 * 1000L;
+    static final long C4 = C3 * 60L;
+    static final long C5 = C4 * 60L;
+    static final long C6 = C5 * 24L;
+
+    /**
+     * Time unit representing one thousandth of a second
+     */
+    public static class MILLISECONDS {
+
+        public static long toSeconds(long d) {
+            return d / (C3 / C2);
+        }
+
+        public static long toMinutes(long d) {
+            return d / (C4 / C2);
+        }
+
+        public static long toHours(long d)   {
+            return d / (C5 / C2);
+        }
+
+        public static long toDays(long d)    {
+            return d / (C6 / C2);
+        }
+
+        public static long toDurationSeconds(long d)   {
+            return (d % (C4 / C2)) / (C3 / C2);
+        }
+
+        public static long toDurationMinutes(long d)   {
+            return (d % (C5 / C2)) / (C4 / C2);
+        }
+
+        public static long toDurationHours(long d)   {
+            return (d % (C6 / C2)) / (C5 / C2);
+        }
+
     }
 
 }
