@@ -2179,7 +2179,6 @@ public class ProcessService {
         int update = taskDefinitionMapper.updateById(taskDefinition);
         // save task definition log
         TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-        taskDefinitionLog.set(taskDefinition);
         taskDefinitionLog.setOperator(operator.getId());
         taskDefinitionLog.setOperateTime(now);
         int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
@@ -2314,25 +2313,27 @@ public class ProcessService {
             List<String> depList = taskNode.getDepList();
             if (CollectionUtils.isNotEmpty(depList)) {
                 for (String preTaskName : depList) {
-                    builderRelationList.add(new ProcessTaskRelation("",// todo relation name
+                    builderRelationList.add(new ProcessTaskRelation("",
                             processDefinition.getVersion(),
                             projectCode,
                             processDefinition.getCode(),
                             taskNameAndCode.get(preTaskName),
                             taskNameAndCode.get(taskNode.getName()),
-                            ConditionType.of("none"), // todo conditionType
+                            ConditionType.of("none"),
                             taskNode.getConditionResult(),
                             now,
                             now));
                 }
             } else {
-                builderRelationList.add(new ProcessTaskRelation("",// todo relation name
+                // todo relation name
+                builderRelationList.add(new ProcessTaskRelation("",
                         processDefinition.getVersion(),
                         projectCode,
                         processDefinition.getCode(),
                         0L,
                         taskNameAndCode.get(taskNode.getName()),
-                        ConditionType.of("none"), // todo conditionType
+                        // todo conditionType
+                        ConditionType.of("none"),
                         taskNode.getConditionResult(),
                         now,
                         now));
@@ -2359,9 +2360,7 @@ public class ProcessService {
         setTaskFromTaskNode(taskNode, taskDefinition);
         // save the new task definition
         int insert = taskDefinitionMapper.insert(taskDefinition);
-        // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-        taskDefinitionLog.set(taskDefinition);
+        TaskDefinitionLog taskDefinitionLog = (TaskDefinitionLog)taskDefinition;
         taskDefinitionLog.setOperator(operator.getId());
         taskDefinitionLog.setOperateTime(now);
         int logInsert = taskDefinitionLogMapper.insert(taskDefinitionLog);
