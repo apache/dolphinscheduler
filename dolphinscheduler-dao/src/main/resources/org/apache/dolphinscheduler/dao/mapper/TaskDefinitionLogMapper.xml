@@ -47,4 +47,17 @@
         WHERE code = #{taskDefinitionCode}
         and version = #{version}
     </select>
+    <select id="queryByTaskDefinitions" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition_log
+        WHERE  1 = 1
+        <if test="taskDefinitions != null and taskDefinitions.length != 0">
+            and
+            <foreach collection="taskDefinitions" index="index" item="item" open="(" separator=" or " close=")">
+                (code = #{item.code}
+                and version = #{item.version})
+            </foreach>
+        </if>
+    </select>
 </mapper>
