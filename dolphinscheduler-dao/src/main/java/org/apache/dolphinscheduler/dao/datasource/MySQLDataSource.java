@@ -35,9 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MySQLDataSource extends BaseDataSource {
 
-    private final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
-
-    private final String sensitiveParam = "autoDeserialize";
+    private static final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
 
     private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
 
@@ -92,9 +90,9 @@ public class MySQLDataSource extends BaseDataSource {
 
     @Override
     public String getUser() {
-        if (user.contains(sensitiveParam)) {
-            logger.warn("sensitive param : {} in username field is filtered", sensitiveParam);
-            user = user.replace(sensitiveParam, "");
+        if (user.contains(AUTO_DESERIALIZE)) {
+            logger.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
+            user = user.replace(AUTO_DESERIALIZE, "");
         }
         logger.debug("username : {}", user);
         return user;
@@ -113,9 +111,9 @@ public class MySQLDataSource extends BaseDataSource {
     public String getPassword() {
         // password need decode
         password = super.getPassword();
-        if (password.contains(sensitiveParam)) {
-            logger.warn("sensitive param : {} in password field is filtered", sensitiveParam);
-            password = password.replace(sensitiveParam, "");
+        if (password.contains(AUTO_DESERIALIZE)) {
+            logger.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
+            password = password.replace(AUTO_DESERIALIZE, "");
         }
         return password;
     }
