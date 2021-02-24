@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
