@@ -37,7 +37,7 @@ public class MySQLDataSource extends BaseDataSource {
 
     private final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
 
-    private final String sensitiveParam = "autoDeserialize=true";
+    private final String sensitiveParam = "autoDeserialize";
 
     private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
 
@@ -47,11 +47,11 @@ public class MySQLDataSource extends BaseDataSource {
 
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
 
+    private static final String APPEND_PARAMS = "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
+
     private static boolean checkKeyIsLegitimate(String key) {
         return !key.contains(ALLOW_LOAD_LOCAL_IN_FILE_NAME) && !key.contains(AUTO_DESERIALIZE) && !key.contains(ALLOW_LOCAL_IN_FILE_NAME) && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
     }
-
-    private final char symbol = '&';
 
     /**
      * gets the JDBC url for the data source connection
@@ -72,20 +72,14 @@ public class MySQLDataSource extends BaseDataSource {
     }
 
     public static Map<String, String> buildOtherParams(String other) {
-        Map<String, String> newParamMap = new HashMap<>();
-        newParamMap.put(ALLOW_LOAD_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
-        newParamMap.put(AUTO_DESERIALIZE, Boolean.FALSE.toString());
-        newParamMap.put(ALLOW_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
-        newParamMap.put(ALLOW_URL_IN_LOCAL_IN_FILE_NAME, Boolean.FALSE.toString());
-
         if (StringUtils.isBlank(other)) {
-            return newParamMap;
+            return null;
         }
         Map<String, String> paramMap = JSONUtils.toMap(other);
         if (MapUtils.isEmpty(paramMap)) {
-            return newParamMap;
+            return null;
         }
-
+        Map<String, String> newParamMap = new HashMap<>();
         paramMap.forEach((k, v) -> {
             if (!checkKeyIsLegitimate(k)) {
                 return;
@@ -104,6 +98,15 @@ public class MySQLDataSource extends BaseDataSource {
         }
         logger.debug("username : {}", user);
         return user;
+    }
+
+    @Override
+    protected String filterOther(String otherParams) {
+        if (StringUtils.isBlank(otherParams)) {
+            return APPEND_PARAMS;
+        }
+        char symbol = '&';
+        return otherParams + symbol + APPEND_PARAMS;
     }
 
     @Override

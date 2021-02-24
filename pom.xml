@@ -868,6 +868,7 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/datasource/MySQLDataSourceTest.java</include>
                         <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/entity/UdfFuncTest.java</include>
                         <include>**/remote/JsonSerializerTest.java</include>

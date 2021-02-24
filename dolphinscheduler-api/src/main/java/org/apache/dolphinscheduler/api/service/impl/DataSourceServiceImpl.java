@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -36,6 +37,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +48,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +77,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public static final String DATABASE = "database";
     public static final String USER_NAME = "userName";
     public static final String OTHER = "other";
+
+    private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
+
+    private static final Pattern IPV6_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\:\\[\\]]+$");
+
+    private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
+
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
+
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
@@ -442,7 +455,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                                  String port, String database, String principal, String userName,
                                  String password, DbConnectType connectType, String other,
                                  String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) {
-
+        checkParams(type, port, host, database, other);
         String address = buildAddress(type, host, port, connectType);
         Map<String, Object> parameterMap = new LinkedHashMap<>();
         String jdbcUrl;
@@ -494,7 +507,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             map = MySQLDataSource.buildOtherParams(other);
         }
 
-        if (map != null) {
+        if (MapUtils.isNotEmpty(map)) {
             StringBuilder otherSb = new StringBuilder();
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
@@ -670,5 +683,40 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         result[0] = hosts.toString();
         result[1] = port;
         return result;
+    }
+
+    private void checkParams(DbType type, String port, String host, String database, String other) {
+        if (null == DbType.of(type.getCode())) {
+            throw new ServiceException(Status.DATASOURCE_DB_TYPE_ILLEGAL);
+        }
+        if (!isNumeric(port)) {
+            throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
+        }
+        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+            throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
+        }
+        if (!DATABASE_PATTER.matcher(database).matches()) {
+            throw new ServiceException(Status.DATASOURCE_NAME_ILLEGAL);
+        }
+        if (StringUtils.isBlank(other)) {
+            return;
+        }
+        Map<String, String> map = JSONUtils.toMap(other);
+        if (MapUtils.isEmpty(map)) {
+            return;
+        }
+        boolean paramsCheck = map.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
+        if (!paramsCheck) {
+            throw new ServiceException(Status.DATASOURCE_OTHER_PARAMS_ILLEGAL);
+        }
+    }
+
+    private static boolean isNumeric(String str) {
+        for (int i = str.length(); --i >= 0; ) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

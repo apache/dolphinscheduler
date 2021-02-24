@@ -36,7 +36,7 @@ public class MySQLDataSourceTest {
         Assert.assertEquals("test123", dataSource.getUser());
         String sensitiveUsername = "test123?autoDeserialize=true";
         dataSource.setUser(sensitiveUsername);
-        Assert.assertEquals("test123?", dataSource.getUser());
+        Assert.assertEquals("test123?=true", dataSource.getUser());
     }
 
     @Test
@@ -47,7 +47,25 @@ public class MySQLDataSourceTest {
         Assert.assertEquals("test_pwd", dataSource.getPassword());
         String sensitivePwd = "test_pwd?autoDeserialize=true";
         dataSource.setPassword(sensitivePwd);
-        Assert.assertEquals("test_pwd?", dataSource.getPassword());
+        Assert.assertEquals("test_pwd?=true", dataSource.getPassword());
+    }
+
+    @Test
+    public void testFilterOther() {
+        MySQLDataSource dataSource = new MySQLDataSource();
+        String other = dataSource.filterOther("serverTimezone=Asia/Shanghai&characterEncoding=utf8");
+        Assert.assertEquals("serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false", other);
+        //at the first
+        other = dataSource.filterOther("serverTimezone=Asia/Shanghai&characterEncoding=utf8");
+        Assert.assertEquals("serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false", other);
+        //at the end
+        other = dataSource.filterOther("serverTimezone=Asia/Shanghai&characterEncoding=utf8");
+        Assert.assertEquals("serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false", other);
+        //in the middle
+        other = dataSource.filterOther("serverTimezone=Asia/Shanghai&characterEncoding=utf8");
+        Assert.assertEquals("serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false", other);
+        other = dataSource.filterOther(null);
+        Assert.assertEquals("allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false", other);
     }
 
     @Test

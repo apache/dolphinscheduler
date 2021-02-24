@@ -304,14 +304,14 @@ public class DataSourceServiceTest {
         String param = dataSourceService.buildParameter(DbType.MYSQL, "192.168.9.1", "1521", "im"
                 , "", "test", "123456", null, other, "", "", "");
         String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
-                + "\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\",\"other\":\"autoDeserialize=false&allowUrlInLocalInfile=false&allowLocalInfile=false&allowLoadLocalInfile=false\"}";
+                + "\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\"}";
         Assert.assertEquals(expected, param);
 
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
         param = dataSourceService.buildParameter(DbType.MYSQL, "192.168.9.1", "1521", "im"
                 , "", "test", "123456", null, "", "", "", "");
         expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
-                + "\"user\":\"test\",\"password\":\"123456\",\"other\":\"autoDeserialize=false&allowUrlInLocalInfile=false&allowLocalInfile=false&allowLoadLocalInfile=false\"}";
+                + "\"user\":\"test\",\"password\":\"123456\"}";
         Assert.assertEquals(expected, param);
     }
 
