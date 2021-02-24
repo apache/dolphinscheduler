@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
+
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -102,7 +103,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
         checkTaskNode(result, taskNode, taskDefinitionJson);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
+                || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
             return result;
         }
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -218,7 +220,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
         checkTaskNode(result, taskNode, taskDefinitionJson);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
+                || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
             return result;
         }
         int update = processService.updateTaskDefinition(loginUser, project.getCode(), taskNode, taskDefinition);
