@@ -99,17 +99,13 @@ public class ProcedureTask extends AbstractTask {
         Connection connection = null;
         CallableStatement stmt = null;
         try {
-            // load class
-            DataSourceFactory.loadClass(DbType.valueOf(procedureParameters.getType()));
 
             // get datasource
             BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
-            // get jdbc connection
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    baseDataSource.getUser(),
-                    baseDataSource.getPassword());
+            // create jdbc connection
+            connection = baseDataSource.getConnection();
 
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
