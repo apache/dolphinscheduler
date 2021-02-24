@@ -31,6 +31,13 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.server.master.runner.MasterBaseTaskExecThread} instance and intercept `call` methods,
+ * this class provides an isolated thread for running job.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.MasterBaseTaskExecThreadConstructorInterceptor
+ * @see org.apache.dolphinscheduler.skywalking.plugin.MasterBaseTaskExecThreadMethodInterceptor
+ */
 public class MasterBaseTaskExecThreadInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String CONSTRUCTOR_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.MasterBaseTaskExecThreadConstructorInterceptor";
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.MasterBaseTaskExecThreadMethodInterceptor";

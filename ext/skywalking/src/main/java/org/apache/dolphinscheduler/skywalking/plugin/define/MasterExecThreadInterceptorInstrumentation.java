@@ -32,6 +32,14 @@ import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 import static net.bytebuddy.matcher.ElementMatchers.returns;
 import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.server.master.runner.MasterExecThread} instance and intercept `run`  and `getProcessInstanceState` methods,
+ * the `run` method is a unified entrance of scheduled job.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.MasterExecThreadConstructorInterceptor
+ * @see org.apache.dolphinscheduler.skywalking.plugin.MasterExecThreadMethodInterceptor
+ * @see org.apache.dolphinscheduler.skywalking.plugin.MasterExecThreadStateCacheInterceptor
+ */
 public class MasterExecThreadInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String CONSTRUCTOR_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.MasterExecThreadConstructorInterceptor";
     private static final String EXEC_PROCESS_METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.MasterExecThreadMethodInterceptor";

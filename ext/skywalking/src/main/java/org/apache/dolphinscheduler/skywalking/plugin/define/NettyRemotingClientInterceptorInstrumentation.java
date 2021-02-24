@@ -30,6 +30,12 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.remote.NettyRemotingClient} instance and intercept `send` method,
+ * this method send message to remote server.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.NettyRemotingClientMethodInterceptor
+ */
 public class NettyRemotingClientInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.NettyRemotingClientMethodInterceptor";
     private static final String ENHANC_CLASS = "org.apache.dolphinscheduler.remote.NettyRemotingClient";

@@ -49,9 +49,9 @@ public class TaskPriorityQueueImplMethodInterceptor implements InstanceMethodsAr
         Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT);
 
         if (isActive) {
-            Map taskPriorityContext = taskPriority.getContext();
+            Map<String, Object> taskPriorityContext = taskPriority.getContext();
             if (taskPriorityContext == null) {
-                taskPriorityContext = new HashMap();
+                taskPriorityContext = new HashMap<>();
                 taskPriority.setContext(taskPriorityContext);
             }
             taskPriorityContext.put(SKYWALKING_TRACING_CONTEXT, ContextManager.capture());

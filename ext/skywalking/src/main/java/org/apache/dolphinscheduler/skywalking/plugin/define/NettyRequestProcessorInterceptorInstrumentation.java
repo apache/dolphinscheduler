@@ -30,6 +30,12 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor} instance and intercept `process` method,
+ * this method receive and handle message from remote server.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.NettyRequestProcessorMethodInterceptor
+ */
 public class NettyRequestProcessorInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.NettyRequestProcessorMethodInterceptor";
     private static final String ENHANC_CLASS = "org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor";

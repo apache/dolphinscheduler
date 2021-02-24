@@ -30,7 +30,7 @@ import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName
 
 /**
  * Enhance {@link org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService} instance and intercept `scheduleProcess` method,
- * this method is a unified entrance of scheduled job.
+ * this method is a scheduler entrance of job.
  *
  * @see org.apache.dolphinscheduler.skywalking.plugin.MasterSchedulerServiceMethodInterceptor
  */

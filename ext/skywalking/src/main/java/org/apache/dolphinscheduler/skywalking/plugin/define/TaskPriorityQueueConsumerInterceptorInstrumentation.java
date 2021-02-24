@@ -31,6 +31,12 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.returns;
 import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.server.master.consumer.TaskPriorityQueueConsumer} instance and intercept `dispatch` method,
+ * this method is a dispatch the task info of memory queue to worker nodes.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.TaskPriorityQueueConsumerMethodInterceptor
+ */
 public class TaskPriorityQueueConsumerInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.TaskPriorityQueueConsumerMethodInterceptor";
     private static final String ENHANC_CLASS = "org.apache.dolphinscheduler.server.master.consumer.TaskPriorityQueueConsumer";

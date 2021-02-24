@@ -40,7 +40,7 @@ public class TaskPriorityQueueConsumerMethodInterceptor implements InstanceMetho
     @Override
     public void beforeMethod(EnhancedInstance objInst, Method method, Object[] allArguments, Class<?>[] argumentsTypes, MethodInterceptResult result) throws Throwable {
         TaskPriority taskPriority = (TaskPriority) allArguments[0];
-        Map taskContext = taskPriority.getContext();
+        Map<String, Object> taskContext = taskPriority.getContext();
 
         AbstractSpan span = ContextManager.createLocalSpan(OPERATION_NAME);
         span.setComponent(Utils.DOLPHIN_SCHEDULER);

@@ -31,6 +31,13 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread} instance and intercept `run` method,
+ * this class provides an isolated thread for running task.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteThreadConstructorInterceptor
+ * @see org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteThreadMethodInterceptor
+ */
 public class TaskExecuteThreadInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String CONSTRUCTOR_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteThreadConstructorInterceptor";
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteThreadMethodInterceptor";

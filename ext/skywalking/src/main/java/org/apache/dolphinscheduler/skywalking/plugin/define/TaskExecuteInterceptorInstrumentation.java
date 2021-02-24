@@ -31,6 +31,13 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.isPublic;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.server.worker.task.AbstractTask} instance and intercept `init`、`handle` and `after` methods,
+ * the implementation class execute task through these methods.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteConstructorInterceptor
+ * @see org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteConstructorInterceptor
+ */
 public class TaskExecuteInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String CONSTRUCTOR_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteConstructorInterceptor";
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.TaskExecuteMethodInterceptor";

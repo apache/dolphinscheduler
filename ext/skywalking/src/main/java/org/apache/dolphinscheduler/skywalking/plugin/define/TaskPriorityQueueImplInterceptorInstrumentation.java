@@ -30,6 +30,12 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static org.apache.skywalking.apm.agent.core.plugin.match.NameMatch.byName;
 
+/**
+ * Enhance {@link org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl} instance and intercept `put` method,
+ * this method is a publish task info to memory queue.
+ *
+ * @see org.apache.dolphinscheduler.skywalking.plugin.TaskPriorityQueueImplMethodInterceptor
+ */
 public class TaskPriorityQueueImplInterceptorInstrumentation extends ClassInstanceMethodsEnhancePluginDefine {
     private static final String METHOD_INTERCEPTOR_CLASS = "org.apache.dolphinscheduler.skywalking.plugin.TaskPriorityQueueImplMethodInterceptor";
     private static final String ENHANC_CLASS = "org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl";

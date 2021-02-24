@@ -53,7 +53,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
     /**
      * context
      */
-    private Map<String, String> context;
+    private Map<String, Object> context;
 
     public TaskPriority(){}
 
@@ -96,7 +96,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         return taskId;
     }
 
-    public Map<String, String> getContext() {
+    public Map<String, Object> getContext() {
         return context;
     }
 
@@ -112,7 +112,7 @@ public class TaskPriority implements Comparable<TaskPriority> {
         this.groupName = groupName;
     }
 
-    public void setContext(Map<String, String> context) {
+    public void setContext(Map<String, Object> context) {
         this.context = context;
     }
 
