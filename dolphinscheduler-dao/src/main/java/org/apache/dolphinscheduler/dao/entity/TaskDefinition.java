@@ -167,6 +167,14 @@ public class TaskDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    public TaskDefinition() {
+    }
+
+    public TaskDefinition(long code, int version) {
+        this.code = code;
+        this.version = version;
+    }
+
     public String getName() {
         return name;
     }

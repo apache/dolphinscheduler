@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import java.io.IOException;
 import java.util.List;
@@ -100,6 +101,11 @@ public class TaskNode {
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
     @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
     private String preTasks;
+
+    /**
+     * node dependency list
+     */
+    private List<TaskDefinition> preTaskDefinitionList;
 
     /**
      * users store additional information
@@ -371,6 +377,14 @@ public class TaskNode {
 
     public boolean isConditionsTask() {
         return TaskType.CONDITIONS.toString().equalsIgnoreCase(this.getType());
+    }
+
+    public List<TaskDefinition> getPreTaskDefinitionList() {
+        return preTaskDefinitionList;
+    }
+
+    public void setPreTaskDefinitionList(List<TaskDefinition> preTaskDefinitionList) {
+        this.preTaskDefinitionList = preTaskDefinitionList;
     }
 
     @Override
