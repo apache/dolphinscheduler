@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
+import org.apache.dolphinscheduler.common.model.PreviousTaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
@@ -2431,14 +2432,14 @@ public class ProcessService {
                     v.setCode(processTaskRelation.getPostTaskCode());
                     v.setVersion(processTaskRelation.getPostNodeVersion());
                     v.setConditionResult(processTaskRelation.getConditionParams());
-                    List<TaskDefinition> preTaskDefinitionList = new ArrayList<>();
+                    List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
                     if (processTaskRelation.getPreTaskCode() > 0) {
-                        preTaskDefinitionList.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreNodeVersion()));
+                        preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreNodeVersion()));
                     }
-                    v.setPreTaskDefinitionList(preTaskDefinitionList);
+                    v.setPreTaskNodeList(preTaskNodeList);
                 } else {
-                    List<TaskDefinition> preTaskDefinitionList = v.getPreTaskDefinitionList();
-                    preTaskDefinitionList.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreNodeVersion()));
+                    List<PreviousTaskNode> preTaskDefinitionList = v.getPreTaskNodeList();
+                    preTaskDefinitionList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreNodeVersion()));
                 }
                 return v;
             });
@@ -2461,8 +2462,9 @@ public class ProcessService {
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                     taskDefinitionLog.getTaskTimeoutStrategy(),
                     taskDefinitionLog.getTimeout())));
-            v.getPreTaskDefinitionList().forEach(task ->
-                    task = JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinitionLogMap.get(task.getCode())), TaskDefinition.class));
+            // TODO name will be remove
+            v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
+            v.setPreTasks(StringUtils.join(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList()), ","));
         });
         return new ArrayList<>(taskNodeMap.values());
     }
