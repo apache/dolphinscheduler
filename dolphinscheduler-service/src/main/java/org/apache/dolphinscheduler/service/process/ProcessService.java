@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PRO
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -44,13 +46,14 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.DateInterval;
+import org.apache.dolphinscheduler.common.model.PreviousTaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
+import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -112,6 +115,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -126,6 +130,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cronutils.model.Cron;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -747,11 +753,6 @@ public class ProcessService {
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
                 // Recalculate global parameters after rerun.
-                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                        processDefinition.getGlobalParamMap(),
-                        processDefinition.getGlobalParamList(),
-                        getCommandTypeIfComplement(processInstance, command),
-                        processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
@@ -1257,9 +1258,11 @@ public class ProcessService {
         // running, delayed or killed
         // the task already exists in task queue
         // return state
-        if (state == ExecutionStatus.RUNNING_EXECUTION
-                || state == ExecutionStatus.DELAY_EXECUTION
-                || state == ExecutionStatus.KILL) {
+        if (
+                state == ExecutionStatus.RUNNING_EXECUTION
+                        || state == ExecutionStatus.DELAY_EXECUTION
+                        || state == ExecutionStatus.KILL
+        ) {
             return state;
         }
         //return pasue /stop if process instance state is ready pause / stop
@@ -1600,13 +1603,73 @@ public class ProcessService {
                                 int processId,
                                 String appIds,
                                 int taskInstId,
-                                String varPool) {
+                                String varPool,
+                                String result) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
         taskInstance.setVarPool(varPool);
+        changeOutParam(result, taskInstance);
         saveTaskInstance(taskInstance);
+    }
+
+    public void changeOutParam(String result, TaskInstance taskInstance) {
+        if (StringUtils.isEmpty(result)) {
+            return;
+        }
+        List<Map<String, String>> workerResultParam = getListMapByString(result);
+        if (CollectionUtils.isEmpty(workerResultParam)) {
+            return;
+        }
+        //if the result more than one line,just get the first .
+        Map<String, String> row = workerResultParam.get(0);
+        if (row == null || row.size() == 0) {
+            return;
+        }
+        TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+        Map<String, Object> taskParams = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+        Object localParams = taskParams.get(LOCAL_PARAMS);
+        if (localParams == null) {
+            return;
+        }
+        ProcessInstance processInstance = this.processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId());
+        List<Property> params4Property = JSONUtils.toList(processInstance.getGlobalParams(), Property.class);
+        Map<String, Property> allParamMap = params4Property.stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+
+        List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+        for (Property info : allParam) {
+            if (info.getDirect() == Direct.OUT) {
+                String paramName = info.getProp();
+                Property property = allParamMap.get(paramName);
+                if (property == null) {
+                    continue;
+                }
+                String value = row.get(paramName);
+                if (StringUtils.isNotEmpty(value)) {
+                    property.setValue(value);
+                    info.setValue(value);
+                }
+            }
+        }
+        taskParams.put(LOCAL_PARAMS, allParam);
+        taskNode.setParams(JSONUtils.toJsonString(taskParams));
+        // task instance node json
+        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+        String params4ProcessString = JSONUtils.toJsonString(params4Property);
+        int updateCount = this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId());
+        logger.info("updateCount:{}, params4Process:{}, processInstanceId:{}", updateCount, params4ProcessString, processInstance.getId());
+    }
+
+    public List<Map<String, String>> getListMapByString(String json) {
+        List<Map<String, String>> allParams = new ArrayList<>();
+        ArrayNode paramsByJson = JSONUtils.parseArray(json);
+        Iterator<JsonNode> listIterator = paramsByJson.iterator();
+        while (listIterator.hasNext()) {
+            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
+            allParams.add(param);
+        }
+        return allParams;
     }
 
     /**
@@ -2165,7 +2228,6 @@ public class ProcessService {
 
     /**
      * save processDefinition (including create or update processDefinition)
-     *
      */
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
                                      String connects, ProcessData processData, ProcessDefinition processDefinition) {
@@ -2341,10 +2403,6 @@ public class ProcessService {
     /**
      * get process task relation list
      * this function can be query relation list from log record
-     *
-     * @param processCode
-     * @param processVersion
-     * @return
      */
     public List<ProcessTaskRelation> getProcessTaskRelationList(Long processCode, int processVersion) {
         List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
@@ -2357,4 +2415,57 @@ public class ProcessService {
         return processTaskRelations;
     }
 
+    public List<TaskNode> genTaskNodeList(Long processCode, int processVersion) {
+        List<ProcessTaskRelation> processTaskRelations = this.getProcessTaskRelationList(processCode, processVersion);
+        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
+        Map<Long, TaskNode> taskNodeMap = new HashMap<>();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPreTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreNodeVersion()));
+            }
+            if (processTaskRelation.getPostTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostNodeVersion()));
+            }
+            taskNodeMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
+                if (v == null) {
+                    v = new TaskNode();
+                    v.setCode(processTaskRelation.getPostTaskCode());
+                    v.setVersion(processTaskRelation.getPostNodeVersion());
+                    v.setConditionResult(processTaskRelation.getConditionParams());
+                    List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
+                    if (processTaskRelation.getPreTaskCode() > 0) {
+                        preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreNodeVersion()));
+                    }
+                    v.setPreTaskNodeList(preTaskNodeList);
+                } else {
+                    List<PreviousTaskNode> preTaskDefinitionList = v.getPreTaskNodeList();
+                    preTaskDefinitionList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreNodeVersion()));
+                }
+                return v;
+            });
+        }
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
+        Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream().collect(Collectors.toMap(TaskDefinitionLog::getCode, log -> log));
+        taskNodeMap.forEach((k, v) -> {
+            TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
+            v.setId("task-" + taskDefinitionLog.getId());
+            v.setCode(taskDefinitionLog.getCode());
+            v.setName(taskDefinitionLog.getName());
+            v.setDesc(taskDefinitionLog.getDescription());
+            v.setType(taskDefinitionLog.getTaskType().getDescp());
+            v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
+            v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
+            v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
+            v.setParams(taskDefinitionLog.getTaskParams());
+            v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
+            v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+            v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
+                    taskDefinitionLog.getTaskTimeoutStrategy(),
+                    taskDefinitionLog.getTimeout())));
+            // TODO name will be remove
+            v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
+            v.setPreTasks(StringUtils.join(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList()), ","));
+        });
+        return new ArrayList<>(taskNodeMap.values());
+    }
 }

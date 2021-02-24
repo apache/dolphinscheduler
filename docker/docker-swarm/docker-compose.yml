@@ -87,22 +87,11 @@ services:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-alert
     command: alert-server
+    ports:
+    - 50052:50052
     environment:
       TZ: Asia/Shanghai
-      XLS_FILE_PATH: "/tmp/xls"
-      MAIL_SERVER_HOST: ""
-      MAIL_SERVER_PORT: ""
-      MAIL_SENDER: ""
-      MAIL_USER: ""
-      MAIL_PASSWD: ""
-      MAIL_SMTP_STARTTLS_ENABLE: "false"
-      MAIL_SMTP_SSL_ENABLE: "false"
-      MAIL_SMTP_SSL_TRUST: ""
-      ENTERPRISE_WECHAT_ENABLE: "false"
-      ENTERPRISE_WECHAT_CORP_ID: ""
-      ENTERPRISE_WECHAT_SECRET: ""
-      ENTERPRISE_WECHAT_AGENT_ID: ""
-      ENTERPRISE_WECHAT_USERS: ""
+      ALERT_PLUGIN_DIR: lib/plugin/alert
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
@@ -169,21 +158,12 @@ services:
       TZ: Asia/Shanghai
       WORKER_EXEC_THREADS: "100"
       WORKER_HEARTBEAT_INTERVAL: "10"
-      WORKER_FETCH_TASK_NUM: "3"
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
       WORKER_WEIGHT: "100"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
-      XLS_FILE_PATH: "/tmp/xls"
-      MAIL_SERVER_HOST: ""
-      MAIL_SERVER_PORT: ""
-      MAIL_SENDER: ""
-      MAIL_USER: ""
-      MAIL_PASSWD: ""
-      MAIL_SMTP_STARTTLS_ENABLE: "false"
-      MAIL_SMTP_SSL_ENABLE: "false"
-      MAIL_SMTP_SSL_TRUST: ""
+      ALERT_LISTEN_HOST: dolphinscheduler-alert
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root

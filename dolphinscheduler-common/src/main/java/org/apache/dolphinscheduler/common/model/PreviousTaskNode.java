@@ -15,23 +15,52 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.script;
+package org.apache.dolphinscheduler.common.model;
 
-import org.junit.Test;
+public class PreviousTaskNode {
 
-/**
- * ProcessUtilsTest
- */
-public class ProcessUtilsTest {
+    /**
+     * code
+     */
+    private long code;
 
-    private static final String rootPath = System.getProperty("user.dir");
+    /**
+     * name
+     */
+    private String name;
 
-    private static final String shellFilPath = rootPath + "/dolphinscheduler-alert-plugin/dolphinscheduler-alert-script/src/test/script/shell/test.sh";
+    /**
+     * version
+     */
+    private int version;
 
-    private String[] cmd = {"/bin/sh", "-c", shellFilPath + " -t 1"};
+    public PreviousTaskNode(long code, String name, int version) {
+        this.code = code;
+        this.name = name;
+        this.version = version;
+    }
 
-    @Test
-    public void testExecuteScript() {
-        ProcessUtils.executeScript(cmd);
+    public long getCode() {
+        return code;
+    }
+
+    public void setCode(long code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }
