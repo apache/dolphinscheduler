@@ -52,10 +52,23 @@ public class PeerTaskInstancePriorityQueueTest {
         int peekBeforeLength = queue.size();
         queue.poll(1000, TimeUnit.MILLISECONDS);
         queue.poll(1000, TimeUnit.MILLISECONDS);
-        Assert.assertTrue(queue.size() == 0);
-        System.out.println(System.currentTimeMillis());
+        Assert.assertEquals(0, queue.size());
+        Thread producer = new Thread(() -> {
+            System.out.println(String.format("Ready to producing...,now time is %s ", System.currentTimeMillis()));
+            try {
+                Thread.sleep(100);
+                TaskInstance task = createTaskInstance("low_task", Priority.LOW);
+                queue.put(task);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(String.format("End to produce %s at time %s",
+                queue.peek() != null ? queue.peek().getName() : null, System.currentTimeMillis()));
+        });
+        producer.start();
+        System.out.println("Begin to consume at " + System.currentTimeMillis());
         queue.poll(1000, TimeUnit.MILLISECONDS);
-        System.out.println(System.currentTimeMillis());
+        System.out.println("End to consume at " + System.currentTimeMillis());
     }
 
     @Test
@@ -68,7 +81,7 @@ public class PeerTaskInstancePriorityQueueTest {
 
     @Test
     public void size() throws Exception {
-        Assert.assertTrue(getPeerTaskInstancePriorityQueue().size() == 2);
+        Assert.assertEquals(2, getPeerTaskInstancePriorityQueue().size());
     }
 
     @Test
