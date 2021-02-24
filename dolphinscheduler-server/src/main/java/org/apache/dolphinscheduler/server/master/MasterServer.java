@@ -27,12 +27,14 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
-import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+
+import javax.annotation.PostConstruct;
+
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +43,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-
-import javax.annotation.PostConstruct;
 
 
 
@@ -76,12 +76,6 @@ public class MasterServer implements IStoppable {
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     * master registry
-     */
-    @Autowired
-    private MasterRegistry masterRegistry;
-
-    /**
      * zk master client
      */
     @Autowired
@@ -109,6 +103,7 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
+
         try {
             //init remoting server
             NettyServerConfig serverConfig = new NettyServerConfig();
@@ -129,6 +124,7 @@ public class MasterServer implements IStoppable {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e);
         }
+
 
         // self tolerant
         this.zkMasterClient.start();
@@ -190,7 +186,6 @@ public class MasterServer implements IStoppable {
             //
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-            this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
             //close quartz
             try{
