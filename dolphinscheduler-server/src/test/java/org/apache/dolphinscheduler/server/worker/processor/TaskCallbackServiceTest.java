@@ -121,6 +121,11 @@ public class TaskCallbackServiceTest {
         ackCommand.setStartTime(new Date());
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand();
+        String result = responseCommand.getResult();
+        responseCommand.setResult("return string");
+        taskCallbackService.sendResult(1, responseCommand.convert2Command());
+
         Stopper.stop();
 
         nettyRemotingServer.close();
