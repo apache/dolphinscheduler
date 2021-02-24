@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -121,10 +120,6 @@ public class MasterServer implements IStoppable {
 
             this.masterRegistry.getZookeeperRegistryCenter().setStoppable(this);
 
-            String registPath = this.masterRegistry.getMasterPath();
-            this.masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
-            // register
-            this.masterRegistry.registry();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
