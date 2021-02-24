@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -44,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *  sql task test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {SqlTask.class, DriverManager.class})
+@PrepareForTest(value = {SqlTask.class, DriverManager.class, SpringApplicationContext.class, ParameterUtils.class})
 public class SqlTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlTaskTest.class);
@@ -70,7 +72,9 @@ public class SqlTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(
-                "{\"localParams\":[],\"type\":\"POSTGRESQL\",\"datasource\":1,\"sql\":\"insert into tb_1 values('1','2')\",\"sqlType\":1}");
+                "{\"localParams\":[{\"prop\":\"ret\", \"direct\":\"OUT\", \"type\":\"VARCHAR\", \"value\":\"\"}],"
+                        + "\"type\":\"POSTGRESQL\",\"datasource\":1,\"sql\":\"insert into tb_1 values('1','2')\","
+                        + "\"sqlType\":1}");
 
         taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         PowerMockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
@@ -85,6 +89,8 @@ public class SqlTaskTest {
         sqlTaskExecutionContext.setConnectionParams(CONNECTION_PARAMS);
         PowerMockito.when(taskExecutionContext.getSqlTaskExecutionContext()).thenReturn(sqlTaskExecutionContext);
 
+        PowerMockito.mockStatic(SpringApplicationContext.class);
+        PowerMockito.when(SpringApplicationContext.getBean(Mockito.any())).thenReturn(new AlertDao());
         alertClientService = PowerMockito.mock(AlertClientService.class);
         sqlTask = new SqlTask(taskExecutionContext, logger, alertClientService);
         sqlTask.init();
@@ -95,7 +101,7 @@ public class SqlTaskTest {
         Assert.assertNotNull(sqlTask.getParameters());
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testHandle() throws Exception {
         Connection connection = PowerMockito.mock(Connection.class);
         PowerMockito.mockStatic(DriverManager.class);
