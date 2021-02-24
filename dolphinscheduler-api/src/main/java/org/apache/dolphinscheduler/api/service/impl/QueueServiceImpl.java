@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -47,7 +46,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * queue service impl
  */
 @Service
-public class QueueServiceImpl extends BaseService implements QueueService {
+public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     private static final Logger logger = LoggerFactory.getLogger(QueueServiceImpl.class);
 
@@ -63,6 +62,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param loginUser login user
      * @return queue list
      */
+    @Override
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -85,6 +85,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param pageSize page size
      * @return queue list
      */
+    @Override
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -113,6 +114,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param queueName queue name
      * @return create result
      */
+    @Override
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -162,6 +164,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param queueName queue name
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
@@ -230,6 +233,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
+    @Override
     public Result<Object> verifyQueue(String queue, String queueName) {
         Result<Object> result = new Result<>();
 

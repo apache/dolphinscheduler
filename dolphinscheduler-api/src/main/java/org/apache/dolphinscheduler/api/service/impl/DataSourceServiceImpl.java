@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -57,10 +56,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * datasource service impl
+ * data source service impl
  */
 @Service
-public class DataSourceServiceImpl extends BaseService implements DataSourceService {
+public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceImpl.class);
 
@@ -90,6 +89,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param parameter datasource parameters
      * @return create result code
      */
+    @Override
     public Result<Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
 
         Result<Object> result = new Result<>();
@@ -133,6 +133,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param id        data source id
      * @return update result code
      */
+    @Override
     public Result<Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
 
         Result<Object> result = new Result<>();
@@ -193,6 +194,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param id datasource id
      * @return data source detail
      */
+    @Override
     public Map<String, Object> queryDataSource(int id) {
 
         Map<String, Object> result = new HashMap<>();
@@ -288,6 +290,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param pageSize  page size
      * @return data source list page
      */
+    @Override
     public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         IPage<DataSource> dataSourceList;
@@ -340,6 +343,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param type      data source type
      * @return data source list page
      */
+    @Override
     public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>();
 
@@ -363,6 +367,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
+    @Override
     public Result<Object> verifyDataSourceName(String name) {
         Result<Object> result = new Result<>();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
@@ -382,6 +387,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
+    @Override
     public Result<Object> checkConnection(DbType type, String parameter) {
         Result<Object> result = new Result<>();
         BaseDataSource datasource = DataSourceFactory.getDatasource(type, parameter);
@@ -408,6 +414,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param id datasource id
      * @return connect result code
      */
+    @Override
     public Result<Object> connectionTest(int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
@@ -431,6 +438,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param principal principal
      * @return datasource parameter
      */
+    @Override
     public String buildParameter(DbType type, String host,
                                  String port, String database, String principal, String userName,
                                  String password, DbConnectType connectType, String other,
@@ -549,6 +557,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param datasourceId data source id
      * @return delete result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Result<Object> delete(User loginUser, int datasourceId) {
         Result<Object> result = new Result<>();
@@ -581,6 +590,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param userId    user id
      * @return unauthed data source result code
      */
+    @Override
     public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -621,6 +631,7 @@ public class DataSourceServiceImpl extends BaseService implements DataSourceServ
      * @param userId    user id
      * @return authorized result code
      */
+    @Override
     public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 

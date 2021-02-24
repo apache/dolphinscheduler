@@ -14,12 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-msg=$1
-content=$2
-
-if  [ $msg = errorMsg ]
-   then
-     exit 12
-fi
-exit 0
+{{- if .Values.common.fsFileResourcePersistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+  {{- range .Values.common.fsFileResourcePersistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  storageClassName: {{ .Values.common.fsFileResourcePersistence.storageClassName | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.common.fsFileResourcePersistence.storage | quote }}
+{{- end }}

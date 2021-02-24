@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -94,7 +93,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * process instance service impl
  */
 @Service
-public class ProcessInstanceServiceImpl extends BaseService implements ProcessInstanceService {
+public class ProcessInstanceServiceImpl extends BaseServiceImpl implements ProcessInstanceService {
 
     @Autowired
     ProjectMapper projectMapper;
@@ -133,6 +132,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime
      */
+    @Override
     public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser, String projectName, int size, String startTime, String endTime) {
         Map<String, Object> result = new HashMap<>();
 
@@ -180,6 +180,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param processId process instance id
      * @return process instance detail
      */
+    @Override
     public Map<String, Object> queryProcessInstanceById(User loginUser, String projectName, Integer processId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -214,6 +215,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param endDate end time
      * @return process instance list
      */
+    @Override
     public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
                                                         String startDate, String endDate,
                                                         String searchVal, String executorName, ExecutionStatus stateType, String host,
@@ -282,6 +284,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @return task list for the process instance
      * @throws IOException io exception
      */
+    @Override
     public Map<String, Object> queryTaskListByProcessId(User loginUser, String projectName, Integer processId) throws IOException {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -320,6 +323,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
         }
     }
 
+    @Override
     public Map<String, DependResult> parseLogForDependentResult(String log) throws IOException {
         Map<String, DependResult> resultMap = new HashMap<>();
         if (StringUtils.isEmpty(log)) {
@@ -356,6 +360,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param taskId task id
      * @return sub process instance detail
      */
+    @Override
     public Map<String, Object> querySubProcessInstanceByTaskId(User loginUser, String projectName, Integer taskId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -404,6 +409,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @return update result code
      * @throws ParseException parse exception for json parse
      */
+    @Override
     public Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
                                                      String processInstanceJson, String scheduleTime, Boolean syncDefine,
                                                      Flag flag, String locations, String connects) throws ParseException {
@@ -504,6 +510,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param subId sub process id
      * @return parent instance detail
      */
+    @Override
     public Map<String, Object> queryParentInstanceBySubId(User loginUser, String projectName, Integer subId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -544,6 +551,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param processInstanceId process instance id
      * @return delete result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId) {
 
@@ -583,6 +591,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param processInstanceId process instance id
      * @return variables data
      */
+    @Override
     public Map<String, Object> viewVariables(Integer processInstanceId) {
         Map<String, Object> result = new HashMap<>();
 
@@ -656,6 +665,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @return gantt tree data
      * @throws Exception exception when json parse
      */
+    @Override
     public Map<String, Object> viewGantt(Integer processInstanceId) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
@@ -724,6 +734,7 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param states states array
      * @return process instance list
      */
+    @Override
     public List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states) {
         return processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionId, states);
     }
@@ -734,7 +745,8 @@ public class ProcessInstanceServiceImpl extends BaseService implements ProcessIn
      * @param size size
      * @return process instance list
      */
-    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size) {
+    @Override
+    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId, int size) {
         return processInstanceMapper.queryByProcessDefineId(processDefinitionId, size);
     }
 

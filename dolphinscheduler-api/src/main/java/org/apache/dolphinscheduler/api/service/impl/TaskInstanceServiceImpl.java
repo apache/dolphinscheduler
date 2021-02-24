@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -54,7 +53,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * task instance service impl
  */
 @Service
-public class TaskInstanceServiceImpl extends BaseService implements TaskInstanceService {
+public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
 
     @Autowired
     ProjectMapper projectMapper;
@@ -90,6 +89,7 @@ public class TaskInstanceServiceImpl extends BaseService implements TaskInstance
      * @param pageSize page size
      * @return task list page
      */
+    @Override
     public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
                                                    Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
                                                    String endDate, String searchVal, ExecutionStatus stateType, String host,
@@ -158,6 +158,7 @@ public class TaskInstanceServiceImpl extends BaseService implements TaskInstance
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
+    @Override
     public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);

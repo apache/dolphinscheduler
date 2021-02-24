@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -42,8 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,12 +49,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * tenant service
+ * tenant service impl
  */
 @Service
-public class TenantServiceImpl extends BaseService implements TenantService {
-
-    private static final Logger logger = LoggerFactory.getLogger(TenantServiceImpl.class);
+public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -81,6 +76,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @return create result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
@@ -138,6 +134,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param pageSize page size
      * @return tenant list page
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
@@ -168,6 +165,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @return update result code
      * @throws Exception exception
      */
+    @Override
     public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
@@ -231,6 +229,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @return delete result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -309,6 +308,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param loginUser login user
      * @return tenant list
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -326,6 +326,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
+    @Override
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {

@@ -15,11 +15,13 @@
 # limitations under the License.
 #
 
+while getopts t: opts; do
+    case $opts in
+        t) t=$OPTARG ;;
+        ?) ;;
+    esac
+done
 
-msg=$1
-content=$2
+echo "$t"
 
-# Write your specific logic here
-
-# Set the exit code according to your execution result, and alert needs to use it to judge the status of this alarm result
 exit 0

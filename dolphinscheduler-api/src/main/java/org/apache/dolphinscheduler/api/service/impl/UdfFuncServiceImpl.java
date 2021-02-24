@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -48,10 +47,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * udf function service impl
+ * udf func service impl
  */
 @Service
-public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
+public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncService {
 
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceImpl.class);
 
@@ -77,6 +76,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param className class name
      * @return create result code
      */
+    @Override
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
@@ -148,6 +148,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param id  udf function id
      * @return udf function detail
      */
+    @Override
     public Map<String, Object> queryUdfFuncDetail(int id) {
         Map<String, Object> result = new HashMap<>();
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
@@ -173,6 +174,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param className class name
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateUdfFunc(int udfFuncId,
                                              String funcName,
                                              String className,
@@ -243,6 +245,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param searchVal search value
      * @return udf function list page
      */
+    @Override
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -279,6 +282,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param type  udf type
      * @return udf func list
      */
+    @Override
     public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>();
         int userId = loginUser.getId();
@@ -298,6 +302,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param id udf function id
      * @return delete result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Result<Object> delete(int id) {
         Result<Object> result = new Result<>();
@@ -313,6 +318,7 @@ public class UdfFuncServiceImpl extends BaseService implements UdfFuncService {
      * @param name name
      * @return true if the name can user, otherwise return false
      */
+    @Override
     public Result<Object> verifyUdfFuncByName(String name) {
         Result<Object> result = new Result<>();
         if (checkUdfFuncNameExists(name)) {

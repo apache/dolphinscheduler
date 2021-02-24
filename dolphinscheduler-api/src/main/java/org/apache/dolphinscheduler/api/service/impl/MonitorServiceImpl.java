@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
 import org.apache.dolphinscheduler.common.Constants;
@@ -47,7 +46,7 @@ import com.google.common.collect.Sets;
  * monitor service impl
  */
 @Service
-public class MonitorServiceImpl extends BaseService implements MonitorService {
+public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
 
     @Autowired
     private ZookeeperMonitor zookeeperMonitor;
@@ -61,6 +60,7 @@ public class MonitorServiceImpl extends BaseService implements MonitorService {
      * @param loginUser login user
      * @return data base state
      */
+    @Override
     public Map<String,Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
@@ -79,6 +79,7 @@ public class MonitorServiceImpl extends BaseService implements MonitorService {
      * @param loginUser login user
      * @return master information list
      */
+    @Override
     public Map<String,Object> queryMaster(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -96,6 +97,7 @@ public class MonitorServiceImpl extends BaseService implements MonitorService {
      * @param loginUser login user
      * @return zookeeper information list
      */
+    @Override
     public Map<String,Object> queryZookeeperState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
@@ -114,6 +116,7 @@ public class MonitorServiceImpl extends BaseService implements MonitorService {
      * @param loginUser login user
      * @return worker information list
      */
+    @Override
     public Map<String,Object> queryWorker(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -151,6 +154,7 @@ public class MonitorServiceImpl extends BaseService implements MonitorService {
         return result;
     }
 
+    @Override
     public List<Server> getServerListFromZK(boolean isMaster) {
 
         checkNotNull(zookeeperMonitor);
