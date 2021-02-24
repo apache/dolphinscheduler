@@ -2415,6 +2415,20 @@ public class ProcessService {
         return processTaskRelations;
     }
 
+    /**
+     * generate ProcessData
+     */
+    public ProcessData genProcessData(ProcessDefinition processDefinition) {
+        List<TaskNode> taskNodes = genTaskNodeList(processDefinition.getCode()
+                , processDefinition.getVersion());
+        ProcessData processData = new ProcessData();
+        processData.setTasks(taskNodes);
+        processData.setGlobalParams(JSONUtils.toList(processDefinition.getGlobalParams(), Property.class));
+        processData.setTenantId(processDefinition.getTenantId());
+        processData.setTimeout(processDefinition.getTimeout());
+        return processData;
+    }
+
     public List<TaskNode> genTaskNodeList(Long processCode, int processVersion) {
         List<ProcessTaskRelation> processTaskRelations = this.getProcessTaskRelationList(processCode, processVersion);
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
