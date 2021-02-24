@@ -152,7 +152,7 @@ public class WorkerRegistry {
     /**
      * get worker path
      */
-    private Set<String> getWorkerZkPaths() {
+    public Set<String> getWorkerZkPaths() {
         Set<String> workerZkPaths = Sets.newHashSet();
 
         String address = getLocalAddress();
