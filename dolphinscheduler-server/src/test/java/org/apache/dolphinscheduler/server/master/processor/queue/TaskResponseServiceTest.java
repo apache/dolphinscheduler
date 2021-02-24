@@ -70,7 +70,8 @@ public class TaskResponseServiceTest {
             "ids",
             22,
             "varPol",
-            channel);
+            channel,
+                "[{\"id\":70000,\"database_name\":\"yuul\",\"status\":-1,\"create_time\":1601202829000,\"update_time\":1601202829000,\"table_name3\":\"\",\"table_name4\":\"\"}]");
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);

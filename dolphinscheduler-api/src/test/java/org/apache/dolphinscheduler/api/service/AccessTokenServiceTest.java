@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +49,9 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * access token service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class AccessTokenServiceTest {
 
@@ -58,7 +62,6 @@ public class AccessTokenServiceTest {
 
     @Mock
     private AccessTokenMapper accessTokenMapper;
-
 
     @Test
     @SuppressWarnings("unchecked")

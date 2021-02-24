@@ -29,13 +29,13 @@ import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -61,9 +61,9 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * schedule controller
+ * scheduler controller
  */
-@Api(tags = "SCHEDULER_TAG", position = 13)
+@Api(tags = "SCHEDULER_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/schedule")
 public class SchedulerController extends BaseController {
@@ -116,7 +116,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
         logger.info("login user {},project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {},"
                         + "failure policy: {},processInstancePriority : {}, workGroupId:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(projectName), processDefinitionId, schedule, warningType, warningGroupId,
+                RegexUtils.escapeNRT(loginUser.getUserName()), RegexUtils.escapeNRT(projectName), processDefinitionId, schedule, warningType, warningGroupId,
                 failureStrategy, processInstancePriority, workerGroup);
         Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
                 warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
@@ -161,7 +161,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
         logger.info("login user {},project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, "
                         + "failure policy: {},processInstancePriority : {},workerGroupId:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(projectName), id, schedule, warningType, warningGroupId, failureStrategy,
+                RegexUtils.escapeNRT(loginUser.getUserName()), RegexUtils.escapeNRT(projectName), id, schedule, warningType, warningGroupId, failureStrategy,
                 processInstancePriority, workerGroup);
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,

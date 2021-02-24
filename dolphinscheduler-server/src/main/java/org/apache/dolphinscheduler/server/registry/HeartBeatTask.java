@@ -78,7 +78,7 @@ public class HeartBeatTask extends Thread {
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
 
-            int status = Constants.NORAML_NODE_STATUS;
+            int status = Constants.NORMAL_NODE_STATUS;
 
             if (availablePhysicalMemorySize < reservedMemory
                     || loadAverage > maxCpuloadAvg) {

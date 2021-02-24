@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
@@ -90,11 +91,13 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private RetryReportTaskStatusThread retryReportTaskStatusThread;
 
+    @Autowired
+    private WorkerManagerThread workerManagerThread;
+
     /**
      * worker server startup
-     * <p>
-     * worker server not use web service
      *
+     * worker server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -133,6 +136,11 @@ public class WorkerServer implements IStoppable {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
+        // task execute manager
+        this.workerManagerThread.start();
+
+        // retry report task status
+        this.retryReportTaskStatusThread.start();
 
         /**
          * register hooks, which are called before the process exits

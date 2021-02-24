@@ -17,6 +17,14 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_NAME;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_PROPS;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_TITLE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_TYPE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALIDATE;
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
+
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
@@ -35,34 +43,34 @@ public class PluginParams {
     /**
      * param name
      */
-    @JsonProperty("field")
+    @JsonProperty(STRING_PLUGIN_PARAM_FIELD)
     protected String name;
 
     /**
      * param name
      */
-    @JsonProperty("name")
+    @JsonProperty(STRING_PLUGIN_PARAM_NAME)
     protected String fieldName;
 
-    @JsonProperty("props")
+    @JsonProperty(STRING_PLUGIN_PARAM_PROPS)
     protected ParamsProps props;
 
-    @JsonProperty("type")
+    @JsonProperty(STRING_PLUGIN_PARAM_TYPE)
     protected String formType;
 
     /**
      * Name displayed on the page
      */
-    @JsonProperty("title")
+    @JsonProperty(STRING_PLUGIN_PARAM_TITLE)
     protected String title;
 
     /**
      * default value or value input by user in the page
      */
-    @JsonProperty("value")
+    @JsonProperty(STRING_PLUGIN_PARAM_VALUE)
     protected Object value;
 
-    @JsonProperty("validate")
+    @JsonProperty(STRING_PLUGIN_PARAM_VALIDATE)
     protected List<Validate> validateList;
 
     protected PluginParams(Builder builder) {
@@ -164,6 +172,10 @@ public class PluginParams {
 
     public List<Validate> getValidateList() {
         return validateList;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
     }
 }
 

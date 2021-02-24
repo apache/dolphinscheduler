@@ -25,7 +25,7 @@
             v-if="createWarningDialog"
             :visible.sync="createWarningDialog"
             width="auto">
-            <m-create-warning-instance :item="item" :pulginInstance="pulginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning-instance>
+            <m-create-warning-instance :item="item" :pluginInstance="pluginInstance" @onUpdate="onUpdate" @close="close"></m-create-warning-instance>
           </el-dialog>
         </template>
       </m-conditions>
@@ -86,7 +86,7 @@
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
         createWarningDialog: false,
         item: {},
-        pulginInstance: []
+        pluginInstance: []
       }
     },
     mixins: [listUrlParamHandle],
@@ -114,9 +114,9 @@
       },
       _create (item) {
         this.getPlugins({ pluginType: 'ALERT' }).then(res => {
-          this.pulginInstance = res
+          this.pluginInstance = res
         }).catch(e => {
-          this.$message.error(e.msg)
+          this.$message.error(e.msg || '')
         })
         this.item = item
         this.createWarningDialog = true
@@ -148,6 +148,7 @@
             this.isLoading = false
           }
         }).catch(e => {
+          this.$message.error(e.msg || '')
           this.isLoading = false
         })
       }

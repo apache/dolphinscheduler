@@ -136,7 +136,7 @@ public class MasterRegistry {
      */
     private String getLocalAddress() {
 
-        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
+        return NetUtils.getAddr(masterConfig.getListenPort());
 
     }
 
