@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
+
 /**
  * abstract command executor
  */
@@ -85,6 +86,11 @@ public abstract class AbstractCommandExecutor {
     protected final List<String> logBuffer;
 
     /**
+     * SHELL result string
+     */
+    protected String taskResultString;
+
+    /**
      * taskExecutionContext
      */
     protected TaskExecutionContext taskExecutionContext;
@@ -102,6 +108,10 @@ public abstract class AbstractCommandExecutor {
         this.logger = logger;
         this.logBuffer = Collections.synchronizedList(new ArrayList<>());
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+    }
+
+    protected AbstractCommandExecutor(List<String> logBuffer) {
+        this.logBuffer = logBuffer;
     }
 
     /**
@@ -222,6 +232,7 @@ public abstract class AbstractCommandExecutor {
     public String getVarPool() {
         return varPool.toString();
     }
+
 
     /**
      * cancel application
@@ -355,6 +366,7 @@ public abstract class AbstractCommandExecutor {
                             varPool.append("$VarPool$");
                         } else {
                             logBuffer.add(line);
+                            taskResultString = line;
                             lastFlushTime = flush(lastFlushTime);
                         }
                     }
@@ -561,4 +573,12 @@ public abstract class AbstractCommandExecutor {
     protected abstract String commandInterpreter();
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
+
+    public String getTaskResultString() {
+        return taskResultString;
+    }
+
+    public void setTaskResultString(String taskResultString) {
+        this.taskResultString = taskResultString;
+    }
 }
