@@ -262,7 +262,7 @@ public class ExecutorService2Test {
     }
 
     @Test
-    public void testExecuteRepeatRunning() throws Exception{
+    public void testExecuteRepeatRunning() throws Exception {
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Map<String, Object> result = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.REPEAT_RUNNING);
         Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
