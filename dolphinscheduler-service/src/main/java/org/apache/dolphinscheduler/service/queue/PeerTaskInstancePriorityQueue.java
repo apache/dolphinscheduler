@@ -82,8 +82,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      */
     @Override
     public TaskInstance poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException {
-        throw new TaskPriorityQueueException("This operation is not currently supported," +
-            "and suggest to use PriorityBlockingQueue if you want！");
+        throw new TaskPriorityQueueException("This operation is not currently supported and suggest to use PriorityBlockingQueue if you want！");
     }
 
     /**
