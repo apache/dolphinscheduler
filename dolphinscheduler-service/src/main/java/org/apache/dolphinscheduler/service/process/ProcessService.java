@@ -563,23 +563,8 @@ public class ProcessService {
         processInstance.setLocations(processDefinition.getLocations());
         processInstance.setConnects(processDefinition.getConnects());
 
-        // get start params from command param
-        Map<String, String> startParamMap = null;
-        if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
-            String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
-            startParamMap = JSONUtils.toMap(startParamJson);
-        }
-
-        // set start param into global params
-        if (startParamMap != null && startParamMap.size() > 0
-                && processDefinition.getGlobalParamMap() != null) {
-            for (Map.Entry<String, String> param : processDefinition.getGlobalParamMap().entrySet()) {
-                String val = startParamMap.get(param.getKey());
-                if (val != null) {
-                    param.setValue(val);
-                }
-            }
-        }
+        // reset global params while there are start parameters
+        setGlobalParamIfCommanded(processDefinition,cmdParam);
 
         // curing global params
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
@@ -597,6 +582,26 @@ public class ProcessService {
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
+    }
+
+    private void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam) {
+        // get start params from command param
+        Map<String, String> startParamMap = null;
+        if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
+            String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
+            startParamMap = JSONUtils.toMap(startParamJson);
+        }
+
+        // set start param into global params
+        if (startParamMap != null && startParamMap.size() > 0
+                && processDefinition.getGlobalParamMap() != null) {
+            for (Map.Entry<String, String> param : processDefinition.getGlobalParamMap().entrySet()) {
+                String val = startParamMap.get(param.getKey());
+                if (val != null) {
+                    param.setValue(val);
+                }
+            }
+        }
     }
 
     /**
@@ -690,7 +695,20 @@ public class ProcessService {
                 processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
             } else {
                 processInstance = this.findProcessInstanceDetailById(processInstanceId);
+                CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
+
+                // reset global params while repeat running is needed by cmdParam
+                if (commandTypeIfComplement == CommandType.REPEAT_RUNNING) {
+                    setGlobalParamIfCommanded(processDefinition, cmdParam);
+                }
+
                 // Recalculate global parameters after rerun.
+
+                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                    processDefinition.getGlobalParamMap(),
+                    processDefinition.getGlobalParamList(),
+                    commandTypeIfComplement,
+                    processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
