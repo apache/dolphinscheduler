@@ -27,7 +27,7 @@ public class MasterExecThreadConstructorInterceptor implements InstanceConstruct
     @Override
     public void onConstruct(EnhancedInstance objInst, Object[] allArguments) throws Throwable {
         ProcessInstance processInstance = (ProcessInstance) allArguments[0];
-        TaskContext taskContext = new TaskContext(processInstance, ContextManager.capture());
+        TaskContext<ProcessInstance> taskContext = new TaskContext<>(processInstance, ContextManager.capture());
 
         objInst.setSkyWalkingDynamicField(taskContext);
     }

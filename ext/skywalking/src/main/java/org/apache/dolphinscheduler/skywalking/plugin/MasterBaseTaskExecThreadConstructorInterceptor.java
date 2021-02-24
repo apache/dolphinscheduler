@@ -27,7 +27,7 @@ public class MasterBaseTaskExecThreadConstructorInterceptor implements InstanceC
     @Override
     public void onConstruct(EnhancedInstance objInst, Object[] allArguments) throws Throwable {
         TaskInstance taskInstance = (TaskInstance) allArguments[0];
-        TaskContext taskContext = new TaskContext(taskInstance, ContextManager.capture());
+        TaskContext<TaskInstance> taskContext = new TaskContext<>(taskInstance, ContextManager.capture());
 
         objInst.setSkyWalkingDynamicField(taskContext);
     }

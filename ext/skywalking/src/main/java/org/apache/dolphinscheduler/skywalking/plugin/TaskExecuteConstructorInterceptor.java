@@ -27,7 +27,7 @@ public class TaskExecuteConstructorInterceptor implements InstanceConstructorInt
     @Override
     public void onConstruct(EnhancedInstance objInst, Object[] allArguments) throws Throwable {
         TaskExecutionContext taskExecutionContext = (TaskExecutionContext) allArguments[0];
-        TaskContext taskContext = new TaskContext(taskExecutionContext, ContextManager.capture());
+        TaskContext<TaskExecutionContext> taskContext = new TaskContext<>(taskExecutionContext, ContextManager.capture());
 
         objInst.setSkyWalkingDynamicField(taskContext);
     }
