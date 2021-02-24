@@ -33,7 +33,7 @@ jobs:
         with:
           submodule: true
       - name: Check License Header
-        uses: apache/skywalking-eyes@9bd5feb
+        uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -45,7 +45,7 @@ jobs:
           sh ./docker/build/hooks/build
       - name: Docker Run
         run: |
-          export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
+          export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
           sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
           docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d
       - name: Check Server Status

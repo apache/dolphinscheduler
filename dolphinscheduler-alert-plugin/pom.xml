@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.3.4-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -35,6 +35,7 @@
         <module>dolphinscheduler-alert-dingtalk</module>
         <module>dolphinscheduler-alert-script</module>
         <module>dolphinscheduler-alert-http</module>
+        <module>dolphinscheduler-alert-feishu</module>
     </modules>
 
 

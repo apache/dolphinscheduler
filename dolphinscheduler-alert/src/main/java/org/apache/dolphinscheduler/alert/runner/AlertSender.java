@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.alert.runner;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.spi.alert.AlertResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,25 +47,22 @@ public class AlertSender {
 
     private List<Alert> alertList;
     private AlertDao alertDao;
-    private PluginDao pluginDao;
     private AlertPluginManager alertPluginManager;
 
     public AlertSender(AlertPluginManager alertPluginManager) {
         this.alertPluginManager = alertPluginManager;
     }
 
-    public AlertSender(AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
+    public AlertSender(AlertDao alertDao, AlertPluginManager alertPluginManager) {
         super();
         this.alertDao = alertDao;
-        this.pluginDao = pluginDao;
         this.alertPluginManager = alertPluginManager;
     }
 
-    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
+    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertPluginManager alertPluginManager) {
         super();
         this.alertList = alertList;
         this.alertDao = alertDao;
-        this.pluginDao = pluginDao;
         this.alertPluginManager = alertPluginManager;
     }
 
@@ -75,13 +73,14 @@ public class AlertSender {
             List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
             if (CollectionUtils.isEmpty(alertInstanceList)) {
                 logger.error("send alert msg fail,no bind plugin instance.");
-                return;
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "no bind plugin instance", alert.getId());
+                continue;
             }
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
-                .setContent(alert.getContent())
-                .setLog(alert.getLog())
-                .setTitle(alert.getTitle());
+                    .setContent(alert.getContent())
+                    .setLog(alert.getLog())
+                    .setTitle(alert.getTitle());
 
             for (AlertPluginInstance instance : alertInstanceList) {
 
@@ -107,7 +106,7 @@ public class AlertSender {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = new AlertData();
         alertData.setContent(content)
-            .setTitle(title);
+                .setTitle(title);
 
         boolean sendResponseStatus = true;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
@@ -126,7 +125,7 @@ public class AlertSender {
         for (AlertPluginInstance instance : alertInstanceList) {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
             AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                    Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
             sendResponseStatus = sendResponseStatus && alertSendResponseResult.getStatus();
             sendResponseResults.add(alertSendResponseResult);
         }
@@ -142,7 +141,7 @@ public class AlertSender {
      * @return AlertResult
      */
     private AlertResult alertResultHandler(AlertPluginInstance instance, AlertData alertData) {
-        String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
+        String pluginName = alertPluginManager.getPluginNameById(instance.getPluginDefineId());
         AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
         AlertResult alertResultExtend = new AlertResult();
         String pluginInstanceName = instance.getInstanceName();
@@ -156,8 +155,16 @@ public class AlertSender {
 
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(instance.getPluginInstanceParams());
-        AlertResult alertResult = alertChannel.process(alertInfo);
+        Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
+        alertInfo.setAlertParams(paramsMap);
+        AlertResult alertResult;
+        try {
+            alertResult = alertChannel.process(alertInfo);
+        } catch (Exception e) {
+            alertResult = new AlertResult("false", e.getMessage());
+            logger.error("send alert error alert data id :{},", alertData.getId(), e);
+        }
+
 
         if (alertResult == null) {
             String message = String.format("Alert Plugin %s send error : return alertResult value is null", pluginInstanceName);

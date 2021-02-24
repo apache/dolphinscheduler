@@ -33,32 +33,38 @@ public class ScriptSender {
 
     private String scriptPath;
 
-    private Integer scriptType;
+    private String scriptType;
 
     private String userParams;
 
+    private static final String ALERT_TITLE_OPTION = " -t ";
+
+    private static final String ALERT_CONTENT_OPTION = " -c ";
+
+    private static final String ALERT_USER_PARAMS_OPTION = " -p ";
+
     ScriptSender(Map<String, String> config) {
         scriptPath = config.get(ScriptParamsConstants.NAME_SCRIPT_PATH);
-        scriptType = Integer.parseInt(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE));
+        scriptType = config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE);
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
 
-    AlertResult sendScriptAlert(String msg) {
+    AlertResult sendScriptAlert(String title, String content) {
         AlertResult alertResult = new AlertResult();
-        if (ScriptType.of(scriptType).equals(ScriptType.SHELL)) {
-            return executeShellScript(msg);
+        if (ScriptType.SHELL.getDescp().equals(scriptType)) {
+            return executeShellScript(title, content);
         }
         return alertResult;
     }
 
-    private AlertResult executeShellScript(String msg) {
+    private AlertResult executeShellScript(String title, String content) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
         if (Boolean.TRUE.equals(OSUtils.isWindows())) {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
-        String[] cmd = {"/bin/sh", "-c", scriptPath + " " + msg + " " + userParams};
+        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {

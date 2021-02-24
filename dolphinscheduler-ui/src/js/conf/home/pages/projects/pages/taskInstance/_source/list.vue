@@ -18,7 +18,7 @@
   <div class="list-model">
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="name" :label="$t('Name')"></el-table-column>
         <el-table-column :label="$t('Process Instance')" min-width="200">
           <template slot-scope="scope">
@@ -76,7 +76,7 @@
       :show-close="false"
       :visible.sync="logDialog"
       width="auto">
-      <m-log :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
+      <m-log :key="logId" :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
   </div>
 </template>

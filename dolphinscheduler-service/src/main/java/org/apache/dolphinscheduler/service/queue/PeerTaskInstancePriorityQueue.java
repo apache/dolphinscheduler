@@ -45,6 +45,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * @param taskInstance taskInstance
      * @throws TaskPriorityQueueException
      */
+    @Override
     public void put(TaskInstance taskInstance) throws TaskPriorityQueueException {
         queue.add(taskInstance);
     }
@@ -74,6 +75,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      *
      * @return size
      */
+    @Override
     public int size() {
         return queue.size();
     }

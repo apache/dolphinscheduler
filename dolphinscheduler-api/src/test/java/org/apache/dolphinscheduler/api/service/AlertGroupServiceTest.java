@@ -21,9 +21,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,13 +47,17 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * alert group service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class AlertGroupServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupServiceTest.class);
 
     @InjectMocks
-    private AlertGroupService alertGroupService;
+    private AlertGroupServiceImpl alertGroupService;
+
     @Mock
     private AlertGroupMapper alertGroupMapper;
 
@@ -64,7 +67,7 @@ public class AlertGroupServiceTest {
     public void testQueryAlertGroup() {
 
         Mockito.when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
-        HashMap<String, Object> result = alertGroupService.queryAlertgroup();
+        Map<String, Object> result = alertGroupService.queryAlertgroup();
         logger.info(result.toString());
         List<AlertGroup> alertGroups = (List<AlertGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(alertGroups));

@@ -17,6 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.controller.BaseController;
+import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Session;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -24,26 +33,18 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.api.controller.BaseController;
-import org.apache.dolphinscheduler.api.service.BaseService;
-import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.dao.entity.Session;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.WebUtils;
 
 /**
  * session service implement
  */
 @Service
-public class SessionServiceImpl extends BaseService implements SessionService {
+public class SessionServiceImpl extends BaseServiceImpl implements SessionService {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 
@@ -56,11 +57,12 @@ public class SessionServiceImpl extends BaseService implements SessionService {
      * @param request request
      * @return session
      */
+    @Override
     public Session getSession(HttpServletRequest request) {
         String sessionId = request.getHeader(Constants.SESSION_ID);
 
         if (StringUtils.isBlank(sessionId)) {
-            Cookie cookie = getCookie(request, Constants.SESSION_ID);
+            Cookie cookie = WebUtils.getCookie(request, Constants.SESSION_ID);
 
             if (cookie != null) {
                 sessionId = cookie.getValue();
@@ -84,6 +86,7 @@ public class SessionServiceImpl extends BaseService implements SessionService {
      * @param ip ip
      * @return session string
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public String createSession(User user, String ip) {
         Session session = null;
@@ -141,6 +144,7 @@ public class SessionServiceImpl extends BaseService implements SessionService {
      * @param ip no use
      * @param loginUser login user
      */
+    @Override
     public void signOut(String ip, User loginUser) {
         try {
             /**

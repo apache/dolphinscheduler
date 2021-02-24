@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
+
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.api.transaction.CuratorOp;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
@@ -29,17 +33,15 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 /**
  * zk base operator
@@ -57,26 +59,30 @@ public class ZookeeperOperator implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         this.zkClient = buildClient();
-        initStateLister();
+        initStateListener();
         treeCacheStart();
     }
 
     /**
      * this method is for sub class,
      */
-    protected void registerListener(){}
+    protected void registerListener() {
+        // Used by sub class
+    }
 
-    protected void treeCacheStart(){}
+    protected void treeCacheStart() {
+        // Used by sub class
+    }
 
-    public void initStateLister() {
+    public void initStateListener() {
         checkNotNull(zkClient);
 
         zkClient.getConnectionStateListenable().addListener((client, newState) -> {
-            if(newState == ConnectionState.LOST){
+            if (newState == ConnectionState.LOST) {
                 logger.error("connection lost from zookeeper");
-            } else if(newState == ConnectionState.RECONNECTED){
+            } else if (newState == ConnectionState.RECONNECTED) {
                 logger.info("reconnected to zookeeper");
-            } else if(newState == ConnectionState.SUSPENDED){
+            } else if (newState == ConnectionState.SUSPENDED) {
                 logger.warn("connection SUSPENDED to zookeeper");
             }
         });
@@ -85,7 +91,8 @@ public class ZookeeperOperator implements InitializingBean {
     private CuratorFramework buildClient() {
         logger.info("zookeeper registry center init, server lists is: {}.", zookeeperConfig.getServerList());
 
-        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(),"zookeeper quorum can't be null")))
+        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(),
+                "zookeeper quorum can't be null")))
                 .retryPolicy(new ExponentialBackoffRetry(zookeeperConfig.getBaseSleepTimeMs(), zookeeperConfig.getMaxRetries(), zookeeperConfig.getMaxSleepMs()));
 
         //these has default value
@@ -114,7 +121,7 @@ public class ZookeeperOperator implements InitializingBean {
         try {
             zkClient.blockUntilConnected();
         } catch (final Exception ex) {
-            throw new RuntimeException(ex);
+            throw new ServiceException(ex);
         }
         return zkClient;
     }
@@ -138,12 +145,12 @@ public class ZookeeperOperator implements InitializingBean {
             throw new IllegalStateException(ex);
         } catch (Exception ex) {
             logger.error("getChildrenKeys key : {}", key, ex);
-            throw new RuntimeException(ex);
+            throw new ServiceException(ex);
         }
     }
 
-    public boolean hasChildren(final String key){
-        Stat stat ;
+    public boolean hasChildren(final String key) {
+        Stat stat;
         try {
             stat = zkClient.checkExists().forPath(key);
             return stat.getNumChildren() >= 1;

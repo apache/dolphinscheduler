@@ -39,7 +39,7 @@
           <template slot="content">
             <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" disabled="true" v-if="item.id">
               <el-option
-                      v-for="items in pulginInstance"
+                      v-for="items in pluginInstance"
                       :key="items.id"
                       :value="items.id"
                       :label="items.pluginName">
@@ -47,7 +47,7 @@
             </el-select>
             <el-select v-model="pluginDefineId" size="small" style="width: 100%" @change="changePlugin" v-else>
               <el-option
-                      v-for="items in pulginInstance"
+                      v-for="items in pluginInstance"
                       :key="items.id"
                       :value="items.id"
                       :label="items.pluginName">
@@ -83,7 +83,7 @@
     },
     props: {
       item: Object,
-      pulginInstance: Array
+      pluginInstance: Array
     },
     methods: {
       _ok () {
@@ -121,7 +121,7 @@
           this.rule = JSON.parse(res.pluginParams)
           this.rule.forEach(item => {
             if (item.title.indexOf('$t') !== -1) {
-              item.title = $t(item.field)
+              item.title = this.$t(item.field)
             }
           })
         }).catch(e => {
@@ -129,28 +129,36 @@
         })
       },
       _submit () {
-        this.$f.rule.forEach(item => {
-          item.title = item.name
-        })
-        let param = {
-          instanceName: this.instanceName,
-          pluginDefineId: this.pluginDefineId,
-          pluginInstanceParams: JSON.stringify(this.$f.rule)
-        }
-        if (this.item) {
-          param.alertPluginInstanceId = this.item.id
-          param.pluginDefineId = null
-        }
-        this.$refs.popover.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
-          this.$refs.popover.spinnerLoading = false
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.$refs.popover.spinnerLoading = false
+        this.$f.validate((valid) => {
+          if (valid) {
+            this.$f.rule.forEach(item => {
+              item.title = item.name
+            })
+            let param = {
+              instanceName: this.instanceName,
+              pluginDefineId: this.pluginDefineId,
+              pluginInstanceParams: JSON.stringify(this.$f.rule)
+            }
+            if (this.item) {
+              param.alertPluginInstanceId = this.item.id
+              param.pluginDefineId = null
+            }
+            this.$refs.popover.spinnerLoading = true
+            this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
+              this.$refs.popover.spinnerLoading = false
+              this.$emit('onUpdate')
+              this.$message.success(res.msg)
+            }).catch(e => {
+              this.$message.error(e.msg || '')
+              this.$refs.popover.spinnerLoading = false
+            })
+          } else {
+            this.$message.warning(`${i18n.$t('Instance parameter exception')}`)
+            this.$refs.popover.spinnerLoading = false
+          }
         })
       },
+
       close () {
         this.$emit('close')
       }
@@ -163,7 +171,7 @@
         this.pluginDefineId = this.item.pluginDefineId
         JSON.parse(this.item.pluginInstanceParams).forEach(item => {
           if (item.title.indexOf('$t') !== -1) {
-            item.title = $t(item.field)
+            item.title = this.$t(item.field)
           }
           pluginInstanceParams.push(item)
         })

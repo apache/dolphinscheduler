@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,28 +63,39 @@ import org.springframework.mock.web.MockMultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * resources service test
+ */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
 @PrepareForTest({HadoopUtils.class, PropertyUtils.class, FileUtils.class, org.apache.dolphinscheduler.api.utils.FileUtils.class})
 public class ResourcesServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceTest.class);
 
     @InjectMocks
-    private ResourcesService resourcesService;
+    private ResourcesServiceImpl resourcesService;
+
     @Mock
     private ResourceMapper resourcesMapper;
+
     @Mock
     private TenantMapper tenantMapper;
-    @Mock
-    private ResourceUserMapper resourceUserMapper;
+
     @Mock
     private HadoopUtils hadoopUtils;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     private UdfFuncMapper udfFunctionMapper;
+
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
+    private ResourceUserMapper resourceUserMapper;
 
     @Before
     public void setUp() {
@@ -313,6 +326,9 @@ public class ResourcesServiceTest {
             //SUCCESS
             loginUser.setTenantId(1);
             Mockito.when(hadoopUtils.delete(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(true);
+            Mockito.when(processDefinitionMapper.listResources()).thenReturn(getResources());
+            Mockito.when(resourcesMapper.deleteIds(Mockito.any())).thenReturn(1);
+            Mockito.when(resourceUserMapper.deleteResourceUserArray(Mockito.anyInt(), Mockito.any())).thenReturn(1);
             result = resourcesService.delete(loginUser, 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
@@ -686,5 +702,14 @@ public class ResourcesServiceTest {
         List<String> contentList = new ArrayList<>();
         contentList.add("test");
         return contentList;
+    }
+
+    private List<Map<String, Object>> getResources() {
+        List<Map<String, Object>> resources = new ArrayList<>();
+        Map<String, Object> resource = new HashMap<>();
+        resource.put("id", 1);
+        resource.put("resource_ids", "1");
+        resources.add(resource);
+        return resources;
     }
 }

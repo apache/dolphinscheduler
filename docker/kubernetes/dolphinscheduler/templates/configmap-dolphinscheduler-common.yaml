@@ -24,12 +24,14 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  DOLPHINSCHEDULER_ENV_PATH: {{ .Values.common.configmap.DOLPHINSCHEDULER_ENV_PATH | quote }}
+  DOLPHINSCHEDULER_ENV: |-
+  {{- range .Values.common.configmap.DOLPHINSCHEDULER_ENV }}
+    {{ . }}
+  {{- end }}
   DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ .Values.common.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH | quote }}
   RESOURCE_STORAGE_TYPE: {{ .Values.common.configmap.RESOURCE_STORAGE_TYPE | quote }}
   RESOURCE_UPLOAD_PATH: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
   FS_DEFAULT_FS: {{ .Values.common.configmap.FS_DEFAULT_FS | quote }}
   FS_S3A_ENDPOINT: {{ .Values.common.configmap.FS_S3A_ENDPOINT | quote }}
   FS_S3A_ACCESS_KEY: {{ .Values.common.configmap.FS_S3A_ACCESS_KEY | quote }}
-  FS_S3A_SECRET_KEY: {{ .Values.common.configmap.FS_S3A_SECRET_KEY | quote }}
 {{- end }}

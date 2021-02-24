@@ -46,13 +46,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * tenant service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class TenantServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
 
     @InjectMocks

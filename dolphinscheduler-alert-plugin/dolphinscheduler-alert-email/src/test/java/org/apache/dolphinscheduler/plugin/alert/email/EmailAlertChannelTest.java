@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,7 +68,9 @@ public class EmailAlertChannelTest {
                 .setTitle("test");
         AlertInfo alertInfo = new AlertInfo();
         alertInfo.setAlertData(alertData);
-        alertInfo.setAlertParams(getEmailAlertParams());
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getEmailAlertParams());
+
+        alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = emailAlertChannel.process(alertInfo);
         Assert.assertNotNull(alertResult);
         Assert.assertEquals("false", alertResult.getStatus());
@@ -87,9 +91,8 @@ public class EmailAlertChannelTest {
         InputParam mailSmtpPort = InputParam.newBuilder("serverPort", "smtp.port")
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
-                        .setType(DataType.NUMBER.getDataType())
                         .build())
-                .setValue(25)
+                .setValue("25")
                 .build();
 
         InputParam mailSender = InputParam.newBuilder("sender", "sender")
@@ -98,10 +101,10 @@ public class EmailAlertChannelTest {
                 .build();
 
         RadioParam enableSmtpAuth = RadioParam.newBuilder("enableSmtpAuth", "smtp.auth")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(false)
+                .setValue("false")
                 .build();
 
         InputParam mailUser = InputParam.newBuilder("user", "user")
@@ -115,17 +118,17 @@ public class EmailAlertChannelTest {
                 .build();
 
         RadioParam enableTls = RadioParam.newBuilder("starttlsEnable", "starttls.enable")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(true)
+                .setValue("true")
                 .build();
 
         RadioParam enableSsl = RadioParam.newBuilder("sslEnable", "smtp.ssl.enable")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(true)
+                .setValue("true")
                 .build();
 
         InputParam sslTrust = InputParam.newBuilder("smtpSslTrust", "smtp.ssl.trust")
