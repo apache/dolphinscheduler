@@ -92,7 +92,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-    
+
     @Test
     public void testStartCheckProcessDefinition() throws Exception {
 
