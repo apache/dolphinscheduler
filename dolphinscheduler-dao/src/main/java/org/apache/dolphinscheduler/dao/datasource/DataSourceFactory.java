@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -67,44 +66,4 @@ public class DataSourceFactory {
         }
     }
 
-    /**
-     * load driver class
-     * @param dbType dbType
-     * @throws Exception Exception
-     */
-    @Deprecated
-    public static void loadClass(DbType dbType) throws Exception {
-        switch (dbType) {
-            case MYSQL :
-                Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
-                break;
-            case POSTGRESQL :
-                Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
-                break;
-            case HIVE :
-                Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
-                break;
-            case SPARK :
-                Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
-                break;
-            case CLICKHOUSE :
-                Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
-                break;
-            case ORACLE :
-                Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
-                break;
-            case SQLSERVER:
-                Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
-                break;
-            case DB2:
-                Class.forName(Constants.COM_DB2_JDBC_DRIVER);
-                break;
-            case PRESTO:
-                Class.forName(Constants.COM_PRESTO_JDBC_DRIVER);
-                break;
-            default:
-                logger.error("not support sql type: {},can't load class", dbType);
-                throw new IllegalArgumentException("not support sql type,can't load class");
-        }
-    }
 }
