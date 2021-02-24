@@ -49,26 +49,11 @@ public class PeerTaskInstancePriorityQueueTest {
     @Test
     public void poll() throws Exception {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
-        int peekBeforeLength = queue.size();
-        queue.poll(1000, TimeUnit.MILLISECONDS);
-        queue.poll(1000, TimeUnit.MILLISECONDS);
-        Assert.assertEquals(0, queue.size());
-        Thread producer = new Thread(() -> {
-            System.out.println(String.format("Ready to producing...,now time is %s ", System.currentTimeMillis()));
-            try {
-                Thread.sleep(100);
-                TaskInstance task = createTaskInstance("low_task", Priority.LOW);
-                queue.put(task);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println(String.format("End to produce %s at time %s",
-                queue.peek() != null ? queue.peek().getName() : null, System.currentTimeMillis()));
-        });
-        producer.start();
-        System.out.println("Begin to consume at " + System.currentTimeMillis());
-        queue.poll(1000, TimeUnit.MILLISECONDS);
-        System.out.println("End to consume at " + System.currentTimeMillis());
+        try {
+            queue.poll(1000, TimeUnit.MILLISECONDS);
+        } catch (TaskPriorityQueueException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
