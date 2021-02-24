@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -258,6 +259,13 @@ public class ExecutorService2Test {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null);
         Assert.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
 
+    }
+
+    @Test
+    public void testExecuteRepeatRunning() throws Exception{
+        Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
+        Map<String, Object> result = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.REPEAT_RUNNING);
+        Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
     }
 
     private List<Server> getMasterServersList() {

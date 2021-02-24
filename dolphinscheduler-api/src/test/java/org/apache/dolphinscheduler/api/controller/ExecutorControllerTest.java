@@ -75,6 +75,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
+    @Ignore
     @Test
     public void testExecute() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
