@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -33,6 +34,9 @@ import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+
+import javax.annotation.PostConstruct;
+
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +45,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-
-import javax.annotation.PostConstruct;
-
-
-
 
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
@@ -64,8 +63,8 @@ public class MasterServer implements IStoppable {
     private MasterConfig masterConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -95,8 +94,9 @@ public class MasterServer implements IStoppable {
 
     /**
      * master server startup
-     *
+     * <p>
      * master server not use web service
+     *
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -108,7 +108,7 @@ public class MasterServer implements IStoppable {
      * run master server
      */
     @PostConstruct
-    public void run(){
+    public void run() {
         try {
             //init remoting server
             NettyServerConfig serverConfig = new NettyServerConfig();
@@ -122,11 +122,11 @@ public class MasterServer implements IStoppable {
             this.masterRegistry.getZookeeperRegistryCenter().setStoppable(this);
 
             String registPath = this.masterRegistry.getMasterPath();
-            this.masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER,Constants.DELETE_ZK_OP);
+            this.masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
             // register
             this.masterRegistry.registry();
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
@@ -166,13 +166,14 @@ public class MasterServer implements IStoppable {
 
     /**
      * gracefully close
+     *
      * @param cause close cause
      */
     public void close(String cause) {
 
         try {
             //execute only once
-            if(Stopper.isStopped()){
+            if (Stopper.isStopped()) {
                 return;
             }
 
@@ -184,7 +185,7 @@ public class MasterServer implements IStoppable {
             try {
                 //thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
             //
@@ -193,11 +194,11 @@ public class MasterServer implements IStoppable {
             this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
             //close quartz
-            try{
+            try {
                 QuartzExecutors.getInstance().shutdown();
                 logger.info("Quartz service stopped");
-            }catch (Exception e){
-                logger.warn("Quartz service stopped exception:{}",e.getMessage());
+            } catch (Exception e) {
+                logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
 
         } catch (Exception e) {
