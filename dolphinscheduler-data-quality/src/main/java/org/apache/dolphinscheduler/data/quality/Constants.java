@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.data.quality;
  */
 public final class Constants {
 
+    private Constants() {
+        throw new IllegalStateException("Construct Constants");
+    }
+
     public static final String DATABASE = "database";
 
     public static final String TABLE = "table";
