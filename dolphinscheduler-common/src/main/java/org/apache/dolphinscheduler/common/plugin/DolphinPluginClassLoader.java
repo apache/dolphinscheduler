@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.plugin;
+package org.apache.dolphinscheduler.common.plugin;
 
 import static java.util.Objects.requireNonNull;
 
@@ -26,9 +26,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 class DolphinPluginClassLoader
         extends URLClassLoader {
@@ -38,14 +39,14 @@ class DolphinPluginClassLoader
     private final List<String> spiPackages;
     private final List<String> spiResources;
 
-    public DolphinPluginClassLoader(
+    DolphinPluginClassLoader(
             List<URL> urls,
             ClassLoader spiClassLoader,
             Iterable<String> spiPackages) {
         this(urls,
                 spiClassLoader,
                 spiPackages,
-                Iterables.transform(spiPackages, DolphinPluginClassLoader::classNameToResource));
+                StreamSupport.stream(spiPackages.spliterator(), false).map(DolphinPluginClassLoader::classNameToResource).collect(Collectors.toList()));
     }
 
     private DolphinPluginClassLoader(
@@ -54,7 +55,7 @@ class DolphinPluginClassLoader
             Iterable<String> spiPackages,
             Iterable<String> spiResources) {
         // plugins should not have access to the system (application) class loader
-        super(urls.toArray(new URL[urls.size()]), PLATFORM_CLASS_LOADER);
+        super(urls.toArray(new URL[0]), PLATFORM_CLASS_LOADER);
         this.spiClassLoader = requireNonNull(spiClassLoader, "spiClassLoader is null");
         this.spiPackages = ImmutableList.copyOf(spiPackages);
         this.spiResources = ImmutableList.copyOf(spiResources);
