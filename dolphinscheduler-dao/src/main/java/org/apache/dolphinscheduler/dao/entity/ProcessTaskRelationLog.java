@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * process task relation log
  */
 @TableName("t_ds_process_task_relation_log")
-public class ProcessTaskRelationLog extends ProcessTaskRelation{
+public class ProcessTaskRelationLog extends ProcessTaskRelation {
 
     /**
      * operator user id
