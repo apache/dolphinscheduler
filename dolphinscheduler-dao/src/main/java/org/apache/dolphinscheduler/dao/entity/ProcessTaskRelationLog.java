@@ -17,96 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.ConditionType;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * process task relation log
  */
 @TableName("t_ds_process_task_relation_log")
-public class ProcessTaskRelationLog {
-
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private int id;
-
-    /**
-     * name
-     */
-    private String name;
-
-    /**
-     * process version
-     */
-    private int processDefinitionVersion;
-
-    /**
-     * project code
-     */
-    private long projectCode;
-
-    /**
-     * process code
-     */
-    private long processDefinitionCode;
-
-    /**
-     * pre task code
-     */
-    private long preTaskCode;
-
-    /**
-     * pre node version
-     */
-    private int preNodeVersion;
-
-    /**
-     * post task code
-     */
-    private long postTaskCode;
-
-    /**
-     * post node version
-     */
-    private int postNodeVersion;
-
-    /**
-     * condition type
-     */
-    private ConditionType conditionType;
-
-    /**
-     * condition parameters
-     */
-    private String conditionParams;
-
-    /**
-     * condition parameter list
-     */
-    @TableField(exist = false)
-    private List<Property> conditionParamList;
-
-    /**
-     * condition parameter map
-     */
-    @TableField(exist = false)
-    private Map<String, String> conditionParamMap;
+public class ProcessTaskRelationLog extends ProcessTaskRelation {
 
     /**
      * operator user id
@@ -119,132 +39,29 @@ public class ProcessTaskRelationLog {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
-    /**
-     * create time
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTime;
-
-    /**
-     * update time
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTime;
-
-    public String getName() {
-        return name;
+    public ProcessTaskRelationLog() {
+        super();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ProcessTaskRelationLog(ProcessTaskRelation processTaskRelation) {
+        super();
+        this.setId(processTaskRelation.getId());
+        this.setName(processTaskRelation.getName());
+        this.setProcessDefinitionCode(processTaskRelation.getProcessDefinitionCode());
+        this.setProcessDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
+        this.setProjectCode(processTaskRelation.getProjectCode());
+        this.setPreTaskCode(processTaskRelation.getPreTaskCode());
+        this.setPreNodeVersion(processTaskRelation.getPreNodeVersion());
+        this.setPostTaskCode(processTaskRelation.getPostTaskCode());
+        this.setPostNodeVersion(processTaskRelation.getPostNodeVersion());
+        this.setConditionType(processTaskRelation.getConditionType());
+        this.setConditionParams(processTaskRelation.getConditionParams());
+        this.setConditionParamList(processTaskRelation.getConditionParamList());
+        this.setConditionParamMap(processTaskRelation.getConditionParamMap());
+        this.setCreateTime(processTaskRelation.getCreateTime());
+        this.setUpdateTime(processTaskRelation.getUpdateTime());
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getConditionParams() {
-        return conditionParams;
-    }
-
-    public void setConditionParams(String conditionParams) {
-        if (conditionParams == null) {
-            this.conditionParamList = new ArrayList<>();
-        } else {
-            this.conditionParamList = JSONUtils.toList(conditionParams, Property.class);
-        }
-        this.conditionParams = conditionParams;
-    }
-
-    public List<Property> getConditionParamList() {
-        return conditionParamList;
-    }
-
-    public void setConditionParamList(List<Property> conditionParamList) {
-        this.conditionParams = JSONUtils.toJsonString(conditionParamList);
-        this.conditionParamList = conditionParamList;
-    }
-
-    public Map<String, String> getConditionParamMap() {
-        if (conditionParamMap == null && StringUtils.isNotEmpty(conditionParams)) {
-            List<Property> propList = JSONUtils.toList(conditionParams, Property.class);
-            conditionParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
-        }
-
-        return conditionParamMap;
-    }
-
-    public void setConditionParamMap(Map<String, String> conditionParamMap) {
-        this.conditionParamMap = conditionParamMap;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public long getPreTaskCode() {
-        return preTaskCode;
-    }
-
-    public void setPreTaskCode(long preTaskCode) {
-        this.preTaskCode = preTaskCode;
-    }
-
-    public long getPostTaskCode() {
-        return postTaskCode;
-    }
-
-    public void setPostTaskCode(long postTaskCode) {
-        this.postTaskCode = postTaskCode;
-    }
-
-    public ConditionType getConditionType() {
-        return conditionType;
-    }
-
-    public void setConditionType(ConditionType conditionType) {
-        this.conditionType = conditionType;
-    }
 
     public int getOperator() {
         return operator;
@@ -262,30 +79,4 @@ public class ProcessTaskRelationLog {
         this.operateTime = operateTime;
     }
 
-    public void set(ProcessTaskRelation processTaskRelation) {
-        this.name = processTaskRelation.getName();
-        this.processDefinitionVersion = processTaskRelation.getProcessDefinitionVersion();
-        this.projectCode = processTaskRelation.getProjectCode();
-        this.processDefinitionCode = processTaskRelation.getProcessDefinitionCode();
-        this.preTaskCode = processTaskRelation.getPreTaskCode();
-        this.postTaskCode = processTaskRelation.getPostTaskCode();
-        this.conditionType = processTaskRelation.getConditionType();
-        this.conditionParams = processTaskRelation.getConditionParams();
-    }
-
-    public int getPostNodeVersion() {
-        return postNodeVersion;
-    }
-
-    public void setPostNodeVersion(int postNodeVersion) {
-        this.postNodeVersion = postNodeVersion;
-    }
-
-    public int getPreNodeVersion() {
-        return preNodeVersion;
-    }
-
-    public void setPreNodeVersion(int preNodeVersion) {
-        this.preNodeVersion = preNodeVersion;
-    }
 }
