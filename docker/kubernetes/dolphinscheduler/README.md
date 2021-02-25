@@ -1,9 +1,9 @@
-# Dolphin Scheduler
+# DolphinScheduler
 
-[Dolphin Scheduler](https://dolphinscheduler.apache.org) is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
+[DolphinScheduler](https://dolphinscheduler.apache.org) is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
 ## Introduction
-This chart bootstraps a [Dolphin Scheduler](https://dolphinscheduler.apache.org) distributed deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [DolphinScheduler](https://dolphinscheduler.apache.org) distributed deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
 $ helm install dolphinscheduler .
 ```
-These commands deploy Dolphin Scheduler on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
+These commands deploy DolphinScheduler on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
 
@@ -67,7 +67,7 @@ The following tables lists the configurable parameters of the Dolphins Scheduler
 | `externalDatabase.database`                                                       | If exists external PostgreSQL, and set `postgresql.enabled` value to false. Dolphins Scheduler's database database will use it | `dolphinscheduler`                                    |
 | `externalDatabase.params`                                                         | If exists external PostgreSQL, and set `postgresql.enabled` value to false. Dolphins Scheduler's database params will use it   | `characterEncoding=utf8`                              |
 |                                                                                   |                                                                                                                                |                                                       |
-| `zookeeper.enabled`                                                               | If not exists external Zookeeper, by default, the Dolphin Scheduler will use a internal Zookeeper                              | `true`                                                |
+| `zookeeper.enabled`                                                               | If not exists external Zookeeper, by default, the DolphinScheduler will use a internal Zookeeper                               | `true`                                                |
 | `zookeeper.fourlwCommandsWhitelist`                                               | A list of comma separated Four Letter Words commands to use                                                                    | `srvr,ruok,wchs,cons`                                 |
 | `zookeeper.service.port`                                                          | ZooKeeper port                                                                                                                 | `2181`                                                |
 | `zookeeper.persistence.enabled`                                                   | Set `zookeeper.persistence.enabled` to `true` to mount a new volume for internal Zookeeper                                     | `false`                                               |
@@ -222,4 +222,108 @@ The following tables lists the configurable parameters of the Dolphins Scheduler
 | `ingress.tls.hosts`                                                               | Ingress tls hosts                                                                                                              | `dolphinscheduler.org`                                |
 | `ingress.tls.secretName`                                                          | Ingress tls secret name                                                                                                        | `dolphinscheduler-tls`                                |
 
-For more information please refer to the [chart](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+## FAQ
+
+### How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?
+
+> Because of the commercial license, we cannot directly use the driver and client of MySQL.
+>
+> If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
+
+2. Create a new `Dockerfile` to add MySQL driver and client:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+RUN apk add --update --no-cache mysql-client
+```
+
+3. Build a new docker image including MySQL driver and client:
+
+```
+docker build -t apache/dolphinscheduler:mysql .
+```
+
+4. Push the docker image `apache/dolphinscheduler:mysql` to a docker registry
+
+5. Modify image `registry` and `repository`, and update `tag` to `mysql` in `values.yaml`
+
+6. Modify postgresql `enabled` to `false`
+
+7. Modify externalDatabase (especially modify `host`, `username` and `password`):
+
+```
+externalDatabase:
+  type: "mysql"
+  driver: "com.mysql.jdbc.Driver"
+  host: "localhost"
+  port: "3306"
+  username: "root"
+  password: "root"
+  database: "dolphinscheduler"
+  params: "useUnicode=true&characterEncoding=UTF-8"
+```
+
+8. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+### How to support MySQL datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of MySQL.
+>
+> If you want to add MySQL datasource, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
+
+2. Create a new `Dockerfile` to add MySQL driver:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including MySQL driver:
+
+```
+docker build -t apache/dolphinscheduler:mysql-driver .
+```
+
+4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry
+
+5. Modify image `registry` and `repository`, and update `tag` to `mysql-driver` in `values.yaml`
+
+6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+7. Add a MySQL datasource in `Datasource manage`
+
+### How to support Oracle datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of Oracle.
+>
+> If you want to add Oracle datasource, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the Oracle driver [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
+
+2. Create a new `Dockerfile` to add Oracle driver:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including Oracle driver:
+
+```
+docker build -t apache/dolphinscheduler:oracle-driver .
+```
+
+4. Push the docker image `apache/dolphinscheduler:oracle-driver` to a docker registry
+
+5. Modify image `registry` and `repository`, and update `tag` to `oracle-driver` in `values.yaml`
+
+6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+7. Add a Oracle datasource in `Datasource manage`
+
+For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
