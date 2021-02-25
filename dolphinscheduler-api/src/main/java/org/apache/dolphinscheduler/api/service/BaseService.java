@@ -89,4 +89,13 @@ public interface BaseService {
      * @param createUserId create user id
      */
     boolean hasPerm(User operateUser, int createUserId);
+
+    /**
+     * check and parse date parameters
+     *
+     * @param startDateStr start date string
+     * @param endDateStr end date string
+     * @return map<status,startDate,endDate>
+     */
+    Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
 }
