@@ -27,35 +27,6 @@ public final class Preconditions {
     }
 
     /**
-     * if obj is null will throw NPE
-     *
-     * @param obj obj
-     * @param <T> T
-     * @return T
-     */
-    public static <T> T checkNotNull(T obj) {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-        return obj;
-    }
-
-    /**
-     * if obj is null will throw NullPointerException with error message
-     *
-     * @param obj obj
-     * @param errorMsg error message
-     * @param <T> T
-     * @return T
-     */
-    public static <T> T checkNotNull(T obj, String errorMsg) {
-        if (obj == null) {
-            throw new NullPointerException(errorMsg);
-        }
-        return obj;
-    }
-
-    /**
      * if condition is false will throw an IllegalArgumentException with the given message
      *
      * @param condition condition

@@ -39,8 +39,4 @@ public class StringUtils {
         }
         return s.trim().length() == 0;
     }
-
-    public static boolean isNotBlank(String s) {
-        return !isBlank(s);
-    }
 }

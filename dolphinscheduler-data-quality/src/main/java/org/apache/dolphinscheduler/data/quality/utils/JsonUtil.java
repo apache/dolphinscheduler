@@ -55,16 +55,6 @@ public class JsonUtil {
         throw new UnsupportedOperationException("Construct JSONUtils");
     }
 
-    public static String toJson(Object object,SerializationFeature feature) {
-        try {
-            ObjectWriter writer = MAPPER.writer(feature);
-            return writer.writeValueAsString(object);
-        } catch (Exception e) {
-            logger.error("object to json exception!", e);
-        }
-        return null;
-    }
-
     public static String toJson(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
@@ -86,30 +76,4 @@ public class JsonUtil {
         }
         return null;
     }
-    
-    public static <T> T fromJson(InputStream in, Class<T> clazz) {
-        
-        try {
-            return MAPPER.readValue(in, clazz);
-        } catch (Exception e) {
-            logger.error("parse object exception!", e);
-        }
-        return null;
-    }
-    
-    public static Map<String, Object> toAnyMap(String json) {
-        if (StringUtils.isEmpty(json)) {
-            return null;
-        }
-
-        try {
-            return MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {
-            });
-        } catch (Exception e) {
-            logger.error("json to map exception!", e);
-        }
-
-        return null;
-    }
-    
 }
