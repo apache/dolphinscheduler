@@ -47,7 +47,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -247,12 +246,10 @@ public class SqlTask extends AbstractTask {
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs,
                                   List<Property> properties) {
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        ResultSet resultSet = null;
-        try {
-            // create connection
-            connection = baseDataSource.getConnection();
+        try (
+                // create connection
+                Connection connection = baseDataSource.getConnection();
+        ) {
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -280,8 +277,6 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             logger.error("execute sql error", e);
             throw new RuntimeException("execute sql error");
-        } finally {
-            close(resultSet, stmt, connection);
         }
     }
 
@@ -408,41 +403,6 @@ public class SqlTask extends AbstractTask {
             for (String createFunc : createFuncs) {
                 logger.info("hive create function sql: {}", createFunc);
                 funcStmt.execute(createFunc);
-            }
-        }
-    }
-
-    /**
-     * close jdbc resource
-     *
-     * @param resultSet resultSet
-     * @param pstmt pstmt
-     * @param connection connection
-     */
-    private void close(ResultSet resultSet,
-                       PreparedStatement pstmt,
-                       Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                logger.error("close result set error : {}", e.getMessage(), e);
-            }
-        }
-
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                logger.error("close prepared statement error : {}", e.getMessage(), e);
-            }
-        }
-
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                logger.error("close connection error : {}", e.getMessage(), e);
             }
         }
     }
