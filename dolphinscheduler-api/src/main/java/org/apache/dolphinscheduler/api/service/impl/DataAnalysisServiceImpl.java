@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -103,7 +102,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 projectId,
                 startDate,
                 endDate,
-                (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
+            (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
     }
 
     /**
@@ -122,7 +121,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 projectId,
                 startDate,
                 endDate,
-                (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+            (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
         // process state count needs to remove state of forced success
         if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
             ((TaskCountDto)result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
@@ -144,7 +143,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
-                putErrorRequestParamsMsg(result);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
@@ -172,7 +171,6 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     @Override
     public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
-
 
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
@@ -211,7 +209,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (StringUtils.isNotEmpty(startDate)) {
             start = DateUtils.getScheduleDate(startDate);
             if (Objects.isNull(start)) {
-                putErrorRequestParamsMsg(result);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
@@ -219,7 +217,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (StringUtils.isNotEmpty(endDate)) {
             end = DateUtils.getScheduleDate(endDate);
             if (Objects.isNull(end)) {
-                putErrorRequestParamsMsg(result);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
@@ -293,8 +291,4 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return true;
     }
 
-    private void putErrorRequestParamsMsg(Map<String, Object> result) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
-    }
 }

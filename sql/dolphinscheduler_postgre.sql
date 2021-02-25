@@ -201,14 +201,14 @@ CREATE TABLE t_ds_alert (
 
 DROP TABLE IF EXISTS t_ds_alertgroup;
 CREATE TABLE t_ds_alertgroup(
-                                id             int NOT NULL,
-                                alert_instance_ids varchar (255) DEFAULT NULL,
-                                create_user_id int4         DEFAULT NULL,
-                                group_name     varchar(255) DEFAULT NULL,
-                                description    varchar(255) DEFAULT NULL,
-                                create_time    timestamp    DEFAULT NULL,
-                                update_time    timestamp    DEFAULT NULL,
-                                PRIMARY KEY (id)
+  id             int NOT NULL,
+  alert_instance_ids varchar (255) DEFAULT NULL,
+  create_user_id int4         DEFAULT NULL,
+  group_name     varchar(255) DEFAULT NULL,
+  description    varchar(255) DEFAULT NULL,
+  create_time    timestamp    DEFAULT NULL,
+  update_time    timestamp    DEFAULT NULL,
+  PRIMARY KEY (id)
 ) ;
 
 --
@@ -688,7 +688,7 @@ CREATE TABLE t_ds_task_instance (
   alert_flag int DEFAULT NULL ,
   retry_times int DEFAULT '0' ,
   pid int DEFAULT NULL ,
-  app_link varchar(255) DEFAULT NULL ,
+  app_link text ,
   flag int DEFAULT '1' ,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
@@ -889,44 +889,40 @@ ALTER TABLE t_ds_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_version_id_se
 
 DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
-ALTER TABLE t_ds_worker_group
-    ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
+ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
 CREATE SEQUENCE t_ds_worker_server_id_sequence;
-ALTER TABLE t_ds_worker_server
-    ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
+ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time)
-VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50',
-        '2018-10-24 17:40:22');
+VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
-        '2018-11-29 10:20:39');
+VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('1.3.0');
+INSERT INTO t_ds_version(version) VALUES ('1.4.0');
 
 --
 -- Table structure for table t_ds_plugin_define
 --
 DROP TABLE IF EXISTS t_ds_plugin_define;
 CREATE TABLE t_ds_plugin_define (
-	id serial NOT NULL,
-	plugin_name varchar(100) NOT NULL,
-	plugin_type varchar(100) NOT NULL,
-	plugin_params text NULL,
-	create_time timestamp NULL,
-	update_time timestamp NULL,
-	CONSTRAINT t_ds_plugin_define_pk PRIMARY KEY (id),
-	CONSTRAINT t_ds_plugin_define_un UNIQUE (plugin_name, plugin_type)
+  id serial NOT NULL,
+  plugin_name varchar(100) NOT NULL,
+  plugin_type varchar(100) NOT NULL,
+  plugin_params text NULL,
+  create_time timestamp NULL,
+  update_time timestamp NULL,
+  CONSTRAINT t_ds_plugin_define_pk PRIMARY KEY (id),
+  CONSTRAINT t_ds_plugin_define_un UNIQUE (plugin_name, plugin_type)
 );
 
 --
@@ -934,11 +930,11 @@ CREATE TABLE t_ds_plugin_define (
 --
 DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
 CREATE TABLE t_ds_alert_plugin_instance (
-	id serial NOT NULL,
-	plugin_define_id int4 NOT NULL,
-	plugin_instance_params text NULL,
-	create_time timestamp NULL,
-	update_time timestamp NULL,
-	instance_name varchar(200) NULL,
-	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
+  id serial NOT NULL,
+  plugin_define_id int4 NOT NULL,
+  plugin_instance_params text NULL,
+  create_time timestamp NULL,
+  update_time timestamp NULL,
+  instance_name varchar(200) NULL,
+  CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
