@@ -1,4 +1,4 @@
-## Dolphin Scheduler是什么?
+## DolphinScheduler是什么?
 
 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 
@@ -6,7 +6,7 @@ GitHub URL: https://github.com/apache/incubator-dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
-![Dolphin Scheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
+![DolphinScheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
@@ -115,7 +115,7 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 ## 环境变量
 
-Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些变量不是必须的，但是可以帮助你更容易配置镜像并根据你的需求定义相应的服务配置。
+DolphinScheduler映像使用了几个容易遗漏的环境变量。虽然这些变量不是必须的，但是可以帮助你更容易配置镜像并根据你的需求定义相应的服务配置。
 
 **`DATABASE_TYPE`**
 
@@ -305,3 +305,142 @@ EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
 ```
+
+## FAQ
+
+### 如何通过 docker-compose 停止 dolphinscheduler？
+
+停止所有容器:
+
+```
+docker-compose stop
+```
+
+停止所有容器并移除所有容器，网络和存储卷:
+
+```
+docker-compose down -v
+```
+
+### 如何在 Docker Swarm 上部署 dolphinscheduler？
+
+假设 Docker Swarm 集群已经部署（如果还没有创建 Docker Swarm 集群，请参考 [https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/）
+
+启动名为 dolphinscheduler 的 stack
+
+```
+docker stack deploy -c docker-stack.yml dolphinscheduler
+```
+
+启动并移除名为 dolphinscheduler 的 stack
+
+```
+docker stack rm dolphinscheduler
+```
+
+### 如何用 MySQL 替代 PostgreSQL 作为 DolphinScheduler 的数据库？
+
+> 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包和客户端.
+>
+> 如果你要使用 MySQL, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
+
+1. 下载 MySQL 驱动包 [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (要求 `>=5.1.47`)
+
+2. 创建一个新的 `Dockerfile`，用于添加 MySQL 的驱动包和客户端:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+RUN apk add --update --no-cache mysql-client
+```
+
+3. 构建一个包含 MySQL 的驱动包和客户端的新镜像:
+
+```
+docker build -t apache/dolphinscheduler:mysql .
+```
+
+4. 修改 `docker-compose.yml` 文件中的所有 image 字段为 `apache/dolphinscheduler:mysql`
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+5. 注释 `docker-compose.yml` 文件中的 `dolphinscheduler-postgresql` 块
+
+6. 在 `docker-compose.yml` 文件中添加 `dolphinscheduler-mysql` 服务（**可选**，你可以直接使用一个外部的 MySQL 数据库）
+
+7. 修改 `docker-compose.yml` 文件中的所有 DATABASE 环境变量
+
+```
+DATABASE_TYPE: mysql
+DATABASE_DRIVER: com.mysql.jdbc.Driver
+DATABASE_HOST: dolphinscheduler-mysql
+DATABASE_PORT: 3306
+DATABASE_USERNAME: root
+DATABASE_PASSWORD: root
+DATABASE_DATABASE: dolphinscheduler
+DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
+```
+
+> 如果你已经添加了 `dolphinscheduler-mysql` 服务，设置 `DATABASE_HOST` 为 `dolphinscheduler-mysql` 即可
+
+8. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+### How to support MySQL datasource in `Datasource manage`？
+
+> 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包.
+>
+> 如果你要添加 MySQL 数据源, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
+
+1. 下载 MySQL 驱动包 [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (要求 `>=5.1.47`)
+
+2. 创建一个新的 `Dockerfile`，用于添加 MySQL 驱动包:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+```
+
+3. 构建一个包含 MySQL 驱动包的新镜像:
+
+```
+docker build -t apache/dolphinscheduler:mysql-driver .
+```
+
+4. 将 `docker-compose.yml` 文件中的所有 image 字段 修改为 `apache/dolphinscheduler:mysql-driver`
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+5. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+6. 在数据源中心添加一个 MySQL 数据源
+
+### How to support Oracle datasource in `Datasource manage`？
+
+> 由于商业许可证的原因，我们不能直接使用 Oracle 的驱动包.
+>
+> 如果你要添加 Oracle 数据源, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
+
+1. 下载 Oracle 驱动包 [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
+
+2. 创建一个新的 `Dockerfile`，用于添加 Oracle 驱动包:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+```
+
+3. 构建一个包含 Oracle 驱动包的新镜像:
+
+```
+docker build -t apache/dolphinscheduler:oracle-driver .
+```
+
+4. 将 `docker-compose.yml` 文件中的所有 image 字段 修改为 `apache/dolphinscheduler:oracle-driver`
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+5. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+6. 在数据源中心添加一个 Oracle 数据源
+
+更多信息请查看 [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) 文档.
