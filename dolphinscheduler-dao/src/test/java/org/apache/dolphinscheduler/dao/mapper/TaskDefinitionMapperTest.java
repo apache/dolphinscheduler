@@ -40,7 +40,7 @@ public class TaskDefinitionMapperTest {
     @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
 
-    public TaskDefinition insertOne(){
+    public TaskDefinition insertOne() {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");
@@ -55,8 +55,8 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void testInsert(){
-       TaskDefinition taskDefinition = insertOne();
+    public void testInsert() {
+        TaskDefinition taskDefinition = insertOne();
         Assert.assertNotEquals(taskDefinition.getId(), 0);
     }
 }

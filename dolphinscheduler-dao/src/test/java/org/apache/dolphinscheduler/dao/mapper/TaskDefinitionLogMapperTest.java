@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-@Rollback(false)
+@Rollback(true)
 public class TaskDefinitionLogMapperTest {
 
 
