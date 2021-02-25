@@ -42,7 +42,7 @@ public class TaskDefinitionLogMapperTest {
     @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    public TaskDefinitionLog insertOne(){
+    public TaskDefinitionLog insertOne() {
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");
@@ -57,7 +57,7 @@ public class TaskDefinitionLogMapperTest {
     }
 
     @Test
-    public void testInsert(){
+    public void testInsert() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         Assert.assertNotEquals(taskDefinitionLog.getId(), 0);
     }
