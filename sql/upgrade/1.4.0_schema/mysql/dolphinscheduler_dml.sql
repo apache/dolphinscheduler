@@ -14,5 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
-SET FOREIGN_KEY_CHECKS=0;
