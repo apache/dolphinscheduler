@@ -564,21 +564,18 @@
                 <groupId>org.sonatype.aether</groupId>
                 <artifactId>aether-api</artifactId>
                 <version>1.13.1</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>io.airlift.resolver</groupId>
                 <artifactId>resolver</artifactId>
                 <version>1.5</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>6.2.1</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -860,8 +857,7 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/common/plugin/FilePluginManagerTest</include>
-                        <include>**/common/plugin/PluginClassLoaderTest</include>
+                        <include>**/common/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
@@ -985,7 +981,7 @@
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
-                        <!--<include>**/alert/plugin/EmailAlertPluginTest.java</include>-->
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>

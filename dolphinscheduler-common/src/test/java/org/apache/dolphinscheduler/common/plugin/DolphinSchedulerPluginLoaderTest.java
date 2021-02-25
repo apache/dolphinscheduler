@@ -15,39 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.plugin;
-
-import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
+package org.apache.dolphinscheduler.common.plugin;
 
 import java.util.Objects;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
-/**
- * DolphinPluginLoader Tester.
- */
-public class DolphinPluginLoaderTest {
+public class DolphinSchedulerPluginLoaderTest {
 
     /**
      * Method: loadPlugins()
      */
     @Test
     public void testLoadPlugins() {
-        AlertPluginManager alertPluginManager = new AlertPluginManager();
+        PluginManagerTest pluginManager = new PluginManagerTest();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = Objects.requireNonNull(DolphinPluginLoader.class.getClassLoader().getResource("")).getPath();
         alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
-        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
+        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(pluginManager));
         try {
             alertPluginLoader.loadPlugins();
         } catch (Exception e) {
             throw new RuntimeException("load Alert Plugin Failed !", e);
         }
-
-        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
     }
 }
