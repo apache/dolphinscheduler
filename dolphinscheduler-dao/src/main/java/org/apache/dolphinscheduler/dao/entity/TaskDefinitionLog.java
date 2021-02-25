@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
+import org.datanucleus.store.rdbms.sql.method.MathSinMethod;
+
 /**
  * task definition log
  */
@@ -39,6 +41,37 @@ public class TaskDefinitionLog extends TaskDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
+    public TaskDefinitionLog(){
+        super();
+    }
+
+    public TaskDefinitionLog(TaskDefinition taskDefinition){
+        super();
+        this.setId(taskDefinition.getId());
+        this.setCode(taskDefinition.getCode());
+        this.setVersion(taskDefinition.getVersion());
+        this.setName(taskDefinition.getName());
+        this.setDescription(taskDefinition.getDescription());
+        this.setUserId(taskDefinition.getUserId());
+        this.setUserName(taskDefinition.getUserName());
+        this.setWorkerGroup(taskDefinition.getWorkerGroup());
+        this.setProjectCode(taskDefinition.getProjectCode());
+        this.setProjectName(taskDefinition.getProjectName());
+        this.setResourceIds(taskDefinition.getResourceIds());
+        this.setTaskParams(taskDefinition.getTaskParams());
+        this.setTaskParamList(taskDefinition.getTaskParamList());
+        this.setTaskParamMap(taskDefinition.getTaskParamMap());
+        this.setTaskPriority(taskDefinition.getTaskPriority());
+        this.setTaskTimeoutStrategy(taskDefinition.getTaskTimeoutStrategy());
+        this.setTaskType(taskDefinition.getTaskType());
+        this.setTimeout(taskDefinition.getTimeout());
+        this.setTimeoutFlag(taskDefinition.getTimeoutFlag());
+        this.setUpdateTime(taskDefinition.getUpdateTime());
+        this.setCreateTime(taskDefinition.getCreateTime());
+        this.setFailRetryInterval(taskDefinition.getFailRetryInterval());
+        this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
+        this.setFlag(taskDefinition.getFlag());
+    }
 
     public int getOperator() {
         return operator;

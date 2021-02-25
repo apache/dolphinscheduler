@@ -39,6 +39,30 @@ public class ProcessTaskRelationLog extends ProcessTaskRelation {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
+    public ProcessTaskRelationLog(){
+        super();
+    }
+
+    public ProcessTaskRelationLog(ProcessTaskRelation processTaskRelation){
+        super();
+        this.setId(processTaskRelation.getId());
+        this.setName(processTaskRelation.getName());
+        this.setProcessDefinitionCode(processTaskRelation.getProcessDefinitionCode());
+        this.setProcessDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
+        this.setProjectCode(processTaskRelation.getProjectCode());
+        this.setPreTaskCode(processTaskRelation.getPreTaskCode());
+        this.setPreNodeVersion(processTaskRelation.getPreNodeVersion());
+        this.setPostTaskCode(processTaskRelation.getPostTaskCode());
+        this.setPostNodeVersion(processTaskRelation.getPostNodeVersion());
+        this.setConditionType(processTaskRelation.getConditionType());
+        this.setConditionParams(processTaskRelation.getConditionParams());
+        this.setConditionParamList(processTaskRelation.getConditionParamList());
+        this.setConditionParamMap(processTaskRelation.getConditionParamMap());
+        this.setCreateTime(processTaskRelation.getCreateTime());
+        this.setUpdateTime(processTaskRelation.getUpdateTime());
+    }
+
+
     public int getOperator() {
         return operator;
     }

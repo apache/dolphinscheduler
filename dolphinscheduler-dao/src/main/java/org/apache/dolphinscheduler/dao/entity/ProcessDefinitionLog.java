@@ -39,6 +39,38 @@ public class ProcessDefinitionLog extends ProcessDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
+    public ProcessDefinitionLog(){
+        super();
+    }
+
+    public ProcessDefinitionLog(ProcessDefinition processDefinition){
+        this.setId(processDefinition.getId());
+        this.setCode(processDefinition.getCode());
+        this.setName(processDefinition.getName());
+        this.setVersion(processDefinition.getVersion());
+        this.setReleaseState(processDefinition.getReleaseState());
+        this.setProjectCode(processDefinition.getProjectCode());
+        this.setDescription(processDefinition.getDescription());
+        this.setGlobalParams(processDefinition.getGlobalParams());
+        this.setGlobalParamList(processDefinition.getGlobalParamList());
+        this.setGlobalParamMap(processDefinition.getGlobalParamMap());
+        this.setCreateTime(processDefinition.getCreateTime());
+        this.setUpdateTime(processDefinition.getUpdateTime());
+        this.setFlag(processDefinition.getFlag());
+        this.setUserId(processDefinition.getUserId());
+        this.setUserName(processDefinition.getUserName());
+        this.setProjectName(processDefinition.getProjectName());
+        this.setLocations(processDefinition.getLocations());
+        this.setConnects(processDefinition.getConnects());
+        this.setScheduleReleaseState(processDefinition.getScheduleReleaseState());
+        this.setTimeout(processDefinition.getTimeout());
+        this.setTenantId(processDefinition.getTenantId());
+        this.setModifyBy(processDefinition.getModifyBy());
+        this.setResourceIds(processDefinition.getResourceIds());
+        this.setWarningGroupId(processDefinition.getWarningGroupId());
+    }
+
+
     public int getOperator() {
         return operator;
     }

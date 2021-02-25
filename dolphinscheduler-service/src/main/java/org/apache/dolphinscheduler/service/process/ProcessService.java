@@ -404,10 +404,7 @@ public class ProcessService {
      * covert log to process definition
      */
     public ProcessDefinition convertFromLog(ProcessDefinitionLog processDefinitionLog) {
-        ProcessDefinition definition = null;
-        if (null != processDefinitionLog) {
-            definition = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinitionLog), ProcessDefinition.class);
-        }
+        ProcessDefinition definition = processDefinitionLog;
         if (null != definition) {
             definition.setId(0);
         }
@@ -2130,8 +2127,7 @@ public class ProcessService {
             return Constants.EXIT_CODE_FAILURE;
         }
 
-        ProcessDefinition tmpDefinition = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinitionLog),
-                ProcessDefinition.class);
+        ProcessDefinition tmpDefinition = processDefinitionLog;
         tmpDefinition.setId(processDefinition.getId());
         tmpDefinition.setReleaseState(ReleaseState.OFFLINE);
         tmpDefinition.setFlag(Flag.YES);
@@ -2153,8 +2149,7 @@ public class ProcessService {
         }
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogList) {
-            ProcessTaskRelation processTaskRelation = JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog),
-                    ProcessTaskRelation.class);
+            ProcessTaskRelation processTaskRelation = processTaskRelationLog;
             processTaskRelationMapper.insert(processTaskRelation);
         }
     }
@@ -2178,7 +2173,7 @@ public class ProcessService {
         setTaskFromTaskNode(taskNode, taskDefinition);
         int update = taskDefinitionMapper.updateById(taskDefinition);
         // save task definition log
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
         taskDefinitionLog.setOperator(operator.getId());
         taskDefinitionLog.setOperateTime(now);
         int insert = taskDefinitionLogMapper.insert(taskDefinitionLog);
@@ -2342,7 +2337,7 @@ public class ProcessService {
         for (ProcessTaskRelation processTaskRelation : builderRelationList) {
             processTaskRelationMapper.insert(processTaskRelation);
             // save process task relation log
-            ProcessTaskRelationLog processTaskRelationLog = (ProcessTaskRelationLog)processTaskRelation;
+            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
             processTaskRelationLog.setOperator(operator.getId());
             processTaskRelationLog.setOperateTime(now);
             processTaskRelationLogMapper.insert(processTaskRelationLog);
@@ -2359,7 +2354,7 @@ public class ProcessService {
         setTaskFromTaskNode(taskNode, taskDefinition);
         // save the new task definition
         int insert = taskDefinitionMapper.insert(taskDefinition);
-        TaskDefinitionLog taskDefinitionLog = (TaskDefinitionLog)taskDefinition;
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
         taskDefinitionLog.setOperator(operator.getId());
         taskDefinitionLog.setOperateTime(now);
         int logInsert = taskDefinitionLogMapper.insert(taskDefinitionLog);
@@ -2408,7 +2403,7 @@ public class ProcessService {
                 processVersion);
         List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
         for (ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs) {
-            processTaskRelations.add(JSONUtils.parseObject(JSONUtils.toJsonString(processTaskRelationLog), ProcessTaskRelation.class));
+            processTaskRelations.add(processTaskRelationLog);
         }
         return processTaskRelations;
     }
