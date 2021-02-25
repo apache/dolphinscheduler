@@ -2342,8 +2342,7 @@ public class ProcessService {
         for (ProcessTaskRelation processTaskRelation : builderRelationList) {
             processTaskRelationMapper.insert(processTaskRelation);
             // save process task relation log
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
-            processTaskRelationLog.set(processTaskRelation);
+            ProcessTaskRelationLog processTaskRelationLog = (ProcessTaskRelationLog)processTaskRelation;
             processTaskRelationLog.setOperator(operator.getId());
             processTaskRelationLog.setOperateTime(now);
             processTaskRelationLogMapper.insert(processTaskRelationLog);
