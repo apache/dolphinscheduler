@@ -263,7 +263,7 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`worker-server`的端口，默认值 `1234`。
 
-**`WORKER_GROUP`**
+**`WORKER_GROUPS`**
 
 配置`worker-server`的分组，默认值 `default`。
 
