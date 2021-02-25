@@ -160,7 +160,7 @@ services:
       WORKER_HEARTBEAT_INTERVAL: "10"
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
-      WORKER_GROUP: "default"
+      WORKER_GROUPS: "default"
       WORKER_WEIGHT: "100"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       ALERT_LISTEN_HOST: dolphinscheduler-alert
