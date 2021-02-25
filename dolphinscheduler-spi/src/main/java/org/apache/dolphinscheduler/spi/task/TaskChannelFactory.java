@@ -15,19 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
+package org.apache.dolphinscheduler.spi.task;
 
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+public interface TaskChannelFactory {
 
-import com.google.common.collect.ImmutableList;
 
-/**
- * email alert plugin
- */
-public class EmailAlertPlugin extends DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+
+
+
+
+
 }

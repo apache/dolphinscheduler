@@ -1107,5 +1107,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-task-plugin</module>
     </modules>
 </project>

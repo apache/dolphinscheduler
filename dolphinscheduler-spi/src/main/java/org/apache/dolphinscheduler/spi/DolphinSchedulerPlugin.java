@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.spi;
 import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
 /**
  * Dolphinscheduler plugin interface
@@ -30,9 +31,13 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
  * The other method is called <code>create(Map config)</code>. This method contains at least one parameter  <code>Map config</code>.
  * Config contains custom parameters read from the plug-in configuration file.
  */
-public interface DolphinSchedulerPlugin {
+public abstract class DolphinSchedulerPlugin {
 
-    default Iterable<AlertChannelFactory> getAlertChannelFactorys() {
+    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
         return emptyList();
     }
+
+   public Iterable<TaskChannelFactory> getTaskChannelFactorys(){
+        return emptyList();
+    };
 }
