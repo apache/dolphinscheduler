@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.data.quality.Constants.SQL;
 
 import org.apache.dolphinscheduler.data.quality.configuration.WriterParameter;
 import org.apache.dolphinscheduler.data.quality.flow.JdbcBaseConfig;
-import org.apache.dolphinscheduler.data.quality.utils.JdbcUtil;
+import org.apache.dolphinscheduler.data.quality.utils.JdbcUtils;
 import org.apache.dolphinscheduler.data.quality.utils.Preconditions;
 
 import org.apache.spark.sql.SaveMode;
@@ -51,7 +51,7 @@ public class JdbcWriter implements IWriter {
         JdbcBaseConfig jdbcBaseConfig = new JdbcBaseConfig(config);
         String sql = String.valueOf(config.getOrDefault(SQL,EMPTY));
 
-        Preconditions.checkArgument(JdbcUtil.isJdbcDriverLoaded(jdbcBaseConfig.getDriver()), "JDBC driver $driver not present in classpath");
+        Preconditions.checkArgument(JdbcUtils.isJdbcDriverLoaded(jdbcBaseConfig.getDriver()), "JDBC driver $driver not present in classpath");
 
         sparkSession.sql(sql)
                 .write()

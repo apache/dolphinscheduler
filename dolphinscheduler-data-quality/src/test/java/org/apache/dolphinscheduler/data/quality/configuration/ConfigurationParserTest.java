@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.data.quality.configuration;
 
-import org.apache.dolphinscheduler.data.quality.utils.JsonUtil;
+import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -78,7 +78,7 @@ public class ConfigurationParserTest {
                     + "\t\t\"table.alias\": \"total_count\"\n"
                     + "\t}]\n"
                     + "}";
-            DataQualityConfiguration dataQualityConfiguration = JsonUtil.fromJson(parameterStr,DataQualityConfiguration.class);
+            DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(parameterStr,DataQualityConfiguration.class);
             dataQualityConfiguration.validate();
         } catch (Exception e) {
             flag = 0;

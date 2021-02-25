@@ -19,15 +19,17 @@ package org.apache.dolphinscheduler.data.quality;
 
 import org.apache.dolphinscheduler.data.quality.configuration.DataQualityConfiguration;
 import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
+import org.apache.dolphinscheduler.data.quality.exception.DataQualityException;
 import org.apache.dolphinscheduler.data.quality.flow.DataQualityTask;
 import org.apache.dolphinscheduler.data.quality.flow.connector.ConnectorFactory;
 import org.apache.dolphinscheduler.data.quality.flow.executor.SparkSqlExecuteTask;
 import org.apache.dolphinscheduler.data.quality.flow.writer.WriterFactory;
-import org.apache.dolphinscheduler.data.quality.utils.JsonUtil;
+import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,14 +46,14 @@ public class DataQualityApplication {
     public static void main(String[] args) throws Exception {
 
         if (args.length < 1) {
-            logger.error("can not find DataQualityConfiguration");
+            logger.error("Can not find DataQualityConfiguration");
             System.exit(-1);
         }
 
         String dataQualityParameter = args[0];
-        logger.info("DataQualityParameter is {}" + dataQualityParameter);
+        logger.info(MessageFormat.format("DataQualityParameter is {}.", dataQualityParameter));
 
-        DataQualityConfiguration dataQualityConfiguration = JsonUtil.fromJson(dataQualityParameter,DataQualityConfiguration.class);
+        DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(dataQualityParameter,DataQualityConfiguration.class);
         if (dataQualityConfiguration == null) {
             logger.info("DataQualityConfiguration is null");
             System.exit(-1);
@@ -73,7 +75,7 @@ public class DataQualityApplication {
         sparkSession.stop();
     }
 
-    private static List<DataQualityTask> buildDataQualityFlow(DataQualityContext context) throws Exception {
+    private static List<DataQualityTask> buildDataQualityFlow(DataQualityContext context) throws DataQualityException {
         List<DataQualityTask> taskList =
                 new ArrayList<>(ConnectorFactory.getInstance().getConnectors(context));
         taskList.add(new SparkSqlExecuteTask(context.getSparkSession(),context.getExecutorParameterList()));

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.data.quality.flow.connector;
 import org.apache.dolphinscheduler.data.quality.configuration.ConnectorParameter;
 import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
 import org.apache.dolphinscheduler.data.quality.enums.ConnectorType;
+import org.apache.dolphinscheduler.data.quality.exception.DataQualityException;
 
 import org.apache.spark.sql.SparkSession;
 
@@ -39,7 +40,7 @@ public class ConnectorFactory {
         return Singleton.instance;
     }
 
-    public List<IConnector> getConnectors(DataQualityContext context) throws Exception {
+    public List<IConnector> getConnectors(DataQualityContext context) throws DataQualityException {
 
         List<IConnector> connectorList = new ArrayList<>();
 
@@ -53,7 +54,7 @@ public class ConnectorFactory {
         return connectorList;
     }
 
-    private IConnector getConnector(SparkSession sparkSession,ConnectorParameter connectorParameter) throws Exception {
+    private IConnector getConnector(SparkSession sparkSession,ConnectorParameter connectorParameter) throws DataQualityException {
         ConnectorType connectorType = ConnectorType.getType(connectorParameter.getType());
         if (connectorType != null) {
             switch (connectorType) {
@@ -62,7 +63,7 @@ public class ConnectorFactory {
                 case JDBC:
                     return new JdbcConnector(sparkSession, connectorParameter);
                 default:
-                    throw new Exception("connector type ${connectorType} is not supported!");
+                    throw new DataQualityException("connector type ${connectorType} is not supported!");
             }
         }
 

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.data.quality.flow.writer;
 import org.apache.dolphinscheduler.data.quality.configuration.WriterParameter;
 import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
 import org.apache.dolphinscheduler.data.quality.enums.WriterType;
+import org.apache.dolphinscheduler.data.quality.exception.DataQualityException;
 
 import org.apache.spark.sql.SparkSession;
 
@@ -39,7 +40,7 @@ public class WriterFactory {
         return Singleton.instance;
     }
 
-    public List<IWriter> getWriters(DataQualityContext context) throws Exception {
+    public List<IWriter> getWriters(DataQualityContext context) throws DataQualityException {
 
         List<IWriter> writerList = new ArrayList<>();
 
@@ -53,13 +54,13 @@ public class WriterFactory {
         return writerList;
     }
 
-    private IWriter getWriter(SparkSession sparkSession,WriterParameter writerParam) throws Exception {
+    private IWriter getWriter(SparkSession sparkSession,WriterParameter writerParam) throws DataQualityException {
         WriterType writerType = WriterType.getType(writerParam.getType());
         if (writerType != null) {
             if (writerType == WriterType.JDBC) {
                 return new JdbcWriter(sparkSession, writerParam);
             }
-            throw new Exception("writer type $readerType is not supported!");
+            throw new DataQualityException("writer type $readerType is not supported!");
         }
 
         return null;

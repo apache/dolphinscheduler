@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.data.quality.utils;
 
+/**
+ * StringUtils
+ */
 public class StringUtils {
 
     public static final String EMPTY = "";
 
     private StringUtils() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException("Construct StringUtils");
     }
 
     public static boolean isEmpty(final CharSequence cs) {

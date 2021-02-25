@@ -22,24 +22,19 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * JsonUtil
  */
-public class JsonUtil {
+public class JsonUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
     /**
      * can use static singleton, inject: just make sure to reuse!
@@ -51,7 +46,7 @@ public class JsonUtil {
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .setTimeZone(TimeZone.getDefault());
 
-    private JsonUtil() {
+    private JsonUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
     }
 

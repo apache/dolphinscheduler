@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.data.quality.flow.connector;
 
 import org.apache.dolphinscheduler.data.quality.configuration.ConnectorParameter;
 import org.apache.dolphinscheduler.data.quality.flow.JdbcBaseConfig;
-import org.apache.dolphinscheduler.data.quality.utils.JdbcUtil;
+import org.apache.dolphinscheduler.data.quality.utils.JdbcUtils;
 import org.apache.dolphinscheduler.data.quality.utils.Preconditions;
 
 import org.apache.spark.sql.SparkSession;
@@ -46,7 +46,7 @@ public class JdbcConnector implements IConnector {
         Map<String,Object> config = connectorParameter.getConfig();
         JdbcBaseConfig jdbcBaseConfig = new JdbcBaseConfig(config);
 
-        Preconditions.checkArgument(JdbcUtil.isJdbcDriverLoaded(jdbcBaseConfig.getDriver()), "JDBC driver $driver not present in classpath");
+        Preconditions.checkArgument(JdbcUtils.isJdbcDriverLoaded(jdbcBaseConfig.getDriver()), "JDBC driver $driver not present in classpath");
 
         sparkSession
                 .read()

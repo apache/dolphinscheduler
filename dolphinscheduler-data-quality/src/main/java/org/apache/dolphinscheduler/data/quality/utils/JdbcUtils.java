@@ -23,9 +23,13 @@ import org.slf4j.LoggerFactory;
 /**
  * JdbcUtil
  */
-public class JdbcUtil {
+public class JdbcUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdbcUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(JdbcUtils.class);
+
+    private JdbcUtils() {
+        throw new UnsupportedOperationException("Construct JdbcUtils");
+    }
 
     public static boolean isJdbcDriverLoaded(String driver) {
         try {
