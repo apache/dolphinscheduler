@@ -22,12 +22,17 @@ import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * base service impl
@@ -140,4 +145,39 @@ public class BaseServiceImpl implements BaseService {
     public boolean hasPerm(User operateUser, int createUserId) {
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
+
+    /**
+     * check and parse date parameters
+     *
+     * @param startDateStr start date string
+     * @param endDateStr end date string
+     * @return map<status,startDate,endDate>
+     */
+    @Override
+    public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {
+        Map<String, Object> result = new HashMap<>();
+        Date start = null;
+        if (StringUtils.isNotEmpty(startDateStr)) {
+            start = DateUtils.getScheduleDate(startDateStr);
+            if (Objects.isNull(start)) {
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
+            }
+        }
+        result.put(Constants.START_TIME, start);
+
+        Date end = null;
+        if (StringUtils.isNotEmpty(endDateStr)) {
+            end = DateUtils.getScheduleDate(endDateStr);
+            if (Objects.isNull(end)) {
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                return result;
+            }
+        }
+        result.put(Constants.END_TIME, end);
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
 }
