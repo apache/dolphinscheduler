@@ -49,15 +49,6 @@ public class RegisterOperatorTest {
     private static final String DS_ROOT = "/dolphinscheduler";
     private static final String MASTER_NODE = "127.0.0.1:5678";
 
-    public void init() {
-        try {
-            registerOperator.afterPropertiesSet();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
     @Before
     public void before() {
         new Thread(() -> {

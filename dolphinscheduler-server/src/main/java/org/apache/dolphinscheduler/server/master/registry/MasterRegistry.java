@@ -95,9 +95,8 @@ public class MasterRegistry {
                     logger.info("master : {} reconnected to zookeeper", address);
                     zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
                 } else if (newState == ConnectionState.SUSPENDED) {
-                    zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
-                } else if (newState == ConnectionState.SUSPENDED) {
                     logger.warn("master : {} connection SUSPENDED ", address);
+                    zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
                 }
             }
         });
