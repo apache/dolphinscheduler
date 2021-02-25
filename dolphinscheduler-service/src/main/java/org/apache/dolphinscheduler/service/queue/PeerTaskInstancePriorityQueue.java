@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Task instances priority queue implementation
@@ -38,6 +40,11 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * queue
      */
     private PriorityQueue<TaskInstance> queue = new PriorityQueue<>(QUEUE_MAX_SIZE, new TaskInfoComparator());
+
+    /**
+     * Lock used for all public operations
+     */
+    private final ReentrantLock lock = new ReentrantLock(true);
 
     /**
      * put task instance to priority queue
@@ -59,6 +66,23 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     @Override
     public TaskInstance take() throws TaskPriorityQueueException {
         return queue.poll();
+    }
+
+    /**
+     * poll task info with timeout
+     * <p>
+     * WARN: Please use PriorityBlockingQueue if you want to use poll(timeout, unit)
+     * because this method of override interface used without considering accuracy of timeout
+     *
+     * @param timeout
+     * @param unit
+     * @return
+     * @throws TaskPriorityQueueException
+     * @throws InterruptedException
+     */
+    @Override
+    public TaskInstance poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException {
+        throw new TaskPriorityQueueException("This operation is not currently supported and suggest to use PriorityBlockingQueue if you want！");
     }
 
     /**
