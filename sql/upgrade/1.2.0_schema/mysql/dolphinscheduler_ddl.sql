@@ -124,24 +124,6 @@ delimiter ;
 CALL ut_dolphin_T_t_ds_error_command;
 DROP PROCEDURE ut_dolphin_T_t_ds_error_command;
 
--- ut_dolphin_T_t_ds_master_server
-drop PROCEDURE if EXISTS ut_dolphin_T_t_ds_master_server;
-delimiter d//
-CREATE PROCEDURE ut_dolphin_T_t_ds_master_server()
-	BEGIN
-		IF EXISTS (SELECT 1 FROM information_schema.TABLES
-			WHERE TABLE_NAME='t_escheduler_master_server'
-			AND TABLE_SCHEMA=(SELECT DATABASE()))
-		THEN
-			ALTER TABLE t_escheduler_master_server RENAME t_ds_master_server;
-		END IF;
-	END;
-d//
-
-delimiter ;
-CALL ut_dolphin_T_t_ds_master_server;
-DROP PROCEDURE ut_dolphin_T_t_ds_master_server;
-
 -- ut_dolphin_T_t_ds_process_definition
 drop PROCEDURE if EXISTS ut_dolphin_T_t_ds_process_definition;
 delimiter d//
@@ -483,24 +465,6 @@ d//
 delimiter ;
 CALL ut_dolphin_T_t_ds_worker_group;
 DROP PROCEDURE ut_dolphin_T_t_ds_worker_group;
-
--- ut_dolphin_T_t_ds_worker_server
-drop PROCEDURE if EXISTS ut_dolphin_T_t_ds_worker_server;
-delimiter d//
-CREATE PROCEDURE ut_dolphin_T_t_ds_worker_server()
-	BEGIN
-		IF EXISTS (SELECT 1 FROM information_schema.TABLES
-			WHERE TABLE_NAME='t_escheduler_worker_server'
-			AND TABLE_SCHEMA=(SELECT DATABASE()))
-		THEN
-			ALTER TABLE t_escheduler_worker_server RENAME t_ds_worker_server;
-		END IF;
-	END;
-d//
-
-delimiter ;
-CALL ut_dolphin_T_t_ds_worker_server;
-DROP PROCEDURE ut_dolphin_T_t_ds_worker_server;
 
 -- uc_dolphin_T_t_ds_alertgroup_C_desc
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_alertgroup_C_desc;

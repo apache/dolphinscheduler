@@ -105,21 +105,6 @@ CREATE TABLE `t_escheduler_datasource` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for t_escheduler_master_server
--- ----------------------------
-DROP TABLE IF EXISTS `t_escheduler_master_server`;
-CREATE TABLE `t_escheduler_master_server` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `host` varchar(45) DEFAULT NULL COMMENT 'ip',
-  `port` int(11) DEFAULT NULL COMMENT 'port',
-  `zk_directory` varchar(64) DEFAULT NULL COMMENT 'the server path in zk directory',
-  `res_info` varchar(256) DEFAULT NULL COMMENT 'json resource information:{"cpu":xxx,"memroy":xxx}',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `last_heartbeat_time` datetime DEFAULT NULL COMMENT 'last head beat time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
 -- Table structure for t_escheduler_process_definition
 -- ----------------------------
 DROP TABLE IF EXISTS `t_escheduler_process_definition`;
@@ -425,21 +410,6 @@ CREATE TABLE `t_escheduler_user` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_escheduler_worker_server
--- ----------------------------
-DROP TABLE IF EXISTS `t_escheduler_worker_server`;
-CREATE TABLE `t_escheduler_worker_server` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `host` varchar(45) DEFAULT NULL COMMENT 'ip',
-  `port` int(11) DEFAULT NULL COMMENT 'process id',
-  `zk_directory` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT 'zk path',
-  `res_info` varchar(255) DEFAULT NULL COMMENT 'json resource info,{"cpu":xxx,"memroy":xxx}',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `last_heartbeat_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
  /*drop table first */

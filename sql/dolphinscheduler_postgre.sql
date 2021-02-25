@@ -276,9 +276,6 @@ CREATE TABLE t_ds_error_command (
   message text ,
   PRIMARY KEY (id)
 );
---
--- Table structure for table t_ds_master_server
---
 
 --
 -- Table structure for table t_ds_process_definition
@@ -664,22 +661,6 @@ CREATE TABLE t_ds_worker_group (
   PRIMARY KEY (id)
 ) ;
 
---
--- Table structure for table t_ds_worker_server
---
-
-DROP TABLE IF EXISTS t_ds_worker_server;
-CREATE TABLE t_ds_worker_server (
-  id int NOT NULL  ,
-  host varchar(45) DEFAULT NULL ,
-  port int DEFAULT NULL ,
-  zk_directory varchar(64)   DEFAULT NULL ,
-  res_info varchar(255) DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  last_heartbeat_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
-) ;
-
 
 DROP SEQUENCE IF EXISTS t_ds_access_token_id_sequence;
 CREATE SEQUENCE  t_ds_access_token_id_sequence;
@@ -755,9 +736,6 @@ ALTER TABLE t_ds_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_version_id_se
 DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
 ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
-CREATE SEQUENCE t_ds_worker_server_id_sequence;
-ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
