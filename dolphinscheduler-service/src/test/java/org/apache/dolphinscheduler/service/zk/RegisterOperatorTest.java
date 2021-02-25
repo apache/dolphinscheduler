@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.curator.framework.CuratorFramework;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,10 +46,8 @@ public class RegisterOperatorTest {
     @Mock
     private ZookeeperConfig zookeeperConfig;
 
-    protected CuratorFramework zkClient;
-
-
     private static final String DS_ROOT = "/dolphinscheduler";
+    private static final String MASTER_NODE = "127.0.0.1:5678";
 
     public void init() {
         try {
@@ -79,7 +78,7 @@ public class RegisterOperatorTest {
         Mockito.when(zookeeperConfig.getSessionTimeoutMs()).thenReturn(60000);
         Mockito.when(zookeeperConfig.getConnectionTimeoutMs()).thenReturn(30000);
         Mockito.when(zookeeperConfig.getDigest()).thenReturn("");
-        Mockito.when(zookeeperConfig.getDsRoot()).thenReturn("/dolphinscheduler");
+        Mockito.when(zookeeperConfig.getDsRoot()).thenReturn(DS_ROOT);
         Mockito.when(zookeeperConfig.getMaxWaitTime()).thenReturn(30000);
 
         registerOperator.afterPropertiesSet();
@@ -94,10 +93,33 @@ public class RegisterOperatorTest {
     }
 
     @Test
-    public void getDeadZNodeParentPath() throws Exception {
+    public void testGetDeadZNodeParentPath() throws Exception {
+
         testAfterPropertiesSet();
         String path = registerOperator.getDeadZNodeParentPath();
-        Assert.assertEquals("/dolphinscheduler/dead-servers", path);
+
+        Assert.assertEquals(DS_ROOT + Constants.ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS, path);
+    }
+
+    @Test
+    public void testHandleDeadServer() throws Exception {
+        testAfterPropertiesSet();
+        registerOperator.handleDeadServer(MASTER_NODE, ZKNodeType.MASTER,Constants.ADD_ZK_OP);
+        String path = registerOperator.getDeadZNodeParentPath();
+        Assert.assertTrue(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
+
+    }
+
+    @Test
+    public void testRemoveDeadServerByHost() throws Exception {
+        testAfterPropertiesSet();
+        String path = registerOperator.getDeadZNodeParentPath();
+
+        registerOperator.handleDeadServer(MASTER_NODE, ZKNodeType.MASTER,Constants.ADD_ZK_OP);
+        Assert.assertTrue(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
+
+        registerOperator.removeDeadServerByHost(MASTER_NODE,Constants.MASTER_PREFIX);
+        Assert.assertFalse(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
     }
 
 }
