@@ -19,16 +19,19 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.sql.DriverManager;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * shell task test.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ShellTask.class})
+@PrepareForTest(value = {ShellTask.class, DriverManager.class, SpringApplicationContext.class, ParameterUtils.class})
 public class ShellTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellTaskTest.class);
@@ -57,6 +60,7 @@ public class ShellTaskTest {
         System.setProperty("log4j2.disable.jmx", Boolean.TRUE.toString());
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
         PowerMockito.whenNew(ShellCommandExecutor.class).withAnyArguments().thenReturn(shellCommandExecutor);
+        shellCommandExecutor.setTaskResultString("shellReturn");
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
@@ -68,7 +72,7 @@ public class ShellTaskTest {
             "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\",\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,\"id\":\""
                 +
                 "tasks-16849\",\"maxRetryTimes\":0,\"name\":\"shell test 001\",\"params\":\"{\\\"rawScript\\\":\\\"#!/bin/sh\\\\necho $[yyyy-MM-dd HH:mm:ss +3]\\\\necho \\\\\\\" ?? "
-                + "${time1} \\\\\\\"\\\\necho \\\\\\\" ????? ${time2}\\\\\\\"\\\\n\\\",\\\"localParams\\\":[{\\\"prop\\\":\\\"time1\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":"
+                + "${time1} \\\\\\\"\\\\necho \\\\\\\" ????? ${time2}\\\\\\\"\\\\n\\\",\\\"localParams\\\":[{\\\"prop\\\":\\\"time1\\\",\\\"direct\\\":\\\"OUT\\\",\\\"type\\\":"
                 + "\\\"VARCHAR\\\",\\\"value\\\":\\\"$[yyyy-MM-dd HH:mm:ss]\\\"},{\\\"prop\\\":\\\"time2\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${time_gb}\\\"}"
                 + "],\\\"resourceList\\\":[]}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\",\"taskTimeoutParameter\":"
                 + "{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}");
@@ -82,7 +86,7 @@ public class ShellTaskTest {
         taskExecutionContext.setTaskParams(
             "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
                 +
-                "[{\"prop\":\"time1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"$[yyyy-MM-dd HH:mm:ss]\"},{\"prop\":\"time2\",\"direct\":\"IN\",\"type\":\"VARCHAR"
+                "[{\"prop\":\"time1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"$[yyyy-MM-dd HH:mm:ss]\"},{\"prop\":\"time2\",\"direct\":\"IN\",\"type\":\"VARCHAR"
                 + "\",\"value\":\"${time_gb}\"}],\"resourceList\":[]}");
         Map<String, String> definedParams = new HashMap<>();
         definedParams.put("time_gb", "2020-12-16 00:00:00");
@@ -99,6 +103,8 @@ public class ShellTaskTest {
     public void testComplementData() throws Exception {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellCommandExecutor.isSuccessOfYarnState(new ArrayList<>());
+        shellCommandExecutor.isSuccessOfYarnState(null);
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
     }
@@ -111,4 +117,13 @@ public class ShellTaskTest {
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
     }
+
+    @Test
+    public void testSetResult() {
+        shellTask = new ShellTask(taskExecutionContext, logger);
+        shellTask.init();
+        String r = "return";
+        shellTask.setResult(r);
+    }
+
 }
