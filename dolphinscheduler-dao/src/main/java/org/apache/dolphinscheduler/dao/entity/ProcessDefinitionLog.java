@@ -39,11 +39,11 @@ public class ProcessDefinitionLog extends ProcessDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
-    public ProcessDefinitionLog(){
+    public ProcessDefinitionLog() {
         super();
     }
 
-    public ProcessDefinitionLog(ProcessDefinition processDefinition){
+    public ProcessDefinitionLog(ProcessDefinition processDefinition) {
         this.setId(processDefinition.getId());
         this.setCode(processDefinition.getCode());
         this.setName(processDefinition.getName());
