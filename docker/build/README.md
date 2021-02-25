@@ -1,12 +1,12 @@
-## What is Dolphin Scheduler?
+## What is DolphinScheduler?
 
-Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
+DolphinScheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
 GitHub URL: https://github.com/apache/incubator-dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
-![Dolphin Scheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
+![DolphinScheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
@@ -118,7 +118,7 @@ Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script
 
 ## Environment Variables
 
-The Dolphin Scheduler image uses several environment variables which are easy to miss. While none of the variables are required, they may significantly aid you in using the image.
+The DolphinScheduler image uses several environment variables which are easy to miss. While none of the variables are required, they may significantly aid you in using the image.
 
 **`DATABASE_TYPE`**
 
@@ -308,3 +308,142 @@ EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
 ```
+
+## FAQ
+
+### How to stop dolphinscheduler by docker-compose?
+
+Stop containers:
+
+```
+docker-compose stop
+```
+
+Stop containers and removes containers, networks and volumes:
+
+```
+docker-compose down -v
+```
+
+### How to deploy dolphinscheduler on Docker Swarm?
+
+Assuming that the Docker Swarm cluster has been created (If there is no Docker Swarm cluster, please refer to [https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/))
+
+Start a stack named dolphinscheduler
+
+```
+docker stack deploy -c docker-stack.yml dolphinscheduler
+```
+
+Stop and remove the stack named dolphinscheduler
+
+```
+docker stack rm dolphinscheduler
+```
+
+### How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?
+
+> Because of the commercial license, we cannot directly use the driver and client of MySQL.
+>
+> If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
+
+2. Create a new `Dockerfile` to add MySQL driver and client:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+RUN apk add --update --no-cache mysql-client
+```
+
+3. Build a new docker image including MySQL driver and client:
+
+```
+docker build -t apache/dolphinscheduler:mysql .
+```
+
+4. Modify all `image` fields to `apache/dolphinscheduler:mysql` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+5. Comment the `dolphinscheduler-postgresql` block in `docker-compose.yml`
+
+6. Add `dolphinscheduler-mysql` service in `docker-compose.yml` (**Optional**, you can directly use a external MySQL database)
+
+7. Modify all DATABASE environments in `docker-compose.yml`
+
+```
+DATABASE_TYPE: mysql
+DATABASE_DRIVER: com.mysql.jdbc.Driver
+DATABASE_HOST: dolphinscheduler-mysql
+DATABASE_PORT: 3306
+DATABASE_USERNAME: root
+DATABASE_PASSWORD: root
+DATABASE_DATABASE: dolphinscheduler
+DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
+```
+
+> If you have added `dolphinscheduler-mysql` service in `docker-compose.yml`, just set `DATABASE_HOST` to `dolphinscheduler-mysql`
+
+8. Run a dolphinscheduler (See **How to use this docker image**)
+
+### How to support MySQL datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of MySQL.
+>
+> If you want to add MySQL datasource, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
+
+2. Create a new `Dockerfile` to add MySQL driver:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including MySQL driver:
+
+```
+docker build -t apache/dolphinscheduler:mysql-driver .
+```
+
+4. Modify all `image` fields to `apache/dolphinscheduler:mysql-driver` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+5. Run a dolphinscheduler (See **How to use this docker image**)
+
+6. Add a MySQL datasource in `Datasource manage`
+
+### How to support Oracle datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of Oracle.
+>
+> If you want to add Oracle datasource, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the Oracle driver [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
+
+2. Create a new `Dockerfile` to add Oracle driver:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including Oracle driver:
+
+```
+docker build -t apache/dolphinscheduler:oracle-driver .
+```
+
+4. Modify all `image` fields to `apache/dolphinscheduler:oracle-driver` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+5. Run a dolphinscheduler (See **How to use this docker image**)
+
+6. Add a Oracle datasource in `Datasource manage`
+
+For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.

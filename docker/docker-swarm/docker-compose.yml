@@ -58,11 +58,14 @@ services:
     - 12345:12345
     environment:
       TZ: Asia/Shanghai
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
       RESOURCE_STORAGE_TYPE: HDFS
       RESOURCE_UPLOAD_PATH: /dolphinscheduler
@@ -92,11 +95,14 @@ services:
     environment:
       TZ: Asia/Shanghai
       ALERT_PLUGIN_DIR: lib/plugin/alert
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
       interval: 30s
@@ -126,11 +132,14 @@ services:
       MASTER_TASK_COMMIT_INTERVAL: "1000"
       MASTER_MAX_CPULOAD_AVG: "100"
       MASTER_RESERVED_MEMORY: "0.1"
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
@@ -173,11 +182,14 @@ services:
       DATAX_HOME: "/opt/soft/datax/bin/datax.py"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       ALERT_LISTEN_HOST: dolphinscheduler-alert
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
       RESOURCE_STORAGE_TYPE: HDFS
       RESOURCE_UPLOAD_PATH: /dolphinscheduler
