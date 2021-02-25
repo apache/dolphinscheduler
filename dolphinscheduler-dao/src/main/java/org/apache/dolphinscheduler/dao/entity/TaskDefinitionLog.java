@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
-import org.datanucleus.store.rdbms.sql.method.MathSinMethod;
-
 /**
  * task definition log
  */
@@ -41,11 +39,11 @@ public class TaskDefinitionLog extends TaskDefinition {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
-    public TaskDefinitionLog(){
+    public TaskDefinitionLog() {
         super();
     }
 
-    public TaskDefinitionLog(TaskDefinition taskDefinition){
+    public TaskDefinitionLog(TaskDefinition taskDefinition) {
         super();
         this.setId(taskDefinition.getId());
         this.setCode(taskDefinition.getCode());
