@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
@@ -88,6 +89,8 @@ public class TaskParametersUtils {
                 return JSONUtils.parseObject(parameter, ConditionsParameters.class);
             case SQOOP:
                 return JSONUtils.parseObject(parameter, SqoopParameters.class);
+            case DATA_QUALITY:
+                return JSONUtils.parseObject(parameter, DataQualityParameters.class);
             default:
                 return null;
         }

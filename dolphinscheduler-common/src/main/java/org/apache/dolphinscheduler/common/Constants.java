@@ -401,16 +401,12 @@ public final class Constants {
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
+
     /***
      *
      * rpc port
      */
     public static final int RPC_PORT = 50051;
-
-    /***
-     * alert rpc port
-     */
-    public static final int ALERT_RPC_PORT = 50052;
 
     /**
      * forbid running task
@@ -461,8 +457,6 @@ public final class Constants {
     public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
     public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
-
-    public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
     /**
      * complement data start date
@@ -907,11 +901,6 @@ public final class Constants {
     public static final String PASSWORD_DEFAULT = "******";
 
     /**
-     * locale
-     */
-    public static final String LOCALE_LANGUAGE = "language";
-
-    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
@@ -956,7 +945,39 @@ public final class Constants {
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
+    public static final String TABLE = "table";
+    public static final String URL = "url";
+    public static final String DRIVER = "driver";
+    public static final String SQL = "sql";
 
+    /**
+     * data quality task
+     */
+    public static final String SRC_CONNECTOR_TYPE = "src_connector_type";
+    public static final String SRC_DATASOURCE_ID = "src_datasource_id";
+    public static final String SRC_TABLE = "src_table";
+    public static final String SRC_FILTER = "src_filter";
+    public static final String SRC_FIELD = "src_field";
+    public static final String TARGET_CONNECTOR_TYPE = "target_connector_type";
+    public static final String TARGET_DATASOURCE_ID = "target_datasource_id";
+    public static final String TARGET_TABLE = "target_table";
+    public static final String TARGET_FILTER = "target_filter";
+    public static final String TARGET_FILED = "target_filed";
+    public static final String STATISTICS_NAME = "statistics_name";
+    public static final String STATISTICS_EXECUTE_SQL = "statistics_execute_sql";
+    public static final String COMPARISON_NAME = "comparison_name";
+    public static final String COMPARISON_TITLE = "comparison_title";
+    public static final String COMPARISON_VALUE = "comparison_value";
+    public static final String COMPARISON_EXECUTE_SQL = "comparison_execute_sql";
+    public static final String MAPPING_COLUMNS = "mapping_columns";
+    public static final String ON_CLAUSE = "on_clause";
+    public static final String WHERE_CLAUSE = "where_clause";
+    public static final String CHECK_TYPE = "check_type";
+    public static final String THRESHOLD = "threshold";
+    public static final String OPERATOR = "operator";
+    public static final String STATISTICS_TABLE = "statistics_table";
+    public static final String COMPARISON_TABLE = "comparison_table";
+    public static final String AND = " AND ";
 
     /**
      * session timeout
@@ -1017,8 +1038,6 @@ public final class Constants {
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
 
-    public static final String EXCEL_SUFFIX_XLS = ".xls";
-
     /**
      * datasource encryption salt
      */
@@ -1040,4 +1059,29 @@ public final class Constants {
      * pstree, get pud and sub pid
      */
     public static final String PSTREE = "pstree";
+
+    /**
+     * dolphinscheduler.env.path
+     */
+    public static final String DOLPHINSCHEDULER_DQ_JAR_NAME = "dq.jar.name";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_LEFT = "{{";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_RIGHT = "}}";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_LEFT_SPACE = "{ {";
+
+    /**
+     * double brackets left
+     */
+    public static final String DOUBLE_BRACKETS_RIGHT_SPACE = "} }";
 }
