@@ -268,7 +268,7 @@ This environment variable sets port for `worker-server`. The default value is `1
 
 **`WORKER_GROUPS`**
 
-This environment variable sets group for `worker-server`. The default value is `default`.
+This environment variable sets groups for `worker-server`. The default value is `default`.
 
 **`WORKER_WEIGHT`**
 
@@ -319,7 +319,7 @@ Stop containers:
 docker-compose stop
 ```
 
-Stop containers and removes containers, networks and volumes:
+Stop containers and remove containers, networks and volumes:
 
 ```
 docker-compose down -v
