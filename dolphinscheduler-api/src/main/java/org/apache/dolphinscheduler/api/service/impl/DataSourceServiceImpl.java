@@ -693,7 +693,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
         }
         if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
-            throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
+            throw new ServiceException(Status.DATASOURCE_HOST_ILLEGAL);
         }
         if (!DATABASE_PATTER.matcher(database).matches()) {
             throw new ServiceException(Status.DATASOURCE_NAME_ILLEGAL);
