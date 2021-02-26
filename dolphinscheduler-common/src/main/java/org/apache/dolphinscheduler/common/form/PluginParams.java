@@ -126,6 +126,7 @@ public class PluginParams {
         public PluginParams build() {
             return new PluginParams(this);
         }
+
     }
 
     public String getField() {

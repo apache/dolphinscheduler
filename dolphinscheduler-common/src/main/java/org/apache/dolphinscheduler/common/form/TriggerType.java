@@ -19,18 +19,22 @@ package org.apache.dolphinscheduler.common.form;
 
 public enum TriggerType {
 
+    /**
+     * blur
+     * change
+     */
     BLUR("blur"),
 
     CHANGE("change");
 
-    private final String triggerType;
+    private final String type;
 
-    TriggerType(String triggerType) {
-        this.triggerType = triggerType;
+    TriggerType(String type) {
+        this.type = type;
     }
 
     public String getTriggerType() {
-        return this.triggerType;
+        return this.type;
     }
 
 }

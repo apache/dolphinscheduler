@@ -53,6 +53,11 @@ public class SelectParam extends PluginParams {
             super(field, FormType.SELECT, title);
         }
 
+        public Builder setParamsOptionsList(List<ParamsOptions> paramsOptionsList) {
+            this.paramsOptionsList = paramsOptionsList;
+            return this;
+        }
+
         public Builder addValidate(Validate validate) {
             if (this.validateList == null) {
                 this.validateList = new ArrayList<>();
@@ -78,11 +83,6 @@ public class SelectParam extends PluginParams {
 
         public Builder setValidateList(List<Validate> validateList) {
             this.validateList = validateList;
-            return this;
-        }
-
-        public Builder setParamsOptionsList(List<ParamsOptions> paramsOptionsList) {
-            this.paramsOptionsList = paramsOptionsList;
             return this;
         }
 

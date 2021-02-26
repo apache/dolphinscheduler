@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.form.props;
 
 import org.apache.dolphinscheduler.common.form.CascaderParamsOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -57,6 +58,9 @@ public class CascaderParamsProps {
     }
 
     public CascaderParamsProps setOption(CascaderParamsOptions options) {
+        if (this.options == null) {
+            this.options = new ArrayList<>();
+        }
         this.options.add(options);
         return this;
     }

@@ -45,6 +45,11 @@ public class CascaderParam extends PluginParams {
             super(field, FormType.CASCADER, title);
         }
 
+        public Builder setProps(CascaderParamsProps props) {
+            this.props = props;
+            return this;
+        }
+
         public Builder addValidate(Validate validate) {
             if (this.validateList == null) {
                 this.validateList = new ArrayList<>();
@@ -73,11 +78,6 @@ public class CascaderParam extends PluginParams {
             return this;
         }
 
-        public Builder setProps(CascaderParamsProps props) {
-            this.props = props;
-            return this;
-        }
-
         public Builder setParamsOptionsList(List<CascaderParamsOptions> paramsOptionsList) {
             if (this.props == null) {
                 this.setProps(new CascaderParamsProps());
@@ -93,7 +93,7 @@ public class CascaderParam extends PluginParams {
             }
 
             if (((CascaderParamsProps)this.props).getOptions() == null) {
-                ((CascaderParamsProps)this.props).setOptions(new ArrayList<CascaderParamsOptions>());
+                ((CascaderParamsProps)this.props).setOptions(new ArrayList<>());
             }
 
             ((CascaderParamsProps)this.props).setOption(paramsOptions);

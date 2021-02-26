@@ -17,15 +17,32 @@
 
 package org.apache.dolphinscheduler.common.task;
 
+import org.apache.dolphinscheduler.common.form.CascaderParamsOptions;
+import org.apache.dolphinscheduler.common.form.ParamsOptions;
+import org.apache.dolphinscheduler.common.form.PluginParams;
+import org.apache.dolphinscheduler.common.form.TriggerType;
+import org.apache.dolphinscheduler.common.form.Validate;
+import org.apache.dolphinscheduler.common.form.props.CascaderParamsProps;
+import org.apache.dolphinscheduler.common.form.props.InputParamsProps;
+import org.apache.dolphinscheduler.common.form.props.SelectParamsProps;
+import org.apache.dolphinscheduler.common.form.type.CascaderParam;
+import org.apache.dolphinscheduler.common.form.type.InputParam;
+import org.apache.dolphinscheduler.common.form.type.SelectParam;
 import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * DataQualityParameterTest
@@ -303,5 +320,61 @@ public class DataQualityParameterTest {
         dataQualityParameters.setRuleInputParameter(inputParameterValue);
 
         Assert.assertFalse(dataQualityParameters.checkParameters());
+    }
+
+    @Test
+    public void testRuleInputParameter() {
+        String formCreateJson = "[{\"field\":\"src_connector_type\","
+                + "\"props\":{\"multiple\":false,\"disabled\":false,\"size\":\"small\"},\"type\":\"select\",\"title\":\"源数据类型\",\"value\":\"JDBC\","
+                + "\"options\":[{\"label\":\"HIVE\",\"value\":\"HIVE\",\"disabled\":false},{\"label\":\"JDBC\",\"value\":\"JDBC\",\"disabled\":false}]},"
+                + "{\"field\":\"src_datasource_id\","
+                + "\"props\":{\"options\":"
+                + "[{\"label\":\"mysql\",\"value\":\"0\",\"disabled\":false,\"children\":[{\"label\":\"mysql数据源\",\"value\":1,\"disabled\":false}]}],"
+                + "\"changeOnSelect\":false,\"size\":\"small\"},\"type\":\"cascader\",\"title\":\"源数据源\",\"value\":1},{\"field\":\"src_table\","
+                + "\"props\":{\"placeholder\":\"Please enter source table name\",\"rows\":0,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":\"源数据表\","
+                + "\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
+
+        List<PluginParams> pluginParamsList = new ArrayList<>();
+        SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type","源数据类型")
+                .setProps(new SelectParamsProps().setMultiple(false).setDisabled(false).setSize("small"))
+                .addParamsOptions(new ParamsOptions("HIVE","HIVE",false))
+                .addParamsOptions(new ParamsOptions("JDBC","JDBC",false))
+                .setValue("JDBC")
+                .build();
+
+        List<CascaderParamsOptions> children = new ArrayList<>();
+        CascaderParamsOptions child = new CascaderParamsOptions("mysql数据源",1,false);
+        children.add(child);
+        CascaderParamsOptions root = new CascaderParamsOptions("mysql","0",children,false);
+
+        CascaderParam srcDatasourceId = CascaderParam.newBuilder("src_datasource_id","源数据源")
+                .setProps(new CascaderParamsProps().setOption(root).setChangeOnSelect(false).setSize("small"))
+                .setValue(1)
+                .build();
+
+        InputParam srcTable = InputParam.newBuilder("src_table","源数据表")
+                .setProps(new InputParamsProps()
+                        .setPlaceholder("Please enter source table name")
+                        .setDisabled(false)
+                        .setSize("small")
+                        .setRows(0))
+                .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
+                .build();
+
+        pluginParamsList.add(srcConnectorType);
+        pluginParamsList.add(srcDatasourceId);
+        pluginParamsList.add(srcTable);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String result = null;
+
+        try {
+            result = mapper.writeValueAsString(pluginParamsList);
+        } catch (JsonProcessingException e) {
+            Assert.fail();
+        }
+
+        Assert.assertEquals(formCreateJson,result);
     }
 }

@@ -31,14 +31,14 @@ public enum ValueType {
     NUMBER("number"),
     LIKE_SQL("sql");
 
-    private final String valueType;
+    private final String type;
 
-    ValueType(String valueType) {
-        this.valueType = valueType;
+    ValueType(String type) {
+        this.type = type;
     }
 
     @JsonValue
     public String getValueType() {
-        return this.valueType;
+        return this.type;
     }
 }

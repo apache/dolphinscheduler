@@ -45,15 +45,6 @@ public class InputParam extends PluginParams {
             super(field, FormType.INPUT, title);
         }
 
-        public Builder setPlaceholder(String placeholder) {
-            if (this.props == null) {
-                this.setProps(new InputParamsProps());
-            }
-
-            ((InputParamsProps)this.props).setPlaceholder(placeholder);
-            return this;
-        }
-
         public Builder addValidate(Validate validate) {
             if (this.validateList == null) {
                 this.validateList = new ArrayList<>();
@@ -64,11 +55,6 @@ public class InputParam extends PluginParams {
 
         public Builder setField(String field) {
             this.field = field;
-            return this;
-        }
-
-        public Builder setProps(InputParamsProps props) {
-            this.props = props;
             return this;
         }
 
@@ -84,6 +70,20 @@ public class InputParam extends PluginParams {
 
         public Builder setValidateList(List<Validate> validateList) {
             this.validateList = validateList;
+            return this;
+        }
+
+        public Builder setPlaceholder(String placeholder) {
+            if (this.props == null) {
+                this.setProps(new InputParamsProps());
+            }
+
+            ((InputParamsProps)this.props).setPlaceholder(placeholder);
+            return this;
+        }
+
+        public Builder setProps(InputParamsProps props) {
+            this.props = props;
             return this;
         }
 
