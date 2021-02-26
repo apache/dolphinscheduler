@@ -287,7 +287,7 @@
         })
       },
       operationTree (item) {
-        if (item.dirctory) {
+        if (item.directory) {
           item.isDisabled = true
         }
         delete item.children
