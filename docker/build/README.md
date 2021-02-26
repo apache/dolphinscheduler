@@ -23,7 +23,7 @@ The default **postgres** user `root`, postgres password `root` and database `dol
 
 The default **zookeeper** is created in the `docker-compose.yml`.
 
-Access the Web UI：http://192.168.xx.xx:12345/dolphinscheduler
+Access the Web UI: http://192.168.xx.xx:12345/dolphinscheduler
 
 The default username is `admin` and the default password is `dolphinscheduler123`
 
