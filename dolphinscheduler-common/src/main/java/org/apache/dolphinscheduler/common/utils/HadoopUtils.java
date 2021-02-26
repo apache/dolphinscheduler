@@ -660,12 +660,7 @@ public class HadoopUtils implements Closeable {
                 }
 
             } catch (Exception e) {
-                for (int i = 1; i < rmIdArr.length; i++) {
-                    String  state = getRMState(String.format(yarnUrl, rmIdArr[i]));
-                    if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                        return rmIdArr[i];
-                    }
-                }
+                logger.error("yarn ha application url generation failed, message:{}", e.getMessage());
             }
             return null;
         }
