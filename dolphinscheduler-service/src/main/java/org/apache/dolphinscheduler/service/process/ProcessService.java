@@ -344,25 +344,23 @@ public class ProcessService {
     /**
      * get task node list by definitionId
      */
-    public List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId) {
+    public List<TaskDefinition> getTaskNodeListByDefinitionId(Integer defineId) {
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.error("process define not exists");
             return new ArrayList<>();
         }
-
         List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
         Map<Long, TaskDefinition> taskDefinitionMap = new HashMap<>();
         for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
             if (taskDefinitionMap.containsKey(processTaskRelation.getPostTaskCode())) {
-                TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(processTaskRelation.getPostTaskCode());
+                TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                        processTaskRelation.getPostTaskCode(), processTaskRelation.getPostNodeVersion());
                 taskDefinitionMap.put(processTaskRelation.getPostTaskCode(), taskDefinition);
             }
         }
-        return taskDefinitionMap.entrySet()
-                .stream()
-                .map(e -> JSONUtils.parseObject(JSONUtils.toJsonString(e.getValue()), TaskNode.class))
-                .collect(Collectors.toList());
+        return new ArrayList<>(taskDefinitionMap.values());
+
     }
 
     /**
@@ -394,21 +392,10 @@ public class ProcessService {
     public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
         if (processDefinition.getVersion() != version) {
-            ProcessDefinitionLog log = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
-            processDefinition = convertFromLog(log);
+            processDefinition = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
+            processDefinition.setId(0);
         }
         return processDefinition;
-    }
-
-    /**
-     * covert log to process definition
-     */
-    public ProcessDefinition convertFromLog(ProcessDefinitionLog processDefinitionLog) {
-        ProcessDefinition definition = processDefinitionLog;
-        if (null != definition) {
-            definition.setId(0);
-        }
-        return definition;
     }
 
     /**
@@ -500,11 +487,13 @@ public class ProcessService {
      * @param ids ids
      */
     public void recurseFindSubProcessId(int parentId, List<Integer> ids) {
-        List<TaskNode> taskNodeList = this.getTaskNodeListByDefinitionId(parentId);
+        List<TaskDefinition> taskNodeList = this.getTaskNodeListByDefinitionId(parentId);
+
+
         if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
-            for (TaskNode taskNode : taskNodeList) {
-                String parameter = taskNode.getParams();
+            for (TaskDefinition taskNode : taskNodeList) {
+                String parameter = taskNode.getTaskParams();
                 ObjectNode parameterJson = JSONUtils.parseObject(parameter);
                 if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_ID) != null) {
                     SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
@@ -2404,7 +2393,7 @@ public class ProcessService {
      * @return dag graph
      */
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-        List<TaskNode> taskNodeList = this.getTaskNodeListByDefinitionId(processDefinition.getId());
+        List<TaskNode> taskNodeList = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion());
         List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, processTaskRelations);
         // Generate concrete Dag to be executed
