@@ -52,6 +52,7 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -1748,11 +1749,42 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
 
         for (TaskNode taskNode : taskNodeList) {
+            List<String> taskItems = new ArrayList<>();
+            //get task node with the given task name
             if (taskNode.getName().equals(taskName)) {
-                //getPreTasks() holds inner dependency information
-                depList.add(taskNode.getPreTasks());
+                String preTasksField = taskNode.getPreTasks();
+                //parse preTasks field
+                taskItems = JSONUtils.toList(preTasksField, String.class);
+                //add preTasks to depList
+                depList.add(preTasksField);
             }
+            for (String taskItem : taskItems) {
+                for (TaskNode taskNode1 : taskNodeList) {
+                    //find task node if ID is in the preTasks
+                    if (taskNode1.getName().equals(taskItem)) {
+                        if (taskNode1.getType().equals("DEPENDENT")) {
+                            String dependenceField = taskNode1.getDependence();
 
+                            //parse dependence field if task node is dependent
+                            DependentParameters dependParam = JSONUtils.parseObject(dependenceField, DependentParameters.class);
+
+                            List<DependentTaskModel> dependentTaskList = (dependParam.getDependTaskList() == null) ? new ArrayList<>() : dependParam.getDependTaskList();
+
+                            for (DependentTaskModel dependentTask : dependentTaskList) {
+                                List<DependentItem> dependentItemList = (dependentTask.getDependItemList() == null) ? new ArrayList<>() : dependentTask.getDependItemList();
+
+                                for (DependentItem dependentItem : dependentItemList) {
+                                    //add depTasks to depList
+                                    depList.add(dependentItem.getDepTasks());
+                                }
+                            }
+                        } else {
+                            //add preTasks to depList if task node is not dependent
+                            depList.add(taskNode1.getPreTasks());
+                        }
+                    }
+                }
+            }
         }
 
         result.put(Constants.DATA_LIST, depList);
@@ -1785,22 +1817,38 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
 
+        //iterate all task nodes
         for (TaskNode taskNode : taskNodeList) {
-            if (taskNode.getName().equals(taskName)) {
-                if (taskNode.getType().equals("DEPENDENT")) {
-                    //dependenceField hold outer dependency information
-                    String dependenceField = taskNode.getDependence();
+            if (taskNode.getType().equals("DEPENDENT")) {
+                String dependenceField = taskNode.getDependence();
 
-                    DependentParameters dependParam = JSONUtils.parseObject(dependenceField, DependentParameters.class);
+                //parse dependence field if task node is dependent
+                DependentParameters dependParam = JSONUtils.parseObject(dependenceField, DependentParameters.class);
 
-                    List<DependentTaskModel> dependentTaskList = (dependParam.getDependTaskList() == null) ? new ArrayList<>() : dependParam.getDependTaskList();
+                List<DependentTaskModel> dependentTaskList = (dependParam.getDependTaskList() == null) ? new ArrayList<>() : dependParam.getDependTaskList();
 
-                    for (DependentTaskModel dependentTask : dependentTaskList) {
-                        List<DependentItem> dependentItemList = (dependentTask.getDependItemList() == null) ? new ArrayList<>() : dependentTask.getDependItemList();
+                for (DependentTaskModel dependentTask : dependentTaskList) {
+                    List<DependentItem> dependentItemList = (dependentTask.getDependItemList() == null) ? new ArrayList<>() : dependentTask.getDependItemList();
 
-                        for (DependentItem dependentItem : dependentItemList) {
-                            depList.add(dependentItem.getDepTasks());
+                    for (DependentItem dependentItem : dependentItemList) {
+                        String depTasksField = dependentItem.getDepTasks();
+                        if (depTasksField.contains(taskName)) {
+                            //add the dependent item to depList if it is same as taskName
+                            depList.add(taskNode.getName());
                         }
+                    }
+                }
+
+            } else {
+                List<String> taskItems;
+                String preTaskField = taskNode.getPreTasks();
+                //parse preTaskField if task node is not dependent
+                taskItems = JSONUtils.toList(preTaskField, String.class);
+
+                for (String  taskItem : taskItems) {
+                    if (taskItem.equals(taskName)) {
+                        //add the task item to depList if it is same as taskName
+                        depList.add(taskNode.getName());
                     }
                 }
             }
