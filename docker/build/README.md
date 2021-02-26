@@ -25,6 +25,8 @@ The default **zookeeper** is created in the `docker-compose.yml`.
 
 Access the Web UI：http://192.168.xx.xx:12345/dolphinscheduler
 
+The default username is `admin` and the default password is `dolphinscheduler123`
+
 #### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
 
 You can specify **existing postgres and zookeeper service**. Example:
@@ -264,7 +266,7 @@ This environment variable sets reserved memory for `worker-server`. The default 
 
 This environment variable sets port for `worker-server`. The default value is `1234`.
 
-**`WORKER_GROUP`**
+**`WORKER_GROUPS`**
 
 This environment variable sets group for `worker-server`. The default value is `default`.
 
