@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ConnectorType {
     /**
-     *
+     * 0-jdbc
+     * 1-hive
      */
     JDBC(0,"JDBC"),
     HIVE(1,"HIVE");

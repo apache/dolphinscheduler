@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ComparisonValueType {
     /**
-     *
+     * 0-fixed_value
+     * 1-caculate_value
      */
     FIXED_VALUE(0,"fixed_value"),
     CALCULATE_VALUE(1,"calculate_value");

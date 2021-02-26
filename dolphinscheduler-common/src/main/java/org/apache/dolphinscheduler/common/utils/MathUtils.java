@@ -15,22 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.form;
+package org.apache.dolphinscheduler.common.utils;
 
-public enum TriggerType {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-    BLUR("blur"),
+/**
+ * MathUtils
+ */
+public class MathUtils {
 
-    CHANGE("change");
-
-    private final String triggerType;
-
-    TriggerType(String triggerType) {
-        this.triggerType = triggerType;
+    private MathUtils() {
+        throw new UnsupportedOperationException("Construct MathUtils");
     }
 
-    public String getTriggerType() {
-        return this.triggerType;
+    public static boolean isNum(String str) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(str);
+        return isNum.matches();
     }
-
 }

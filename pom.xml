@@ -828,6 +828,7 @@
                         <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/HttpParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
+                        <include>**/common/task/DataQualityParameterTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
                         <include>**/common/threadutils/ThreadUtilsTest.java</include>
                         <include>**/common/utils/CollectionUtilsTest.java</include>

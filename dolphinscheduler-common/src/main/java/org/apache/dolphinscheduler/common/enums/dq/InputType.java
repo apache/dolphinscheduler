@@ -22,7 +22,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum InputType {
     /**
-     *
+     * 0-default
+     * 1-statistics
+     * 2-comparison
+     * 3-check
      */
     DEFAULT(0,"default"),
     STATISTICS(1,"statistics"),
@@ -47,7 +50,7 @@ public enum InputType {
         return description;
     }
 
-    public static InputType of(int value){
+    public static InputType of(int value) {
         for (InputType e: InputType.values()) {
             if (e.ordinal() == value) {
                 return e;

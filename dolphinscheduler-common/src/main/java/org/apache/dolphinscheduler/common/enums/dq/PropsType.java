@@ -23,7 +23,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum PropsType {
 
     /**
-     *
+     * 0-text
+     * 1-password
+     * 2-textarea
      */
     TEXT(0,"text"),
     PASSWORD(1,"password"),

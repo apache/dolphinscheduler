@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums.dq;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -21,10 +22,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RuleType {
     /**
-     * 0,single_table
-     * 1,single_table_custom_sql
-     * 2,multi_table_accuracy
-     * 3,multi_table_comparison
+     * 0-single_table
+     * 1-single_table_custom_sql
+     * 2-multi_table_accuracy
+     * 3-multi_table_comparison
      */
     SINGLE_TABLE(0,"single_table"),
     SINGLE_TABLE_CUSTOM_SQL(1,"single_table_custom_sql"),

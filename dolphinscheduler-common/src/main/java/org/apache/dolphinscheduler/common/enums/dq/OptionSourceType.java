@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums.dq;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -22,7 +23,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum OptionSourceType {
 
     /**
-     *
+     * 0-default
+     * 1-datasource
      */
     DEFAULT(0,"default"),
     DATASOURCE(1,"datasource");
@@ -42,7 +44,7 @@ public enum OptionSourceType {
     }
 
     public String getDescription() {
-      return description;
+        return description;
     }
 
     public static OptionSourceType of(int value) {

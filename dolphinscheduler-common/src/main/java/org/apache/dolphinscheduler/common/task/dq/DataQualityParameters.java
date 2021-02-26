@@ -26,15 +26,13 @@ import org.apache.dolphinscheduler.common.task.dq.rule.RuleDefinition;
 import org.apache.dolphinscheduler.common.task.dq.rule.RuleInputEntry;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.MathUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections.MapUtils;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +44,24 @@ public class DataQualityParameters extends AbstractParameters {
 
     private static final Logger logger = LoggerFactory.getLogger(org.apache.dolphinscheduler.common.task.dq.DataQualityParameters.class);
 
+    /**
+     * ruleId
+     */
     private int ruleId;
+
+    /**
+     * ruleJson
+     */
     private String ruleJson;
+
+    /**
+     * ruleInputParameter
+     */
     private Map<String,String> ruleInputParameter;
+
+    /**
+     * sparkParameters
+     */
     private SparkParameters sparkParameters;
 
     public int getRuleId() {
@@ -112,13 +125,13 @@ public class DataQualityParameters extends AbstractParameters {
                     switch (valueType) {
                         case STRING:
                             if (value.contains(",")) {
-                                logger.error(MessageFormat.format("{} can not contains ',' ", ruleInputEntry.getField()));
+                                logger.error("{} [{}] can not contains ',' ", ruleInputEntry.getField(),value);
                                 return false;
                             }
                             break;
                         case NUMBER:
-                            if (!isNum(value)) {
-                                logger.error(MessageFormat.format("{} should be a num", ruleInputEntry.getField()));
+                            if (!MathUtils.isNum(value)) {
+                                logger.error("{} [{}] should be a num", ruleInputEntry.getField(),value);
                                 return false;
                             }
                             break;
@@ -143,11 +156,5 @@ public class DataQualityParameters extends AbstractParameters {
 
     public void setSparkParameters(SparkParameters sparkParameters) {
         this.sparkParameters = sparkParameters;
-    }
-
-    private boolean isNum(String str) {
-        Pattern pattern = Pattern.compile("[0-9]*");
-        Matcher isNum = pattern.matcher(str);
-        return isNum.matches();
     }
 }
