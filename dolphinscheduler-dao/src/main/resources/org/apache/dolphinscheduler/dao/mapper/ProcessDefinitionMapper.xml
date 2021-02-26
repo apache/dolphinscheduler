@@ -139,4 +139,12 @@
         set version = #{version}
         where id = #{processDefinitionId}
     </update>
+
+    <select id="queryDefinitionByIdAndVersion" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition
+        where id = #{processDefinitionId}
+        and version = #{version}
+    </select>
 </mapper>

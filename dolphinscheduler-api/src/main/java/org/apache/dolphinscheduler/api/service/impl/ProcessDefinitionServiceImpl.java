@@ -1798,5 +1798,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
+    /**
+     * check has associated process definition
+     *
+     * @param processDefinitionId process definition id
+     * @param version version
+     * @return The query result has a specific process definition return true
+     */
+    @Override
+    public boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version) {
+        ProcessDefinition processDefinition = processDefineMapper.queryDefinitionByIdAndVersion(processDefinitionId, version);
+        return Objects.nonNull(processDefinition);
+    }
+
 }
 
