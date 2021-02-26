@@ -14,6 +14,7 @@ Official Website: https://dolphinscheduler.apache.org
 ## 如何使用docker镜像
 
 #### 以 docker-compose 的方式启动dolphinscheduler(推荐)
+
 ```
 $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 ```
