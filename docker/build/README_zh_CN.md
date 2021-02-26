@@ -168,9 +168,41 @@ DolphinScheduler映像使用了几个容易遗漏的环境变量。虽然这些�
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
 
-**`DOLPHINSCHEDULER_ENV_PATH`**
+**`HADOOP_HOME`**
 
-任务执行时的环境变量配置文件， 默认值 `/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
+配置`dolphinscheduler`的`HADOOP_HOME`，默认值 `/opt/soft/hadoop`。
+
+**`HADOOP_CONF_DIR`**
+
+配置`dolphinscheduler`的`HADOOP_CONF_DIR`，默认值 `/opt/soft/hadoop/etc/hadoop`。
+
+**`SPARK_HOME1`**
+
+配置`dolphinscheduler`的`SPARK_HOME1`，默认值 `/opt/soft/spark1`。
+
+**`SPARK_HOME2`**
+
+配置`dolphinscheduler`的`SPARK_HOME2`，默认值 `/opt/soft/spark2`。
+
+**`PYTHON_HOME`**
+
+配置`dolphinscheduler`的`PYTHON_HOME`，默认值 `/usr/bin/python`。
+
+**`JAVA_HOME`**
+
+配置`dolphinscheduler`的`JAVA_HOME`，默认值 `/usr/lib/jvm/java-1。8-openjdk`。
+
+**`HIVE_HOME`**
+
+配置`dolphinscheduler`的`HIVE_HOME`，默认值 `/opt/soft/hive`。
+
+**`FLINK_HOME`**
+
+配置`dolphinscheduler`的`FLINK_HOME`，默认值 `/opt/soft/flink`。
+
+**`DATAX_HOME`**
+
+配置`dolphinscheduler`的`DATAX_HOME`，默认值 `/opt/soft/datax/bin/datax。py`。
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 

@@ -132,6 +132,7 @@ services:
       MASTER_TASK_COMMIT_INTERVAL: "1000"
       MASTER_MAX_CPULOAD_AVG: "100"
       MASTER_RESERVED_MEMORY: "0.1"
+      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       DATABASE_TYPE: postgresql
       DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql

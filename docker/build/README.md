@@ -168,9 +168,41 @@ This environment variable sets the database for database. The default value is `
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 
-**`DOLPHINSCHEDULER_ENV_PATH`**
+**`HADOOP_HOME`**
 
-This environment variable sets the runtime environment for task. The default value is `/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+This environment variable sets `HADOOP_HOME`. The default value is `/opt/soft/hadoop`.
+
+**`HADOOP_CONF_DIR`**
+
+This environment variable sets `HADOOP_CONF_DIR`. The default value is `/opt/soft/hadoop/etc/hadoop`.
+
+**`SPARK_HOME1`**
+
+This environment variable sets `SPARK_HOME1`. The default value is `/opt/soft/spark1`.
+
+**`SPARK_HOME2`**
+
+This environment variable sets `SPARK_HOME2`. The default value is `/opt/soft/spark2`.
+
+**`PYTHON_HOME`**
+
+This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/python`.
+
+**`JAVA_HOME`**
+
+This environment variable sets `JAVA_HOME`. The default value is `/usr/lib/jvm/java-1.8-openjdk`.
+
+**`HIVE_HOME`**
+
+This environment variable sets `HIVE_HOME`. The default value is `/opt/soft/hive`.
+
+**`FLINK_HOME`**
+
+This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/flink`.
+
+**`DATAX_HOME`**
+
+This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax/bin/datax.py`.
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 
