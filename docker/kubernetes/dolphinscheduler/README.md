@@ -7,8 +7,8 @@ This chart bootstraps a [DolphinScheduler](https://dolphinscheduler.apache.org) 
 
 ## Prerequisites
 
-- Helm 3.1.0+
-- Kubernetes 1.12+
+- [Helm](https://helm.sh/) 3.1.0+
+- [Kubernetes](https://kubernetes.io/) 1.12+
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -22,9 +22,37 @@ $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
 $ helm install dolphinscheduler .
 ```
+
+To install the chart with a namespace named `test`:
+
+```bash
+$ helm install dolphinscheduler . -n test
+```
+
+> **Tip**: If a namespace named `test` is used, the option `-n test` needs to be added to the `helm` and `kubectl` command
+
 These commands deploy DolphinScheduler on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
+
+## Access DolphinScheduler UI
+
+If `ingress.enabled` in `values.yaml` is set to `true`, you just access `http://${ingress.host}/dolphinscheduler` in browser.
+
+> **Tip**: If there is a problem with ingress access, please contact the Kubernetes administrator and refer to the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+
+Otherwise, you need to execute port-forward command like:
+
+```bash
+$ kubectl port-forward --address 0.0.0.0 svc/dolphinscheduler-api 12345:12345
+$ kubectl port-forward --address 0.0.0.0 -n test svc/dolphinscheduler-api 12345:12345 # with test namespace
+```
+
+> **Tip**: If the error of `unable to do port forwarding: socat not found` appears, you need to install `socat` at first
+
+And then access the web: http://192.168.xx.xx:12345/dolphinscheduler
+
+The default username is `admin` and the default password is `dolphinscheduler123`
 
 ## Uninstalling the Chart
 
@@ -34,7 +62,15 @@ To uninstall/delete the `dolphinscheduler` deployment:
 $ helm uninstall dolphinscheduler
 ```
 
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+The command removes all the Kubernetes components but PVC's associated with the chart and deletes the release.
+
+To delete the PVC's associated with `dolphinscheduler`:
+
+```bash
+$ kubectl delete pvc -l app.kubernetes.io/instance=dolphinscheduler
+```
+
+> **Note**: Deleting the PVC's will delete all data as well. Please be cautious before doing it.
 
 ## Configuration
 
@@ -82,9 +118,9 @@ The following tables lists the configurable parameters of the Dolphins Scheduler
 | `common.configmap.RESOURCE_STORAGE_TYPE`                                          | Resource storage type: HDFS, S3, NONE                                                                                          | `HDFS`                                                |
 | `common.configmap.RESOURCE_UPLOAD_PATH`                                           | Resource store on HDFS/S3 path, please make sure the directory exists on hdfs and have read write permissions                  | `/dolphinscheduler`                                   |
 | `common.configmap.FS_DEFAULT_FS`                                                  | Resource storage file system like `file:///`, `hdfs://mycluster:8020` or `s3a://dolphinscheduler`                              | `file:///`                                            |
-| `common.configmap.FS_S3A_ENDPOINT`                                                | S3 endpoint when `common.configmap.RESOURCE_STORAGE_TYPE` is seted to `S3`                                                     | `s3.xxx.amazonaws.com`                                |
-| `common.configmap.FS_S3A_ACCESS_KEY`                                              | S3 access key when `common.configmap.RESOURCE_STORAGE_TYPE` is seted to `S3`                                                   | `xxxxxxx`                                             |
-| `common.configmap.FS_S3A_SECRET_KEY`                                              | S3 secret key when `common.configmap.RESOURCE_STORAGE_TYPE` is seted to `S3`                                                   | `xxxxxxx`                                             |
+| `common.configmap.FS_S3A_ENDPOINT`                                                | S3 endpoint when `common.configmap.RESOURCE_STORAGE_TYPE` is set to `S3`                                                       | `s3.xxx.amazonaws.com`                                |
+| `common.configmap.FS_S3A_ACCESS_KEY`                                              | S3 access key when `common.configmap.RESOURCE_STORAGE_TYPE` is set to `S3`                                                     | `xxxxxxx`                                             |
+| `common.configmap.FS_S3A_SECRET_KEY`                                              | S3 secret key when `common.configmap.RESOURCE_STORAGE_TYPE` is set to `S3`                                                     | `xxxxxxx`                                             |
 | `common.fsFileResourcePersistence.enabled`                                        | Set `common.fsFileResourcePersistence.enabled` to `true` to mount a new file resource volume for `api` and `worker`            | `false`                                               |
 | `common.fsFileResourcePersistence.accessModes`                                    | `PersistentVolumeClaim` Access Modes, must be `ReadWriteMany`                                                                  | `[ReadWriteMany]`                                     |
 | `common.fsFileResourcePersistence.storageClassName`                               | Resource Persistent Volume Storage Class, must support the access mode: ReadWriteMany                                          | `-`                                                   |
