@@ -17,12 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.task;
 
-public interface TaskChannelFactory {
+import org.apache.dolphinscheduler.spi.common.UiChannelFactory;
 
+public interface TaskChannelFactory extends UiChannelFactory {
 
-
-
-
-
-
+    TaskChannel create();
 }

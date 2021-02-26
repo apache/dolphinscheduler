@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,19 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
+import org.slf4j.Logger;
 
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+public interface TaskChannel {
 
-import com.google.common.collect.ImmutableList;
 
-/**
- * email alert plugin
- */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+    void cancelApplication(boolean status);
+
+    TaskResponse processTask(TaskRequest taskRequest, Logger logger);
+
+
 }

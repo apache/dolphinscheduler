@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * DingTalkAlertPlugin
  */
-public class DingTalkAlertPlugin extends DolphinSchedulerPlugin {
+public class DingTalkAlertPlugin implements DolphinSchedulerPlugin {
 
     @Override
     public Iterable<AlertChannelFactory> getAlertChannelFactorys() {

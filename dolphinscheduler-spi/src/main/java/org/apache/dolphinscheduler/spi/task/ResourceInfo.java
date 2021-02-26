@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,19 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
-
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-
-import com.google.common.collect.ImmutableList;
-
 /**
- * email alert plugin
+ * resource info
  */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
+public class ResourceInfo {
+    /**
+     * res the name of the resource that was uploaded
+     */
+    private int id;
+
+    public int getId() {
+        return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private String res;
+
+    public String getRes() {
+        return res;
+    }
+
+    public void setRes(String res) {
+        this.res = res;
+    }
+
+
 }

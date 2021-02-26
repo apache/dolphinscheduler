@@ -31,13 +31,13 @@ import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
  * The other method is called <code>create(Map config)</code>. This method contains at least one parameter  <code>Map config</code>.
  * Config contains custom parameters read from the plug-in configuration file.
  */
-public abstract class DolphinSchedulerPlugin {
+public interface DolphinSchedulerPlugin {
 
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
+    default Iterable<AlertChannelFactory> getAlertChannelFactorys() {
         return emptyList();
     }
 
-   public Iterable<TaskChannelFactory> getTaskChannelFactorys(){
+    default Iterable<TaskChannelFactory> getTaskChannelFactorys(){
         return emptyList();
     };
 }

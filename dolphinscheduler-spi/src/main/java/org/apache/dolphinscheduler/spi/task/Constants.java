@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,19 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
+public class Constants {
 
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+    public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
 
-import com.google.common.collect.ImmutableList;
-
-/**
- * email alert plugin
- */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+    /**
+     * string false
+     */
+    public static final String STRING_FALSE = "false";
 }

@@ -14,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.dolphinscheduler.plugin.alert.email;
-
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-
-import com.google.common.collect.ImmutableList;
+package org.apache.dolphinscheduler.spi.task;
 
 /**
- * email alert plugin
+ * data types in user define parameter
  */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+public enum DataType {
+    /**
+     * 0 string
+     * 1 integer
+     * 2 long
+     * 3 float
+     * 4 double
+     * 5 date, "YYYY-MM-DD"
+     * 6 time, "HH:MM:SS"
+     * 7 time stamp
+     * 8 Boolean
+     */
+    VARCHAR,INTEGER,LONG,FLOAT,DOUBLE,DATE,TIME,TIMESTAMP,BOOLEAN
 }

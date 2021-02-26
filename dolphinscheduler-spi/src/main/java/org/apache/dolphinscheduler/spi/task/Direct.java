@@ -14,20 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.dolphinscheduler.plugin.alert.email;
-
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-
-import com.google.common.collect.ImmutableList;
+package org.apache.dolphinscheduler.spi.task;
 
 /**
- * email alert plugin
+ * parameter of stored procedure
  */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+public enum Direct {
+    /**
+     * 0 in; 1 out;
+     */
+    IN,OUT
 }

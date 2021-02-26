@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.common;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,19 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import java.util.List;
 
-import com.google.common.collect.ImmutableList;
+public interface UiChannelFactory {
 
-/**
- * email alert plugin
- */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+    /**
+     * plugin name
+     * Must be UNIQUE .
+     * This alert plugin name eg: email , message ...
+     * Name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
+     *
+     * @return this alert plugin name
+     */
+    String getName();
+
+    /**
+     * Returns the configurable parameters that this plugin needs to display on the web ui
+     *
+     * @return this alert plugin params
+     */
+    List<PluginParams> getParams();
+
 }

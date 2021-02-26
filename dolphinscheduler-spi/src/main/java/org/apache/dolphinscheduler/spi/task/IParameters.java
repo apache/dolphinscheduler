@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,19 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
-
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 /**
- * email alert plugin
+ * job params interface
  */
-public class EmailAlertPlugin implements DolphinSchedulerPlugin {
-    @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new EmailAlertChannelFactory());
-    }
+public interface IParameters {
+    /**
+     * check parameters is valid
+     *
+     * @return result
+     */
+    boolean checkParameters();
+
+    /**
+     * get project resource files list
+     *
+     * @return resource files list
+     */
+    List<ResourceInfo> getResourceFilesList();
 }
