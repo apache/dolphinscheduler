@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RegisterOperator extends ZookeeperCachedOperator {
 
-    private final Logger logger = LoggerFactory.getLogger(ZookeeperCachedOperator.class);
+    private final Logger logger = LoggerFactory.getLogger(RegisterOperator.class);
 
     /**
      * @return get dead server node parent path
@@ -113,7 +113,7 @@ public class RegisterOperator extends ZookeeperCachedOperator {
                 super.persist(deadServerPath, (type + UNDERLINE + host));
 
                 logger.info("{} server dead , and {} added to zk dead server path success",
-                        zkNodeType.toString(), zNode);
+                        zkNodeType, zNode);
             }
         }
 
@@ -145,7 +145,7 @@ public class RegisterOperator extends ZookeeperCachedOperator {
                     super.persist(deadServerPath, (type + UNDERLINE + host));
 
                     logger.info("{} server dead , and {} added to zk dead server path success",
-                            zkNodeType.toString(), zNode);
+                            zkNodeType, zNode);
                 }
             }
 
