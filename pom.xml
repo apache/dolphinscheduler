@@ -121,6 +121,9 @@
         <guava-retry.version>2.0.0</guava-retry.version>
         <dep.airlift.version>0.184</dep.airlift.version>
         <dep.packaging.version>${dep.airlift.version}</dep.packaging.version>
+        <protostuff.version>1.7.2</protostuff.version>
+        <reflections.version>0.9.12</reflections.version>
+        <byte-buddy.version>1.9.16</byte-buddy.version>
     </properties>
 
     <dependencyManagement>
@@ -313,6 +316,32 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <!--protostuff-->
+            <!-- https://mvnrepository.com/artifact/io.protostuff/protostuff-core -->
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-core</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/io.protostuff/protostuff-runtime -->
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-runtime</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
             </dependency>
 
             <dependency>
@@ -868,6 +897,7 @@
                         <include>**/dao/entity/UdfFuncTest.java</include>
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/rpc/RpcTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/remote/NettyUtilTest.java</include>
