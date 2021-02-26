@@ -51,7 +51,7 @@ public enum DqTaskState {
         return description;
     }
 
-    public static DqTaskState of(int value){
+    public static DqTaskState of(int value) {
         for (DqTaskState e: DqTaskState.values()) {
             if (e.ordinal() == value) {
                 return e;
