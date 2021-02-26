@@ -30,9 +30,7 @@ import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
-import org.apache.curator.framework.state.ConnectionStateListener;
 
 import java.util.Date;
 import java.util.Set;
@@ -108,9 +106,8 @@ public class WorkerRegistry {
 
         for (String workerZKPath : workerZkPaths) {
             zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
-            zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
-                @Override
-                public void stateChanged(CuratorFramework client, ConnectionState newState) {
+            zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
+                (client,newState) -> {
                     if (newState == ConnectionState.LOST) {
                         logger.error("worker : {} connection lost from zookeeper", address);
                     } else if (newState == ConnectionState.RECONNECTED) {
@@ -119,8 +116,7 @@ public class WorkerRegistry {
                     } else if (newState == ConnectionState.SUSPENDED) {
                         logger.warn("worker : {} connection SUSPENDED ", address);
                     }
-                }
-            });
+                });
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 

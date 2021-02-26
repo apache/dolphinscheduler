@@ -99,10 +99,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      * close
      */
     public void close() {
-        if (isStarted.compareAndSet(true, false)) {
-            if (registerOperator != null) {
-                registerOperator.close();
-            }
+        if (isStarted.compareAndSet(true, false) && registerOperator != null) {
+            registerOperator.close();
         }
     }
 

@@ -142,7 +142,7 @@ public abstract class AbstractZKClient extends RegisterOperator {
         String path = getZNodeParentPath(zkNodeType);
         if (StringUtils.isEmpty(path)) {
             logger.error("check zk node exists error, host:{}, zk node type:{}",
-                    host, zkNodeType.toString());
+                    host, zkNodeType);
             return false;
         }
         Map<String, String> serverMaps = getServerMaps(zkNodeType);

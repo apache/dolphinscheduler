@@ -25,9 +25,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
-import org.apache.curator.framework.state.ConnectionStateListener;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -86,9 +84,8 @@ public class MasterRegistry {
         String address = NetUtils.getHost();
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
-        zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
+        zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
+            (client, newState) -> {
                 if (newState == ConnectionState.LOST) {
                     logger.error("master : {} connection lost from zookeeper", address);
                 } else if (newState == ConnectionState.RECONNECTED) {
@@ -98,8 +95,7 @@ public class MasterRegistry {
                     logger.warn("master : {} connection SUSPENDED ", address);
                     zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
                 }
-            }
-        });
+            });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterReservedMemory(),

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Heart beat task
  */
-public class HeartBeatTask extends Thread {
+public class HeartBeatTask implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
 
@@ -66,10 +66,9 @@ public class HeartBeatTask extends Thread {
     public void run() {
         try {
 
-            //check dead or not in zookeeper
+            // check dead or not in zookeeper
             for (String heartBeatPath : heartBeatPaths) {
                 if (zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)) {
-                    //logger.error("i was judged to death, release resources and stop myself");
                     zookeeperRegistryCenter.getStoppable().stop("i was judged to death, release resources and stop myself");
                     return;
                 }
