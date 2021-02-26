@@ -45,18 +45,4 @@ public enum ScriptType {
         return descp;
     }
 
-    private static final Map<Integer, ScriptType> SCRIPT_TYPE_MAP = new HashMap<>();
-
-    static {
-        for (ScriptType scriptType : ScriptType.values()) {
-            SCRIPT_TYPE_MAP.put(scriptType.code, scriptType);
-        }
-    }
-
-    public static ScriptType of(Integer code) {
-        if (SCRIPT_TYPE_MAP.containsKey(code)) {
-            return SCRIPT_TYPE_MAP.get(code);
-        }
-        throw new IllegalArgumentException("invalid code : " + code);
-    }
 }
