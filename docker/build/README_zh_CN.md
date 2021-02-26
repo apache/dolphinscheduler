@@ -24,6 +24,8 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 
 访问前端界面：http://192.168.xx.xx:12345/dolphinscheduler
 
+默认的用户是`admin`，默认的密码是`dolphinscheduler123`
+
 #### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
 你可以指定已经存在的 **`Postgres`** 和 **`Zookeeper`** 服务. 如下:
