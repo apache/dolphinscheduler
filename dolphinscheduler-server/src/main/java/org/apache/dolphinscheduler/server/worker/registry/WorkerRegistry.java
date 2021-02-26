@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
@@ -146,8 +146,8 @@ public class WorkerRegistry {
 
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
-        String weight = getWorkerWeight();
-        String workerStartTime = COLON + System.currentTimeMillis();
+        int weight = workerConfig.getWeight();
+        long workerStartTime = System.currentTimeMillis();
 
         for (String workGroup : this.workerGroups) {
             StringBuilder workerZkPathBuilder = new StringBuilder(100);
@@ -157,9 +157,7 @@ public class WorkerRegistry {
             }
             // trim and lower case is need
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
-            workerZkPathBuilder.append(address);
-            workerZkPathBuilder.append(weight);
-            workerZkPathBuilder.append(workerStartTime);
+            workerZkPathBuilder.append(Host.generate(address, weight, workerStartTime));
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;
@@ -169,14 +167,7 @@ public class WorkerRegistry {
      * get local address
      */
     private String getLocalAddress() {
-        return NetUtils.getHost() + COLON + workerConfig.getListenPort();
-    }
-
-    /**
-     * get Worker Weight
-     */
-    private String getWorkerWeight() {
-        return COLON + workerConfig.getWeight();
+        return NetUtils.getAddr(workerConfig.getListenPort());
     }
 
 }

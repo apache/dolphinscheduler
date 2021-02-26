@@ -84,6 +84,39 @@
             </el-input>
           </template>
         </m-list-box-f>
+        <m-list-box-f :class="{hidden:showPrincipal}">
+          <template slot="name">krb5.conf</template>
+          <template slot="content">
+            <el-input
+              type="input"
+              v-model="javaSecurityKrb5Conf"
+              size="small"
+              :placeholder="$t('Please enter the kerberos authentication parameter java.security.krb5.conf')">
+            </el-input>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f :class="{hidden:showPrincipal}">
+          <template slot="name">keytab.username</template>
+          <template slot="content">
+            <el-input
+              type="input"
+              v-model="loginUserKeytabUsername"
+              size="small"
+              :placeholder="$t('Please enter the kerberos authentication parameter login.user.keytab.username')">
+            </el-input>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f :class="{hidden:showPrincipal}">
+          <template slot="name">keytab.path</template>
+          <template slot="content">
+            <el-input
+              type="input"
+              v-model="loginUserKeytabPath"
+              size="small"
+              :placeholder="$t('Please enter the kerberos authentication parameter login.user.keytab.path')">
+            </el-input>
+          </template>
+        </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
@@ -108,7 +141,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong :class="{hidden:showdDatabase}">*</strong>{{$t('Database Name')}}</template>
+          <template slot="name"><strong :class="{hidden:showDatabase}">*</strong>{{$t('Database Name')}}</template>
           <template slot="content">
             <el-input
                     type="input"
@@ -176,6 +209,12 @@
         database: '',
         // principal
         principal: '',
+        // java.security.krb5.conf
+        javaSecurityKrb5Conf: '',
+        // login.user.keytab.username
+        loginUserKeytabUsername: '',
+        // login.user.keytab.path
+        loginUserKeytabPath: '',
         // database username
         userName: '',
         // Database password
@@ -187,7 +226,7 @@
         // btn test loading
         testLoading: false,
         showPrincipal: true,
-        showdDatabase: false,
+        showDatabase: false,
         showConnectType: false,
         isShowPrincipal: true,
         prePortMapper: {},
@@ -267,6 +306,9 @@
           port: this.port,
           database: this.database,
           principal: this.principal,
+          javaSecurityKrb5Conf: this.javaSecurityKrb5Conf,
+          loginUserKeytabUsername: this.loginUserKeytabUsername,
+          loginUserKeytabPath: this.loginUserKeytabPath,
           userName: this.userName,
           password: this.password,
           connectType: this.connectType,
@@ -328,7 +370,7 @@
           return false
         }
 
-        if (!this.database && this.showdDatabase === false) {
+        if (!this.database && this.showDatabase === false) {
           this.$message.warning(`${i18n.$t('Please enter database name')}`)
           return false
         }
@@ -338,7 +380,6 @@
             return false
           }
         }
-
         return true
       },
       /**
@@ -376,6 +417,9 @@
           }, 0)
 
           this.principal = res.principal
+          this.javaSecurityKrb5Conf = res.javaSecurityKrb5Conf
+          this.loginUserKeytabUsername = res.loginUserKeytabUsername
+          this.loginUserKeytabPath = res.loginUserKeytabPath
           this.database = res.database
           this.userName = res.userName
           this.password = res.password
@@ -450,9 +494,9 @@
     watch: {
       type (value) {
         if (value === 'POSTGRESQL') {
-          this.showdDatabase = true
+          this.showDatabase = true
         } else {
-          this.showdDatabase = false
+          this.showDatabase = false
         }
 
         if (value === 'ORACLE' && !this.item.id) {

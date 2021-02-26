@@ -283,7 +283,7 @@
           this._toggleArchive()
           return
         }
-        this.type = true
+        this.type = type
         this.id = data
         this.fileChildUpdateDialog = true
       },

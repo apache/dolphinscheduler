@@ -58,62 +58,82 @@ externalDatabase:
 # If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
-  taskQueue: "zookeeper"
-  config: null
+  fourlwCommandsWhitelist: srvr,ruok,wchs,cons
   service:
     port: "2181"
   persistence:
     enabled: false
     size: "20Gi"
     storageClass: "-"
+  zookeeperRoot: "/dolphinscheduler"
 
 # If exists external zookeeper, and set zookeeper.enable value to false.
-# If zookeeper.enable is false,  Dolphinscheduler's zookeeper will use it.
+# If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
 externalZookeeper:
-  taskQueue: "zookeeper"
   zookeeperQuorum: "127.0.0.1:2181"
   zookeeperRoot: "/dolphinscheduler"
 
 common:
+  ## ConfigMap
   configmap:
-    DOLPHINSCHEDULER_ENV_PATH: "/tmp/dolphinscheduler/env"
-    DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler/files"
-    RESOURCE_STORAGE_TYPE: "NONE"
-    RESOURCE_UPLOAD_PATH: "/ds"
-    FS_DEFAULT_FS: "s3a://xxxx"
+    DOLPHINSCHEDULER_ENV:
+    - "export HADOOP_HOME=/opt/soft/hadoop"
+    - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
+    - "export SPARK_HOME1=/opt/soft/spark1"
+    - "export SPARK_HOME2=/opt/soft/spark2"
+    - "export PYTHON_HOME=/usr/bin/python"
+    - "export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk"
+    - "export HIVE_HOME=/opt/soft/hive"
+    - "export FLINK_HOME=/opt/soft/flink"
+    - "export DATAX_HOME=/opt/soft/datax/bin/datax.py"
+    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
+    DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
+    RESOURCE_STORAGE_TYPE: "HDFS"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "file:///"
     FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
     FS_S3A_ACCESS_KEY: "xxxxxxx"
     FS_S3A_SECRET_KEY: "xxxxxxx"
+  ## If RESOURCE_STORAGE_TYPE is HDFS and FS_DEFAULT_FS is file:///, fsFileResourcePersistence should be enabled for resource storage
+  fsFileResourcePersistence:
+    enabled: false
+    accessModes:
+    - "ReadWriteMany"
+    ## storageClassName must support the access mode: ReadWriteMany
+    storageClassName: "-"
+    storage: "20Gi"
 
 master:
+  ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  ## Replicas is the desired number of replicas of the given Template.
   replicas: "3"
-  # NodeSelector is a selector which must be true for the pod to fit on a node.
-  # Selector which must match a node's labels for the pod to be scheduled on that node.
-  # More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  nodeSelector: {}
-  # Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
-  # effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
-  tolerations: []
-  # Affinity is a group of affinity scheduling rules.
-  # If specified, the pod's scheduling constraints.
-  # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
-  affinity: {}
-  # The jvm options for java instance startup
-  jvmOptions: ""
-  resources: {}
-  # limits:
-  #   memory: "18Gi"
-  #   cpu: "4"
-  # requests:
-  #   memory: "2Gi"
-  #   cpu: "500m"
-  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
-  # Clients such as tools and libraries can retrieve this metadata.
+  ## You can use annotations to attach arbitrary non-identifying metadata to objects.
+  ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
-  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  affinity: {}
+  ## NodeSelector is a selector which must be true for the pod to fit on a node.
+  ## Selector which must match a node's labels for the pod to be scheduled on that node.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  nodeSelector: {}
+  ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
+  ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
+  tolerations: []
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
+  resources: {}
+  # resources:
+  #   limits:
+  #     memory: "8Gi"
+  #     cpu: "4"
+  #   requests:
+  #     memory: "2Gi"
+  #     cpu: "500m"
+  ## ConfigMap
   configmap:
+    DOLPHINSCHEDULER_OPTS: ""
     MASTER_EXEC_THREADS: "100"
     MASTER_EXEC_TASK_NUM: "20"
     MASTER_HEARTBEAT_INTERVAL: "10"
@@ -122,6 +142,8 @@ master:
     MASTER_MAX_CPULOAD_AVG: "100"
     MASTER_RESERVED_MEMORY: "0.1"
     MASTER_LISTEN_PORT: "5678"
+  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
     enabled: true
     initialDelaySeconds: "30"
@@ -138,7 +160,7 @@ master:
     timeoutSeconds: "5"
     failureThreshold: "3"
     successThreshold: "1"
-  ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
+  ## PersistentVolumeClaim represents a reference to a PersistentVolumeClaim in the same namespace.
   ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
   ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
   ## A claim in this list takes precedence over any volumes in the template, with the same name.
@@ -150,31 +172,43 @@ master:
     storage: "20Gi"
 
 worker:
+  ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  ## Replicas is the desired number of replicas of the given Template.
   replicas: "3"
-  # NodeSelector is a selector which must be true for the pod to fit on a node.
-  # Selector which must match a node's labels for the pod to be scheduled on that node.
-  # More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  nodeSelector: {}
-  # Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
-  # effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
-  tolerations: []
-  # Affinity is a group of affinity scheduling rules.
-  # If specified, the pod's scheduling constraints.
-  # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
-  affinity: {}
-  # The jvm options for java instance startup
-  jvmOptions: ""
-  resources: {}
-  # limits:
-  #   memory: "18Gi"
-  #   cpu: "4"
-  # requests:
-  #   memory: "2Gi"
-  #   cpu: "500m"
-  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
-  # Clients such as tools and libraries can retrieve this metadata.
+  ## You can use annotations to attach arbitrary non-identifying metadata to objects.
+  ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  affinity: {}
+  ## NodeSelector is a selector which must be true for the pod to fit on a node.
+  ## Selector which must match a node's labels for the pod to be scheduled on that node.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  nodeSelector: {}
+  ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
+  ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
+  tolerations: []
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
+  resources: {}
+  # resources:
+  #   limits:
+  #     memory: "8Gi"
+  #     cpu: "4"
+  #   requests:
+  #     memory: "2Gi"
+  #     cpu: "500m"
+  ## ConfigMap
+  configmap:
+    DOLPHINSCHEDULER_OPTS: ""
+    WORKER_EXEC_THREADS: "100"
+    WORKER_HEARTBEAT_INTERVAL: "10"
+    WORKER_MAX_CPULOAD_AVG: "100"
+    WORKER_RESERVED_MEMORY: "0.1"
+    WORKER_LISTEN_PORT: "1234"
+    WORKER_GROUPS: "default"
+    WORKER_WEIGHT: "100"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -193,27 +227,7 @@ worker:
     timeoutSeconds: "5"
     failureThreshold: "3"
     successThreshold: "1"
-  configmap:
-    WORKER_EXEC_THREADS: "100"
-    WORKER_HEARTBEAT_INTERVAL: "10"
-    WORKER_FETCH_TASK_NUM: "3"
-    WORKER_MAX_CPULOAD_AVG: "100"
-    WORKER_RESERVED_MEMORY: "0.1"
-    WORKER_LISTEN_PORT: "1234"
-    WORKER_GROUP: "default"
-    WORKER_WEIGHT: "100"
-    DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-    DOLPHINSCHEDULER_ENV:
-    - "export HADOOP_HOME=/opt/soft/hadoop"
-    - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
-    - "export SPARK_HOME1=/opt/soft/spark1"
-    - "export SPARK_HOME2=/opt/soft/spark2"
-    - "export PYTHON_HOME=/opt/soft/python"
-    - "export JAVA_HOME=/opt/soft/java"
-    - "export HIVE_HOME=/opt/soft/hive"
-    - "export FLINK_HOME=/opt/soft/flink"
-    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
-  ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
+  ## PersistentVolumeClaim represents a reference to a PersistentVolumeClaim in the same namespace.
   ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
   ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
   ## A claim in this list takes precedence over any volumes in the template, with the same name.
@@ -235,38 +249,40 @@ worker:
       storage: "20Gi"
 
 alert:
+  ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
+  replicas: "1"
+  ## The deployment strategy to use to replace existing pods with new ones.
   strategy:
     type: "RollingUpdate"
     rollingUpdate:
       maxSurge: "25%"
       maxUnavailable: "25%"
-  replicas: "1"
-  # NodeSelector is a selector which must be true for the pod to fit on a node.
-  # Selector which must match a node's labels for the pod to be scheduled on that node.
-  # More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  nodeSelector: {}
-  # Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
-  # effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
-  tolerations: []
-  # Affinity is a group of affinity scheduling rules.
-  # If specified, the pod's scheduling constraints.
-  # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
-  affinity: {}
-  # The jvm options for java instance startup
-  jvmOptions: ""
-  resources: {}
-  # limits:
-  #   memory: "4Gi"
-  #   cpu: "1"
-  # requests:
-  #   memory: "2Gi"
-  #   cpu: "500m"
-  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
-  # Clients such as tools and libraries can retrieve this metadata.
+  ## You can use annotations to attach arbitrary non-identifying metadata to objects.
+  ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
-  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+  ## NodeSelector is a selector which must be true for the pod to fit on a node.
+  ## Selector which must match a node's labels for the pod to be scheduled on that node.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
+  nodeSelector: {}
+  ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
+  ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
+  tolerations: []
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  resources: {}
+  # resources:
+  #   limits:
+  #     memory: "2Gi"
+  #     cpu: "1"
+  #   requests:
+  #     memory: "1Gi"
+  #     cpu: "500m"
+  ## ConfigMap
   configmap:
+    DOLPHINSCHEDULER_OPTS: ""
     ALERT_PLUGIN_DIR: "/opt/dolphinscheduler/alert/plugin"
     XLS_FILE_PATH: "/tmp/xls"
     MAIL_SERVER_HOST: ""
@@ -282,6 +298,8 @@ alert:
     ENTERPRISE_WECHAT_SECRET: ""
     ENTERPRISE_WECHAT_AGENT_ID: ""
     ENTERPRISE_WECHAT_USERS: ""
+  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
     enabled: true
     initialDelaySeconds: "30"
@@ -298,10 +316,8 @@ alert:
     timeoutSeconds: "5"
     failureThreshold: "3"
     successThreshold: "1"
-  ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
-  ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
-  ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
-  ## A claim in this list takes precedence over any volumes in the template, with the same name.
+  ## PersistentVolumeClaim represents a reference to a PersistentVolumeClaim in the same namespace.
+  ## More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   persistentVolumeClaim:
     enabled: false
     accessModes:
@@ -310,92 +326,40 @@ alert:
     storage: "20Gi"
 
 api:
+  ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
+  replicas: "1"
+  ## The deployment strategy to use to replace existing pods with new ones.
   strategy:
     type: "RollingUpdate"
     rollingUpdate:
       maxSurge: "25%"
       maxUnavailable: "25%"
-  replicas: "1"
-  # NodeSelector is a selector which must be true for the pod to fit on a node.
-  # Selector which must match a node's labels for the pod to be scheduled on that node.
-  # More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  nodeSelector: {}
-  # Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
-  # effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
-  tolerations: []
-  # Affinity is a group of affinity scheduling rules.
-  # If specified, the pod's scheduling constraints.
-  # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
-  affinity: {}
-  # The jvm options for java instance startup
-  jvmOptions: ""
-  resources: {}
-  # limits:
-  #   memory: "4Gi"
-  #   cpu: "2"
-  # requests:
-  #   memory: "2Gi"
-  #   cpu: "500m"
-  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
-  # Clients such as tools and libraries can retrieve this metadata.
+  ## You can use annotations to attach arbitrary non-identifying metadata to objects.
+  ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
-  ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: "30"
-    periodSeconds: "30"
-    timeoutSeconds: "5"
-    failureThreshold: "3"
-    successThreshold: "1"
-  ## Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: "30"
-    periodSeconds: "30"
-    timeoutSeconds: "5"
-    failureThreshold: "3"
-    successThreshold: "1"
-  ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
-  ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
-  ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
-  ## A claim in this list takes precedence over any volumes in the template, with the same name.
-  persistentVolumeClaim:
-    enabled: false
-    accessModes:
-    - "ReadWriteOnce"
-    storageClassName: "-"
-    storage: "20Gi"
-
-frontend:
-  strategy:
-    type: "RollingUpdate"
-    rollingUpdate:
-      maxSurge: "25%"
-      maxUnavailable: "25%"
-  replicas: "1"
-  # NodeSelector is a selector which must be true for the pod to fit on a node.
-  # Selector which must match a node's labels for the pod to be scheduled on that node.
-  # More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  nodeSelector: {}
-  # Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
-  # effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
-  tolerations: []
-  # Affinity is a group of affinity scheduling rules.
-  # If specified, the pod's scheduling constraints.
-  # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  ## NodeSelector is a selector which must be true for the pod to fit on a node.
+  ## Selector which must match a node's labels for the pod to be scheduled on that node.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   affinity: {}
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
+  nodeSelector: {}
+  ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
+  ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
+  tolerations: []
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   resources: {}
-  # limits:
-  #     memory: "256Mi"
+  # resources:
+  #   limits:
+  #     memory: "2Gi"
   #     cpu: "1"
   #   requests:
-  #     memory: "256Mi"
+  #     memory: "1Gi"
   #     cpu: "500m"
-  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
-  # Clients such as tools and libraries can retrieve this metadata.
-  annotations: {}
+  ## ConfigMap
+  configmap:
+    DOLPHINSCHEDULER_OPTS: ""
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -414,10 +378,8 @@ frontend:
     timeoutSeconds: "5"
     failureThreshold: "3"
     successThreshold: "1"
-  ## volumeClaimTemplates is a list of claims that pods are allowed to reference.
-  ## The StatefulSet controller is responsible for mapping network identities to claims in a way that maintains the identity of a pod.
-  ## Every claim in this list must have at least one matching (by name) volumeMount in one container in the template.
-  ## A claim in this list takes precedence over any volumes in the template, with the same name.
+  ## PersistentVolumeClaim represents a reference to a PersistentVolumeClaim in the same namespace.
+  ## More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims
   persistentVolumeClaim:
     enabled: false
     accessModes:

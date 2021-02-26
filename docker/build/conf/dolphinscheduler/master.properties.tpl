@@ -21,6 +21,9 @@ master.exec.threads=${MASTER_EXEC_THREADS}
 # master execute task number in parallel
 master.exec.task.num=${MASTER_EXEC_TASK_NUM}
 
+# master dispatch task number
+#master.dispatch.task.num=3
+
 # master heartbeat interval
 master.heartbeat.interval=${MASTER_HEARTBEAT_INTERVAL}
 
@@ -37,4 +40,4 @@ master.max.cpuload.avg=${MASTER_MAX_CPULOAD_AVG}
 master.reserved.memory=${MASTER_RESERVED_MEMORY}
 
 # master listen port
-#master.listen.port=${MASTER_LISTEN_PORT}
+master.listen.port=${MASTER_LISTEN_PORT}

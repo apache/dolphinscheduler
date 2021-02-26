@@ -7,19 +7,20 @@ This chart bootstraps a [Dolphin Scheduler](https://dolphinscheduler.apache.org)
 
 ## Prerequisites
 
-- Kubernetes 1.10+
+- Helm 3.1.0+
+- Kubernetes 1.12+
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `dolphinscheduler`:
 
 ```bash
 $ git clone https://github.com/apache/incubator-dolphinscheduler.git
-$ cd incubator-dolphinscheduler/kubernetes/dolphinscheduler
+$ cd incubator-dolphinscheduler/docker/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
-$ helm install --name dolphinscheduler .
+$ helm install dolphinscheduler .
 ```
 These commands deploy Dolphin Scheduler on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
@@ -30,7 +31,7 @@ These commands deploy Dolphin Scheduler on the Kubernetes cluster in the default
 To uninstall/delete the `dolphinscheduler` deployment:
 
 ```bash
-$ helm delete --purge dolphinscheduler
+$ helm uninstall dolphinscheduler
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -219,32 +220,6 @@ The following tables lists the configurable parameters of the Dolphins Scheduler
 | `api.persistentVolumeClaim.accessModes`                                           | `PersistentVolumeClaim` Access Modes                                                                                           | `[ReadWriteOnce]`                                     |
 | `api.persistentVolumeClaim.storageClassName`                                      | `api` logs data Persistent Volume Storage Class. If set to "-", storageClassName: "", which disables dynamic provisioning      | `-`                                                   |
 | `api.persistentVolumeClaim.storage`                                               | `PersistentVolumeClaim` Size                                                                                                   | `20Gi`                                                |
-|                                                                                   |                                                                                                                                |                                                       |
-| `frontend.strategy.type`                                                          | Type of deployment. Can be "Recreate" or "RollingUpdate"                                                                       | `RollingUpdate`                                       |
-| `frontend.strategy.rollingUpdate.maxSurge`                                        | The maximum number of pods that can be scheduled above the desired number of pods                                              | `25%`                                                 |
-| `frontend.strategy.rollingUpdate.maxUnavailable`                                  | The maximum number of pods that can be unavailable during the update                                                           | `25%`                                                 |
-| `frontend.replicas`                                                               | Replicas is the desired number of replicas of the given Template                                                               | `1`                                                   |
-| `frontend.nodeSelector`                                                           | NodeSelector is a selector which must be true for the pod to fit on a node                                                     | `{}`                                                  |
-| `frontend.tolerations`                                                            | If specified, the pod's tolerations                                                                                            | `{}`                                                  |
-| `frontend.affinity`                                                               | If specified, the pod's scheduling constraints                                                                                 | `{}`                                                  |
-| `frontend.resources`                                                                 |  The `resource` limit and request config for frontend server. | `{}`                                                  |
-| `frontend.annotations`                                                                 |  The `annotations` for frontend server. | `{}`                                                  |
-| `frontend.livenessProbe.enabled`                                                  | Turn on and off liveness probe                                                                                                 | `true`                                                |
-| `frontend.livenessProbe.initialDelaySeconds`                                      | Delay before liveness probe is initiated                                                                                       | `30`                                                  |
-| `frontend.livenessProbe.periodSeconds`                                            | How often to perform the probe                                                                                                 | `30`                                                  |
-| `frontend.livenessProbe.timeoutSeconds`                                           | When the probe times out                                                                                                       | `5`                                                   |
-| `frontend.livenessProbe.failureThreshold`                                         | Minimum consecutive successes for the probe                                                                                    | `3`                                                   |
-| `frontend.livenessProbe.successThreshold`                                         | Minimum consecutive failures for the probe                                                                                     | `1`                                                   |
-| `frontend.readinessProbe.enabled`                                                 | Turn on and off readiness probe                                                                                                | `true`                                                |
-| `frontend.readinessProbe.initialDelaySeconds`                                     | Delay before readiness probe is initiated                                                                                      | `30`                                                  |
-| `frontend.readinessProbe.periodSeconds`                                           | How often to perform the probe                                                                                                 | `30`                                                  |
-| `frontend.readinessProbe.timeoutSeconds`                                          | When the probe times out                                                                                                       | `5`                                                   |
-| `frontend.readinessProbe.failureThreshold`                                        | Minimum consecutive successes for the probe                                                                                    | `3`                                                   |
-| `frontend.readinessProbe.successThreshold`                                        | Minimum consecutive failures for the probe                                                                                     | `1`                                                   |
-| `frontend.persistentVolumeClaim.enabled`                                          | Set `frontend.persistentVolumeClaim.enabled` to `true` to mount a new volume for `frontend`                                    | `false`                                               |
-| `frontend.persistentVolumeClaim.accessModes`                                      | `PersistentVolumeClaim` Access Modes                                                                                           | `[ReadWriteOnce]`                                     |
-| `frontend.persistentVolumeClaim.storageClassName`                                 | `frontend` logs data Persistent Volume Storage Class. If set to "-", storageClassName: "", which disables dynamic provisioning | `-`                                                   |
-| `frontend.persistentVolumeClaim.storage`                                          | `PersistentVolumeClaim` Size                                                                                                   | `20Gi`                                                |
 |                                                                                   |                                                                                                                                |                                                       |
 | `ingress.enabled`                                                                 | Enable ingress                                                                                                                 | `false`                                               |
 | `ingress.host`                                                                    | Ingress host                                                                                                                   | `dolphinscheduler.org`                                |

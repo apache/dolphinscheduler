@@ -178,7 +178,7 @@
         :title="$t('Set the DAG diagram name')"
         :visible.sync="dialogVisible"
         width="auto">
-        <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
+        <m-udp ref="mUdp" @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
       </el-dialog>
       <el-dialog
         :title="$t('Please set the parameters before starting')"
@@ -268,7 +268,7 @@
     },
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState', 'switchProcessDefinitionVersion', 'getProcessDefinitionVersionsPage', 'deleteProcessDefinitionVersion']),
-      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
+      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects', 'resetLocalParam']),
       startRunning (item, startNodeList, sourceType) {
         this.startData = item
         this.startNodeList = startNodeList
@@ -377,7 +377,7 @@
 
             // remove tip state dom
             $('.w').find('.state-p').html('')
-
+            const newTask = []
             data.forEach(v1 => {
               idArr.forEach(v2 => {
                 if (v2.name === v1.name) {
@@ -387,6 +387,12 @@
                   taskList.forEach(item => {
                     if (item.name === v1.name) {
                       depState = item.state
+                      const params = item.taskJson ? JSON.parse(item.taskJson).params : ''
+                      let localParam = params.localParams || []
+                      newTask.push({
+                        id: v2.id,
+                        localParam
+                      })
                     }
                   })
                   dom.attr('data-state-id', v1.stateId)
@@ -402,6 +408,9 @@
               if (isReset) {
                 findComponentDownward(this.$root, `${this.type}-details`)._reset()
               }
+            }
+            if (!isReset) {
+              this.resetLocalParam(newTask)
             }
             resolve()
           })
@@ -550,7 +559,11 @@
           this.$message.warning(`${i18n.$t('Failed to create node to save')}`)
           return
         }
+
         this.dialogVisible = true
+        this.$nextTick(() => {
+          this.$refs.mUdp.reloadParam()
+        })
       },
       /**
        * Return to the previous child node

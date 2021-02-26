@@ -129,28 +129,36 @@
         })
       },
       _submit () {
-        this.$f.rule.forEach(item => {
-          item.title = item.name
-        })
-        let param = {
-          instanceName: this.instanceName,
-          pluginDefineId: this.pluginDefineId,
-          pluginInstanceParams: JSON.stringify(this.$f.rule)
-        }
-        if (this.item) {
-          param.alertPluginInstanceId = this.item.id
-          param.pluginDefineId = null
-        }
-        this.$refs.popover.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
-          this.$refs.popover.spinnerLoading = false
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.$refs.popover.spinnerLoading = false
+        this.$f.validate((valid) => {
+          if (valid) {
+            this.$f.rule.forEach(item => {
+              item.title = item.name
+            })
+            let param = {
+              instanceName: this.instanceName,
+              pluginDefineId: this.pluginDefineId,
+              pluginInstanceParams: JSON.stringify(this.$f.rule)
+            }
+            if (this.item) {
+              param.alertPluginInstanceId = this.item.id
+              param.pluginDefineId = null
+            }
+            this.$refs.popover.spinnerLoading = true
+            this.store.dispatch(`security/${this.item ? 'updateAlertPluginInstance' : 'createAlertPluginInstance'}`, param).then(res => {
+              this.$refs.popover.spinnerLoading = false
+              this.$emit('onUpdate')
+              this.$message.success(res.msg)
+            }).catch(e => {
+              this.$message.error(e.msg || '')
+              this.$refs.popover.spinnerLoading = false
+            })
+          } else {
+            this.$message.warning(`${i18n.$t('Instance parameter exception')}`)
+            this.$refs.popover.spinnerLoading = false
+          }
         })
       },
+
       close () {
         this.$emit('close')
       }

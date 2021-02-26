@@ -13,90 +13,83 @@ Official Website: https://dolphinscheduler.apache.org
 
 ## 如何使用docker镜像
 
-#### 你可以运行一个dolphinscheduler实例
+#### 以 docker-compose 的方式启动dolphinscheduler(推荐)
 ```
-$ docker run -dit --name dolphinscheduler \ 
--e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
--p 8888:8888 \
-dolphinscheduler all
+$ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 ```
 
-在`startup.sh`脚本中，默认的创建`Postgres`的用户、密码和数据库，默认值分别为：`root`、`root`、`dolphinscheduler`。
+在`docker-compose.yml`文件中，默认的创建`Postgres`的用户、密码和数据库，默认值分别为：`root`、`root`、`dolphinscheduler`。
 
-同时，默认的`Zookeeper`也会在`startup.sh`脚本中被创建。
+同时，默认的`Zookeeper`也会在`docker-compose.yml`文件中被创建。
+
+访问前端界面：http://192.168.xx.xx:12345/dolphinscheduler
 
 #### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
-你可以指定一个已经存在的 **`Postgres`** 服务. 如下:
+你可以指定已经存在的 **`Postgres`** 和 **`Zookeeper`** 服务. 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
--p 8888:8888 \
-dolphinscheduler all
+-p 12345:12345 \
+apache/dolphinscheduler:latest all
 ```
 
-你也可以指定一个已经存在的 **Zookeeper** 服务. 如下:
-
-```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
--p 8888:8888 \
-dolphinscheduler all
-```
+访问前端界面：http://192.168.xx.xx:12345/dolphinscheduler
 
 #### 或者运行dolphinscheduler中的部分服务
 
 你能够运行dolphinscheduler中的部分服务。
 
+* 创建一个 **本地卷** 用于资源存储，如下:
+
+```
+docker volume create dolphinscheduler-resource-local
+```
+
 * 启动一个 **master server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
+$ docker run -d --name dolphinscheduler-master \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
-dolphinscheduler master-server
+apache/dolphinscheduler:latest master-server
 ```
 
 * 启动一个 **worker server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
+$ docker run -d --name dolphinscheduler-worker \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
-dolphinscheduler worker-server
+-e ALERT_LISTEN_HOST="dolphinscheduler-alert" \
+-v dolphinscheduler-resource-local:/dolphinscheduler \
+apache/dolphinscheduler:latest worker-server
 ```
 
 * 启动一个 **api server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler-api \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
-dolphinscheduler api-server
+apache/dolphinscheduler:latest api-server
 ```
 
 * 启动一个 **alert server**, 如下:
 
 ```
-$ docker run -dit --name dolphinscheduler \
+$ docker run -d --name dolphinscheduler-alert \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
-dolphinscheduler alert-server
-```
-
-* 启动一个 **frontend**, 如下:
-
-```
-$ docker run -dit --name dolphinscheduler \
--e FRONTEND_API_SERVER_HOST="192.168.x.x" -e FRONTEND_API_SERVER_PORT="12345" \
--p 8888:8888 \
-dolphinscheduler frontend
+apache/dolphinscheduler:latest alert-server
 ```
 
 **注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM`。
@@ -115,7 +108,7 @@ $ sh ./docker/build/hooks/build
 Windows系统, 如下:
 
 ```bat
-c:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。
@@ -180,11 +173,43 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 用户数据目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler`。
 
+**`DOLPHINSCHEDULER_OPTS`**
+
+配置`dolphinscheduler`的`java options`，默认值 `""`、
+
+**`RESOURCE_STORAGE_TYPE`**
+
+配置`dolphinscheduler`的资源存储类型，可选项为 `HDFS`、`S3`、`NONE`，默认值 `HDFS`。
+
+**`RESOURCE_UPLOAD_PATH`**
+
+配置`HDFS/S3`上的资源存储路径，默认值 `/dolphinscheduler`。
+
+**`FS_DEFAULT_FS`**
+
+配置资源存储的文件系统协议，如 `file:///`, `hdfs://mycluster:8020` or `s3a://dolphinscheduler`，默认值 `file:///`。
+
+**`FS_S3A_ENDPOINT`**
+
+当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的访问路径，默认值 `s3.xxx.amazonaws.com`。
+
+**`FS_S3A_ACCESS_KEY`**
+
+当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的`s3 access key`，默认值 `xxxxxxx`。
+
+**`FS_S3A_SECRET_KEY`**
+
+当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的`s3 secret key`，默认值 `xxxxxxx`。
+
 **`ZOOKEEPER_QUORUM`**
 
 配置`master-server`和`worker-serverr`的`Zookeeper`地址, 默认值 `127.0.0.1:2181`。
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`ZOOKEEPER_ROOT`**
+
+配置`dolphinscheduler`在`zookeeper`中数据存储的根目录，默认值 `/dolphinscheduler`。
 
 **`MASTER_EXEC_THREADS`**
 
@@ -226,10 +251,6 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`worker-server`中的心跳交互时间，默认值 `10`。
 
-**`WORKER_FETCH_TASK_NUM`**
-
-配置`worker-server`中的获取任务的数量，默认值 `3`。
-
 **`WORKER_MAX_CPULOAD_AVG`**
 
 配置`worker-server`中的CPU中的最大`load average`值，默认值 `100`。
@@ -238,85 +259,25 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`worker-server`的保留内存，默认值 `0.1`。
 
-**`WORKER_WEIGHT`**
-
-配置`worker-server`的权重，默认之`100`。
-
 **`WORKER_LISTEN_PORT`**
 
 配置`worker-server`的端口，默认值 `1234`。
 
-**`WORKER_GROUP`**
+**`WORKER_GROUPS`**
 
 配置`worker-server`的分组，默认值 `default`。
 
-**`XLS_FILE_PATH`**
+**`WORKER_WEIGHT`**
 
-配置`alert-server`的`XLS`文件的存储路径，默认值 `/tmp/xls`。
+配置`worker-server`的权重，默认之`100`。
 
-**`MAIL_SERVER_HOST`**
+**`ALERT_LISTEN_HOST`**
 
-配置`alert-server`的邮件服务地址，默认值 `空`。
+配置`worker-server`的告警主机，即`alert-server`的主机名，默认值 `127.0.0.1`。
 
-**`MAIL_SERVER_PORT`**
+**`ALERT_PLUGIN_DIR`**
 
-配置`alert-server`的邮件服务端口，默认值 `空`。
-
-**`MAIL_SENDER`**
-
-配置`alert-server`的邮件发送人，默认值 `空`。
-
-**`MAIL_USER=`**
-
-配置`alert-server`的邮件服务用户名，默认值 `空`。
-
-**`MAIL_PASSWD`**
-
-配置`alert-server`的邮件服务用户密码，默认值 `空`。
-
-**`MAIL_SMTP_STARTTLS_ENABLE`**
-
-配置`alert-server`的邮件服务是否启用TLS，默认值 `true`。
-
-**`MAIL_SMTP_SSL_ENABLE`**
-
-配置`alert-server`的邮件服务是否启用SSL，默认值 `false`。
-
-**`MAIL_SMTP_SSL_TRUST`**
-
-配置`alert-server`的邮件服务SSL的信任地址，默认值 `空`。
-
-**`ENTERPRISE_WECHAT_ENABLE`**
-
-配置`alert-server`的邮件服务是否启用企业微信，默认值 `false`。
-
-**`ENTERPRISE_WECHAT_CORP_ID`**
-
-配置`alert-server`的邮件服务企业微信`ID`，默认值 `空`。
-
-**`ENTERPRISE_WECHAT_SECRET`**
-
-配置`alert-server`的邮件服务企业微信`SECRET`，默认值 `空`。
-
-**`ENTERPRISE_WECHAT_AGENT_ID`**
-
-配置`alert-server`的邮件服务企业微信`AGENT_ID`，默认值 `空`。
-
-**`ENTERPRISE_WECHAT_USERS`**
-
-配置`alert-server`的邮件服务企业微信`USERS`，默认值 `空`。
-
-**`FRONTEND_API_SERVER_HOST`**
-
-配置`frontend`的连接`api-server`的地址，默认值 `127.0.0.1`。
-
-**Note**: 当单独运行`api-server`时，你应该指定`api-server`这个值。
-
-**`FRONTEND_API_SERVER_PORT`**
-
-配置`frontend`的连接`api-server`的端口，默认值 `12345`。
-
-**Note**: 当单独运行`api-server`时，你应该指定`api-server`这个值。
+配置`alert-server`的告警插件目录，默认值 `lib/plugin/alert`。
 
 ## 初始化脚本
 
@@ -326,7 +287,7 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 ```
 export API_SERVER_PORT=5555
-``` 
+```
 
 当添加以上环境变量后，你应该在相应的模板文件`/opt/dolphinscheduler/conf/application-api.properties.tpl`中添加这个环境变量配置:
 ```
@@ -343,8 +304,4 @@ $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
 EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
-
-echo "generate nginx config"
-sed -i "s/FRONTEND_API_SERVER_HOST/${FRONTEND_API_SERVER_HOST}/g" /etc/nginx/conf.d/dolphinscheduler.conf
-sed -i "s/FRONTEND_API_SERVER_PORT/${FRONTEND_API_SERVER_PORT}/g" /etc/nginx/conf.d/dolphinscheduler.conf
 ```

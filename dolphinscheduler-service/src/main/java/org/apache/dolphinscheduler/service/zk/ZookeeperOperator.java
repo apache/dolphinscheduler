@@ -59,7 +59,7 @@ public class ZookeeperOperator implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         this.zkClient = buildClient();
-        initStateLister();
+        initStateListener();
         treeCacheStart();
     }
 
@@ -74,7 +74,7 @@ public class ZookeeperOperator implements InitializingBean {
         // Used by sub class
     }
 
-    public void initStateLister() {
+    public void initStateListener() {
         checkNotNull(zkClient);
 
         zkClient.getConnectionStateListenable().addListener((client, newState) -> {

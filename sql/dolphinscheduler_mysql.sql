@@ -297,14 +297,14 @@ CREATE TABLE `t_ds_alert` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup`(
-                                  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-                                  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
-                                  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
-                                  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
-                                  `description`    varchar(255) DEFAULT NULL,
-                                  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
-                                  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
-                                  PRIMARY KEY (`id`)
+  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
+  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
+  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
+  `description`    varchar(255) DEFAULT NULL,
+  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
+  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -458,7 +458,7 @@ CREATE TABLE `t_ds_process_instance` (
   `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
   `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',
   `run_times` int(11) DEFAULT NULL COMMENT 'process instance run times',
-  `host` varchar(45) DEFAULT NULL COMMENT 'process instance host',
+  `host` varchar(135) DEFAULT NULL COMMENT 'process instance host',
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type. 0: only current node,1:before the node,2:later nodes',
@@ -697,7 +697,7 @@ CREATE TABLE `t_ds_task_instance` (
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
   `start_time` datetime DEFAULT NULL COMMENT 'task start time',
   `end_time` datetime DEFAULT NULL COMMENT 'task end time',
-  `host` varchar(45) DEFAULT NULL COMMENT 'host of task running on',
+  `host` varchar(135) DEFAULT NULL COMMENT 'host of task running on',
   `execute_path` varchar(200) DEFAULT NULL COMMENT 'task execute path in the host',
   `log_path` varchar(200) DEFAULT NULL COMMENT 'task log path',
   `alert_flag` tinyint(4) DEFAULT NULL COMMENT 'whether alert',
@@ -804,29 +804,25 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT INTO `t_ds_version`
-VALUES ('1', '1.3.0');
+INSERT INTO `t_ds_version` VALUES ('1', '1.4.0');
 
 
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
-INSERT INTO `t_ds_alertgroup`
-VALUES (1,"1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
-        '2018-11-29 10:20:39');
+INSERT INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
 INSERT INTO `t_ds_user`
-VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50',
-        '2018-10-24 17:40:22', null, 1);
+VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-SET
-sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,

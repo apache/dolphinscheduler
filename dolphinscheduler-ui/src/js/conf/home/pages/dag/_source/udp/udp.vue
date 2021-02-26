@@ -142,7 +142,12 @@
         return true
       },
       _accuStore () {
-        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        const udp = _.cloneDeep(this.udpList)
+        udp.forEach(u => {
+          delete u.ifFixed
+        })
+        this.store.commit('dag/setGlobalParams', udp)
+
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
@@ -191,6 +196,46 @@
        */
       close () {
         this.$emit('close')
+      },
+      /**
+       * reload localParam
+       */
+      reloadParam () {
+        const dag = _.cloneDeep(this.store.state.dag)
+        let fixedParam = []
+        const tasks = this.store.state.dag.tasks
+        for (const task of tasks) {
+          const localParam = task.params ? task.params.localParams : []
+          localParam.forEach(l => {
+            if (!fixedParam.some(f => { return f.prop === l.prop })) {
+              fixedParam.push(Object.assign({
+                ifFixed: true
+              }, l))
+            }
+          })
+        }
+
+        let globalParams = _.cloneDeep(dag.globalParams)
+
+        globalParams = globalParams.map(g => {
+          if (fixedParam.some(f => { return g.prop === f.prop })) {
+            fixedParam = fixedParam.filter(f => { return g.prop !== f.prop })
+            return Object.assign(g, {
+              ifFixed: true
+            })
+          } else {
+            return g
+          }
+        })
+        let udpList = [...fixedParam, ...globalParams].sort(s => {
+          if (s.ifFixed) {
+            return -1
+          } else {
+            return 1
+          }
+        })
+        this.udpList = udpList
+        this.udpListCache = udpList
       }
     },
     watch: {
@@ -203,8 +248,7 @@
     },
     created () {
       const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
+
       this.name = dag.name
       this.originalName = dag.name
       this.description = dag.description
@@ -213,10 +257,10 @@
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {
-        if (dag.tenantId === -1) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        } else {
+        if (dag.tenantId > -1) {
           this.tenantId = dag.tenantId
+        } else if (this.store.state.user.userInfo.tenantId) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
         }
       })
     },

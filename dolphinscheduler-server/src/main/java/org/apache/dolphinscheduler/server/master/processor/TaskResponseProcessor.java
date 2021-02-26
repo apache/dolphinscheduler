@@ -80,7 +80,9 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
                 responseCommand.getAppIds(),
                 responseCommand.getTaskInstanceId(),
                 responseCommand.getVarPool(),
-                channel);
+                channel,
+                responseCommand.getResult()
+                );
         taskResponseService.addResponse(taskResponseEvent);
     }
 

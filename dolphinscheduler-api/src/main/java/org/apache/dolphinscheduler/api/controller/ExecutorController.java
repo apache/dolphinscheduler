@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.text.ParseException;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -58,9 +57,9 @@ import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * execute process controller
+ * executor controller
  */
-@Api(tags = "PROCESS_INSTANCE_EXECUTOR_TAG", position = 1)
+@Api(tags = "EXECUTOR_TAG")
 @RestController
 @RequestMapping("projects/{projectName}/executors")
 public class ExecutorController extends BaseController {
@@ -121,7 +120,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
-                                       @RequestParam(value = "startParams", required = false) String startParams) throws ParseException {
+                                       @RequestParam(value = "startParams", required = false) String startParams) {
         logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {},  "
                         + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
                         + "notify group id: {}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}, startParams: {} ",

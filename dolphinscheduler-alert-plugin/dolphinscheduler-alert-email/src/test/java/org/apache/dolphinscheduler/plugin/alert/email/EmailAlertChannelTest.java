@@ -91,9 +91,8 @@ public class EmailAlertChannelTest {
         InputParam mailSmtpPort = InputParam.newBuilder("serverPort", "smtp.port")
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
-                        .setType(DataType.NUMBER.getDataType())
                         .build())
-                .setValue(25)
+                .setValue("25")
                 .build();
 
         InputParam mailSender = InputParam.newBuilder("sender", "sender")
@@ -102,10 +101,10 @@ public class EmailAlertChannelTest {
                 .build();
 
         RadioParam enableSmtpAuth = RadioParam.newBuilder("enableSmtpAuth", "smtp.auth")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(false)
+                .setValue("false")
                 .build();
 
         InputParam mailUser = InputParam.newBuilder("user", "user")
@@ -119,17 +118,17 @@ public class EmailAlertChannelTest {
                 .build();
 
         RadioParam enableTls = RadioParam.newBuilder("starttlsEnable", "starttls.enable")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(true)
+                .setValue("true")
                 .build();
 
         RadioParam enableSsl = RadioParam.newBuilder("sslEnable", "smtp.ssl.enable")
-                .addParamsOptions(new ParamsOptions("YES", true, false))
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                .addParamsOptions(new ParamsOptions("YES", "true", false))
+                .addParamsOptions(new ParamsOptions("NO", "false", false))
                 .addValidate(Validate.newBuilder().setRequired(true).build())
-                .setValue(true)
+                .setValue("true")
                 .build();
 
         InputParam sslTrust = InputParam.newBuilder("smtpSslTrust", "smtp.ssl.trust")

@@ -50,16 +50,12 @@ public class StringUtils {
         return !isBlank(s);
     }
 
-    public static String replaceNRTtoUnderline(String src) {
-        if (isBlank(src)) {
-            return src;
-        } else {
-            return src.replaceAll("[\n|\r|\t]", "_");
-        }
-    }
-
     public static String trim(String str) {
         return str == null ? null : str.trim();
+    }
+
+    public static String defaultIfBlank(String str, String defaultStr) {
+        return isBlank(str) ? defaultStr : str;
     }
 
     public static boolean equalsIgnoreCase(String str1, String str2) {
