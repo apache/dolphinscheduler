@@ -36,4 +36,19 @@ public class RegexUtilsTest {
         Assert.assertFalse(numeric2);
     }
 
+    @Test
+    public void testEscapeNRT() {
+        String result1 = RegexUtils.escapeNRT("abc\n");
+        Assert.assertEquals("abc_", result1);
+
+        String result2 = RegexUtils.escapeNRT("abc\r");
+        Assert.assertEquals("abc_", result2);
+
+        String result3 = RegexUtils.escapeNRT("abc\t");
+        Assert.assertEquals("abc_", result3);
+
+        String result4 = RegexUtils.escapeNRT(null);
+        Assert.assertNull(result4);
+    }
+
 }

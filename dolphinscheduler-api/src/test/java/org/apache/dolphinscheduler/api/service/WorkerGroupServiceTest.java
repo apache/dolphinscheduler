@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -40,16 +41,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * worker group service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceTest.class);
-
     @InjectMocks
-    private WorkerGroupService workerGroupService;
+    private WorkerGroupServiceImpl workerGroupService;
 
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
@@ -71,8 +71,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenReturn(workerGroupStrList);
 
         List<String> defaultIpList = new ArrayList<>();
-        defaultIpList.add("192.168.220.188:1234");
-        defaultIpList.add("192.168.220.189:1234");
+        defaultIpList.add("192.168.220.188:1234:100:1234567");
+        defaultIpList.add("192.168.220.189:1234:100:1234567");
 
         Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultIpList);
 

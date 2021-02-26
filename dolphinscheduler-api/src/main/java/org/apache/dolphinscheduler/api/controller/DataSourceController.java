@@ -62,7 +62,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * data source controller
  */
-@Api(tags = "DATA_SOURCE_TAG", position = 3)
+@Api(tags = "DATA_SOURCE_TAG")
 @RestController
 @RequestMapping("datasources")
 public class DataSourceController extends BaseController {
@@ -96,10 +96,14 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST", required = true, dataType = "String"),
             @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT", required = true, dataType = "String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "DATA_SOURCE_PRINCIPAL", dataType = "String"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String"),
+            @ApiImplicitParam(name = "javaSecurityKrb5Conf", value = "DATA_SOURCE_KERBEROS_KRB5_CONF", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabUsername", value = "DATA_SOURCE_KERBEROS_KEYTAB_USERNAME", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabPath", value = "DATA_SOURCE_KERBEROS_KEYTAB_PATH", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -115,10 +119,14 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "connectType") DbConnectType connectType,
-                                   @RequestParam(value = "other") String other) {
+                                   @RequestParam(value = "other") String other,
+                                   @RequestParam(value = "javaSecurityKrb5Conf", required = false) String javaSecurityKrb5Conf,
+                                   @RequestParam(value = "loginUserKeytabUsername", required = false) String loginUserKeytabUsername,
+                                   @RequestParam(value = "loginUserKeytabPath", required = false) String loginUserKeytabPath) {
         logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, host, port, database, principal, userName, connectType, other);
-        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other,
+                javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath);
         return dataSourceService.createDataSource(loginUser, name, note, type, parameter);
     }
 
@@ -149,10 +157,14 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST", required = true, dataType = "String"),
             @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT", required = true, dataType = "String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "DATA_SOURCE_PRINCIPAL", dataType = "String"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String"),
+            @ApiImplicitParam(name = "javaSecurityKrb5Conf", value = "DATA_SOURCE_KERBEROS_KRB5_CONF", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabUsername", value = "DATA_SOURCE_KERBEROS_KEYTAB_USERNAME", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabPath", value = "DATA_SOURCE_KERBEROS_KEYTAB_PATH", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -169,10 +181,14 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "connectType") DbConnectType connectType,
-                                   @RequestParam(value = "other") String other) {
+                                   @RequestParam(value = "other") String other,
+                                   @RequestParam(value = "javaSecurityKrb5Conf", required = false) String javaSecurityKrb5Conf,
+                                   @RequestParam(value = "loginUserKeytabUsername", required = false) String loginUserKeytabUsername,
+                                   @RequestParam(value = "loginUserKeytabPath", required = false) String loginUserKeytabPath) {
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other,
+                javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath);
         return dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
     }
 
@@ -274,10 +290,14 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST", required = true, dataType = "String"),
             @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT", required = true, dataType = "String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "DATA_SOURCE_PRINCIPAL", dataType = "String"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String"),
+            @ApiImplicitParam(name = "javaSecurityKrb5Conf", value = "DATA_SOURCE_KERBEROS_KRB5_CONF", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabUsername", value = "DATA_SOURCE_KERBEROS_KEYTAB_USERNAME", dataType = "String"),
+            @ApiImplicitParam(name = "loginUserKeytabPath", value = "DATA_SOURCE_KERBEROS_KEYTAB_PATH", dataType = "String")
     })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
@@ -293,10 +313,14 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "userName") String userName,
                                     @RequestParam(value = "password") String password,
                                     @RequestParam(value = "connectType") DbConnectType connectType,
-                                    @RequestParam(value = "other") String other) {
+                                    @RequestParam(value = "other") String other,
+                                    @RequestParam(value = "javaSecurityKrb5Conf", required = false) String javaSecurityKrb5Conf,
+                                    @RequestParam(value = "loginUserKeytabUsername", required = false) String loginUserKeytabUsername,
+                                    @RequestParam(value = "loginUserKeytabPath", required = false) String loginUserKeytabPath) {
         logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other,
+                javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath);
         return dataSourceService.checkConnection(type, parameter);
     }
 
