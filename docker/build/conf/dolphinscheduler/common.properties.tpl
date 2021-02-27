@@ -64,7 +64,7 @@ yarn.application.status.address=http://ds1:8088/ws/v1/cluster/apps/%s
 yarn.job.history.status.address=http://ds1:19888/ws/v1/history/mapreduce/jobs/%s
 
 # system env path, If you want to set your own path, you need to set this env file to an absolute path
-dolphinscheduler.env.path=${DOLPHINSCHEDULER_ENV_PATH}
+#dolphinscheduler.env.path=env/dolphinscheduler_env.sh
 development.state=false
 
 # kerberos tgt expire time, unit is hours
