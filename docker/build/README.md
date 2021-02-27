@@ -2,7 +2,7 @@
 
 Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
-Github URL: https://github.com/apache/incubator-dolphinscheduler
+GitHub URL: https://github.com/apache/incubator-dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
