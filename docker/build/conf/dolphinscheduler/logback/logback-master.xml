@@ -20,6 +20,14 @@
 <configuration scan="true" scanPeriod="120 seconds"> <!--debug="true" -->
 
     <property name="log.base" value="logs"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
+            </pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
 
     <conversionRule conversionWord="messsage"
                     converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
@@ -66,6 +74,7 @@
     <!-- master server logback config end -->
 
     <root level="INFO">
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="MASTERLOGFILE"/>
     </root>

@@ -92,11 +92,20 @@ export ALERT_LISTEN_HOST=${ALERT_LISTEN_HOST:-"127.0.0.1"}
 #============================================================================
 export ALERT_PLUGIN_DIR=${ALERT_PLUGIN_DIR:-"lib/plugin/alert"}
 
-echo "generate app config"
-find ${DOLPHINSCHEDULER_HOME}/conf/ -name "*.tpl" | while read file; do
+echo "generate dolphinscheduler config"
+ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
-$(cat ${file})
+$(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
 EOF
-" > ${file%.*}
+" > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
-find ${DOLPHINSCHEDULER_HOME}/conf/ -name "*.sh" -exec chmod +x {} \;
+
+# generate dolphinscheduler env only in docker
+DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh
+if [ -z "${KUBERNETES_SERVICE_HOST}" ] && [ -r "${DOLPHINSCHEDULER_ENV_PATH}.tpl" ]; then
+eval "cat << EOF
+$(cat ${DOLPHINSCHEDULER_ENV_PATH}.tpl)
+EOF
+" > ${DOLPHINSCHEDULER_ENV_PATH}
+chmod +x ${DOLPHINSCHEDULER_ENV_PATH}
+fi
