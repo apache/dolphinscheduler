@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.dolphinscheduler.common.exception.BaseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -207,7 +208,7 @@ public class HadoopUtils implements Closeable {
         yarnEnabled = true;
         String appUrl = StringUtils.isEmpty(rmHaIds) ? appAddress : getAppAddress(appAddress, rmHaIds);
         if (StringUtils.isBlank(appUrl)) {
-            throw new Exception("yarn application url generation failed");
+            throw new BaseException("yarn application url generation failed");
         }
         if (logger.isDebugEnabled()) {
             logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
