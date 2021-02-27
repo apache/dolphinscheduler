@@ -23,7 +23,7 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 
 同时，默认的`Zookeeper`也会在`docker-compose.yml`文件中被创建。
 
-访问前端界面：http://192.168.xx.xx:12345/dolphinscheduler
+访问前端页面：http://192.168.xx.xx:12345/dolphinscheduler
 
 默认的用户是`admin`，默认的密码是`dolphinscheduler123`
 
@@ -40,7 +40,7 @@ $ docker run -d --name dolphinscheduler \
 apache/dolphinscheduler:latest all
 ```
 
-访问前端界面：http://192.168.xx.xx:12345/dolphinscheduler
+访问前端页面：http://192.168.xx.xx:12345/dolphinscheduler
 
 #### 或者运行dolphinscheduler中的部分服务
 
@@ -62,7 +62,7 @@ $ docker run -d --name dolphinscheduler-master \
 apache/dolphinscheduler:latest master-server
 ```
 
-* 启动一个 **worker server**, 如下:
+* 启动一个 **worker server** (包括 **logger server**), 如下:
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
@@ -118,7 +118,7 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 ## 环境变量
 
-DolphinScheduler映像使用了几个容易遗漏的环境变量。虽然这些变量不是必须的，但是可以帮助你更容易配置镜像并根据你的需求定义相应的服务配置。
+DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会使用默认值
 
 **`DATABASE_TYPE`**
 
@@ -359,7 +359,7 @@ docker-compose down -v
 
 ### 如何在 Docker Swarm 上部署 dolphinscheduler？
 
-假设 Docker Swarm 集群已经部署（如果还没有创建 Docker Swarm 集群，请参考 [https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/）
+假设 Docker Swarm 集群已经部署（如果还没有创建 Docker Swarm 集群，请参考 [create-swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/)）
 
 启动名为 dolphinscheduler 的 stack
 
@@ -420,7 +420,7 @@ DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
 
 8. 运行 dolphinscheduler (详见**如何使用docker镜像**)
 
-### How to support MySQL datasource in `Datasource manage`？
+### 如何在数据源中心支持 MySQL 数据源？
 
 > 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包.
 >
@@ -449,7 +449,7 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 
 6. 在数据源中心添加一个 MySQL 数据源
 
-### How to support Oracle datasource in `Datasource manage`？
+### 如何在数据源中心支持 Oracle 数据源？
 
 > 由于商业许可证的原因，我们不能直接使用 Oracle 的驱动包.
 >
