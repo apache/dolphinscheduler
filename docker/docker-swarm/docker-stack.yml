@@ -58,11 +58,15 @@ services:
     - 12345:12345
     environment:
       TZ: Asia/Shanghai
+      DOLPHINSCHEDULER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
       RESOURCE_STORAGE_TYPE: HDFS
       RESOURCE_UPLOAD_PATH: /dolphinscheduler
@@ -89,11 +93,15 @@ services:
     environment:
       TZ: Asia/Shanghai
       ALERT_PLUGIN_DIR: lib/plugin/alert
+      DOLPHINSCHEDULER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
       interval: 30s
@@ -122,11 +130,16 @@ services:
       MASTER_TASK_COMMIT_INTERVAL: "1000"
       MASTER_MAX_CPULOAD_AVG: "100"
       MASTER_RESERVED_MEMORY: "0.1"
+      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
+      DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
@@ -156,6 +169,7 @@ services:
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUPS: "default"
       WORKER_WEIGHT: "100"
+      ALERT_LISTEN_HOST: dolphinscheduler-alert
       HADOOP_HOME: "/opt/soft/hadoop"
       HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
       SPARK_HOME1: "/opt/soft/spark1"
@@ -166,12 +180,15 @@ services:
       FLINK_HOME: "/opt/soft/flink"
       DATAX_HOME: "/opt/soft/datax/bin/datax.py"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
-      ALERT_LISTEN_HOST: dolphinscheduler-alert
+      DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
       DATABASE_HOST: dolphinscheduler-postgresql
       DATABASE_PORT: 5432
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
+      DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
       RESOURCE_STORAGE_TYPE: HDFS
       RESOURCE_UPLOAD_PATH: /dolphinscheduler
