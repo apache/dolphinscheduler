@@ -38,7 +38,6 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * abstract controller test
  */
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class AbstractControllerTest {
