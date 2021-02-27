@@ -661,7 +661,7 @@ public class ProcessDefinitionController extends BaseController {
      * @return task dependencies list
      */
     @ApiOperation(value = "queryUpstreamTaskDependencies", notes = "QUERY_TASK_DEPENDENCIES_BY_TASK_NAME_NOTES")
-    @GetMapping(value = "/task-dependencies")
+    @GetMapping(value = "/upstream-task-dependencies")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEPENDENCIES_BY_TASK_NAME_ERROR)
     public Result queryUpstreamTaskDependencies(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -683,7 +683,7 @@ public class ProcessDefinitionController extends BaseController {
      * @return task dependencies list
      */
     @ApiOperation(value = "queryDownstreamTaskDependencies", notes = "QUERY_TASK_DEPENDENCIES_BY_TASK_NAME_NOTES")
-    @GetMapping(value = "/task-dependencies")
+    @GetMapping(value = "/downstream-task-dependencies")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEPENDENCIES_BY_TASK_NAME_ERROR)
     public Result queryDownstreamTaskDependencies(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
