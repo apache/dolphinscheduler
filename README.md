@@ -56,7 +56,7 @@ Overload processing: By using the task queue mechanism, the number of schedulabl
 ![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
 
 ### QuickStart in Docker
-Please referer the official website document:[[QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/1.3.4/user_doc/docker-deployment.html)]
+Please referer the official website document:[[QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/1.3.5/user_doc/docker-deployment.html)]
 
 
 ### How to Build
