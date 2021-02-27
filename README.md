@@ -15,7 +15,7 @@ Dolphin Scheduler Official Website
 
 ### Design Features:
 
-DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`. 
+DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
 
 Its main objectives are as follows:
 
@@ -83,7 +83,7 @@ We would like to express our deep gratitude to all the open-source projects used
 
 ### Community
 You are so much welcomed to communicate with the developers and users of Dolphin Scheduler freely. There are two ways to find them:
-1. Join the slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-l8k90ceu-wwUfobaDkJxjzMfZp4y1Ag).
+1. Join the slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-mzqu52gi-rCggPkSHQ0DZYkwbTxO1Gw).
 2. Follow the [twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news just on time.
 
 
@@ -93,4 +93,3 @@ The community welcomes everyone to participate in contributing, please refer to 
 
 ### License
 Please refer to the [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
-
