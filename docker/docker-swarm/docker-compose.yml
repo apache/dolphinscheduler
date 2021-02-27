@@ -162,6 +162,15 @@ services:
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUPS: "default"
       WORKER_WEIGHT: "100"
+      HADOOP_HOME: "/opt/soft/hadoop"
+      HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
+      SPARK_HOME1: "/opt/soft/spark1"
+      SPARK_HOME2: "/opt/soft/spark2"
+      PYTHON_HOME: "/usr/bin/python"
+      JAVA_HOME: "/usr/lib/jvm/java-1.8-openjdk"
+      HIVE_HOME: "/opt/soft/hive"
+      FLINK_HOME: "/opt/soft/flink"
+      DATAX_HOME: "/opt/soft/datax/bin/datax.py"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       ALERT_LISTEN_HOST: dolphinscheduler-alert
       DATABASE_HOST: dolphinscheduler-postgresql
@@ -183,7 +192,6 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes:
-    - ./dolphinscheduler_env.sh:/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
     - dolphinscheduler-worker-data:/tmp/dolphinscheduler
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     - dolphinscheduler-resource-local:/dolphinscheduler
