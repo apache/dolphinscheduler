@@ -695,5 +695,4 @@ public class ProcessDefinitionController extends BaseController {
         Map<String, Object> result = processDefinitionService.queryDownstreamTaskDependencies(processId, taskName);
         return returnDataList(result);
     }
-
 }
