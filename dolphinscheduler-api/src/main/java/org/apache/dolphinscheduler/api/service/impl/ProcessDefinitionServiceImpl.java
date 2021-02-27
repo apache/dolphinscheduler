@@ -1737,7 +1737,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
         //process data check
         if (null == processData) {
             logger.error("Upstream dependencies process data is null");
@@ -1745,8 +1744,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return result;
         }
 
-        List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-
+        List<TaskNode> taskNodeList = processData.getTasks();
         for (TaskNode taskNode : taskNodeList) {
             List<String> taskItems = new ArrayList<>();
             //get task node with the given task name
@@ -1763,15 +1761,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     if (taskNode1.getName().equals(taskItem)) {
                         if (taskNode1.getType().equals("DEPENDENT")) {
                             String dependenceField = taskNode1.getDependence();
-
                             //parse dependence field if task node is dependent
                             DependentParameters dependParam = JSONUtils.parseObject(dependenceField, DependentParameters.class);
-
-                            List<DependentTaskModel> dependentTaskList = (dependParam.getDependTaskList() == null) ? new ArrayList<>() : dependParam.getDependTaskList();
-
+                            List<DependentTaskModel> dependentTaskList = dependParam.getDependTaskList();
                             for (DependentTaskModel dependentTask : dependentTaskList) {
-                                List<DependentItem> dependentItemList = (dependentTask.getDependItemList() == null) ? new ArrayList<>() : dependentTask.getDependItemList();
-
+                                List<DependentItem> dependentItemList = dependentTask.getDependItemList();
                                 for (DependentItem dependentItem : dependentItemList) {
                                     //add depTasks to depList
                                     depList.add(dependentItem.getDepTasks());
@@ -1793,42 +1787,33 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     }
 
     public Map<String, Object> queryDownstreamTaskDependencies(Integer processId, String taskName) {
-        Map<String, Object> result = new HashMap<>();
         List<String> depList = new ArrayList<>();
-
+        Map<String, Object> result = new HashMap<>();
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
             logger.info("Downstream dependencies process define not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+
             return result;
         }
-
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        //process data check
         if (null == processData) {
             logger.error("Downstream dependencies process data is null");
             putMsg(result, Status.DATA_IS_NOT_VALID, processDefinitionJson);
+
             return result;
         }
-
-        List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-
+        List<TaskNode> taskNodeList = processData.getTasks();
         //iterate all task nodes
         for (TaskNode taskNode : taskNodeList) {
             if (taskNode.getType().equals("DEPENDENT")) {
                 String dependenceField = taskNode.getDependence();
-
                 //parse dependence field if task node is dependent
                 DependentParameters dependParam = JSONUtils.parseObject(dependenceField, DependentParameters.class);
-
-                List<DependentTaskModel> dependentTaskList = (dependParam.getDependTaskList() == null) ? new ArrayList<>() : dependParam.getDependTaskList();
-
+                List<DependentTaskModel> dependentTaskList = dependParam.getDependTaskList();
                 for (DependentTaskModel dependentTask : dependentTaskList) {
-                    List<DependentItem> dependentItemList = (dependentTask.getDependItemList() == null) ? new ArrayList<>() : dependentTask.getDependItemList();
-
+                    List<DependentItem> dependentItemList = dependentTask.getDependItemList();
                     for (DependentItem dependentItem : dependentItemList) {
                         String depTasksField = dependentItem.getDepTasks();
                         if (depTasksField.contains(taskName)) {
@@ -1843,7 +1828,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 String preTaskField = taskNode.getPreTasks();
                 //parse preTaskField if task node is not dependent
                 taskItems = JSONUtils.toList(preTaskField, String.class);
-
                 for (String  taskItem : taskItems) {
                     if (taskItem.equals(taskName)) {
                         //add the task item to depList if it is same as taskName
