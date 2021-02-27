@@ -390,6 +390,23 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testQueryProcessDefinitionVersions() {
         String projectName = "test";
+
+        Result result = processDefinitionController.queryProcessDefinitionVersions(
+                user
+                , projectName
+                , 1
+                , -10
+                , 1);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
+
+        result = processDefinitionController.queryProcessDefinitionVersions(
+                user
+                , projectName
+                , -1
+                , 10
+                , 1);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
+
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
         resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionVersion>(1, 10));
@@ -400,7 +417,7 @@ public class ProcessDefinitionControllerTest {
                 , 10
                 , 1))
                 .thenReturn(resultMap);
-        Result result = processDefinitionController.queryProcessDefinitionVersions(
+        result = processDefinitionController.queryProcessDefinitionVersions(
                 user
                 , projectName
                 , 1

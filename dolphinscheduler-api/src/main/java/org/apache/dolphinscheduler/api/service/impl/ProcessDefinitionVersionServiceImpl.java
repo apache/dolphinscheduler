@@ -115,17 +115,6 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
     @Override
     public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, int processDefinitionId) {
 
-        Map<String, Object> result = new HashMap<>();
-
-        // check the if pageNo or pageSize less than 1
-        if (pageNo <= 0 || pageSize <= 0) {
-            putMsg(result
-                    , Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR
-                    , pageNo
-                    , pageSize);
-            return result;
-        }
-
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
