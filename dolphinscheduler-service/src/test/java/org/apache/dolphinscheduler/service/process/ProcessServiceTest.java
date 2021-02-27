@@ -336,8 +336,6 @@ public class ProcessServiceTest {
                 + "\"MEDIUM\",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":"
                 + "\"SHELL\",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
         Mockito.when(processDefineMapper.selectById(parentId)).thenReturn(processDefinition);
-//        Mockito.when(processDefineMapper.selectById(222)).thenReturn(processDefinition2);
-
 
         List<ProcessTaskRelationLog> relationLogList = new ArrayList<>();
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong()
