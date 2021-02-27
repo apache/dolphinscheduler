@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -46,14 +48,15 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+/**
+ * scheduler service test
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(QuartzExecutors.class)
-
 public class SchedulerServiceTest {
 
-
     @InjectMocks
-    private SchedulerService schedulerService;
+    private SchedulerServiceImpl schedulerService;
 
     @Mock
     private MonitorService monitorService;
