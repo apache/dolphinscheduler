@@ -62,7 +62,7 @@ $ docker run -d --name dolphinscheduler-master \
 apache/dolphinscheduler:latest master-server
 ```
 
-* Start a **worker server**, For example:
+* Start a **worker server** (including **logger server**), For example:
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
@@ -118,7 +118,7 @@ Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script
 
 ## Environment Variables
 
-The DolphinScheduler image uses several environment variables which are easy to miss. While none of the variables are required, they may significantly aid you in using the image.
+The DolphinScheduler Docker container is configured through environment variables, and the default value will be used if an environment variable is not set.
 
 **`DATABASE_TYPE`**
 
@@ -359,7 +359,7 @@ docker-compose down -v
 
 ### How to deploy dolphinscheduler on Docker Swarm?
 
-Assuming that the Docker Swarm cluster has been created (If there is no Docker Swarm cluster, please refer to [https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/))
+Assuming that the Docker Swarm cluster has been created (If there is no Docker Swarm cluster, please refer to [create-swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/))
 
 Start a stack named dolphinscheduler
 
