@@ -71,8 +71,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenReturn(workerGroupStrList);
 
         List<String> defaultIpList = new ArrayList<>();
-        defaultIpList.add("192.168.220.188:1234");
-        defaultIpList.add("192.168.220.189:1234");
+        defaultIpList.add("192.168.220.188:1234:100:1234567");
+        defaultIpList.add("192.168.220.189:1234:100:1234567");
 
         Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultIpList);
 

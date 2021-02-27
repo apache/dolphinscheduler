@@ -94,6 +94,14 @@ common:
     FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
     FS_S3A_ACCESS_KEY: "xxxxxxx"
     FS_S3A_SECRET_KEY: "xxxxxxx"
+  ## If RESOURCE_STORAGE_TYPE is HDFS and FS_DEFAULT_FS is file:///, fsFileResourcePersistence should be enabled for resource storage
+  fsFileResourcePersistence:
+    enabled: false
+    accessModes:
+    - "ReadWriteMany"
+    ## storageClassName must support the access mode: ReadWriteMany
+    storageClassName: "-"
+    storage: "20Gi"
 
 master:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
@@ -199,7 +207,7 @@ worker:
     WORKER_MAX_CPULOAD_AVG: "100"
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
-    WORKER_GROUP: "default"
+    WORKER_GROUPS: "default"
     WORKER_WEIGHT: "100"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
