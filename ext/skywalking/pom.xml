@@ -31,10 +31,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dolphinscheduler.version>${parent.version}</dolphinscheduler.version>
-        <skywalking.version>8.4.0</skywalking.version>
 
         <agent.dir>${project.build.directory}/skywalking-agent/</agent.dir>
         <agent-plugins.dir>${agent.dir}/plugins/</agent-plugins.dir>
+        <agent-activations.dir>${agent.dir}/activations/</agent-activations.dir>
         <agent-config.dir>${agent.dir}/config</agent-config.dir>
         <agent-dashboard.dir>${agent.dir}/dashboard</agent-dashboard.dir>
         <agent-dependencies-shade.package>org.apache.skywalking.apm.dependencies</agent-dependencies-shade.package>
@@ -114,6 +114,7 @@
                         </goals>
                         <configuration>
                             <artifactItems>
+                                <!-- skywalking agent -->
                                 <artifactItem>
                                     <groupId>org.apache.skywalking</groupId>
                                     <artifactId>apm-agent</artifactId>
@@ -121,6 +122,8 @@
                                     <destFileName>skywalking-agent.jar</destFileName>
                                     <outputDirectory>${agent.dir}</outputDirectory>
                                 </artifactItem>
+
+                                <!-- skywalking plugins -->
                                 <artifactItem>
                                     <groupId>org.apache.dolphinscheduler</groupId>
                                     <artifactId>dolphinscheduler-skywalking</artifactId>
@@ -181,6 +184,14 @@
                                     <artifactId>apm-springmvc-annotation-5.x-plugin</artifactId>
                                     <version>${skywalking.version}</version>
                                     <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+
+                                <!-- skywalking toolkit -->
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-toolkit-logback-1.x-activation</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-activations.dir}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

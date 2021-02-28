@@ -588,5 +588,9 @@
 			<scope>compile</scope>
         </dependency>
 
+		<dependency>
+			<groupId>org.apache.skywalking</groupId>
+			<artifactId>apm-toolkit-logback-1.x</artifactId>
+		</dependency>
 	</dependencies>
 </project>
