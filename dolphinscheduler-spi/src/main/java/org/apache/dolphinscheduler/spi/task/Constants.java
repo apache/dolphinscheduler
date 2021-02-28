@@ -23,4 +23,9 @@ public class Constants {
      * string false
      */
     public static final String STRING_FALSE = "false";
+
+    /**
+     * exit code kill
+     */
+    public static final int EXIT_CODE_KILL = 137;
 }

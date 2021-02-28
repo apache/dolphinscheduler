@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
+import static org.apache.dolphinscheduler.spi.task.Constants.EXIT_CODE_KILL;
+
+import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.task.TaskResponse;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -59,19 +63,27 @@ public class ShellCommandExecutor {
 
     public TaskResponse run(String execCommand, TaskRequest req, Logger logger) throws IOException {
         this.logger = logger;
-        this.logBuffer=req.
+        //  this.logBuffer=req.get
 
         TaskResponse result = new TaskResponse();
         int taskInstanceId = req.getTaskInstanceId();
+        if(null== TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)){
+            result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
+        }
+        if (StringUtils.isEmpty(execCommand)) {
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+            return result;
+        }
         // 需要从缓存判断是否被Kill  因此 此缓存需要下沉到task层面 todo taskExecutionContextCacheManager
-        String commandFilePath = buildCommandFilePath(req.getExecutePath(),req.getTaskAppId());
+        String commandFilePath = buildCommandFilePath(req.getExecutePath(), req.getTaskAppId());
 
 
         // create command file if not exists
-        createCommandFileIfNotExists(execCommand, commandFilePath,req);
+        createCommandFileIfNotExists(execCommand, commandFilePath, req);
 
         //build process
-        buildProcess(commandFilePath,req);
+        buildProcess(commandFilePath, req);
 
         // parse process output
         parseProcessOutput(process);
@@ -80,16 +92,26 @@ public class ShellCommandExecutor {
 
         result.setProcessId(processId);
 
-       return result;
+        // cache processId
+        req.setProcessId(processId);
+        boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(req);
+        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
+            ProcessUtils.kill(req);
+            result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
+        }
+
+        return result;
 
     }
+
     /**
      * build process
      *
      * @param commandFile command file
      * @throws IOException IO Exception
      */
-    private void buildProcess(String commandFile,TaskRequest req) throws IOException {
+    private void buildProcess(String commandFile, TaskRequest req) throws IOException {
         // setting up user to run commands
         List<String> command = new LinkedList<>();
 
@@ -162,7 +184,6 @@ public class ShellCommandExecutor {
     }
 
 
-
     /**
      * print command
      *
@@ -184,7 +205,7 @@ public class ShellCommandExecutor {
      *
      * @param process process
      */
-    private void parseProcessOutput(Process process,TaskRequest req) {
+    private void parseProcessOutput(Process process, TaskRequest req) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", req.getTaskAppId());
         ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
         getOutputLogService.submit(() -> {
