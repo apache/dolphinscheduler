@@ -31,7 +31,7 @@ do
   workersGroupMap+=([$worker]=$groupName)
 done
 
-skywalkingEnv="SKYWALKING_ENABLE=$enableSkywalking SW_AGENT_COLLECTOR_BACKEND_SERVICES=$skywalkingServers"
+skywalkingEnv="SKYWALKING_ENABLE=$enableSkywalking SW_AGENT_COLLECTOR_BACKEND_SERVICES=$skywalkingServers SW_GRPC_LOG_SERVER_HOST=$skywalkingLogReporterHost SW_GRPC_LOG_SERVER_PORT=$skywalkingLogReporterPort"
 
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
