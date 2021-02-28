@@ -390,9 +390,7 @@ api:
 ingress:
   enabled: false
   host: "dolphinscheduler.org"
-  path: "/"
+  path: "/dolphinscheduler"
   tls:
     enabled: false
-    hosts:
-      - "dolphinscheduler.org"
     secretName: "dolphinscheduler-tls"
