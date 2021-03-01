@@ -105,8 +105,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         if (projectMapper.insert(project) > 0) {
-            Project insertedProject = projectMapper.queryByName(name);
-            result.put(Constants.DATA_LIST, insertedProject);
+            result.put(Constants.DATA_LIST, project);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);

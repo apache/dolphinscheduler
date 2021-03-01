@@ -43,7 +43,7 @@ public class BrowserCommon {
     protected Actions actions;
 
     /**
-     * Javascript
+     * JavaScript
      */
     protected JavascriptExecutor je;
 

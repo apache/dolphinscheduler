@@ -1,6 +1,6 @@
 ## *Tips*
 - *Thanks very much for contributing to Apache DolphinScheduler.*
-- *Please review https://dolphinscheduler.apache.org/en-us/community/index.html before opening a pull request.*
+- *Please review https://dolphinscheduler.apache.org/en-us/community/development/pull-request.html before opening a pull request.*
 
 ## What is the purpose of the pull request
 

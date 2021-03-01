@@ -44,11 +44,10 @@ COPY ./startup-init-conf.sh /root/startup-init-conf.sh
 COPY ./startup.sh /root/startup.sh
 COPY ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
 COPY ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
-COPY ./conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
+COPY ./conf/dolphinscheduler/env/dolphinscheduler_env.sh.tpl /opt/dolphinscheduler/conf/env/
 RUN dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
     dos2unix /root/startup.sh && \
-    dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
     dos2unix /opt/dolphinscheduler/script/*.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
     rm -rf /bin/sh && \
