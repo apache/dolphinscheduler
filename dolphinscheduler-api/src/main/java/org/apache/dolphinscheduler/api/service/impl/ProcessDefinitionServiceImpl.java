@@ -276,7 +276,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getId());
+        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
         resourceList.stream().forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
@@ -314,7 +314,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Page<ProcessDefinition> page = new Page<>(pageNo, pageSize);
         IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
-                page, searchVal, userId, project.getId(), isAdmin(loginUser));
+                page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
         records.stream().forEach(processDefinition -> {
@@ -377,7 +377,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getId(), processDefinitionName);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
@@ -440,7 +440,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         if (!name.equals(processDefinition.getName())) {
             // check whether the new process define name exist
-            ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getId(), name);
+            ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
@@ -479,7 +479,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -847,7 +847,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         //use currentProjectName to query
         Project targetProject = projectMapper.queryByName(currentProjectName);
         if (null != targetProject) {
-            processDefinitionName = recursionProcessDefinitionName(targetProject.getId(),
+            processDefinitionName = recursionProcessDefinitionName(targetProject.getCode(),
                     processDefinitionName, 1);
         }
 
@@ -1077,7 +1077,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             String subProcessJson = JSONUtils.toJsonString(processService.genProcessData(subProcess));
             //check current project has sub process
-            ProcessDefinition currentProjectSubProcess = processDefinitionMapper.queryByDefineName(targetProject.getId(), subProcess.getName());
+            ProcessDefinition currentProjectSubProcess = processDefinitionMapper.queryByDefineName(targetProject.getCode(), subProcess.getName());
 
             if (null == currentProjectSubProcess) {
                 ArrayNode subJsonArray = (ArrayNode) JSONUtils.parseObject(subProcessJson).get(TASKS);
@@ -1116,7 +1116,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
 
                 //modify task node
-                ProcessDefinition newSubProcessDefine = processDefinitionMapper.queryByDefineName(subProcess.getProjectId(), subProcess.getName());
+                ProcessDefinition newSubProcessDefine = processDefinitionMapper.queryByDefineName(subProcess.getCode(), subProcess.getName());
 
                 if (null != newSubProcessDefine) {
                     subProcessCodeMap.put(subProcessCode, newSubProcessDefine.getCode());
@@ -1262,7 +1262,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         HashMap<String, Object> result = new HashMap<>();
 
-        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectId);
+        Project project = projectMapper.selectById(projectId);
+        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
         resourceList.stream().forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
@@ -1432,8 +1433,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return graph.hasCycle();
     }
 
-    private String recursionProcessDefinitionName(Integer projectId, String processDefinitionName, int num) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectId, processDefinitionName);
+    private String recursionProcessDefinitionName(Long projectCode, String processDefinitionName, int num) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         if (processDefinition != null) {
             if (num > 1) {
                 String str = processDefinitionName.substring(0, processDefinitionName.length() - 3);
@@ -1444,7 +1445,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             return processDefinitionName;
         }
-        return recursionProcessDefinitionName(projectId, processDefinitionName, num + 1);
+        return recursionProcessDefinitionName(projectCode, processDefinitionName, num + 1);
     }
 
     private Map<String, Object> copyProcessDefinition(User loginUser,
@@ -1756,3 +1757,4 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
 }
+
