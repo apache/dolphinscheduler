@@ -30,8 +30,8 @@ worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 # worker listener port
 worker.listen.port=${WORKER_LISTEN_PORT}
 
-# default worker group
-worker.groups=${WORKER_GROUP}
+# default worker groups
+worker.groups=${WORKER_GROUPS}
 
 # default worker weight
 worker.weight=${WORKER_WEIGHT}
