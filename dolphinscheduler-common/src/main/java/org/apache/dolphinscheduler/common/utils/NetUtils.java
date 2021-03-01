@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NetUtils {
 
-    private static final Pattern MASTER_WORKER_STS_PATTERN = Pattern.compile("(master|worker)-\\d+$");
+    private static final Pattern STS_PATTERN = Pattern.compile("-\\d+$"); // StatefulSet pattern
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
     private static final String NETWORK_PRIORITY_DEFAULT = "default";
     private static final String NETWORK_PRIORITY_INNER = "inner";
@@ -83,7 +83,7 @@ public class NetUtils {
                 String canonicalHost = inetAddress.getCanonicalHostName();
                 if (!canonicalHost.contains(".") || IP_PATTERN.matcher(canonicalHost).matches()) {
                     String host = inetAddress.getHostName();
-                    if (MASTER_WORKER_STS_PATTERN.matcher(host).find()) {
+                    if (STS_PATTERN.matcher(host).find()) {
                         return String.format("%s.%s", host, host.replaceFirst("\\d+$", "headless"));
                     }
                 }
