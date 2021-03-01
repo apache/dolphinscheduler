@@ -125,6 +125,7 @@
                                     <groupId>org.apache.skywalking</groupId>
                                     <artifactId>apm-agent</artifactId>
                                     <version>${skywalking.version}</version>
+                                    <destFileName>skywalking-agent.jar</destFileName>
                                     <outputDirectory>${agent.dir}</outputDirectory>
                                 </artifactItem>
 
