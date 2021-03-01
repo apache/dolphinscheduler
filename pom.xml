@@ -795,6 +795,9 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                        <include>**/api/controller/ProjectControllerTest.java</include>
+                        <include>**/api/controller/QueueControllerTest.java</include>
+                        <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>

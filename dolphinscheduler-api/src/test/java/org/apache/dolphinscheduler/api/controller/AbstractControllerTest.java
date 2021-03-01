@@ -63,7 +63,7 @@ public class AbstractControllerTest {
     }
 
     @After
-    public void after(){
+    public void after() throws Exception {
         sessionService.signOut("127.0.0.1", user);
     }
 
