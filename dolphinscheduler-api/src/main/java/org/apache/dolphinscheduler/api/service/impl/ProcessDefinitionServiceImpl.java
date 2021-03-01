@@ -354,12 +354,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         ProcessDefinition processDefinition = processDefinitionMapper.selectById(processId);
 
-        ProcessData processData = processService.genProcessData(processDefinition);
-        processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
+            ProcessData processData = processService.genProcessData(processDefinition);
+            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
             result.put(Constants.DATA_LIST, processDefinition);
             putMsg(result, Status.SUCCESS);
         }
@@ -379,12 +378,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getId(), processDefinitionName);
-        ProcessData processData = processService.genProcessData(processDefinition);
-        processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
         } else {
+            ProcessData processData = processService.genProcessData(processDefinition);
+            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
             result.put(Constants.DATA_LIST, processDefinition);
             putMsg(result, Status.SUCCESS);
         }
