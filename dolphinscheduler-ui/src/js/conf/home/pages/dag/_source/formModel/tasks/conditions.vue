@@ -99,7 +99,6 @@
         $('body').find('.tooltip.fade.top.in').remove()
       },
       _onDeleteAll (i) {
-        this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this.dependTaskList.map((item, i) => {
           if (item.dependItemList.length === 0) {
             this.dependTaskList.splice(i, 1)
