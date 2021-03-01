@@ -12,6 +12,7 @@ aspectjweaver-1.9.2.jar
 audience-annotations-0.5.0.jar
 avro-1.7.4.jar
 aws-java-sdk-1.7.4.jar
+apm-agent-8.4.0.jar
 apm-toolkit-logback-1.x-8.4.0.jar
 apm-toolkit-logback-1.x-activation-8.4.0.jar
 apm-httpclient-3.x-plugin-8.4.0.jar
@@ -21,7 +22,6 @@ apm-quartz-scheduler-2.x-plugin-8.4.0.jar
 apm-spring-core-patch-8.4.0.jar
 apm-springmvc-annotation-5.x-plugin-8.4.0.jar
 apm-springmvc-annotation-commons-8.4.0.jar
-apm-spring-commons-8.4.0.jar
 apm-zookeeper-3.4.x-plugin-8.4.0.jar
 bonecp-0.8.0.RELEASE.jar
 byte-buddy-1.9.10.jar
@@ -175,7 +175,6 @@ protobuf-java-2.5.0.jar
 quartz-2.3.0.jar
 quartz-jobs-2.3.0.jar
 slf4j-api-1.7.5.jar
-skywalking-agent.jar
 snakeyaml-1.23.jar
 snappy-0.2.jar
 snappy-java-1.0.4.1.jar
@@ -210,6 +209,7 @@ springfox-swagger2-2.9.2.jar
 swagger-annotations-1.5.20.jar
 swagger-bootstrap-ui-1.9.3.jar
 swagger-models-1.5.20.jar
+spring-commons-8.4.0.jar
 tephra-api-0.6.0.jar
 threetenbp-1.3.6.jar
 transaction-api-1.1.jar

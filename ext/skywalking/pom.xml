@@ -125,7 +125,6 @@
                                     <groupId>org.apache.skywalking</groupId>
                                     <artifactId>apm-agent</artifactId>
                                     <version>${skywalking.version}</version>
-                                    <destFileName>skywalking-agent.jar</destFileName>
                                     <outputDirectory>${agent.dir}</outputDirectory>
                                 </artifactItem>
 
@@ -170,7 +169,6 @@
                                     <groupId>org.apache.skywalking</groupId>
                                     <artifactId>spring-commons</artifactId>
                                     <version>${skywalking.version}</version>
-                                    <destFileName>apm-spring-commons.jar</destFileName>
                                     <outputDirectory>${agent-plugins.dir}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
