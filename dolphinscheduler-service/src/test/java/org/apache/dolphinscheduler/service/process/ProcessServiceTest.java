@@ -34,12 +34,14 @@ import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
@@ -72,15 +74,12 @@ public class ProcessServiceTest {
 
     @InjectMocks
     private ProcessService processService;
-
-
     @Mock
     private CommandMapper commandMapper;
-
-
+    @Mock
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
     @Mock
     private ErrorCommandMapper errorCommandMapper;
-
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
     @Mock
@@ -238,6 +237,7 @@ public class ProcessServiceTest {
         processDefinition.setId(123);
         processDefinition.setName("test");
         processDefinition.setVersion(1);
+        processDefinition.setCode(11L);
         processDefinition.setProcessDefinitionJson("{\"globalParams\":[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"tasks\":[{\"conditionResult\":"
                 + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
                 + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
@@ -314,6 +314,7 @@ public class ProcessServiceTest {
     @Test
     public void testRecurseFindSubProcessId() {
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(10L);
         processDefinition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
                 + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\""
                 + ",\"dependence\":{},\"description\":\"\",\"id\":\"tasks-76544\""
@@ -326,6 +327,7 @@ public class ProcessServiceTest {
         int parentId = 111;
         List<Integer> ids = new ArrayList<>();
         ProcessDefinition processDefinition2 = new ProcessDefinition();
+        processDefinition2.setCode(11L);
         processDefinition2.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\""
                 + ":{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{},"
                 + "\"description\":\"\",\"id\":\"tasks-76544\",\"maxRetryTimes\":\"0\",\"name\":\"test\","
@@ -334,7 +336,12 @@ public class ProcessServiceTest {
                 + "\"MEDIUM\",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":"
                 + "\"SHELL\",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
         Mockito.when(processDefineMapper.selectById(parentId)).thenReturn(processDefinition);
-        Mockito.when(processDefineMapper.selectById(222)).thenReturn(processDefinition2);
+
+        List<ProcessTaskRelationLog> relationLogList = new ArrayList<>();
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong()
+                , Mockito.anyInt()))
+                .thenReturn(relationLogList);
+
         processService.recurseFindSubProcessId(parentId, ids);
 
     }
