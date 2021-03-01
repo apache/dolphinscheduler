@@ -61,10 +61,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.skywalking</groupId>
-            <artifactId>apm-test-tools</artifactId>
+            <artifactId>apm-agent</artifactId>
             <version>${skywalking.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -128,7 +134,6 @@
                                     <groupId>org.apache.dolphinscheduler</groupId>
                                     <artifactId>dolphinscheduler-skywalking</artifactId>
                                     <version>${project.version}</version>
-                                    <destFileName>apm-dolphinscheduler-${project.version}-plugin.jar</destFileName>
                                     <outputDirectory>${agent-plugins.dir}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
@@ -165,6 +170,7 @@
                                     <groupId>org.apache.skywalking</groupId>
                                     <artifactId>spring-commons</artifactId>
                                     <version>${skywalking.version}</version>
+                                    <destFileName>apm-spring-commons.jar</destFileName>
                                     <outputDirectory>${agent-plugins.dir}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
