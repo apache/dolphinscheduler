@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
@@ -63,6 +64,12 @@ public class ZKMasterClient extends AbstractZKClient {
 	@Autowired
 	private ProcessService processService;
 
+    /**
+     * master registry
+     */
+    @Autowired
+    private MasterRegistry masterRegistry;
+
 	public void start() {
 
 		InterProcessMutex mutex = null;
@@ -71,6 +78,9 @@ public class ZKMasterClient extends AbstractZKClient {
 			String znodeLock = getMasterStartUpLockPath();
 			mutex = new InterProcessMutex(getZkClient(), znodeLock);
 			mutex.acquire();
+
+            //  Master registry
+            masterRegistry.registry();
 
 			// init system znode
 			this.initSystemZNode();
@@ -94,6 +104,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	@Override
 	public void close(){
 		super.close();
+        masterRegistry.unRegistry();
 	}
 
 	/**
@@ -160,6 +171,9 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @throws Exception	exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
+        if (StringUtils.isEmpty(serverHost)) {
+            return;
+        }
 		switch (zkNodeType) {
 			case MASTER:
 				failoverMaster(serverHost);
@@ -272,9 +286,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		if(workerServerStartDate != null){
 			return taskInstance.getStartTime().after(workerServerStartDate);
-		}else{
-			return false;
-		}
+        }
+		return false;
 	}
 
 	/**
