@@ -81,7 +81,7 @@ public class HiveDataSourceTest {
 
         hiveDataSource.setOther("hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2");
         Assert.assertEquals(
-                "jdbc:hive2://127.0.0.1:10000/test;?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
+                "jdbc:hive2://127.0.0.1:10000/test?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
                 hiveDataSource.getJdbcUrl());
 
     }
