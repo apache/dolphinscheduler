@@ -597,7 +597,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             // get all resource id of process definitions those is released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);

@@ -30,31 +30,33 @@ public class ResourceProcessDefinitionUtils {
      * @param list the map key is process definition id and value is resource_ids
      * @return resource process definition map
      */
-    public static Map<Integer, Set<Integer>> getResourceProcessDefinitionMap(List<Map<String, Object>> list) {
-        Map<Integer, String> map = new HashMap<>();
-        Map<Integer, Set<Integer>> result = new HashMap<>();
+    public static Map<Integer, Set<Long>> getResourceProcessDefinitionMap(List<Map<String, Object>> list) {
+        Map<Long, String> map = new HashMap<>();
+
+        // resourceId -> processDefinitionCodes
+        Map<Integer, Set<Long>> result = new HashMap<>();
         if (CollectionUtils.isNotEmpty(list)) {
             for (Map<String, Object> tempMap : list) {
-                map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
+                map.put((Long) tempMap.get("code"), (String)tempMap.get("resource_ids"));
             }
         }
 
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
-            Integer mapKey = entry.getKey();
-            String[] arr = entry.getValue().split(",");
-            Set<Integer> mapValues = Arrays.stream(arr).map(Integer::parseInt).collect(Collectors.toSet());
-            for (Integer value : mapValues) {
-                if (result.containsKey(value)) {
-                    Set<Integer> set = result.get(value);
-                    set.add(mapKey);
-                    result.put(value, set);
+        for (Map.Entry<Long, String> entry : map.entrySet()) {
+            Long code = entry.getKey();
+            String[] resourceIds = entry.getValue().split(",");
+            Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
+            for (Integer resourceId : resourceIdSet) {
+                Set<Long> codeSet;
+                if (result.containsKey(resourceId)) {
+                    codeSet = result.get(resourceId);
                 } else {
-                    Set<Integer> set = new HashSet<>();
-                    set.add(mapKey);
-                    result.put(value, set);
+                    codeSet = new HashSet<>();
                 }
+                codeSet.add(code);
+                result.put(resourceId, codeSet);
             }
         }
+        
         return result;
     }
 }

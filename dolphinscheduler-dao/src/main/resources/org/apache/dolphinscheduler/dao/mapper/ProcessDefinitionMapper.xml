@@ -123,6 +123,7 @@
         </if>
         group by td.user_id,tu.user_name
     </select>
+    
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT
             pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
@@ -137,17 +138,28 @@
         AND pd.id = #{processDefineId}
     </select>
 
-
     <select id="listResources" resultType="java.util.HashMap">
-        SELECT id,resource_ids
-        FROM t_ds_process_definition
-        WHERE release_state = 1 and resource_ids is not null and resource_ids != ''
+        SELECT distinct pd.code,td.resource_ids
+        FROM t_ds_process_task_relation ptr
+        join t_ds_process_definition pd
+            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
+                and ptr.project_code=pd.project_code and  pd.release_state = 1
+        join t_ds_task_definition td
+            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+        WHERE  td.resource_ids is not null and td.resource_ids != ''
     </select>
 
     <select id="listResourcesByUser" resultType="java.util.HashMap">
-        SELECT id,resource_ids
-        FROM t_ds_process_definition
-        WHERE user_id = #{userId} and release_state = 1 and resource_ids is not null and resource_ids != ''
+        SELECT distinct pd.code,td.resource_ids
+        FROM t_ds_process_task_relation ptr
+        join t_ds_process_definition pd
+            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
+                and ptr.project_code=pd.project_code and  pd.release_state = 1
+        join t_ds_task_definition td
+            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+        WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
     </select>
 
     <select id="listProjectIds" resultType="java.lang.Integer">
