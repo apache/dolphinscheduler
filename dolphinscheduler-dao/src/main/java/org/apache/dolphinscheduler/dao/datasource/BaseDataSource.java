@@ -161,6 +161,11 @@ public abstract class BaseDataSource {
                     separator = ":";
                     break;
                 case HIVE:
+                    if ("?".equals(otherParams.substring(0, 1))) {
+                        break;
+                    }
+                    separator = ";";
+                    break;
                 case SPARK:
                 case SQLSERVER:
                     separator = ";";

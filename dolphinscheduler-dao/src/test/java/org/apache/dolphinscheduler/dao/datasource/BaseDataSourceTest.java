@@ -171,11 +171,11 @@ public class BaseDataSourceTest {
 
         //set fake other
         hiveDataSource.setConnParams("hive.tez.container.size=20000;");
-        Assert.assertEquals("jdbc:hive2://127.0.0.1:10000/test;?hive.tez.container.size=20000", hiveDataSource.getJdbcUrl());
-        // TODO ;? Joiner
+        Assert.assertEquals("jdbc:hive2://127.0.0.1:10000/test?hive.tez.container.size=20000", hiveDataSource.getJdbcUrl());
+
         hiveDataSource.setOther(null);
         hiveDataSource.setConnParams("hive.tez.container.size=20000");
-        Assert.assertEquals("jdbc:hive2://127.0.0.1:10000/test;?hive.tez.container.size=20000", hiveDataSource.getJdbcUrl());
+        Assert.assertEquals("jdbc:hive2://127.0.0.1:10000/test?hive.tez.container.size=20000", hiveDataSource.getJdbcUrl());
 
         hiveDataSource.setOther(null);
         hiveDataSource.setConnParams("hive.tez.container.size=20000;hive.zzz=100");
