@@ -171,7 +171,7 @@ services:
       WORKER_HEARTBEAT_INTERVAL: "10"
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
-      WORKER_GROUP: "default"
+      WORKER_GROUPS: "default"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       XLS_FILE_PATH: "/tmp/xls"
       MAIL_SERVER_HOST: ""

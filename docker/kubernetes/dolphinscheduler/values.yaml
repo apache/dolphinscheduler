@@ -158,7 +158,7 @@ worker:
     WORKER_MAX_CPULOAD_AVG: "100"
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
-    WORKER_GROUP: "default"
+    WORKER_GROUPS: "default"
     DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
     DOLPHINSCHEDULER_ENV:
     - "export HADOOP_HOME=/opt/soft/hadoop"

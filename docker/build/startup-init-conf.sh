@@ -71,7 +71,7 @@ export WORKER_HEARTBEAT_INTERVAL=${WORKER_HEARTBEAT_INTERVAL:-"10"}
 export WORKER_MAX_CPULOAD_AVG=${WORKER_MAX_CPULOAD_AVG:-"100"}
 export WORKER_RESERVED_MEMORY=${WORKER_RESERVED_MEMORY:-"0.1"}
 export WORKER_LISTEN_PORT=${WORKER_LISTEN_PORT:-"1234"}
-export WORKER_GROUP=${WORKER_GROUP:-"default"}
+export WORKER_GROUPS=${WORKER_GROUPS:-"default"}
 
 #============================================================================
 # Alert Server
