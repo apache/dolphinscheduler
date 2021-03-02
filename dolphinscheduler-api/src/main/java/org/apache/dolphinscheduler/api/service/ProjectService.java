@@ -88,6 +88,7 @@ public class ProjectService extends BaseService{
         project.setUpdateTime(now);
 
         if (projectMapper.insert(project) > 0) {
+            result.put(Constants.DATA_LIST, project);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
