@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.vo.ProjectIdVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -99,7 +98,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .build();
 
         if (projectMapper.insert(project) > 0) {
-            result.put(Constants.DATA_LIST, new ProjectIdVO(project.getId()));
+            result.put(Constants.DATA_LIST, project.getId());
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
