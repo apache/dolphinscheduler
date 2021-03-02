@@ -230,7 +230,7 @@ public class TaskInstanceMapperTest {
         TaskInstance task = insertOne();
 
         ProcessDefinition definition = new ProcessDefinition();
-        definition.setProjectId(1111);
+        definition.setProjectCode(1111L);
         processDefinitionMapper.insert(definition);
         task.setProcessDefinitionId(definition.getId());
         taskInstanceMapper.updateById(task);
@@ -259,7 +259,10 @@ public class TaskInstanceMapperTest {
 
         TaskInstance task = insertOne();
         ProcessDefinition definition = new ProcessDefinition();
+        definition.setCode(1111L);
         definition.setProjectId(1111);
+        definition.setProjectCode(1111L);
+
         processDefinitionMapper.insert(definition);
         task.setProcessDefinitionId(definition.getId());
         taskInstanceMapper.updateById(task);
@@ -267,7 +270,7 @@ public class TaskInstanceMapperTest {
 
         List<ExecuteStatusCount> count = taskInstanceMapper.countTaskInstanceStateByUser(
                 null, null,
-                new Integer[]{definition.getProjectId()}
+                new Long[]{definition.getProjectCode()}
         );
 
         processDefinitionMapper.deleteById(definition.getId());
@@ -283,6 +286,7 @@ public class TaskInstanceMapperTest {
 
         ProcessDefinition definition = new ProcessDefinition();
         definition.setProjectId(1111);
+        definition.setProjectCode(1111L);
         processDefinitionMapper.insert(definition);
 
         ProcessInstance processInstance = new ProcessInstance();

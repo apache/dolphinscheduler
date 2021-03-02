@@ -72,6 +72,7 @@ public class ProcessDefinition {
      * project id
      * TODO: delete
      */
+    @TableField(exist = false)
     private int projectId;
 
     /**
@@ -83,6 +84,7 @@ public class ProcessDefinition {
      * definition json string
      * TODO: delete
      */
+    @TableField(exist = false)
     private String processDefinitionJson;
 
     /**
@@ -171,11 +173,13 @@ public class ProcessDefinition {
     /**
      * modify user name
      */
+    @TableField(exist = false)
     private String modifyBy;
 
     /**
      * resource ids
      */
+    @TableField(exist = false)
     private String resourceIds;
 
     /**

@@ -130,7 +130,7 @@ public class DataAnalysisServiceTest {
 
         //SUCCESS
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Integer[]{1})).thenReturn(getTaskInstanceStateCounts());
+                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
 
         result = dataAnalysisService.countTaskStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -156,7 +156,7 @@ public class DataAnalysisServiceTest {
         // when counting general user's task status then return user's task status count
         user.setUserType(UserType.GENERAL_USER);
         Mockito.when(processService.getProjectIdListHavePerm(anyInt()))
-                .thenReturn(Collections.singletonList(123));
+                .thenReturn(Collections.singletonList(123L));
         ExecuteStatusCount executeStatusCount = new ExecuteStatusCount();
         executeStatusCount.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         executeStatusCount.setCount(10);
@@ -216,7 +216,7 @@ public class DataAnalysisServiceTest {
 
         //SUCCESS
         Mockito.when(processInstanceMapper.countInstanceStateByUser(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Integer[]{1})).thenReturn(getTaskInstanceStateCounts());
+                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
         result = dataAnalysisService.countProcessInstanceStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -241,10 +241,10 @@ public class DataAnalysisServiceTest {
         commandCount.setCommandType(CommandType.START_PROCESS);
         commandCounts.add(commandCount);
         Mockito.when(commandMapper.countCommandState(0, DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Integer[]{1})).thenReturn(commandCounts);
+                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(commandCounts);
 
         Mockito.when(errorCommandMapper.countCommandState(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Integer[]{1})).thenReturn(commandCounts);
+                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(commandCounts);
 
         result = dataAnalysisService.countCommandState(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

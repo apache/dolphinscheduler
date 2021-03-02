@@ -75,9 +75,9 @@
         left join t_ds_process_definition d on d.code=t.process_definition_code
         left join t_ds_project p on p.id=d.project_id
         where 1=1
-        <if test="projectIds != null and projectIds.length != 0">
-            and d.project_id in
-            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and d.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>

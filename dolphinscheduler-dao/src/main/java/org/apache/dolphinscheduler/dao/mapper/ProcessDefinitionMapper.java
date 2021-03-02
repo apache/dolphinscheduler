@@ -62,21 +62,21 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     /**
      * verify process definition by name
      *
-     * @param projectId projectId
+     * @param projectCode projectCode
      * @param name name
      * @return process definition
      */
-    ProcessDefinition verifyByDefineName(@Param("projectId") int projectId,
+    ProcessDefinition verifyByDefineName(@Param("projectCode") Long projectCode,
                                         @Param("processDefinitionName") String name);
 
     /**
      * query process definition by name
      *
-     * @param projectId projectId
+     * @param projectCode projectCode
      * @param name name
      * @return process definition
      */
-    ProcessDefinition queryByDefineName(@Param("projectId") int projectId,
+    ProcessDefinition queryByDefineName(@Param("projectCode") Long projectCode,
                                         @Param("processDefinitionName") String name);
 
     /**
@@ -93,23 +93,23 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param page page
      * @param searchVal searchVal
      * @param userId userId
-     * @param projectId projectId
+     * @param projectCode projectCode
      * @param isAdmin isAdmin
      * @return process definition IPage
      */
     IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
                                                    @Param("searchVal") String searchVal,
                                                    @Param("userId") int userId,
-                                                   @Param("projectId") int projectId,
+                                                   @Param("projectCode") Long projectCode,
                                                    @Param("isAdmin") boolean isAdmin);
 
     /**
      * query all process definition list
      *
-     * @param projectId projectId
+     * @param projectCode projectCode
      * @return process definition list
      */
-    List<ProcessDefinition> queryAllDefinitionList(@Param("projectId") int projectId);
+    List<ProcessDefinition> queryAllDefinitionList(@Param("projectCode") Long projectCode);
 
     /**
      * query process definition by ids
@@ -131,13 +131,13 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * count process definition group by user
      *
      * @param userId userId
-     * @param projectIds projectIds
+     * @param projectCodes projectCodes
      * @param isAdmin isAdmin
      * @return process definition list
      */
     List<DefinitionGroupByUser> countDefinitionGroupByUser(
             @Param("userId") Integer userId,
-            @Param("projectIds") Integer[] projectIds,
+            @Param("projectCodes") Long[] projectCodes,
             @Param("isAdmin") boolean isAdmin);
 
     /**

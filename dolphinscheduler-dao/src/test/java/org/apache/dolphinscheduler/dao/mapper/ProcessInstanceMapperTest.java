@@ -262,9 +262,9 @@ public class ProcessInstanceMapperTest {
         processInstance.setProcessDefinitionId(processDefinition.getId());
         int update = processInstanceMapper.updateById(processInstance);
 
-        Integer[] projectIds = new Integer[]{processDefinition.getProjectId()};
+        Long[] projectCodes = new Long[]{processDefinition.getProjectCode()};
 
-        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByUser(null, null, projectIds);
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateByUser(null, null, projectCodes);
 
 
         Assert.assertNotEquals(executeStatusCounts.size(), 0);
