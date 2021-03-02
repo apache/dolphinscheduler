@@ -39,7 +39,8 @@ import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEP
  * master registry test
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes={SpringZKServer.class, MasterRegistry.class,ZookeeperRegistryCenter.class, MasterConfig.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
+@ContextConfiguration(classes = {SpringZKServer.class, MasterRegistry.class, ZookeeperRegistryCenter.class,
+        MasterConfig.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, CuratorZookeeperClient.class})
 public class MasterRegistryTest {
 
     @Autowired
@@ -56,18 +57,20 @@ public class MasterRegistryTest {
         masterRegistry.registry();
         String masterPath = zookeeperRegistryCenter.getMasterPath();
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
-        String masterNodePath = masterPath + Constants.SLASH + (OSUtils.getAddr(Constants.LOCAL_ADDRESS, masterConfig.getListenPort()));
-        String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(masterNodePath);
+        String masterNodePath = masterPath + "/" + (Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort());
+        String heartbeat = zookeeperRegistryCenter.getRegisterOperator().get(masterNodePath);
         Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
+        masterRegistry.unRegistry();
     }
 
     @Test
     public void testUnRegistry() throws InterruptedException {
+        masterRegistry.init();
         masterRegistry.registry();
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         masterRegistry.unRegistry();
         String masterPath = zookeeperRegistryCenter.getMasterPath();
-        List<String> childrenKeys = zookeeperRegistryCenter.getZookeeperCachedOperator().getChildrenKeys(masterPath);
+        List<String> childrenKeys = zookeeperRegistryCenter.getRegisterOperator().getChildrenKeys(masterPath);
         Assert.assertTrue(childrenKeys.isEmpty());
     }
 }
