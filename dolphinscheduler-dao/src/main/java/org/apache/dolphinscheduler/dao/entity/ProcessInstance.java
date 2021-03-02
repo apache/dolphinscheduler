@@ -187,7 +187,7 @@ public class ProcessInstance {
      * @return
      */
     @TableField(exist = false)
-    private Long duration;
+    private String duration;
 
     /**
      * process instance priority
@@ -527,11 +527,11 @@ public class ProcessInstance {
         this.dependenceScheduleTimes = dependenceScheduleTimes;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
