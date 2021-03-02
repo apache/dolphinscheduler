@@ -19,11 +19,15 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.common.Constants.SEMICOLON;
 
 /**
  * data source of hive
@@ -100,4 +104,13 @@ public class HiveDataSource extends BaseDataSource {
         return super.getConnection();
     }
 
+    @Override
+    public void setConnParams(String connParams) {
+        // Verification parameters
+        Map<String, String> connParamMap = CollectionUtils.stringToMap(connParams, SEMICOLON);
+        StringBuilder otherSb = new StringBuilder();
+        connParamMap.forEach((k, v) -> otherSb.append(String.format("%s=%s%s", k, v, SEMICOLON)));
+        StringBuilder otherAppend = otherSb.append(getOther());
+        super.setOther(otherAppend.toString());
+    }
 }
