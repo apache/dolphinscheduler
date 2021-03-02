@@ -154,9 +154,9 @@
         <if test="startTime != null and endTime != null">
             and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
-        <if test="projectIds != null and projectIds.length != 0">
-            and p.id in
-            <foreach collection="projectIds" index="index" item="i" open="(" close=")" separator=",">
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and p.code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
