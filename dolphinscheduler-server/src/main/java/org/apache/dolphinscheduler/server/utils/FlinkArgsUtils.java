@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class FlinkArgsUtils {
             args.add(Constants.FLINK_YARN_CLUSTER);   //yarn-cluster
 
             int slot = param.getSlot();
-            if (slot != 0) {
+            if (slot > 0) {
                 args.add(Constants.FLINK_YARN_SLOT);
                 args.add(String.format("%d", slot));   //-ys
             }
@@ -68,7 +69,7 @@ public class FlinkArgsUtils {
             String flinkVersion = param.getFlinkVersion();
             if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
                 int taskManager = param.getTaskManager();
-                if (taskManager != 0) {                        //-yn
+                if (taskManager > 0) {                        //-yn
                     args.add(Constants.FLINK_TASK_MANAGE);
                     args.add(String.format("%d", taskManager));
                 }
@@ -93,11 +94,19 @@ public class FlinkArgsUtils {
                 }
             }
 
-            args.add(Constants.FLINK_DETACH); //-d
-
+            // Do not run the job in detached mode
+            // args.add(Constants.FLINK_DETACH); //-d
         }
 
-        // -p -s -yqu -yat -sae -yD -D
+        int parallelism = param.getParallelism();
+        if (parallelism > 0) {
+            args.add(Constants.FLINK_PARALLELISM);
+            args.add(String.format("%d", parallelism));   // -p
+        }
+
+        args.add(Constants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
+
+        // -s -yqu -yat -yD -D
         if (StringUtils.isNotEmpty(others)) {
             args.add(others);
         }

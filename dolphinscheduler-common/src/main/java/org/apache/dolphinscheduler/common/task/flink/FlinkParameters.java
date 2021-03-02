@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.task.flink;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +52,11 @@ public class FlinkParameters extends AbstractParameters {
    * slot count
    */
   private int slot;
+
+  /**
+   * parallelism
+   */
+  private int parallelism;
 
   /**
    *Yarn application name
@@ -139,6 +143,14 @@ public class FlinkParameters extends AbstractParameters {
 
   public void setSlot(int slot) {
     this.slot = slot;
+  }
+
+  public int getParallelism() {
+    return parallelism;
+  }
+
+  public void setParallelism(int parallelism) {
+    this.parallelism = parallelism;
   }
 
   public String getAppName() {
