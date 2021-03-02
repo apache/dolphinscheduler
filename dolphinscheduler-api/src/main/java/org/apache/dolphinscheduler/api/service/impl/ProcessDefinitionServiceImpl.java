@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service.impl;
+package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 
@@ -23,10 +23,7 @@ import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
-import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
-import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.SchedulerService;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -43,8 +40,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -53,7 +48,6 @@ import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StreamUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -80,7 +74,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -218,45 +211,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     }
 
-
-    /**
-     * get resource ids
-     *
-     * @param processData process data
-     * @return resource ids
-     */
-    private String getResourceIds(ProcessData processData) {
-        List<TaskNode> tasks = processData.getTasks();
-        Set<Integer> resourceIds = new HashSet<>();
-        StringBuilder sb = new StringBuilder();
-        if (CollectionUtils.isEmpty(tasks)) {
-            return sb.toString();
-        }
-        for (TaskNode taskNode : tasks) {
-            String taskParameter = taskNode.getParams();
-            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
-            if (params == null) {
-                continue;
-            }
-            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-                Set<Integer> tempSet = params.getResourceFilesList().
-                        stream()
-                        .filter(t -> t.getId() != 0)
-                        .map(ResourceInfo::getId)
-                        .collect(Collectors.toSet());
-                resourceIds.addAll(tempSet);
-            }
-        }
-
-        for (int i : resourceIds) {
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(i);
-        }
-        return sb.toString();
-    }
-
     /**
      * query process definition list
      *
@@ -278,7 +232,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
-        resourceList.stream().forEach(processDefinition -> {
+        resourceList.forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -317,7 +271,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-        records.stream().forEach(processDefinition -> {
+        records.forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -1264,7 +1218,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Project project = projectMapper.selectById(projectId);
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
-        resourceList.stream().forEach(processDefinition -> {
+        resourceList.forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -1461,9 +1415,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
-            taskNodeList.stream().forEach(taskNode -> {
-                taskNode.setCode(0L);
-            });
+            taskNodeList.forEach(taskNode -> taskNode.setCode(0L));
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             return createProcessDefinition(
