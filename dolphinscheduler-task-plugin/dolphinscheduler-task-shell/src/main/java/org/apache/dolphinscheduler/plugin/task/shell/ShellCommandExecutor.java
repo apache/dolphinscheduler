@@ -17,8 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
+import static org.apache.dolphinscheduler.spi.task.Constants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.spi.task.Constants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.spi.task.Constants.EXIT_CODE_SUCCESS;
 
+import org.apache.dolphinscheduler.spi.task.Constants;
+import org.apache.dolphinscheduler.spi.task.LoggerUtils;
+import org.apache.dolphinscheduler.spi.task.Stopper;
 import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.task.TaskResponse;
@@ -28,15 +33,22 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
@@ -55,15 +67,36 @@ public class ShellCommandExecutor {
      */
     private Process process;
 
+    protected StringBuilder varPool = new StringBuilder();
+
+
+    protected boolean logOutputIsScuccess = false;
+
+    /**
+     * SHELL result string
+     */
+    protected String taskResultString;
+
+    /**
+     * log handler
+     */
+    protected Consumer<List<String>> logHandler;
+
+    /**
+     * rules for extracting application ID
+     */
+    protected static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
+
 
     /**
      * log list
      */
-    protected final List<String> logBuffer;
+    protected List<String> logBuffer;
 
-    public TaskResponse run(String execCommand, TaskRequest req, Logger logger) throws IOException {
+    public TaskResponse run(Consumer<List<String>> logHandler, String execCommand, TaskRequest req, Logger logger) throws IOException, InterruptedException {
         this.logger = logger;
-        //  this.logBuffer=req.get
+        this.logHandler = logHandler;
+        this.logBuffer = Collections.synchronizedList(new ArrayList<>());
 
         TaskResponse result = new TaskResponse();
         int taskInstanceId = req.getTaskInstanceId();
@@ -75,9 +108,8 @@ public class ShellCommandExecutor {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
             return result;
         }
-        // 需要从缓存判断是否被Kill  因此 此缓存需要下沉到task层面 todo taskExecutionContextCacheManager
-        String commandFilePath = buildCommandFilePath(req.getExecutePath(), req.getTaskAppId());
 
+        String commandFilePath = buildCommandFilePath(req.getExecutePath(), req.getTaskAppId());
 
         // create command file if not exists
         createCommandFileIfNotExists(execCommand, commandFilePath, req);
@@ -86,7 +118,7 @@ public class ShellCommandExecutor {
         buildProcess(commandFilePath, req);
 
         // parse process output
-        parseProcessOutput(process);
+        parseProcessOutput(process,req);
 
         Integer processId = getProcessId(process);
 
@@ -100,9 +132,161 @@ public class ShellCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
         }
+        // print process id
+        logger.info("process start, process id is: {}", processId);
+
+        // if timeout occurs, exit directly
+        long remainTime = getRemaintime(req);
+
+        // waiting for the run to finish
+        boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
+        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
+                req.getExecutePath(),
+                processId
+                , result.getExitStatusCode());
+
+        // if SHELL task exit
+        if (status) {
+            // set appIds
+            List<String> appIds = getAppIds(req.getLogPath());
+            result.setAppIds(String.join(Constants.COMMA, appIds));
+
+            // SHELL task state
+            result.setExitStatusCode(process.exitValue());
+
+            // if yarn task , yarn state is final state
+            if (process.exitValue() == 0) {
+                result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
+            }
+        } else {
+            logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
+            ProcessUtils.kill(req);
+            result.setExitStatusCode(EXIT_CODE_FAILURE);
+        }
 
         return result;
 
+    }
+
+    /**
+     * check yarn state
+     *
+     * @param appIds application id list
+     * @return is success of yarn task state
+     */
+    public boolean isSuccessOfYarnState(List<String> appIds) {
+        boolean result = true;
+        try {
+            for (String appId : appIds) {
+                while (Stopper.isRunning()) {
+                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+                    logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
+                    if (applicationStatus.equals(ExecutionStatus.FAILURE)
+                            || applicationStatus.equals(ExecutionStatus.KILL)) {
+                        return false;
+                    }
+
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
+                        break;
+                    }
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()), e);
+            result = false;
+        }
+        return result;
+
+    }
+
+    /**
+     * get app links
+     *
+     * @param logPath log path
+     * @return app id list
+     */
+    private List<String> getAppIds(String logPath) {
+        List<String> logs = convertFile2List(logPath);
+
+        List<String> appIds = new ArrayList<>();
+        /**
+         * analysis log?get submited yarn application id
+         */
+        for (String log : logs) {
+            String appId = findAppId(log);
+            if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
+                logger.info("find app id: {}", appId);
+                appIds.add(appId);
+            }
+        }
+        return appIds;
+    }
+
+    /**
+     * find app id
+     *
+     * @param line line
+     * @return appid
+     */
+    private String findAppId(String line) {
+        Matcher matcher = APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
+    }
+
+    /**
+     * convert file to list
+     *
+     * @param filename file name
+     * @return line list
+     */
+    private List<String> convertFile2List(String filename) {
+        List lineList = new ArrayList<String>(100);
+        File file = new File(filename);
+
+        if (!file.exists()) {
+            return lineList;
+        }
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                lineList.add(line);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("read file: %s failed : ", filename), e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
+        }
+        return lineList;
+    }
+
+    /**
+     * get remain time（s）
+     *
+     * @return remain time
+     */
+    private long getRemaintime(TaskRequest request) {
+        long usedTime = (System.currentTimeMillis() - request.getStartTime().getTime()) / 1000;
+        long remainTime = request.getTaskTimeout() - usedTime;
+
+        if (remainTime < 0) {
+            throw new RuntimeException("task execution time out");
+        }
+
+        return remainTime;
     }
 
     /**
@@ -251,5 +435,77 @@ public class ShellCommandExecutor {
         });
         parseProcessOutputExecutorService.shutdown();
     }
+    /**
+     * get process id
+     *
+     * @param process process
+     * @return process id
+     */
+    private int getProcessId(Process process) {
+        int processId = 0;
 
+        try {
+            Field f = process.getClass().getDeclaredField(Constants.PID);
+            f.setAccessible(true);
+
+            processId = f.getInt(process);
+        } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return processId;
+    }
+
+    /**
+     * close buffer reader
+     *
+     * @param inReader in reader
+     */
+    private void close(BufferedReader inReader) {
+        if (inReader != null) {
+            try {
+                inReader.close();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    /**
+     * when log buffer siz or flush time reach condition , then flush
+     *
+     * @param lastFlushTime last flush time
+     * @return last flush time
+     */
+    private long flush(long lastFlushTime) {
+        long now = System.currentTimeMillis();
+
+        /**
+         * when log buffer siz or flush time reach condition , then flush
+         */
+        if (logBuffer.size() >= Constants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > Constants.DEFAULT_LOG_FLUSH_INTERVAL) {
+            lastFlushTime = now;
+            /** log handle */
+            logHandler.accept(logBuffer);
+
+            logBuffer.clear();
+        }
+        return lastFlushTime;
+    }
+
+    /**
+     * clear
+     */
+    private void clear() {
+
+        List<String> markerList = new ArrayList<>();
+        markerList.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
+
+        if (!logBuffer.isEmpty()) {
+            // log handle
+            logHandler.accept(logBuffer);
+            logBuffer.clear();
+        }
+        logHandler.accept(markerList);
+    }
 }

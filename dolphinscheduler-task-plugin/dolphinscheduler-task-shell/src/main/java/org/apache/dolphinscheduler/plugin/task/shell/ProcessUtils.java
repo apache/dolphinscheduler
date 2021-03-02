@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.shell;
 
 import org.apache.dolphinscheduler.spi.task.Constants;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -276,6 +277,65 @@ public class ProcessUtils {
             matchList.add(regexMatcher.group());
         }
         return matchList.toArray(new String[0]);
+    }
+
+
+    /**
+     * kill tasks according to different task types.
+     *
+     * @param request
+     */
+    public static void kill(TaskRequest request) {
+        try {
+            int processId = request.getProcessId();
+            if (processId == 0) {
+                logger.error("process kill failed, process id :{}, task id:{}",
+                        processId, request.getTaskInstanceId());
+                return;
+            }
+
+            String cmd = String.format("kill -9 %s", getPidsStr(processId));
+            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+            logger.info("process id:{}, cmd:{}", processId, cmd);
+
+            OSUtils.exeCmd(cmd);
+
+            // find log and kill yarn job
+            killYarnJob(taskExecutionContext);
+
+        } catch (Exception e) {
+            logger.error("kill task failed", e);
+        }
+    }
+
+    /**
+     * get pids str.
+     *
+     * @param processId process id
+     * @return pids pid String
+     * @throws Exception exception
+     */
+    public static String getPidsStr(int processId) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        Matcher mat = null;
+        // pstree pid get sub pids
+        if (OSUtils.isMacOS()) {
+            String pids = OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId));
+            if (null != pids) {
+                mat = MACPATTERN.matcher(pids);
+            }
+        } else {
+            String pids = OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId));
+            mat = WINDOWSATTERN.matcher(pids);
+        }
+
+        if (null != mat) {
+            while (mat.find()) {
+                sb.append(mat.group(1)).append(" ");
+            }
+        }
+
+        return sb.toString().trim();
     }
 
 

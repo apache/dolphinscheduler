@@ -28,4 +28,41 @@ public class Constants {
      * exit code kill
      */
     public static final int EXIT_CODE_KILL = 137;
+    public static final String PID="pid";
+
+    /**
+     * comma ,
+     */
+    public static final String COMMA = ",";
+
+    /**
+     * sleep time
+     */
+    public static final int SLEEP_TIME_MILLIS = 1000;
+
+    /**
+     * exit code failure
+     */
+    public static final int EXIT_CODE_FAILURE = -1;
+
+    /**
+     * exit code success
+     */
+    public static final int EXIT_CODE_SUCCESS = 0;
+
+    /**
+     * default log cache rows num,output when reach the number
+     */
+    public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
+
+    /**
+     * log flush interval?output when reach the interval
+     */
+    public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
+
+    /**
+     * pstree, get pud and sub pid
+     */
+    public static final String PSTREE = "pstree";
+
 }
