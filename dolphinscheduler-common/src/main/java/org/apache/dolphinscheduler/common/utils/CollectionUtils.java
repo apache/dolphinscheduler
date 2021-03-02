@@ -70,6 +70,11 @@ public class CollectionUtils {
     }
 
     /**
+     * The load factor used when none specified in constructor.
+     */
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+    /**
      * String to map
      *
      * @param str       string
@@ -97,7 +102,8 @@ public class CollectionUtils {
             return emptyMap;
         }
         String[] strings = str.split(separator);
-        Map<String, String> map = new HashMap<>(strings.length);
+        int initialCapacity = (int)(strings.length / DEFAULT_LOAD_FACTOR) + 1;
+        Map<String, String> map = new HashMap<>(initialCapacity);
         for (int i = 0; i < strings.length; i++) {
             String[] strArray = strings[i].split("=");
             if (strArray.length != 2) {
