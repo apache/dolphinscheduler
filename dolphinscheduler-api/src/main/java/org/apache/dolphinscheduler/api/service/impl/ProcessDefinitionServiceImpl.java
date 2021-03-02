@@ -218,6 +218,45 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     }
 
+
+    /**
+     * get resource ids
+     *
+     * @param processData process data
+     * @return resource ids
+     */
+    private String getResourceIds(ProcessData processData) {
+        List<TaskNode> tasks = processData.getTasks();
+        Set<Integer> resourceIds = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        if (CollectionUtils.isEmpty(tasks)) {
+            return sb.toString();
+        }
+        for (TaskNode taskNode : tasks) {
+            String taskParameter = taskNode.getParams();
+            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
+            if (params == null) {
+                continue;
+            }
+            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+                Set<Integer> tempSet = params.getResourceFilesList().
+                        stream()
+                        .filter(t -> t.getId() != 0)
+                        .map(ResourceInfo::getId)
+                        .collect(Collectors.toSet());
+                resourceIds.addAll(tempSet);
+            }
+        }
+
+        for (int i : resourceIds) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(i);
+        }
+        return sb.toString();
+    }
+
     /**
      * query process definition list
      *
@@ -239,7 +278,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
-        resourceList.forEach(processDefinition -> {
+        resourceList.stream().forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -278,7 +317,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-        records.forEach(processDefinition -> {
+        records.stream().forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -1225,7 +1264,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Project project = projectMapper.selectById(projectId);
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
-        resourceList.forEach(processDefinition -> {
+        resourceList.stream().forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -1422,7 +1461,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
-            taskNodeList.forEach(taskNode -> taskNode.setCode(0L));
+            taskNodeList.stream().forEach(taskNode -> {
+                taskNode.setCode(0L);
+            });
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             return createProcessDefinition(
@@ -1716,4 +1757,3 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
 }
-
