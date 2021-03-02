@@ -93,11 +93,11 @@ public class ZookeeperNodeManager implements InitializingBean {
         /**
          * init MasterNodeListener listener
          */
-        registryCenter.getZookeeperCachedOperator().addListener(new MasterNodeListener());
+        registryCenter.getRegisterOperator().addListener(new MasterNodeListener());
         /**
          * init WorkerNodeListener listener
          */
-        registryCenter.getZookeeperCachedOperator().addListener(new WorkerGroupNodeListener());
+        registryCenter.getRegisterOperator().addListener(new WorkerGroupNodeListener());
     }
 
     /**
