@@ -17,38 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.spi.task.Constants;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +39,110 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+
 /**
  * hadoop utils
  * single instance
  */
 public class HadoopUtils implements Closeable {
+
+    private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
+
+    private FileSystem fs;
+
+
+    private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
+            .newBuilder()
+            // todo maybe is null
+            .expireAfterWrite(Long.parseLong(Constants.KERBEROS_EXPIRE_TIME), TimeUnit.HOURS)
+            .build(new CacheLoader<String, HadoopUtils>() {
+                @Override
+                public HadoopUtils load(String key){
+                    return new HadoopUtils();
+                }
+            });
+
+
+
+    private HadoopUtils() {
+        init();
+        initHdfsPath();
+    }
+
+    /**
+     * init hadoop configuration
+     */
+    private void init() {
+        try {
+            configuration = new HdfsConfiguration();
+
+            String resourceStorageType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
+            ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
+
+            if (resUploadType == ResUploadType.HDFS) {
+                if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+                    System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
+                            PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
+                    configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                    hdfsUser = "";
+                    UserGroupInformation.setConfiguration(configuration);
+                    UserGroupInformation.loginUserFromKeytab(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
+                }
+
+                String defaultFS = configuration.get(Constants.FS_DEFAULTFS);
+                //first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
+                // the default is the local file system
+                if (defaultFS.startsWith("file")) {
+                    String defaultFSProp = PropertyUtils.getString(Constants.FS_DEFAULTFS);
+                    if (StringUtils.isNotBlank(defaultFSProp)) {
+                        Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
+                        configuration.set(Constants.FS_DEFAULTFS, defaultFSProp);
+                        fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
+                    } else {
+                        logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULTFS);
+                        throw new RuntimeException(
+                                String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULTFS)
+                        );
+                    }
+                } else {
+                    logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULTFS, defaultFS);
+                }
+
+                if (fs == null) {
+                    if (StringUtils.isNotEmpty(hdfsUser)) {
+                        UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
+                        ugi.doAs(new PrivilegedExceptionAction<Boolean>() {
+                            @Override
+                            public Boolean run() throws Exception {
+                                fs = FileSystem.get(configuration);
+                                return true;
+                            }
+                        });
+                    } else {
+                        logger.warn("hdfs.root.user is not set value!");
+                        fs = FileSystem.get(configuration);
+                    }
+                }
+            } else if (resUploadType == ResUploadType.S3) {
+                System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);
+                configuration.set(Constants.FS_DEFAULTFS, PropertyUtils.getString(Constants.FS_DEFAULTFS));
+                configuration.set(Constants.FS_S3A_ENDPOINT, PropertyUtils.getString(Constants.FS_S3A_ENDPOINT));
+                configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
+                configuration.set(Constants.FS_S3A_SECRET_KEY, PropertyUtils.getString(Constants.FS_S3A_SECRET_KEY));
+                fs = FileSystem.get(configuration);
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+
+    public static HadoopUtils getInstance() {
+
+        return cache.getUnchecked(HADOOP_UTILS_KEY);
+    }
 
     /**
      * get the state of an application
@@ -160,4 +240,15 @@ public class HadoopUtils implements Closeable {
     }
 
 
+    @Override
+    public void close() throws IOException {
+        if (fs != null) {
+            try {
+                fs.close();
+            } catch (IOException e) {
+                logger.error("Close HadoopUtils instance failed", e);
+                throw new IOException("Close HadoopUtils instance failed", e);
+            }
+        }
+    }
 }

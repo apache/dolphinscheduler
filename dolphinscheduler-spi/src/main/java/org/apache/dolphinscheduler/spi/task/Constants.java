@@ -65,4 +65,15 @@ public class Constants {
      */
     public static final String PSTREE = "pstree";
 
+
+    /**
+     * UTF-8
+     */
+    public static final String UTF_8 = "UTF-8";
+
+    /**
+     * kerberos expire time
+     */
+    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
+
 }
