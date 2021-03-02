@@ -97,20 +97,12 @@ public class TaskInstanceService extends BaseService {
             statusArray = new int[]{stateType.ordinal()};
         }
 
-        Date start = null;
-        Date end = null;
-        try {
-            if(StringUtils.isNotEmpty(startDate)){
-                start = DateUtils.getScheduleDate(startDate);
-            }
-            if(StringUtils.isNotEmpty( endDate)){
-                end = DateUtils.getScheduleDate(endDate);
-            }
-        } catch (Exception e) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
-            return result;
+        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
+        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return checkAndParseDateResult;
         }
+        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
+        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
 
         Page<TaskInstance> page = new Page(pageNo, pageSize);
         PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
