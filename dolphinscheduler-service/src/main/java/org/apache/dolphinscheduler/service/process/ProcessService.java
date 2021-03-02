@@ -350,17 +350,15 @@ public class ProcessService {
             logger.error("process define not exists");
             return new ArrayList<>();
         }
-        List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
-        Map<Long, TaskDefinition> taskDefinitionMap = new HashMap<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-            if (taskDefinitionMap.containsKey(processTaskRelation.getPostTaskCode())) {
-                TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                        processTaskRelation.getPostTaskCode(), processTaskRelation.getPostNodeVersion());
-                taskDefinitionMap.put(processTaskRelation.getPostTaskCode(), taskDefinition);
+        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
+        for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPostTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostNodeVersion()));
             }
         }
-        return new ArrayList<>(taskDefinitionMap.values());
-
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
+        return new ArrayList<>(taskDefinitionLogs);
     }
 
     /**
@@ -614,7 +612,7 @@ public class ProcessService {
         processInstance.setConnects(processDefinition.getConnects());
 
         // reset global params while there are start parameters
-        setGlobalParamIfCommanded(processDefinition,cmdParam);
+        setGlobalParamIfCommanded(processDefinition, cmdParam);
 
         // curing global params
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
@@ -753,10 +751,10 @@ public class ProcessService {
                 // Recalculate global parameters after rerun.
 
                 processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    commandTypeIfComplement,
-                    processInstance.getScheduleTime()));
+                        processDefinition.getGlobalParamMap(),
+                        processDefinition.getGlobalParamList(),
+                        commandTypeIfComplement,
+                        processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
@@ -2090,13 +2088,13 @@ public class ProcessService {
     }
 
     /**
-     * get resource by resoruce id
+     * get resource by resource id
      *
-     * @param resoruceId resource id
+     * @param resourceId resource id
      * @return Resource
      */
-    public Resource getResourceById(int resoruceId) {
-        return resourceMapper.selectById(resoruceId);
+    public Resource getResourceById(int resourceId) {
+        return resourceMapper.selectById(resourceId);
     }
 
     /**
@@ -2134,16 +2132,15 @@ public class ProcessService {
             return Constants.EXIT_CODE_FAILURE;
         }
 
-        ProcessDefinition tmpDefinition = processDefinitionLog;
-        tmpDefinition.setId(processDefinition.getId());
-        tmpDefinition.setReleaseState(ReleaseState.OFFLINE);
-        tmpDefinition.setFlag(Flag.YES);
+        processDefinitionLog.setId(processDefinition.getId());
+        processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
+        processDefinitionLog.setFlag(Flag.YES);
 
         int switchResult = 0;
         if (0 == processDefinition.getId()) {
-            switchResult = processDefineMapper.insert(tmpDefinition);
+            switchResult = processDefineMapper.insert(processDefinitionLog);
         } else {
-            switchResult = processDefineMapper.updateById(tmpDefinition);
+            switchResult = processDefineMapper.updateById(processDefinitionLog);
         }
         switchProcessTaskRelationVersion(processDefinition);
         return switchResult;
@@ -2156,8 +2153,7 @@ public class ProcessService {
         }
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogList) {
-            ProcessTaskRelation processTaskRelation = processTaskRelationLog;
-            processTaskRelationMapper.insert(processTaskRelation);
+            processTaskRelationMapper.insert(processTaskRelationLog);
         }
     }
 
@@ -2327,14 +2323,12 @@ public class ProcessService {
                             now));
                 }
             } else {
-                // todo relation name
                 builderRelationList.add(new ProcessTaskRelation("",
                         processDefinition.getVersion(),
                         projectCode,
                         processDefinition.getCode(),
                         0L,
                         taskNameAndCode.get(taskNode.getName()),
-                        // todo conditionType
                         ConditionType.of("none"),
                         taskNode.getConditionResult(),
                         now,
@@ -2394,33 +2388,17 @@ public class ProcessService {
      */
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
         List<TaskNode> taskNodeList = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion());
-        List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelationList(processDefinition.getCode(), processDefinition.getVersion());
-        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, processTaskRelations);
+        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, new ArrayList<>(processTaskRelations));
         // Generate concrete Dag to be executed
         return DagHelper.buildDagGraph(processDag);
-    }
-
-    /**
-     * get process task relation list
-     * this function can be query relation list from log record
-     */
-    public List<ProcessTaskRelation> getProcessTaskRelationList(Long processCode, int processVersion) {
-        List<ProcessTaskRelationLog> taskRelationLogs = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                processCode,
-                processVersion);
-        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
-        for (ProcessTaskRelationLog processTaskRelationLog : taskRelationLogs) {
-            processTaskRelations.add(processTaskRelationLog);
-        }
-        return processTaskRelations;
     }
 
     /**
      * generate ProcessData
      */
     public ProcessData genProcessData(ProcessDefinition processDefinition) {
-        List<TaskNode> taskNodes = genTaskNodeList(processDefinition.getCode()
-                , processDefinition.getVersion());
+        List<TaskNode> taskNodes = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion());
         ProcessData processData = new ProcessData();
         processData.setTasks(taskNodes);
         processData.setGlobalParams(JSONUtils.toList(processDefinition.getGlobalParams(), Property.class));
@@ -2430,10 +2408,10 @@ public class ProcessService {
     }
 
     public List<TaskNode> genTaskNodeList(Long processCode, int processVersion) {
-        List<ProcessTaskRelation> processTaskRelations = this.getProcessTaskRelationList(processCode, processVersion);
+        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
+        for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() > 0) {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreNodeVersion()));
             }

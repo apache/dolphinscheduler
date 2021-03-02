@@ -1401,35 +1401,27 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-
     /**
      * whether the graph has a ring
      *
-     * @param taskNodeResponseList task node response list
+     * @param taskNodeList task node list
      * @return if graph has cycle flag
      */
-    private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
-        DAG<String, TaskNode, String> graph = new DAG<>();
-
-        // Fill the vertices
-        for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            graph.addNode(taskNodeResponse.getName(), taskNodeResponse);
-        }
-
-        // Fill edge relations
-        for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            taskNodeResponse.getPreTasks();
-            List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
+    private boolean graphHasCycle(List<TaskNode> taskNodeList) {
+        List<String> preTaskList = new ArrayList<>();
+        for (TaskNode taskNode : taskNodeList) {
+            List<String> preTasks = JSONUtils.toList(taskNode.getPreTasks(), String.class);
             if (CollectionUtils.isNotEmpty(preTasks)) {
                 for (String preTask : preTasks) {
-                    if (!graph.addEdge(preTask, taskNodeResponse.getName())) {
+                    if (preTaskList.contains(preTask)) {
                         return true;
+                    } else {
+                        preTaskList.add(preTask);
                     }
                 }
             }
         }
-
-        return graph.hasCycle();
+        return false;
     }
 
     private String recursionProcessDefinitionName(Integer projectId, String processDefinitionName, int num) {
