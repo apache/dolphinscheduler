@@ -372,12 +372,11 @@ public class ProcessUtils {
 
             OSUtils.exeCmd(cmd);
 
-            // find log and kill yarn job
-            killYarnJob(taskExecutionContext);
-
         } catch (Exception e) {
             logger.error("kill task failed", e);
         }
+        // find log and kill yarn job
+        killYarnJob(taskExecutionContext);
     }
 
     /**

@@ -112,9 +112,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      */
     private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
         List<String> appIds = Collections.emptyList();
+        int taskInstanceId = killCommand.getTaskInstanceId();
+        TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         try {
-            int taskInstanceId = killCommand.getTaskInstanceId();
-            TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
             Integer processId = taskExecutionContext.getProcessId();
             if (processId.equals(0)) {
                 workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
@@ -128,17 +128,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
 
             OSUtils.exeCmd(cmd);
-
-            // find log and kill yarn job
-            appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
-
-            return Pair.of(true, appIds);
         } catch (Exception e) {
             logger.error("kill task error", e);
         }
+        // find log and kill yarn job
+        appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
+                taskExecutionContext.getLogPath(),
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTenantCode());
         return Pair.of(false, appIds);
     }
 
