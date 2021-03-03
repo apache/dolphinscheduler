@@ -123,6 +123,8 @@ export default {
   'Please enter TaskManager memory': 'Please enter TaskManager memory',
   'Slot Number': 'Slot Number',
   'Please enter Slot number': 'Please enter Slot number',
+  Parallelism: 'Parallelism',
+  'Please enter Parallelism': 'Please enter Parallelism',
   'TaskManager Number': 'TaskManager Number',
   'Please enter TaskManager number': 'Please enter TaskManager number',
   'App Name': 'App Name',

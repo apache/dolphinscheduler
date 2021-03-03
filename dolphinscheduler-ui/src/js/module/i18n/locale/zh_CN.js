@@ -123,6 +123,8 @@ export default {
   'Please enter TaskManager memory': '请输入TaskManager内存数',
   'Slot Number': 'Slot数量',
   'Please enter Slot number': '请输入Slot数量',
+  Parallelism: '并行度',
+  'Please enter Parallelism': '请输入并行度',
   'TaskManager Number': 'TaskManager数量',
   'Please enter TaskManager number': '请输入TaskManager数量',
   'App Name': '任务名称',
