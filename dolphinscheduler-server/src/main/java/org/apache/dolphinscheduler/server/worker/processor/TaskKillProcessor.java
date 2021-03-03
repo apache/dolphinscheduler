@@ -136,7 +136,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 taskExecutionContext.getLogPath(),
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTenantCode());
-        return Pair.of(false, appIds);
+        return Pair.of(true, appIds);
     }
 
     /**
