@@ -32,7 +32,7 @@ public class ResourceProcessDefinitionUtilsTest {
     public void getResourceProcessDefinitionMapTest(){
         List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String,Object> map = new HashMap();
-        map.put("id",1);
+        map.put("code",1L);
         map.put("resource_ids","1,2,3");
         mapList.add(map);
         Assert.assertNotNull(ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(mapList));
