@@ -92,9 +92,6 @@ public class FlinkArgsUtils {
                     args.add(queue);
                 }
             }
-
-            // Do not run the job in detached mode
-            // args.add(Constants.FLINK_DETACH); //-d
         }
 
         int parallelism = param.getParallelism();
@@ -103,6 +100,8 @@ public class FlinkArgsUtils {
             args.add(String.format("%d", parallelism));   // -p
         }
 
+        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated abruptly
+        // The task status will be synchronized with the cluster job status
         args.add(Constants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
 
         // -s -yqu -yat -yD -D

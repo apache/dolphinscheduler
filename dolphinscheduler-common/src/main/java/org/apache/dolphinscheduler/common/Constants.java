@@ -854,7 +854,6 @@ public final class Constants {
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
-    public static final String FLINK_DETACH = "-d";
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
