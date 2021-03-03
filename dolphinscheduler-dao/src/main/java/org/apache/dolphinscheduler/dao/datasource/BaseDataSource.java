@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,6 +161,11 @@ public abstract class BaseDataSource {
                     separator = ":";
                     break;
                 case HIVE:
+                    if ("?".equals(otherParams.substring(0, 1))) {
+                        break;
+                    }
+                    separator = ";";
+                    break;
                 case SPARK:
                 case SQLSERVER:
                     separator = ";";
@@ -176,6 +185,19 @@ public abstract class BaseDataSource {
     public Connection getConnection() throws Exception {
         Class.forName(driverClassSelector());
         return DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+    }
+
+    /**
+     * the data source test connection
+     * @param info Properties
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    public Connection getConnection(Properties info) throws Exception {
+        Class.forName(driverClassSelector());
+        info.setProperty(USER, getUser());
+        info.setProperty(PASSWORD, getPassword());
+        return DriverManager.getConnection(getJdbcUrl(), info);
     }
 
     protected String filterOther(String otherParams) {
@@ -224,6 +246,10 @@ public abstract class BaseDataSource {
 
     public void setOther(String other) {
         this.other = other;
+    }
+
+    public void setConnParams(String connParams) {
+
     }
 
     public String getJavaSecurityKrb5Conf() {

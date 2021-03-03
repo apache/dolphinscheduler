@@ -244,6 +244,9 @@ public class SqlTask extends AbstractTask {
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
         try {
+
+            baseDataSource.setConnParams(sqlParameters.getConnParams());
+
             // create connection
             connection = baseDataSource.getConnection();
             // create temp function
