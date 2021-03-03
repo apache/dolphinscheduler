@@ -111,6 +111,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @return kill result
      */
     private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
+        boolean flag = true;
         List<String> appIds = Collections.emptyList();
         int taskInstanceId = killCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
@@ -129,6 +130,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
             OSUtils.exeCmd(cmd);
         } catch (Exception e) {
+            flag = false;
             logger.error("kill task error", e);
         }
         // find log and kill yarn job
@@ -136,7 +138,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 taskExecutionContext.getLogPath(),
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTenantCode());
-        return Pair.of(true, appIds);
+        return Pair.of(flag, appIds);
     }
 
     /**
