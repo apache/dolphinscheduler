@@ -389,6 +389,13 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
         resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionLog>(1, 10));
+        Mockito.when(processDefinitionService.queryProcessDefinitionVersions(
+                user
+                , projectName
+                , 1
+                , 10
+                , 1))
+                .thenReturn(resultMap);
         Result result = processDefinitionController.queryProcessDefinitionVersions(
                 user
                 , projectName
