@@ -145,9 +145,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
-
-    @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     private SchedulerService schedulerService;
@@ -190,9 +187,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkProcessJson;
         }
 
-        Long processDefinitionCode;
         try {
-            processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
+            long processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
             processDefinition.setCode(processDefinitionCode);
         } catch (SnowFlakeException e) {
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
@@ -1346,7 +1342,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 runningNodeMap.remove(nodeName);
             }
-            if (waitingRunningNodeMap == null || waitingRunningNodeMap.size() == 0) {
+            if (waitingRunningNodeMap.size() == 0) {
                 break;
             } else {
                 runningNodeMap.putAll(waitingRunningNodeMap);
@@ -1366,6 +1362,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return if graph has cycle flag
      */
     private boolean graphHasCycle(List<TaskNode> taskNodeList) {
+        if (taskNodeList == null) {
+            return false;
+        }
         List<String> preTaskList = new ArrayList<>();
         for (TaskNode taskNode : taskNodeList) {
             List<String> preTasks = JSONUtils.toList(taskNode.getPreTasks(), String.class);
@@ -1626,7 +1625,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param processDefinitionId processDefinitionId
      */
     private void setFailedProcessList(List<String> failedProcessList, String processDefinitionId) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(Integer.valueOf(processDefinitionId));
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(Integer.parseInt(processDefinitionId));
         if (processDefinition != null) {
             failedProcessList.add(processDefinitionId + "[" + processDefinition.getName() + "]");
         } else {
