@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_TASK_PARAMS;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_TASK_STATE;
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
 
 public class TaskExecuteMethodInterceptor implements InstanceMethodsAroundInterceptor {
     private static final int DEFAULT_TASK_STATUS_CODE = -1;
@@ -44,6 +45,7 @@ public class TaskExecuteMethodInterceptor implements InstanceMethodsAroundInterc
 
         AbstractSpan span = ContextManager.createLocalSpan(operationName);
         span.setComponent(Utils.DOLPHIN_SCHEDULER);
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
     }
 
     @Override

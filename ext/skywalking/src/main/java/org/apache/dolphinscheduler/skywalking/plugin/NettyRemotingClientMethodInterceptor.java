@@ -32,6 +32,8 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInt
 
 import java.lang.reflect.Method;
 
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
+
 public class NettyRemotingClientMethodInterceptor implements InstanceMethodsAroundInterceptor {
     private static final String OPERATION_NAME_PREFIX = "rpc/command/send/";
 
@@ -46,6 +48,7 @@ public class NettyRemotingClientMethodInterceptor implements InstanceMethodsArou
         AbstractSpan span = ContextManager.createExitSpan(operationName, contextCarrier, host.getAddress());
         span.setComponent(Utils.DOLPHIN_SCHEDULER);
         SpanLayer.asRPCFramework(span);
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
 
         CarrierItem item = contextCarrier.items();
         while (item.hasNext()) {

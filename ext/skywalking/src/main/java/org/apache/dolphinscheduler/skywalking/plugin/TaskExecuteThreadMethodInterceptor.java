@@ -38,6 +38,7 @@ import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_DE
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_INSTANCE_ID;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.getProjectId;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.getProcessDefinitionId;
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
 
 public class TaskExecuteThreadMethodInterceptor implements InstanceMethodsAroundInterceptor {
     private static final String OPERATION_NAME_PREFIX = "worker/execute/";
@@ -63,6 +64,7 @@ public class TaskExecuteThreadMethodInterceptor implements InstanceMethodsAround
         TAG_TASK_INSTANCE_ID.set(span, String.valueOf(executionContext.getTaskInstanceId()));
         TAG_TASK_EXECUTE_PATH.set(span, executionContext.getExecutePath());
         TAG_TASK_LOG_PATH.set(span, executionContext.getLogPath());
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
 
         ContextManager.continued(taskContext.getContextSnapshot());
     }

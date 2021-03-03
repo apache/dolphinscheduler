@@ -22,6 +22,8 @@ import org.apache.skywalking.apm.agent.core.context.tag.StringTag;
 import org.apache.skywalking.apm.network.trace.component.ComponentsDefine;
 import org.apache.skywalking.apm.network.trace.component.OfficialComponent;
 
+import java.lang.reflect.Method;
+
 public class Utils {
     public static final OfficialComponent DOLPHIN_SCHEDULER = ComponentsDefine.DOLPHIN_SCHEDULER;
 
@@ -52,11 +54,17 @@ public class Utils {
 
     public static final StringTag TAG_NETTY_REMOTE_ADDRESS = new StringTag("netty.remoteAddress");
 
+    public static final StringTag TAG_EXECUTE_METHOD = new StringTag("execute.method");
+
     public static String getProjectId(int id) {
         return "project_id_" + id;
     }
 
     public static String getProcessDefinitionId(int id) {
         return "process_definition_id_" + id;
+    }
+
+    public static String getMethodName(Method method) {
+        return method.getDeclaringClass().getTypeName() + "#" + method.getName();
     }
 }

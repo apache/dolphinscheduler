@@ -36,6 +36,7 @@ import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_DE
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_INSTANCE_ID;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_TASK_INSTANCE_NAME;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_TASK_WORKER_GROUP;
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.getProcessDefinitionId;
 
 public class MasterBaseTaskExecThreadMethodInterceptor implements InstanceMethodsAroundInterceptor {
@@ -54,6 +55,7 @@ public class MasterBaseTaskExecThreadMethodInterceptor implements InstanceMethod
         TAG_TASK_INSTANCE_ID.set(span, String.valueOf(taskInstance.getId()));
         TAG_TASK_INSTANCE_NAME.set(span, taskInstance.getName());
         TAG_TASK_WORKER_GROUP.set(span, taskInstance.getWorkerGroup());
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
 
         ContextManager.continued(taskContext.getContextSnapshot());
     }

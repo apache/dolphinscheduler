@@ -40,6 +40,7 @@ import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_CO
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_WORKER_GROUP;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_TIMEOUT;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.MASTER_PROCESS_EXECUTION_STATUS;
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.getProjectId;
 
 public class MasterExecThreadMethodInterceptor implements InstanceMethodsAroundInterceptor {
@@ -62,6 +63,7 @@ public class MasterExecThreadMethodInterceptor implements InstanceMethodsAroundI
         TAG_PROCESS_COMMAND_TYPE.set(span, processInstance.getCommandType().name());
         TAG_PROCESS_WORKER_GROUP.set(span, processInstance.getWorkerGroup());
         TAG_PROCESS_TIMEOUT.set(span, String.valueOf(processInstance.getTimeout()));
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
 
         ContextManager.continued(taskContext.getContextSnapshot());
     }

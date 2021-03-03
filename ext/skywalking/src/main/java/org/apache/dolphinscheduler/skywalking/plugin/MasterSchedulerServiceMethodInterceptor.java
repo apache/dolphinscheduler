@@ -27,6 +27,8 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInt
 
 import java.lang.reflect.Method;
 
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
+
 public class MasterSchedulerServiceMethodInterceptor implements InstanceMethodsAroundInterceptor {
     private static final String OPERATION_NAME = "master/schedule/process";
 
@@ -35,6 +37,7 @@ public class MasterSchedulerServiceMethodInterceptor implements InstanceMethodsA
         AbstractSpan span = ContextManager.createLocalSpan(OPERATION_NAME);
         span.setComponent(Utils.DOLPHIN_SCHEDULER);
         Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT);
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
     }
 
     @Override

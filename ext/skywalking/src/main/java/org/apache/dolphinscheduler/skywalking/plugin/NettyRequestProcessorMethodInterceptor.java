@@ -33,6 +33,7 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInt
 import java.lang.reflect.Method;
 
 import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_NETTY_REMOTE_ADDRESS;
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_EXECUTE_METHOD;
 
 public class NettyRequestProcessorMethodInterceptor implements InstanceMethodsAroundInterceptor {
     private static final String OPERATION_NAME_PREFIX = "rpc/command/process/";
@@ -55,6 +56,7 @@ public class NettyRequestProcessorMethodInterceptor implements InstanceMethodsAr
         span.setComponent(Utils.DOLPHIN_SCHEDULER);
         SpanLayer.asRPCFramework(span);
         TAG_NETTY_REMOTE_ADDRESS.set(span, channel.remoteAddress().toString());
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
     }
 
     @Override

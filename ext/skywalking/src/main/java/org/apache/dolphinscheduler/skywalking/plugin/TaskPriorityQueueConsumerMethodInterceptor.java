@@ -30,12 +30,10 @@ import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.MethodInt
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_TASK_ID;
-import static org.apache.dolphinscheduler.skywalking.plugin.Utils.TAG_PROCESS_INSTANCE_ID;
-import static org.apache.dolphinscheduler.skywalking.plugin.Utils.SKYWALKING_TRACING_CONTEXT;
+import static org.apache.dolphinscheduler.skywalking.plugin.Utils.*;
 
 public class TaskPriorityQueueConsumerMethodInterceptor implements InstanceMethodsAroundInterceptor {
-    private static final String OPERATION_NAME = "masetr/queue/take";
+    private static final String OPERATION_NAME = "master/queue/take";
 
     @Override
     public void beforeMethod(EnhancedInstance objInst, Method method, Object[] allArguments, Class<?>[] argumentsTypes, MethodInterceptResult result) throws Throwable {
@@ -47,6 +45,7 @@ public class TaskPriorityQueueConsumerMethodInterceptor implements InstanceMetho
         TAG_TASK_ID.set(span, String.valueOf(taskPriority.getTaskId()));
         TAG_PROCESS_INSTANCE_ID.set(span, String.valueOf(taskPriority.getProcessInstanceId()));
         Tags.LOGIC_ENDPOINT.set(span, Tags.VAL_LOCAL_SPAN_AS_LOGIC_ENDPOINT);
+        TAG_EXECUTE_METHOD.set(span, Utils.getMethodName(method));
 
         ContextSnapshot contextSnapshot = (ContextSnapshot) taskContext.get(SKYWALKING_TRACING_CONTEXT);
         ContextManager.continued(contextSnapshot);
