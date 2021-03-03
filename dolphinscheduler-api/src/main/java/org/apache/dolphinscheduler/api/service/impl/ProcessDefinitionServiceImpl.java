@@ -61,7 +61,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -1358,27 +1357,27 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * whether the graph has a ring
      *
-     * @param taskNodeList task node list
+     * @param taskNodeResponseList task node response list
      * @return if graph has cycle flag
      */
-    private boolean graphHasCycle(List<TaskNode> taskNodeList) {
-        if (taskNodeList == null) {
-            return false;
+    private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
+        DAG<String, TaskNode, String> graph = new DAG<>();
+        // Fill the vertices
+        for (TaskNode taskNodeResponse : taskNodeResponseList) {
+            graph.addNode(taskNodeResponse.getName(), taskNodeResponse);
         }
-        List<String> preTaskList = new ArrayList<>();
-        for (TaskNode taskNode : taskNodeList) {
-            List<String> preTasks = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+        // Fill edge relations
+        for (TaskNode taskNodeResponse : taskNodeResponseList) {
+            List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
             if (CollectionUtils.isNotEmpty(preTasks)) {
                 for (String preTask : preTasks) {
-                    if (preTaskList.contains(preTask)) {
+                    if (!graph.addEdge(preTask, taskNodeResponse.getName())) {
                         return true;
-                    } else {
-                        preTaskList.add(preTask);
                     }
                 }
             }
         }
-        return false;
+        return graph.hasCycle();
     }
 
     private String recursionProcessDefinitionName(Long projectCode, String processDefinitionName, int num) {
