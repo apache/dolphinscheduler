@@ -16,17 +16,17 @@
  */
 <template>
   <div class="dep-list-model">
-    <div v-for="(el,$index) in dependItemList" :key='$index' @click="itemIndex = $index">
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectId" @change="_onChangeProjectId" size="small">
+    <div v-for="(el,$index) in dependItemList" :key='$index'>
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectId" @change="v => _onChangeProjectId(v, $index)" size="small">
         <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label"></el-option>
       </el-select>
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionId" @change="_onChangeDefinitionId" size="small">
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionId" @change="v => _onChangeDefinitionId(v, $index)" size="small">
         <el-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label"></el-option>
       </el-select>
       <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.depTasks" size="small">
         <el-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item"></el-option>
       </el-select>
-      <el-select v-model="el.cycle" :disabled="isDetails" @change="_onChangeCycle" size="small">
+      <el-select v-model="el.cycle" :disabled="isDetails" @change="v => _onChangeCycle(v, $index)" size="small">
         <el-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label"></el-option>
       </el-select>
       <el-select v-model="el.dateValue" :disabled="isDetails" size="small">
@@ -62,8 +62,7 @@
         list: [],
         projectList: [],
         cycleList: cycleList,
-        isInstance: false,
-        itemIndex: null
+        isInstance: false
       }
     },
     mixins: [disabledState],
@@ -105,7 +104,8 @@
        * remove task
        */
       _remove (i) {
-        // this.dependTaskList[this.index].dependItemList.splice(i, 1)
+        // eslint-disable-next-line
+        this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
@@ -170,33 +170,33 @@
       /**
        * change process get dependItemList
        */
-      _onChangeProjectId (value) {
+      _onChangeProjectId (value, itemIndex) {
         this._getProcessByProjectId(value).then(definitionList => {
-          /* this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item)) */
+          /* this.$set(this.dependItemList, itemIndex, this._dlOldParams(value, definitionList, item)) */
           let definitionId = definitionList[0].value
           this._getDependItemList(definitionId).then(depTasksList => {
-            let item = this.dependItemList[this.itemIndex]
+            let item = this.dependItemList[itemIndex]
             // init set depTasks All
             item.depTasks = 'ALL'
             // set dependItemList item data
-            this.$set(this.dependItemList, this.itemIndex, this._cpOldParams(value, definitionId, definitionList, depTasksList, item))
+            this.$set(this.dependItemList, itemIndex, this._cpOldParams(value, definitionId, definitionList, depTasksList, item))
           })
         })
       },
-      _onChangeDefinitionId (value) {
+      _onChangeDefinitionId (value, itemIndex) {
         // get depItem list data
         this._getDependItemList(value).then(depTasksList => {
-          let item = this.dependItemList[this.itemIndex]
+          let item = this.dependItemList[itemIndex]
           // init set depTasks All
           item.depTasks = 'ALL'
           // set dependItemList item data
-          this.$set(this.dependItemList, this.itemIndex, this._rtOldParams(value, item.definitionList, depTasksList, item))
+          this.$set(this.dependItemList, itemIndex, this._rtOldParams(value, item.definitionList, depTasksList, item))
         })
       },
-      _onChangeCycle (value) {
+      _onChangeCycle (value, itemIndex) {
         let list = _.cloneDeep(dateValueList[value])
-        this.$set(this.dependItemList[this.itemIndex], 'dateValue', list[0].value)
-        this.$set(this.dependItemList[this.itemIndex], 'dateValueList', list)
+        this.$set(this.dependItemList[itemIndex], 'dateValue', list[0].value)
+        this.$set(this.dependItemList[itemIndex], 'dateValueList', list)
       },
       _rtNewParams (value, definitionList, depTasksList, projectId) {
         return {
