@@ -149,7 +149,7 @@ public class LowerWeightHostManager extends CommonHostManager {
                     String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for(String node : nodes){
-                        String heartbeat = registryCenter.getZookeeperCachedOperator().get(workerGroupPath + "/" + node);
+                        String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
                         if(StringUtils.isNotEmpty(heartbeat)
                                 && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
                             String[] parts = heartbeat.split(COMMA);

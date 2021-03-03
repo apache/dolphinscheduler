@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
@@ -105,7 +106,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         if (projectMapper.insert(project) > 0) {
-            result.put(Constants.DATA_LIST, project);
+            result.put(Constants.DATA_LIST, project.getId());
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
