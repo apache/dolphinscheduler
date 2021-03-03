@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -102,6 +103,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * process definition service impl
@@ -1711,4 +1713,82 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
+    /**
+     * query the pagination versions info by one certain process definition id
+     *
+     * @param loginUser login user info to check auth
+     * @param projectName process definition project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefinitionId process definition id
+     * @return the pagination process definition versions info of the certain process definition
+     */
+    @Override
+    public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, int processDefinitionId) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        // check the if pageNo or pageSize less than 1
+        if (pageNo <= 0 || pageSize <= 0) {
+            putMsg(result
+                    , Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR
+                    , pageNo
+                    , pageSize);
+            return result;
+        }
+
+        Project project = projectMapper.queryByName(projectName);
+
+        // check project auth
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefinitionId);
+
+        PageInfo<ProcessDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<ProcessDefinitionLog> page = new Page<>(pageNo, pageSize);
+        IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, processDefinition.getCode());
+        List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
+        pageInfo.setLists(processDefinitionLogs);
+        pageInfo.setTotalCount((int) processDefinitionVersionsPaging.getTotal());
+        return ImmutableMap.of(
+                Constants.MSG, Status.SUCCESS.getMsg()
+                , Constants.STATUS, Status.SUCCESS
+                , Constants.DATA_LIST, pageInfo);
+    }
+
+
+    /**
+     * delete one certain process definition by version number and process definition id
+     *
+     * @param loginUser login user info to check auth
+     * @param projectName process definition project name
+     * @param processDefinitionId process definition id
+     * @param version version number
+     * @return delele result code
+     */
+    @Override
+    public Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName, int processDefinitionId, long version) {
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByName(projectName);
+        // check project auth
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefinitionId);
+
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+        } else {
+            processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(processDefinition.getCode(), version);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+
+    }
 }

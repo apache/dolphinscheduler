@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -63,9 +62,6 @@ public class ProcessDefinitionControllerTest {
 
     @Mock
     private ProcessDefinitionServiceImpl processDefinitionService;
-
-    @Mock
-    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     protected User user;
 
@@ -393,13 +389,6 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
         resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionVersion>(1, 10));
-        Mockito.when(processDefinitionVersionService.queryProcessDefinitionVersions(
-                user
-                , projectName
-                , 1
-                , 10
-                , 1))
-                .thenReturn(resultMap);
         Result result = processDefinitionController.queryProcessDefinitionVersions(
                 user
                 , projectName
@@ -435,7 +424,7 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
-        Mockito.when(processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(
+        Mockito.when(processDefinitionService.deleteByProcessDefinitionIdAndVersion(
                 user
                 , projectName
                 , 1

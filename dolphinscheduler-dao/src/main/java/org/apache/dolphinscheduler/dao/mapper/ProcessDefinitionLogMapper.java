@@ -18,12 +18,15 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * process definition log mapper interface
@@ -62,4 +65,23 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      */
     ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("processDefinitionCode") Long processDefinitionCode,
                                                          @Param("version") long version);
+    
+    /**
+     * query the paging process definition version list by pagination info
+     *
+     * @param page pagination info
+     * @param processDefinitionCode process definition code
+     * @return the paging process definition version list
+     */
+    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
+                                                                         @Param("processDefinitionCode") Long processDefinitionCode);
+
+    /**
+     * delete the certain process definition version by process definition id and version number
+     *
+     * @param processDefinitionCode process definition code
+     * @param version version number
+     * @return delete result
+     */
+    int deleteByProcessDefinitionCodeAndVersion(@Param("processDefinitionCode") Long processDefinitionCode, @Param("version") long version);
 }
