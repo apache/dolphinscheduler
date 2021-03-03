@@ -56,7 +56,11 @@
             <span>{{scope.row.endTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="duration" :label="$t('Duration')"></el-table-column>
+        <el-table-column :label="$t('Duration')">
+          <template slot-scope="scope">
+            <span>{{scope.row.duration | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
