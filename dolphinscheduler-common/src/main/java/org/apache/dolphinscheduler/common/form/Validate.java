@@ -70,7 +70,7 @@ public class Validate {
 
         private String message;
 
-        private String type = ValueType.STRING.getValueType();
+        private String type = ValueType.STRING.getDescription();
 
         private String trigger = TriggerType.BLUR.getTriggerType();
 

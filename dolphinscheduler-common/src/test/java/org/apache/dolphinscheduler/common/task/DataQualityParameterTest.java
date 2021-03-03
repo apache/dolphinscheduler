@@ -249,7 +249,6 @@ public class DataQualityParameterTest {
                 + "\t\t}]\n"
                 + "\t}\n"
                 + "}";
-        dataQualityParameters.setRuleJson(ruleJson);
         dataQualityParameters.setSparkParameters(new SparkParameters());
     }
 
@@ -274,52 +273,6 @@ public class DataQualityParameterTest {
         dataQualityParameters.setRuleInputParameter(inputParameterValue);
 
         Assert.assertTrue(dataQualityParameters.checkParameters());
-    }
-
-    @Test
-    public void testCheckParameterStringInputFormat() {
-
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1,");
-        inputParameterValue.put("src_filter","date=2012-10-05");
-        inputParameterValue.put("src_field","id");
-
-        inputParameterValue.put("rule_type","1");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","1000");
-        inputParameterValue.put("create_time","2012-10-05");
-        inputParameterValue.put("update_time","2012-10-05");
-
-        dataQualityParameters.setRuleInputParameter(inputParameterValue);
-
-        Assert.assertFalse(dataQualityParameters.checkParameters());
-    }
-
-    @Test
-    public void testCheckParameterNumberInputFormat() {
-
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("src_filter","date=2012-10-05");
-        inputParameterValue.put("src_field","id");
-
-        inputParameterValue.put("rule_type","1");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","a");
-        inputParameterValue.put("create_time","2012-10-05");
-        inputParameterValue.put("update_time","2012-10-05");
-
-        dataQualityParameters.setRuleInputParameter(inputParameterValue);
-
-        Assert.assertFalse(dataQualityParameters.checkParameters());
     }
 
     @Test

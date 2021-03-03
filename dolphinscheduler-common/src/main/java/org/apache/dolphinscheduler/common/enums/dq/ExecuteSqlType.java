@@ -20,20 +20,17 @@ package org.apache.dolphinscheduler.common.enums.dq;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum ValueType {
-
+public enum ExecuteSqlType {
     /**
-     * 0-string
-     * 1-list
-     * 2-number
-     * 3-sql
+     * 0-middle
+     * 1-statistics
+     * 2-comparison
      */
-    STRING(0,"string"),
-    LIST(1,"list"),
-    NUMBER(2,"number"),
-    LIKE_SQL(3,"sql");
+    MIDDLE(0,"middle"),
+    STATISTICS(1,"statistics"),
+    COMPARISON(2,"comparison");
 
-    ValueType(int code, String description) {
+    ExecuteSqlType(int code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -51,8 +48,8 @@ public enum ValueType {
         return description;
     }
 
-    public static ValueType of(int value) {
-        for (ValueType e: ValueType.values()) {
+    public static ExecuteSqlType of(int value) {
+        for (ExecuteSqlType e: ExecuteSqlType.values()) {
             if (e.ordinal() == value) {
                 return e;
             }

@@ -77,14 +77,4 @@ public enum DbType {
         }
         throw new IllegalArgumentException("invalid type : " + type);
     }
-
-    public static DbType of(String description) {
-        for (DbType e: DbType.values()) {
-            if (e.getDescp().equalsIgnoreCase(description)) {
-                return e;
-            }
-        }
-        //For values out of enum scope
-        return null;
-    }
 }
