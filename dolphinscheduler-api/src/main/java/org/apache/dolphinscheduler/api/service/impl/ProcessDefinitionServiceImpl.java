@@ -43,8 +43,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -53,7 +51,6 @@ import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StreamUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -80,7 +77,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -218,45 +214,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     }
 
-
-    /**
-     * get resource ids
-     *
-     * @param processData process data
-     * @return resource ids
-     */
-    private String getResourceIds(ProcessData processData) {
-        List<TaskNode> tasks = processData.getTasks();
-        Set<Integer> resourceIds = new HashSet<>();
-        StringBuilder sb = new StringBuilder();
-        if (CollectionUtils.isEmpty(tasks)) {
-            return sb.toString();
-        }
-        for (TaskNode taskNode : tasks) {
-            String taskParameter = taskNode.getParams();
-            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
-            if (params == null) {
-                continue;
-            }
-            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-                Set<Integer> tempSet = params.getResourceFilesList().
-                        stream()
-                        .filter(t -> t.getId() != 0)
-                        .map(ResourceInfo::getId)
-                        .collect(Collectors.toSet());
-                resourceIds.addAll(tempSet);
-            }
-        }
-
-        for (int i : resourceIds) {
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(i);
-        }
-        return sb.toString();
-    }
-
     /**
      * query process definition list
      *
@@ -276,9 +233,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getId());
+        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
-        resourceList.stream().forEach(processDefinition -> {
+        resourceList.forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -314,10 +271,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Page<ProcessDefinition> page = new Page<>(pageNo, pageSize);
         IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
-                page, searchVal, userId, project.getId(), isAdmin(loginUser));
+                page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-        records.stream().forEach(processDefinition -> {
+        records.forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -377,7 +334,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getId(), processDefinitionName);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(project.getCode(), processDefinitionName);
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
@@ -440,7 +397,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         if (!name.equals(processDefinition.getName())) {
             // check whether the new process define name exist
-            ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getId(), name);
+            ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
                 putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
                 return result;
@@ -479,7 +436,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -847,7 +804,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         //use currentProjectName to query
         Project targetProject = projectMapper.queryByName(currentProjectName);
         if (null != targetProject) {
-            processDefinitionName = recursionProcessDefinitionName(targetProject.getId(),
+            processDefinitionName = recursionProcessDefinitionName(targetProject.getCode(),
                     processDefinitionName, 1);
         }
 
@@ -1077,7 +1034,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             String subProcessJson = JSONUtils.toJsonString(processService.genProcessData(subProcess));
             //check current project has sub process
-            ProcessDefinition currentProjectSubProcess = processDefinitionMapper.queryByDefineName(targetProject.getId(), subProcess.getName());
+            ProcessDefinition currentProjectSubProcess = processDefinitionMapper.queryByDefineName(targetProject.getCode(), subProcess.getName());
 
             if (null == currentProjectSubProcess) {
                 ArrayNode subJsonArray = (ArrayNode) JSONUtils.parseObject(subProcessJson).get(TASKS);
@@ -1116,7 +1073,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
 
                 //modify task node
-                ProcessDefinition newSubProcessDefine = processDefinitionMapper.queryByDefineName(subProcess.getProjectId(), subProcess.getName());
+                ProcessDefinition newSubProcessDefine = processDefinitionMapper.queryByDefineName(subProcess.getCode(), subProcess.getName());
 
                 if (null != newSubProcessDefine) {
                     subProcessCodeMap.put(subProcessCode, newSubProcessDefine.getCode());
@@ -1262,8 +1219,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         HashMap<String, Object> result = new HashMap<>();
 
-        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectId);
-        resourceList.stream().forEach(processDefinition -> {
+        Project project = projectMapper.selectById(projectId);
+        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
+        resourceList.forEach(processDefinition -> {
             ProcessData processData = processService.genProcessData(processDefinition);
             processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         });
@@ -1432,8 +1390,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return graph.hasCycle();
     }
 
-    private String recursionProcessDefinitionName(Integer projectId, String processDefinitionName, int num) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectId, processDefinitionName);
+    private String recursionProcessDefinitionName(Long projectCode, String processDefinitionName, int num) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineName(projectCode, processDefinitionName);
         if (processDefinition != null) {
             if (num > 1) {
                 String str = processDefinitionName.substring(0, processDefinitionName.length() - 3);
@@ -1444,7 +1402,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             return processDefinitionName;
         }
-        return recursionProcessDefinitionName(projectId, processDefinitionName, num + 1);
+        return recursionProcessDefinitionName(projectCode, processDefinitionName, num + 1);
     }
 
     private Map<String, Object> copyProcessDefinition(User loginUser,
@@ -1460,9 +1418,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
-            taskNodeList.stream().forEach(taskNode -> {
-                taskNode.setCode(0L);
-            });
+            taskNodeList.forEach(taskNode -> taskNode.setCode(0L));
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             return createProcessDefinition(
@@ -1756,4 +1712,3 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
 }
-
