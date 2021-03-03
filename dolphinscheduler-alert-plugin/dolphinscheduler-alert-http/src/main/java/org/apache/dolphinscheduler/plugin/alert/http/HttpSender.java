@@ -165,8 +165,8 @@ public class HttpSender {
         //set msg content field
         objectNode.put(contentField, msg);
         try {
-            HeaderElement element = httpRequest.getHeaders("Content-Type")[0].getElements()[0];
-            ((HttpPost)httpRequest).setEntity(new StringEntity(objectNode.toString(), ContentType.create(element.getName(), Charset.forName("UTF-8"))));
+            StringEntity entity = new StringEntity(bodyParams, DEFAULT_CHARSET);
+            ((HttpPost)httpRequest).setEntity(entity);
         } catch (Exception e) {
             logger.error("send http alert msg  exception : {}", e.getMessage());
         }
