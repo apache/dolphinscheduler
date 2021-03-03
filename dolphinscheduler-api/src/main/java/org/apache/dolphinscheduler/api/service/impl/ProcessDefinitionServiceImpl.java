@@ -54,7 +54,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -1752,6 +1751,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Page<ProcessDefinitionLog> page = new Page<>(pageNo, pageSize);
         IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, processDefinition.getCode());
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
+
+        ProcessData processData = processService.genProcessData(processDefinition);
+        processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         pageInfo.setLists(processDefinitionLogs);
         pageInfo.setTotalCount((int) processDefinitionVersionsPaging.getTotal());
         return ImmutableMap.of(
