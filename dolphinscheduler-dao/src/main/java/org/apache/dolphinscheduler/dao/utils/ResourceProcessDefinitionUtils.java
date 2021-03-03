@@ -18,7 +18,12 @@ package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -26,37 +31,37 @@ import java.util.stream.Collectors;
  */
 public class ResourceProcessDefinitionUtils {
     /**
-     * get resource process map key is resource id,value is the set of process definition
-     * @param list the map key is process definition id and value is resource_ids
-     * @return resource process definition map
+     * get resource process map key is resource id,value is the set of process definition code
+     *
+     * @param resourceList the map key is process definition code and value is resource_ids
+     * @return resource process definition map (resourceId -> processDefinitionCodes)
      */
-    public static Map<Integer, Set<Long>> getResourceProcessDefinitionMap(List<Map<String, Object>> list) {
-        Map<Long, String> map = new HashMap<>();
+    public static Map<Integer, Set<Long>> getResourceProcessDefinitionMap(List<Map<String, Object>> resourceList) {
 
         // resourceId -> processDefinitionCodes
-        Map<Integer, Set<Long>> result = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (Map<String, Object> tempMap : list) {
-                map.put((Long) tempMap.get("code"), (String)tempMap.get("resource_ids"));
+        Map<Integer, Set<Long>> resourceResult = new HashMap<>();
+
+        if (CollectionUtils.isNotEmpty(resourceList)) {
+            for (Map<String, Object> resourceMap : resourceList) {
+                Long code = (Long) resourceMap.get("code");
+                String[] resourceIds = ((String) resourceMap.get("resource_ids"))
+                        .split(",");
+
+                Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
+                for (Integer resourceId : resourceIdSet) {
+                    Set<Long> codeSet;
+                    if (resourceResult.containsKey(resourceId)) {
+                        codeSet = resourceResult.get(resourceId);
+                    } else {
+                        codeSet = new HashSet<>();
+                    }
+                    codeSet.add(code);
+                    resourceResult.put(resourceId, codeSet);
+                }
+
             }
         }
 
-        for (Map.Entry<Long, String> entry : map.entrySet()) {
-            Long code = entry.getKey();
-            String[] resourceIds = entry.getValue().split(",");
-            Set<Integer> resourceIdSet = Arrays.stream(resourceIds).map(Integer::parseInt).collect(Collectors.toSet());
-            for (Integer resourceId : resourceIdSet) {
-                Set<Long> codeSet;
-                if (result.containsKey(resourceId)) {
-                    codeSet = result.get(resourceId);
-                } else {
-                    codeSet = new HashSet<>();
-                }
-                codeSet.add(code);
-                result.put(resourceId, codeSet);
-            }
-        }
-        
-        return result;
+        return resourceResult;
     }
 }
