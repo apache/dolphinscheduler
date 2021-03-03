@@ -279,6 +279,6 @@ templates:
       ]
     # Activated as the DASHBOARD type, makes this templates added into the UI page automatically.
     # False means providing a basic template, user needs to add it manually.
-    activated: false
+    activated: true
     # True means wouldn't show up on the dashboard. Only keeps the definition in the storage.
     disabled: false
