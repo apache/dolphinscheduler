@@ -2025,15 +2025,15 @@ public class ProcessService {
      * get have perm project ids
      *
      * @param userId userId
-     * @return project ids
+     * @return project codes
      */
-    public List<Integer> getProjectIdListHavePerm(int userId) {
+    public List<Long> getProjectIdListHavePerm(int userId) {
 
-        List<Integer> projectIdList = new ArrayList<>();
+        List<Long> projectCodeList = new ArrayList<>();
         for (Project project : getProjectListHavePerm(userId)) {
-            projectIdList.add(project.getId());
+            projectCodeList.add(project.getCode());
         }
-        return projectIdList;
+        return projectCodeList;
     }
 
     /**

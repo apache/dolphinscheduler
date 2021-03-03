@@ -930,6 +930,7 @@
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
+                        <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/HostTest.java</include>
@@ -961,6 +962,7 @@
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>
+                        <include>**/service/zk/RegisterOperatorTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
 
@@ -988,6 +990,7 @@
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/datasource/OracleDataSourceTest.java</include>
                         <include>**/dao/datasource/HiveDataSourceTest.java</include>
+                        <include>**/dao/datasource/BaseDataSourceTest.java</include>
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>
