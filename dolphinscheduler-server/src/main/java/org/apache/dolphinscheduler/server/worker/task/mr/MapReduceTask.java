@@ -156,7 +156,7 @@ public class MapReduceTask extends AbstractYarnTask {
         List<String> result = new ArrayList<>();
 
         // main jar
-        if (mapreduceParameters.getMainJar()!= null) {
+        if (mapreduceParameters.getMainJar() != null) {
             result.add(Constants.JAR);
             result.add(mapreduceParameters.getMainJar().getRes());
         }

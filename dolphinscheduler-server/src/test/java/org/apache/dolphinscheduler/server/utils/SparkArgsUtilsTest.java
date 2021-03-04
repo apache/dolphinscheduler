@@ -88,46 +88,46 @@ public class SparkArgsUtilsTest {
         }
 
         //Expected values and order
-        assertEquals(result.size(),22);
+        assertEquals(22, result.size());
 
-        assertEquals(result.get(0),"--master");
-        assertEquals(result.get(1),"yarn");
+        assertEquals("--master", result.get(0));
+        assertEquals("yarn", result.get(1));
 
-        assertEquals(result.get(2),"--deploy-mode");
-        assertEquals(result.get(3),mode);
+        assertEquals("--deploy-mode", result.get(2));
+        assertEquals(mode, result.get(3));
 
-        assertEquals(result.get(4),"--class");
-        assertEquals(result.get(5),mainClass);
+        assertEquals("--class", result.get(4));
+        assertEquals(mainClass, result.get(5));
 
-        assertEquals(result.get(6),"--driver-cores");
-        assertSame(Integer.valueOf(result.get(7)),driverCores);
+        assertEquals("--driver-cores", result.get(6));
+        assertSame(driverCores, Integer.valueOf(result.get(7)));
 
-        assertEquals(result.get(8),"--driver-memory");
-        assertEquals(result.get(9),driverMemory);
+        assertEquals("--driver-memory", result.get(8));
+        assertEquals(driverMemory, result.get(9));
 
-        assertEquals(result.get(10),"--num-executors");
-        assertSame(Integer.valueOf(result.get(11)),numExecutors);
+        assertEquals("--num-executors", result.get(10));
+        assertSame(numExecutors, Integer.valueOf(result.get(11)));
 
-        assertEquals(result.get(12),"--executor-cores");
-        assertSame(Integer.valueOf(result.get(13)),executorCores);
+        assertEquals("--executor-cores", result.get(12));
+        assertSame(executorCores, Integer.valueOf(result.get(13)));
 
-        assertEquals(result.get(14),"--executor-memory");
-        assertEquals(result.get(15),executorMemory);
+        assertEquals("--executor-memory", result.get(14));
+        assertEquals(executorMemory, result.get(15));
 
-        assertEquals(result.get(16),"--name");
-        assertEquals(result.get(17),ArgsUtils.escape(appName));
+        assertEquals("--name", result.get(16));
+        assertEquals(ArgsUtils.escape(appName), result.get(17));
 
-        assertEquals(result.get(18),"--queue");
-        assertEquals(result.get(19),queue);
+        assertEquals("--queue", result.get(18));
+        assertEquals(queue, result.get(19));
 
-        assertEquals(result.get(20),mainJar.getRes());
-        assertEquals(result.get(21),mainArgs);
+        assertEquals(mainJar.getRes(), result.get(20));
+        assertEquals(mainArgs, result.get(21));
 
         //Others param without --queue
         SparkParameters param1 = new SparkParameters();
         param1.setOthers("--files xxx/hive-site.xml");
         param1.setQueue(queue);
         result = SparkArgsUtils.buildArgs(param1);
-        assertEquals(result.size(),7);
+        assertEquals(7, result.size());
     }
 }
