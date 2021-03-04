@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+package org.apache.dolphinscheduler.plugin.task.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,7 +15,24 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-public class Constants {
+public class TaskConstants {
+
+    /**
+     * http connect time out
+     */
+    public static final int HTTP_CONNECT_TIMEOUT = 60 * 1000;
+
+
+    /**
+     * http connect request time out
+     */
+    public static final int HTTP_CONNECTION_REQUEST_TIMEOUT = 60 * 1000;
+
+    /**
+     * httpclient soceket time out
+     */
+    public static final int SOCKET_TIMEOUT = 60 * 1000;
+
 
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
 
@@ -28,7 +45,7 @@ public class Constants {
      * exit code kill
      */
     public static final int EXIT_CODE_KILL = 137;
-    public static final String PID="pid";
+    public static final String PID = "pid";
 
     /**
      * comma ,
@@ -49,6 +66,14 @@ public class Constants {
      * exit code success
      */
     public static final int EXIT_CODE_SUCCESS = 0;
+
+    //todo
+    public static final String SH="sh";
+
+    /**
+     * FAILED
+     */
+    public static final String FAILED = "FAILED";
 
     /**
      * default log cache rows num,output when reach the number
@@ -75,5 +100,38 @@ public class Constants {
      * kerberos expire time
      */
     public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
+
+    /**
+     * hdfs/s3 configuration
+     * resource.upload.path
+     */
+    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
+
+    //todo
+    public static final String SYSTEM_ENV_PATH = "";
+
+    /**
+     * hadoop.security.authentication
+     */
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+
+
+    /**
+     * loginUserFromKeytab user
+     */
+    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    /**
+     * loginUserFromKeytab path
+     */
+    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+    /**
+     * java.security.krb5.conf.path
+     */
+    public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
+
+
+
 
 }

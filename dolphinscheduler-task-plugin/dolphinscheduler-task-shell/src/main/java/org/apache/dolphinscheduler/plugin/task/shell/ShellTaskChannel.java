@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
-import org.apache.dolphinscheduler.spi.task.TaskResponse;
+
+import org.apache.dolphinscheduler.plugin.task.api.AbstractShell;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskRequest;
+import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.slf4j.Logger;
 
-public class ShellTaskChannel implements TaskChannel {
+public class ShellTaskChannel  implements TaskChannel {
     /**
      * shell parameters
      */

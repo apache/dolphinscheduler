@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.shell;
+package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.Constants;
-import org.apache.dolphinscheduler.spi.task.TaskRequest;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -187,7 +188,7 @@ public class ProcessUtils {
             allowAmbiguousCommands = true;
             String value = System.getProperty(LOCAL_PROCESS_EXEC);
             if (value != null) {
-                allowAmbiguousCommands = !Constants.STRING_FALSE.equalsIgnoreCase(value);
+                allowAmbiguousCommands = !TaskConstants.STRING_FALSE.equalsIgnoreCase(value);
             }
         }
         return allowAmbiguousCommands;
@@ -295,13 +296,13 @@ public class ProcessUtils {
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+            cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
 
             // find log and kill yarn job
-            killYarnJob(taskExecutionContext);
+            killYarnJob(request);
 
         } catch (Exception e) {
             logger.error("kill task failed", e);
@@ -320,12 +321,12 @@ public class ProcessUtils {
         Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
-            String pids = OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId));
+            String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
             if (null != pids) {
                 mat = MACPATTERN.matcher(pids);
             }
         } else {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId));
+            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
             mat = WINDOWSATTERN.matcher(pids);
         }
 
@@ -338,6 +339,77 @@ public class ProcessUtils {
         return sb.toString().trim();
     }
 
+    /**
+     * find logs and kill yarn tasks.
+     *
+     * @param request request
+     */
+    public static void killYarnJob(TaskRequest request) {
+       return;
+    }
 
+    /**
+     * kill yarn application.
+     *
+     * @param appIds app id list
+     * @param logger logger
+     * @param tenantCode tenant code
+     * @param executePath execute path
+     */
+    public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
+        if (CollectionUtils.isNotEmpty(appIds)) {
+
+            for (String appId : appIds) {
+                try {
+                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+
+                    if (!applicationStatus.typeIsFinished()) {
+                        String commandFile = String
+                                .format("%s/%s.kill", executePath, appId);
+                        String cmd = "yarn application -kill " + appId;
+                        execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
+                    }
+                } catch (Exception e) {
+                    logger.error(String.format("Get yarn application app id [%s] status failed: [%s]", appId, e.getMessage()));
+                }
+            }
+        }
+    }
+
+    /**
+     * build kill command for yarn application
+     *
+     * @param logger logger
+     * @param tenantCode tenant code
+     * @param appId app id
+     * @param commandFile command file
+     * @param cmd cmd
+     */
+    private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile, String cmd) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("#!/bin/sh\n");
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+            sb.append("cd $BASEDIR\n");
+            if (TaskProperties.getProperties(TaskConstants.SYSTEM_ENV_PATH) != null) {
+                sb.append("source ").append(TaskProperties.getProperties(TaskConstants.SYSTEM_ENV_PATH)).append("\n");
+            }
+            sb.append("\n\n");
+            sb.append(cmd);
+
+            File f = new File(commandFile);
+
+            if (!f.exists()) {
+                FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+            }
+
+            String runCmd = String.format("%s %s", TaskConstants.SH, commandFile);
+            runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
+            logger.info("kill cmd:{}", runCmd);
+            OSUtils.exeCmd(runCmd);
+        } catch (Exception e) {
+            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
+        }
+    }
 
 }

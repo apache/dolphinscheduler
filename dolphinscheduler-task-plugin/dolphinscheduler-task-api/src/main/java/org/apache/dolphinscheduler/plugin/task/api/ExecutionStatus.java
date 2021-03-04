@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.shell;
+package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+package org.apache.dolphinscheduler.plugin.task.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,32 +15,14 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-/**
- * resource info
- */
-public class ResourceInfo {
-    /**
-     * res the name of the resource that was uploaded
-     */
-    private int id;
+import org.slf4j.Logger;
 
-    public int getId() {
-        return id;
-    }
+public interface TaskChannel {
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
-    private String res;
+    void cancelApplication(boolean status);
 
-    public String getRes() {
-        return res;
-    }
-
-    public void setRes(String res) {
-        this.res = res;
-    }
+    TaskResponse processTask(TaskRequest taskRequest, Logger logger);
 
 
 }

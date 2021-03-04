@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task;
+package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.util.ArrayList;
 import java.util.List;

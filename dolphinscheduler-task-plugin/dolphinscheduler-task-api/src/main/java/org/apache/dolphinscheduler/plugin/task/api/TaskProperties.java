@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+package org.apache.dolphinscheduler.plugin.task.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,23 +15,31 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-import java.util.List;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-/**
- * job params interface
- */
-public interface IParameters {
-    /**
-     * check parameters is valid
-     *
-     * @return result
-     */
-    boolean checkParameters();
+import java.util.Map;
 
-    /**
-     * get project resource files list
-     *
-     * @return resource files list
-     */
-    List<ResourceInfo> getResourceFilesList();
+public class TaskProperties {
+
+
+    //todo init
+    private static Map<String, String> propertiesMap;
+
+
+    public static String getProperties(String key, String def) {
+        if (StringUtils.isBlank(key)) {
+            return def;
+        }
+        if (propertiesMap.containsKey(key)) {
+            return propertiesMap.get(key);
+        }
+        return def;
+    }
+
+    public static String getProperties(String key) {
+        if (StringUtils.isBlank(key)) {
+            return null;
+        }
+        return propertiesMap.get(key);
+    }
 }

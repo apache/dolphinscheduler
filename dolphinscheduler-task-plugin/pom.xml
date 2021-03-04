@@ -13,5 +13,10 @@
     <artifactId>dolphinscheduler-task-plugin</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>dolphinscheduler-task-shell</module>
+        <module>dolphinscheduler-task-api</module>
+    </modules>
+
 
 </project>

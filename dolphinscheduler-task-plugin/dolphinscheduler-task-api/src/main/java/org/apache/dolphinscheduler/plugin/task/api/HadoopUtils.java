@@ -15,21 +15,41 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.shell;
+package org.apache.dolphinscheduler.plugin.task.api;
 
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESOURCE_UPLOAD_PATH;
 
 import org.apache.dolphinscheduler.spi.task.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.security.UserGroupInformation;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
+
+import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +70,15 @@ public class HadoopUtils implements Closeable {
 
     private FileSystem fs;
 
+    //todo default value
+    public static final String resourceUploadPath = RESOURCE_UPLOAD_PATH;// "/dolphinscheduler");
+
+
 
     private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
             .newBuilder()
-            // todo maybe is null
-            .expireAfterWrite(Long.parseLong(Constants.KERBEROS_EXPIRE_TIME), TimeUnit.HOURS)
+            // todo maybe is null defult value
+            .expireAfterWrite(Long.parseLong(TaskConstants.KERBEROS_EXPIRE_TIME), TimeUnit.HOURS)
             .build(new CacheLoader<String, HadoopUtils>() {
                 @Override
                 public HadoopUtils load(String key){
@@ -70,17 +94,33 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
+     * init dolphinscheduler root path in hdfs
+     */
+
+    private void initHdfsPath() {
+        Path path = new Path(resourceUploadPath);
+
+        try {
+            if (!fs.exists(path)) {
+                fs.mkdirs(path);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    /**
      * init hadoop configuration
      */
     private void init() {
         try {
             configuration = new HdfsConfiguration();
 
-            String resourceStorageType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
+            String resourceStorageType = TaskConstants.RESOURCE_STORAGE_TYPE;
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
 
             if (resUploadType == ResUploadType.HDFS) {
-                if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+                if (TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
                     System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
                             PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
                     configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
@@ -155,12 +195,13 @@ public class HadoopUtils implements Closeable {
             return null;
         }
 
-        String result = Constants.FAILED;
+        String result = TaskConstants.FAILED;
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
         String responseContent;
-        if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+        // 可能为空
+        if (Boolean.parseBoolean(TaskProperties.getProperties(TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, "false"))) {
             responseContent = KerberosHttpClient.get(applicationUrl);
         } else {
             responseContent = HttpUtils.get(applicationUrl);

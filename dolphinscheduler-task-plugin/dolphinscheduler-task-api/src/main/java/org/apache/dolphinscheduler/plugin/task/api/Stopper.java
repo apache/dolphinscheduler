@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,15 +14,26 @@ package org.apache.dolphinscheduler.spi.task;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.slf4j.Logger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public interface TaskChannel {
+/**
+ *  if the process closes, a signal is placed as true, and all threads get this flag to stop working
+ */
+public class Stopper {
 
-
-    void cancelApplication(boolean status);
-
-    TaskResponse processTask(TaskRequest taskRequest, Logger logger);
-
-
+	private static AtomicBoolean signal = new AtomicBoolean(false);
+	
+	public static final boolean isStopped(){
+		return signal.get();
+	}
+	
+	public static final boolean isRunning(){
+		return !signal.get();
+	}
+	
+	public static final void stop(){
+		signal.set(true);
+	}
 }

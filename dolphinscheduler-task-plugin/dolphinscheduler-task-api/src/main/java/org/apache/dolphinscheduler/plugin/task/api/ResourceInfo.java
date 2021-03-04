@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.plugin.task.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,26 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.spi.task;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- *  if the process closes, a signal is placed as true, and all threads get this flag to stop working
+ * resource info
  */
-public class Stopper {
+public class ResourceInfo {
+    /**
+     * res the name of the resource that was uploaded
+     */
+    private int id;
 
-	private static AtomicBoolean signal = new AtomicBoolean(false);
-	
-	public static final boolean isStopped(){
-		return signal.get();
-	}
-	
-	public static final boolean isRunning(){
-		return !signal.get();
-	}
-	
-	public static final void stop(){
-		signal.set(true);
-	}
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private String res;
+
+    public String getRes() {
+        return res;
+    }
+
+    public void setRes(String res) {
+        this.res = res;
+    }
+
+
 }

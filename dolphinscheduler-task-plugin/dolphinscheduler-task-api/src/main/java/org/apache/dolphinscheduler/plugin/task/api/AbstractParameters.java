@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+package org.apache.dolphinscheduler.plugin.task.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -52,9 +52,9 @@ public abstract class AbstractParameters implements IParameters {
      * get local parameters map
      * @return parameters map
      */
-    public Map<String,Property> getLocalParametersMap() {
+    public Map<String, Property> getLocalParametersMap() {
         if (localParams != null) {
-            Map<String,Property> localParametersMaps = new LinkedHashMap<>();
+            Map<String, Property> localParametersMaps = new LinkedHashMap<>();
 
             for (Property property : localParams) {
                 localParametersMaps.put(property.getProp(),property);

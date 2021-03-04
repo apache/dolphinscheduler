@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.shell;
+package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.spi.utils.Constants;
 
@@ -149,7 +149,7 @@ public class HttpUtils {
             if (response.getStatusLine().getStatusCode() == 200) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-                    responseContent = EntityUtils.toString(entity, Constants.UTF_8);
+                    responseContent = EntityUtils.toString(entity, TaskConstants.UTF_8);
                 } else {
                     logger.warn("http entity is null");
                 }

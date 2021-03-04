@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,17 +15,11 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+package org.apache.dolphinscheduler.plugin.task.api;
 
-public class OSUtils {
+import org.apache.dolphinscheduler.spi.common.UiChannelFactory;
 
-    /**
-     *  get sudo command
-     * @param tenantCode tenantCode
-     * @param command command
-     * @return result of sudo execute command
-     */
-    public static String getSudoCmd(String tenantCode, String command) {
-        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
-    }
+public interface TaskChannelFactory extends UiChannelFactory {
+
+    TaskChannel create();
 }

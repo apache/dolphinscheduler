@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.plugin.task.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,11 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.task;
+import java.util.List;
 
-import org.apache.dolphinscheduler.spi.common.UiChannelFactory;
+/**
+ * job params interface
+ */
+public interface IParameters {
+    /**
+     * check parameters is valid
+     *
+     * @return result
+     */
+    boolean checkParameters();
 
-public interface TaskChannelFactory extends UiChannelFactory {
-
-    TaskChannel create();
+    /**
+     * get project resource files list
+     *
+     * @return resource files list
+     */
+    List<ResourceInfo> getResourceFilesList();
 }

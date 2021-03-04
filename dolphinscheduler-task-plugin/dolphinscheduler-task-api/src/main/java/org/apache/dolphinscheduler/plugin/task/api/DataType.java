@@ -14,14 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.spi.task;
+package org.apache.dolphinscheduler.plugin.task.api;
 
 /**
- * parameter of stored procedure
+ * data types in user define parameter
  */
-public enum Direct {
+public enum DataType {
     /**
-     * 0 in; 1 out;
+     * 0 string
+     * 1 integer
+     * 2 long
+     * 3 float
+     * 4 double
+     * 5 date, "YYYY-MM-DD"
+     * 6 time, "HH:MM:SS"
+     * 7 time stamp
+     * 8 Boolean
      */
-    IN,OUT
+    VARCHAR,INTEGER,LONG,FLOAT,DOUBLE,DATE,TIME,TIMESTAMP,BOOLEAN
 }
