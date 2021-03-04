@@ -43,19 +43,19 @@
     </select>
     <select id="queryResourceListAuthored" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        from t_ds_resources r, t_ds_relation_resources_user rel
         where 1 = 1
         <if test="type != -1">
-            and type=#{type}
+            and r.type=#{type}
         </if>
         <if test="userId != 0 and perm != 0">
-            and id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId} and perm=#{perm}
-            union select id as resources_id from t_ds_resources where user_id=#{userId})
+            and ( (r.id = rel.resources_id and rel.user_id=#{userId} and rel.perm=#{perm} ) or r.user_id=#{userId} )
         </if>
         <if test="userId != 0 and perm == 0">
-            and id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId}
-            union select id as resources_id from t_ds_resources where user_id=#{userId})
+            and ( (r.id = rel.resources_id and rel.user_id=#{userId} ) or r.user_id=#{userId} )
         </if>
     </select>
     <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
@@ -67,8 +67,7 @@
         join t_ds_user u on d.user_id = u.id
         where d.type=#{type} and d.pid=#{id}
         <if test="userId != 0">
-            and d.id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId}
-            union select id as resources_id from t_ds_resources where user_id=#{userId})
+            and ( (d.id = rel.resources_id and rel.user_id=#{userId} ) or d.user_id=#{userId} )
         </if>
         <if test="searchVal != null and searchVal != ''">
             and d.alias like concat('%', #{searchVal}, '%')
@@ -80,7 +79,7 @@
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
         </include>
-        from t_ds_resources r,t_ds_relation_resources_user rel
+        from t_ds_resources r, t_ds_relation_resources_user rel
         where r.id = rel.resources_id AND rel.user_id = #{userId} and perm=7
     </select>
     <select id="queryResourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
@@ -97,13 +96,14 @@
     </select>
     <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
-        where type=0
-        and id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId} and perm=7
-        union select id as resources_id from t_ds_resources where user_id=#{userId})
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        from t_ds_resources r, t_ds_relation_resources_user rel
+        where r.type=0
+        and ( (r.id = rel.resources_id and rel.user_id=#{userId} and perm=7 ) or r.user_id=#{userId} )
         <if test="resNames != null and resNames != ''">
-            and full_name in
+            and r.full_name in
             <foreach collection="resNames" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
@@ -111,12 +111,13 @@
     </select>
     <select id="listAuthorizedResourceById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
-        where id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId} and perm=7
-        union select id as resources_id from t_ds_resources where user_id=#{userId})
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        from t_ds_resources r, t_ds_relation_resources_user rel
+        where  ( (r.id = rel.resources_id and rel.user_id=#{userId} and perm=7 ) or r.user_id=#{userId} )
         <if test="resIds != null and resIds != ''">
-            and id in
+            and r.id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
