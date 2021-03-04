@@ -74,7 +74,6 @@ public class ProcessTaskRelationServiceImplTest {
         //project check auth fail
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
 
-
         Map<String, Object> relation = processTaskRelationService
                 .queryProcessTaskRelation(loginUser, projectName, 11L);
 

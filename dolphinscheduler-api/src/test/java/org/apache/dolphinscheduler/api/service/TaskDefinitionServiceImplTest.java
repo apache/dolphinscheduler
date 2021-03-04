@@ -171,7 +171,6 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionMapper.queryByDefinitionName(project.getCode(), taskName))
                 .thenReturn(new TaskDefinition());
 
-
         Map<String, Object> relation = taskDefinitionService
                 .queryTaskDefinitionByName(loginUser, projectName, taskName);
 
@@ -241,7 +240,6 @@ public class TaskDefinitionServiceImplTest {
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
-
     @Test
     public void switchVersion() {
         String projectName = "project_test1";
@@ -267,8 +265,7 @@ public class TaskDefinitionServiceImplTest {
 
         Mockito.when(taskDefinitionMapper.queryByDefinitionCode(taskCode))
                 .thenReturn(new TaskDefinition());
-
-
+        
         Map<String, Object> relation = taskDefinitionService
                 .switchVersion(loginUser, projectName, taskCode, version);
 
