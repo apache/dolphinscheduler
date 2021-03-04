@@ -23,24 +23,30 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
 
 /**
  * mapreduce task
  */
 public class MapReduceTask extends AbstractYarnTask {
 
+    /**
+     *  map reduce command
+     *  usage: hadoop jar <jar> [mainClass] [GENERIC_OPTIONS] args...
+     */
+    private static final String MAP_REDUCE_COMMAND = Constants.HADOOP;
 
     /**
      * mapreduce parameters
@@ -77,7 +83,6 @@ public class MapReduceTask extends AbstractYarnTask {
         mapreduceParameters.setQueue(taskExecutionContext.getQueue());
         setMainJarName();
 
-
         // replace placeholder
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
@@ -85,10 +90,10 @@ public class MapReduceTask extends AbstractYarnTask {
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
 
-        if (paramsMap != null){
+        if (paramsMap != null) {
             String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));
             mapreduceParameters.setMainArgs(args);
-            if(mapreduceParameters.getProgramType() != null && mapreduceParameters.getProgramType() == ProgramType.PYTHON){
+            if (mapreduceParameters.getProgramType() != null && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
                 String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),  ParamUtils.convert(paramsMap));
                 mapreduceParameters.setOthers(others);
             }
@@ -102,9 +107,13 @@ public class MapReduceTask extends AbstractYarnTask {
      */
     @Override
     protected String buildCommand() throws Exception {
-        List<String> parameterList = buildParameters(mapreduceParameters);
+        // hadoop jar <jar> [mainClass] [GENERIC_OPTIONS] args...
+        List<String> args = new ArrayList<>();
+        args.add(MAP_REDUCE_COMMAND);
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", parameterList),
+        args.addAll(buildParameters(mapreduceParameters));
+
+        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args),
                 taskExecutionContext.getDefinedParams());
         logger.info("mapreduce task command: {}", command);
 
@@ -143,21 +152,18 @@ public class MapReduceTask extends AbstractYarnTask {
      * @param mapreduceParameters mapreduce parameters
      * @return parameter list
      */
-    private List<String> buildParameters(MapreduceParameters mapreduceParameters){
-
+    private List<String> buildParameters(MapreduceParameters mapreduceParameters) {
         List<String> result = new ArrayList<>();
 
-        result.add(Constants.HADOOP);
-
         // main jar
-        if(mapreduceParameters.getMainJar()!= null){
+        if (mapreduceParameters.getMainJar()!= null) {
             result.add(Constants.JAR);
             result.add(mapreduceParameters.getMainJar().getRes());
         }
 
         // main class
-        if(!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
-                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
+        if (!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
+                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())) {
             result.add(mapreduceParameters.getMainClass());
         }
 
@@ -170,13 +176,13 @@ public class MapReduceTask extends AbstractYarnTask {
             }
 
             result.add(mapreduceParameters.getOthers());
-        }else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
+        } else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
             result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
 
         }
 
         // command args
-        if(StringUtils.isNotEmpty(mapreduceParameters.getMainArgs())){
+        if (StringUtils.isNotEmpty(mapreduceParameters.getMainArgs())) {
             result.add(mapreduceParameters.getMainArgs());
         }
         return result;
