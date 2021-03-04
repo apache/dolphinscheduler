@@ -62,8 +62,8 @@ jobs:
           unzip chromedriver_linux64.zip
           sudo mv -f chromedriver /usr/local/share/chromedriver
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
-      - name: Run e2e Test
-        run: cd ./e2e && mvn -B clean test
+#     - name: Run e2e Test
+#       run: cd ./e2e && mvn -B clean test
       - name: Collect logs
         if: failure()
         uses: actions/upload-artifact@v2
