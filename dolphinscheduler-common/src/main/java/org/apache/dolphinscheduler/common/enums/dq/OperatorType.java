@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * OperatorType
+ * operator type
  */
 public enum OperatorType {
     /**

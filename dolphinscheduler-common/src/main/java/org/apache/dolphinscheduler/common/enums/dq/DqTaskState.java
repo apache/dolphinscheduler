@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * CheckType
+ * data quality task state
  */
 public enum DqTaskState {
     /**

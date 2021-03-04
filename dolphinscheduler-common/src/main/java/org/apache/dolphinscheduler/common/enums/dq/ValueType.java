@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.common.enums.dq;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * rule input entry value type
+ */
 public enum ValueType {
     /**
      * 0-string

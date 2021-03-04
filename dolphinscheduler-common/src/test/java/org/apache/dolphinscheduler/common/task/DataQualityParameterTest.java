@@ -24,9 +24,11 @@ import org.apache.dolphinscheduler.common.form.TriggerType;
 import org.apache.dolphinscheduler.common.form.Validate;
 import org.apache.dolphinscheduler.common.form.props.CascaderParamsProps;
 import org.apache.dolphinscheduler.common.form.props.InputParamsProps;
+import org.apache.dolphinscheduler.common.form.props.RadioParamsProps;
 import org.apache.dolphinscheduler.common.form.props.SelectParamsProps;
 import org.apache.dolphinscheduler.common.form.type.CascaderParam;
 import org.apache.dolphinscheduler.common.form.type.InputParam;
+import org.apache.dolphinscheduler.common.form.type.RadioParam;
 import org.apache.dolphinscheduler.common.form.type.SelectParam;
 import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
@@ -91,7 +93,10 @@ public class DataQualityParameterTest {
                 + "[{\"label\":\"mysql\",\"value\":\"0\",\"disabled\":false,\"children\":[{\"label\":\"mysql数据源\",\"value\":1,\"disabled\":false}]}],"
                 + "\"changeOnSelect\":false,\"size\":\"small\"},\"type\":\"cascader\",\"title\":\"源数据源\",\"value\":1},{\"field\":\"src_table\","
                 + "\"props\":{\"placeholder\":\"Please enter source table name\",\"rows\":0,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":\"源数据表\","
-                + "\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
+                + "\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]},"
+                + "{\"field\":\"is_alert\",\"props\":{\"size\":\"small\",\"disabled\":false},\"type\":\"radio\",\"title\":\"是否告警\","
+                + "\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}],"
+                + "\"options\":[{\"label\":\"Yes\",\"value\":\"1\",\"disabled\":false},{\"label\":\"No\",\"value\":\"0\",\"disabled\":false}]}]";
 
         List<PluginParams> pluginParamsList = new ArrayList<>();
         SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type","源数据类型")
@@ -120,9 +125,18 @@ public class DataQualityParameterTest {
                 .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
                 .build();
 
+        RadioParam isAlert = RadioParam.newBuilder("is_alert","是否告警")
+                .setProps(new RadioParamsProps()
+                        .setSize("small"))
+                .addParamsOptions(new ParamsOptions("Yes","1",false))
+                .addParamsOptions(new ParamsOptions("No","0",false))
+                .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
+                .build();
+
         pluginParamsList.add(srcConnectorType);
         pluginParamsList.add(srcDatasourceId);
         pluginParamsList.add(srcTable);
+        pluginParamsList.add(isAlert);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

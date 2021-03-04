@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CascaderParam
+ * cascader
  */
 public class CascaderParam extends PluginParams {
 

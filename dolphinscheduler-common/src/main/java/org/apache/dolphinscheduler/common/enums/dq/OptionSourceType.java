@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.common.enums.dq;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * form options source type
+ */
 public enum OptionSourceType {
     /**
      * 0-default
