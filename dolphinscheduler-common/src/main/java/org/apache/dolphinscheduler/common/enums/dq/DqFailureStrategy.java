@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * failure policy when dqs task node failed.
  */
 public enum DqFailureStrategy {
-
     /**
      * 0-ending process when dqs tasks failed.
      * 1-continue running when dqs tasks failed.

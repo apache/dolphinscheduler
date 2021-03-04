@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OptionSourceType {
-
     /**
      * 0-default
      * 1-datasource

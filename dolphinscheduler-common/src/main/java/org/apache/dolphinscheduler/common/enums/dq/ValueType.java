@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ValueType {
-
     /**
      * 0-string
      * 1-list

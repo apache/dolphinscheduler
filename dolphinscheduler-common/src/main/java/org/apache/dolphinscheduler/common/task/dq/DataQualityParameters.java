@@ -36,8 +36,17 @@ public class DataQualityParameters extends AbstractParameters {
 
     private static  final Logger logger = LoggerFactory.getLogger(DataQualityParameters.class);
 
+    /**
+     * rule id
+     */
     private int ruleId;
+    /**
+     * rule input entry value map
+     */
     private Map<String,String> ruleInputParameter;
+    /**
+     * spark parameters
+     */
     private SparkParameters sparkParameters;
 
     public int getRuleId() {

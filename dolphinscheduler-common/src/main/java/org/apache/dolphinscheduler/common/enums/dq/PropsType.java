@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum PropsType {
-
     /**
      * 0-text
      * 1-password

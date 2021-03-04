@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum FormType {
-
     /**
      * 0-input
      * 1-radio
