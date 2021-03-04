@@ -101,8 +101,6 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run() {
-        logger.info("start master server...");
-
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());

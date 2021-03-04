@@ -105,14 +105,11 @@ public class WorkerServer implements IStoppable {
         new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
     }
 
-
     /**
      * worker server run
      */
     @PostConstruct
     public void run() {
-        logger.info("start worker server...");
-
         // alert-server client registry
         alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), Constants.ALERT_RPC_PORT);
 
