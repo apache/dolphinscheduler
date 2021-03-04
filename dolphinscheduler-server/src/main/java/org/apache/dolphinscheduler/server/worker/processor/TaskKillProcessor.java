@@ -134,10 +134,15 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             logger.error("kill task error", e);
         }
         // find log and kill yarn job
-        appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
+        try {
+            appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
+                    taskExecutionContext.getLogPath(),
+                    taskExecutionContext.getExecutePath(),
+                    taskExecutionContext.getTenantCode());
+        } catch (Exception e) {
+            flag = false;
+            logger.error("kill yarn task error", e);
+        }
         return Pair.of(flag, appIds);
     }
 
@@ -191,12 +196,13 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             }
         } catch (Exception e) {
             logger.error("kill yarn job error", e);
+            throw new RuntimeException("kill yarn job error");
         } finally {
             if (logClient != null) {
                 logClient.close();
             }
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
 }
