@@ -371,6 +371,10 @@ public class MasterExecThread implements Runnable {
      * process end handle
      */
     private void endProcess() {
+        // when user kill process instance on ui page,we must change READY_STOP to FAILURE in endProcess
+        if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+            processInstance.setState(ExecutionStatus.FAILURE);
+        }
         processInstance.setEndTime(new Date());
         processService.updateProcessInstance(processInstance);
         if (processInstance.getState().typeIsWaitingThread()) {

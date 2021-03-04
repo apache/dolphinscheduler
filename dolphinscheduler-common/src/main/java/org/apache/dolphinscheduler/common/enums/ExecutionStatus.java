@@ -145,7 +145,7 @@ public enum ExecutionStatus {
      * @return status
      */
     public boolean typeIsCancel() {
-        return this == KILL || this == STOP;
+        return this == KILL || this == STOP || this == READY_STOP;;
     }
 
     public int getCode() {
