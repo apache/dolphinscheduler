@@ -253,8 +253,6 @@ public class ProcessDefinitionServiceTest {
     private ProcessInstanceService processInstanceService;
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
-    @Mock
-    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     @Test
     public void testQueryProcessDefinitionList() {
