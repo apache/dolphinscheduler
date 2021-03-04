@@ -32,14 +32,19 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -85,6 +90,9 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     ProcessInstanceMapper processInstanceMapper;
+
+    @Mock
+    ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Mock
     ProcessDefinitionMapper processDefineMapper;
@@ -384,12 +392,20 @@ public class ProcessInstanceServiceTest {
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
+        when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
+
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
         when(processDefineMapper.updateById(processDefinition)).thenReturn(1);
+        when(processService.saveProcessDefinition(Mockito.any(), Mockito.any(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.any(), Mockito.any())).thenReturn(1);
+        putMsg(result, Status.SUCCESS, projectName);
+
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -477,7 +493,20 @@ public class ProcessInstanceServiceTest {
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
+        when(processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion()
+        )).thenReturn(new ProcessDefinitionLog());
+        when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
         when(taskInstanceMapper.queryByInstanceIdAndName(Mockito.anyInt(), Mockito.any())).thenReturn(taskInstance);
+        DAG<String, TaskNode, TaskNodeRelation> graph = new DAG<>();
+        for (int i = 1; i <= 7; ++i) {
+            graph.addNode(i + "", new TaskNode());
+        }
+
+        when(processService.genDagGraph(Mockito.any(ProcessDefinition.class)))
+                .thenReturn(graph);
+
         Map<String, Object> successRes = processInstanceService.viewGantt(1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -530,9 +559,11 @@ public class ProcessInstanceServiceTest {
      */
     private ProcessDefinition getProcessDefinition() {
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(46L);
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectId(2);
+        processDefinition.setProjectCode(2L);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         return processDefinition;
