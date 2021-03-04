@@ -25,9 +25,9 @@ metadata:
 spec:
   ports:
     - port: 12345
-      targetPort: tcp-port
+      targetPort: api-port
       protocol: TCP
-      name: tcp-port
+      name: api-port
   selector:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
     app.kubernetes.io/instance: {{ .Release.Name }}
