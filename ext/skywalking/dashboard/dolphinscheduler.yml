@@ -1,0 +1,284 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# UI templates initialized file includes the default template when the SkyWalking OAP starts up at the first time.
+#
+# Also, SkyWalking would detect the existing templates in the database, once they are missing, all templates in this file
+# could be added automatically.
+
+templates:
+  - name: Dolphinscheduler
+    type: "DASHBOARD"
+    configuration: |-
+      [
+        {
+          "name":"Dolphinscheduler",
+          "type":"service",
+          "serviceGroup":"dolphinscheduler",
+          "children":[
+            {
+              "name":"Master Scheduler",
+              "children":[
+                {
+                  "width":3,
+                  "title":"QuartzScheduler Load",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_cpm",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"quartz-scheduler/org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob"
+                },
+                {
+                  "width":3,
+                  "title":"QuartzScheduler Avg Time",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_avg",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"quartz-scheduler/org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"QuartzScheduler Time Percentile",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"LABELED_VALUE",
+                  "metricName":"endpoint_percentile",
+                  "queryMetricType":"readLabeledMetricsValues",
+                  "chartType":"ChartLine",
+                  "metricLabels":"P50, P75, P90, P95, P99",
+                  "labelsIndex":"0, 1, 2, 3, 4",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"quartz-scheduler/org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"QuartzScheduler Successful Rate",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_sla",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"quartz-scheduler/org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob",
+                  "unit":"%",
+                  "aggregation":"/",
+                  "aggregationNum":"100"
+                },
+                {
+                  "width":3,
+                  "title":"MasterSchedulerService Load",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_cpm",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"master/schedule/process"
+                },
+                {
+                  "width":3,
+                  "title":"MasterSchedulerService Avg Time",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_avg",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"master/schedule/process",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"MasterSchedulerService Time Percentile",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"LABELED_VALUE",
+                  "queryMetricType":"readLabeledMetricsValues",
+                  "chartType":"ChartLine",
+                  "metricName":"endpoint_percentile",
+                  "metricLabels":"P50, P75, P90, P95, P99",
+                  "labelsIndex":"0, 1, 2, 3, 4",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"master/schedule/process",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"MasterSchedulerService Successful Rate",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "metricName":"endpoint_sla",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"master/schedule/process",
+                  "unit":"%",
+                  "aggregation":"/",
+                  "aggregationNum":"100"
+                }
+              ]
+            },
+            {
+              "name":"Master Queue",
+              "children":[
+                {
+                  "width":3,
+                  "title":"Put Load",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_cpm",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/put"
+                },
+                {
+                  "width":3,
+                  "title":"Put Avg Time",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_avg",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/put",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"Put Time Percentile",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"LABELED_VALUE",
+                  "metricName":"endpoint_percentile",
+                  "queryMetricType":"readLabeledMetricsValues",
+                  "chartType":"ChartLine",
+                  "metricLabels":"P50, P75, P90, P95, P99",
+                  "labelsIndex":"0, 1, 2, 3, 4",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/put",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"Put Successful Rate",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_sla",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/put",
+                  "unit":"%",
+                  "aggregation":"/",
+                  "aggregationNum":"100"
+                },
+                {
+                  "width":3,
+                  "title":"Take Load",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_cpm",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/take"
+                },
+                {
+                  "width":3,
+                  "title":"Take Avg Time",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_avg",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/take",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"Take Time Percentile",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"LABELED_VALUE",
+                  "metricName":"endpoint_percentile",
+                  "queryMetricType":"readLabeledMetricsValues",
+                  "chartType":"ChartLine",
+                  "metricLabels":"P50, P75, P90, P95, P99",
+                  "labelsIndex":"0, 1, 2, 3, 4",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/take",
+                  "unit":"ms"
+                },
+                {
+                  "width":3,
+                  "title":"Take Successful Rate",
+                  "height":350,
+                  "entityType":"Endpoint",
+                  "independentSelector":true,
+                  "metricType":"REGULAR_VALUE",
+                  "metricName":"endpoint_sla",
+                  "queryMetricType":"readMetricsValues",
+                  "chartType":"ChartLine",
+                  "currentService":"dolphinscheduler::master-server",
+                  "currentEndpoint":"masetr/queue/take",
+                  "unit":"%",
+                  "aggregation":"/",
+                  "aggregationNum":"100"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    # Activated as the DASHBOARD type, makes this templates added into the UI page automatically.
+    # False means providing a basic template, user needs to add it manually.
+    activated: true
+    # True means wouldn't show up on the dashboard. Only keeps the definition in the storage.
+    disabled: false

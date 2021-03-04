@@ -41,6 +41,10 @@
     </appender>
     <!-- api server logback config end -->
 
+    <!-- skywalking log reporter start-->
+    <appender name="SKYWALKING-LOG" class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.log.GRPCLogClientAppender"/>
+    <!-- skywalking log reporter end-->
+
     <logger name="org.apache.zookeeper" level="WARN"/>
     <logger name="org.apache.hbase" level="WARN"/>
     <logger name="org.apache.hadoop" level="WARN"/>
@@ -48,6 +52,7 @@
 
     <root level="INFO">
         <appender-ref ref="APILOGFILE"/>
+        <appender-ref ref="SKYWALKING-LOG"/>
     </root>
 
 </configuration>

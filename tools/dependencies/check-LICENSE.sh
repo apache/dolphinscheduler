@@ -27,6 +27,10 @@ echo '=== Self modules: ' && ./mvnw --batch-mode --quiet -Dexec.executable='echo
 
 echo '=== Distributed dependencies: ' && ls dist/lib | tee all-dependencies.txt
 
+echo '=== Skywalking agent dependencies: ' && ls dist/skywalking-agent | grep .jar | tee -a all-dependencies.txt \
+  && ls dist/skywalking-agent/plugins | tee -a all-dependencies.txt \
+  && ls dist/skywalking-agent/activations | tee -a all-dependencies.txt
+
 # Exclude all self modules(jars) to generate all third-party dependencies
 echo '=== Third party dependencies: ' && grep -vf self-modules.txt all-dependencies.txt | tee third-party-dependencies.txt
 

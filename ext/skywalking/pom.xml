@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>dolphinscheduler</artifactId>
+        <groupId>org.apache.dolphinscheduler</groupId>
+        <version>1.3.6-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dolphinscheduler-skywalking</artifactId>
+    <name>dolphinscheduler-skywalking</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dolphinscheduler.version>${parent.version}</dolphinscheduler.version>
+
+        <agent.dir>${project.build.directory}/skywalking-agent/</agent.dir>
+        <agent-plugins.dir>${agent.dir}/plugins/</agent-plugins.dir>
+        <agent-activations.dir>${agent.dir}/activations/</agent-activations.dir>
+        <agent-config.dir>${agent.dir}/config</agent-config.dir>
+        <agent-dashboard.dir>${agent.dir}/dashboard</agent-dashboard.dir>
+        <agent-dependencies-shade.package>org.apache.skywalking.apm.dependencies</agent-dependencies-shade.package>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-service</artifactId>
+            <version>${dolphinscheduler.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-server</artifactId>
+            <version>${dolphinscheduler.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.skywalking</groupId>
+            <artifactId>apm-agent-core</artifactId>
+            <version>${skywalking.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>net.bytebuddy:*</include>
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.bytebuddy</pattern>
+                                    <shadedPattern>${agent-dependencies-shade.package}.net.bytebuddy</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- skywalking agent -->
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-agent</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <destFileName>skywalking-agent.jar</destFileName>
+                                    <outputDirectory>${agent.dir}</outputDirectory>
+                                </artifactItem>
+
+                                <!-- skywalking plugins -->
+                                <artifactItem>
+                                    <groupId>org.apache.dolphinscheduler</groupId>
+                                    <artifactId>dolphinscheduler-skywalking</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-zookeeper-3.4.x-plugin</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-quartz-scheduler-2.x-plugin</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-httpclient-commons</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-httpclient-3.x-plugin</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-httpClient-4.x-plugin</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>spring-commons</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-spring-core-patch</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-springmvc-annotation-commons</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-springmvc-annotation-5.x-plugin</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-plugins.dir}</outputDirectory>
+                                </artifactItem>
+
+                                <!-- skywalking toolkit -->
+                                <artifactItem>
+                                    <groupId>org.apache.skywalking</groupId>
+                                    <artifactId>apm-toolkit-logback-1.x-activation</artifactId>
+                                    <version>${skywalking.version}</version>
+                                    <outputDirectory>${agent-activations.dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy overwrite="true" file="${project.basedir}/config/agent.config" tofile="${agent-config.dir}/agent.config" />
+                                <copy overwrite="true" todir="${agent-dashboard.dir}" >
+                                    <fileset dir="${project.basedir}/dashboard">
+                                        <include name="*" />
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
