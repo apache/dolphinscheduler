@@ -63,9 +63,9 @@
         d.id, d.alias, d.file_name, d.description, d.user_id, d.type, d.size, d.create_time, d.update_time,
         d.pid, d.full_name, d.is_directory,
         u.user_name as user_name
-        from t_ds_resources d
-        join t_ds_user u on d.user_id = u.id
-        where d.type=#{type} and d.pid=#{id}
+        from t_ds_resources d, t_ds_user u, t_ds_relation_resources_user rel
+        where d.user_id = u.id
+        and d.type=#{type} and d.pid=#{id}
         <if test="userId != 0">
             and ( (d.id = rel.resources_id and rel.user_id=#{userId} ) or d.user_id=#{userId} )
         </if>
