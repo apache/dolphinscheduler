@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * Test SparkArgsUtils
@@ -48,12 +49,11 @@ public class SparkArgsUtilsTest {
     public int executorCores = 6;
     public String sparkVersion = "SPARK1";
     public int numExecutors = 4;
+    public String appName = "spark test";
     public String queue = "queue1";
 
-
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp() {
         ResourceInfo main = new ResourceInfo();
         main.setRes("testspark-1.0.0-SNAPSHOT.jar");
         mainJar = main;
@@ -78,6 +78,7 @@ public class SparkArgsUtilsTest {
         param.setProgramType(programType);
         param.setSparkVersion(sparkVersion);
         param.setMainArgs(mainArgs);
+        param.setAppName(appName);
         param.setQueue(queue);
 
         //Invoke buildArgs
@@ -87,7 +88,7 @@ public class SparkArgsUtilsTest {
         }
 
         //Expected values and order
-        assertEquals(result.size(),20);
+        assertEquals(result.size(),22);
 
         assertEquals(result.get(0),"--master");
         assertEquals(result.get(1),"yarn");
@@ -113,10 +114,14 @@ public class SparkArgsUtilsTest {
         assertEquals(result.get(14),"--executor-memory");
         assertEquals(result.get(15),executorMemory);
 
-        assertEquals(result.get(16),"--queue");
-        assertEquals(result.get(17),queue);
-        assertEquals(result.get(18),mainJar.getRes());
-        assertEquals(result.get(19),mainArgs);
+        assertEquals(result.get(16),"--name");
+        assertEquals(result.get(17),ArgsUtils.escape(appName));
+
+        assertEquals(result.get(18),"--queue");
+        assertEquals(result.get(19),queue);
+
+        assertEquals(result.get(20),mainJar.getRes());
+        assertEquals(result.get(21),mainArgs);
 
         //Others param without --queue
         SparkParameters param1 = new SparkParameters();
