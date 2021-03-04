@@ -61,7 +61,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -146,9 +145,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
-
-    @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     private SchedulerService schedulerService;
@@ -191,9 +187,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkProcessJson;
         }
 
-        Long processDefinitionCode;
         try {
-            processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
+            long processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
             processDefinition.setCode(processDefinitionCode);
         } catch (SnowFlakeException e) {
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
@@ -1347,7 +1342,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 runningNodeMap.remove(nodeName);
             }
-            if (waitingRunningNodeMap == null || waitingRunningNodeMap.size() == 0) {
+            if (waitingRunningNodeMap.size() == 0) {
                 break;
             } else {
                 runningNodeMap.putAll(waitingRunningNodeMap);
@@ -1360,7 +1355,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return result;
     }
 
-
     /**
      * whether the graph has a ring
      *
@@ -1369,15 +1363,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
         DAG<String, TaskNode, String> graph = new DAG<>();
-
         // Fill the vertices
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
             graph.addNode(taskNodeResponse.getName(), taskNodeResponse);
         }
-
         // Fill edge relations
         for (TaskNode taskNodeResponse : taskNodeResponseList) {
-            taskNodeResponse.getPreTasks();
             List<String> preTasks = JSONUtils.toList(taskNodeResponse.getPreTasks(), String.class);
             if (CollectionUtils.isNotEmpty(preTasks)) {
                 for (String preTask : preTasks) {
@@ -1387,7 +1378,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             }
         }
-
         return graph.hasCycle();
     }
 
@@ -1635,7 +1625,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param processDefinitionId processDefinitionId
      */
     private void setFailedProcessList(List<String> failedProcessList, String processDefinitionId) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(Integer.valueOf(processDefinitionId));
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(Integer.parseInt(processDefinitionId));
         if (processDefinition != null) {
             failedProcessList.add(processDefinitionId + "[" + processDefinition.getName() + "]");
         } else {
