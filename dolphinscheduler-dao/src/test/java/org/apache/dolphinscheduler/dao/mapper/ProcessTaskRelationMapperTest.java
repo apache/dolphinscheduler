@@ -19,11 +19,8 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.assertj.core.util.Arrays;
 import org.junit.Assert;
