@@ -111,31 +111,32 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run() {
+        logger.info("start worker server...");
+
+        // alert-server client registry
+        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), Constants.ALERT_RPC_PORT);
+
+        // init remoting server
+        NettyServerConfig serverConfig = new NettyServerConfig();
+        serverConfig.setListenPort(workerConfig.getListenPort());
+        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
+        this.nettyRemotingServer.start();
+
+        // worker registry
         try {
-            logger.info("start worker server...");
-
-            //init remoting server
-            NettyServerConfig serverConfig = new NettyServerConfig();
-            serverConfig.setListenPort(workerConfig.getListenPort());
-            this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-            this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
-            this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
-            this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
-            this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
-            this.nettyRemotingServer.start();
-
+            this.workerRegistry.registry();
             this.workerRegistry.getZookeeperRegistryCenter().setStoppable(this);
             Set<String> workerZkPaths = this.workerRegistry.getWorkerZkPaths();
             this.workerRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(workerZkPaths, ZKNodeType.WORKER, Constants.DELETE_ZK_OP);
-            // worker registry
-            this.workerRegistry.registry();
-
-            // retry report task status
-            this.retryReportTaskStatusThread.start();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
+
         // task execute manager
         this.workerManagerThread.start();
 
