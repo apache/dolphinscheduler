@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -26,7 +25,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -63,9 +62,6 @@ public class ProcessDefinitionControllerTest {
 
     @Mock
     private ProcessDefinitionServiceImpl processDefinitionService;
-
-    @Mock
-    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     protected User user;
 
@@ -392,8 +388,8 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
-        resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionVersion>(1, 10));
-        Mockito.when(processDefinitionVersionService.queryProcessDefinitionVersions(
+        resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionLog>(1, 10));
+        Mockito.when(processDefinitionService.queryProcessDefinitionVersions(
                 user
                 , projectName
                 , 1
@@ -435,7 +431,7 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
-        Mockito.when(processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(
+        Mockito.when(processDefinitionService.deleteByProcessDefinitionIdAndVersion(
                 user
                 , projectName
                 , 1

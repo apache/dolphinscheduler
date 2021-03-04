@@ -37,7 +37,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINI
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -89,9 +88,6 @@ public class ProcessDefinitionController extends BaseController {
 
     @Autowired
     private ProcessDefinitionService processDefinitionService;
-
-    @Autowired
-    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     /**
      * create process definition
@@ -297,8 +293,9 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId) {
 
-        Map<String, Object> result = processDefinitionVersionService.queryProcessDefinitionVersions(loginUser
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionVersions(loginUser
             , projectName, pageNo, pageSize, processDefinitionId);
+
         return returnDataList(result);
     }
 
@@ -351,7 +348,7 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
 
-        Map<String, Object> result = processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectName, processDefinitionId, version);
+        Map<String, Object> result = processDefinitionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectName, processDefinitionId, version);
         return returnDataList(result);
     }
 
