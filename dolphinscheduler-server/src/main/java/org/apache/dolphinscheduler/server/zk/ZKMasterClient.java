@@ -85,6 +85,9 @@ public class ZKMasterClient extends AbstractZKClient {
             //  Master registry
             masterRegistry.registry();
 
+            String registPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
+
             // init system znode
             this.initSystemZNode();
 
@@ -295,15 +298,6 @@ public class ZKMasterClient extends AbstractZKClient {
         }
         return false;
     }
-
-    /**
-     * failover worker tasks
-     *
-     * 1. kill yarn job if there are yarn jobs in tasks.
-     * 2. change task state from running to need failover.
-     * 3. failover all tasks when workerHost is null
-     * @param workerHost worker host
-     */
 
     /**
      * failover worker tasks
