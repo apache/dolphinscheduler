@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
 
-    private static final String NO_NODE_EXCEPTION_REGEX = "KeeperException$NoNodeException";
+    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceImpl.class);
 
     @Autowired
     protected ZookeeperCachedOperator zookeeperCachedOperator;
@@ -137,27 +139,22 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return WorkerGroup list
      */
     private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
-
         String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
         List<WorkerGroup> workerGroups = new ArrayList<>();
-        List<String> workerGroupList;
+        List<String> workerGroupList = null;
         try {
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
-            if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
-                if (isPaging) {
-                    return workerGroups;
-                }
+            logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
+        }
 
-                //ignore noNodeException return Default
+        if (workerGroupList == null || workerGroupList.isEmpty()) {
+            if (!isPaging) {
                 WorkerGroup wg = new WorkerGroup();
                 wg.setName(DEFAULT_WORKER_GROUP);
                 workerGroups.add(wg);
-                return workerGroups;
-
-            } else {
-                throw e;
             }
+            return workerGroups;
         }
 
         for (String workerGroup : workerGroupList) {
