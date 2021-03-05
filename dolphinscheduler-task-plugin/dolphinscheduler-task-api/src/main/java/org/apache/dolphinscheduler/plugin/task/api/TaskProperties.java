@@ -15,31 +15,109 @@ package org.apache.dolphinscheduler.plugin.task.api;/*
  * limitations under the License.
  */
 
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TaskProperties {
 
+    /**
+     * logger
+     */
+    private static final Logger logger = LoggerFactory.getLogger(TaskProperties.class);
 
-    //todo init
-    private static Map<String, String> propertiesMap;
 
 
-    public static String getProperties(String key, String def) {
-        if (StringUtils.isBlank(key)) {
-            return def;
-        }
-        if (propertiesMap.containsKey(key)) {
-            return propertiesMap.get(key);
-        }
-        return def;
+
+    //  初始化 todo
+    private static final Properties properties = new Properties();
+
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @return property value
+     */
+    public static String getString(String key) {
+        return properties.getProperty(key.trim());
     }
 
-    public static String getProperties(String key) {
-        if (StringUtils.isBlank(key)) {
-            return null;
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultVal default value
+     * @return property value
+     */
+    public static String getString(String key, String defaultVal) {
+        String val = properties.getProperty(key.trim());
+        return val == null ? defaultVal : val;
+    }
+
+    /**
+     * get all properties with specified prefix, like: fs.
+     *
+     * @param prefix prefix to search
+     * @return all properties with specified prefix
+     */
+    public static Map<String, String> getPrefixedProperties(String prefix) {
+        Map<String, String> matchedProperties = new HashMap<>();
+        for (String propName : properties.stringPropertyNames()) {
+            if (propName.startsWith(prefix)) {
+                matchedProperties.put(propName, properties.getProperty(propName));
+            }
         }
-        return propertiesMap.get(key);
+        return matchedProperties;
+    }
+
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @return get property int value , if key == null, then return -1
+     */
+    public static int getInt(String key) {
+        return getInt(key, -1);
+    }
+
+    /**
+     * @param key key
+     * @param defaultValue default value
+     * @return property value
+     */
+    public static int getInt(String key, int defaultValue) {
+        String value = getString(key);
+        if (value == null) {
+            return defaultValue;
+        }
+
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            logger.info(e.getMessage(), e);
+        }
+        return defaultValue;
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultValue default value
+     * @return property value
+     */
+    public static Boolean getBoolean(String key, boolean defaultValue) {
+        String value = properties.getProperty(key.trim());
+        if (null != value) {
+            return Boolean.parseBoolean(value);
+        }
+
+        return defaultValue;
     }
 }

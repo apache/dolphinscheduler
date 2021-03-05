@@ -74,7 +74,7 @@ public abstract class AbstractCommandExecutor {
      */
     protected List<String> logBuffer;
 
-    protected boolean logOutputIsScuccess = false;
+    protected boolean logOutputIsSuccess = false;
 
     /**
      * SHELL result string
@@ -347,7 +347,7 @@ public abstract class AbstractCommandExecutor {
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             } finally {
-                logOutputIsScuccess = true;
+                logOutputIsSuccess = true;
                 close(inReader);
             }
         });
@@ -357,7 +357,7 @@ public abstract class AbstractCommandExecutor {
         parseProcessOutputExecutorService.submit(() -> {
             try {
                 long lastFlushTime = System.currentTimeMillis();
-                while (logBuffer.size() > 0 || !logOutputIsScuccess) {
+                while (logBuffer.size() > 0 || !logOutputIsSuccess) {
                     if (logBuffer.size() > 0) {
                         lastFlushTime = flush(lastFlushTime);
                     } else {

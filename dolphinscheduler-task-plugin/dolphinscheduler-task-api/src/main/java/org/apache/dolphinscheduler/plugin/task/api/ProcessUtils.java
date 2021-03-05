@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,8 +86,6 @@ public class ProcessUtils {
          */
         private static final Pattern PATTERN = Pattern.compile("[^\\s\"]+|\"[^\"]*\"");
     }
-
-
 
 
     /**
@@ -283,8 +284,6 @@ public class ProcessUtils {
 
     /**
      * kill tasks according to different task types.
-     *
-     * @param request
      */
     public static void kill(TaskRequest request) {
         try {
@@ -341,11 +340,29 @@ public class ProcessUtils {
 
     /**
      * find logs and kill yarn tasks.
-     *
+     * 判断是否是yarn todo
      * @param request request
      */
-    public static void killYarnJob(TaskRequest request) {
-       return;
+    private static void killYarnJob(TaskRequest request) {
+        try {
+            Thread.sleep(TaskConstants.SLEEP_TIME_MILLIS);
+
+
+            if (StringUtils.isNotEmpty(request.getAppIds())) {
+                List<String> appIds = Collections.singletonList(request.getAppIds());
+                String workerDir = request.getExecutePath();
+                if (StringUtils.isEmpty(workerDir)) {
+                    logger.error("task instance work dir is empty");
+                    throw new RuntimeException("task instance work dir is empty");
+                }
+                if (CollectionUtils.isNotEmpty(appIds)) {
+                    cancelApplication(appIds, logger, request.getTenantCode(), request.getExecutePath());
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("kill yarn job failure", e);
+        }
     }
 
     /**
@@ -391,8 +408,8 @@ public class ProcessUtils {
             sb.append("#!/bin/sh\n");
             sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
             sb.append("cd $BASEDIR\n");
-            if (TaskProperties.getProperties(TaskConstants.SYSTEM_ENV_PATH) != null) {
-                sb.append("source ").append(TaskProperties.getProperties(TaskConstants.SYSTEM_ENV_PATH)).append("\n");
+            if (TaskProperties.getString(TaskConstants.SYSTEM_ENV_PATH) != null) {
+                sb.append("source ").append(TaskProperties.getString(TaskConstants.SYSTEM_ENV_PATH)).append("\n");
             }
             sb.append("\n\n");
             sb.append(cmd);

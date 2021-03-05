@@ -180,6 +180,24 @@ public class TaskRequest {
     private Map<String, String> resources;
 
 
+    private Map<String, Property> paramsMap;
+
+    public Map<String, String> getResources() {
+        return resources;
+    }
+
+    public void setResources(Map<String, String> resources) {
+        this.resources = resources;
+    }
+
+    public Map<String, Property> getParamsMap() {
+        return paramsMap;
+    }
+
+    public void setParamsMap(Map<String, Property> paramsMap) {
+        this.paramsMap = paramsMap;
+    }
+
     public int getTaskInstanceId() {
         return taskInstanceId;
     }
