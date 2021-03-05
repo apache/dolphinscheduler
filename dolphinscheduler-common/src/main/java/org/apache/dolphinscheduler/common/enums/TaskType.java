@@ -54,7 +54,7 @@ public enum TaskType {
     CONDITIONS(11, "conditions"),
     SQOOP(12, "sqoop"),
     WATERDROP(13, "waterdrop"),
-    DATA_QUALITY(13, "data_quality");
+    DATA_QUALITY(14, "data_quality");
 
     TaskType(int code, String descp) {
         this.code = code;
