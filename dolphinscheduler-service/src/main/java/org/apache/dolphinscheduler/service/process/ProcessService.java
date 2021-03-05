@@ -1998,16 +1998,15 @@ public class ProcessService {
                 case RESOURCE_FILE_ID:
                 case UDF_FILE:
                     List<Integer> udfRelationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
-                    List<Resource> udfRelationResources = resourceMapper.queryResourceListById(udfRelationResourceIds);
+                    List<Resource> udfRelationResources = udfRelationResourceIds.size() > 0 ? resourceMapper.queryResourceListById(udfRelationResourceIds) : new ArrayList<>();
                     List<Resource> ownUdfResources = resourceMapper.listAuthorizedResourceById(userId, needChecks);
                     ownUdfResources.addAll(udfRelationResources);
-
                     Set<Integer> authorizedResourceFiles = ownUdfResources.stream().map(Resource::getId).collect(toSet());
                     originResSet.removeAll(authorizedResourceFiles);
                     break;
                 case RESOURCE_FILE_NAME:
                     List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
-                    List<Resource> relationResources = resourceMapper.queryResourceListById(relationResourceIds);
+                    List<Resource> relationResources = relationResourceIds.size() > 0 ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
                     List<Resource> ownResources = resourceMapper.listAuthorizedResource(userId, needChecks);
                     ownResources.addAll(relationResources);
                     Set<String> authorizedResources = ownResources.stream().map(Resource::getFullName).collect(toSet());

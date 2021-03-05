@@ -623,8 +623,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } else {
             // query resource relation
             List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-            relationResources = resourcesMapper.queryResourceListById(resourcesIds);
+            relationResources = resourcesIds.size() > 0 ? resourcesMapper.queryResourceListById(resourcesIds) : new ArrayList<>();
         }
+
         List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
         ownResourceList.addAll(relationResources);
 
@@ -654,7 +655,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } else {
             // query resource relation
             List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-            relationResources = resourcesMapper.queryResourceListById(resourcesIds);
+            relationResources = resourcesIds.size() > 0 ? resourcesMapper.queryResourceListById(resourcesIds) : new ArrayList<>();
         }
 
         List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());

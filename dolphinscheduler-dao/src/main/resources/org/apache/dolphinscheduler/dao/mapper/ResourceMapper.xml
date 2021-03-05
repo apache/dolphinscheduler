@@ -100,7 +100,7 @@
         where r.type = 0
         and r.user_id=#{userId}
         <if test="resNames != null and resNames != ''">
-            and r.full_name in
+
             <foreach collection="resNames" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
