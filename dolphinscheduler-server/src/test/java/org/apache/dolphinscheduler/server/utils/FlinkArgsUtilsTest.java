@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * Test FlinkArgsUtils
@@ -39,6 +40,7 @@ public class FlinkArgsUtilsTest {
 
     public String mode = "cluster";
     public int slot = 2;
+    public int parallelism = 3;
     public String appName = "testFlink";
     public int taskManager = 4;
     public String taskManagerMemory = "2G";
@@ -48,7 +50,7 @@ public class FlinkArgsUtilsTest {
     public ResourceInfo mainJar = null;
     public String mainArgs = "testArgs --input file:///home";
     public String queue = "queue1";
-    public String others = "-p 4";
+    public String others = "-s hdfs:///flink/savepoint-1537";
     public String flinkVersion = "<1.10";
 
 
@@ -72,6 +74,7 @@ public class FlinkArgsUtilsTest {
         param.setMainClass(mainClass);
         param.setAppName(appName);
         param.setSlot(slot);
+        param.setParallelism(parallelism);
         param.setTaskManager(taskManager);
         param.setJobManagerMemory(jobManagerMemory);
         param.setTaskManagerMemory(taskManagerMemory);
@@ -89,7 +92,7 @@ public class FlinkArgsUtilsTest {
         }
 
         //Expected values and order
-        assertEquals(20, result.size());
+        assertEquals(22, result.size());
 
         assertEquals("-m", result.get(0));
         assertEquals("yarn-cluster", result.get(1));
@@ -112,15 +115,18 @@ public class FlinkArgsUtilsTest {
         assertEquals("-yqu", result.get(12));
         assertEquals(result.get(13),queue);
 
-        assertEquals("-d", result.get(14));
+        assertEquals("-p", result.get(14));
+        assertSame(Integer.valueOf(result.get(15)),parallelism);
 
-        assertEquals(result.get(15),others);
+        assertEquals("-sae", result.get(16));
 
-        assertEquals("-c", result.get(16));
-        assertEquals(result.get(17),mainClass);
+        assertEquals(result.get(17),others);
 
-        assertEquals(result.get(18),mainJar.getRes());
-        assertEquals(result.get(19),mainArgs);
+        assertEquals("-c", result.get(18));
+        assertEquals(result.get(19),mainClass);
+
+        assertEquals(result.get(20),mainJar.getRes());
+        assertEquals(result.get(21),mainArgs);
 
         //Others param without -yqu
         FlinkParameters param1 = new FlinkParameters();
