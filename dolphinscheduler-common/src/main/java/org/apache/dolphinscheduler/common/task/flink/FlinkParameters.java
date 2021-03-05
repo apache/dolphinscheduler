@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.flink;
 
 import org.apache.dolphinscheduler.common.enums.ProgramType;
@@ -39,8 +40,8 @@ public class FlinkParameters extends AbstractParameters {
   private String mainClass;
 
   /**
-   * deploy mode  yarn-cluster  yarn-client  yarn-local
-    */
+   * deploy mode  yarn-cluster yarn-local
+   */
   private String deployMode;
 
   /**
@@ -54,25 +55,29 @@ public class FlinkParameters extends AbstractParameters {
   private int slot;
 
   /**
-   *Yarn application name
+   * parallelism
    */
+  private int parallelism;
 
+  /**
+   * yarn application name
+   */
   private String appName;
 
   /**
    * taskManager count
    */
-  private int  taskManager;
+  private int taskManager;
 
   /**
    * job manager memory
    */
-  private String  jobManagerMemory ;
+  private String jobManagerMemory;
 
   /**
    * task manager memory
    */
-  private String  taskManagerMemory;
+  private String taskManagerMemory;
 
   /**
    * resource list
@@ -138,6 +143,14 @@ public class FlinkParameters extends AbstractParameters {
 
   public void setSlot(int slot) {
     this.slot = slot;
+  }
+
+  public int getParallelism() {
+    return parallelism;
+  }
+
+  public void setParallelism(int parallelism) {
+    this.parallelism = parallelism;
   }
 
   public String getAppName() {
@@ -217,7 +230,6 @@ public class FlinkParameters extends AbstractParameters {
     return mainJar != null && programType != null;
   }
 
-
   @Override
   public List<ResourceInfo> getResourceFilesList() {
     if (mainJar != null && !resourceList.contains(mainJar)) {
@@ -225,4 +237,5 @@ public class FlinkParameters extends AbstractParameters {
     }
     return resourceList;
   }
+
 }
