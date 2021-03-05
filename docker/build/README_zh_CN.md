@@ -332,7 +332,7 @@ server.port=${API_SERVER_PORT}
 `/root/start-init-conf.sh`将根据模板文件动态的生成配置文件：
 
 ```sh
-echo "generate app config"
+echo "generate dolphinscheduler config"
 ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
 $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})

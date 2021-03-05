@@ -25,8 +25,8 @@ fullnameOverride: ""
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "apache"
-  repository: "dolphinscheduler"
+  registry: "docker.io"
+  repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
   pullSecrets: []
@@ -58,7 +58,7 @@ externalDatabase:
 ## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
-  fourlwCommandsWhitelist: srvr,ruok,wchs,cons
+  fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
   service:
     port: "2181"
   persistence:
