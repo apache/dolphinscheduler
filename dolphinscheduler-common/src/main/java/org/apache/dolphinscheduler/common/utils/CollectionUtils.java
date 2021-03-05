@@ -47,6 +47,11 @@ public class CollectionUtils {
     }
 
     /**
+     * The load factor used when none specified in constructor.
+     */
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+    /**
      * Returns a new {@link Collection} containing <i>a</i> minus a subset of
      * <i>b</i>.  Only the elements of <i>b</i> that satisfy the predicate
      * condition, <i>p</i> are subtracted from <i>a</i>.
@@ -95,6 +100,7 @@ public class CollectionUtils {
      * @return string to map
      */
     public static Map<String, String> stringToMap(String str, String separator, String keyPrefix) {
+
         Map<String, String> emptyMap = new HashMap<>(0);
         if (StringUtils.isEmpty(str)) {
             return emptyMap;
@@ -103,7 +109,8 @@ public class CollectionUtils {
             return emptyMap;
         }
         String[] strings = str.split(separator);
-        Map<String, String> map = new HashMap<>(strings.length);
+        int initialCapacity = (int)(strings.length / DEFAULT_LOAD_FACTOR) + 1;
+        Map<String, String> map = new HashMap<>(initialCapacity);
         for (int i = 0; i < strings.length; i++) {
             String[] strArray = strings[i].split("=");
             if (strArray.length != 2) {
