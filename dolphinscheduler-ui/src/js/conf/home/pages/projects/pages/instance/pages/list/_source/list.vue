@@ -64,7 +64,7 @@
         <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
-        <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
+        <el-table-column prop="host" :label="$t('host')" min-width="190"></el-table-column>
         <el-table-column :label="$t('Operation')" width="240" fixed="right">
           <template slot-scope="scope">
             <div v-show="scope.row.disabled">
