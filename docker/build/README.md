@@ -332,7 +332,7 @@ server.port=${API_SERVER_PORT}
 `/root/start-init-conf.sh` will dynamically generate config file:
 
 ```sh
-echo "generate app config"
+echo "generate dolphinscheduler config"
 ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
 $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})

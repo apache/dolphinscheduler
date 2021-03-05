@@ -25,13 +25,13 @@ fullnameOverride: ""
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "apache"
-  repository: "dolphinscheduler"
+  registry: "docker.io"
+  repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
   pullSecrets: []
 
-# If not exists external database, by default, Dolphinscheduler's database will use it.
+## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
   enabled: true
   postgresqlUsername: "root"
@@ -42,8 +42,8 @@ postgresql:
     size: "20Gi"
     storageClass: "-"
 
-# If exists external database, and set postgresql.enable value to false.
-# external database will be used, otherwise Dolphinscheduler's database will be used.
+## If exists external database, and set postgresql.enable value to false.
+## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
   type: "postgresql"
   driver: "org.postgresql.Driver"
@@ -52,13 +52,13 @@ externalDatabase:
   username: "root"
   password: "root"
   database: "dolphinscheduler"
-  # multi params should join with & char
+  ## multi params should join with & char
   params: "characterEncoding=utf8"
 
-# If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
+## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
-  fourlwCommandsWhitelist: srvr,ruok,wchs,cons
+  fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
   service:
     port: "2181"
   persistence:
@@ -67,8 +67,8 @@ zookeeper:
     storageClass: "-"
   zookeeperRoot: "/dolphinscheduler"
 
-# If exists external zookeeper, and set zookeeper.enable value to false.
-# If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
+## If exists external zookeeper, and set zookeeper.enable value to false.
+## If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
 externalZookeeper:
   zookeeperQuorum: "127.0.0.1:2181"
   zookeeperRoot: "/dolphinscheduler"
@@ -283,21 +283,7 @@ alert:
   ## ConfigMap
   configmap:
     DOLPHINSCHEDULER_OPTS: ""
-    ALERT_PLUGIN_DIR: "/opt/dolphinscheduler/alert/plugin"
-    XLS_FILE_PATH: "/tmp/xls"
-    MAIL_SERVER_HOST: ""
-    MAIL_SERVER_PORT: ""
-    MAIL_SENDER: ""
-    MAIL_USER: ""
-    MAIL_PASSWD: ""
-    MAIL_SMTP_STARTTLS_ENABLE: false
-    MAIL_SMTP_SSL_ENABLE: false
-    MAIL_SMTP_SSL_TRUST: ""
-    ENTERPRISE_WECHAT_ENABLE: false
-    ENTERPRISE_WECHAT_CORP_ID: ""
-    ENTERPRISE_WECHAT_SECRET: ""
-    ENTERPRISE_WECHAT_AGENT_ID: ""
-    ENTERPRISE_WECHAT_USERS: ""
+    ALERT_PLUGIN_DIR: "lib/plugin/alert"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -390,9 +376,7 @@ api:
 ingress:
   enabled: false
   host: "dolphinscheduler.org"
-  path: "/"
+  path: "/dolphinscheduler"
   tls:
     enabled: false
-    hosts:
-      - "dolphinscheduler.org"
     secretName: "dolphinscheduler-tls"

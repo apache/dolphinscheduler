@@ -69,7 +69,7 @@ spec:
             - "api-server"
           ports:
             - containerPort: 12345
-              name: tcp-port
+              name: "api-port"
           env:
             - name: TZ
               value: {{ .Values.timezone }}
@@ -132,7 +132,7 @@ spec:
               {{- end }}
             - name: ZOOKEEPER_QUORUM
               {{- if .Values.zookeeper.enabled }}
-              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
+              value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
               {{- else }}
               value: {{ .Values.externalZookeeper.zookeeperQuorum }}
               {{- end }}

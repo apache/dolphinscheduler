@@ -98,6 +98,8 @@
       this.searchParams.projectId = this.id === 0 ? 0 : localStore.getItem('projectId')
       this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
       this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
+      this.searchParams.startDate = this.dataTime[0]
+      this.searchParams.endDate = this.dataTime[1]
     },
     components: {
       mListConstruction,
