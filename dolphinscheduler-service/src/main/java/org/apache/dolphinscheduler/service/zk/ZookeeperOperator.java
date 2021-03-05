@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.service.zk;
 
+import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -24,20 +26,20 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 /**
  * zk base operator
@@ -127,10 +129,10 @@ public class ZookeeperOperator implements InitializingBean {
     }
 
     public List<String> getChildrenKeys(final String key) {
-        List<String> values;
         try {
-            values = zkClient.getChildren().forPath(key);
-            return values;
+            return zkClient.getChildren().forPath(key);
+        } catch (NoNodeException ex) {
+            return new ArrayList<>();
         } catch (InterruptedException ex) {
             logger.error("getChildrenKeys key : {} InterruptedException", key);
             throw new IllegalStateException(ex);
@@ -184,7 +186,7 @@ public class ZookeeperOperator implements InitializingBean {
             if (isExisted(key)) {
                 try {
                     zkClient.delete().deletingChildrenIfNeeded().forPath(key);
-                } catch (KeeperException.NoNodeException ignore) {
+                } catch (NoNodeException ignore) {
                     //NOP
                 }
             }
@@ -221,7 +223,7 @@ public class ZookeeperOperator implements InitializingBean {
             if (isExisted(key)) {
                 zkClient.delete().deletingChildrenIfNeeded().forPath(key);
             }
-        } catch (KeeperException.NoNodeException ignore) {
+        } catch (NoNodeException ignore) {
             //NOP
         } catch (final Exception ex) {
             logger.error("remove key : {}", key, ex);
