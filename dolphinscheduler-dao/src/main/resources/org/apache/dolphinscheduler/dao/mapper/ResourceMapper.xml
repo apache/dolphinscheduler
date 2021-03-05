@@ -46,16 +46,13 @@
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
         </include>
-        from t_ds_resources r, t_ds_relation_resources_user rel
+        from t_ds_resources r
         where 1 = 1
         <if test="type != -1">
             and r.type=#{type}
         </if>
-        <if test="userId != 0 and perm != 0">
-            and ( (r.id = rel.resources_id and rel.user_id=#{userId} and rel.perm=#{perm} ) or r.user_id=#{userId} )
-        </if>
-        <if test="userId != 0 and perm == 0">
-            and ( (r.id = rel.resources_id and rel.user_id=#{userId} ) or r.user_id=#{userId} )
+        <if test="userId != 0">
+            and r.user_id=#{userId}
         </if>
     </select>
     <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
@@ -99,12 +96,28 @@
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
         </include>
-        from t_ds_resources r, t_ds_relation_resources_user rel
-        where r.type=0
-        and ( (r.id = rel.resources_id and rel.user_id=#{userId} and perm=7 ) or r.user_id=#{userId} )
+        from t_ds_resources r
+        where r.type = 0
+        and r.user_id=#{userId}
         <if test="resNames != null and resNames != ''">
             and r.full_name in
             <foreach collection="resNames" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="queryResourceListById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        ,u.user_name as user_name
+        from t_ds_resources r
+        join t_ds_user u on r.user_id = u.id
+        where 1 = 1
+        <if test="resIds != null">
+            and r.id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
@@ -114,8 +127,8 @@
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
         </include>
-        from t_ds_resources r, t_ds_relation_resources_user rel
-        where  ( (r.id = rel.resources_id and rel.user_id=#{userId} and perm=7 ) or r.user_id=#{userId} )
+        from t_ds_resources r
+        where  r.user_id=#{userId}
         <if test="resIds != null and resIds != ''">
             and r.id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">

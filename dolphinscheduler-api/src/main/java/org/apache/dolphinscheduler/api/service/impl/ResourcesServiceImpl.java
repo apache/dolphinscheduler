@@ -529,6 +529,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
                 userId,directoryId, type.ordinal(), searchVal);
+
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
@@ -614,14 +615,22 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
 
+        List<Resource> relationResources;
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId = 0;
+            relationResources = new ArrayList<>();
+        } else {
+            // query resource relation
+            List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
+            relationResources = resourcesMapper.queryResourceListById(resourcesIds);
         }
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
+        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        ownResourceList.addAll(relationResources);
+
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(ownResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }
@@ -636,11 +645,22 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Map<String, Object> result = new HashMap<>();
-        String suffix = ".jar";
+
+        List<Resource> relationResources;
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId = 0;
+            relationResources = new ArrayList<>();
+        } else {
+            // query resource relation
+            List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
+            relationResources = resourcesMapper.queryResourceListById(resourcesIds);
         }
+
+        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        ownResourceList.addAll(relationResources);
+
+        String suffix = ".jar";
         if (programType != null) {
             switch (programType) {
                 case JAVA:
@@ -652,11 +672,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 default:
             }
         }
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
-        List<Resource> resources = new ResourceFilter(suffix,new ArrayList<>(allResourceList)).filter();
+        List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(ownResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }

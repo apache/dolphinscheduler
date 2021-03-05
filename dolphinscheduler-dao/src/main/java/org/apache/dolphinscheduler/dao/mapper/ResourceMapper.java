@@ -43,14 +43,10 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * query resource list
      * @param userId userId
      * @param type type
-     * @param perm perm
      * @return resource list
      */
-    List<Resource> queryResourceListAuthored(
-                                     @Param("userId") int userId,
-                                     @Param("type") int type,
-                                     @Param("perm") int perm);
-
+    List<Resource> queryResourceListAuthored(@Param("userId") int userId,
+                                             @Param("type") int type);
 
     /**
      * resource page
@@ -96,9 +92,14 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @param <T> T
      * @return resource list
      */
-    <T> List<Resource> listAuthorizedResource(@Param("userId") int userId,@Param("resNames")T[] resNames);
+    <T> List<Resource> listAuthorizedResource(@Param("userId") int userId, @Param("resNames") T[] resNames);
 
-
+    /**
+     * list resources by id
+     * @param resIds resIds
+     * @return resource list
+     */
+    List<Resource> queryResourceListById(@Param("resIds") List<Integer> resIds);
 
     /**
      * list authorized resource

@@ -390,10 +390,10 @@ public class ResourceMapperTest {
         Resource resource = createResource(generalUser1);
         createResourcesUser(resource, generalUser2);
 
-        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 0);
+        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
         Assert.assertNotNull(resourceList);
 
-        resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 4);
+        resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal());
         Assert.assertFalse(resourceList.contains(resource));
     }
 
