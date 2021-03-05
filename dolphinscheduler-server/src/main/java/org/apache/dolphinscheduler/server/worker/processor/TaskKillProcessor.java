@@ -19,11 +19,8 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -37,6 +34,7 @@ import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCache
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.task.spark.SparkTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
@@ -129,11 +127,19 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
             OSUtils.exeCmd(cmd);
 
-            // find log and kill yarn job
-            appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
+            TaskType anEnum = EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType());
+            switch (anEnum) {
+                case SPARK:
+                case FLINK:
+                    // find log and kill yarn job
+                    appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
+                            taskExecutionContext.getLogPath(),
+                            taskExecutionContext.getExecutePath(),
+                            taskExecutionContext.getTenantCode());
+                    break;
+                default:
+                    appIds = Collections.EMPTY_LIST;
+            }
 
             return Pair.of(true, appIds);
         } catch (Exception e) {
