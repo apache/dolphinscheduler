@@ -22,7 +22,7 @@ setlocal enableextensions enabledelayedexpansion
 if not defined VERSION (
     echo "set environment variable [VERSION]"
     set first=1
-    for /f "tokens=3 delims=<>" %%a in ('findstr "<version>[0-9].*</version>" %cd%\pom.xml') do (
+    for /f "tokens=3 delims=<>" %%a in ('findstr "<revision>[0-9].*</revision>" %cd%\pom.xml') do (
         if !first! EQU 1 (set VERSION=%%a)
         set first=0
     )
