@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.apache.dolphinscheduler.common.enums.dq.FormType;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,6 +34,8 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
  */
 @JsonDeserialize(builder = PluginParams.Builder.class)
 public class PluginParams {
+
+    private static final String NULL_LOG = "{0} is null";
 
     /**
      * param name
@@ -63,10 +66,10 @@ public class PluginParams {
 
     protected PluginParams(Builder builder) {
 
-        requireNonNull(builder, "builder is null");
-        requireNonNull(builder.field, "field is null");
-        requireNonNull(builder.type, "type is null");
-        requireNonNull(builder.title, "title is null");
+        requireNonNull(builder, MessageFormat.format(NULL_LOG,"builder"));
+        requireNonNull(builder.field, MessageFormat.format(NULL_LOG,"field"));
+        requireNonNull(builder.type, MessageFormat.format(NULL_LOG,"type"));
+        requireNonNull(builder.title, MessageFormat.format(NULL_LOG,"title"));
 
         this.field = builder.field;
         this.type = builder.type.getDescription();
