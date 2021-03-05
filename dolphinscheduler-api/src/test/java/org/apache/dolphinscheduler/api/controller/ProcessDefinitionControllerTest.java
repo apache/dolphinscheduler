@@ -188,7 +188,6 @@ public class ProcessDefinitionControllerTest {
         processDefinition.setId(id);
         processDefinition.setLocations(locations);
         processDefinition.setName(name);
-        processDefinition.setProcessDefinitionJson(json);
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
@@ -271,7 +270,6 @@ public class ProcessDefinitionControllerTest {
         processDefinition.setId(id);
         processDefinition.setLocations(locations);
         processDefinition.setName(name);
-        processDefinition.setProcessDefinitionJson(json);
 
         String name2 = "dag_test";
         int id2 = 2;
@@ -283,7 +281,6 @@ public class ProcessDefinitionControllerTest {
         processDefinition2.setId(id2);
         processDefinition2.setLocations(locations);
         processDefinition2.setName(name2);
-        processDefinition2.setProcessDefinitionJson(json);
 
         resourceList.add(processDefinition);
         resourceList.add(processDefinition2);
