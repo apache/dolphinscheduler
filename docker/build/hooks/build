@@ -24,7 +24,7 @@ printenv
 if [ -z "${VERSION}" ]
 then
     echo "set default environment variable [VERSION]"
-    export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
+    export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
 fi
 
 if [ "${DOCKER_REPO}x" = "x" ]
