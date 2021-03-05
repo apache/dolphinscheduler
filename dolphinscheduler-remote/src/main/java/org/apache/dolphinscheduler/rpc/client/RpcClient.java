@@ -15,15 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.plugin;
+package org.apache.dolphinscheduler.rpc.client;
 
-import org.apache.dolphinscheduler.dao.DaoFactory;
-import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 
-public abstract class AbstractDolphinPluginManager {
+import org.apache.dolphinscheduler.remote.utils.Host;
 
-    protected PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.MethodDelegation;
 
-    public abstract void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin);
+/**
+ * RpcClient
+ */
+public class RpcClient implements IRpcClient {
+
+    @Override
+    public <T> T create(Class<T> clazz, Host host) throws Exception {
+        return new ByteBuddy()
+                .subclass(clazz)
+                .method(isDeclaredBy(clazz)).intercept(MethodDelegation.to(new ConsumerInterceptor(host)))
+                .make()
+                .load(getClass().getClassLoader())
+                .getLoaded()
+                .getDeclaredConstructor().newInstance();
+    }
 }

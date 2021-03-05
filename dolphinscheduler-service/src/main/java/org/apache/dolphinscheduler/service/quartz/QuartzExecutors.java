@@ -370,7 +370,7 @@ public class QuartzExecutors {
      * @return data map
      */
     public static Map<String, Object> buildDataMap(int projectId, int scheduleId, Schedule schedule) {
-        Map<String, Object> dataMap = new HashMap<>(3);
+        Map<String, Object> dataMap = new HashMap<>(8);
         dataMap.put(PROJECT_ID, projectId);
         dataMap.put(SCHEDULE_ID, scheduleId);
         dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));
