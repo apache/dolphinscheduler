@@ -48,19 +48,19 @@ public class ProjectControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(ProjectControllerTest.class);
 
-    private Project project;
+    private String projectId;
 
     @Before
     public void before() throws Exception {
-        project = testCreateProject("project_test1", "the test project");
+        projectId = testCreateProject("project_test1", "the test project");
     }
 
     @After
     public void after() throws Exception {
-        testDeleteProject(String.valueOf(project.getId()));
+        testDeleteProject(projectId);
     }
 
-    private Project testCreateProject(String projectName, String description) throws Exception {
+    private String testCreateProject(String projectName, String description) throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectName",projectName);
@@ -73,19 +73,19 @@ public class ProjectControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), new TypeReference<Result<Project>>() {});
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), new TypeReference<Result<String>>() {});
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         Assert.assertNotNull(result.getData());
         logger.info("create project return result:{}", mvcResult.getResponse().getContentAsString());
 
-        return (Project) result.getData();
+        return (String)result.getData();
     }
 
     @Test
     public void testUpdateProject() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId", String.valueOf(project.getId()));
+        paramsMap.add("projectId", projectId);
         paramsMap.add("projectName","project_test_update");
         paramsMap.add("desc","the test project update");
 
@@ -106,7 +106,7 @@ public class ProjectControllerTest extends AbstractControllerTest {
     public void testQueryProjectById() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId", String.valueOf(project.getId()));
+        paramsMap.add("projectId", projectId);
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/query-by-id")
                 .header(SESSION_ID, sessionId)
@@ -118,7 +118,7 @@ public class ProjectControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
-        logger.info("query project by id :{}, return result:{}", project.getId(), mvcResult.getResponse().getContentAsString());
+        logger.info("query project by id :{}, return result:{}", projectId, mvcResult.getResponse().getContentAsString());
 
     }
 
