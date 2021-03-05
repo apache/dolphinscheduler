@@ -113,4 +113,19 @@ public class RegisterOperatorTest {
         Assert.assertFalse(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
     }
 
+    @Test
+    public void testGetChildrenKeysWithNoNodeException() throws Exception {
+        testAfterPropertiesSet();
+        String path = registerOperator.getDeadZNodeParentPath();
+        Assert.assertEquals(0, registerOperator.getChildrenKeys(path).size());
+    }
+
+    @Test
+    public void testNoNodeException() throws Exception {
+        testAfterPropertiesSet();
+        String path = registerOperator.getDeadZNodeParentPath();
+        registerOperator.persistEphemeral(path, "test");
+        registerOperator.remove(path);
+    }
+
 }
