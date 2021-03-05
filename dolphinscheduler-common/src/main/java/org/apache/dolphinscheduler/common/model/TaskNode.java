@@ -222,8 +222,8 @@ public class TaskNode {
     }
 
     public Boolean isForbidden() {
-        return (StringUtils.isNotEmpty(this.runFlag) &&
-                this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
+        return (StringUtils.isNotEmpty(this.runFlag)
+                && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN));
     }
 
     @Override
@@ -235,18 +235,17 @@ public class TaskNode {
             return false;
         }
         TaskNode taskNode = (TaskNode) o;
-        return Objects.equals(name, taskNode.name) &&
-                Objects.equals(desc, taskNode.desc) &&
-                Objects.equals(type, taskNode.type) &&
-                Objects.equals(params, taskNode.params) &&
-                Objects.equals(preTasks, taskNode.preTasks) &&
-                Objects.equals(extras, taskNode.extras) &&
-                Objects.equals(runFlag, taskNode.runFlag) &&
-                Objects.equals(dependence, taskNode.dependence) &&
-                Objects.equals(workerGroup, taskNode.workerGroup) &&
-                Objects.equals(conditionResult, taskNode.conditionResult) &&
-
-                CollectionUtils.equalLists(depList, taskNode.depList);
+        return Objects.equals(name, taskNode.name)
+                && Objects.equals(desc, taskNode.desc)
+                && Objects.equals(type, taskNode.type)
+                && Objects.equals(params, taskNode.params)
+                && Objects.equals(preTasks, taskNode.preTasks)
+                && Objects.equals(extras, taskNode.extras)
+                && Objects.equals(runFlag, taskNode.runFlag)
+                && Objects.equals(dependence, taskNode.dependence)
+                && Objects.equals(workerGroup, taskNode.workerGroup)
+                && Objects.equals(conditionResult, taskNode.conditionResult)
+                && CollectionUtils.equalLists(depList, taskNode.depList);
     }
 
     @Override
