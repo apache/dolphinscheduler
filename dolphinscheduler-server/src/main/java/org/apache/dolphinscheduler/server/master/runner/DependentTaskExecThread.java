@@ -149,6 +149,10 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                     logger.error("process instance not exists , master task exec thread exit");
                     return true;
                 }
+                if (checkTaskTimeout()) {
+                    this.checkTimeoutFlag = !alertTimeout();
+                    handleTimeoutFailed();
+                }
                 if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
                     cancelTaskInstance();
                     break;
@@ -181,7 +185,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
     private void initTaskParameters() {
         taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
-        taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
+        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);

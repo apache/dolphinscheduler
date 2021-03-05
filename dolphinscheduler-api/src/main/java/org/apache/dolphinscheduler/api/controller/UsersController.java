@@ -14,8 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -24,28 +38,34 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
- * user controller
+ * users controller
  */
-@Api(tags = "USERS_TAG", position = 14)
+@Api(tags = "USERS_TAG")
 @RestController
 @RequestMapping("/users")
 public class UsersController extends BaseController {
@@ -72,9 +92,9 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
             @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
             @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/create")
@@ -105,8 +125,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "queryUserList", notes = "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String")
     })
     @GetMapping(value = "/list-paging")
@@ -114,8 +134,8 @@ public class UsersController extends BaseController {
     @ApiException(QUERY_USER_LIST_PAGING_ERROR)
     public Result queryUserList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("pageNo") Integer pageNo,
-                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                @RequestParam("pageSize") Integer pageSize) {
+                                @RequestParam("pageSize") Integer pageSize,
+                                @RequestParam(value = "searchVal", required = false) String searchVal) {
         logger.info("login user {}, list user paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(), pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
@@ -147,9 +167,9 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
             @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
             @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/update")
@@ -166,7 +186,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "state", required = false) int state) throws Exception {
         logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}, state: {}",
                 loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone, queue, state);
-        Map<String, Object> result = usersService.updateUser(id, userName, userPassword, email, tenantId, phone, queue, state);
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
     }
 

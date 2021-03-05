@@ -45,6 +45,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
+/**
+ * process definition version service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionVersionServiceTest {
 
@@ -216,18 +219,17 @@ public class ProcessDefinitionVersionServiceTest {
      */
     private ProcessDefinitionVersion getProcessDefinitionVersion(ProcessDefinition processDefinition) {
         return ProcessDefinitionVersion
-                .newBuilder()
-                .processDefinitionId(processDefinition.getId())
-                .version(1)
-                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
-                .description(processDefinition.getDescription())
-                .locations(processDefinition.getLocations())
-                .connects(processDefinition.getConnects())
-                .timeout(processDefinition.getTimeout())
-                .globalParams(processDefinition.getGlobalParams())
-                .createTime(processDefinition.getUpdateTime())
-                .receivers(processDefinition.getReceivers())
-                .receiversCc(processDefinition.getReceiversCc())
+            .newBuilder()
+            .processDefinitionId(processDefinition.getId())
+            .version(1)
+            .processDefinitionJson(processDefinition.getProcessDefinitionJson())
+            .description(processDefinition.getDescription())
+            .locations(processDefinition.getLocations())
+            .connects(processDefinition.getConnects())
+            .timeout(processDefinition.getTimeout())
+            .globalParams(processDefinition.getGlobalParams())
+            .createTime(processDefinition.getUpdateTime())
+            .warningGroupId(processDefinition.getWarningGroupId())
                 .resourceIds(processDefinition.getResourceIds())
                 .build();
     }

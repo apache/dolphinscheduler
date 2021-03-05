@@ -33,12 +33,12 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
-      - name: checkout submodules
-        shell: bash
-        run: |
-          git submodule sync --recursive
-          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with:
+          submodule: true
+      - name: Check License Header
+        uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Only enable review / suggestion here
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -48,8 +48,8 @@ jobs:
       - name: Bootstrap database
         run: |
           sed -i "s/: root/: test/g" $(pwd)/docker/docker-swarm/docker-compose.yml
-          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml create --force-recreate dolphinscheduler-zookeeper dolphinscheduler-postgresql
-          sudo cp $(pwd)/sql/dolphinscheduler-postgre.sql $(docker volume inspect docker-swarm_dolphinscheduler-postgresql-initdb | grep "Mountpoint" | awk -F "\"" '{print $4}')
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up --no-start --force-recreate dolphinscheduler-zookeeper dolphinscheduler-postgresql
+          sudo cp $(pwd)/sql/dolphinscheduler_postgre.sql $(docker volume inspect docker-swarm_dolphinscheduler-postgresql-initdb | grep "Mountpoint" | awk -F "\"" '{print $4}')
           docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d dolphinscheduler-zookeeper dolphinscheduler-postgresql
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -98,12 +98,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
-      - name: checkout submodules
-        shell: bash
-        run: |
-          git submodule sync --recursive
-          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with:
+          submodule: true
       - name: check code style
         env:
           WORKDIR: ./

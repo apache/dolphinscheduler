@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.controller;
 
+package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ACCESS_TOKEN_ERROR;
@@ -54,7 +54,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * access token controller
  */
-@Api(tags = "ACCESS_TOKEN_TAG", position = 1)
+@Api(tags = "ACCESS_TOKEN_TAG")
 @RestController
 @RequestMapping("/access-token")
 public class AccessTokenController extends BaseController {
@@ -86,7 +86,7 @@ public class AccessTokenController extends BaseController {
         logger.info("login user {}, create token , userId : {} , token expire time : {} , token : {}", loginUser.getUserName(),
                 userId, expireTime, token);
 
-        Map<String, Object> result = accessTokenService.createToken(userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.createToken(loginUser, userId, expireTime, token);
         return returnDataList(result);
     }
 
@@ -106,7 +106,7 @@ public class AccessTokenController extends BaseController {
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "expireTime") String expireTime) {
         logger.info("login user {}, generate token , userId : {} , token expire time : {}", loginUser, userId, expireTime);
-        Map<String, Object> result = accessTokenService.generateToken(userId, expireTime);
+        Map<String, Object> result = accessTokenService.generateToken(loginUser, userId, expireTime);
         return returnDataList(result);
     }
 
@@ -185,7 +185,7 @@ public class AccessTokenController extends BaseController {
         logger.info("login user {}, update token , userId : {} , token expire time : {} , token : {}", loginUser.getUserName(),
                 userId, expireTime, token);
 
-        Map<String, Object> result = accessTokenService.updateToken(id, userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.updateToken(loginUser, id, userId, expireTime, token);
         return returnDataList(result);
     }
 

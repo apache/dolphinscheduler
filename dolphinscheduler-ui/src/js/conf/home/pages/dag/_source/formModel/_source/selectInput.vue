@@ -15,33 +15,34 @@
  * limitations under the License.
  */
 <template>
-  <x-select
+  <el-select
           style="width: 157px;"
           :disabled="isDetails"
-          @on-change="_onChange"
-          v-model="value">
-      <x-input
+          size="small"
+          @change="_onChange"
+          v-model="selectedValue">
+      <el-input
               ref="input"
               slot="trigger"
               v-if="isInput"
               :disabled="isDetails"
               slot-scope="{ selectedModel }"
               maxlength="4"
-              @on-blur="_onBlur"
+              @blur="_onBlur"
               :placeholder="$t('Please choose')"
               :value="selectedModel === null ? '0' : selectedModel.value"
               style="width: 100%;"
-              @on-click-icon.stop="_ckIcon">
-        <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="!isIconState"></em>
-        <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="isIconState"></em>
-      </x-input>
-    <x-option
+              @click="_ckIcon">
+        <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="!isIconState"></em>
+        <em slot="suffix" class="el-icon-arrow-down" style="font-size: 12px;" v-show="isIconState"></em>
+      </el-input>
+    <el-option
             v-for="city in list"
             :key="city"
             :value="city"
             :label="city">
-    </x-option>
-  </x-select>
+    </el-option>
+  </el-select>
 </template>
 <script>
   import _ from 'lodash'
@@ -52,6 +53,7 @@
     name: 'form-select-input',
     data () {
       return {
+        selectedValue: this.value,
         isIconState: false,
         isInput: true
       }
@@ -67,8 +69,8 @@
     },
     methods: {
       _onChange (o) {
-        this.$emit('valueEvent', +o.value)
-        this._setIconState(+o.value)
+        this.$emit('valueEvent', +o)
+        this._setIconState(+o)
       },
       _setIconState (value) {
         // Whether there is a list
@@ -87,7 +89,7 @@
         }, 1)
       },
       _onBlur () {
-        let val = $(this.$refs['input'].$el).find('input')[0].value
+        let val = $(this.$refs.input.$el).find('input')[0].value
         if (this._validation(val)) {
           this.$emit('valueEvent', val)
           this._setIconState(val)
@@ -106,9 +108,12 @@
       }
     },
     watch: {
+      value (val) {
+        this.selectedValue = val
+      }
     },
     created () {
-      this._setIconState(this.value)
+      this._setIconState(this.selectedValue)
     },
     mounted () {
     },

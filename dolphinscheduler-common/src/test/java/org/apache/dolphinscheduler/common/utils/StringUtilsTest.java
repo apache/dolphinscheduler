@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import org.junit.Assert;
@@ -60,5 +61,23 @@ public class StringUtilsTest {
         //"test" string
         b = StringUtils.isNotBlank("test");
         Assert.assertTrue(b);
+    }
+
+    @Test
+    public void testTrim() {
+        String trim = StringUtils.trim(null);
+        Assert.assertNull(trim);
+
+        trim = StringUtils.trim(" test ");
+        Assert.assertEquals("test", trim);
+    }
+
+    @Test
+    public void testDefaultIfBlank() {
+        String defaultStr = StringUtils.defaultIfBlank("", "defaultStr");
+        Assert.assertEquals("defaultStr", defaultStr);
+
+        defaultStr = StringUtils.defaultIfBlank("test", "defaultStr");
+        Assert.assertEquals("test", defaultStr);
     }
 }

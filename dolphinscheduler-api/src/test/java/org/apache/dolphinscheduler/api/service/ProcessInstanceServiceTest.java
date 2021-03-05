@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProcessInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -64,11 +65,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * process instance service test
+ */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessInstanceServiceTest {
 
     @InjectMocks
-    ProcessInstanceService processInstanceService;
+    ProcessInstanceServiceImpl processInstanceService;
 
     @Mock
     ProjectMapper projectMapper;
@@ -90,9 +94,6 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     ProcessDefinitionVersionService processDefinitionVersionService;
-
-    @Mock
-    ExecutorService execService;
 
     @Mock
     TaskInstanceMapper taskInstanceMapper;
@@ -124,9 +125,18 @@ public class ProcessInstanceServiceTest {
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
-        //project auth success
+        // data parameter check
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Map<String, Object> dataParameterRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "20200101 00:00:00",
+                "20200102 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
+                "192.168.xx.xx", 1, 10);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, dataParameterRes.get(Constants.STATUS));
+
+        //project auth success
+        putMsg(result, Status.SUCCESS, projectName);
         Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
         Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
         ProcessInstance processInstance = getProcessInstance();
@@ -143,6 +153,14 @@ public class ProcessInstanceServiceTest {
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
         Map<String, Object> successRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
                 "2020-01-02 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
+                "192.168.xx.xx", 1, 10);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        // data parameter empty
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(-1), Mockito.any(),
+                eq("192.168.xx.xx"), eq(null), eq(null))).thenReturn(pageReturn);
+        successRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "",
+                "", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
@@ -211,8 +229,6 @@ public class ProcessInstanceServiceTest {
 
         //project auth success
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setReceivers("xxx@qq.com");
-        processInstance.setReceiversCc("xxx@qq.com");
         processInstance.setProcessDefinitionId(46);
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);

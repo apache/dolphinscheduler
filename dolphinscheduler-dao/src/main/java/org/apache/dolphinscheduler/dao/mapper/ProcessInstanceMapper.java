@@ -75,6 +75,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param projectId projectId
      * @param processDefinitionId processDefinitionId
      * @param searchVal searchVal
+     * @param executorId executorId
      * @param statusArray statusArray
      * @param host host
      * @param startTime startTime
@@ -220,4 +221,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
             @Param("processDefinitionId") int processDefinitionId,
             @Param("states") int[] states);
 
+    int updateGlobalParamsById(
+            @Param("globalParams") String globalParams,
+            @Param("id")  int id);
 }

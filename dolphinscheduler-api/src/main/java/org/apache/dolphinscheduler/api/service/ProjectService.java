@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -119,5 +120,12 @@ public interface ProjectService {
      * @return project list
      */
     Map<String, Object> queryAllProjectList();
+
+    /**
+     * query authorized and user create project list by user id
+     * @param loginUser
+     * @return
+     */
+    Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser);
 
 }

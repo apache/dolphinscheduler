@@ -202,7 +202,7 @@ public class ProcessInstance {
      * @return
      */
     @TableField(exist = false)
-    private Long duration;
+    private String duration;
 
     /**
      * process instance priority
@@ -228,18 +228,6 @@ public class ProcessInstance {
      * varPool string
      */
     private String varPool;
-    
-    /**
-     * receivers for api
-     */
-    @TableField(exist = false)
-    private String receivers;
-
-    /**
-     * receivers cc for api
-     */
-    @TableField(exist = false)
-    private String receiversCc;
 
     public ProcessInstance() {
 
@@ -268,7 +256,7 @@ public class ProcessInstance {
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
-    
+
     public ProcessDefinition getProcessDefinition() {
         return processDefinition;
     }
@@ -559,11 +547,11 @@ public class ProcessInstance {
         this.dependenceScheduleTimes = dependenceScheduleTimes;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -589,22 +577,6 @@ public class ProcessInstance {
 
     public void setTenantId(int tenantId) {
         this.tenantId = tenantId;
-    }
-
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
     }
 
     @Override
@@ -679,12 +651,6 @@ public class ProcessInstance {
                 + timeout
                 + ", tenantId="
                 + tenantId
-                + ", receivers='"
-                + receivers
-                + '\''
-                + ", receiversCc='"
-                + receiversCc
-                + '\''
                 + '}';
     }
 

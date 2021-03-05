@@ -15,103 +15,107 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit User') : $t('Create User')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-user-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="userName"
                     maxlength="60"
+                    size="small"
                     :placeholder="$t('Please enter user name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="router.history.current.name !== 'account'">
           <template slot="name"><strong>*</strong>{{$t('Password')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="password"
                     v-model="userPassword"
+                    size="small"
                     :placeholder="$t('Please enter your password')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
           <template slot="name"><strong>*</strong>{{$t('Tenant')}}</template>
           <template slot="content">
-            <x-select v-model="tenantId" style="width: 100%;">
-              <x-option
+            <el-select v-model="tenantId" style="width: 100%;" size="small">
+              <el-option
                       v-for="city in tenantList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
           <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
-            <x-select v-model="queueName" style="width: 100%;">
-              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
-                <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
-                <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
-              </x-input>
-              <x-option
+            <el-select v-model="queueName" style="width: 100%;" size="small">
+              <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
+                <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
+                <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="queueName!=''"></em>
+              </el-input>
+              <el-option
                       v-for="city in queueList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Email')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="email"
+                    size="small"
                     :placeholder="$t('Please enter email')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Phone')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="phone"
+                    size="small"
                     :placeholder="$t('Please enter phone number')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <m-list-box-f style="line-height: 38px;">
           <template slot="name">{{$t('State')}}</template>
           <template slot="content">
-            <x-radio-group v-model="userState" >
-              <x-radio :label="'1'">{{$t('Enable')}}</x-radio>
-              <x-radio :label="'0'">{{$t('Disable')}}</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="userState" size="small">
+              <el-radio :label="'1'">{{$t('Enable')}}</el-radio>
+              <el-radio :label="'0'">{{$t('Disable')}}</el-radio>
+            </el-radio-group>
           </template>
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import router from '@/conf/home/router'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -145,7 +149,7 @@
             return
           }
           // Verify username
-          this.store.dispatch(`security/verifyName`, {
+          this.store.dispatch('security/verifyName', {
             type: 'user',
             userName: this.userName
           }).then(res => {
@@ -161,26 +165,26 @@
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
 
-        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
-        
+        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/
+
         let userNameLength = this.userName.length
         // user name
-        if (userNameLength<3 || userNameLength>39) {
+        if (userNameLength < 3 || userNameLength > 39) {
           this.$message.warning(`${i18n.$t('User name length is between 3 and 39')}`)
           return false
         }
-        if (!this.userName.replace(/\s*/g,"")) {
+        if (!this.userName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter user name')}`)
           return false
         }
         // password
-        if (this.userPassword!='' && this.item) {
-          if(!regPassword.test(this.userPassword)) {
+        if (this.userPassword !== '' && this.item) {
+          if (!regPassword.test(this.userPassword)) {
             this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
           }
-        } else if(!this.item){
-          if(!regPassword.test(this.userPassword)) {
+        } else if (!this.item) {
+          if (!regPassword.test(this.userPassword)) {
             this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
           }
@@ -209,7 +213,6 @@
       _getQueueList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getQueueList').then(res => {
-
             this.queueList = _.map(res, v => {
               return {
                 id: v.id,
@@ -232,22 +235,24 @@
             this.tenantList = _.map(arr, v => {
               return {
                 id: v.id,
-                code: v.tenantName
+                code: v.tenantCode
               }
             })
             this.$nextTick(() => {
-              this.tenantId = this.tenantList[0].id
+              if (this.tenantList.length) {
+                this.tenantId = this.tenantList[0].id
+              }
             })
             resolve()
           })
         })
       },
       _submit () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
 
-        let queueCode = '';
-        //get queue code
-        if (this.queueName != ''){
+        let queueCode = ''
+        // get queue code
+        if (this.queueName !== '') {
           queueCode = this.queueList.length > 0 ? _.find(this.queueList, ['id', this.queueName]).code : ''
         }
         let param = {
@@ -265,15 +270,16 @@
         }
 
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
-          setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
-          }, 800)
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate', param)
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},
@@ -287,9 +293,14 @@
             this.email = this.item.email
             this.phone = this.item.phone
             this.userState = this.item.state + '' || '1'
-            this.tenantId = this.item.tenantId
+            if (this.item.tenantId) {
+              this.tenantId = this.item.tenantId
+            }
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id||''
+              let queue = _.find(this.queueList, ['code', this.item.queue])
+              if (queue) {
+                this.queueName = queue.id || ''
+              }
             })
           }
         })
@@ -300,9 +311,14 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.userState = this.state + '' || '1'
-          this.tenantId = this.item.tenantId
-          if(this.queueList.length>0) {
-            this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+          if (this.item.tenantId) {
+            this.tenantId = this.item.tenantId
+          }
+          if (this.queueList.length > 0) {
+            let queue = _.find(this.queueList, ['code', this.item.queue])
+            if (queue) {
+              this.queueName = queue.id || ''
+            }
           } else {
             this.queueName = ''
           }
@@ -312,6 +328,6 @@
     mounted () {
 
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>

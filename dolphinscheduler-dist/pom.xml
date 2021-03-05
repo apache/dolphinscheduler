@@ -20,12 +20,12 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.3.2-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-dist</artifactId>
-    <packaging>pom</packaging>
+    <packaging>provisio</packaging>
     <name>${project.artifactId}</name>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>

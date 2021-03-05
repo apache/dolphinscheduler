@@ -14,55 +14,81 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.server.registry.DependencyConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.apache.dolphinscheduler.server.zk.SpringZKServer;
-import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
-import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, TaskResponseService.class, ZookeeperRegistryCenter.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, TaskResponseService.class,
-        CuratorZookeeperClient.class})
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import io.netty.channel.Channel;
+
+@RunWith(MockitoJUnitRunner.class)
 public class TaskResponseServiceTest {
 
-    @Autowired
-    private TaskResponseService taskResponseService;
+    @Mock(name = "processService")
+    private ProcessService processService;
 
-    @Test
-    public void testAdd(){
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
-                "", "", "", 1);
-        taskResponseService.addResponse(taskResponseEvent);
-        Assert.assertTrue(taskResponseService.getEventQueue().size() == 1);
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException ignore) {
-        }
-        //after sleep, inner worker will take the event
-        Assert.assertTrue(taskResponseService.getEventQueue().size() == 0);
+    @InjectMocks
+    TaskResponseService taskRspService;
+
+    @Mock
+    private Channel channel;
+
+    private TaskResponseEvent ackEvent;
+
+    private TaskResponseEvent resultEvent;
+
+    private TaskInstance taskInstance;
+
+    @Before
+    public void before() {
+        taskRspService.start();
+
+        ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,
+            new Date(),
+            "127.*.*.*",
+            "path",
+            "logPath",
+            22,
+            channel);
+
+        resultEvent = TaskResponseEvent.newResult(ExecutionStatus.SUCCESS,
+            new Date(),
+            1,
+            "ids",
+            22,
+            "varPol",
+            channel,
+                "[{\"id\":70000,\"database_name\":\"yuul\",\"status\":-1,\"create_time\":1601202829000,\"update_time\":1601202829000,\"table_name3\":\"\",\"table_name4\":\"\"}]");
+
+        taskInstance = new TaskInstance();
+        taskInstance.setId(22);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
     }
 
     @Test
-    public void testStop(){
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
-                "", "", "", 1);
-        taskResponseService.addResponse(taskResponseEvent);
-        taskResponseService.stop();
-        Assert.assertTrue(taskResponseService.getEventQueue().size() == 0);
+    public void testAddResponse() {
+        Mockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
+        Mockito.when(channel.writeAndFlush(Mockito.any())).thenReturn(null);
+        taskRspService.addResponse(ackEvent);
+        taskRspService.addResponse(resultEvent);
     }
+
+    @After
+    public void after() {
+        taskRspService.stop();
+    }
+
 }

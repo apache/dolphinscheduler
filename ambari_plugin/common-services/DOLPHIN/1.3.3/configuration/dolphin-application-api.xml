@@ -1,0 +1,87 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<configuration>
+	<property>
+		<name>server.port</name>
+		<value>12345</value>
+		<description>
+			server port
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+	</property>
+	<property>
+		<name>server.servlet.session.timeout</name>
+		<value>7200</value>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<description>
+		</description>
+	</property>
+	<property>
+		<name>server.servlet.context-path</name>
+		<value>/dolphinscheduler/</value>
+		<description>
+		</description>
+	</property>
+	<property>
+		<name>spring.servlet.multipart.max-file-size</name>
+		<value>1024</value>
+		<value-attributes>
+			<unit>MB</unit>
+			<type>int</type>
+		</value-attributes>
+		<description>
+		</description>
+	</property>
+	<property>
+		<name>spring.servlet.multipart.max-request-size</name>
+		<value>1024</value>
+		<value-attributes>
+			<unit>MB</unit>
+			<type>int</type>
+		</value-attributes>
+		<description>
+		</description>
+	</property>
+	<property>
+		<name>server.jetty.max-http-post-size</name>
+		<value>5000000</value>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<description>
+		</description>
+	</property>
+	<property>
+		<name>spring.messages.encoding</name>
+		<value>UTF-8</value>
+		<description></description>
+	</property>
+	<property>
+		<name>spring.messages.basename</name>
+		<value>i18n/messages</value>
+		<description></description>
+	</property>
+	<property>
+		<name>security.authentication.type</name>
+		<value>PASSWORD</value>
+		<description></description>
+	</property>
+</configuration>

@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.processor;
 
-import java.util.Date;
+package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -37,17 +36,21 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseSer
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -56,26 +59,29 @@ import io.netty.channel.Channel;
 
 /**
  * test task call back service
+ * todo  refactor it in the form of mock
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={
-        TaskCallbackServiceTestConfig.class,
-        SpringZKServer.class,
-        SpringApplicationContext.class,
-        MasterRegistry.class,
-        WorkerRegistry.class,
-        ZookeeperRegistryCenter.class,
-        MasterConfig.class,
-        WorkerConfig.class,
-        ZookeeperCachedOperator.class,
-        ZookeeperConfig.class,
-        ZookeeperNodeManager.class,
-        TaskCallbackService.class,
-        TaskResponseService.class,
-        TaskAckProcessor.class,
-        TaskResponseProcessor.class,
-        TaskExecuteProcessor.class,
-        CuratorZookeeperClient.class})
+@ContextConfiguration(classes = {
+    TaskCallbackServiceTestConfig.class,
+    SpringZKServer.class,
+    SpringApplicationContext.class,
+    MasterRegistry.class,
+    WorkerRegistry.class,
+    ZookeeperRegistryCenter.class,
+    MasterConfig.class,
+    WorkerConfig.class,
+    RegisterOperator.class,
+    ZookeeperConfig.class,
+    ZookeeperNodeManager.class,
+    TaskCallbackService.class,
+    TaskResponseService.class,
+    TaskAckProcessor.class,
+    TaskResponseProcessor.class,
+    TaskExecuteProcessor.class,
+    CuratorZookeeperClient.class,
+    TaskExecutionContextCacheManagerImpl.class,
+    WorkerManagerThread.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
@@ -95,10 +101,11 @@ public class TaskCallbackServiceTest {
 
     /**
      * send ack test
+     *
      * @throws Exception
      */
     @Test
-    public void testSendAck() throws Exception{
+    public void testSendAck() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -114,6 +121,11 @@ public class TaskCallbackServiceTest {
         ackCommand.setStartTime(new Date());
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand();
+        String result = responseCommand.getResult();
+        responseCommand.setResult("return string");
+        taskCallbackService.sendResult(1, responseCommand.convert2Command());
+
         Stopper.stop();
 
         nettyRemotingServer.close();
@@ -122,10 +134,11 @@ public class TaskCallbackServiceTest {
 
     /**
      * send result test
+     *
      * @throws Exception
      */
     @Test
-    public void testSendResult() throws Exception{
+    public void testSendResult() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -136,7 +149,7 @@ public class TaskCallbackServiceTest {
         NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
         Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
-        TaskExecuteResponseCommand responseCommand  = new TaskExecuteResponseCommand();
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand();
         responseCommand.setTaskInstanceId(1);
         responseCommand.setEndTime(new Date());
 
@@ -152,20 +165,13 @@ public class TaskCallbackServiceTest {
         nettyRemotingClient.close();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testSendAckWithIllegalArgumentException(){
-        TaskExecuteAckCommand ackCommand = Mockito.mock(TaskExecuteAckCommand.class);
-        taskCallbackService.sendAck(1, ackCommand.convert2Command());
-        Stopper.stop();
+    @Test
+    public void testPause() {
+        Assert.assertEquals(5000, taskCallbackService.pause(3));
     }
 
     @Test
-    public void testPause(){
-        Assert.assertEquals(5000, taskCallbackService.pause(3));;
-    }
-
-    @Test
-    public void testSendAck1(){
+    public void testSendAck1() {
         masterRegistry.registry();
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
@@ -177,7 +183,7 @@ public class TaskCallbackServiceTest {
         NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
         Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
-//        channel.close();
+        //        channel.close();
 
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(1);
@@ -185,7 +191,7 @@ public class TaskCallbackServiceTest {
 
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
-        Assert.assertEquals(true, channel.isOpen());
+        Assert.assertTrue(channel.isOpen());
 
         Stopper.stop();
 
@@ -195,7 +201,7 @@ public class TaskCallbackServiceTest {
     }
 
     @Test
-    public void testTaskExecuteProcessor() throws Exception{
+    public void testTaskExecuteProcessor() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -207,11 +213,11 @@ public class TaskCallbackServiceTest {
 
         TaskExecuteRequestCommand taskExecuteRequestCommand = new TaskExecuteRequestCommand();
 
-        nettyRemotingClient.send(new Host("localhost",30000),taskExecuteRequestCommand.convert2Command());
+        nettyRemotingClient.send(new Host("localhost", 30000), taskExecuteRequestCommand.convert2Command());
 
         taskExecuteRequestCommand.setTaskExecutionContext(JSONUtils.toJsonString(new TaskExecutionContext()));
 
-        nettyRemotingClient.send(new Host("localhost",30000),taskExecuteRequestCommand.convert2Command());
+        nettyRemotingClient.send(new Host("localhost", 30000), taskExecuteRequestCommand.convert2Command());
 
         Thread.sleep(5000);
 
@@ -222,41 +228,5 @@ public class TaskCallbackServiceTest {
         nettyRemotingServer.close();
         nettyRemotingClient.close();
     }
-
-//    @Test(expected = IllegalStateException.class)
-//    public void testSendAckWithIllegalStateException2(){
-//        masterRegistry.registry();
-//        final NettyServerConfig serverConfig = new NettyServerConfig();
-//        serverConfig.setListenPort(30000);
-//        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-//        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
-//        nettyRemotingServer.start();
-//
-//        final NettyClientConfig clientConfig = new NettyClientConfig();
-//        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
-//        Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
-//        taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
-//        channel.close();
-//        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
-//        ackCommand.setTaskInstanceId(1);
-//        ackCommand.setStartTime(new Date());
-//
-//        nettyRemotingServer.close();
-//
-//        taskCallbackService.sendAck(1, ackCommand.convert2Command());
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Stopper.stop();
-//
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
 }

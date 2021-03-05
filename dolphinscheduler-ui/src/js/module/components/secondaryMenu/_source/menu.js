@@ -26,8 +26,8 @@ const menu = {
       id: 0,
       path: 'projects-index',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-home-solid',
+      enabled: true,
+      icon: 'ri-home-4-line',
       children: []
     },
     {
@@ -35,8 +35,8 @@ const menu = {
       id: 1,
       path: 'projects-kinship',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-node',
+      enabled: true,
+      icon: 'ri-node-tree',
       children: []
     },
     {
@@ -44,38 +44,38 @@ const menu = {
       id: 2,
       path: '',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-gear',
+      enabled: true,
+      icon: 'el-icon-s-tools',
       children: [
         {
           name: `${i18n.$t('Process definition')}`,
           path: 'definition',
           id: 0,
-          disabled: true
+          enabled: true
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 1,
-          disabled: true
+          enabled: true
         },
         {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
           id: 2,
-          disabled: true
+          enabled: true
         },
         {
           name: `${i18n.$t('Task record')}`,
           path: 'task-record',
           id: 3,
-          disabled: config.recordSwitch
+          enabled: config.recordSwitch
         },
         {
           name: `${i18n.$t('History task record')}`,
           path: 'history-task-record',
           id: 4,
-          disabled: config.recordSwitch
+          enabled: config.recordSwitch
         }
       ]
     }
@@ -87,8 +87,8 @@ const menu = {
       id: 0,
       path: 'tenement-manage',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-user-solid',
+      enabled: true,
+      icon: 'el-icon-user-solid',
       children: []
     },
     {
@@ -96,8 +96,8 @@ const menu = {
       id: 1,
       path: 'users-manage',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-user-circle-solid',
+      enabled: true,
+      icon: 'el-icon-user-solid',
       children: []
     },
     {
@@ -105,8 +105,17 @@ const menu = {
       id: 2,
       path: 'warning-groups-manage',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-danger-solid',
+      enabled: true,
+      icon: 'el-icon-warning',
+      children: []
+    },
+    {
+      name: `${i18n.$t('Warning instance manage')}`,
+      id: 2,
+      path: 'warning-instance-manage',
+      isOpen: true,
+      enabled: true,
+      icon: 'el-icon-warning-outline',
       children: []
     },
     {
@@ -114,8 +123,8 @@ const menu = {
       id: 4,
       path: 'worker-groups-manage',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-diary',
+      enabled: true,
+      icon: 'el-icon-s-custom',
       children: []
     },
     {
@@ -123,8 +132,8 @@ const menu = {
       id: 3,
       path: 'queue-manage',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-recycle',
+      enabled: true,
+      icon: 'el-icon-s-grid',
       children: []
     },
     {
@@ -132,9 +141,9 @@ const menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
-      icon: 'ans-icon-document',
+      icon: 'el-icon-document',
       children: [],
-      disabled: true
+      enabled: true
     }
   ],
   resource: [
@@ -143,29 +152,29 @@ const menu = {
       id: 0,
       path: 'file',
       isOpen: true,
-      icon: 'ans-icon-documents',
+      icon: 'el-icon-document-copy',
       children: [],
-      disabled: true
+      enabled: true
     },
     {
       name: `${i18n.$t('UDF manage')}`,
       id: 1,
       path: '',
       isOpen: true,
-      icon: 'ans-icon-document',
-      disabled: true,
+      icon: 'el-icon-document',
+      enabled: true,
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
           path: 'resource-udf',
           id: 0,
-          disabled: true
+          enabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
           path: 'resource-func',
           id: 1,
-          disabled: true
+          enabled: true
         }
       ]
     }
@@ -176,27 +185,27 @@ const menu = {
       id: 0,
       path: 'account',
       isOpen: true,
-      icon: 'ans-icon-user-solid',
+      icon: 'el-icon-user-solid',
       children: [],
-      disabled: true
+      enabled: true
     },
     {
       name: `${i18n.$t('Edit password')}`,
       id: 1,
       path: 'password',
       isOpen: true,
-      icon: 'ans-icon-key',
+      icon: 'el-icon-key',
       children: [],
-      disabled: true
+      enabled: true
     },
     {
       name: `${i18n.$t('Token manage')}`,
       id: 2,
       path: 'token',
       isOpen: true,
-      icon: 'ans-icon-diary',
+      icon: 'el-icon-s-custom',
       children: [],
-      disabled: Permissions.getAuth()
+      enabled: Permissions.getAuth()
     }
   ],
   monitor: [
@@ -205,32 +214,32 @@ const menu = {
       id: 1,
       path: '',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-menu',
+      enabled: true,
+      icon: 'el-icon-menu',
       children: [
         {
           name: 'Master',
           path: 'servers-master',
           id: 0,
-          disabled: true
+          enabled: true
         },
         {
           name: 'Worker',
           path: 'servers-worker',
           id: 1,
-          disabled: true
+          enabled: true
         },
         {
           name: 'Zookeeper',
           path: 'servers-zookeeper',
           id: 4,
-          disabled: true
+          enabled: true
         },
         {
           name: 'DB',
           path: 'servers-db',
           id: 6,
-          disabled: true
+          enabled: true
         }
       ]
     },
@@ -239,14 +248,14 @@ const menu = {
       id: 0,
       path: '',
       isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-menu',
+      enabled: true,
+      icon: 'el-icon-menu',
       children: [
         {
           name: 'Statistics',
           path: 'statistics',
           id: 0,
-          disabled: true
+          enabled: true
         }
       ]
     }

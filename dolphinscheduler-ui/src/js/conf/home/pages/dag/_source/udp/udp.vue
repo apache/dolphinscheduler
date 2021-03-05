@@ -17,28 +17,26 @@
 <template>
   <div class="udp-model">
     <div class="scrollbar contpi-boxt">
-      <div class="title">
-        <span>{{$t('Set the DAG diagram name')}}</span>
-      </div>
-
       <div>
-        <x-input
+        <el-input
                 type="text"
+                size="small"
                 v-model="name"
                 :disabled="router.history.current.name === 'projects-instance-details'"
                 :placeholder="$t('Please enter name (required)')">
-        </x-input>
+        </el-input>
       </div>
 
       <template v-if="router.history.current.name !== 'projects-instance-details'">
         <div style="padding-top: 12px;">
-          <x-input
+          <el-input
                   type="textarea"
+                  size="small"
                   v-model="description"
                   :autosize="{minRows:2}"
                   :placeholder="$t('Please enter description(optional)')"
                   autocomplete="off">
-          </x-input>
+          </el-input>
         </div>
       </template>
 
@@ -49,14 +47,14 @@
       <div class="title" style="padding-top: 6px;">
         <span class="text-b">{{$t('warning of timeout')}}</span>
         <span style="padding-left: 6px;">
-          <x-switch v-model="checkedTimeout"></x-switch>
+          <el-switch v-model="checkedTimeout" size="small"></el-switch>
         </span>
       </div>
       <div class="content" style="padding-bottom: 10px;" v-if="checkedTimeout">
         <span>
-          <x-input v-model="timeout" style="width: 160px;" maxlength="9">
+          <el-input v-model="timeout" style="width: 160px;" maxlength="9" size="small">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
         </span>
       </div>
 
@@ -76,13 +74,18 @@
     </div>
     <div class="bottom">
       <div class="submit">
-        <template v-if="router.history.current.name === 'projects-instance-details'">
+        <template v-if="router.history.current.name === 'projects-definition-details'">
           <div class="lint-pt">
-            <x-checkbox v-model="syncDefine">{{$t('Whether to update the process definition')}}</x-checkbox>
+            <el-checkbox v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Whether to go online the process definition')}}</el-checkbox>
           </div>
         </template>
-        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :disabled="isDetails" @click="ok()">{{$t('Add')}}</x-button>
+        <template v-if="router.history.current.name === 'projects-instance-details'">
+          <div class="lint-pt">
+            <el-checkbox v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
+          </div>
+        </template>
+        <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()">{{$t('Add')}}</el-button>
       </div>
     </div>
   </div>
@@ -93,7 +96,7 @@
   import mLocalParams from '../formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Affirm from '../jumpAffirm'
-  import FormTenant from "./_source/selectTenant";
+  import FormTenant from './_source/selectTenant'
 
   export default {
     name: 'udp',
@@ -108,6 +111,8 @@
         udpList: [],
         // Global custom parameters
         udpListCache: [],
+        // Whether to go online the process definition
+        releaseState: 'ONLINE',
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
@@ -136,13 +141,19 @@
         }
         return true
       },
-      _accuStore(){
-        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+      _accuStore () {
+        const udp = _.cloneDeep(this.udpList)
+        udp.forEach(u => {
+          delete u.ifFixed
+        })
+        this.store.commit('dag/setGlobalParams', udp)
+
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
         this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
+        this.store.commit('dag/setReleaseState', this.releaseState)
       },
       /**
        * submit
@@ -185,6 +196,46 @@
        */
       close () {
         this.$emit('close')
+      },
+      /**
+       * reload localParam
+       */
+      reloadParam () {
+        const dag = _.cloneDeep(this.store.state.dag)
+        let fixedParam = []
+        const tasks = this.store.state.dag.tasks
+        for (const task of tasks) {
+          const localParam = task.params ? task.params.localParams : []
+          localParam.forEach(l => {
+            if (!fixedParam.some(f => { return f.prop === l.prop })) {
+              fixedParam.push(Object.assign({
+                ifFixed: true
+              }, l))
+            }
+          })
+        }
+
+        let globalParams = _.cloneDeep(dag.globalParams)
+
+        globalParams = globalParams.map(g => {
+          if (fixedParam.some(f => { return g.prop === f.prop })) {
+            fixedParam = fixedParam.filter(f => { return g.prop !== f.prop })
+            return Object.assign(g, {
+              ifFixed: true
+            })
+          } else {
+            return g
+          }
+        })
+        let udpList = [...fixedParam, ...globalParams].sort(s => {
+          if (s.ifFixed) {
+            return -1
+          } else {
+            return 1
+          }
+        })
+        this.udpList = udpList
+        this.udpListCache = udpList
       }
     },
     watch: {
@@ -197,25 +248,24 @@
     },
     created () {
       const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
+
       this.name = dag.name
       this.originalName = dag.name
       this.description = dag.description
       this.syncDefine = dag.syncDefine
+      this.releaseState = dag.releaseState
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {
-        if (dag.tenantId === -1) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        } else {
+        if (dag.tenantId > -1) {
           this.tenantId = dag.tenantId
+        } else if (this.store.state.user.userInfo.tenantId) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
         }
       })
-
     },
     mounted () {},
-    components: {FormTenant, mLocalParams }
+    components: { FormTenant, mLocalParams }
   }
 </script>
 

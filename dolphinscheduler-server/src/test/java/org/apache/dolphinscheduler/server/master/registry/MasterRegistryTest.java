@@ -60,7 +60,7 @@ public class MasterRegistryTest {
         String masterPath = zookeeperRegistryCenter.getMasterPath();
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         String masterNodePath = masterPath + "/" + (Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort());
-        String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(masterNodePath);
+        String heartbeat = zookeeperRegistryCenter.getRegisterOperator().get(masterNodePath);
         Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
         masterRegistry.unRegistry();
     }
@@ -72,7 +72,7 @@ public class MasterRegistryTest {
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         masterRegistry.unRegistry();
         String masterPath = zookeeperRegistryCenter.getMasterPath();
-        List<String> childrenKeys = zookeeperRegistryCenter.getZookeeperCachedOperator().getChildrenKeys(masterPath);
+        List<String> childrenKeys = zookeeperRegistryCenter.getRegisterOperator().getChildrenKeys(masterPath);
         Assert.assertTrue(childrenKeys.isEmpty());
     }
 }

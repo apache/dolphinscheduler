@@ -21,7 +21,7 @@
         <div class="row-box" v-for="(item,$index) in workerList" :key="$index">
           <div class="row-title">
             <div class="left">
-              <span class="sp">IP: {{item.host}}</span>
+              <span class="sp">Host: {{item.host}}</span>
               <span>{{$t('Zk registration directory')}}: <a href="javascript:" @click="_showZkDirectories(item)" class="links">{{$t('Directory detail')}}</a></span>
             </div>
             <div class="right">
@@ -57,6 +57,11 @@
           </div>
         </div>
       </div>
+      <el-drawer
+        :visible.sync="drawer"
+        :with-header="false">
+        <zookeeper-directories-popup :zkDirectories = zkDirectories></zookeeper-directories-popup>
+      </el-drawer>
       <div v-if="!workerList.length">
         <m-no-data></m-no-data>
       </div>
@@ -68,7 +73,6 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mGauge from './_source/gauge'
-  import mList from './_source/zookeeperList'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
@@ -81,41 +85,33 @@
       return {
         isLoading: false,
         workerList: [],
-        color: themeData.color
+        color: themeData.color,
+        drawer: false,
+        zkDirectories: []
       }
     },
     props: {},
     methods: {
       ...mapActions('monitor', ['getWorkerData']),
       _showZkDirectories (item) {
-        let zkDirectories = []
+        this.zkDirectories = []
         item.zkDirectories.forEach(zkDirectory => {
-          zkDirectories.push({
+          this.zkDirectories.push({
             zkDirectory: zkDirectory
           })
         })
-        this.$drawer({
-          direction: 'right',
-          render (h) {
-            return h(zookeeperDirectoriesPopup, {
-              props: {
-                zkDirectories: zkDirectories
-              }
-            })
-          }
-        })
+        this.drawer = true
       }
     },
     watch: {},
     created () {
-
     },
     mounted () {
       this.isLoading = true
       this.getWorkerData().then(res => {
         this.workerList = _.map(res, (v, i) => {
           return _.assign(v, {
-            id: v.host + "_" + v.id,
+            id: v.host + '_' + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })
@@ -124,7 +120,7 @@
         this.isLoading = true
       })
     },
-    components: { mList, mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
+    components: { mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

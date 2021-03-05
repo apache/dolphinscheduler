@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,9 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * project service test
+ **/
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
 
@@ -65,7 +69,6 @@ public class ProjectServiceTest {
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
-
 
     private String projectName = "ProjectServiceTest";
 
@@ -296,10 +299,31 @@ public class ProjectServiceTest {
     }
 
     @Test
-    public void testQueryAllProjectList() {
+    public void testQueryProjectCreatedAndAuthorizedByUser() {
 
+        Map<String, Object> result = null;
+        User loginUser = getLoginUser();
+
+        // not admin user
+        Mockito.when(projectMapper.queryProjectCreatedAndAuthorizedByUserId(1)).thenReturn(getList());
+        result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
+        List<Project> notAdminUserResult = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(notAdminUserResult));
+
+        //admin user
+        loginUser.setUserType(UserType.ADMIN_USER);
         Mockito.when(projectMapper.selectList(null)).thenReturn(getList());
-        Mockito.when(processDefinitionMapper.selectList(null)).thenReturn(getProcessDefinitions());
+        result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
+        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+
+    }
+
+    @Test
+    public void testQueryAllProjectList() {
+        Mockito.when(processDefinitionMapper.listProjectIds()).thenReturn(getProjectIds());
+        Mockito.when(projectMapper.selectBatchIds(getProjectIds())).thenReturn(getList());
 
         Map<String, Object> result = projectService.queryAllProjectList();
         logger.info(result.toString());
@@ -340,13 +364,11 @@ public class ProjectServiceTest {
      * create admin user
      */
     private User getLoginUser() {
-
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setUserName(userName);
         loginUser.setId(1);
         return loginUser;
-
     }
 
     /**
@@ -366,6 +388,11 @@ public class ProjectServiceTest {
         list.add(processDefinition);
         return list;
     }
+
+    private List<Integer> getProjectIds() {
+        return Collections.singletonList(1);
+    }
+
 
     private String getDesc() {
         return "projectUserMapper.deleteProjectRelation(projectId,userId)projectUserMappe"

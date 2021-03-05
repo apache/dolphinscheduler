@@ -34,6 +34,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  */
 public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
+    /**
+     * verify process definition by name
+     *
+     * @param projectId projectId
+     * @param name name
+     * @return process definition
+     */
+    ProcessDefinition verifyByDefineName(@Param("projectId") int projectId,
+                                        @Param("processDefinitionName") String name);
 
     /**
      * query process definition by name
@@ -129,4 +138,10 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param version version
      */
     void updateVersionByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
+
+    /**
+     * list all project ids
+     * @return project ids list
+     */
+    List<Integer> listProjectIds();
 }

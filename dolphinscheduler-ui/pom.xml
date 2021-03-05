@@ -20,7 +20,7 @@
   <parent>
     <artifactId>dolphinscheduler</artifactId>
     <groupId>org.apache.dolphinscheduler</groupId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -201,7 +201,6 @@
 
 
   </profiles>
-
 
 
 </project>

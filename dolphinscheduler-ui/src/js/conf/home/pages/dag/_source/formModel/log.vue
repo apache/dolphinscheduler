@@ -29,16 +29,16 @@
             <span>{{$t('View log')}}</span>
             <div class="full-screen">
               <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('Download Log')">
-                <em class="ans-icon-download" style="font-size: 20px"></em>
+                <em class="el-icon-download" style="font-size: 20px"></em>
               </a>
               <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('Refresh Log')">
-                <em class="ans-icon-refresh"></em>
+                <em class="el-icon-refresh"></em>
               </a>
               <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('Enter full screen')">
-                <em class="ans-icon-max"></em>
+                <em class="el-icon-full-screen"></em>
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('Cancel full screen')">
-                <em class="ans-icon-min"></em>
+                <em class="el-icon-aim"></em>
               </a>
             </div>
           </div>
@@ -48,7 +48,7 @@
             </div>
           </div>
           <div class="operation">
-            <x-button type="primary" shape="circle" @click="close"> {{$t('Close')}} </x-button>
+            <el-button type="primary" size="small" round @click="close"> {{$t('Close')}} </el-button>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@
    */
   const handerTextareaSize = (isH = 0) => {
     $('body').find('.tooltip.fade.top.in').remove()
-    return $('.textarea-ft').css({ 'height': `${$('.content-log-box').height() - isH}px` })
+    return $('.textarea-ft').css({ height: `${$('.content-log-box').height() - isH}px` })
   }
 
   let content = ''
@@ -89,7 +89,7 @@
     props: {
       item: {
         type: Object,
-        default: {}
+        default: Object
       },
       source: {
         type: String,
@@ -118,8 +118,8 @@
       },
       _ckLog () {
         this.isLog = true
+
         this.store.dispatch('dag/getLog', this._rtParam).then(res => {
-          this.$message.destroy()
           if (!res.data) {
             this.isData = false
             setTimeout(() => {
@@ -138,7 +138,6 @@
             }, 800)
           }
         }).catch(e => {
-          this.$message.destroy()
           this.$message.error(e.msg || '')
         })
       },
@@ -169,7 +168,7 @@
        * Download log
        */
       _downloadLog () {
-        downloadFile('/dolphinscheduler/log/download-log', {
+        downloadFile('log/download-log', {
           taskInstanceId: this.stateId || this.logId
         })
       },
@@ -180,8 +179,8 @@
         this.loadingIndex = this.loadingIndex - 1
         this._ckLog()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * down
@@ -190,8 +189,8 @@
         this.loadingIndex = this.loadingIndex + 1
         this._ckLog()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * Monitor scroll bar
@@ -203,11 +202,7 @@
           // Listen for scrollbar events
           if (($this.scrollTop() + $this.height()) === $this.height()) {
             if (self.loadingIndex > 0) {
-              self.$message.loading({
-                content: `${i18n.$t('Loading Log...')}`,
-                duration: 0,
-                closable: false
-              })
+              self.$message.info(`${i18n.$t('Loading Log...')}`)
               self._onUp()
             }
           }
@@ -215,11 +210,7 @@
           if ($this.get(0).scrollHeight === ($this.height() + $this.scrollTop())) {
             // No data is not requested
             if (self.isData) {
-              self.$message.loading({
-                content: `${i18n.$t('Loading Log...')}`,
-                duration: 0,
-                closable: false
-              })
+              self.$message.info(`${i18n.$t('Loading Log...')}`)
               self._onDown()
             }
           }
@@ -240,11 +231,7 @@
     created () {
       // Source is a task instance
       if (this.source === 'list') {
-        this.$message.loading({
-          content: `${i18n.$t('Loading Log...')}`,
-          duration: 0,
-          closable: false
-        })
+        this.$message.info(`${i18n.$t('Loading Log...')}`)
         this._ckLog()
       }
     },
@@ -301,27 +288,30 @@
           top: 12px;
           a{
             color: #0097e0;
-            font-size: 12px;
             margin-left: 10px;
-            i {
+            em {
+              font-size: 17px;
+              font-weight: 400;
+              text-decoration: none !important;
               vertical-align: middle;
             }
           }
           .clock {
-            >i {
+            >em {
               font-size: 20px;
               vertical-align: middle;
               transform: scale(1);
             }
           }
           .refresh-log {
-            >i {
+            >em {
+              text-decoration: none;
               font-size: 20px;
               vertical-align: middle;
               transform: scale(1);
             }
             &.active {
-              >i {
+              >em {
                 -webkit-transition-property: -webkit-transform;
                 -webkit-transition-duration: 1s;
                 -moz-transition-property: -moz-transform;
@@ -368,5 +358,16 @@
       }
     }
   }
-
+  @-webkit-keyframes rotateloading{from{-webkit-transform: rotate(0deg)}
+    to{-webkit-transform: rotate(360deg)}
+  }
+  @-moz-keyframes rotateloading{from{-moz-transform: rotate(0deg)}
+    to{-moz-transform: rotate(359deg)}
+  }
+  @-o-keyframes rotateloading{from{-o-transform: rotate(0deg)}
+    to{-o-transform: rotate(359deg)}
+  }
+  @keyframes rotateloading{from{transform: rotate(0deg)}
+    to{transform: rotate(359deg)}
+  }
 </style>
