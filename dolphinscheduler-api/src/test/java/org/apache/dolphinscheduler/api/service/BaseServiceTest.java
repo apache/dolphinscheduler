@@ -22,6 +22,10 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,12 +37,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mock.web.MockCookie;
-import org.springframework.mock.web.MockHttpServletRequest;
-
-import javax.servlet.http.Cookie;
-import java.util.HashMap;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
@@ -90,20 +88,6 @@ public class BaseServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
         //has params
         baseService.putMsg(result,Status.PROJECT_NOT_FOUNT,"test");
-    }
-    @Test
-    public void testGetCookie(){
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockCookie mockCookie = new MockCookie("userId","1");
-        request.setCookies(mockCookie);
-        //cookie is not null
-        Cookie cookie = BaseService.getCookie(request,"userId");
-        Assert.assertNotNull(cookie);
-        //cookie is null
-        cookie = BaseService.getCookie(request,"userName");
-        Assert.assertNull(cookie);
-
     }
     @Test
     public void testCreateTenantDirIfNotExists(){
