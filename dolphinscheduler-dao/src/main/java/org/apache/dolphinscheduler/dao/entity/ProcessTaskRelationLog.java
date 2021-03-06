@@ -51,9 +51,9 @@ public class ProcessTaskRelationLog extends ProcessTaskRelation {
         this.setProcessDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
         this.setProjectCode(processTaskRelation.getProjectCode());
         this.setPreTaskCode(processTaskRelation.getPreTaskCode());
-        this.setPreNodeVersion(processTaskRelation.getPreNodeVersion());
+        this.setPreTaskVersion(processTaskRelation.getPreTaskVersion());
         this.setPostTaskCode(processTaskRelation.getPostTaskCode());
-        this.setPostNodeVersion(processTaskRelation.getPostNodeVersion());
+        this.setPostTaskVersion(processTaskRelation.getPostTaskVersion());
         this.setConditionType(processTaskRelation.getConditionType());
         this.setConditionParams(processTaskRelation.getConditionParams());
         this.setConditionParamList(processTaskRelation.getConditionParamList());
