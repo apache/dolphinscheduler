@@ -614,22 +614,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
-
-        List<Resource> relationResources;
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-            relationResources = new ArrayList<>();
-        } else {
-            // query resource relation
-            List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-            relationResources = resourcesIds.size() > 0 ? resourcesMapper.queryResourceListById(resourcesIds) : new ArrayList<>();
-        }
-
-        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        ownResourceList.addAll(relationResources);
-
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(ownResourceList);
+        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);
 
@@ -647,19 +633,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Map<String, Object> result = new HashMap<>();
 
-        List<Resource> relationResources;
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-            relationResources = new ArrayList<>();
-        } else {
-            // query resource relation
-            List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-            relationResources = resourcesIds.size() > 0 ? resourcesMapper.queryResourceListById(resourcesIds) : new ArrayList<>();
-        }
-
-        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        ownResourceList.addAll(relationResources);
+        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
 
         String suffix = ".jar";
         if (programType != null) {
@@ -673,7 +647,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 default:
             }
         }
-        List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(ownResourceList)).filter();
+        List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);
@@ -1345,6 +1319,30 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             childList.add(childId);
             listAllChildren(childId, childList);
         }
+    }
+
+    /**
+     *  query authored resource list (own and authorized)
+     * @param loginUser login user
+     * @param type ResourceType
+     * @return all authored resource list
+     */
+    private List<Resource> queryAuthoredResourceList(User loginUser, ResourceType type) {
+        List<Resource> relationResources;
+        int userId = loginUser.getId();
+        if (isAdmin(loginUser)) {
+            userId = 0;
+            relationResources = new ArrayList<>();
+        } else {
+            // query resource relation
+            List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
+            relationResources = CollectionUtils.isNotEmpty(resourcesIds) ? resourcesMapper.queryResourceListById(resourcesIds) : new ArrayList<>();
+        }
+
+        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        ownResourceList.addAll(relationResources);
+
+        return ownResourceList;
     }
 
 }

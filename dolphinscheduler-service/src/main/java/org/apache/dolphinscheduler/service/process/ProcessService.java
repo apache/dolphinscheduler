@@ -2010,18 +2010,14 @@ public class ProcessService {
             switch (authorizationType) {
                 case RESOURCE_FILE_ID:
                 case UDF_FILE:
-                    List<Integer> udfRelationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
-                    List<Resource> udfRelationResources = udfRelationResourceIds.size() > 0 ? resourceMapper.queryResourceListById(udfRelationResourceIds) : new ArrayList<>();
                     List<Resource> ownUdfResources = resourceMapper.listAuthorizedResourceById(userId, needChecks);
-                    ownUdfResources.addAll(udfRelationResources);
+                    addAuthorizedResources(ownUdfResources, userId);
                     Set<Integer> authorizedResourceFiles = ownUdfResources.stream().map(Resource::getId).collect(toSet());
                     originResSet.removeAll(authorizedResourceFiles);
                     break;
                 case RESOURCE_FILE_NAME:
-                    List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
-                    List<Resource> relationResources = relationResourceIds.size() > 0 ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
                     List<Resource> ownResources = resourceMapper.listAuthorizedResource(userId, needChecks);
-                    ownResources.addAll(relationResources);
+                    addAuthorizedResources(ownResources, userId);
                     Set<String> authorizedResources = ownResources.stream().map(Resource::getFullName).collect(toSet());
                     originResSet.removeAll(authorizedResources);
                     break;
@@ -2144,5 +2140,16 @@ public class ProcessService {
             }
         }
         return JSONUtils.toJsonString(processData);
+    }
+
+    /**
+     * add authorized resources
+     * @param ownResources own resources
+     * @param userId userId
+     */
+    private void addAuthorizedResources(List<Resource> ownResources, int userId) {
+        List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
+        List<Resource> relationResources = CollectionUtils.isNotEmpty(relationResourceIds) ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
+        ownResources.addAll(relationResources);
     }
 }
