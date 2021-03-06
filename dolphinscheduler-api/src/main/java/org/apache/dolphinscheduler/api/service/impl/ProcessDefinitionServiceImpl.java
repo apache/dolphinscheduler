@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
 
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -257,7 +258,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         for (int i : resourceIds) {
             if (sb.length() > 0) {
-                sb.append(",");
+                sb.append(COMMA);
             }
             sb.append(i);
         }
@@ -609,7 +610,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 // To check resources whether they are already cancel authorized or deleted
                 String resourceIds = processDefinition.getResourceIds();
                 if (StringUtils.isNotBlank(resourceIds)) {
-                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(COMMA)).map(Integer::parseInt).toArray(Integer[]::new);
                     PermissionCheck<Integer> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE_ID, processService, resourceIdArray, loginUser.getId(), logger);
                     try {
                         permissionCheck.checkPermission();
@@ -681,7 +682,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     private List<ProcessMeta> getProcessDefinitionList(String processDefinitionIds) {
         List<ProcessMeta> processDefinitionList = new ArrayList<>();
-        String[] processDefinitionIdArray = processDefinitionIds.split(",");
+        String[] processDefinitionIdArray = processDefinitionIds.split(COMMA);
         for (String strProcessDefinitionId : processDefinitionIdArray) {
             //get workflow info
             int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
@@ -1246,21 +1247,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Override
     public Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList) {
         Map<String, Object> result = new HashMap<>();
-
-        Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
-        String[] idList = defineIdList.split(",");
-        List<Integer> idIntList = new ArrayList<>();
-        for (String definitionId : idList) {
-            idIntList.add(Integer.parseInt(definitionId));
-        }
-        Integer[] idArray = idIntList.toArray(new Integer[0]);
-        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(idArray);
+        Integer[] idArray = Arrays.stream(defineIdList.split(COMMA)).map(Integer::parseInt).toArray(Integer[]::new);
+        List<ProcessDefinition> processDefinitionList = idArray != null && idArray.length > 0 ? processDefineMapper.queryDefinitionListByIdList(idArray) : null;
         if (CollectionUtils.isEmpty(processDefinitionList)) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);
             return result;
         }
 
+        Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         for (ProcessDefinition processDefinition : processDefinitionList) {
             String processDefinitionJson = processDefinition.getProcessDefinitionJson();
             ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
@@ -1554,7 +1549,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
+        String[] processDefinitionIdList = processDefinitionIds.split(COMMA);
         doBatchCopyProcessDefinition(loginUser, targetProject, failedProcessList, processDefinitionIdList);
 
         checkBatchOperateResult(projectName, targetProject.getName(), result, failedProcessList, true);
@@ -1602,7 +1597,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
+        String[] processDefinitionIdList = processDefinitionIds.split(COMMA);
         doBatchMoveProcessDefinition(targetProject, failedProcessList, processDefinitionIdList);
 
         checkBatchOperateResult(projectName, targetProject.getName(), result, failedProcessList, false);
@@ -1789,9 +1784,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                          Map<String, Object> result, List<String> failedProcessList, boolean isCopy) {
         if (!failedProcessList.isEmpty()) {
             if (isCopy) {
-                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName, String.join(",", failedProcessList));
+                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName, String.join(COMMA, failedProcessList));
             } else {
-                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName, String.join(",", failedProcessList));
+                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName, String.join(COMMA, failedProcessList));
             }
         } else {
             putMsg(result, Status.SUCCESS);
