@@ -79,6 +79,18 @@
         </x-select>
       </div>
     </m-list-box>
+    <m-list-box v-if="deployMode === 'cluster'">
+      <div slot="text">{{$t('App Name')}}</div>
+      <div slot="content">
+        <x-input
+                :disabled="isDetails"
+                type="input"
+                v-model="appName"
+                :placeholder="$t('Please enter app name(optional)')"
+                autocomplete="off">
+        </x-input>
+      </div>
+    </m-list-box>
     <div class="list-box-4p" v-if="deployMode === 'cluster'">
       <div class="clearfix list">
         <span class="sp1" style="word-break:break-all">{{$t('JobManager Memory')}}</span>
@@ -124,6 +136,21 @@
                   v-model="taskManager"
                   :placeholder="$t('Please enter TaskManager number')"
                   style="width: 186px;"
+                  autocomplete="off">
+          </x-input>
+        </span>
+      </div>
+    </div>
+    <div class="list-box-4p">
+      <div class="clearfix list">
+        <span class="sp1" style="word-break:break-all">{{$t('Parallelism')}}</span>
+        <span class="sp2">
+          <x-input
+                  :disabled="isDetails"
+                  type="input"
+                  v-model="parallelism"
+                  :placeholder="$t('Please enter Parallelism')"
+                  style="width: 200px;"
                   autocomplete="off">
           </x-input>
         </span>
@@ -209,12 +236,16 @@
         localParams: [],
         // Slot number
         slot: 1,
+        // Parallelism
+        parallelism: 1,
         // TaskManager mumber
         taskManager: '2',
         // JobManager memory
         jobManagerMemory: '1G',
         // TaskManager memory
         taskManagerMemory: '2G',
+        // Flink app name
+        appName: '',
         // Main arguments
         mainArgs: '',
         // Option parameters
@@ -322,6 +353,11 @@
           return false
         }
 
+        if (!Number.isInteger(parseInt(this.parallelism))) {
+          this.$message.warning(`${i18n.$t('Please enter Parallelism')}`)
+          return false
+        }
+
         if (this.flinkVersion === '<1.10' && !Number.isInteger(parseInt(this.taskManager))) {
           this.$message.warning(`${i18n.$t('Please enter TaskManager number')}`)
           return false
@@ -351,9 +387,11 @@
           localParams: this.localParams,
           flinkVersion: this.flinkVersion,
           slot: this.slot,
+          parallelism: this.parallelism,
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -481,9 +519,11 @@
           localParams: this.localParams,
           flinkVersion: this.flinkVersion,
           slot: this.slot,
+          parallelism: this.parallelism,
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -522,10 +562,11 @@
           this.deployMode = o.params.deployMode || ''
           this.flinkVersion = o.params.flinkVersion || '<1.10'
           this.slot = o.params.slot || 1
+          this.parallelism = o.params.parallelism || 1
           this.taskManager = o.params.taskManager || '2'
           this.jobManagerMemory = o.params.jobManagerMemory || '1G'
           this.taskManagerMemory = o.params.taskManagerMemory || '2G'
-
+          this.appName = o.params.appName || ''
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others
           this.programType = o.params.programType || 'SCALA'
