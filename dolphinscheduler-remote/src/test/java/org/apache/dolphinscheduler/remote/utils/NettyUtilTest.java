@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote;
+package org.apache.dolphinscheduler.remote.utils;
 
 import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
-
-import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +28,6 @@ import io.netty.channel.epoll.Epoll;
  * NettyUtilTest
  */
 public class NettyUtilTest {
-
 
     @Test
     public void testUserEpoll() {

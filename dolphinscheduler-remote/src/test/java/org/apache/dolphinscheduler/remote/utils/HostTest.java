@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
-
-import org.apache.dolphinscheduler.remote.utils.Host;
+package org.apache.dolphinscheduler.remote.utils;
 
 import org.junit.Assert;
 import org.junit.Test;

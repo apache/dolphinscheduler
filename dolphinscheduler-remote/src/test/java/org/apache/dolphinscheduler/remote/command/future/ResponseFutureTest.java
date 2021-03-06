@@ -15,24 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote;
-
+package org.apache.dolphinscheduler.remote.command.future;
 
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 public class ResponseFutureTest {
 
     @Test
-    public void testScanFutureTable(){
+    public void testScanFutureTable() {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
         executorService.scheduleAtFixedRate(new Runnable() {
             @Override
