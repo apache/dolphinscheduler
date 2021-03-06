@@ -73,7 +73,7 @@
         select state, count(0) as count
         from t_ds_task_instance t
         left join t_ds_process_definition d on d.code=t.process_definition_code
-        left join t_ds_project p on p.id=d.project_id
+        left join t_ds_project p on p.code=d.project_code
         where 1=1
         <if test="projectCodes != null and projectCodes.length != 0">
             and d.project_code in
