@@ -257,9 +257,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
 
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processDefineId);
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
-                        project.getId(), processDefineId, searchVal, executorId, statusArray, host, start, end);
+                        project.getCode(), processDefinition.getCode(), searchVal, executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
@@ -733,24 +734,24 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     /**
      * query process instance by processDefinitionId and stateArray
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @param states states array
      * @return process instance list
      */
     @Override
-    public List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states) {
-        return processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionId, states);
+    public List<ProcessInstance> queryByProcessDefineIdAndStatus(Long processDefinitionCode, int[] states) {
+        return processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionCode, states);
     }
 
     /**
      * query process instance by processDefinitionId
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @param size size
      * @return process instance list
      */
     @Override
-    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId, int size) {
-        return processInstanceMapper.queryByProcessDefineId(processDefinitionId, size);
+    public List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size) {
+        return processInstanceMapper.queryByProcessDefineCode(processDefinitionCode, size);
     }
 
 }

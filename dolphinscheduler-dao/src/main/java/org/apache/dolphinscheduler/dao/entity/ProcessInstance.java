@@ -52,6 +52,7 @@ public class ProcessInstance {
      * process definition id
      * TODO delete
      */
+    @TableField(exist = false)
     private int processDefinitionId;
 
     /**
@@ -160,6 +161,7 @@ public class ProcessInstance {
      * process instance json
      * TODO delete
      */
+    @TableField(exist = false)
     private String processInstanceJson;
 
     /**
@@ -193,11 +195,13 @@ public class ProcessInstance {
     /**
      * task locations for web
      */
+    @TableField(exist = false)
     private String locations;
 
     /**
      * task connects for web
      */
+    @TableField(exist = false)
     private String connects;
 
     /**
@@ -208,6 +212,7 @@ public class ProcessInstance {
     /**
      * depend processes schedule time
      */
+    @TableField(exist = false)
     private String dependenceScheduleTimes;
 
     /**

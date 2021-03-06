@@ -149,21 +149,21 @@ public interface ProcessInstanceService {
     Map<String, Object> viewGantt(Integer processInstanceId) throws Exception;
 
     /**
-     * query process instance by processDefinitionId and stateArray
+     * query process instance by processDefinitionCode and stateArray
      *
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states);
+    List<ProcessInstance> queryByProcessDefineIdAndStatus(Long processDefinitionCode, int[] states);
 
     /**
-     * query process instance by processDefinitionId
+     * query process instance by processDefinitionCode
      *
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @param size size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size);
+    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size);
 
 }

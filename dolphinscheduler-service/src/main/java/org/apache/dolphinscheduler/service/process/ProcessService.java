@@ -1916,7 +1916,8 @@ public class ProcessService {
      * @return process instance
      */
     public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
-        return processInstanceMapper.queryLastSchedulerProcess(definitionId,
+        ProcessDefinition processDefinition = processDefineMapper.selectById(definitionId);
+        return processInstanceMapper.queryLastSchedulerProcess(processDefinition.getCode(),
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
@@ -1929,7 +1930,8 @@ public class ProcessService {
      * @return process instance
      */
     public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
-        return processInstanceMapper.queryLastManualProcess(definitionId,
+        ProcessDefinition processDefinition = processDefineMapper.selectById(definitionId);
+        return processInstanceMapper.queryLastManualProcess(processDefinition.getCode(),
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
@@ -1943,7 +1945,8 @@ public class ProcessService {
      * @return process instance
      */
     public ProcessInstance findLastRunningProcess(int definitionId, Date startTime, Date endTime) {
-        return processInstanceMapper.queryLastRunningProcess(definitionId,
+        ProcessDefinition processDefinition = processDefineMapper.selectById(definitionId);
+        return processInstanceMapper.queryLastRunningProcess(processDefinition.getCode(),
                 startTime,
                 endTime,
                 stateArray);
