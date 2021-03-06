@@ -428,12 +428,7 @@ public class HadoopUtils implements Closeable {
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
-        String responseContent;
-        if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-            responseContent = KerberosHttpClient.get(applicationUrl);
-        } else {
-            responseContent = HttpUtils.get(applicationUrl);
-        }
+        String responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
             if (!jsonObject.has("app")) {
@@ -445,7 +440,8 @@ public class HadoopUtils implements Closeable {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
-            responseContent = HttpUtils.get(jobHistoryUrl);
+            responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
+
             if (null != responseContent) {
                 ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
                 if (!jsonObject.has("job")) {
@@ -682,7 +678,7 @@ public class HadoopUtils implements Closeable {
          */
         public static String getRMState(String url) {
 
-            String retStr = HttpUtils.get(url);
+            String retStr = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(url) : HttpUtils.get(url);
 
             if (StringUtils.isEmpty(retStr)) {
                 return null;
