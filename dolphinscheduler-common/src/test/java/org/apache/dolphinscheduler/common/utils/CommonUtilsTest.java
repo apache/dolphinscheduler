@@ -35,11 +35,7 @@ public class CommonUtilsTest {
         logger.info(CommonUtils.getSystemEnvPath());
         Assert.assertTrue(true);
     }
-    @Test
-    public void isDevelopMode() {
-        logger.info("develop mode: {}",CommonUtils.isDevelopMode());
-        Assert.assertTrue(true);
-    }
+
     @Test
     public void getKerberosStartupState(){
         logger.info("kerberos startup state: {}",CommonUtils.getKerberosStartupState());

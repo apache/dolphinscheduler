@@ -62,13 +62,6 @@ public class CommonUtils {
     }
 
     /**
-     * @return is develop mode
-     */
-    public static boolean isDevelopMode() {
-        return PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
-    }
-
-    /**
      * if upload resource is HDFS and kerberos startup is true , else false
      *
      * @return true if upload resource is HDFS and kerberos startup

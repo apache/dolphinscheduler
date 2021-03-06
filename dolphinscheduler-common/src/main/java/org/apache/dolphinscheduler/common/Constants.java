@@ -150,12 +150,6 @@ public final class Constants {
     public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
-     * development.state
-     */
-    public static final String DEVELOPMENT_STATE = "development.state";
-    public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
-
-    /**
      * string true
      */
     public static final String STRING_TRUE = "true";
