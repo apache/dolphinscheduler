@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="spark-model">
+  <div class="mr-model">
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
