@@ -110,9 +110,7 @@ public class WorkerGroupServiceTest {
     }
 
     @Test
-    public void testQueryAllGroupWithNoNodeException() {
-        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
-        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenThrow(new RuntimeException("KeeperException$NoNodeException"));
+    public void testQueryAllGroupWithDefault() {
         Map<String, Object> result = workerGroupService.queryAllGroup();
         Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(1, workerGroups.size());

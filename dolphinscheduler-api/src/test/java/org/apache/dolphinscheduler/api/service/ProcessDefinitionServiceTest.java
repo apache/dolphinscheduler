@@ -254,8 +254,6 @@ public class ProcessDefinitionServiceTest {
     private ProcessInstanceService processInstanceService;
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
-    @Mock
-    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     @Test
     public void testQueryProcessDefinitionList() {
@@ -606,7 +604,6 @@ public class ProcessDefinitionServiceTest {
         schedules.add(schedule);
         Mockito.when(scheduleMapper.queryByProcessDefinitionId(46)).thenReturn(schedules);
         Mockito.when(processDefineMapper.deleteById(46)).thenReturn(0);
-        Mockito.when(processTaskRelationMapper.deleteByCode(null, null)).thenReturn(0);
         Map<String, Object> deleteFail = processDefinitionService.deleteProcessDefinitionById(loginUser,
                 "project_test1", 46);
         Assert.assertEquals(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR, deleteFail.get(Constants.STATUS));
@@ -800,9 +797,9 @@ public class ProcessDefinitionServiceTest {
 //        processDefinition.setProcessDefinitionJson(SHELL_JSON);
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
-        Mockito.when(processService.genProcessData(processDefinition)).thenReturn(getProcessData());
-        Mockito.when(processDefineMapper.queryAllDefinitionList(projectCode)).thenReturn(processDefinitionList);
-
+        Project test = getProject("test");
+        Mockito.when(projectMapper.selectById(projectId)).thenReturn(test);
+        Mockito.when(processDefineMapper.queryAllDefinitionList(test.getCode())).thenReturn(processDefinitionList);
         Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionAllByProjectId(projectId);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -1173,81 +1170,6 @@ public class ProcessDefinitionServiceTest {
         processDefinitionService.batchExportProcessDefinitionByIds(
                 loginUser, projectName, "1", response);
 
-    }
-
-    @Test
-    public void testGetResourceIds() throws Exception {
-        // set up
-        Method testMethod = ReflectionUtils.findMethod(ProcessDefinitionServiceImpl.class, "getResourceIds", ProcessData.class);
-        assertThat(testMethod).isNotNull();
-        testMethod.setAccessible(true);
-
-        // when processData has empty task, then return empty string
-        ProcessData input1 = new ProcessData();
-        input1.setTasks(Collections.emptyList());
-        String output1 = (String) testMethod.invoke(processDefinitionService, input1);
-        assertThat(output1).isEmpty();
-
-        // when task is null, then return empty string
-        ProcessData input2 = new ProcessData();
-        input2.setTasks(null);
-        String output2 = (String) testMethod.invoke(processDefinitionService, input2);
-        assertThat(output2).isEmpty();
-
-        // when task type is incorrect mapping, then return empty string
-        ProcessData input3 = new ProcessData();
-        TaskNode taskNode3 = new TaskNode();
-        taskNode3.setType("notExistType");
-        input3.setTasks(Collections.singletonList(taskNode3));
-        String output3 = (String) testMethod.invoke(processDefinitionService, input3);
-        assertThat(output3).isEmpty();
-
-        // when task parameter list is null, then return empty string
-        ProcessData input4 = new ProcessData();
-        TaskNode taskNode4 = new TaskNode();
-        taskNode4.setType("SHELL");
-        taskNode4.setParams(null);
-        input4.setTasks(Collections.singletonList(taskNode4));
-        String output4 = (String) testMethod.invoke(processDefinitionService, input4);
-        assertThat(output4).isEmpty();
-
-        // when resource id list is 0 1, then return 0,1
-        ProcessData input5 = new ProcessData();
-        TaskNode taskNode5 = new TaskNode();
-        taskNode5.setType("SHELL");
-        ShellParameters shellParameters5 = new ShellParameters();
-        ResourceInfo resourceInfo5A = new ResourceInfo();
-        resourceInfo5A.setId(1);
-        ResourceInfo resourceInfo5B = new ResourceInfo();
-        resourceInfo5B.setId(2);
-        shellParameters5.setResourceList(Arrays.asList(resourceInfo5A, resourceInfo5B));
-        taskNode5.setParams(JSONUtils.toJsonString(shellParameters5));
-        input5.setTasks(Collections.singletonList(taskNode5));
-        String output5 = (String) testMethod.invoke(processDefinitionService, input5);
-        assertThat(output5.split(",")).hasSize(2)
-                .containsExactlyInAnyOrder("1", "2");
-
-        // when resource id list is 0 1 1 2, then return 0,1,2
-        ProcessData input6 = new ProcessData();
-        TaskNode taskNode6 = new TaskNode();
-        taskNode6.setType("SHELL");
-        ShellParameters shellParameters6 = new ShellParameters();
-        ResourceInfo resourceInfo6A = new ResourceInfo();
-        resourceInfo6A.setId(3);
-        ResourceInfo resourceInfo6B = new ResourceInfo();
-        resourceInfo6B.setId(1);
-        ResourceInfo resourceInfo6C = new ResourceInfo();
-        resourceInfo6C.setId(1);
-        ResourceInfo resourceInfo6D = new ResourceInfo();
-        resourceInfo6D.setId(2);
-        shellParameters6.setResourceList(Arrays.asList(resourceInfo6A, resourceInfo6B, resourceInfo6C, resourceInfo6D));
-        taskNode6.setParams(JSONUtils.toJsonString(shellParameters6));
-        input6.setTasks(Collections.singletonList(taskNode6));
-
-        String output6 = (String) testMethod.invoke(processDefinitionService, input6);
-
-        assertThat(output6.split(",")).hasSize(3)
-                .containsExactlyInAnyOrder("3", "1", "2");
     }
 
     /**

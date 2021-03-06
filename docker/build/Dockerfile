@@ -28,7 +28,7 @@ ENV DOCKER true
 # RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 # RUN sed -i 's/dl-cdn.alpinelinux.org/mirror.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 RUN apk update && \
-    apk add --no-cache tzdata dos2unix bash python2 python3 procps sudo shadow tini postgresql-client && \
+    apk add --no-cache tzdata dos2unix bash python2 python3 supervisor procps sudo shadow tini postgresql-client && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     apk del tzdata && \
     rm -rf /var/cache/apk/*
@@ -44,6 +44,7 @@ COPY ./startup-init-conf.sh /root/startup-init-conf.sh
 COPY ./startup.sh /root/startup.sh
 COPY ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
 COPY ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
+COPY ./conf/dolphinscheduler/supervisor/supervisor.ini /etc/supervisor.d/
 COPY ./conf/dolphinscheduler/env/dolphinscheduler_env.sh.tpl /opt/dolphinscheduler/conf/env/
 RUN dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
