@@ -16,29 +16,37 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
 
-import java.lang.management.OperatingSystemMXBean;
+import org.apache.commons.configuration.Configuration;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
 
 /**
  * os utils
@@ -49,6 +57,9 @@ public class OSUtils {
   private static final Logger logger = LoggerFactory.getLogger(OSUtils.class);
 
   public static final ThreadLocal<Logger> taskLoggerThreadLocal = new ThreadLocal<>();
+
+  private static final Pattern STS_PATTERN = Pattern.compile("-\\d+$"); // StatefulSet pattern
+  private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
 
   private static final SystemInfo SI = new SystemInfo();
   public static final String TWO_DECIMAL = "0.00";
@@ -439,7 +450,17 @@ public class OSUtils {
    */
   public static String getHost(InetAddress inetAddress){
     if (inetAddress != null) {
-      return Constants.KUBERNETES_MODE ? inetAddress.getHostName() : inetAddress.getHostAddress();
+      if (Constants.KUBERNETES_MODE) {
+        String canonicalHost = inetAddress.getCanonicalHostName();
+        if (!canonicalHost.contains(".") || IP_PATTERN.matcher(canonicalHost).matches()) {
+          String host = inetAddress.getHostName();
+          if (STS_PATTERN.matcher(host).find()) {
+            return String.format("%s.%s", host, host.replaceFirst("\\d+$", "headless"));
+          }
+        }
+        return canonicalHost;
+      }
+      return inetAddress.getHostAddress();
     }
     return null;
   }
