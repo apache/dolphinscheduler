@@ -323,14 +323,14 @@ public class ProcessUtils {
     public static String getKerberosInitCommand() {
         logger.info("get kerberos init command");
         StringBuilder kerberosCommandBuilder = new StringBuilder();
-        Boolean hadoopKerberosState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
+        boolean hadoopKerberosState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
         if (hadoopKerberosState) {
             kerberosCommandBuilder.append("export KRB5_CONFIG=")
                     .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
                     .append("\n\n")
                     .append(String.format("kinit -k -t %s %s || true",PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
                     .append("\n\n");
-            logger.info("kerberos init command: {}", kerberosCommandBuilder.toString());
+            logger.info("kerberos init command: {}", kerberosCommandBuilder);
         }
         return kerberosCommandBuilder.toString();
     }
