@@ -18,9 +18,12 @@
 
 set -e
 
-DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
-DOLPHINSCHEDULER_SCRIPT=${DOLPHINSCHEDULER_HOME}/script
-DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
+export DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
+export MASTER_START_ENABLED=false
+export WORKER_START_ENABLED=false
+export API_START_ENABLED=false
+export ALERT_START_ENABLED=false
+export LOGGER_START_ENABLED=false
 
 # wait database
 waitDatabase() {
@@ -54,7 +57,7 @@ waitDatabase() {
 # init database
 initDatabase() {
     echo "import sql data"
-    ${DOLPHINSCHEDULER_SCRIPT}/create-dolphinscheduler.sh
+    ${DOLPHINSCHEDULER_HOME}/script/create-dolphinscheduler.sh
 }
 
 # check ds version
@@ -102,41 +105,6 @@ waitZK() {
     done
 }
 
-# start master-server
-initMasterServer() {
-    echo "start master-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop master-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start master-server
-}
-
-# start worker-server
-initWorkerServer() {
-    echo "start worker-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop worker-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start worker-server
-}
-
-# start api-server
-initApiServer() {
-    echo "start api-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop api-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start api-server
-}
-
-# start logger-server
-initLoggerServer() {
-    echo "start logger-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop logger-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start logger-server
-}
-
-# start alert-server
-initAlertServer() {
-    echo "start alert-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop alert-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start alert-server
-}
-
 # print usage
 printUsage() {
     echo -e "Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system,"
@@ -157,38 +125,33 @@ case "$1" in
         waitZK
         waitDatabase
         initDatabase
-        initMasterServer
-        initWorkerServer
-        initApiServer
-        initAlertServer
-        initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api.log
+        export MASTER_START_ENABLED=true
+        export WORKER_START_ENABLED=true
+        export API_START_ENABLED=true
+        export ALERT_START_ENABLED=true
+        export LOGGER_START_ENABLED=true
     ;;
     (master-server)
         waitZK
         waitDatabase
-        initMasterServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
+        export MASTER_START_ENABLED=true
     ;;
     (worker-server)
         waitZK
         waitDatabase
-        initWorkerServer
-        initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
+        export WORKER_START_ENABLED=true
+        export LOGGER_START_ENABLED=true
     ;;
     (api-server)
         waitZK
         waitDatabase
         initDatabase
-        initApiServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api.log
+        export API_START_ENABLED=true
     ;;
     (alert-server)
         waitDatabase
         checkInitDatabase
-        initAlertServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
+        export ALERT_START_ENABLED=true
     ;;
     (help)
         printUsage
@@ -200,8 +163,8 @@ case "$1" in
     ;;
 esac
 
-# init directories and log files
-mkdir -p ${DOLPHINSCHEDULER_LOGS} && cat /dev/null >> ${LOGFILE}
+# init directories
+mkdir -p ${DOLPHINSCHEDULER_HOME}/logs
 
-echo "tail begin"
-exec bash -c "tail -n 1 -f ${LOGFILE}"
+# start supervisord
+supervisord -n -u root
