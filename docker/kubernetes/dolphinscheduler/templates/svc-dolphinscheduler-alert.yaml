@@ -17,19 +17,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-api
+  name: {{ include "dolphinscheduler.fullname" . }}-alert
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   ports:
-    - port: 12345
-      targetPort: api-port
+    - port: 50052
+      targetPort: alert-port
       protocol: TCP
-      name: api-port
+      name: alert-port
   selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: api
+    app.kubernetes.io/component: alert
