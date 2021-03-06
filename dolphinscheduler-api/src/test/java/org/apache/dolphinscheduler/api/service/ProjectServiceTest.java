@@ -348,6 +348,7 @@ public class ProjectServiceTest {
 
     private Project getProject() {
         Project project = new Project();
+        project.setCode(1L);
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);
