@@ -14,32 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
-import java.util.Collection;
+public class HostWorkerTest {
 
-/**
- *  AbstractSelector
- */
-public  abstract class AbstractSelector<T> implements Selector<T> {
-    @Override
-    public T select(Collection<T> source) {
-
-        if (CollectionUtils.isEmpty(source)) {
-            throw new IllegalArgumentException("Empty source.");
-        }
-
-        /**
-         * if only one , return directly
-         */
-        if (source.size() == 1) {
-            return (T)source.toArray()[0];
-        }
-        return doSelect(source);
+    @Test
+    public void testHostWorker1() {
+        HostWorker hostWorker = new HostWorker("192.158.2.2", 11, 20, "default");
+        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assert.assertEquals(11, hostWorker.getPort());
+        Assert.assertEquals(20, hostWorker.getWeight());
+        Assert.assertEquals("default", hostWorker.getWorkerGroup());
     }
 
-    protected abstract T doSelect(Collection<T> source);
+    @Test
+    public void testHostWorker2() {
+        HostWorker hostWorker = HostWorker.of("192.158.2.2:22", 80, "default");
+        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assert.assertEquals(22, hostWorker.getPort());
+        Assert.assertEquals(80, hostWorker.getWeight());
+        Assert.assertEquals("default", hostWorker.getWorkerGroup());
+    }
 
 }

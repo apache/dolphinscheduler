@@ -26,25 +26,12 @@ import org.junit.Test;
 public class HostTest {
 
     @Test
-    public void testHostWarmUp() {
-        Host host = Host.of(("192.158.2.2:22:100:" + (System.currentTimeMillis() - 60 * 5 * 1000)));
-        Assert.assertEquals(50, host.getWeight());
-        host = Host.of(("192.158.2.2:22:100:" + (System.currentTimeMillis() - 60 * 10 * 1000)));
-        Assert.assertEquals(100, host.getWeight());
-    }
-
-    @Test
     public void testHost() {
         Host host = Host.of("192.158.2.2:22");
         Assert.assertEquals(22, host.getPort());
+        host.setAddress("127.0.0.1:8888");
+        Assert.assertEquals("127.0.0.1", host.getIp());
+        Assert.assertEquals(8888, host.getPort());
     }
 
-    @Test
-    public void testGenerate() {
-        String address = "192.158.2.2:22";
-        int weight = 100;
-        long startTime = System.currentTimeMillis();
-        String generateHost = Host.generate(address, weight, startTime);
-        Assert.assertEquals(address + ":" + weight + ":" + startTime, generateHost);
-    }
 }

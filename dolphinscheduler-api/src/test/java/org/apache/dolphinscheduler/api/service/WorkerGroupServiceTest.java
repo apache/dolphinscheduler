@@ -70,13 +70,13 @@ public class WorkerGroupServiceTest {
         workerGroupStrList.add("test");
         Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenReturn(workerGroupStrList);
 
-        List<String> defaultIpList = new ArrayList<>();
-        defaultIpList.add("192.168.220.188:1234:100:1234567");
-        defaultIpList.add("192.168.220.189:1234:100:1234567");
+        List<String> defaultAddressList = new ArrayList<>();
+        defaultAddressList.add("192.168.220.188:1234");
+        defaultAddressList.add("192.168.220.189:1234");
 
-        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultIpList);
+        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultAddressList);
 
-        Mockito.when(zookeeperCachedOperator.get(workerPath + "/default" + "/" + defaultIpList.get(0))).thenReturn("0.01,0.17,0.03,25.83,8.0,1.0,2020-07-21 11:17:59,2020-07-21 14:39:20,0,13238");
+        Mockito.when(zookeeperCachedOperator.get(workerPath + "/default" + "/" + defaultAddressList.get(0))).thenReturn("0.01,0.17,0.03,25.83,8.0,1.0,2020-07-21 11:17:59,2020-07-21 14:39:20,0,13238");
     }
 
     /**

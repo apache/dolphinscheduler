@@ -47,7 +47,7 @@ public class WorkerConfig {
     @Value("#{'${worker.groups:default}'.split(',')}")
     private Set<String> workerGroups;
 
-    @Value("${worker.listen.port: 1234}")
+    @Value("${worker.listen.port:1234}")
     private int listenPort;
 
     @Value("${worker.host.weight:100}")

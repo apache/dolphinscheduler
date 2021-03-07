@@ -51,7 +51,7 @@ public class ResponseFutureTest {
         ResponseFuture future = new ResponseFuture(1, 2000, invokeCallback, null);
         try {
             latch.await(5000, TimeUnit.MILLISECONDS);
-            Assert.assertTrue(ResponseFuture.getFuture(1) == null);
+            Assert.assertNull(ResponseFuture.getFuture(1));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
