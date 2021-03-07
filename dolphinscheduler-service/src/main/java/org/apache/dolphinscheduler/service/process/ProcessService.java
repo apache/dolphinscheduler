@@ -1911,12 +1911,12 @@ public class ProcessService {
     /**
      * find last scheduler process instance in the date interval
      *
-     * @param definitionId definitionId
+     * @param definitionCode definitionCode
      * @param dateInterval dateInterval
      * @return process instance
      */
-    public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
-        return processInstanceMapper.queryLastSchedulerProcess(definitionId,
+    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval) {
+        return processInstanceMapper.queryLastSchedulerProcess(definitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
@@ -1924,12 +1924,12 @@ public class ProcessService {
     /**
      * find last manual process instance interval
      *
-     * @param definitionId process definition id
+     * @param definitionCode process definition code
      * @param dateInterval dateInterval
      * @return process instance
      */
-    public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
-        return processInstanceMapper.queryLastManualProcess(definitionId,
+    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval) {
+        return processInstanceMapper.queryLastManualProcess(definitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
@@ -1937,13 +1937,13 @@ public class ProcessService {
     /**
      * find last running process instance
      *
-     * @param definitionId process definition id
+     * @param definitionCode process definition code
      * @param startTime start time
      * @param endTime end time
      * @return process instance
      */
-    public ProcessInstance findLastRunningProcess(int definitionId, Date startTime, Date endTime) {
-        return processInstanceMapper.queryLastRunningProcess(definitionId,
+    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime) {
+        return processInstanceMapper.queryLastRunningProcess(definitionCode,
                 startTime,
                 endTime,
                 stateArray);
