@@ -151,19 +151,19 @@ public interface ProcessInstanceService {
     /**
      * query process instance by processDefinitionId and stateArray
      *
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states);
+    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states);
 
     /**
-     * query process instance by processDefinitionId
+     * query process instance by processDefinitionCode
      *
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @param size size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size);
+    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,int size);
 
 }

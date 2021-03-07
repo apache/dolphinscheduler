@@ -484,7 +484,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         // check process instances is already running
-        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineIdAndStatus(processDefinitionId, Constants.NOT_TERMINATED_STATES);
+        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             putMsg(result, Status.DELETE_PROCESS_DEFINITION_BY_ID_FAIL, processInstances.size());
             return result;
@@ -1259,7 +1259,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         /**
          * List of process instances
          */
-        List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineId(processId, limit);
+        List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(processDefinition.getCode(), limit);
 
         for (ProcessInstance processInstance : processInstanceList) {
             processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));

@@ -75,9 +75,10 @@
         </include>
         ,
         u.user_name as user_name,
-        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_id = p.id) AS def_count,
-        (SELECT COUNT(*) FROM t_ds_process_definition def, t_ds_process_instance inst WHERE def.id =
-        inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
         from t_ds_project p
         join t_ds_user u on u.id=p.user_id
         where 1=1
