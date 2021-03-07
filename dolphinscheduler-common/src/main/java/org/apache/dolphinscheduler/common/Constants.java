@@ -69,7 +69,12 @@ public final class Constants {
     /**
      * common properties path
      */
-    public static final String COMMON_PROPERTIES_PATH = "/common.properties";
+    public static final String COMMON_PROPERTIES_PATH = "../../../../../common.properties";
+
+    /**
+     * alert properties path
+     */
+    public static final String ALERT_PROPERTIES_PATH = "../../../../../alert.properties";
 
     /**
      * fs.defaultFS
@@ -421,7 +426,7 @@ public final class Constants {
     /**
      * datasource configuration path
      */
-    public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
+    public static final String DATASOURCE_PROPERTIES = "../../../../../datasource.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 
@@ -542,7 +547,6 @@ public final class Constants {
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-
 
 
     /**
@@ -859,15 +863,15 @@ public final class Constants {
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
 
 
-    public static final int[] NOT_TERMINATED_STATES = new int[] {
-        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-        ExecutionStatus.DELAY_EXECUTION.ordinal(),
-        ExecutionStatus.READY_PAUSE.ordinal(),
-        ExecutionStatus.READY_STOP.ordinal(),
-        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-        ExecutionStatus.WAITTING_THREAD.ordinal(),
-        ExecutionStatus.WAITTING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[]{
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.DELAY_EXECUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal(),
+            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+            ExecutionStatus.WAITTING_THREAD.ordinal(),
+            ExecutionStatus.WAITTING_DEPEND.ordinal()
     };
 
     /**

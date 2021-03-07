@@ -60,6 +60,7 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
@@ -150,7 +151,7 @@ public class QuartzExecutors {
             StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
             Properties properties = new Properties();
 
-            String dataSourceDriverClass = org.apache.dolphinscheduler.dao.utils.PropertyUtils.getString(SPRING_DATASOURCE_DRIVER_CLASS_NAME);
+            String dataSourceDriverClass = PropertyUtils.getString(SPRING_DATASOURCE_DRIVER_CLASS_NAME);
             if (dataSourceDriverClass.equals(ORG_POSTGRESQL_DRIVER)) {
                 properties.setProperty(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS, conf.getString(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS, PostgreSQLDelegate.class.getName()));
             } else {

@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.ALERT_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
+import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
@@ -51,7 +53,7 @@ public class PropertyUtils {
     }
 
     static {
-        String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
+        String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH,ALERT_PROPERTIES_PATH, DATASOURCE_PROPERTIES};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {
