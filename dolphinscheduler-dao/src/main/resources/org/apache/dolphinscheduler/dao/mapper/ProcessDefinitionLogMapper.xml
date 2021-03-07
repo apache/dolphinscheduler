@@ -40,7 +40,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_definition_log
-        WHERE pd.code = #{processDefinitionCode}
+        WHERE code = #{processDefinitionCode}
     </select>
     <select id="queryByDefinitionCodeAndVersion"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">

@@ -354,7 +354,7 @@ public class ProcessService {
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
         for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPostTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostNodeVersion()));
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
             }
         }
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
@@ -2412,25 +2412,25 @@ public class ProcessService {
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
         for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreNodeVersion()));
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion()));
             }
             if (processTaskRelation.getPostTaskCode() > 0) {
-                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostNodeVersion()));
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
             }
             taskNodeMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
                 if (v == null) {
                     v = new TaskNode();
                     v.setCode(processTaskRelation.getPostTaskCode());
-                    v.setVersion(processTaskRelation.getPostNodeVersion());
+                    v.setVersion(processTaskRelation.getPostTaskVersion());
                     v.setConditionResult(processTaskRelation.getConditionParams());
                     List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
                     if (processTaskRelation.getPreTaskCode() > 0) {
-                        preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreNodeVersion()));
+                        preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
                     }
                     v.setPreTaskNodeList(preTaskNodeList);
                 } else {
                     List<PreviousTaskNode> preTaskDefinitionList = v.getPreTaskNodeList();
-                    preTaskDefinitionList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreNodeVersion()));
+                    preTaskDefinitionList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
                 }
                 return v;
             });
