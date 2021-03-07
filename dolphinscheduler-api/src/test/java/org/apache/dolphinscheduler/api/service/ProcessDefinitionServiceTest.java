@@ -717,7 +717,6 @@ public class ProcessDefinitionServiceTest {
 
         //success
         Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(new ProcessData());
-//        processDefinition.setProcessDefinitionJson(SHELL_JSON);
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
         Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
         Assert.assertEquals(Status.SUCCESS, dataNotValidRes.get(Constants.STATUS));
@@ -734,7 +733,6 @@ public class ProcessDefinitionServiceTest {
 
         //process definition exist
         ProcessDefinition processDefinition = getProcessDefinition();
-//        processDefinition.setProcessDefinitionJson(SHELL_JSON);
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
         Mockito.when(processDefineMapper.queryDefinitionListByIdList(idArray)).thenReturn(processDefinitionList);
@@ -766,7 +764,6 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectMapper.selectById(projectId)).thenReturn(project);
 
         ProcessDefinition processDefinition = getProcessDefinition();
-//        processDefinition.setProcessDefinitionJson(SHELL_JSON);
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
         Project test = getProject("test");
@@ -1266,16 +1263,6 @@ public class ProcessDefinitionServiceTest {
         Integer processDefinitionId = 111;
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(processDefinitionId);
-        //TODO...
-        //ut change
-//        processDefinition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
-//                + "{\"failedNode\":[\"\"],\"successNode\":"
-//                + "[\"\"]},\"delayTime\":\"0\",\"dependence\":{},"
-//                + "\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\","
-//                + "\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]},"
-//                + "\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\","
-//                + "\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
         Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinition));
     }
 

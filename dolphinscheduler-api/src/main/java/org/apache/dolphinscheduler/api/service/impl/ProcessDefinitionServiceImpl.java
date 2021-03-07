@@ -713,7 +713,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private void addExportTaskNodeSpecialParam(ProcessData processData) {
         List<TaskNode> taskNodeList = processData.getTasks();
         List<TaskNode> tmpNodeList = new ArrayList<>();
-        for(TaskNode taskNode : taskNodeList){
+        for (TaskNode taskNode : taskNodeList) {
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskNode.getType());
             JsonNode jsonNode = JSONUtils.toJsonNode(taskNode);
             if (null != addTaskParam) {
