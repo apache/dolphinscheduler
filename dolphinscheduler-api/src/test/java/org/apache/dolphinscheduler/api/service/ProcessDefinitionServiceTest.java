@@ -392,13 +392,6 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Mockito.when(processDefineMapper.queryByDefineName(project.getCode(), "test_def")).thenReturn(null);
 
-//        String processDefinitionJson = "{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
-//                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
-//                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
-//                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
-//                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
-//                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
-//                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}";
         ProcessData processData = getProcessData();
         Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(processData);
         Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionByName(loginUser,
@@ -417,12 +410,6 @@ public class ProcessDefinitionServiceTest {
 
         String projectName = "project_test1";
         Project project = getProject(projectName);
-        String processDefinitionJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\","
-                + "\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234"
-                + "\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\","
-                + "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
-                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
-
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -517,11 +504,6 @@ public class ProcessDefinitionServiceTest {
 
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
-//        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\""
-//                + ",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234"
-//                + "\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\","
-//                + "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
-//                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
         definition.setConnects("[]");
 
         // check target project result == null
@@ -655,16 +637,6 @@ public class ProcessDefinitionServiceTest {
                 loginUser, "project_test1", 46, ReleaseState.getEnum(2));
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
 
-        //FIXME has function exit code 1 when exception
-        //process definition offline
-        //        List<Schedule> schedules = new ArrayList<>();
-        //        Schedule schedule = getSchedule();
-        //        schedules.add(schedule);
-        //        Mockito.when(scheduleMapper.selectAllByProcessDefineArray(new int[]{46})).thenReturn(schedules);
-        //        Mockito.when(scheduleMapper.updateById(schedule)).thenReturn(1);
-        //        Map<String, Object> offlineRes = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-        //                46, ReleaseState.OFFLINE.getCode());
-        //        Assert.assertEquals(Status.SUCCESS, offlineRes.get(Constants.STATUS));
     }
 
     @Test
@@ -773,7 +745,7 @@ public class ProcessDefinitionServiceTest {
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
-    private ProcessData getProcessData(){
+    private ProcessData getProcessData() {
         ProcessData processData = new ProcessData();
         List<TaskNode> taskNodeList = new ArrayList<>();
         processData.setTasks(taskNodeList);
