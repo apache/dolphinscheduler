@@ -510,7 +510,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (tenant != null) {
             processInstance.setTenantCode(tenant.getTenantCode());
         }
-        processInstance.setProcessInstanceJson(processInstanceJson);
         processInstance.setGlobalParams(globalParams);
     }
     /**

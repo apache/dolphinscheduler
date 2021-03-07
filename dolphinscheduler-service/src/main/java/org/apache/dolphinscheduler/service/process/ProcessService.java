@@ -1582,7 +1582,6 @@ public class ProcessService {
                                      String locations, String connects) {
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
         if (processInstance != null) {
-            processInstance.setProcessInstanceJson(processJson);
             processInstance.setGlobalParams(globalParams);
             processInstance.setScheduleTime(scheduleTime);
             processInstance.setLocations(locations);
