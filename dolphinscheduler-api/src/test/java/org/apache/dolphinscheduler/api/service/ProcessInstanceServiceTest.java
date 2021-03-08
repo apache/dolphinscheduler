@@ -130,18 +130,6 @@ public class ProcessInstanceServiceTest {
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
-        // data parameter check
-        putMsg(result, Status.SUCCESS, projectName);
-        Project project = getProject(projectName);
-        when(projectMapper.queryByName(projectName)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Map<String, Object> dataParameterRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "20200101 00:00:00",
-                "20200102 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
-                "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, dataParameterRes.get(Constants.STATUS));
-
-        //project auth success
-        putMsg(result, Status.SUCCESS, projectName);
         Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
         Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
         ProcessInstance processInstance = getProcessInstance();
@@ -149,6 +137,25 @@ public class ProcessInstanceServiceTest {
         Page<ProcessInstance> pageReturn = new Page<>(1, 10);
         processInstanceList.add(processInstance);
         pageReturn.setRecords(processInstanceList);
+
+        // data parameter check
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        when(processDefineMapper.selectById(Mockito.anyInt())).thenReturn(getProcessDefinition());
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class)
+                , Mockito.any(), Mockito.any(), Mockito.any(),Mockito.any(), Mockito.any(),
+                eq("192.168.xx.xx"),  Mockito.any(),  Mockito.any())).thenReturn(pageReturn);
+
+        Map<String, Object> dataParameterRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "20200101 00:00:00",
+                "20200102 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
+                "192.168.xx.xx", 1, 10);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, dataParameterRes.get(Constants.STATUS));
+
+        //project auth success
+        putMsg(result, Status.SUCCESS, projectName);
+
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
@@ -532,6 +539,7 @@ public class ProcessInstanceServiceTest {
      */
     private Project getProject(String projectName) {
         Project project = new Project();
+        project.setCode(1L);
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);

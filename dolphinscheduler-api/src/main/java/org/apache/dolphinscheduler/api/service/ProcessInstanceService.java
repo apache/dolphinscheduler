@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -149,7 +150,7 @@ public interface ProcessInstanceService {
     Map<String, Object> viewGantt(Integer processInstanceId) throws Exception;
 
     /**
-     * query process instance by processDefinitionId and stateArray
+     * query process instance by processDefinitionCode and stateArray
      *
      * @param processDefinitionCode processDefinitionCode
      * @param states states array

@@ -98,7 +98,7 @@ public class ProcessDefinitionLogMapperTest {
         processDefinitionLogMapper.insert(processDefinitionLog);
         return processDefinitionLog;
     }
-    
+
     @Test
     public void testInsert() {
         ProcessDefinitionLog processDefinitionLog = insertOne();
