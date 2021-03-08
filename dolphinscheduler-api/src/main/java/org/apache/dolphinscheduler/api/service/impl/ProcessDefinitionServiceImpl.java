@@ -484,7 +484,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         // check process instances is already running
-        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineIdAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
+        List<ProcessInstance> processInstances = processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(), Constants.NOT_TERMINATED_STATES);
         if (CollectionUtils.isNotEmpty(processInstances)) {
             putMsg(result, Status.DELETE_PROCESS_DEFINITION_BY_ID_FAIL, processInstances.size());
             return result;
@@ -621,17 +621,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * get process definition list by ids
      */
     private List<ProcessMeta> getProcessDefinitionList(String processDefinitionIds) {
-        List<ProcessMeta> processDefinitionList = new ArrayList<>();
         String[] processDefinitionIdArray = processDefinitionIds.split(",");
+
+        List<ProcessMeta> processDefinitionList = new ArrayList<>();
         for (String strProcessDefinitionId : processDefinitionIdArray) {
             //get workflow info
             int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
             ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefinitionId);
-            String processDefinitionJson = JSONUtils.toJsonString(processService.genProcessData(processDefinition));
-            processDefinition.setProcessDefinitionJson(processDefinitionJson);
-            processDefinitionList.add(exportProcessMetaData(processDefinitionId, processDefinition));
+            processDefinitionList.add(exportProcessMetaData(processDefinition));
         }
-
         return processDefinitionList;
     }
 
@@ -671,39 +669,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * get export process metadata string
      *
-     * @param processDefinitionId process definition id
      * @param processDefinition process definition
      * @return export process metadata string
      */
-    public String exportProcessMetaDataStr(Integer processDefinitionId, ProcessDefinition processDefinition) {
-        //create workflow json file
-        return JSONUtils.toJsonString(exportProcessMetaData(processDefinitionId, processDefinition));
-    }
-
-    /**
-     * get export process metadata string
-     *
-     * @param processDefinitionId process definition id
-     * @param processDefinition process definition
-     * @return export process metadata string
-     */
-    public ProcessMeta exportProcessMetaData(Integer processDefinitionId, ProcessDefinition processDefinition) {
-        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
+    public ProcessMeta exportProcessMetaData(ProcessDefinition processDefinition) {
+        ProcessData processData = processService.genProcessData(processDefinition);
         //correct task param which has data source or dependent param
-        String correctProcessDefinitionJson = addExportTaskNodeSpecialParam(processDefinitionJson);
-        processDefinition.setProcessDefinitionJson(correctProcessDefinitionJson);
+        addExportTaskNodeSpecialParam(processData);
 
         //export process metadata
         ProcessMeta exportProcessMeta = new ProcessMeta();
         exportProcessMeta.setProjectName(processDefinition.getProjectName());
         exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
-        exportProcessMeta.setProcessDefinitionJson(processDefinitionJson);
+        exportProcessMeta.setProcessDefinitionJson(JSONUtils.toJsonString(processService.genProcessData(processDefinition)));
         exportProcessMeta.setProcessDefinitionDescription(processDefinition.getDescription());
         exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
         exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
 
         //schedule info
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinition.getId());
         if (!schedules.isEmpty()) {
             Schedule schedule = schedules.get(0);
             exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
@@ -723,26 +707,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * correct task param which has datasource or dependent
      *
-     * @param processDefinitionJson processDefinitionJson
+     * @param processData process data
      * @return correct processDefinitionJson
      */
-    private String addExportTaskNodeSpecialParam(String processDefinitionJson) {
-        ObjectNode jsonObject = JSONUtils.parseObject(processDefinitionJson);
-        ArrayNode jsonArray = (ArrayNode) jsonObject.path(TASKS);
-
-        for (int i = 0; i < jsonArray.size(); i++) {
-            JsonNode taskNode = jsonArray.path(i);
-            if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
-                String taskType = taskNode.path("type").asText();
-
-                ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
-                if (null != addTaskParam) {
-                    addTaskParam.addExportSpecialParam(taskNode);
-                }
+    private void addExportTaskNodeSpecialParam(ProcessData processData) {
+        List<TaskNode> taskNodeList = processData.getTasks();
+        List<TaskNode> tmpNodeList = new ArrayList<>();
+        for (TaskNode taskNode : taskNodeList) {
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskNode.getType());
+            JsonNode jsonNode = JSONUtils.toJsonNode(taskNode);
+            if (null != addTaskParam) {
+                addTaskParam.addExportSpecialParam(jsonNode);
             }
+            tmpNodeList.add(JSONUtils.parseObject(jsonNode.toString(), TaskNode.class));
         }
-        jsonObject.set(TASKS, jsonArray);
-        return jsonObject.toString();
+        processData.setTasks(tmpNodeList);
     }
 
     /**

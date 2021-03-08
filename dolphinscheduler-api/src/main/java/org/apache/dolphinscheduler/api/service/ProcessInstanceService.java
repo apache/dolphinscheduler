@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -155,7 +156,7 @@ public interface ProcessInstanceService {
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineIdAndStatus(Long processDefinitionCode, int[] states);
+    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states);
 
     /**
      * query process instance by processDefinitionCode
@@ -164,6 +165,6 @@ public interface ProcessInstanceService {
      * @param size size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size);
+    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,int size);
 
 }

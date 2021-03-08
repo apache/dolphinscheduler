@@ -1582,7 +1582,6 @@ public class ProcessService {
                                      String locations, String connects) {
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
         if (processInstance != null) {
-            processInstance.setProcessInstanceJson(processJson);
             processInstance.setGlobalParams(globalParams);
             processInstance.setScheduleTime(scheduleTime);
             processInstance.setLocations(locations);
@@ -1911,13 +1910,12 @@ public class ProcessService {
     /**
      * find last scheduler process instance in the date interval
      *
-     * @param definitionId definitionId
+     * @param definitionCode definitionCode
      * @param dateInterval dateInterval
      * @return process instance
      */
-    public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
-        ProcessDefinition processDefinition = processDefineMapper.selectById(definitionId);
-        return processInstanceMapper.queryLastSchedulerProcess(processDefinition.getCode(),
+    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval) {
+        return processInstanceMapper.queryLastSchedulerProcess(definitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
@@ -1925,13 +1923,12 @@ public class ProcessService {
     /**
      * find last manual process instance interval
      *
-     * @param definitionId process definition id
+     * @param definitionCode process definition code
      * @param dateInterval dateInterval
      * @return process instance
      */
-    public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
-        ProcessDefinition processDefinition = processDefineMapper.selectById(definitionId);
-        return processInstanceMapper.queryLastManualProcess(processDefinition.getCode(),
+    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval) {
+        return processInstanceMapper.queryLastManualProcess(definitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
@@ -1939,14 +1936,13 @@ public class ProcessService {
     /**
      * find last running process instance
      *
-     * @param definitionId process definition id
+     * @param definitionCode process definition code
      * @param startTime start time
      * @param endTime end time
      * @return process instance
      */
-    public ProcessInstance findLastRunningProcess(int definitionId, Date startTime, Date endTime) {
-        ProcessDefinition processDefinition = processDefineMapper.selectById(definitionId);
-        return processInstanceMapper.queryLastRunningProcess(processDefinition.getCode(),
+    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime) {
+        return processInstanceMapper.queryLastRunningProcess(definitionCode,
                 startTime,
                 endTime,
                 stateArray);

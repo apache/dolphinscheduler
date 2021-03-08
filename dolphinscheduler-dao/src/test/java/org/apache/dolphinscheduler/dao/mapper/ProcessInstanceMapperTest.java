@@ -64,7 +64,6 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstance = new ProcessInstance();
         Date start = startTime;
         Date end = endTime;
-        processInstance.setProcessDefinitionCode(1L);
         processInstance.setStartTime(start);
         processInstance.setEndTime(end);
         processInstance.setState(ExecutionStatus.SUCCESS);
@@ -83,7 +82,6 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstance = new ProcessInstance();
         Date start = new Date(2019 - 1900, 1 - 1, 1, 0, 10, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 1, 1, 0, 0);
-        processInstance.setProcessDefinitionCode(1L);
         processInstance.setStartTime(start);
         processInstance.setEndTime(end);
         processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
@@ -172,16 +170,12 @@ public class ProcessInstanceMapperTest {
                 ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
         processDefinition.setProjectId(1010);
-        processDefinition.setProjectCode(1L);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
 
         ProcessInstance processInstance = insertOne();
-        processInstance.setProcessDefinitionCode(processDefinition.getCode());
+        processInstance.setProcessDefinitionId(processDefinition.getId());
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setIsSubProcess(Flag.NO);
         processInstance.setStartTime(new Date());
@@ -260,18 +254,10 @@ public class ProcessInstanceMapperTest {
 
         Project project = new Project();
         project.setName("testProject");
-        project.setCode(1L);
-        project.setCreateTime(new Date());
-        project.setUpdateTime(new Date());
         projectMapper.insert(project);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setProjectId(1010);
-        processDefinition.setProjectCode(1L);
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
+        processDefinition.setProjectId(project.getId());
 
         processDefinitionMapper.insert(processDefinition);
         ProcessInstance processInstance = insertOne();
@@ -297,6 +283,8 @@ public class ProcessInstanceMapperTest {
     public void testQueryByProcessDefineId() {
         ProcessInstance processInstance = insertOne();
         ProcessInstance processInstance1 = insertOne();
+
+
         List<ProcessInstance> processInstances = processInstanceMapper.queryByProcessDefineCode(processInstance.getProcessDefinitionCode(), 1);
         Assert.assertEquals(1, processInstances.size());
 
@@ -315,6 +303,7 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstance = insertOne();
         processInstance.setScheduleTime(new Date());
         processInstanceMapper.updateById(processInstance);
+
         ProcessInstance processInstance1 = processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null);
         Assert.assertNotEquals(processInstance1, null);
         processInstanceMapper.deleteById(processInstance.getId());
