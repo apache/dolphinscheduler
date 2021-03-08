@@ -257,9 +257,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
 
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefineId);
+
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
-                        project.getId(), processDefineId, searchVal, executorId, statusArray, host, start, end);
+                        project.getCode(), processDefinition.getCode(), searchVal, executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
@@ -451,7 +453,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
-            updateDefine = syncDefinition(loginUser, project, processInstanceJson, locations, connects,
+            updateDefine = syncDefinition(loginUser, project, locations, connects,
                     processInstance, processDefinition, processData);
         }
         if (update > 0 && updateDefine > 0) {
@@ -465,12 +467,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * sync definition according process instance
      */
-    private int syncDefinition(User loginUser, Project project, String processInstanceJson, String locations, String connects,
+    private int syncDefinition(User loginUser, Project project, String locations, String connects,
                                ProcessInstance processInstance, ProcessDefinition processDefinition,
                                ProcessData processData) {
 
         String originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
-        processDefinition.setProcessDefinitionJson(processInstanceJson);
         processDefinition.setGlobalParams(originDefParams);
         processDefinition.setLocations(locations);
         processDefinition.setConnects(connects);
@@ -511,9 +512,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (tenant != null) {
             processInstance.setTenantCode(tenant.getTenantCode());
         }
-        processInstance.setProcessInstanceJson(processInstanceJson);
         processInstance.setGlobalParams(globalParams);
     }
+
     /**
      * query parent process instance detail info by sub process instance id
      *
@@ -645,10 +646,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     /**
      * get local params
-     *
-     * @param processInstance
-     * @param timeParams
-     * @return
      */
     private Map<String, Map<String, Object>> getLocalParams(ProcessInstance processInstance, Map<String, String> timeParams) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
@@ -674,6 +671,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         return localUserDefParams;
     }
+
     /**
      * encapsulation gantt structure
      *
@@ -732,25 +730,27 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     }
 
     /**
-     * query process instance by processDefinitionId and stateArray
-     * @param processDefinitionId processDefinitionId
+     * query process instance by processDefinitionCode and stateArray
+     *
+     * @param processDefinitionCode processDefinitionCode
      * @param states states array
      * @return process instance list
      */
     @Override
-    public List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states) {
-        return processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionId, states);
+    public List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states) {
+        return processInstanceMapper.queryByProcessDefineCodeAndStatus(processDefinitionCode, states);
     }
 
     /**
-     * query process instance by processDefinitionId
-     * @param processDefinitionId processDefinitionId
+     * query process instance by processDefinitionCode
+     *
+     * @param processDefinitionCode processDefinitionCode
      * @param size size
      * @return process instance list
      */
     @Override
-    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId, int size) {
-        return processInstanceMapper.queryByProcessDefineId(processDefinitionId, size);
+    public List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size) {
+        return processInstanceMapper.queryByProcessDefineCode(processDefinitionCode, size);
     }
 
 }
