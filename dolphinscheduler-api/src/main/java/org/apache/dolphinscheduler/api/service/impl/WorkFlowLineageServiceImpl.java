@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
 import java.util.ArrayList;
@@ -43,10 +45,14 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
     @Override
     public Map<String, Object> queryWorkFlowLineageByName(String workFlowName, int projectId) {
+        Project project = projectMapper.selectById(projectId);
         Map<String, Object> result = new HashMap<>();
-        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByName(workFlowName, projectId);
+        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByName(workFlowName, project.getCode());
         result.put(Constants.DATA_LIST, workFlowLineageList);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -58,13 +64,13 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
             List<WorkFlowRelation> workFlowRelationsTmp = workFlowLineageMapper.querySourceTarget(id);
             if (workFlowRelationsTmp != null && !workFlowRelationsTmp.isEmpty()) {
                 Set<Integer> idsTmp = new HashSet<>();
-                for (WorkFlowRelation workFlowRelation:workFlowRelationsTmp) {
+                for (WorkFlowRelation workFlowRelation : workFlowRelationsTmp) {
                     if (!sourceIds.contains(workFlowRelation.getTargetWorkFlowId())) {
                         idsTmp.add(workFlowRelation.getTargetWorkFlowId());
                     }
                 }
                 workFlowRelations.addAll(workFlowRelationsTmp);
-                getWorkFlowRelationRecursion(idsTmp, workFlowRelations,sourceIds);
+                getWorkFlowRelationRecursion(idsTmp, workFlowRelations, sourceIds);
             }
         }
     }
@@ -72,11 +78,12 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     @Override
     public Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids, int projectId) {
         Map<String, Object> result = new HashMap<>();
-        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByIds(ids, projectId);
+        Project project = projectMapper.selectById(projectId);
+        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByIds(ids, project.getCode());
         Map<String, Object> workFlowLists = new HashMap<>();
         Set<Integer> idsV = new HashSet<>();
         if (ids == null || ids.isEmpty()) {
-            for (WorkFlowLineage workFlowLineage:workFlowLineageList) {
+            for (WorkFlowLineage workFlowLineage : workFlowLineageList) {
                 idsV.add(workFlowLineage.getWorkFlowId());
             }
         } else {
@@ -96,7 +103,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                 idSet.remove(id);
             }
             if (!idSet.isEmpty()) {
-                workFlowLineageList.addAll(workFlowLineageMapper.queryByIds(idSet, projectId));
+                workFlowLineageList.addAll(workFlowLineageMapper.queryByIds(idSet, project.getCode()));
             }
         }
 

@@ -41,7 +41,7 @@ public class WorkFlowLineageMapperTest {
 
     @Test
     public void testQueryByName() {
-        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByName("test",1);
+        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByName("test",1L);
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 
@@ -50,7 +50,7 @@ public class WorkFlowLineageMapperTest {
     public void testQueryByIds() {
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
-        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByIds(ids,1);
+        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByIds(ids,1L);
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
 

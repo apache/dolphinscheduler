@@ -444,7 +444,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return Constants.ALL_PERMISSIONS;
         }
 
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getCode(), user.getId());
 
         if (projectUser == null) {
             return 0;

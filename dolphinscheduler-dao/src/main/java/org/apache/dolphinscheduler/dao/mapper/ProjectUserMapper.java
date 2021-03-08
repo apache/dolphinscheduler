@@ -27,19 +27,19 @@ public interface ProjectUserMapper extends BaseMapper<ProjectUser> {
 
     /**
      * delte prject user relation
-     * @param projectId projectId
+     * @param projectCode projectCode
      * @param userId userId
      * @return delete result
      */
-    int deleteProjectRelation(@Param("projectId") int projectId,
+    int deleteProjectRelation(@Param("projectCode") Long projectCode,
                               @Param("userId") int userId);
 
     /**
      * query project relation
-     * @param projectId projectId
+     * @param projectCode projectCode
      * @param userId userId
      * @return project user relation
      */
-    ProjectUser queryProjectRelation(@Param("projectId") int projectId,
+    ProjectUser queryProjectRelation(@Param("projectCode") Long projectCode,
                                      @Param("userId") int userId);
 }

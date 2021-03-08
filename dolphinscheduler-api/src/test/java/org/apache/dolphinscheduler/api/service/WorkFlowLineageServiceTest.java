@@ -53,7 +53,7 @@ public class WorkFlowLineageServiceTest {
     @Test
     public void testQueryWorkFlowLineageByName() {
         String searchVal = "test";
-        when(workFlowLineageMapper.queryByName(searchVal, 1)).thenReturn(getWorkFlowLineages());
+        when(workFlowLineageMapper.queryByName(searchVal, 1L)).thenReturn(getWorkFlowLineages());
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,1);
         List<WorkFlowLineage> workFlowLineageList = (List<WorkFlowLineage>)result.get(Constants.DATA_LIST);
         Assert.assertTrue(workFlowLineageList.size()>0);
@@ -66,7 +66,7 @@ public class WorkFlowLineageServiceTest {
         ids.add(1);
         ids.add(2);
 
-        when(workFlowLineageMapper.queryByIds(ids, 1)).thenReturn(getWorkFlowLineages());
+        when(workFlowLineageMapper.queryByIds(ids, 1L)).thenReturn(getWorkFlowLineages());
         when(workFlowLineageMapper.querySourceTarget(1)).thenReturn(getWorkFlowRelation());
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(ids,1);
         Map<String, Object> workFlowLists = (Map<String, Object>)result.get(Constants.DATA_LIST);

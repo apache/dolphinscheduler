@@ -83,9 +83,9 @@
         join t_ds_user u on u.id=p.user_id
         where 1=1
         <if test="userId != 0">
-            and p.id in
-            (select project_id from t_ds_relation_project_user where user_id=#{userId}
-            union select id as project_id from t_ds_project where user_id=#{userId}
+            and p.code in
+            (select project_code from t_ds_relation_project_user where user_id=#{userId}
+            union select id as project_code from t_ds_project where user_id=#{userId}
             )
         </if>
         <if test="searchName!=null and searchName != ''">
