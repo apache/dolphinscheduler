@@ -54,9 +54,9 @@ spec:
       {{- if .Values.master.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.image.pullSecrets }}
+      {{- if .Values.image.pullSecret }}
       imagePullSecrets:
-      - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
+      - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
