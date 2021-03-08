@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
 import org.slf4j.Logger;
@@ -109,7 +110,7 @@ public class HadoopUtils implements Closeable {
      */
     private void init() {
         try {
-            configuration = new Configuration();
+            configuration = new HdfsConfiguration();
 
             String resourceStorageType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
