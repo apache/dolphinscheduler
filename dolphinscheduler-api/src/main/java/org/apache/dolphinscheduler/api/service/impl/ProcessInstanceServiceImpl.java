@@ -453,7 +453,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
-            updateDefine = syncDefinition(loginUser, project, processInstanceJson, locations, connects,
+            updateDefine = syncDefinition(loginUser, project, locations, connects,
                     processInstance, processDefinition, processData);
         }
         if (update > 0 && updateDefine > 0) {
@@ -467,12 +467,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * sync definition according process instance
      */
-    private int syncDefinition(User loginUser, Project project, String processInstanceJson, String locations, String connects,
+    private int syncDefinition(User loginUser, Project project, String locations, String connects,
                                ProcessInstance processInstance, ProcessDefinition processDefinition,
                                ProcessData processData) {
 
         String originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
-        processDefinition.setProcessDefinitionJson(processInstanceJson);
         processDefinition.setGlobalParams(originDefParams);
         processDefinition.setLocations(locations);
         processDefinition.setConnects(connects);
@@ -513,7 +512,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (tenant != null) {
             processInstance.setTenantCode(tenant.getTenantCode());
         }
-        processInstance.setProcessInstanceJson(processInstanceJson);
         processInstance.setGlobalParams(globalParams);
     }
 

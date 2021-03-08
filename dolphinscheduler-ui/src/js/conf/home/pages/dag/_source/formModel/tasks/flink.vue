@@ -33,7 +33,6 @@
         </el-select>
       </div>
     </m-list-box>
-
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main Class')}}</div>
       <div slot="content">
