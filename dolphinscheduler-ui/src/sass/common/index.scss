@@ -365,6 +365,8 @@ body::-webkit-scrollbar-thumb {
 .el-dialog__body {
   padding: 10px;
 }
-
-
-
+.el-dialog__header {
+  .el-dialog__headerbtn {
+    right: 10px;
+  }
+}
