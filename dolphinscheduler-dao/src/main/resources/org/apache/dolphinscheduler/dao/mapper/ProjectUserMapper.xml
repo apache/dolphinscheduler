@@ -25,15 +25,15 @@
         delete from t_ds_relation_project_user
         where 1=1
         and user_id = #{userId}
-        <if test="projectId != 0 ">
-            and project_id = #{projectId}
+        <if test="projectCode != 0 ">
+            and project_code = #{projectCode}
         </if>
     </delete>
     <select id="queryProjectRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
         select
         <include refid="baseSql"/>
         from t_ds_relation_project_user
-        where project_id = #{projectId}
+        where project_code = #{projectCode}
         and user_id = #{userId}
         limit 1
     </select>

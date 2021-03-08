@@ -22,7 +22,7 @@
         select tepd.id as work_flow_id,tepd.name as work_flow_name
         from t_ds_process_definition tepd
         left join t_ds_schedules tes on tepd.id = tes.process_definition_id
-        where tepd.project_id = #{projectId}
+        where tepd.project_code = #{projectCode}
         <if test="searchVal != null and searchVal != ''">
             and  tepd.name like concat('%', #{searchVal}, '%')
         </if>
@@ -38,7 +38,7 @@
                           tes.release_state as schedule_publish_status
         from t_ds_process_definition tepd
         left join t_ds_schedules tes on tepd.id = tes.process_definition_id
-        where tepd.project_id = #{projectId}
+        where tepd.project_code = #{projectCode}
         <if test="ids != null and ids.size()>0">
             and  tepd.id in
             <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
@@ -68,7 +68,7 @@
                       tes.release_state as schedule_publish_status
                  from t_ds_process_definition tepd
                  left join t_ds_schedules tes on tepd.id = tes.process_definition_id
-                 where tepd.project_id = #{projectId}
+                 where tepd.project_code = #{projectCode}
                  <if test="ids != null and ids.size()>0">
                      and  tepd.id in
                      <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">

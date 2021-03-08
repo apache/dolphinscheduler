@@ -52,6 +52,7 @@ public class ProjectUserMapperTest {
     private ProjectUser insertOne(){
         //insertOne
         ProjectUser projectUser = new ProjectUser();
+        projectUser.setProjectCode(1010L);
         projectUser.setProjectId(1010);
         projectUser.setUserId(111);
         projectUserMapper.insert(projectUser);
@@ -100,7 +101,7 @@ public class ProjectUserMapperTest {
 
 
         ProjectUser projectUser = insertOne();
-        int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
+        int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectCode(), projectUser.getUserId());
         assertThat(delete,greaterThanOrEqualTo(1));
 
     }
@@ -111,7 +112,7 @@ public class ProjectUserMapperTest {
     @Test
     public void testQueryProjectRelation() {
         ProjectUser projectUser = insertOne();
-        ProjectUser projectUser1 = projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
+        ProjectUser projectUser1 = projectUserMapper.queryProjectRelation(projectUser.getProjectCode(), projectUser.getUserId());
         Assert.assertNotEquals(projectUser1, null);
 
     }
