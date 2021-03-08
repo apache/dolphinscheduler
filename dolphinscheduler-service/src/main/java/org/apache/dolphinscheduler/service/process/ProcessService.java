@@ -2242,7 +2242,7 @@ public class ProcessService {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
         processDefinitionLog.setCode(processDefinitionCode);
-        processDefinitionLog.setVersion(version == null ? 1 : version);
+        processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version);
         processDefinitionLog.setName(processDefinitionName);
         processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionLog.setProjectCode(project.getCode());
