@@ -116,7 +116,7 @@ public class ProjectServiceTest {
     @Test
     public void testCheckProjectAndAuth() {
 
-        Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
+        Mockito.when(projectUserMapper.queryProjectRelation(1L, 1)).thenReturn(getProjectUser());
         User loginUser = getLoginUser();
 
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, null, projectName);

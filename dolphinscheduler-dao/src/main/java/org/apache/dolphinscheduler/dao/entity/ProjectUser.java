@@ -34,11 +34,11 @@ public class ProjectUser {
     @TableField("user_id")
     private int userId;
 
-    @TableField("project_id")
+    @TableField(exist = false)
     private int projectId;
 
     @TableField("project_code")
-    private int projectCode;
+    private long projectCode;
 
     /**
      * project name
@@ -63,11 +63,11 @@ public class ProjectUser {
     @TableField("update_time")
     private Date updateTime;
 
-    public int getProjectCode() {
+    public long getProjectCode() {
         return projectCode;
     }
 
-    public void setProjectCode(int projectCode) {
+    public void setProjectCode(long projectCode) {
         this.projectCode = projectCode;
     }
 

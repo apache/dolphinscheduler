@@ -526,7 +526,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteProjectRelation(0, userId);
+        projectUserMapper.deleteProjectRelation(0L, userId);
 
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             return result;
