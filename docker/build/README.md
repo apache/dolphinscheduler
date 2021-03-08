@@ -11,6 +11,11 @@ Official Website: https://dolphinscheduler.apache.org
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
+## Prerequisites
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+
 ## How to use this docker image
 
 #### You can start a dolphinscheduler by docker-compose (recommended)
