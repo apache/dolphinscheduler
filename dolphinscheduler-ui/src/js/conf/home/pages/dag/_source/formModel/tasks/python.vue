@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="shell-model">
+  <div class="python-model">
     <m-list-box>
       <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
@@ -36,7 +36,6 @@
         </treeselect>
       </div>
     </m-list-box>
-
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
