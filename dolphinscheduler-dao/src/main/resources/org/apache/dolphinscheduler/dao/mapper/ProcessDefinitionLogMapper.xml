@@ -54,7 +54,6 @@
         select max(version)
         from t_ds_process_definition_log
         where code = #{processDefinitionCode}
-
     </select>
 
     <select id="queryProcessDefinitionVersionsPaging"

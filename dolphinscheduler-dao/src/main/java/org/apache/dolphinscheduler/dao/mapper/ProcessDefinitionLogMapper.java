@@ -53,7 +53,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
     /**
      * query max version for definition
      */
-    int queryMaxVersionForDefinition(@Param("processDefinitionCode") long processDefinitionCode);
+    Integer queryMaxVersionForDefinition(@Param("processDefinitionCode") long processDefinitionCode);
 
     /**
      * query the certain process definition version info by process definition code and version number
