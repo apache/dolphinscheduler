@@ -43,7 +43,7 @@ public class BaseController {
      * @return check result code
      */
     public Map<String, Object> checkPageParams(int pageNo, int pageSize) {
-        Map<String, Object> result = new HashMap<>(2);
+        Map<String, Object> result = new HashMap<>(4);
         Status resultEnum = Status.SUCCESS;
         String msg = Status.SUCCESS.getMsg();
         if (pageNo <= 0) {
@@ -197,7 +197,7 @@ public class BaseController {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        Map<String, Object> map = new HashMap<>(4);
+        Map<String, Object> map = new HashMap<>(8);
         map.put(Constants.TOTAL_LIST, totalList);
         map.put(Constants.CURRENT_PAGE, currentPage);
         map.put(Constants.TOTAL_PAGE, totalPage);
