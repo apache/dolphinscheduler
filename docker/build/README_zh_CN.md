@@ -11,6 +11,11 @@ Official Website: https://dolphinscheduler.apache.org
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
+## 先决条件
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+
 ## 如何使用docker镜像
 
 #### 以 docker-compose 的方式启动dolphinscheduler(推荐)
