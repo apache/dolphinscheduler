@@ -32,6 +32,8 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 
 默认的用户是`admin`，默认的密码是`dolphinscheduler123`
 
+> **提示**: 为了在docker中快速开始，你可以创建一个名为`ds`的租户，并将这个租户`ds`关联到用户`admin`
+
 #### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
 你可以指定已经存在的 **`Postgres`** 和 **`Zookeeper`** 服务. 如下:

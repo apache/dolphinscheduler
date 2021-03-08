@@ -54,6 +54,8 @@ And then access the web: http://192.168.xx.xx:12345/dolphinscheduler
 
 The default username is `admin` and the default password is `dolphinscheduler123`
 
+> **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `dolphinscheduler` deployment:
