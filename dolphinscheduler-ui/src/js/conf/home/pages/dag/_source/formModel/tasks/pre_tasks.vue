@@ -16,35 +16,33 @@
  */
 <template>
   <div class="pre_tasks-model">
-    <div class="clearfix list">
-      <div class="text-box">
-        <span>{{$t('Pre tasks')}}</span>
+    <m-list-box>
+      <div slot="text">{{$t('Pre tasks')}}</div>
+      <div slot="content">
+        <el-select
+            ref="preTasksSelector"
+            style="width: 100%;"
+            filterable
+            multiple
+            size="small"
+            v-model="preTasks"
+            :disabled="isDetails"
+            :id="preTasksSelectorId">
+          <el-option
+              v-for="task in preTaskList"
+              :key="task.id"
+              :value="task.id"
+              :label="task.name">
+          </el-option>
+        </el-select>
       </div>
-      <div class="cont-box">
-        <div class="label-box">
-          <el-select
-              ref="preTasksSelector"
-              style="width: 100%;"
-              filterable
-              multiple
-              size="small"
-              v-model="preTasks"
-              :disabled="isDetails"
-              :id="preTasksSelectorId">
-            <el-option
-                v-for="task in preTaskList"
-                :key="task.id"
-                :value="task.id"
-                :label="task.name">
-            </el-option>
-          </el-select>
-        </div>
-      </div>
-    </div>
+    </m-list-box>
   </div>
 </template>
 <script>
   import disabledState from '@/module/mixin/disabledState'
+  import mListBox from './_source/listBox'
+
   export default {
     name: 'pre_tasks',
     mixins: [disabledState],
@@ -104,6 +102,7 @@
         })
         return true
       }
-    }
+    },
+    components: { mListBox }
   }
 </script>
