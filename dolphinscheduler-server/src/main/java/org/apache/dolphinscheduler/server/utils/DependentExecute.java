@@ -101,7 +101,7 @@ public class DependentExecute {
 
         DependResult result = DependResult.FAILED;
         for(DateInterval dateInterval : dateIntervals){
-            ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionId(),
+            ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
                                                     dateInterval);
             if(processInstance == null){
                 return DependResult.WAITING;
@@ -170,24 +170,20 @@ public class DependentExecute {
      * find the last one process instance that :
      * 1. manual run and finish between the interval
      * 2. schedule run and schedule time between the interval
-     * @param definitionId  definition id
+     * @param definitionCode  definition code
      * @param dateInterval  date interval
      * @return ProcessInstance
      */
-    private ProcessInstance findLastProcessInterval(int definitionId, DateInterval dateInterval) {
+    private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval.getStartTime(), dateInterval.getEndTime());
+        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionCode, dateInterval.getStartTime(), dateInterval.getEndTime());
         if(runningProcess != null){
             return runningProcess;
         }
 
-        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(
-                definitionId, dateInterval
-        );
+        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(definitionCode, dateInterval);
 
-        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(
-                definitionId, dateInterval
-        );
+        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(definitionCode, dateInterval);
 
         if(lastManualProcess ==null){
             return lastSchedulerProcess;
