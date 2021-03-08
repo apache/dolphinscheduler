@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="dependence-model">
+  <div class="dependent-model">
     <m-list-box>
       <div slot="text">{{$t('Add dependency')}}</div>
       <div slot="content">
@@ -67,7 +67,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'dependence',
+    name: 'dependent',
     data () {
       return {
         relation: 'AND',
@@ -132,7 +132,7 @@
           this.isLoading = false
         }, 600)
       },
-      cacheDependence (val) {
+      cacheDependent (val) {
         this.$emit('on-cache-dependent', val)
       }
     },
@@ -157,7 +157,7 @@
     destroyed () {
     },
     computed: {
-      cacheDependence () {
+      cacheDependent () {
         return {
           relation: this.relation,
           dependTaskList: _.map(this.dependTaskList, v => {
@@ -174,7 +174,7 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .dependence-model {
+  .dependent-model {
     margin-top: -10px;
     .dep-opt {
       margin-bottom: 10px;
