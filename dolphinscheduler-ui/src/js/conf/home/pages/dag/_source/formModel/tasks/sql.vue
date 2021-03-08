@@ -34,7 +34,7 @@
         </div>
       </div>
     </m-list-box>
-    <template v-if="sqlType==0">
+    <template v-if="sqlType === 0">
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
@@ -54,7 +54,7 @@
         </div>
       </m-list-box>
     </template>
-    <m-list-box v-show="type === 'HIVE'">
+    <m-list-box v-if="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
         <el-input

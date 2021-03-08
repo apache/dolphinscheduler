@@ -16,35 +16,32 @@
  */
 <template>
   <div class="sub_process-model">
-    <div class="clearfix list">
-      <div class="text-box">
-        <span>{{$t('Child Node')}}</span>
+    <m-list-box>
+      <div slot="text">{{$t('Child Node')}}</div>
+      <div slot="content">
+        <el-select
+                style="width: 100%;"
+                size="small"
+                filterable
+                v-model="wdiCurr"
+                :disabled="isDetails"
+                @change="_handleWdiChanged">
+          <el-option
+                v-for="city in processDefinitionList"
+                :key="city.code"
+                :value="city.id"
+                :label="city.code">
+          </el-option>
+        </el-select>
       </div>
-      <div class="cont-box">
-        <div class="label-box">
-          <el-select
-                  style="width: 100%;"
-                  size="small"
-                  filterable
-                  v-model="wdiCurr"
-                  :disabled="isDetails"
-                  @change="_handleWdiChanged">
-            <el-option
-                  v-for="city in processDefinitionList"
-                  :key="city.code"
-                  :value="city.id"
-                  :label="city.code">
-            </el-option>
-          </el-select>
-        </div>
-      </div>
-    </div>
+    </m-list-box>
   </div>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import disabledState from '@/module/mixin/disabledState'
+  import mListBox from './_source/listBox'
 
   export default {
     name: 'sub_process',
@@ -125,6 +122,7 @@
       }
     },
     mounted () {
-    }
+    },
+    components: { mListBox }
   }
 </script>
