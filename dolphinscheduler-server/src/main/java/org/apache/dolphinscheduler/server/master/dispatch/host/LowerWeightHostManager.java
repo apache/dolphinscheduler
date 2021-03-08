@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -147,25 +147,19 @@ public class LowerWeightHostManager extends CommonHostManager {
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for (String node : nodes) {
                         String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
-                        if (StringUtils.isNotEmpty(heartbeat)) {
+                        if (ResInfo.isValidHeartbeatForZKInfo(heartbeat)) {
                             String[] parts = heartbeat.split(Constants.COMMA);
-                            if (parts.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH
-                                    && parts.length != Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH) {
-                                continue;
-                            }
-
                             int status = Integer.parseInt(parts[8]);
                             if (status == Constants.ABNORMAL_NODE_STATUS) {
                                 logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
                                         Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
                                 continue;
                             }
-
                             double cpu = Double.parseDouble(parts[0]);
                             double memory = Double.parseDouble(parts[1]);
                             double loadAverage = Double.parseDouble(parts[2]);
                             long startTime = DateUtils.stringToDate(parts[6]).getTime();
-                            int weight = parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH ? Integer.parseInt(parts[10]) : Constants.DEFAULT_WORKER_WEIGHT;
+                            int weight = ResInfo.isNewHeartbeatWithWeight(parts) ? Integer.parseInt(parts[10]) : Constants.DEFAULT_WORKER_WEIGHT;
                             HostWeight hostWeight = new HostWeight(HostWorker.of(node, weight, workerGroup), cpu, memory, loadAverage, startTime);
                             hostWeights.add(hostWeight);
                         }

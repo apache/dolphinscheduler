@@ -92,14 +92,10 @@ public class ResInfo {
      * @return heartbeat info to Server
      */
     public static Server parseHeartbeatForZKInfo(String heartBeatInfo) {
-        if (StringUtils.isEmpty(heartBeatInfo)) {
+        if (!isValidHeartbeatForZKInfo(heartBeatInfo)) {
             return null;
         }
         String[] parts = heartBeatInfo.split(Constants.COMMA);
-        if (parts.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH
-                && parts.length != Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH) {
-            return null;
-        }
         Server server = new Server();
         server.setResInfo(getResInfoJson(Double.parseDouble(parts[0]),
                 Double.parseDouble(parts[1]),
@@ -109,6 +105,29 @@ public class ResInfo {
         //set process id
         server.setId(Integer.parseInt(parts[9]));
         return server;
+    }
+
+    /**
+     * is valid heartbeat info for zk
+     * @param heartBeatInfo heartbeat info
+     * @return heartbeat info is valid
+     */
+    public static boolean isValidHeartbeatForZKInfo(String heartBeatInfo) {
+        if (StringUtils.isNotEmpty(heartBeatInfo)) {
+            String[] parts = heartBeatInfo.split(Constants.COMMA);
+            return parts.length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH
+                    || parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH;
+        }
+        return false;
+    }
+
+    /**
+     * is new heartbeat info for zk with weight
+     * @param parts heartbeat info parts
+     * @return heartbeat info is new with weight
+     */
+    public static boolean isNewHeartbeatWithWeight(String[] parts) {
+        return parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH;
     }
 
 }

@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import org.apache.dolphinscheduler.remote.utils.Host;
 
-import java.util.Objects;
-
 /**
  * host worker
  */
@@ -66,20 +64,6 @@ public class HostWorker extends Host {
 
     public static HostWorker of(String address, int weight, String workerGroup) {
         return new HostWorker(address, weight, workerGroup);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        HostWorker hostWorker = (HostWorker) o;
-        return Objects.equals(getAddress(), hostWorker.getAddress())
-                && getWeight() == hostWorker.getWeight()
-                && Objects.equals(getWorkerGroup(), hostWorker.getWorkerGroup());
     }
 
     @Override

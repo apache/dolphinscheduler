@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -81,7 +82,7 @@ public abstract class CommonHostManager implements HostManager {
             int weight = Constants.DEFAULT_WORKER_WEIGHT;
             if (StringUtils.isNotEmpty(heartbeat)) {
                 String[] parts = heartbeat.split(Constants.COMMA);
-                if (parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH) {
+                if (ResInfo.isNewHeartbeatWithWeight(parts)) {
                     weight = Integer.parseInt(parts[10]);
                 }
             }

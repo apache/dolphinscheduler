@@ -60,7 +60,7 @@ public class HostWeight {
     }
 
     public Host getHost() {
-        return hostWorker;
+        return (Host)hostWorker;
     }
 
     @Override
