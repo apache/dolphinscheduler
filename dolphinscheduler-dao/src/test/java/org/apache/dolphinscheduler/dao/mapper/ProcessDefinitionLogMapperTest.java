@@ -151,8 +151,8 @@ public class ProcessDefinitionLogMapperTest {
         ProcessDefinitionLog processDefinitionLog = insertOne();
         ProcessDefinitionLog processDefinitionLog1 = insertTwo();
 
-        int version = processDefinitionLogMapper.queryMaxVersionForDefinition(1L);
-        Assert.assertEquals(2, version);
+        Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(1L);
+        Assert.assertEquals(2, version == null ? 1 : version);
     }
 
     @Test

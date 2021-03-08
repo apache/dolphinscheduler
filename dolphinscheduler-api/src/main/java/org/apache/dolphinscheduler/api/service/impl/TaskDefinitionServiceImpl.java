@@ -285,7 +285,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinition.setFailRetryTimes(taskDefinitionLog.getFailRetryTimes());
         taskDefinition.setFailRetryInterval(taskDefinitionLog.getFailRetryInterval());
         taskDefinition.setTimeoutFlag(taskDefinitionLog.getTimeoutFlag());
-        taskDefinition.setTaskTimeoutStrategy(taskDefinitionLog.getTaskTimeoutStrategy());
+        taskDefinition.setTimeoutNotifyStrategy(taskDefinitionLog.getTimeoutNotifyStrategy());
         taskDefinition.setTimeout(taskDefinitionLog.getTimeout());
         taskDefinition.setUpdateTime(new Date());
         taskDefinition.setResourceIds(taskDefinitionLog.getResourceIds());
