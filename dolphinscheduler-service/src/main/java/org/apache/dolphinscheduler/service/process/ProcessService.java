@@ -2193,7 +2193,7 @@ public class ProcessService {
         taskDefinition.setFailRetryTimes(taskNode.getMaxRetryTimes());
         taskDefinition.setFailRetryInterval(taskNode.getRetryInterval());
         taskDefinition.setTimeoutFlag(taskNode.getTaskTimeoutParameter().getEnable() ? TimeoutFlag.OPEN : TimeoutFlag.CLOSE);
-        taskDefinition.setTaskTimeoutStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
+        taskDefinition.setTimeoutNotifyStrategy(taskNode.getTaskTimeoutParameter().getStrategy());
         taskDefinition.setTimeout(taskNode.getTaskTimeoutParameter().getInterval());
         taskDefinition.setResourceIds(getResourceIds(taskDefinition));
     }
@@ -2207,7 +2207,7 @@ public class ProcessService {
     public String getResourceIds(TaskDefinition taskDefinition) {
         Set<Integer> resourceIds = null;
         // TODO modify taskDefinition.getTaskType()
-        AbstractParameters params = TaskParametersUtils.getParameters(taskDefinition.getTaskType().getDescp(), taskDefinition.getTaskParams());
+        AbstractParameters params = TaskParametersUtils.getParameters(taskDefinition.getTaskType().getDescp().toUpperCase(), taskDefinition.getTaskParams());
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
             resourceIds = params.getResourceFilesList().
@@ -2240,9 +2240,9 @@ public class ProcessService {
                                                            ProcessData processData, Project project,
                                                            String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
-        int version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionLog.getCode());
+        Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
         processDefinitionLog.setCode(processDefinitionCode);
-        processDefinitionLog.setVersion(version);
+        processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version);
         processDefinitionLog.setName(processDefinitionName);
         processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionLog.setProjectCode(project.getCode());
@@ -2252,9 +2252,10 @@ public class ProcessService {
         processDefinitionLog.setTimeout(processData.getTimeout());
         processDefinitionLog.setTenantId(processData.getTenantId());
         processDefinitionLog.setOperator(operator.getId());
-        Date updateTime = new Date();
-        processDefinitionLog.setOperateTime(updateTime);
-        processDefinitionLog.setUpdateTime(updateTime);
+        Date now = new Date();
+        processDefinitionLog.setOperateTime(now);
+        processDefinitionLog.setUpdateTime(now);
+        processDefinitionLog.setCreateTime(now);
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
@@ -2443,7 +2444,7 @@ public class ProcessService {
             v.setCode(taskDefinitionLog.getCode());
             v.setName(taskDefinitionLog.getName());
             v.setDesc(taskDefinitionLog.getDescription());
-            v.setType(taskDefinitionLog.getTaskType().getDescp());
+            v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
             v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
             v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
@@ -2451,7 +2452,7 @@ public class ProcessService {
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
-                    taskDefinitionLog.getTaskTimeoutStrategy(),
+                    taskDefinitionLog.getTimeoutNotifyStrategy(),
                     taskDefinitionLog.getTimeout())));
             // TODO name will be remove
             v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
