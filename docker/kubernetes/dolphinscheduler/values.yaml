@@ -19,9 +19,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-nameOverride: ""
-fullnameOverride: ""
-
+## Fullname for Dolphinscheduler, by default, the release name is used
+fullname: ""
 timezone: "Asia/Shanghai"
 
 image:
