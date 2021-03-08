@@ -77,7 +77,7 @@ public class ZKMasterClient extends AbstractZKClient {
 
         InterProcessMutex mutex = null;
         try {
-            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
+            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
             String znodeLock = getMasterStartUpLockPath();
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
