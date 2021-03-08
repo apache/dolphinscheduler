@@ -80,25 +80,14 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Create a default docker image registry.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+Create a default docker image fullname.
 */}}
-{{- define "dolphinscheduler.image.registry" -}}
-{{- $registry := default "docker.io" .Values.image.registry -}}
-{{- printf "%s" $registry | trunc 63 | trimSuffix "/" -}}
-{{- end -}}
-
-{{/*
-Create a default docker image repository.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "dolphinscheduler.image.repository" -}}
-{{- printf "%s/%s:%s" (include "dolphinscheduler.image.registry" .) .Values.image.repository .Values.image.tag -}}
+{{- define "dolphinscheduler.image.fullname" -}}
+{{- printf "%s:%s" .Values.image.repository .Values.image.tag -}}
 {{- end -}}
 
 {{/*
 Create a default image pull secrects.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "dolphinscheduler.image.pullSecrets" -}}
 {{- default nil .Values.image.pullSecrets -}}
@@ -124,9 +113,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{/*
 Create a default fully qualified zookkeeper quorum.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "dolphinscheduler.zookeeper.quorum" -}}
 {{- $port := default "2181" (.Values.zookeeper.service.port | toString) -}}
-{{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port -}}
 {{- end -}}

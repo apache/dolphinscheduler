@@ -63,7 +63,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
-          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          image: {{ include "dolphinscheduler.image.fullname" . | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "alert-server"

@@ -81,7 +81,6 @@ The Configuration file is `values.yaml`, and the following tables lists the conf
 | `nameOverride`                                                                    | String to partially override common.names.fullname                                                                             | `nil`                                                 |
 | `fullnameOverride`                                                                | String to fully override common.names.fullname                                                                                 | `nil`                                                 |
 | `timezone`                                                                        | World time and date for cities in all time zones                                                                               | `Asia/Shanghai`                                       |
-| `image.registry`                                                                  | Docker image registry for the DolphinScheduler                                                                                 | `docker.io`                                           |
 | `image.repository`                                                                | Docker image repository for the DolphinScheduler                                                                               | `apache/dolphinscheduler`                             |
 | `image.tag`                                                                       | Docker image version for the DolphinScheduler                                                                                  | `latest`                                              |
 | `image.pullPolicy`                                                                | Image pull policy. One of Always, Never, IfNotPresent                                                                          | `IfNotPresent`                                        |
@@ -283,7 +282,7 @@ docker build -t apache/dolphinscheduler:mysql .
 
 4. Push the docker image `apache/dolphinscheduler:mysql` to a docker registry
 
-5. Modify image `registry` and `repository`, and update `tag` to `mysql` in `values.yaml`
+5. Modify image `repository` and update `tag` to `mysql` in `values.yaml`
 
 6. Modify postgresql `enabled` to `false`
 
@@ -326,7 +325,7 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 
 4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry
 
-5. Modify image `registry` and `repository`, and update `tag` to `mysql-driver` in `values.yaml`
+5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`
 
 6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
 
@@ -355,7 +354,7 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 4. Push the docker image `apache/dolphinscheduler:oracle-driver` to a docker registry
 
-5. Modify image `registry` and `repository`, and update `tag` to `oracle-driver` in `values.yaml`
+5. Modify image `repository` and update `tag` to `oracle-driver` in `values.yaml`
 
 6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
 

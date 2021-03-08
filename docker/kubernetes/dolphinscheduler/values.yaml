@@ -25,7 +25,6 @@ fullnameOverride: ""
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "docker.io"
   repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
