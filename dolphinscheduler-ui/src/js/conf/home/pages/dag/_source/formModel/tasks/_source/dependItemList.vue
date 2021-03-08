@@ -257,6 +257,7 @@
       // get processlist
       this._getProjectList().then(() => {
         if (!this.dependItemList.length) {
+          if (!this.projectList.length) return
           let projectId = this.projectList[0].value
           this._getProcessByProjectId(projectId).then(definitionList => {
             let value = definitionList[0].value
