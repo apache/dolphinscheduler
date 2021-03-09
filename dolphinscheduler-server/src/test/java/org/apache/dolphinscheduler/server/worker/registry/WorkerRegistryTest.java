@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
-import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -121,7 +121,7 @@ public class WorkerRegistryTest {
 
         int i = 0;
         for (String workerGroup : workerConfig.getWorkerGroups()) {
-            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getAddr(workerConfig.getListenPort()));
+            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (OSUtils.getAddr(workerConfig.getListenPort()));
             String heartbeat = zookeeperRegistryCenter.getRegisterOperator().get(workerZkPath);
             if (0 == i) {
                 Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/test/"));

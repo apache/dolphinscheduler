@@ -44,9 +44,10 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import org.apache.curator.CuratorZookeeperClient;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,10 +66,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class, CuratorZookeeperClient.class,
+@ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, RegisterOperator.class, ZookeeperConfig.class, MasterConfig.class,
-        CuratorZookeeperClient.class})
+        ZookeeperNodeManager.class, RegisterOperator.class, ZookeeperConfig.class, MasterConfig.class})
 public class TaskPriorityQueueConsumerTest {
 
 
@@ -395,7 +395,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -449,7 +449,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -502,7 +502,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
@@ -550,7 +550,7 @@ public class TaskPriorityQueueConsumerTest {
         // task node
         TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
-        Map<String, String>  map = taskPriorityQueueConsumer.getResourceFullNames(taskNode);
+        Map<String, String> map = taskPriorityQueueConsumer.getResourceFullNames(taskNode);
 
         List<Resource> resourcesList = new ArrayList<Resource>();
         Resource resource = new Resource();
@@ -560,35 +560,6 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
         Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
         Assert.assertNotNull(map);
-
-    }
-
-    @Test
-    public void testVerifyTenantIsNull() throws Exception {
-        Tenant tenant = null;
-
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
-        taskInstance.setProcessInstanceId(1);
-
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        taskInstance.setProcessInstance(processInstance);
-
-        boolean res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant,taskInstance);
-        Assert.assertTrue(res);
-
-        tenant = new Tenant();
-        tenant.setId(1);
-        tenant.setTenantCode("journey");
-        tenant.setDescription("journey");
-        tenant.setQueueId(1);
-        tenant.setCreateTime(new Date());
-        tenant.setUpdateTime(new Date());
-        res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant,taskInstance);
-        Assert.assertFalse(res);
 
     }
 
@@ -645,7 +616,7 @@ public class TaskPriorityQueueConsumerTest {
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
-        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);

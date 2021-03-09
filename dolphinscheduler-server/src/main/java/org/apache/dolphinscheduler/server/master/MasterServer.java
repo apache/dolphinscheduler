@@ -44,9 +44,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-
-
-
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
@@ -127,7 +124,7 @@ public class MasterServer implements IStoppable {
         }
 
         // self tolerant
-        this.zkMasterClient.start();
+        this.zkMasterClient.start(this);
 
         // scheduler start
         this.masterSchedulerService.start();

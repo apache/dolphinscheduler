@@ -41,18 +41,25 @@ public class HeartBeatTask implements Runnable {
     private double reservedMemory;
     private double maxCpuloadAvg;
     private Set<String> heartBeatPaths;
+    private String serverType;
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    /**
+     * server stop or not
+     */
+    protected IStoppable stoppable = null;
 
     public HeartBeatTask(String startTime,
                          double reservedMemory,
                          double maxCpuloadAvg,
                          Set<String> heartBeatPaths,
+                         String serverType,
                          ZookeeperRegistryCenter zookeeperRegistryCenter) {
         this.startTime = startTime;
         this.reservedMemory = reservedMemory;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.heartBeatPaths = heartBeatPaths;
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
+        this.serverType = serverType;
     }
 
     @Override
@@ -70,7 +77,7 @@ public class HeartBeatTask implements Runnable {
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
 
-            int status = Constants.NORMAL_NODE_STATUS;
+            int status = Constants.NORAML_NODE_STATUS;
 
             if (availablePhysicalMemorySize < reservedMemory
                     || loadAverage > maxCpuloadAvg) {
