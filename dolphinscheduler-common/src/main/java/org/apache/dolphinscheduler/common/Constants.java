@@ -141,7 +141,7 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties";
+    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -275,6 +275,10 @@ public final class Constants {
      */
     public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
+    /**
+     * date format of yyyyMMddHHmmssSSS
+     */
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
     /**
      * http connect time out
      */

@@ -125,7 +125,7 @@ public class TaskInstanceService extends BaseService {
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
 
         for(TaskInstance taskInstance : taskInstanceList){
-            taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(), taskInstance.getEndTime()));
+            taskInstance.setDuration(DateUtils.format2Duration(taskInstance.getStartTime(), taskInstance.getEndTime()));
             User executor = usersService.queryUser(taskInstance.getExecutorId());
             if (null != executor) {
                 taskInstance.setExecutorName(executor.getUserName());

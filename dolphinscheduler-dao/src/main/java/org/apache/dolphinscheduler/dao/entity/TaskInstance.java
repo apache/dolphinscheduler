@@ -160,7 +160,7 @@ public class TaskInstance implements Serializable {
      * duration
      */
     @TableField(exist = false)
-    private Long duration;
+    private String duration;
 
     /**
      * max retry times
@@ -403,11 +403,11 @@ public class TaskInstance implements Serializable {
         this.processInstanceName = processInstanceName;
     }
 
-    public Long getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 

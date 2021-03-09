@@ -184,7 +184,7 @@ public class ProcessInstanceService extends BaseDAGService {
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
         for(ProcessInstance processInstance: processInstances){
-            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+            processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(),processInstance.getEndTime()));
             User executor = usersService.queryUser(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
