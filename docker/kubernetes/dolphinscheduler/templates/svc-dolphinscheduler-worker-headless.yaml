@@ -20,7 +20,7 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
-    app.kubernetes.io/instance: {{ .Release.Name }}-worker-headless
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   clusterIP: "None"
