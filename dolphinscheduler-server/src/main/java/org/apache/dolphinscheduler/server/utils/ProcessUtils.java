@@ -59,7 +59,7 @@ public class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("\\((\\d+)\\)");
+    private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
 
     private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
 
