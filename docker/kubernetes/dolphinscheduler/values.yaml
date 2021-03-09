@@ -19,17 +19,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-nameOverride: ""
-fullnameOverride: ""
-
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "docker.io"
   repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
-  pullSecrets: []
+  pullSecret: ""
 
 ## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
@@ -52,7 +48,6 @@ externalDatabase:
   username: "root"
   password: "root"
   database: "dolphinscheduler"
-  ## multi params should join with & char
   params: "characterEncoding=utf8"
 
 ## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
