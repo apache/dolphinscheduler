@@ -146,7 +146,7 @@ public class TaskDefinition {
     /**
      * timeout notify strategy
      */
-    private TaskTimeoutStrategy taskTimeoutStrategy;
+    private TaskTimeoutStrategy timeoutNotifyStrategy;
 
     /**
      * task warning time out. unit: minute
@@ -247,34 +247,23 @@ public class TaskDefinition {
     }
 
     public void setTaskParams(String taskParams) {
-        if (taskParams == null) {
-            this.taskParamList = new ArrayList<>();
-        } else {
-            this.taskParamList = JSONUtils.toList(taskParams, Property.class);
-        }
         this.taskParams = taskParams;
     }
 
     public List<Property> getTaskParamList() {
-        return taskParamList;
-    }
+        List<Property> propList = JSONUtils.toList(JSONUtils.parseObject(taskParams).findValue("localParams").toString(),
+                Property.class);
+        return taskParamList = propList;
 
-    public void setTaskParamList(List<Property> taskParamList) {
-        this.taskParams = JSONUtils.toJsonString(taskParamList);
-        this.taskParamList = taskParamList;
     }
 
     public Map<String, String> getTaskParamMap() {
         if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
-            List<Property> propList = JSONUtils.toList(taskParams, Property.class);
+            List<Property> propList = JSONUtils.toList(JSONUtils.parseObject(taskParams).findValue("localParams").toString(),
+                    Property.class);
             taskParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
-
         return taskParamMap;
-    }
-
-    public void setTaskParamMap(Map<String, String> taskParamMap) {
-        this.taskParamMap = taskParamMap;
     }
 
     public int getTimeout() {
@@ -357,12 +346,12 @@ public class TaskDefinition {
         this.failRetryInterval = failRetryInterval;
     }
 
-    public TaskTimeoutStrategy getTaskTimeoutStrategy() {
-        return taskTimeoutStrategy;
+    public TaskTimeoutStrategy getTimeoutNotifyStrategy() {
+        return timeoutNotifyStrategy;
     }
 
-    public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
-        this.taskTimeoutStrategy = taskTimeoutStrategy;
+    public void setTimeoutNotifyStrategy(TaskTimeoutStrategy timeoutNotifyStrategy) {
+        this.timeoutNotifyStrategy = timeoutNotifyStrategy;
     }
 
     public TimeoutFlag getTimeoutFlag() {
