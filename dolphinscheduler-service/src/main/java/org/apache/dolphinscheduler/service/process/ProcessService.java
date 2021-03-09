@@ -2126,7 +2126,7 @@ public class ProcessService {
     /**
      * switch process definition version to process definition log version
      */
-    public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
+    public int processDefinitionToDB(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         if (null == processDefinition || null == processDefinitionLog) {
             return Constants.EXIT_CODE_FAILURE;
         }
@@ -2135,13 +2135,23 @@ public class ProcessService {
         processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionLog.setFlag(Flag.YES);
 
-        int switchResult = 0;
+        int result;
         if (0 == processDefinition.getId()) {
-            switchResult = processDefineMapper.insert(processDefinitionLog);
+            result = processDefineMapper.insert(processDefinitionLog);
         } else {
-            switchResult = processDefineMapper.updateById(processDefinitionLog);
+            result = processDefineMapper.updateById(processDefinitionLog);
         }
-        switchProcessTaskRelationVersion(processDefinition);
+        return result;
+    }
+
+    /**
+     * switch process definition version to process definition log version
+     */
+    public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
+        int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog);
+        if(switchResult != Constants.EXIT_CODE_FAILURE) {
+            switchProcessTaskRelationVersion(processDefinition);
+        }
         return switchResult;
     }
 
@@ -2161,16 +2171,11 @@ public class ProcessService {
      */
     public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
 
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByDefinitionCode(taskDefinition.getCode());
-        int version = taskDefinitionLogs
-                .stream()
-                .map(TaskDefinitionLog::getVersion)
-                .max((x, y) -> x > y ? x : y)
-                .orElse(0) + 1;
+        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode());
         Date now = new Date();
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setUserId(operator.getId());
-        taskDefinition.setVersion(version);
+        taskDefinition.setVersion(version == null || version == 0 ? 1 : version);
         taskDefinition.setUpdateTime(now);
         setTaskFromTaskNode(taskNode, taskDefinition);
         int update = taskDefinitionMapper.updateById(taskDefinition);
@@ -2230,7 +2235,7 @@ public class ProcessService {
         createTaskAndRelation(operator, project.getCode(), processDefinition, processData);
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
-        return switchVersion(processDefinition, processDefinitionLog);
+        return processDefinitionToDB(processDefinition, processDefinitionLog);
     }
 
     /**
@@ -2280,13 +2285,12 @@ public class ProcessService {
                                       ProcessDefinition processDefinition,
                                       ProcessData processData) {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-        Map<String, Long> taskNameAndCode = new HashMap<>();
+        Map<String, TaskDefinition> taskNameAndCode = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
             TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(projectCode, taskNode.getName());
             if (taskDefinition == null) {
-                long code;
                 try {
-                    code = SnowFlakeUtils.getInstance().nextId();
+                    long code = SnowFlakeUtils.getInstance().nextId();
                     taskDefinition = new TaskDefinition();
                     taskDefinition.setCode(code);
                 } catch (SnowFlakeException e) {
@@ -2299,7 +2303,7 @@ public class ProcessService {
                 }
                 updateTaskDefinition(operator, projectCode, taskNode, taskDefinition);
             }
-            taskNameAndCode.put(taskNode.getName(), taskDefinition.getCode());
+            taskNameAndCode.put(taskNode.getName(), taskDefinition);
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
@@ -2315,8 +2319,10 @@ public class ProcessService {
                             processDefinition.getVersion(),
                             projectCode,
                             processDefinition.getCode(),
-                            taskNameAndCode.get(preTaskName),
-                            taskNameAndCode.get(taskNode.getName()),
+                            taskNameAndCode.get(preTaskName).getCode(),
+                            taskNameAndCode.get(preTaskName).getVersion(),
+                            taskNameAndCode.get(taskNode.getName()).getCode(),
+                            taskNameAndCode.get(taskNode.getName()).getVersion(),
                             ConditionType.of("none"),
                             taskNode.getConditionResult(),
                             now,
@@ -2327,8 +2333,10 @@ public class ProcessService {
                         processDefinition.getVersion(),
                         projectCode,
                         processDefinition.getCode(),
-                        0L,
-                        taskNameAndCode.get(taskNode.getName()),
+                        0L, // this isn't previous task node, set zero
+                        0,
+                        taskNameAndCode.get(taskNode.getName()).getCode(),
+                        taskNameAndCode.get(taskNode.getName()).getVersion(),
                         ConditionType.of("none"),
                         taskNode.getConditionResult(),
                         now,
