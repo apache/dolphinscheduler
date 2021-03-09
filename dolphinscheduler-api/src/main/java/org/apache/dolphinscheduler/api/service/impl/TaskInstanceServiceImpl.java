@@ -118,7 +118,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getId(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
+                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
         );
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
