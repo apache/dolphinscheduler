@@ -111,7 +111,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @return kill result
      */
     private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
-        boolean flag = true;
+        boolean processFlag = true;
         List<String> appIds = Collections.emptyList();
         int taskInstanceId = killCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
@@ -130,20 +130,15 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
             OSUtils.exeCmd(cmd);
         } catch (Exception e) {
-            flag = false;
+            processFlag = false;
             logger.error("kill task error", e);
         }
         // find log and kill yarn job
-        try {
-            appIds = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
-                    taskExecutionContext.getLogPath(),
-                    taskExecutionContext.getExecutePath(),
-                    taskExecutionContext.getTenantCode());
-        } catch (Exception e) {
-            flag = false;
-            logger.error("kill yarn task error", e);
-        }
-        return Pair.of(flag, appIds);
+        Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
+                taskExecutionContext.getLogPath(),
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTenantCode());
+        return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
     }
 
     /**
@@ -174,35 +169,34 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @param logPath     logPath
      * @param executePath executePath
      * @param tenantCode  tenantCode
-     * @return List<String> appIds
+     * @return Pair<Boolean, List<String>> yarn kill result
      */
-    private List<String> killYarnJob(String host, String logPath, String executePath, String tenantCode) {
+    private Pair<Boolean, List<String>> killYarnJob(String host, String logPath, String executePath, String tenantCode) {
         LogClientService logClient = null;
         try {
             logClient = new LogClientService();
             logger.info("view log host : {},logPath : {}", host, logPath);
             String log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
-
+            List<String> appIds = Collections.emptyList();
             if (StringUtils.isNotEmpty(log)) {
-                List<String> appIds = LoggerUtils.getAppIds(log, logger);
+                appIds = LoggerUtils.getAppIds(log, logger);
                 if (StringUtils.isEmpty(executePath)) {
                     logger.error("task instance execute path is empty");
                     throw new RuntimeException("task instance execute path is empty");
                 }
                 if (appIds.size() > 0) {
                     ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
-                    return appIds;
                 }
             }
+            return Pair.of(true, appIds);
         } catch (Exception e) {
             logger.error("kill yarn job error", e);
-            throw new RuntimeException("kill yarn job error");
         } finally {
             if (logClient != null) {
                 logClient.close();
             }
         }
-        return Collections.emptyList();
+        return Pair.of(false, Collections.emptyList());
     }
 
 }
