@@ -2149,7 +2149,7 @@ public class ProcessService {
      */
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog);
-        if(switchResult != Constants.EXIT_CODE_FAILURE) {
+        if (switchResult != Constants.EXIT_CODE_FAILURE) {
             switchProcessTaskRelationVersion(processDefinition);
         }
         return switchResult;
