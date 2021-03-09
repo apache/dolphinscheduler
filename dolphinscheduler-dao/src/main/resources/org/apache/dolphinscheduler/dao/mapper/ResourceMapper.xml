@@ -102,7 +102,7 @@
         where type=0
         and id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId} and perm=7
         union select id as resources_id from t_ds_resources where user_id=#{userId})
-        <if test="resNames != null and resNames != ''">
+        <if test="resNames != null and resNames.length > 0">
             and full_name in
             <foreach collection="resNames" item="i" open="(" close=")" separator=",">
                 #{i}
@@ -115,7 +115,7 @@
         from t_ds_resources
         where id in (select resources_id from t_ds_relation_resources_user where user_id=#{userId} and perm=7
         union select id as resources_id from t_ds_resources where user_id=#{userId})
-        <if test="resIds != null and resIds != ''">
+        <if test="resIds != null and resIds.length > 0">
             and id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">
                 #{i}
