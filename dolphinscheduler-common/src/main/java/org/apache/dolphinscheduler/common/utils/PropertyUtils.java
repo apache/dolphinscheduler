@@ -22,8 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PAT
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -51,7 +49,13 @@ public class PropertyUtils {
     }
 
     static {
-        String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
+        loadPropertyFile(COMMON_PROPERTIES_PATH);
+    }
+
+    /**
+     * init properties
+     */
+    public static void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {
@@ -61,11 +65,11 @@ public class PropertyUtils {
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 if (fis != null) {
-                    IOUtils.closeQuietly(fis);
+                    org.apache.dolphinscheduler.common.utils.IOUtils.closeQuietly(fis);
                 }
                 System.exit(1);
             } finally {
-                IOUtils.closeQuietly(fis);
+                org.apache.dolphinscheduler.common.utils.IOUtils.closeQuietly(fis);
             }
         }
     }
