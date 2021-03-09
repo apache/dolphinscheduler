@@ -991,6 +991,10 @@ public final class Constants {
     public static final int NORAML_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
+    public static final String START_TIME = "start time";
+    public static final String END_TIME = "end time";
+    public static final String START_END_DATE = "startDate,endDate";
+
     /**
      * datasource encryption salt
      */
