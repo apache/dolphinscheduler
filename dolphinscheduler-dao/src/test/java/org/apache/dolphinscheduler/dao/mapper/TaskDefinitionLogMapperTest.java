@@ -18,9 +18,18 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.apache.ibatis.annotations.Param;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,17 +46,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Rollback(true)
 public class TaskDefinitionLogMapperTest {
 
-
     @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
 
+    @Autowired
+    TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    UserMapper userMapper;
+
+    @Autowired
+    ProjectMapper projectMapper;
+
     public TaskDefinitionLog insertOne() {
+        return insertOne(99);
+    }
+
+    public TaskDefinitionLog insertOne(int userId) {
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");
-        taskDefinition.setProjectCode(111111L);
+        taskDefinition.setProjectCode(1L);
         taskDefinition.setTaskType(TaskType.SHELL);
-        taskDefinition.setUserId(99);
+        taskDefinition.setUserId(userId);
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());
@@ -60,4 +81,59 @@ public class TaskDefinitionLogMapperTest {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         Assert.assertNotEquals(taskDefinitionLog.getId(), 0);
     }
+
+    @Test
+    public void queryByDefinitionName() {
+        User user = new User();
+        user.setUserName("un");
+        userMapper.insert(user);
+        User un = userMapper.queryByUserNameAccurately("un");
+
+        Project project = new Project();
+        project.setCode(1L);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+
+        TaskDefinitionLog taskDefinitionLog = insertOne(un.getId());
+
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper
+                .queryByDefinitionName(taskDefinitionLog.getProjectCode(), taskDefinitionLog.getName());
+        Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
+    }
+
+    @Test
+    public void queryByDefinitionCode() {
+        TaskDefinitionLog taskDefinitionLog = insertOne();
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper
+                .queryByDefinitionCode(taskDefinitionLog.getCode());
+        Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
+    }
+
+    @Test
+    public void queryByDefinitionCodeAndVersion() {
+        TaskDefinitionLog taskDefinitionLog = insertOne();
+        TaskDefinitionLog tdl = taskDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+        Assert.assertNotNull(tdl);
+    }
+
+    @Test
+    public void queryByTaskDefinitions() {
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setCode(888888L);
+        taskDefinition.setName("unit-test");
+        taskDefinition.setProjectCode(1L);
+        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setUserId(1);
+        taskDefinition.setResourceIds("1");
+        taskDefinition.setVersion(1);
+        ArrayList<TaskDefinition> taskDefinitions = new ArrayList<>();
+        taskDefinitions.add(taskDefinition);
+
+        TaskDefinitionLog taskDefinitionLog = insertOne();
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
+        Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
+    }
+
 }

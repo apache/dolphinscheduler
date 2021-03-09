@@ -196,18 +196,6 @@ public class UdfFuncMapperTest {
     }
 
     /**
-     * test query
-     */
-    @Test
-    public void testQuery() {
-        //insertOne
-        UdfFunc udfFunc = insertOne();
-        //query
-        List<UdfFunc> udfFuncList = udfFuncMapper.selectList(null);
-        Assert.assertNotEquals(udfFuncList.size(), 0);
-    }
-
-    /**
      * test query udf by ids
      */
     @Test
