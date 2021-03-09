@@ -96,18 +96,6 @@ public class ProcessTaskRelation {
     private String conditionParams;
 
     /**
-     * condition parameter list
-     */
-    @TableField(exist = false)
-    private List<Property> conditionParamList;
-
-    /**
-     * condition parameter map
-     */
-    @TableField(exist = false)
-    private Map<String, String> conditionParamMap;
-
-    /**
      * create time
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -127,7 +115,9 @@ public class ProcessTaskRelation {
                                long projectCode,
                                long processDefinitionCode,
                                long preTaskCode,
+                               int preTaskVersion,
                                long postTaskCode,
+                               int postTaskVersion,
                                ConditionType conditionType,
                                String conditionParams,
                                Date createTime,
@@ -137,7 +127,9 @@ public class ProcessTaskRelation {
         this.projectCode = projectCode;
         this.processDefinitionCode = processDefinitionCode;
         this.preTaskCode = preTaskCode;
+        this.preTaskVersion = preTaskVersion;
         this.postTaskCode = postTaskCode;
+        this.postTaskVersion = postTaskVersion;
         this.conditionType = conditionType;
         this.conditionParams = conditionParams;
         this.createTime = createTime;
@@ -181,34 +173,7 @@ public class ProcessTaskRelation {
     }
 
     public void setConditionParams(String conditionParams) {
-        if (conditionParams == null) {
-            this.conditionParamList = new ArrayList<>();
-        } else {
-            this.conditionParamList = JSONUtils.toList(conditionParams, Property.class);
-        }
         this.conditionParams = conditionParams;
-    }
-
-    public List<Property> getConditionParamList() {
-        return conditionParamList;
-    }
-
-    public void setConditionParamList(List<Property> conditionParamList) {
-        this.conditionParams = JSONUtils.toJsonString(conditionParamList);
-        this.conditionParamList = conditionParamList;
-    }
-
-    public Map<String, String> getConditionParamMap() {
-        if (conditionParamMap == null && StringUtils.isNotEmpty(conditionParams)) {
-            List<Property> propList = JSONUtils.toList(conditionParams, Property.class);
-            conditionParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
-        }
-
-        return conditionParamMap;
-    }
-
-    public void setConditionParamMap(Map<String, String> conditionParamMap) {
-        this.conditionParamMap = conditionParamMap;
     }
 
     public int getProcessDefinitionVersion() {
