@@ -65,11 +65,11 @@ public class PropertyUtils {
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 if (fis != null) {
-                    org.apache.dolphinscheduler.common.utils.IOUtils.closeQuietly(fis);
+                    IOUtils.closeQuietly(fis);
                 }
                 System.exit(1);
             } finally {
-                org.apache.dolphinscheduler.common.utils.IOUtils.closeQuietly(fis);
+                IOUtils.closeQuietly(fis);
             }
         }
     }
