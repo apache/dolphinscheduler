@@ -44,11 +44,13 @@ public class SparkTask extends AbstractYarnTask {
 
     /**
      * spark1 command
+     * usage: spark-submit [options] <app jar | python file> [app arguments]
      */
     private static final String SPARK1_COMMAND = "${SPARK_HOME1}/bin/spark-submit";
 
     /**
      * spark2 command
+     * usage: spark-submit [options] <app jar | python file> [app arguments]
      */
     private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark-submit";
 
@@ -93,6 +95,7 @@ public class SparkTask extends AbstractYarnTask {
      */
     @Override
     protected String buildCommand() {
+        // spark-submit [options] <app jar | python file> [app arguments]
         List<String> args = new ArrayList<>();
 
         //spark version

@@ -45,19 +45,14 @@ public class SparkArgsUtils {
      */
     public static List<String> buildArgs(SparkParameters param) {
         List<String> args = new ArrayList<>();
-        String deployMode = SPARK_CLUSTER;
-
         args.add(Constants.MASTER);
-        if (StringUtils.isNotEmpty(param.getDeployMode())) {
-            deployMode = param.getDeployMode();
 
-        }
+        String deployMode = StringUtils.isNotEmpty(param.getDeployMode()) ? param.getDeployMode() : SPARK_CLUSTER;
         if (!SPARK_LOCAL.equals(deployMode)) {
             args.add(SPARK_ON_YARN);
             args.add(Constants.DEPLOY_MODE);
         }
-
-        args.add(param.getDeployMode());
+        args.add(deployMode);
 
         ProgramType type = param.getProgramType();
         String mainClass = param.getMainClass();
@@ -67,7 +62,7 @@ public class SparkArgsUtils {
         }
 
         int driverCores = param.getDriverCores();
-        if (driverCores != 0) {
+        if (driverCores > 0) {
             args.add(Constants.DRIVER_CORES);
             args.add(String.format("%d", driverCores));
         }
@@ -79,13 +74,13 @@ public class SparkArgsUtils {
         }
 
         int numExecutors = param.getNumExecutors();
-        if (numExecutors != 0) {
+        if (numExecutors > 0) {
             args.add(Constants.NUM_EXECUTORS);
             args.add(String.format("%d", numExecutors));
         }
 
         int executorCores = param.getExecutorCores();
-        if (executorCores != 0) {
+        if (executorCores > 0) {
             args.add(Constants.EXECUTOR_CORES);
             args.add(String.format("%d", executorCores));
         }
@@ -96,22 +91,26 @@ public class SparkArgsUtils {
             args.add(executorMemory);
         }
 
-        // --files --conf --libjar ...
+        String appName = param.getAppName();
+        if (StringUtils.isNotEmpty(appName)) {
+            args.add(Constants.SPARK_NAME);
+            args.add(ArgsUtils.escape(appName));
+        }
+
         String others = param.getOthers();
-        String queue = param.getQueue();
-        if (StringUtils.isNotEmpty(others)) {
-
-            if (!others.contains(Constants.SPARK_QUEUE) && StringUtils.isNotEmpty(queue)) {
-                args.add(Constants.SPARK_QUEUE);
-                args.add(queue);
+        if (!SPARK_LOCAL.equals(deployMode)) {
+            if (StringUtils.isEmpty(others) || !others.contains(Constants.SPARK_QUEUE)) {
+                String queue = param.getQueue();
+                if (StringUtils.isNotEmpty(queue)) {
+                    args.add(Constants.SPARK_QUEUE);
+                    args.add(queue);
+                }
             }
+        }
 
+        // --conf --files --jars --packages
+        if (StringUtils.isNotEmpty(others)) {
             args.add(others);
-
-        } else if (StringUtils.isNotEmpty(queue)) {
-            args.add(Constants.SPARK_QUEUE);
-            args.add(queue);
-
         }
 
         ResourceInfo mainJar = param.getMainJar();
