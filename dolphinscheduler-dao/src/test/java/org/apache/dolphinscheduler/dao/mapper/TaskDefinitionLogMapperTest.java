@@ -79,7 +79,7 @@ public class TaskDefinitionLogMapperTest {
     }
 
     @Test
-    public void queryByDefinitionName() {
+    public void testQueryByDefinitionName() {
         User user = new User();
         user.setUserName("un");
         userMapper.insert(user);
@@ -99,15 +99,15 @@ public class TaskDefinitionLogMapperTest {
     }
 
     @Test
-    public void queryByDefinitionCode() {
+    public void testQueryMaxVersionForDefinition() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
-        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper
-                .queryByDefinitionCode(taskDefinitionLog.getCode());
-        Assert.assertNotEquals(taskDefinitionLogs.size(), 0);
+        int version = taskDefinitionLogMapper
+                .queryMaxVersionForDefinition(taskDefinitionLog.getCode());
+        Assert.assertNotEquals(version, 0);
     }
 
     @Test
-    public void queryByDefinitionCodeAndVersion() {
+    public void testQueryByDefinitionCodeAndVersion() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         TaskDefinitionLog tdl = taskDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
@@ -115,7 +115,7 @@ public class TaskDefinitionLogMapperTest {
     }
 
     @Test
-    public void queryByTaskDefinitions() {
+    public void testQueryByTaskDefinitions() {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");

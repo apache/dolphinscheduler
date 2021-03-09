@@ -86,7 +86,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void queryByDefinitionId() {
+    public void testQueryByDefinitionId() {
 
         User user = new User();
         user.setUserName("un");
@@ -108,7 +108,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void queryByDefinitionCode() {
+    public void testQueryByDefinitionCode() {
         TaskDefinition taskDefinition = insertOne();
         TaskDefinition result = taskDefinitionMapper.queryByDefinitionCode(taskDefinition.getCode());
         Assert.assertNotNull(result);
@@ -116,7 +116,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void queryAllDefinitionList() {
+    public void testQueryAllDefinitionList() {
         TaskDefinition taskDefinition = insertOne();
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryAllDefinitionList(taskDefinition.getProjectCode());
         Assert.assertNotEquals(taskDefinitions.size(), 0);
@@ -124,7 +124,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void queryDefinitionListByIdList() {
+    public void testQueryDefinitionListByIdList() {
         TaskDefinition taskDefinition = insertOne();
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryDefinitionListByIdList(new Integer[]{taskDefinition.getId()});
         Assert.assertNotEquals(taskDefinitions.size(), 0);
@@ -132,7 +132,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void countDefinitionGroupByUser() {
+    public void testCountDefinitionGroupByUser() {
         User user = new User();
         user.setUserName("un");
         userMapper.insert(user);
@@ -145,7 +145,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void listResources() {
+    public void testListResources() {
         TaskDefinition taskDefinition = insertOne();
         List<Map<String, Object>> maps = taskDefinitionMapper.listResources();
         Assert.assertNotEquals(maps.size(), 0);
@@ -153,7 +153,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void listResourcesByUser() {
+    public void testListResourcesByUser() {
         User user = new User();
         user.setUserName("un");
         userMapper.insert(user);
@@ -166,7 +166,7 @@ public class TaskDefinitionMapperTest {
     }
 
     @Test
-    public void deleteByCode() {
+    public void testDeleteByCode() {
         TaskDefinition taskDefinition = insertOne();
         int i = taskDefinitionMapper.deleteByCode(taskDefinition.getCode());
         Assert.assertNotEquals(i, 0);
