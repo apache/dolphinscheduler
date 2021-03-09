@@ -29,7 +29,7 @@ data:
   WORKER_MAX_CPULOAD_AVG: {{ .Values.worker.configmap.WORKER_MAX_CPULOAD_AVG | quote }}
   WORKER_RESERVED_MEMORY: {{ .Values.worker.configmap.WORKER_RESERVED_MEMORY | quote }}
   WORKER_LISTEN_PORT: {{ .Values.worker.configmap.WORKER_LISTEN_PORT | quote }}
-  WORKER_GROUP: {{ .Values.worker.configmap.WORKER_GROUP | quote }}
+  WORKER_GROUPS: {{ .Values.worker.configmap.WORKER_GROUPS | quote }}
   DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
   dolphinscheduler_env.sh: |-
   {{- range .Values.worker.configmap.DOLPHINSCHEDULER_ENV }}
