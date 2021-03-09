@@ -190,6 +190,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             long processDefinitionCode = SnowFlakeUtils.getInstance().nextId();
             processDefinition.setCode(processDefinitionCode);
+            processDefinition.setVersion(1);
         } catch (SnowFlakeException e) {
             putMsg(result, Status.CREATE_PROCESS_DEFINITION);
             return result;
