@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: "3.4"
+version: "3.1"
 
 services:
 
@@ -76,7 +76,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
@@ -110,7 +109,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     volumes:
@@ -150,7 +148,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
@@ -204,7 +201,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper

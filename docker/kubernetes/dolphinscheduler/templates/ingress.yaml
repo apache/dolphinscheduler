@@ -26,7 +26,7 @@ kind: Ingress
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.name" . }}
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
