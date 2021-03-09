@@ -277,7 +277,7 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
-            if (this.item.tenantName) {
+            if (this.item.tenantId) {
               this.tenantId = this.item.tenantId
             }
             this.$nextTick(() => {
@@ -294,10 +294,10 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
-          if (this.item.tenantName) {
+          if (this.item.tenantId) {
             this.tenantId = this.item.tenantId
           }
-          if(this.queueList.length>0) {
+          if (this.queueList.length > 0) {
             let queue = _.find(this.queueList, ['code', this.item.queue])
             if (queue) {
               this.queueName = queue.id || ''
