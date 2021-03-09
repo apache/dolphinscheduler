@@ -259,7 +259,7 @@ This environment variable sets reserved memory for `worker-server`. The default 
 
 This environment variable sets port for `worker-server`. The default value is `1234`.
 
-**`WORKER_GROUP`**
+**`WORKER_GROUPS`**
 
 This environment variable sets group for `worker-server`. The default value is `default`.
 

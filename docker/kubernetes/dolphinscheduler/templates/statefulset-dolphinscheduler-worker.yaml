@@ -89,11 +89,11 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
                   key: WORKER_LISTEN_PORT
-            - name: WORKER_GROUP
+            - name: WORKER_GROUPS
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_GROUP
+                  key: WORKER_GROUPS
             - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
               valueFrom:
                 configMapKeyRef:
