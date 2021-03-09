@@ -43,12 +43,11 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
                                                   @Param("taskDefinitionName") String name);
 
     /**
-     * query task definition log list
+     * query max version for definition
      *
      * @param taskDefinitionCode taskDefinitionCode
-     * @return task definition log list
      */
-    List<TaskDefinitionLog> queryByDefinitionCode(@Param("taskDefinitionCode") long taskDefinitionCode);
+    Integer queryMaxVersionForDefinition(@Param("taskDefinitionCode") long taskDefinitionCode);
 
     /**
      * query task definition log

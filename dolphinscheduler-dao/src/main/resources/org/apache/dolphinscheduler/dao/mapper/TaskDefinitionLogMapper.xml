@@ -34,9 +34,8 @@
         WHERE p.code = #{projectCode}
         and td.name = #{taskDefinitionName}
     </select>
-    <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
-        select
-        <include refid="baseSql"/>
+    <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
+        select max(version)
         from t_ds_task_definition_log
         WHERE code = #{taskDefinitionCode}
     </select>

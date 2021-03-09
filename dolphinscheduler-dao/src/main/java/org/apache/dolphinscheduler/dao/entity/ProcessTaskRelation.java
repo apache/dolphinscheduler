@@ -115,7 +115,9 @@ public class ProcessTaskRelation {
                                long projectCode,
                                long processDefinitionCode,
                                long preTaskCode,
+                               int preTaskVersion,
                                long postTaskCode,
+                               int postTaskVersion,
                                ConditionType conditionType,
                                String conditionParams,
                                Date createTime,
@@ -125,7 +127,9 @@ public class ProcessTaskRelation {
         this.projectCode = projectCode;
         this.processDefinitionCode = processDefinitionCode;
         this.preTaskCode = preTaskCode;
+        this.preTaskVersion = preTaskVersion;
         this.postTaskCode = postTaskCode;
+        this.postTaskVersion = postTaskVersion;
         this.conditionType = conditionType;
         this.conditionParams = conditionParams;
         this.createTime = createTime;
