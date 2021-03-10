@@ -20,30 +20,43 @@ set -e
 
 echo "init env variables"
 
-# Define parameters default value.
+# Define parameters default value
+
 #============================================================================
 # Database Source
 #============================================================================
+export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
+export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
 export DATABASE_HOST=${DATABASE_HOST:-"127.0.0.1"}
 export DATABASE_PORT=${DATABASE_PORT:-"5432"}
 export DATABASE_USERNAME=${DATABASE_USERNAME:-"root"}
 export DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
-export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
-export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
 export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 
 #============================================================================
-# System
+# Common
 #============================================================================
-export DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_ENV_PATH:-"/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"}
-export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
+# dolphinscheduler env
+export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-""}
+# common env
+export DATA_BASEDIR_PATH=${DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
 export RESOURCE_STORAGE_TYPE=${RESOURCE_STORAGE_TYPE:-"HDFS"}
 export RESOURCE_UPLOAD_PATH=${RESOURCE_UPLOAD_PATH:-"/dolphinscheduler"}
 export FS_DEFAULT_FS=${FS_DEFAULT_FS:-"file:///"}
 export FS_S3A_ENDPOINT=${FS_S3A_ENDPOINT:-"s3.xxx.amazonaws.com"}
 export FS_S3A_ACCESS_KEY=${FS_S3A_ACCESS_KEY:-"xxxxxxx"}
 export FS_S3A_SECRET_KEY=${FS_S3A_SECRET_KEY:-"xxxxxxx"}
+# dolphinscheduler task env
+export HADOOP_HOME=${HADOOP_HOME:-"/opt/soft/hadoop"}
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/opt/soft/hadoop/etc/hadoop"}
+export SPARK_HOME1=${SPARK_HOME1:-"/opt/soft/spark1"}
+export SPARK_HOME2=${SPARK_HOME2:-"/opt/soft/spark2"}
+export PYTHON_HOME=${PYTHON_HOME:-"/usr/bin/python"}
+export JAVA_HOME=${JAVA_HOME:-"/usr/lib/jvm/java-1.8-openjdk"}
+export HIVE_HOME=${HIVE_HOME:-"/opt/soft/hive"}
+export FLINK_HOME=${FLINK_HOME:-"/opt/soft/flink"}
+export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax/bin/datax.py"}
 
 #============================================================================
 # Zookeeper
@@ -94,10 +107,20 @@ export ENTERPRISE_WECHAT_SECRET=${ENTERPRISE_WECHAT_SECRET:-""}
 export ENTERPRISE_WECHAT_AGENT_ID=${ENTERPRISE_WECHAT_AGENT_ID:-""}
 export ENTERPRISE_WECHAT_USERS=${ENTERPRISE_WECHAT_USERS:-""}
 
-echo "generate app config"
+echo "generate dolphinscheduler config"
 ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
 $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
 EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
+
+# generate dolphinscheduler env only in docker
+DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_HOME}/conf/env/dolphinscheduler_env.sh
+if [ -z "${KUBERNETES_SERVICE_HOST}" ] && [ -r "${DOLPHINSCHEDULER_ENV_PATH}.tpl" ]; then
+eval "cat << EOF
+$(cat ${DOLPHINSCHEDULER_ENV_PATH}.tpl)
+EOF
+" > ${DOLPHINSCHEDULER_ENV_PATH}
+chmod +x ${DOLPHINSCHEDULER_ENV_PATH}
+fi

@@ -24,6 +24,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
+  DOLPHINSCHEDULER_OPTS: {{ .Values.master.configmap.DOLPHINSCHEDULER_OPTS | quote }}
   MASTER_EXEC_THREADS: {{ .Values.master.configmap.MASTER_EXEC_THREADS | quote }}
   MASTER_EXEC_TASK_NUM: {{ .Values.master.configmap.MASTER_EXEC_TASK_NUM | quote }}
   MASTER_HEARTBEAT_INTERVAL: {{ .Values.master.configmap.MASTER_HEARTBEAT_INTERVAL | quote }}

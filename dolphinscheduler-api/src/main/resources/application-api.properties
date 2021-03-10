@@ -21,7 +21,11 @@ server.port=12345
 # session config
 server.servlet.session.timeout=7200
 
+# servlet config
 server.servlet.context-path=/dolphinscheduler/
+
+# time zone
+spring.jackson.time-zone=GMT+8
 
 # file size limit for upload
 spring.servlet.multipart.max-file-size=1024MB
@@ -36,7 +40,7 @@ server.jetty.max-http-post-size=5000000
 
 spring.messages.encoding=UTF-8
 
-#i18n classpath folder , file prefix messages， if have many files, use "," seperator
+# i18n classpath folder, file prefix messages. if have many files, use "," seperator
 spring.messages.basename=i18n/messages
 
 # Authentication types (supported types: PASSWORD)

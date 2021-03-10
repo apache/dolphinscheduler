@@ -22,7 +22,7 @@ master.exec.threads=${MASTER_EXEC_THREADS}
 master.exec.task.num=${MASTER_EXEC_TASK_NUM}
 
 # master dispatch task number
-#master.dispatch.task.num = 3
+#master.dispatch.task.num=3
 
 # master heartbeat interval
 master.heartbeat.interval=${MASTER_HEARTBEAT_INTERVAL}
