@@ -111,7 +111,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_WEIGHT
+                  key: WORKER_HOST_WEIGHT
             - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
               valueFrom:
                 configMapKeyRef:
