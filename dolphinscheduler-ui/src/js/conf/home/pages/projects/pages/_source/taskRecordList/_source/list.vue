@@ -35,7 +35,7 @@
             <span>{{$t('End Time')}}</span>
           </th>
           <th width="134">
-            <span>{{$t('Duration')}}(s)</span>
+            <span>{{$t('Duration')}}</span>
           </th>
           <th>
             <span>{{$t('Source Table')}}</span>
