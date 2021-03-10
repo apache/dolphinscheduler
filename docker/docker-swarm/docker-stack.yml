@@ -165,7 +165,7 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUPS: "default"
-      WORKER_WEIGHT: "100"
+      WORKER_HOST_WEIGHT: "100"
       ALERT_LISTEN_HOST: dolphinscheduler-alert
       HADOOP_HOME: "/opt/soft/hadoop"
       HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
