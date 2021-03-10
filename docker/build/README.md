@@ -309,7 +309,7 @@ This environment variable sets port for `worker-server`. The default value is `1
 
 This environment variable sets groups for `worker-server`. The default value is `default`.
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 This environment variable sets weight for `worker-server`. The default value is `100`.
 
