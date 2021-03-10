@@ -203,7 +203,7 @@ worker:
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
     WORKER_GROUPS: "default"
-    WORKER_WEIGHT: "100"
+    WORKER_HOST_WEIGHT: "100"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
