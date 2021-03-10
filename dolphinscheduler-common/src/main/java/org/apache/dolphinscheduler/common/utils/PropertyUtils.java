@@ -200,7 +200,7 @@ public class PropertyUtils {
      * @param defaultVal default value
      * @return property value
      */
-    public double getDouble(String key, double defaultVal) {
+    public static double getDouble(String key, double defaultVal) {
         String val = getString(key);
         return val == null ? defaultVal : Double.parseDouble(val);
     }
@@ -233,8 +233,8 @@ public class PropertyUtils {
      * @param <T> T
      * @return get enum value
      */
-    public <T extends Enum<T>> T getEnum(String key, Class<T> type,
-                                         T defaultValue) {
+    public static <T extends Enum<T>> T getEnum(String key, Class<T> type,
+                                                T defaultValue) {
         String val = getString(key);
         return val == null ? defaultValue : Enum.valueOf(type, val);
     }
