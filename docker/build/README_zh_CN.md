@@ -11,6 +11,11 @@ Official Website: https://dolphinscheduler.apache.org
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
+## 先决条件
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+
 ## 如何使用docker镜像
 
 #### 以 docker-compose 的方式启动dolphinscheduler(推荐)
@@ -26,6 +31,8 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 访问前端页面：http://192.168.xx.xx:12345/dolphinscheduler
 
 默认的用户是`admin`，默认的密码是`dolphinscheduler123`
+
+> **提示**: 为了在docker中快速开始，你可以创建一个名为`ds`的租户，并将这个租户`ds`关联到用户`admin`
 
 #### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
@@ -302,7 +309,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 配置`worker-server`的分组，默认值 `default`。
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 配置`worker-server`的权重，默认之`100`。
 
@@ -332,7 +339,7 @@ server.port=${API_SERVER_PORT}
 `/root/start-init-conf.sh`将根据模板文件动态的生成配置文件：
 
 ```sh
-echo "generate app config"
+echo "generate dolphinscheduler config"
 ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
 $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})

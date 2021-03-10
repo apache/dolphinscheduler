@@ -19,17 +19,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-nameOverride: ""
-fullnameOverride: ""
-
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "apache"
-  repository: "dolphinscheduler"
+  repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
-  pullSecrets: []
+  pullSecret: ""
 
 ## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
@@ -52,13 +48,12 @@ externalDatabase:
   username: "root"
   password: "root"
   database: "dolphinscheduler"
-  ## multi params should join with & char
   params: "characterEncoding=utf8"
 
 ## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
-  fourlwCommandsWhitelist: srvr,ruok,wchs,cons
+  fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
   service:
     port: "2181"
   persistence:
@@ -208,7 +203,7 @@ worker:
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
     WORKER_GROUPS: "default"
-    WORKER_WEIGHT: "100"
+    WORKER_HOST_WEIGHT: "100"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

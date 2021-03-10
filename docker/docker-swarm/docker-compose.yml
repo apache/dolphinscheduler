@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: "3.4"
+version: "3.1"
 
 services:
 
@@ -76,7 +76,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
@@ -110,7 +109,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     volumes:
@@ -150,7 +148,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
@@ -174,7 +171,7 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUPS: "default"
-      WORKER_WEIGHT: "100"
+      WORKER_HOST_WEIGHT: "100"
       ALERT_LISTEN_HOST: dolphinscheduler-alert
       HADOOP_HOME: "/opt/soft/hadoop"
       HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
@@ -204,7 +201,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper

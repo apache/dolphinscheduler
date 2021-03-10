@@ -25,13 +25,13 @@ echo "init env variables"
 #============================================================================
 # Database Source
 #============================================================================
+export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
+export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
 export DATABASE_HOST=${DATABASE_HOST:-"127.0.0.1"}
 export DATABASE_PORT=${DATABASE_PORT:-"5432"}
 export DATABASE_USERNAME=${DATABASE_USERNAME:-"root"}
 export DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
-export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
-export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
 export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 
 #============================================================================
@@ -84,7 +84,7 @@ export WORKER_MAX_CPULOAD_AVG=${WORKER_MAX_CPULOAD_AVG:-"100"}
 export WORKER_RESERVED_MEMORY=${WORKER_RESERVED_MEMORY:-"0.1"}
 export WORKER_LISTEN_PORT=${WORKER_LISTEN_PORT:-"1234"}
 export WORKER_GROUPS=${WORKER_GROUPS:-"default"}
-export WORKER_WEIGHT=${WORKER_WEIGHT:-"100"}
+export WORKER_HOST_WEIGHT=${WORKER_HOST_WEIGHT:-"100"}
 export ALERT_LISTEN_HOST=${ALERT_LISTEN_HOST:-"127.0.0.1"}
 
 #============================================================================
