@@ -11,6 +11,11 @@ Official Website: https://dolphinscheduler.apache.org
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
+## Prerequisites
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
+
 ## How to use this docker image
 
 #### You can start a dolphinscheduler by docker-compose (recommended)
@@ -26,6 +31,8 @@ The default **zookeeper** is created in the `docker-compose.yml`.
 Access the Web UI: http://192.168.xx.xx:12345/dolphinscheduler
 
 The default username is `admin` and the default password is `dolphinscheduler123`
+
+> **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
 
 #### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
 
@@ -302,7 +309,7 @@ This environment variable sets port for `worker-server`. The default value is `1
 
 This environment variable sets groups for `worker-server`. The default value is `default`.
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 This environment variable sets weight for `worker-server`. The default value is `100`.
 

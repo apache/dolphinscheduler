@@ -52,7 +52,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                           @Param("name") String name);
 
     Integer countTask(
-                      @Param("projectIds") Integer[] projectIds,
+                      @Param("projectCodes") Long[] projectCodes,
                       @Param("taskIds") int[] taskIds);
 
     List<ExecuteStatusCount> countTaskInstanceStateByUser(
@@ -61,7 +61,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                           @Param("projectCodes") Long[] projectCodes);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                    @Param("projectId") int projectId,
+                                                    @Param("projectCode") Long projectCode,
                                                     @Param("processInstanceId") Integer processInstanceId,
                                                     @Param("processInstanceName") String processInstanceName,
                                                     @Param("searchVal") String searchVal,

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -59,7 +60,7 @@ public class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
 
     private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
 
@@ -306,7 +307,7 @@ public class ProcessUtils {
                     if (!applicationStatus.typeIsFinished()) {
                         String commandFile = String
                                 .format("%s/%s.kill", executePath, appId);
-                        String cmd = "yarn application -kill " + appId;
+                        String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
                         execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
                     }
                 } catch (Exception e) {
@@ -314,6 +315,24 @@ public class ProcessUtils {
                 }
             }
         }
+    }
+
+    /**
+     * get kerberos init command
+     */
+    public static String getKerberosInitCommand() {
+        logger.info("get kerberos init command");
+        StringBuilder kerberosCommandBuilder = new StringBuilder();
+        boolean hadoopKerberosState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
+        if (hadoopKerberosState) {
+            kerberosCommandBuilder.append("export KRB5_CONFIG=")
+                    .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                    .append("\n\n")
+                    .append(String.format("kinit -k -t %s %s || true",PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
+                    .append("\n\n");
+            logger.info("kerberos init command: {}", kerberosCommandBuilder);
+        }
+        return kerberosCommandBuilder.toString();
     }
 
     /**
@@ -372,12 +391,11 @@ public class ProcessUtils {
 
             OSUtils.exeCmd(cmd);
 
-            // find log and kill yarn job
-            killYarnJob(taskExecutionContext);
-
         } catch (Exception e) {
             logger.error("kill task failed", e);
         }
+        // find log and kill yarn job
+        killYarnJob(taskExecutionContext);
     }
 
     /**

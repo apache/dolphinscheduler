@@ -54,7 +54,7 @@
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
         <if test="projectCodes != null and projectCodes.length != 0">
-            and td.project_id in
+            and td.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
@@ -85,7 +85,7 @@
     <select id="listResourcesByUser" resultType="java.util.HashMap">
         SELECT id,resource_ids
         FROM t_ds_task_definition
-        WHERE user_id = #{userId} resource_ids is not null and resource_ids != ''
+        WHERE user_id = #{userId} and resource_ids is not null and resource_ids != ''
     </select>
     <delete id="deleteByCode">
         delete from t_ds_task_definition
