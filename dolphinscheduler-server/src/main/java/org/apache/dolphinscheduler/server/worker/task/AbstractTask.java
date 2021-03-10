@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import org.apache.commons.lang.StringUtils;
+import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -27,7 +28,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
-import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
+import org.apache.dolphinscheduler.common.task.mr.MapReduceParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
@@ -38,12 +39,13 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.slf4j.Logger;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 
-import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
+import org.slf4j.Logger;
 
 /**
  * executive task
@@ -222,7 +224,7 @@ public abstract class AbstractTask {
                 paramsClass = ProcedureParameters.class;
                 break;
             case MR:
-                paramsClass = MapreduceParameters.class;
+                paramsClass = MapReduceParameters.class;
                 break;
             case SPARK:
                 paramsClass = SparkParameters.class;

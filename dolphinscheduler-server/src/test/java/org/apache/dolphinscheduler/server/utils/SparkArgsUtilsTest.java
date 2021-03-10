@@ -64,7 +64,6 @@ public class SparkArgsUtilsTest {
      */
     @Test
     public void testBuildArgs() {
-
         //Define params
         SparkParameters param = new SparkParameters();
         param.setDeployMode(mode);
@@ -130,4 +129,5 @@ public class SparkArgsUtilsTest {
         result = SparkArgsUtils.buildArgs(param1);
         assertEquals(7, result.size());
     }
+
 }
