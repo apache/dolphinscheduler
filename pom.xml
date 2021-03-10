@@ -90,7 +90,7 @@
         <commons.collections4.version>4.1</commons.collections4.version>
         <guava.version>20.0</guava.version>
         <postgresql.version>42.1.4</postgresql.version>
-        <hive.jdbc.version>2.1.0</hive.jdbc.version>
+        <hive.jdbc.version>1.1.0</hive.jdbc.version>
         <commons.io.version>2.4</commons.io.version>
         <oshi.core.version>3.5.0</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
@@ -119,6 +119,7 @@
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
         <skywalking.version>8.4.0</skywalking.version>
+        <micrometer.version>1.1.4</micrometer.version>
     </properties>
 
     <dependencyManagement>
@@ -167,6 +168,18 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+                <version>${micrometer.version}</version>
             </dependency>
 
             <dependency>
@@ -351,7 +364,6 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>

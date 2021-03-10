@@ -39,6 +39,7 @@
             <fileNamePattern>${log.base}/dolphinscheduler-api-server.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>168</maxHistory>
             <maxFileSize>64MB</maxFileSize>
+            <totalSizeCap>8GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>

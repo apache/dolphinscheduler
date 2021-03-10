@@ -73,13 +73,13 @@ elif [ "$command" = "master-server" ]; then
   HEAP_INITIAL_SIZE=4g
   HEAP_MAX_SIZE=4g
   HEAP_NEW_GENERATION__SIZE=2g
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.location=${DOLPHINSCHEDULER_CONF_DIR}/master.properties"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
   HEAP_INITIAL_SIZE=2g
   HEAP_MAX_SIZE=2g
   HEAP_NEW_GENERATION__SIZE=1g
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false -Dspring.config.location=${DOLPHINSCHEDULER_CONF_DIR}/worker.properties"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
   HEAP_INITIAL_SIZE=1g
