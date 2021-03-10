@@ -244,7 +244,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`DATAX_HOME`**
 
-配置`dolphinscheduler`的`DATAX_HOME`，默认值 `/opt/soft/datax/bin/datax。py`。
+配置`dolphinscheduler`的`DATAX_HOME`，默认值 `/opt/soft/datax`。
 
 **`ZOOKEEPER_QUORUM`**
 

@@ -57,7 +57,7 @@ export PYTHON_HOME=${PYTHON_HOME:-"/usr/bin/python"}
 export JAVA_HOME=${JAVA_HOME:-"/usr/lib/jvm/java-1.8-openjdk"}
 export HIVE_HOME=${HIVE_HOME:-"/opt/soft/hive"}
 export FLINK_HOME=${FLINK_HOME:-"/opt/soft/flink"}
-export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax/bin/datax.py"}
+export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax"}
 
 #============================================================================
 # Zookeeper
