@@ -309,7 +309,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 配置`worker-server`的分组，默认值 `default`。
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 配置`worker-server`的权重，默认之`100`。
 

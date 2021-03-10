@@ -60,7 +60,7 @@ public class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
 
     private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
 
@@ -391,12 +391,11 @@ public class ProcessUtils {
 
             OSUtils.exeCmd(cmd);
 
-            // find log and kill yarn job
-            killYarnJob(taskExecutionContext);
-
         } catch (Exception e) {
             logger.error("kill task failed", e);
         }
+        // find log and kill yarn job
+        killYarnJob(taskExecutionContext);
     }
 
     /**

@@ -31,5 +31,5 @@ data:
   WORKER_RESERVED_MEMORY: {{ .Values.worker.configmap.WORKER_RESERVED_MEMORY | quote }}
   WORKER_LISTEN_PORT: {{ .Values.worker.configmap.WORKER_LISTEN_PORT | quote }}
   WORKER_GROUPS: {{ .Values.worker.configmap.WORKER_GROUPS | quote }}
-  WORKER_WEIGHT: {{ .Values.worker.configmap.WORKER_WEIGHT | quote }}
+  WORKER_HOST_WEIGHT: {{ .Values.worker.configmap.WORKER_HOST_WEIGHT | quote }}
 {{- end }}
