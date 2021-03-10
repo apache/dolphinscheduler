@@ -39,6 +39,7 @@ export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 #============================================================================
 # dolphinscheduler env
 export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-""}
+export LOGGER_SERVER_OPTS=${LOGGER_SERVER_OPTS:-""}
 # common env
 export DATA_BASEDIR_PATH=${DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
 export RESOURCE_STORAGE_TYPE=${RESOURCE_STORAGE_TYPE:-"HDFS"}

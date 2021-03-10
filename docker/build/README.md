@@ -176,7 +176,11 @@ This environment variable sets the database for database. The default value is `
 
 **`DOLPHINSCHEDULER_OPTS`**
 
-This environment variable sets java options. The default value is empty.
+This environment variable sets jvm options for `master-server`, `worker-server`, `api-server` or `alert-server`. The default value is empty.
+
+**`LOGGER_SERVER_OPTS`**
+
+This environment variable sets jvm options for `logger-server` (since `logger-server` is deployed with `worker-server`, it needs to be set separately). The default value is empty.
 
 **`DATA_BASEDIR_PATH`**
 

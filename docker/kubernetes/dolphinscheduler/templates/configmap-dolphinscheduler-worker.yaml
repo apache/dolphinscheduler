@@ -25,6 +25,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   DOLPHINSCHEDULER_OPTS: {{ .Values.worker.configmap.DOLPHINSCHEDULER_OPTS | quote }}
+  LOGGER_SERVER_OPTS: {{ .Values.worker.configmap.LOGGER_SERVER_OPTS | quote }}
   WORKER_EXEC_THREADS: {{ .Values.worker.configmap.WORKER_EXEC_THREADS | quote }}
   WORKER_HEARTBEAT_INTERVAL: {{ .Values.worker.configmap.WORKER_HEARTBEAT_INTERVAL | quote }}
   WORKER_MAX_CPULOAD_AVG: {{ .Values.worker.configmap.WORKER_MAX_CPULOAD_AVG | quote }}

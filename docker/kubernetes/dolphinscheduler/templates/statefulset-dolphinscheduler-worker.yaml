@@ -77,6 +77,11 @@ spec:
                 configMapKeyRef:
                   key: DOLPHINSCHEDULER_OPTS
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
+            - name: LOGGER_SERVER_OPTS
+              valueFrom:
+                configMapKeyRef:
+                  key: LOGGER_SERVER_OPTS
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
             - name: WORKER_EXEC_THREADS
               valueFrom:
                 configMapKeyRef:

@@ -176,7 +176,11 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`DOLPHINSCHEDULER_OPTS`**
 
-配置`dolphinscheduler`的`java options`，默认值 `""`、
+配置`master-server`、`worker-server`、`api-server`或`alert-server`的`jvm options`，默认值 `""`、
+
+**`LOGGER_SERVER_OPTS`**
+
+配置`logger-server`的`jvm options`（由于`logger-server`和`worker-server`共同部署，因此它需要单独设置），默认值 `""`、
 
 **`DATA_BASEDIR_PATH`**
 

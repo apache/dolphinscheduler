@@ -178,6 +178,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
+      LOGGER_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
       WORKER_EXEC_THREADS: "100"
       WORKER_HEARTBEAT_INTERVAL: "10"
       WORKER_MAX_CPULOAD_AVG: "100"
