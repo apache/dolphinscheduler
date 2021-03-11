@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class EnvFileTest {
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
             while ((line = br.readLine()) != null){
-                if (line.contains("PYTHON_HOME")){
+                if (line.contains(Constants.PYTHON_HOME)){
                     sb.append(line);
                     break;
                 }
