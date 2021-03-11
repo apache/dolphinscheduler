@@ -55,7 +55,7 @@ public class PropertyUtils {
     /**
      * init properties
      */
-    public static void loadPropertyFile(String... propertyFiles) {
+    public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {
