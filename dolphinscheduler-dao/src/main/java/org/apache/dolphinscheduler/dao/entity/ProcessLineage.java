@@ -24,8 +24,8 @@ public class ProcessLineage {
     private Long preTaskCode;
     private int preTaskVersion;
 
-    private Long ProcessDefinitionCode;
-    private int ProcessDefinitionVersion;
+    private Long processDefinitionCode;
+    private int processDefinitionVersion;
 
     public Long getProjectCode() {
         return projectCode;
@@ -36,25 +36,24 @@ public class ProcessLineage {
     }
 
     public Long getProcessDefinitionCode() {
-        return ProcessDefinitionCode;
+        return processDefinitionCode;
     }
 
     public void setProcessDefinitionCode(Long processDefinitionCode) {
-        ProcessDefinitionCode = processDefinitionCode;
+        this.processDefinitionCode = processDefinitionCode;
     }
 
     public int getProcessDefinitionVersion() {
-        return ProcessDefinitionVersion;
+        return processDefinitionVersion;
     }
 
     public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        ProcessDefinitionVersion = processDefinitionVersion;
+        this.processDefinitionVersion = processDefinitionVersion;
     }
 
     public void setPostTaskCode(Long postTaskCode) {
         this.postTaskCode = postTaskCode;
     }
-
 
     public Long getPreTaskCode() {
         return preTaskCode;
@@ -87,6 +86,5 @@ public class ProcessLineage {
     public void setPostTaskCode(long postTaskCode) {
         this.postTaskCode = postTaskCode;
     }
-
 
 }
