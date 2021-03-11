@@ -20,13 +20,14 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,9 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     private WorkFlowLineageMapper workFlowLineageMapper;
 
     @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
     private ProjectMapper projectMapper;
 
     @Override
@@ -58,56 +62,71 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         return result;
     }
 
-    private void getWorkFlowRelationRecursion(Set<Integer> ids, List<WorkFlowRelation> workFlowRelations, Set<Integer> sourceIds) {
-        for (int id : ids) {
-            sourceIds.addAll(ids);
-            List<WorkFlowRelation> workFlowRelationsTmp = workFlowLineageMapper.querySourceTarget(id);
-            if (workFlowRelationsTmp != null && !workFlowRelationsTmp.isEmpty()) {
-                Set<Integer> idsTmp = new HashSet<>();
-                for (WorkFlowRelation workFlowRelation : workFlowRelationsTmp) {
-                    if (!sourceIds.contains(workFlowRelation.getTargetWorkFlowId())) {
-                        idsTmp.add(workFlowRelation.getTargetWorkFlowId());
-                    }
+    private void getRelation(Map<Integer, WorkFlowLineage> workFlowLineageMap,
+                             Set<WorkFlowRelation> workFlowRelations,
+                             ProcessLineage processLineage) {
+        List<ProcessLineage> relations = workFlowLineageMapper.queryCodeRelation(
+                processLineage.getPostTaskCode(), processLineage.getPostTaskVersion()
+                , processLineage.getProcessDefinitionCode());
+
+        for (ProcessLineage relation : relations) {
+            if (relation.getProcessDefinitionCode() != null) {
+
+                relation.setPreTaskCode(processLineage.getPostTaskCode());
+                relation.setPreTaskVersion(processLineage.getPostTaskVersion());
+
+                WorkFlowLineage pre = workFlowLineageMapper
+                        .queryWorkFlowLineageByCode(processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
+                // sourceWorkFlowId = ""
+                if (!workFlowLineageMap.containsKey(pre.getWorkFlowId())) {
+                    workFlowLineageMap.put(pre.getWorkFlowId(), pre);
                 }
-                workFlowRelations.addAll(workFlowRelationsTmp);
-                getWorkFlowRelationRecursion(idsTmp, workFlowRelations, sourceIds);
+
+                WorkFlowLineage post = workFlowLineageMapper
+                        .queryWorkFlowLineageByCode(relation.getProcessDefinitionCode(), relation.getProjectCode());
+
+                if (workFlowLineageMap.containsKey(post.getWorkFlowId())) {
+                    WorkFlowLineage workFlowLineage = workFlowLineageMap.get(post.getWorkFlowId());
+                    String sourceWorkFlowId = workFlowLineage.getSourceWorkFlowId();
+                    if (sourceWorkFlowId.equals("")) {
+                        workFlowLineage.setSourceWorkFlowId(String.valueOf(pre.getWorkFlowId()));
+                    } else {
+                        workFlowLineage.setSourceWorkFlowId(sourceWorkFlowId + "," + pre.getWorkFlowId());
+                    }
+
+                } else {
+                    post.setSourceWorkFlowId(String.valueOf(pre.getWorkFlowId()));
+                    workFlowLineageMap.put(post.getWorkFlowId(), post);
+                }
+
+                WorkFlowRelation workFlowRelation = new WorkFlowRelation();
+                workFlowRelation.setSourceWorkFlowId(pre.getWorkFlowId());
+                workFlowRelation.setTargetWorkFlowId(post.getWorkFlowId());
+                if (workFlowRelations.contains(workFlowRelation)) {
+                    continue;
+                }
+                workFlowRelations.add(workFlowRelation);
+                getRelation(workFlowLineageMap, workFlowRelations, relation);
             }
         }
+
     }
 
     @Override
     public Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids, int projectId) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.selectById(projectId);
-        List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByIds(ids, project.getCode());
+        List<ProcessLineage> processLineages = workFlowLineageMapper.queryRelationByIds(ids, project.getCode());
+
+        Map<Integer, WorkFlowLineage> workFlowLineages = new HashMap<>();
+        Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
+
+        for (ProcessLineage processLineage : processLineages) {
+            getRelation(workFlowLineages, workFlowRelations, processLineage);
+        }
+
         Map<String, Object> workFlowLists = new HashMap<>();
-        Set<Integer> idsV = new HashSet<>();
-        if (ids == null || ids.isEmpty()) {
-            for (WorkFlowLineage workFlowLineage : workFlowLineageList) {
-                idsV.add(workFlowLineage.getWorkFlowId());
-            }
-        } else {
-            idsV = ids;
-        }
-        List<WorkFlowRelation> workFlowRelations = new ArrayList<>();
-        Set<Integer> sourceIds = new HashSet<>();
-        getWorkFlowRelationRecursion(idsV, workFlowRelations, sourceIds);
-
-        Set<Integer> idSet = new HashSet<>();
-        //If the incoming parameter is not empty, you need to add downstream workflow detail attributes
-        if (ids != null && !ids.isEmpty()) {
-            for (WorkFlowRelation workFlowRelation : workFlowRelations) {
-                idSet.add(workFlowRelation.getTargetWorkFlowId());
-            }
-            for (int id : ids) {
-                idSet.remove(id);
-            }
-            if (!idSet.isEmpty()) {
-                workFlowLineageList.addAll(workFlowLineageMapper.queryByIds(idSet, project.getCode()));
-            }
-        }
-
-        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineageList);
+        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineages.values());
         workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
         result.put(Constants.DATA_LIST, workFlowLists);
         putMsg(result, Status.SUCCESS);
