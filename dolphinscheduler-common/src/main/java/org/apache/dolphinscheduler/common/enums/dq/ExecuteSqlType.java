@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums.dq;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -51,13 +54,18 @@ public enum ExecuteSqlType {
         return description;
     }
 
-    public static ExecuteSqlType of(int value) {
-        for (ExecuteSqlType e: ExecuteSqlType.values()) {
-            if (e.ordinal() == value) {
-                return e;
-            }
+    private static final Map<Integer, ExecuteSqlType> VALUES_MAP = new HashMap<>();
+
+    static {
+        for (ExecuteSqlType type : ExecuteSqlType.values()) {
+            VALUES_MAP.put(type.code,type);
         }
-        //For values out of enum scope
-        return null;
+    }
+
+    public static ExecuteSqlType of(Integer status) {
+        if (VALUES_MAP.containsKey(status)) {
+            return VALUES_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid code : " + status);
     }
 }

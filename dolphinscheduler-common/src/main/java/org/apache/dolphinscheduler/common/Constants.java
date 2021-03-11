@@ -956,6 +956,10 @@ public final class Constants {
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
+    public static final String TABLE = "table";
+    public static final String URL = "url";
+    public static final String DRIVER = "driver";
+    public static final String SQL = "sql";
 
 
     /**
@@ -1065,4 +1069,35 @@ public final class Constants {
      * double brackets left
      */
     public static final String DOUBLE_BRACKETS_RIGHT_SPACE = "} }";
+
+    /**
+     * data quality task
+     */
+    public static final String SRC_CONNECTOR_TYPE = "src_connector_type";
+    public static final String SRC_DATASOURCE_ID = "src_datasource_id";
+    public static final String SRC_TABLE = "src_table";
+    public static final String SRC_FILTER = "src_filter";
+    public static final String SRC_FIELD = "src_field";
+    public static final String TARGET_CONNECTOR_TYPE = "target_connector_type";
+    public static final String TARGET_DATASOURCE_ID = "target_datasource_id";
+    public static final String TARGET_TABLE = "target_table";
+    public static final String TARGET_FILTER = "target_filter";
+    public static final String TARGET_FILED = "target_filed";
+    public static final String STATISTICS_NAME = "statistics_name";
+    public static final String STATISTICS_EXECUTE_SQL = "statistics_execute_sql";
+    public static final String COMPARISON_NAME = "comparison_name";
+    public static final String COMPARISON_TITLE = "comparison_title";
+    public static final String COMPARISON_VALUE = "comparison_value";
+    public static final String COMPARISON_EXECUTE_SQL = "comparison_execute_sql";
+    public static final String MAPPING_COLUMNS = "mapping_columns";
+    public static final String ON_CLAUSE = "on_clause";
+    public static final String WHERE_CLAUSE = "where_clause";
+    public static final String CHECK_TYPE = "check_type";
+    public static final String THRESHOLD = "threshold";
+    public static final String OPERATOR = "operator";
+    public static final String STATISTICS_TABLE = "statistics_table";
+    public static final String COMPARISON_TABLE = "comparison_table";
+    public static final String AND = " AND ";
+    public static final String WRITER_CONNECTOR_TYPE = "writer_connector_type";
+    public static final String WRITER_DATASOURCE_ID = "writer_datasource_id";
 }

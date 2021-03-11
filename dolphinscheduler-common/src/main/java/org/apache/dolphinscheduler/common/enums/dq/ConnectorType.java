@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums.dq;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -49,13 +52,18 @@ public enum ConnectorType {
         return description;
     }
 
-    public static ConnectorType of(int value) {
-        for (ConnectorType e: ConnectorType.values()) {
-            if (e.ordinal() == value) {
-                return e;
-            }
+    private static final Map<Integer, ConnectorType> VALUES_MAP = new HashMap<>();
+
+    static {
+        for (ConnectorType type : ConnectorType.values()) {
+            VALUES_MAP.put(type.code,type);
         }
-        //For values out of enum scope
-        return null;
+    }
+
+    public static ConnectorType of(Integer status) {
+        if (VALUES_MAP.containsKey(status)) {
+            return VALUES_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid code : " + status);
     }
 }

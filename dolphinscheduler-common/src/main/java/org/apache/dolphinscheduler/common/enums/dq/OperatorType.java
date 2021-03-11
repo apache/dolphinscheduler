@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums.dq;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -57,13 +60,18 @@ public enum OperatorType {
         return description;
     }
 
-    public static OperatorType of(int value) {
-        for (OperatorType e: OperatorType.values()) {
-            if (e.ordinal() == value) {
-                return e;
-            }
+    private static final Map<Integer, OperatorType> VALUES_MAP = new HashMap<>();
+
+    static {
+        for (OperatorType type : OperatorType.values()) {
+            VALUES_MAP.put(type.code,type);
         }
-        //For values out of enum scope
-        return null;
+    }
+
+    public static OperatorType of(Integer status) {
+        if (VALUES_MAP.containsKey(status)) {
+            return VALUES_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid code : " + status);
     }
 }

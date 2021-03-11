@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums.dq;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -53,13 +56,18 @@ public enum RuleType {
         return description;
     }
 
-    public static RuleType of(int value) {
-        for (RuleType e: RuleType.values()) {
-            if (e.ordinal() == value) {
-                return e;
-            }
+    private static final Map<Integer, RuleType> VALUES_MAP = new HashMap<>();
+
+    static {
+        for (RuleType type : RuleType.values()) {
+            VALUES_MAP.put(type.code,type);
         }
-        //For values out of enum scope
-        return null;
+    }
+
+    public static RuleType of(Integer status) {
+        if (VALUES_MAP.containsKey(status)) {
+            return VALUES_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid code : " + status);
     }
 }

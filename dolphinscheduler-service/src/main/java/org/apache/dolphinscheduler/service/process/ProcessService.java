@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -52,6 +53,10 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CycleDependency;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -67,6 +72,10 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
@@ -78,6 +87,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -102,6 +112,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cronutils.model.Cron;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -157,6 +168,18 @@ public class ProcessService {
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private DqExecuteResultMapper dqExecuteResultMapper;
+
+    @Autowired
+    private DqRuleMapper dqRuleMapper;
+
+    @Autowired
+    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+
+    @Autowired
+    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -2054,5 +2077,42 @@ public class ProcessService {
             }
         }
         return JSONUtils.toJsonString(processData);
+    }
+
+    public DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId) {
+        return dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq("task_instance_id",taskInstanceId));
+    }
+
+    public int updateDqExecuteResultUserId(int taskInstanceId) {
+        DqExecuteResult dqExecuteResult =
+                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq("task_instance_id",taskInstanceId));
+        if (dqExecuteResult == null) {
+            return -1;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(dqExecuteResult.getProcessDefinitionId());
+        if (processDefinition == null) {
+            return -1;
+        }
+
+        dqExecuteResult.setUserId(processDefinition.getUserId());
+        dqExecuteResult.setState(DqTaskState.DEFAULT);
+        return dqExecuteResultMapper.updateById(dqExecuteResult);
+    }
+
+    public int updateDqExecuteResultState(DqExecuteResult dqExecuteResult) {
+        return dqExecuteResultMapper.updateById(dqExecuteResult);
+    }
+
+    public DqRule getDqRule(int ruleId) {
+        return dqRuleMapper.selectById(ruleId);
+    }
+
+    public List<DqRuleInputEntry> getRuleInputEntry(int ruleId) {
+        return DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(ruleId));
+    }
+
+    public List<DqRuleExecuteSql> getDqExecuteSql(int ruleId) {
+        return dqRuleExecuteSqlMapper.getExecuteSqlList(ruleId);
     }
 }

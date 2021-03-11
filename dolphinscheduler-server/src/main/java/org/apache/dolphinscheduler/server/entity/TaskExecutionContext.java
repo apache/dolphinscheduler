@@ -214,6 +214,11 @@ public class TaskExecutionContext implements Serializable {
     /**
      * procedure TaskExecutionContext
      */
+    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
+
+    /**
+     * procedure TaskExecutionContext
+     */
     private ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
     public int getTaskInstanceId() {
@@ -502,6 +507,14 @@ public class TaskExecutionContext implements Serializable {
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
     }
 
+    public DataQualityTaskExecutionContext getDataQualityTaskExecutionContext() {
+        return dataQualityTaskExecutionContext;
+    }
+
+    public void setDataQualityTaskExecutionContext(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
+        this.dataQualityTaskExecutionContext = dataQualityTaskExecutionContext;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{"
@@ -540,6 +553,7 @@ public class TaskExecutionContext implements Serializable {
                 + ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext
                 + ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext
                 + ", procedureTaskExecutionContext=" + procedureTaskExecutionContext
+                + ", dataQualityTaskExecutionContext=" + dataQualityTaskExecutionContext
                 + '}';
     }
 }

@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.enums.dq;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
@@ -51,13 +54,18 @@ public enum DqFailureStrategy {
         return description;
     }
 
-    public static DqFailureStrategy of(int value) {
-        for (DqFailureStrategy e: DqFailureStrategy.values()) {
-            if (e.ordinal() == value) {
-                return e;
-            }
+    private static final Map<Integer, DqFailureStrategy> VALUES_MAP = new HashMap<>();
+
+    static {
+        for (DqFailureStrategy type : DqFailureStrategy.values()) {
+            VALUES_MAP.put(type.code,type);
         }
-        //For values out of enum scope
-        return null;
+    }
+
+    public static DqFailureStrategy of(Integer status) {
+        if (VALUES_MAP.containsKey(status)) {
+            return VALUES_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid code : " + status);
     }
 }

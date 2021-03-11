@@ -36,7 +36,7 @@ jobs:
         with:
           submodule: true
       - name: Check License Header
-        uses: apache/skywalking-eyes@9bd5feb86b5817aa6072b008f9866a2c3bbc8587
+        uses: apache/skywalking-eyes@9bd5feb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Only enable review / suggestion here
       - uses: actions/cache@v1
