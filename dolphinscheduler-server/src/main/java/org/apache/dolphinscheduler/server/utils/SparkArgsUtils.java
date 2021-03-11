@@ -37,6 +37,10 @@ public class SparkArgsUtils {
 
     private static final String SPARK_ON_YARN = "yarn";
 
+    private SparkArgsUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * build args
      *
@@ -54,9 +58,9 @@ public class SparkArgsUtils {
         }
         args.add(deployMode);
 
-        ProgramType type = param.getProgramType();
+        ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
-        if (type != null && type != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
+        if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
             args.add(Constants.MAIN_CLASS);
             args.add(mainClass);
         }
