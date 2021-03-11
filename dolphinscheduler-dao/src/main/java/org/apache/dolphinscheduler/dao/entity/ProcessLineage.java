@@ -14,17 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
+/**
+ * Process lineage
+ */
 public class ProcessLineage {
+
+    /**
+     * project code
+     */
     private Long projectCode;
 
+    /**
+     * post task code
+     */
     private Long postTaskCode;
+
+    /**
+     * post task version
+     */
     private int postTaskVersion;
+
+    /**
+     * pre task code
+     */
     private Long preTaskCode;
+
+    /**
+     * pre task version
+     */
     private int preTaskVersion;
 
+    /**
+     * process definition code
+     */
     private Long processDefinitionCode;
+
+    /**
+     * process definition version
+     */
     private int processDefinitionVersion;
 
     public Long getProjectCode() {
