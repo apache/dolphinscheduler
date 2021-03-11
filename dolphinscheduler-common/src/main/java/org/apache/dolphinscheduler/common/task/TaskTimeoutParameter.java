@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 /**
  * task timeout parameter
@@ -68,6 +70,20 @@ public class TaskTimeoutParameter {
         this.enable = enable;
         this.strategy = strategy;
         this.interval = interval;
+    }
+
+    /**
+     * timeout parameter covert
+     * @param timeoutParameter
+     * @return
+     */
+    public TaskTimeoutParameter getTaskTimeoutParameter(String timeoutParameter){
+        if (StringUtils.isNotEmpty(timeoutParameter)) {
+            String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
+            String taskTimeout = timeoutParameter.replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
+            return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
+        }
+        return new TaskTimeoutParameter(false);
     }
 
     @Override

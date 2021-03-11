@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -107,6 +108,8 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
+
+import org.apache.commons.collections.map.HashedMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2467,5 +2470,83 @@ public class ProcessService {
             v.setPreTasks(StringUtils.join(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList()), ","));
         });
         return new ArrayList<>(taskNodeMap.values());
+    }
+
+    /**
+     * getTaskNodeFromTaskInstance
+     * return null if task definition do not exists
+     * @param taskInstance
+     * @return
+     */
+    public TaskNode getTaskNodeFromTaskInstance(TaskInstance taskInstance){
+        TaskNode taskNode = new TaskNode();
+        ProcessInstance processInstance = processInstanceMapper.selectById(taskInstance.getProcessInstanceId());
+        TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                taskInstance.getTaskCode(),
+                taskInstance.getTaskDefinitionVersion());
+        if(taskDefinition == null){
+            return null;
+        }
+        List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
+                taskInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion()
+        );
+        Map<Long, Integer> taskCodeMap = new HashedMap();
+
+        taskRelationList.forEach(relation -> taskCodeMap.putIfAbsent(relation.getPostTaskCode(), relation.getPostTaskVersion()));
+
+        taskNode.setCode(taskDefinition.getCode());
+        taskNode.setVersion(taskDefinition.getVersion());
+        taskNode.setName(taskDefinition.getName());
+        taskNode.setId("task-" + taskDefinition.getId());
+        taskNode.setCode(taskDefinition.getCode());
+        taskNode.setName(taskDefinition.getName());
+        taskNode.setDesc(taskDefinition.getDescription());
+        taskNode.setType(taskDefinition.getTaskType().getDescp());
+        taskNode.setRunFlag(taskDefinition.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
+        taskNode.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
+        taskNode.setRetryInterval(taskDefinition.getFailRetryInterval());
+        taskNode.setParams(taskDefinition.getTaskParams());
+        taskNode.setTaskInstancePriority(taskDefinition.getTaskPriority());
+        taskNode.setWorkerGroup(taskDefinition.getWorkerGroup());
+        return taskNode;
+//        taskNode.setPreTaskNodeList();
+//        List<PreviousTaskNode> previousTaskNodes =
+//
+//
+//        v.setCode(processTaskRelation.getPostTaskCode());
+//        v.setVersion(processTaskRelation.getPostTaskVersion());
+//        v.setConditionResult(processTaskRelation.getConditionParams());
+//        List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
+//        if (processTaskRelation.getPreTaskCode() > 0) {
+//            preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
+//        }
+//        v.setPreTaskNodeList(preTaskNodeList);
+//
+//        v.setId("task-" + taskDefinitionLog.getId());
+//        v.setCode(taskDefinitionLog.getCode());
+//        v.setName(taskDefinitionLog.getName());
+//        v.setDesc(taskDefinitionLog.getDescription());
+//        v.setType(taskDefinitionLog.getTaskType().getDescp());
+//        v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
+//        v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
+//        v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
+//        v.setParams(taskDefinitionLog.getTaskParams());
+//        v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
+//        v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
+//        v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
+//                taskDefinitionLog.getTaskTimeoutStrategy(),
+//                taskDefinitionLog.getTimeout())));
+//        // TODO name will be remove
+//        v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
+    }
+
+    /**
+     *  find task definition by code and verision
+     * @param taskCode
+     * @param taskDefinitionVersion
+     * @return
+     */
+    public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
+        return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
     }
 }
