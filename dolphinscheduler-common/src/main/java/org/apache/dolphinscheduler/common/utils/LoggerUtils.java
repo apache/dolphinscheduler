@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * logger utils
@@ -35,6 +40,8 @@ public class LoggerUtils {
     private LoggerUtils() {
         throw new UnsupportedOperationException("Construct LoggerUtils");
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
 
     /**
      * rules for extracting application ID
@@ -99,6 +106,26 @@ public class LoggerUtils {
             }
         }
         return appIds;
+    }
+
+    /**
+     * read whole file content
+     *
+     * @param filePath file path
+     * @return whole file content
+     */
+    public static String readWholeFileContent(String filePath) {
+        String line;
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
+            while ((line = br.readLine()) != null) {
+                sb.append(line + "\r\n");
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            logger.error("read file error", e);
+        }
+        return "";
     }
 
     public static void logError(Optional<Logger> optionalLogger
