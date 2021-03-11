@@ -118,7 +118,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
         }
-        return pythonHome;
+        return pythonHome + "/bin/python";
     }
 
 
