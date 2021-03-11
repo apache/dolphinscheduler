@@ -79,14 +79,14 @@ public abstract class CommonHostManager implements HostManager {
         nodes.forEach(node -> {
             String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
             String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
-            int weight = Constants.DEFAULT_WORKER_WEIGHT;
+            int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
             if (StringUtils.isNotEmpty(heartbeat)) {
                 String[] parts = heartbeat.split(Constants.COMMA);
                 if (ResInfo.isNewHeartbeatWithWeight(parts)) {
-                    weight = Integer.parseInt(parts[10]);
+                    hostWeight = Integer.parseInt(parts[10]);
                 }
             }
-            candidateHosts.add(HostWorker.of(node, weight, workerGroup));
+            candidateHosts.add(HostWorker.of(node, hostWeight, workerGroup));
         });
         return select(candidateHosts);
     }

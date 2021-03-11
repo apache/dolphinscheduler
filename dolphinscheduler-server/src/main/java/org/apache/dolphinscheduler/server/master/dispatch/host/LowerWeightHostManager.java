@@ -159,7 +159,7 @@ public class LowerWeightHostManager extends CommonHostManager {
                             double memory = Double.parseDouble(parts[1]);
                             double loadAverage = Double.parseDouble(parts[2]);
                             long startTime = DateUtils.stringToDate(parts[6]).getTime();
-                            int weight = ResInfo.isNewHeartbeatWithWeight(parts) ? Integer.parseInt(parts[10]) : Constants.DEFAULT_WORKER_WEIGHT;
+                            int weight = ResInfo.isNewHeartbeatWithWeight(parts) ? Integer.parseInt(parts[10]) : Constants.DEFAULT_WORKER_HOST_WEIGHT;
                             HostWeight hostWeight = new HostWeight(HostWorker.of(node, weight, workerGroup), cpu, memory, loadAverage, startTime);
                             hostWeights.add(hostWeight);
                         }

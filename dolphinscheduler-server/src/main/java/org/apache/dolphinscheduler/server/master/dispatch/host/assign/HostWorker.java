@@ -25,33 +25,33 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 public class HostWorker extends Host {
 
     /**
-     * weight
+     * host weight
      */
-    private int weight;
+    private int hostWeight;
 
     /**
      * worker group
      */
     private String workerGroup;
 
-    public HostWorker(String ip, int port, int weight, String workerGroup) {
+    public HostWorker(String ip, int port, int hostWeight, String workerGroup) {
         super(ip, port);
-        this.weight = weight;
+        this.hostWeight = hostWeight;
         this.workerGroup = workerGroup;
     }
 
-    public HostWorker(String address, int weight, String workerGroup) {
+    public HostWorker(String address, int hostWeight, String workerGroup) {
         super(address);
-        this.weight = weight;
+        this.hostWeight = hostWeight;
         this.workerGroup = workerGroup;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getHostWeight() {
+        return hostWeight;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setHostWeight(int hostWeight) {
+        this.hostWeight = hostWeight;
     }
 
     public String getWorkerGroup() {
@@ -62,15 +62,15 @@ public class HostWorker extends Host {
         this.workerGroup = workerGroup;
     }
 
-    public static HostWorker of(String address, int weight, String workerGroup) {
-        return new HostWorker(address, weight, workerGroup);
+    public static HostWorker of(String address, int hostWeight, String workerGroup) {
+        return new HostWorker(address, hostWeight, workerGroup);
     }
 
     @Override
     public String toString() {
         return "Host{"
-                + "workerGroup='" + workerGroup + '\''
-                + ", weight=" + weight
+                + "hostWeight=" + hostWeight
+                + ", workerGroup='" + workerGroup + '\''
                 + '}';
     }
 

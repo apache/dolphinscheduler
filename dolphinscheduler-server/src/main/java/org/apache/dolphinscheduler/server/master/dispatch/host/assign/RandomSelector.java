@@ -37,8 +37,8 @@ public class RandomSelector extends AbstractSelector<HostWorker> {
         int index = 0;
 
         for (HostWorker host : hosts) {
-            totalWeight += host.getWeight();
-            weights[index] = host.getWeight();
+            totalWeight += host.getHostWeight();
+            weights[index] = host.getHostWeight();
             index++;
         }
 

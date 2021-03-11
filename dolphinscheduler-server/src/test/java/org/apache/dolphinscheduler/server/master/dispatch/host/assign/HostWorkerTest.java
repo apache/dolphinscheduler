@@ -27,7 +27,7 @@ public class HostWorkerTest {
         HostWorker hostWorker = new HostWorker("192.158.2.2", 11, 20, "default");
         Assert.assertEquals("192.158.2.2", hostWorker.getIp());
         Assert.assertEquals(11, hostWorker.getPort());
-        Assert.assertEquals(20, hostWorker.getWeight());
+        Assert.assertEquals(20, hostWorker.getHostWeight());
         Assert.assertEquals("default", hostWorker.getWorkerGroup());
     }
 
@@ -36,7 +36,7 @@ public class HostWorkerTest {
         HostWorker hostWorker = HostWorker.of("192.158.2.2:22", 80, "default");
         Assert.assertEquals("192.158.2.2", hostWorker.getIp());
         Assert.assertEquals(22, hostWorker.getPort());
-        Assert.assertEquals(80, hostWorker.getWeight());
+        Assert.assertEquals(80, hostWorker.getHostWeight());
         Assert.assertEquals("default", hostWorker.getWorkerGroup());
     }
 

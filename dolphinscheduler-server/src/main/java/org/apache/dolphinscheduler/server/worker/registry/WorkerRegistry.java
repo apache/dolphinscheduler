@@ -123,7 +123,7 @@ public class WorkerRegistry {
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 workerConfig.getWorkerMaxCpuloadAvg(),
                 workerConfig.getWorkerReservedMemory(),
-                workerConfig.getWeight(),
+                workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_PREFIX,
                 zookeeperRegistryCenter);

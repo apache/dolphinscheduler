@@ -163,16 +163,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (CollectionUtils.isEmpty(childrenNodes)) {
                 continue;
             }
-            String node = childrenNodes.get(0);
-            for (int i = 0; i < childrenNodes.size(); i++) {
-                childrenNodes.set(i, Host.of(childrenNodes.get(i)).getIp());
-            }
-
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
             if (isPaging) {
-                wg.setIpList(childrenNodes);
-                String registeredValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + node);
+                wg.setIpList(childrenNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList()));
+                String registeredValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(",")[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(",")[7]));
             }

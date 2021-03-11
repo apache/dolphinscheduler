@@ -119,8 +119,8 @@ public class WorkerConfig {
         return hostWeight;
     }
 
-    public void setHostWeight(int weight) {
-        this.hostWeight = weight;
+    public void setHostWeight(int hostWeight) {
+        this.hostWeight = hostWeight;
     }
 
     public String getAlertListenHost() {

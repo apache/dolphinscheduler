@@ -40,7 +40,7 @@ public class HeartBeatTask implements Runnable {
     private String startTime;
     private double maxCpuloadAvg;
     private double reservedMemory;
-    private int weight; // worker weight
+    private int hostWeight; // worker host weight
     private Set<String> heartBeatPaths;
     private String serverType;
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
@@ -66,14 +66,14 @@ public class HeartBeatTask implements Runnable {
     public HeartBeatTask(String startTime,
                          double maxCpuloadAvg,
                          double reservedMemory,
-                         int weight,
+                         int hostWeight,
                          Set<String> heartBeatPaths,
                          String serverType,
                          ZookeeperRegistryCenter zookeeperRegistryCenter) {
         this.startTime = startTime;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.reservedMemory = reservedMemory;
-        this.weight = weight;
+        this.hostWeight = hostWeight;
         this.heartBeatPaths = heartBeatPaths;
         this.serverType = serverType;
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
@@ -82,7 +82,6 @@ public class HeartBeatTask implements Runnable {
     @Override
     public void run() {
         try {
-
             // check dead or not in zookeeper
             for (String heartBeatPath : heartBeatPaths) {
                 if (zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)) {
@@ -112,11 +111,11 @@ public class HeartBeatTask implements Runnable {
             builder.append(startTime).append(Constants.COMMA);
             builder.append(DateUtils.dateToString(new Date())).append(Constants.COMMA);
             builder.append(status).append(COMMA);
-            //save process id
+            // save process id
             builder.append(OSUtils.getProcessID());
-            //worker weight
+            // worker host weight
             if (Constants.WORKER_PREFIX.equals(serverType)) {
-                builder.append(Constants.COMMA).append(weight);
+                builder.append(Constants.COMMA).append(hostWeight);
             }
 
             for (String heartBeatPath : heartBeatPaths) {

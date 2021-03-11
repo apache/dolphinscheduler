@@ -90,7 +90,7 @@ public class RoundRobinSelector extends AbstractSelector<HostWorker> {
         for (HostWorker host : hosts) {
             String workGroupHost = host.getWorkerGroup() + host.getAddress();
             WeightedRoundRobin weightedRoundRobin = map.get(workGroupHost);
-            int weight = host.getWeight();
+            int weight = host.getHostWeight();
             if (weight < 0) {
                 weight = 0;
             }

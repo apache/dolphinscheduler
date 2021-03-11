@@ -386,9 +386,9 @@ public final class Constants {
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
     /**
-     * worker weight
+     * worker host weight
      */
-    public static final int DEFAULT_WORKER_WEIGHT = 100;
+    public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
      * default log cache rows num,output when reach the number
