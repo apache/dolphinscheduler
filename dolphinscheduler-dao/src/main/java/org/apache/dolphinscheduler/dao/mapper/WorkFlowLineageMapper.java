@@ -40,12 +40,12 @@ public interface WorkFlowLineageMapper {
      *
      * @param taskCode taskCode
      * @param taskVersion taskVersion
-     * @param processCode processCode
+     * @param processDefinitionCode processDefinitionCode
      * @return ProcessLineage
      */
     List<ProcessLineage> queryCodeRelation(
             @Param("taskCode") Long taskCode, @Param("taskVersion") int taskVersion,
-            @Param("processCode") Long processCode);
+            @Param("processDefinitionCode") Long processDefinitionCode, @Param("projectCode") Long projectCode);
 
     /**
      * queryRelationByIds
@@ -59,10 +59,10 @@ public interface WorkFlowLineageMapper {
     /**
      * queryWorkFlowLineageByCode
      *
-     * @param code code
+     * @param processDefinitionCode processDefinitioncode
      * @param projectCode projectCode
      * @return WorkFlowLineage
      */
-    WorkFlowLineage queryWorkFlowLineageByCode(@Param("code") Long code, @Param("projectCode") Long projectCode);
+    WorkFlowLineage queryWorkFlowLineageByCode(@Param("processDefinitionCode") Long processDefinitionCode, @Param("projectCode") Long projectCode);
 
 }

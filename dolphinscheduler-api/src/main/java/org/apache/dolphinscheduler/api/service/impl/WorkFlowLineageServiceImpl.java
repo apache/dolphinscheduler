@@ -67,7 +67,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                              ProcessLineage processLineage) {
         List<ProcessLineage> relations = workFlowLineageMapper.queryCodeRelation(
                 processLineage.getPostTaskCode(), processLineage.getPostTaskVersion()
-                , processLineage.getProcessDefinitionCode());
+                , processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
 
         for (ProcessLineage relation : relations) {
             if (relation.getProcessDefinitionCode() != null) {

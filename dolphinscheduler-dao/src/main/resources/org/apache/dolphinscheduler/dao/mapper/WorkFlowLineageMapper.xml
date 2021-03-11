@@ -29,14 +29,14 @@
         </if>
     </select>
 
-    <select id="queryRelationByIds" resultType="org.apache.dolphinscheduler.dao.entity.processLineage">
+    <select id="queryRelationByIds" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
         select ptr.project_code,
                 ptr.post_task_code,
                 ptr.post_task_version,
                 ptr.pre_task_code,
                 ptr.pre_task_version,
                 ptr.process_definition_code,
-                ptr.process_definition_version,
+                ptr.process_definition_version
         from t_ds_process_definition pd
         join t_ds_process_task_relation ptr on pd.code = ptr.process_definition_code and pd.version =
         ptr.process_definition_version
@@ -49,19 +49,19 @@
         </if>
     </select>
 
-    <select id="queryCodeRelation" resultType="org.apache.dolphinscheduler.dao.entity.processLineage">
+    <select id="queryCodeRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
         select project_code
                post_task_code,
                post_task_version,
                pre_task_code,
                pre_task_version,
                process_definition_code,
-               process_definition_version,
+               process_definition_version
          from t_ds_process_task_relation ptr
-         where ptr.pre_task_code=#{postTaskCode}
-                and ptr.pre_task_version=#{postTaskVersion}
-                and ptr.process_definition_code!=#{processDefinitonCode}
-                and ptr.project_code!=#{projectCode}
+         where ptr.pre_task_code=#{taskCode}
+                and ptr.pre_task_version=#{taskVersion}
+                and ptr.process_definition_code!=#{processDefinitionCode}
+                and ptr.project_code =#{projectCode}
 
     </select>
 
