@@ -17,23 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import static java.util.Calendar.DAY_OF_MONTH;
 
-
-import org.apache.dolphinscheduler.plugin.task.api.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
-import org.apache.dolphinscheduler.plugin.task.api.Direct;
+import org.apache.dolphinscheduler.spi.task.AbstractParameters;
+import org.apache.dolphinscheduler.spi.task.AbstractTask;
+import org.apache.dolphinscheduler.spi.task.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.Property;
+import org.apache.dolphinscheduler.spi.task.Property;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskRequest;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-
-import org.apache.commons.lang.time.DateUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -43,7 +38,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,19 +65,21 @@ public class ShellTask extends AbstractTask {
      */
     private TaskRequest taskRequest;
 
+    private String script;
+
     /**
      * constructor
      *
      * @param taskRequest taskRequest
-     * @param logger               logger
+     * @param logger logger
      */
     public ShellTask(TaskRequest taskRequest, Logger logger) {
         super(taskRequest, logger);
 
         this.taskRequest = taskRequest;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskRequest,
-            logger);
+                taskRequest,
+                logger);
     }
 
     @Override
@@ -92,6 +88,7 @@ public class ShellTask extends AbstractTask {
 
         shellParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), ShellParameters.class);
 
+        assert shellParameters != null;
         if (!shellParameters.checkParameters()) {
             throw new RuntimeException("shell task params is not valid");
         }
@@ -101,7 +98,7 @@ public class ShellTask extends AbstractTask {
     public void handle() throws Exception {
         try {
             // construct process
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(script);
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
             setProcessId(response.getProcessId());
@@ -119,13 +116,19 @@ public class ShellTask extends AbstractTask {
         shellCommandExecutor.cancelApplication();
     }
 
+    @Override
+    public String getPreScript(){
+        return shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+    }
+
     /**
      * create command
      *
      * @return file name
      * @throws Exception exception
      */
-    private String buildCommand() throws Exception {
+    @Override
+    public void buildCommand(String script) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskRequest.getExecutePath(),
@@ -134,10 +137,8 @@ public class ShellTask extends AbstractTask {
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
-            return fileName;
+            this.script = fileName;
         }
-
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
         script = parseScript(script);
         shellParameters.setRawScript(script);
 
@@ -154,8 +155,7 @@ public class ShellTask extends AbstractTask {
         }
 
         Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-
-        return fileName;
+        this.script = fileName;
     }
 
     @Override
@@ -172,7 +172,7 @@ public class ShellTask extends AbstractTask {
         Map<String, Property> localParams = shellParameters.getLocalParametersMap();
         List<Map<String, String>> outProperties = new ArrayList<>();
         Map<String, String> p = new HashMap<>();
-        localParams.forEach((k,v) -> {
+        localParams.forEach((k, v) -> {
             if (v.getDirect() == Direct.OUT) {
                 p.put(k, result);
             }

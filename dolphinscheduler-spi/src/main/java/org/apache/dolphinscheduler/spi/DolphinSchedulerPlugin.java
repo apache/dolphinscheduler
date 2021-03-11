@@ -37,7 +37,6 @@ public interface DolphinSchedulerPlugin {
         return emptyList();
     }
 
-    default Iterable<TaskChannelFactory> getTaskChannelFactorys(){
-        return emptyList();
-    };
+    default Iterable<TaskChannelFactory> getTaskChannelFactorys(){ return emptyList();
+   };
 }

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.param.common.base.PluginParams;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.List;

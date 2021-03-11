@@ -1108,6 +1108,6 @@
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-task-plugin</module>
-        <module>dolphinscheduler-task-shell</module>
+        <module>dolphinscheduler-task-flink</module>
     </modules>
 </project>

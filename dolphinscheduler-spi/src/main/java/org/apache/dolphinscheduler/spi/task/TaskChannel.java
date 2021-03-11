@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.api;/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -22,7 +22,7 @@ public interface TaskChannel {
 
     void cancelApplication(boolean status);
 
-    TaskResponse processTask(TaskRequest taskRequest, Logger logger);
+    Class<? extends AbstractTask> createTask(TaskRequest taskRequest,Logger logger);
 
 
 }

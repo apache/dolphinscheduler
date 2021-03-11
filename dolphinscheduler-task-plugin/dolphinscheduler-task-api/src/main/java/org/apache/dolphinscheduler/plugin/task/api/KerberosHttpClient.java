@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;

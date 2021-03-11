@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.plugin.alert.http;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.params.InputParam;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.Validate;
+import org.apache.dolphinscheduler.param.common.base.PluginParams;
+import org.apache.dolphinscheduler.param.common.base.Validate;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,14 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.task.api;
 
 /**
- * parameter of stored procedure
+ * resource info
  */
-public enum Direct {
+public class ResourceInfo {
     /**
-     * 0 in; 1 out;
+     * res the name of the resource that was uploaded
      */
-    IN,OUT
+    private int id;
+
+    private String resourceName;
+
+
+    private String res;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public String getRes() {
+        return res;
+    }
+
+    public void setRes(String res) {
+        this.res = res;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
 }

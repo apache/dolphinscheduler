@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -301,7 +304,8 @@ public class ProcessUtils {
             OSUtils.exeCmd(cmd);
 
             // find log and kill yarn job
-            killYarnJob(request);
+            // 后置该流程
+          //  killYarnJob(request);
 
         } catch (Exception e) {
             logger.error("kill task failed", e);
@@ -338,11 +342,11 @@ public class ProcessUtils {
         return sb.toString().trim();
     }
 
-    /**
+   /* *//**
      * find logs and kill yarn tasks.
      * 判断是否是yarn todo
      * @param request request
-     */
+     *//*
     private static void killYarnJob(TaskRequest request) {
         try {
             Thread.sleep(TaskConstants.SLEEP_TIME_MILLIS);
@@ -364,7 +368,7 @@ public class ProcessUtils {
             logger.error("kill yarn job failure", e);
         }
     }
-
+*/
     /**
      * kill yarn application.
      *
@@ -373,7 +377,7 @@ public class ProcessUtils {
      * @param tenantCode tenant code
      * @param executePath execute path
      */
-    public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
+  /*  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
         if (CollectionUtils.isNotEmpty(appIds)) {
 
             for (String appId : appIds) {
@@ -391,7 +395,7 @@ public class ProcessUtils {
                 }
             }
         }
-    }
+    }*/
 
     /**
      * build kill command for yarn application

@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.api;/*
+package org.apache.dolphinscheduler.spi.task;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -324,6 +324,8 @@ public class TaskConstants {
      * week_end
      */
     public static final String WEEK_END = "week_end";
+
+    public static final String RWXR_XR_X = "rwxr-xr-x";
 
 
 }

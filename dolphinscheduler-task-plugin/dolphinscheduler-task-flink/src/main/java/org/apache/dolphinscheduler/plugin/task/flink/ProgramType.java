@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,33 +14,17 @@ package org.apache.dolphinscheduler.plugin.task.api;/*
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.plugin.task.flink;
+
 
 /**
- * resource info
+ * support program types
  */
-public class ResourceInfo {
+public enum ProgramType {
     /**
-     * res the name of the resource that was uploaded
+     * 0 JAVA,1 SCALA,2 PYTHON
      */
-    private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    private String res;
-
-    public String getRes() {
-        return res;
-    }
-
-    public void setRes(String res) {
-        this.res = res;
-    }
-
-
+    JAVA,
+    SCALA,
+    PYTHON
 }

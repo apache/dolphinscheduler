@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.sql.PreparedStatement;

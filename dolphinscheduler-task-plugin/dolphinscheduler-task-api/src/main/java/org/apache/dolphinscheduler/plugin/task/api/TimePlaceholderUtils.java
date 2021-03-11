@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_STRING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.N;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.P;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RIGHT_BRACE_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_CHAR;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ADD_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.ADD_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DIVISION_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.DIVISION_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.LEFT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.LEFT_BRACE_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.MULTIPLY_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.MULTIPLY_STRING;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.N;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.P;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.RIGHT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.SUBTRACT_CHAR;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.SUBTRACT_STRING;
+
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 
 import org.apache.commons.lang.StringUtils;
 

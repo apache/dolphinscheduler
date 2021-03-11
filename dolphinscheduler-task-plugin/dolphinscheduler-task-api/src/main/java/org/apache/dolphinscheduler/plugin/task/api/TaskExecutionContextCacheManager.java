@@ -15,6 +15,8 @@ package org.apache.dolphinscheduler.plugin.task.api;/*
  * limitations under the License.
  */
 
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -30,6 +30,8 @@ import org.slf4j.Logger;
  */
 public class LoggerUtils {
 
+    private static final String APPLICATION_REGEX_NAME = "application_\\d+_\\d+";
+
     private LoggerUtils() {
         throw new UnsupportedOperationException("Construct LoggerUtils");
     }
@@ -37,7 +39,7 @@ public class LoggerUtils {
     /**
      * rules for extracting application ID
      */
-    private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
+    private static final Pattern APPLICATION_REGEX = Pattern.compile(APPLICATION_REGEX_NAME);
 
     /**
      * Task Logger's prefix

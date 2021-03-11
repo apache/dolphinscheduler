@@ -17,11 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SH;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_SUCCESS;
+import static org.apache.dolphinscheduler.spi.task.TaskConstants.SH;
 
+import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.io.BufferedReader;
@@ -76,7 +79,7 @@ public abstract class AbstractCommandExecutor {
 
     protected boolean logOutputIsSuccess = false;
 
-    /**
+    /*
      * SHELL result string
      */
     protected String taskResultString;
@@ -106,21 +109,21 @@ public abstract class AbstractCommandExecutor {
      * @param commandFile command file
      * @throws IOException IO Exception
      */
-    private void buildProcess(String commandFile, TaskRequest req) throws IOException {
+    private void buildProcess(String commandFile) throws IOException {
         // setting up user to run commands
         List<String> command = new LinkedList<>();
 
         //init process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         // setting up a working directory
-        processBuilder.directory(new File(req.getExecutePath()));
+        processBuilder.directory(new File(taskRequest.getExecutePath()));
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
 
         // setting up user to run commands
         command.add("sudo");
         command.add("-u");
-        command.add(req.getTenantCode());
+        command.add(taskRequest.getTenantCode());
         command.add(SH);
         command.addAll(Collections.emptyList());
         command.add(commandFile);
@@ -133,13 +136,9 @@ public abstract class AbstractCommandExecutor {
         printCommand(command);
     }
 
-    public TaskResponse run(Consumer<List<String>> logHandler, String execCommand, TaskRequest req, Logger logger) throws IOException, InterruptedException {
-        this.logger = logger;
-        this.logHandler = logHandler;
-        this.logBuffer = Collections.synchronizedList(new ArrayList<>());
-
+    public TaskResponse run(String execCommand) throws IOException, InterruptedException {
         TaskResponse result = new TaskResponse();
-        int taskInstanceId = req.getTaskInstanceId();
+        int taskInstanceId = taskRequest.getTaskInstanceId();
         if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
@@ -155,7 +154,7 @@ public abstract class AbstractCommandExecutor {
         createCommandFileIfNotExists(execCommand, commandFilePath);
 
         //build process
-        buildProcess(commandFilePath, req);
+        buildProcess(commandFilePath);
 
         // parse process output
         parseProcessOutput(process);
@@ -165,10 +164,10 @@ public abstract class AbstractCommandExecutor {
         result.setProcessId(processId);
 
         // cache processId
-        req.setProcessId(processId);
-        boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(req);
+        taskRequest.setProcessId(processId);
+        boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
         if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
-            ProcessUtils.kill(req);
+            ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
         }
@@ -181,14 +180,14 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-                req.getExecutePath(),
+                taskRequest.getExecutePath(),
                 processId
                 , result.getExitStatusCode());
 
         // if SHELL task exit
         if (status) {
             // set appIds
-            List<String> appIds = getAppIds(req.getLogPath());
+            List<String> appIds = getAppIds(taskRequest.getLogPath());
             result.setAppIds(String.join(TaskConstants.COMMA, appIds));
 
             // SHELL task state
@@ -196,11 +195,12 @@ public abstract class AbstractCommandExecutor {
 
             // if yarn task , yarn state is final state
             if (process.exitValue() == 0) {
-                result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
+                // todo 判断是不是yarn
+                //  result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
             }
         } else {
             logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
-            ProcessUtils.kill(req);
+            ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
@@ -376,10 +376,10 @@ public abstract class AbstractCommandExecutor {
     /**
      * check yarn state
      *
-     * @param appIds application id list
+     * @param //appIds application id list
      * @return is success of yarn task state
      */
-    public boolean isSuccessOfYarnState(List<String> appIds) {
+   /* public boolean isSuccessOfYarnState(List<String> appIds) {
         boolean result = true;
         try {
             for (String appId : appIds) {
@@ -403,8 +403,7 @@ public abstract class AbstractCommandExecutor {
         }
         return result;
 
-    }
-
+    }*/
     public int getProcessId() {
         return getProcessId(process);
     }

@@ -13,11 +13,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
 
+import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.utils.Constants;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -46,10 +49,12 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 
+*/
 /**
  * hadoop utils
  * single instance
- */
+ *//*
+
 public class HadoopUtils implements Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
@@ -85,9 +90,11 @@ public class HadoopUtils implements Closeable {
         initHdfsPath();
     }
 
-    /**
+    */
+/**
      * init dolphinscheduler root path in hdfs
-     */
+     *//*
+
 
     private void initHdfsPath() {
         Path path = new Path(resourceUploadPath);
@@ -100,9 +107,11 @@ public class HadoopUtils implements Closeable {
         }
     }
 
-    /**
+    */
+/**
      * init hadoop configuration
-     */
+     *//*
+
     private void init() {
         try {
             configuration = new HdfsConfiguration();
@@ -173,12 +182,14 @@ public class HadoopUtils implements Closeable {
         return cache.getUnchecked(HADOOP_UTILS_KEY);
     }
 
-    /**
+    */
+/**
      * get the state of an application
      *
      * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
-     */
+     *//*
+
     ExecutionStatus getApplicationStatus(String applicationId) throws Exception {
         if (StringUtils.isEmpty(applicationId)) {
             return null;
@@ -245,12 +256,14 @@ public class HadoopUtils implements Closeable {
     }
 
 
-    /**
+    */
+/**
      * get application url
      *
      * @param applicationId application id
      * @return url of application
-     */
+     *//*
+
     private String getApplicationUrl(String applicationId) throws Exception {
         String appUrl;
 
@@ -273,11 +286,13 @@ public class HadoopUtils implements Closeable {
         return String.format(appUrl, applicationId);
     }
 
-    /**
+    */
+/**
      * getAppAddress
      *
      * @return app address
-     */
+     *//*
+
     private static String getAppAddress() {
 
         //get active ResourceManager
@@ -313,14 +328,18 @@ public class HadoopUtils implements Closeable {
         }
     }
 
-    /**
+    */
+/**
      * yarn ha admin utils
-     */
+     *//*
+
     private static final class YarnHAAdminUtils extends RMAdminCLI {
 
-        /**
+        */
+/**
          * get active resource manager
-         */
+         *//*
+
         static String getActiveRMName() {
 
             String[] rmIdArr = HadoopUtils.rmHaIds.split(TaskConstants.COMMA);
@@ -349,9 +368,11 @@ public class HadoopUtils implements Closeable {
             return null;
         }
 
-        /**
+        */
+/**
          * get ResourceManager state
-         */
+         *//*
+
         static String getRMState(String url) {
 
             String retStr = HttpUtils.get(url);
@@ -371,3 +392,4 @@ public class HadoopUtils implements Closeable {
 
     }
 }
+*/

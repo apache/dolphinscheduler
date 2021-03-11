@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.http;
 
-import static org.apache.dolphinscheduler.common.enums.CommandType.*;
-
 import java.io.IOException;
 import java.util.Date;
 

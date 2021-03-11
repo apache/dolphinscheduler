@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.spi.task.TaskConstants;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
