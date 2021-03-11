@@ -51,7 +51,7 @@ public class EnvFileTest {
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
             while ((line = br.readLine()) != null){
-                if (line.contains(Constants.PYTHON_HOME)){
+                if (line.contains(Constants.PYTHON_HOME)) {
                     sb.append(line);
                     break;
                 }
