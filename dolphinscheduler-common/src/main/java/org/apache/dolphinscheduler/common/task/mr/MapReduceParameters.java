@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.mr;
 
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapreduceParameters extends AbstractParameters {
+/**
+ * mapreduce parameters
+ */
+public class MapReduceParameters extends AbstractParameters {
 
     /**
      * major jar
@@ -45,6 +48,11 @@ public class MapreduceParameters extends AbstractParameters {
      * other arguments
      */
     private String others;
+
+    /**
+     * app name
+     */
+    private String appName;
 
     /**
      * queue
@@ -85,6 +93,14 @@ public class MapreduceParameters extends AbstractParameters {
 
     public void setOthers(String others) {
         this.others = others;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public String getQueue() {

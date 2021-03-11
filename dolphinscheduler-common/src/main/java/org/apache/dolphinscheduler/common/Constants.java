@@ -534,9 +534,6 @@ public final class Constants {
 
 
     /**
-     * hadoop params constant
-     */
-    /**
      * jar
      */
     public static final String JAR = "jar";
@@ -547,12 +544,17 @@ public final class Constants {
     public static final String HADOOP = "hadoop";
 
     /**
-     * -D parameter
+     * -D <property>=<value>
      */
     public static final String D = "-D";
 
     /**
-     * -D mapreduce.job.queuename=ququename
+     * -D mapreduce.job.name=name
+     */
+    public static final String MR_NAME = "mapreduce.job.name";
+
+    /**
+     * -D mapreduce.job.queuename=queuename
      */
     public static final String MR_QUEUE = "mapreduce.job.queuename";
 
