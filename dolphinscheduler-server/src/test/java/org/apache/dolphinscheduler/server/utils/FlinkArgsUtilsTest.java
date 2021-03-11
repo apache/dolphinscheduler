@@ -53,10 +53,8 @@ public class FlinkArgsUtilsTest {
     public String others = "-s hdfs:///flink/savepoint-1537";
     public String flinkVersion = "<1.10";
 
-
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp() {
         ResourceInfo main = new ResourceInfo();
         main.setRes("testflink-1.0.0-SNAPSHOT.jar");
         mainJar = main;
@@ -67,7 +65,6 @@ public class FlinkArgsUtilsTest {
      */
     @Test
     public void testBuildArgs() {
-
         //Define params
         FlinkParameters param = new FlinkParameters();
         param.setDeployMode(mode);
@@ -134,6 +131,6 @@ public class FlinkArgsUtilsTest {
         param1.setDeployMode(mode);
         result = FlinkArgsUtils.buildArgs(param1);
         assertEquals(5, result.size());
-
     }
+
 }
