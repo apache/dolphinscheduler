@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.remote.utils.IPUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,12 +118,16 @@ public class LogClientService {
         String result = "";
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                ViewLogResponseCommand viewLog = JSONUtils.parseObject(
-                        response.getBody(), ViewLogResponseCommand.class);
-                return viewLog.getMsg();
+            if (IPUtils.getLocalHost().equals(host)) {
+                result = LoggerUtils.readWholeFileContent(request.getPath());
+            } else {
+                Command command = request.convert2Command();
+                Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+                if (response != null) {
+                    ViewLogResponseCommand viewLog = JSONUtils.parseObject(
+                            response.getBody(), ViewLogResponseCommand.class);
+                    result = viewLog.getMsg();
+                }
             }
         } catch (Exception e) {
             logger.error("view log error", e);
