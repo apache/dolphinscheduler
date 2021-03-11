@@ -57,13 +57,13 @@ spec:
       {{- if .Values.api.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.image.pullSecrets }}
+      {{- if .Values.image.pullSecret }}
       imagePullSecrets:
-      - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
+      - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
-          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          image: {{ include "dolphinscheduler.image.fullname" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "api-server"
@@ -115,8 +115,8 @@ spec:
                   name: {{ template "dolphinscheduler.postgresql.fullname" . }}
                   key: postgresql-password
                   {{- else }}
-                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
-                  key: db-password
+                  name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+                  key: database-password
                   {{- end }}
             - name: DATABASE_DATABASE
               {{- if .Values.postgresql.enabled }}
@@ -172,7 +172,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: fs-s3a-secret-key
-                  name: {{ printf "%s-%s" .Release.Name "fs-s3a"  }}
+                  name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
             {{- end }}
           {{- if .Values.api.resources }}
           resources:

@@ -152,7 +152,7 @@ public class WorkerRegistry {
 
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
-        int weight = workerConfig.getWeight();
+        int weight = workerConfig.getHostWeight();
         long workerStartTime = System.currentTimeMillis();
 
         for (String workGroup : this.workerGroups) {
