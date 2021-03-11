@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -72,8 +73,7 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private MasterRegistry masterRegistry;
 
-    public void start() {
-
+    public void start(MasterServer masterServer) {
         InterProcessMutex mutex = null;
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
@@ -83,6 +83,9 @@ public class ZKMasterClient extends AbstractZKClient {
 
             //  Master registry
             masterRegistry.registry();
+            masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
+            String registPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();

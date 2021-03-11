@@ -14,7 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.registry;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+
+import org.apache.curator.framework.state.ConnectionState;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -23,15 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.state.ConnectionState;
-import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Sets;
 
 /**
- *  master registry
+ * master registry
  */
 @Service
 public class MasterRegistry {
@@ -48,7 +50,7 @@ public class MasterRegistry {
     private final Logger logger = LoggerFactory.getLogger(MasterRegistry.class);
 
     /**
-     *  zookeeper registry center
+     * zookeeper registry center
      */
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
@@ -65,42 +67,41 @@ public class MasterRegistry {
     private ScheduledExecutorService heartBeatExecutor;
 
     /**
-     * worker start time
+     * master start time
      */
     private String startTime;
 
-
     @PostConstruct
-    public void init(){
+    public void init() {
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
     /**
-     *  registry
+     * registry
      */
     public void registry() {
         String address = OSUtils.getHost();
         String localNodePath = getMasterPath();
-        zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-        zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if(newState == ConnectionState.LOST){
+        zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
+        zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
+            (client, newState) -> {
+                if (newState == ConnectionState.LOST) {
                     logger.error("master : {} connection lost from zookeeper", address);
-                } else if(newState == ConnectionState.RECONNECTED){
+                } else if (newState == ConnectionState.RECONNECTED) {
                     logger.info("master : {} reconnected to zookeeper", address);
-                    zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-                } else if(newState == ConnectionState.SUSPENDED){
+                    zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
+                } else if (newState == ConnectionState.SUSPENDED) {
                     logger.warn("master : {} connection SUSPENDED ", address);
+                    zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
                 }
-            }
-        });
+            });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterReservedMemory(),
                 masterConfig.getMasterMaxCpuloadAvg(),
                 Sets.newHashSet(getMasterPath()),
+                Constants.MASTER_PREFIX,
                 zookeeperRegistryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
@@ -108,31 +109,37 @@ public class MasterRegistry {
     }
 
     /**
-     *  remove registry info
+     * remove registry info
      */
     public void unRegistry() {
         String address = getLocalAddress();
         String localNodePath = getMasterPath();
-        zookeeperRegistryCenter.getZookeeperCachedOperator().remove(localNodePath);
+        zookeeperRegistryCenter.getRegisterOperator().remove(localNodePath);
         logger.info("master node : {} unRegistry to ZK.", address);
     }
 
     /**
-     *  get master path
-     * @return
+     * get master path
      */
-    private String getMasterPath() {
+    public String getMasterPath() {
         String address = getLocalAddress();
-        String localNodePath = this.zookeeperRegistryCenter.getMasterPath() + "/" + address;
-        return localNodePath;
+        return this.zookeeperRegistryCenter.getMasterPath() + "/" + address;
     }
 
     /**
-     *  get local address
+     * get local address
      * @return
      */
     private String getLocalAddress(){
         return OSUtils.getAddr(masterConfig.getListenPort());
+    }
+
+    /**
+     * get zookeeper registry center
+     * @return ZookeeperRegistryCenter
+     */
+    public ZookeeperRegistryCenter getZookeeperRegistryCenter() {
+        return zookeeperRegistryCenter;
     }
 
 }

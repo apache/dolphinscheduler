@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
@@ -42,13 +44,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-
-
-
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
-public class MasterServer {
+public class MasterServer implements IStoppable {
 
     /**
      * logger of MasterServer
@@ -72,6 +71,12 @@ public class MasterServer {
      * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
+
+    /**
+     * master registry
+     */
+    @Autowired
+    private MasterRegistry masterRegistry;
 
     /**
      * zk master client
@@ -100,19 +105,26 @@ public class MasterServer {
      * run master server
      */
     @PostConstruct
-    public void run(){
+    public void run() {
+        try {
+            //init remoting server
+            NettyServerConfig serverConfig = new NettyServerConfig();
+            serverConfig.setListenPort(masterConfig.getListenPort());
+            this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
+            this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
+            this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+            this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+            this.nettyRemotingServer.start();
 
-        //init remoting server
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(masterConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
-        this.nettyRemotingServer.start();
+            this.masterRegistry.getZookeeperRegistryCenter().setStoppable(this);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
 
         // self tolerant
-        this.zkMasterClient.start();
+        this.zkMasterClient.start(this);
 
         // scheduler start
         this.masterSchedulerService.start();
@@ -137,7 +149,9 @@ public class MasterServer {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                close("shutdownHook");
+                if (Stopper.isRunning()) {
+                    close("shutdownHook");
+                }
             }
         }));
 
@@ -145,13 +159,14 @@ public class MasterServer {
 
     /**
      * gracefully close
+     *
      * @param cause close cause
      */
     public void close(String cause) {
 
         try {
             //execute only once
-            if(Stopper.isStopped()){
+            if (Stopper.isStopped()) {
                 return;
             }
 
@@ -163,24 +178,32 @@ public class MasterServer {
             try {
                 //thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
             //
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
+            this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
             //close quartz
-            try{
+            try {
                 QuartzExecutors.getInstance().shutdown();
                 logger.info("Quartz service stopped");
-            }catch (Exception e){
-                logger.warn("Quartz service stopped exception:{}",e.getMessage());
+            } catch (Exception e) {
+                logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
+
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
+        } finally {
             System.exit(-1);
         }
+    }
+
+    @Override
+    public void stop(String cause) {
+        close(cause);
     }
 }
 
