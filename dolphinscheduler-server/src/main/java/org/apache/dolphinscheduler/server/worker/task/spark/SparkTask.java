@@ -62,19 +62,19 @@ public class SparkTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private final TaskExecutionContext sparkTaskExecutionContext;
+    private TaskExecutionContext taskExecutionContext;
 
     public SparkTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
-        this.sparkTaskExecutionContext = taskExecutionContext;
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
 
-        logger.info("spark task params {}", sparkTaskExecutionContext.getTaskParams());
+        logger.info("spark task params {}", taskExecutionContext.getTaskParams());
 
-        sparkParameters = JSONUtils.parseObject(sparkTaskExecutionContext.getTaskParams(), SparkParameters.class);
+        sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
             logger.error("Spark params is null");
@@ -84,13 +84,12 @@ public class SparkTask extends AbstractYarnTask {
         if (!sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
-        sparkParameters.setQueue(sparkTaskExecutionContext.getQueue());
+        sparkParameters.setQueue(taskExecutionContext.getQueue());
         setMainJarName();
     }
 
     /**
      * create command
-     *
      * @return command
      */
     @Override
@@ -98,7 +97,7 @@ public class SparkTask extends AbstractYarnTask {
         // spark-submit [options] <app jar | python file> [app arguments]
         List<String> args = new ArrayList<>();
 
-        //spark version
+        // spark version
         String sparkCommand = SPARK2_COMMAND;
 
         if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
@@ -111,11 +110,11 @@ public class SparkTask extends AbstractYarnTask {
         args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
 
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(sparkTaskExecutionContext.getDefinedParams()),
-            sparkTaskExecutionContext.getDefinedParams(),
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+            taskExecutionContext.getDefinedParams(),
             sparkParameters.getLocalParametersMap(),
-            CommandType.of(sparkTaskExecutionContext.getCmdTypeIfComplement()),
-            sparkTaskExecutionContext.getScheduleTime());
+            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+            taskExecutionContext.getScheduleTime());
 
         String command = null;
 
