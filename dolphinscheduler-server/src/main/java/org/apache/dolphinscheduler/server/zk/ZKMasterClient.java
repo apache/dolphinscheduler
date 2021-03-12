@@ -178,9 +178,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if (StringUtils.isEmpty(serverHost)) {
-            return;
-        }
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);
