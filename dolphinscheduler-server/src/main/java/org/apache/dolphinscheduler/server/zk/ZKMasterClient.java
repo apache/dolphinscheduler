@@ -84,8 +84,8 @@ public class ZKMasterClient extends AbstractZKClient {
             // master registry
             masterRegistry.registry();
             masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
-            String registPath = this.masterRegistry.getMasterPath();
-            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
+            String registryPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();
@@ -176,9 +176,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if (StringUtils.isEmpty(serverHost)) {
-            return;
-        }
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);
