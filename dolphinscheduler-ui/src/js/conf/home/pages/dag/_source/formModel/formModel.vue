@@ -355,11 +355,11 @@
         stateList: [
           {
             value: 'success',
-            label: `${i18n.$t('success')}`
+            label: `${i18n.$t('Success')}`
           },
           {
             value: 'failed',
-            label: `${i18n.$t('failed')}`
+            label: `${i18n.$t('Failed')}`
           }
         ],
         // preTasks

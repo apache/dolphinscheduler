@@ -53,7 +53,7 @@
                 <el-button type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
