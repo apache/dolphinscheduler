@@ -73,11 +73,11 @@
       return {
         stateList: [
           {
-            label: `${this.$t('none')}`,
+            label: `${this.$t('None')}`,
             code: ''
           },
           {
-            label: `${this.$t('success')}`,
+            label: `${this.$t('Success')}`,
             code: '成功'
           },
           {
@@ -92,7 +92,7 @@
             label: `${this.$t('finish')}`,
             code: '完成'
           }, {
-            label: `${this.$t('failed')}`,
+            label: `${this.$t('Failed')}`,
             code: '失败'
           }
         ],

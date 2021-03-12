@@ -27,9 +27,9 @@
       </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
-          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
+          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('Success')"></em>
           <em class="iconfont el-icon-timer" :class="'icon-' + el.state" v-if="el.state === 'RUNNING_EXECUTION'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
-          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILURE'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
+          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILURE'" data-toggle="tooltip" data-container="body" :title="$t('Failed')"></em>
         </span>
       </template>
       <span class="operation">
