@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
@@ -55,7 +56,7 @@ public class ZookeeperOperator implements InitializingBean {
     protected CuratorFramework zkClient;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         this.zkClient = buildClient();
         initStateListener();
         treeCacheStart();
@@ -72,11 +73,11 @@ public class ZookeeperOperator implements InitializingBean {
         checkNotNull(zkClient);
 
         zkClient.getConnectionStateListenable().addListener((client, newState) -> {
-            if(newState == ConnectionState.LOST){
+            if (newState == ConnectionState.LOST) {
                 logger.error("connection lost from zookeeper");
-            } else if(newState == ConnectionState.RECONNECTED){
+            } else if (newState == ConnectionState.RECONNECTED) {
                 logger.info("reconnected to zookeeper");
-            } else if(newState == ConnectionState.SUSPENDED){
+            } else if (newState == ConnectionState.SUSPENDED) {
                 logger.warn("connection SUSPENDED to zookeeper");
             }
         });
@@ -142,8 +143,8 @@ public class ZookeeperOperator implements InitializingBean {
         }
     }
 
-    public boolean hasChildren(final String key){
-        Stat stat ;
+    public boolean hasChildren(final String key) {
+        Stat stat;
         try {
             stat = zkClient.checkExists().forPath(key);
             return stat.getNumChildren() >= 1;
