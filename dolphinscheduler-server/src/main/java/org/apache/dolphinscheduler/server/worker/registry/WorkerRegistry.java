@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
@@ -44,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
-
 
 /**
  * worker registry
@@ -113,6 +113,7 @@ public class WorkerRegistry {
                         zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
                     } else if (newState == ConnectionState.SUSPENDED) {
                         logger.warn("worker : {} connection SUSPENDED ", address);
+                        zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
                     }
                 });
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
@@ -140,6 +141,7 @@ public class WorkerRegistry {
             logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
         }
         this.heartBeatExecutor.shutdownNow();
+        logger.info("heartbeat executor shutdown");
     }
 
     /**
@@ -169,7 +171,7 @@ public class WorkerRegistry {
      * get local address
      * @return local address
      */
-    private String getLocalAddress(){
+    private String getLocalAddress() {
         return OSUtils.getAddr(workerConfig.getListenPort());
     }
 

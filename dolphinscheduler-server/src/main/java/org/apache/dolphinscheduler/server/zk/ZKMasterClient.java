@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.zk;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -37,16 +35,18 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * zookeeper master client
@@ -81,7 +81,7 @@ public class ZKMasterClient extends AbstractZKClient {
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
 
-            //  Master registry
+            // master registry
             masterRegistry.registry();
             masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
             String registPath = this.masterRegistry.getMasterPath();
@@ -108,8 +108,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
     @Override
     public void close() {
-        super.close();
         masterRegistry.unRegistry();
+        super.close();
     }
 
     /**

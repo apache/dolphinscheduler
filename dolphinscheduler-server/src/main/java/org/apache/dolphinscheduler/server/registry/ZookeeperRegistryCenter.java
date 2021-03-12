@@ -227,18 +227,14 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      * @throws Exception errors
      */
     protected boolean checkIsDeadServer(String zNode, String serverType) throws Exception {
-        //ip_sequenceno
+        // ip_sequence_no
         String[] zNodesPath = zNode.split("\\/");
         String ipSeqNo = zNodesPath[zNodesPath.length - 1];
 
         String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
         String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
 
-        if (!registerOperator.isExisted(zNode) || registerOperator.isExisted(deadServerPath)) {
-            return true;
-        }
-
-        return false;
+        return !registerOperator.isExisted(zNode) || registerOperator.isExisted(deadServerPath);
     }
 
     public RegisterOperator getRegisterOperator() {
