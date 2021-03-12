@@ -45,7 +45,7 @@
                data-container="body"
                :class="_isDetails"
                @click="!isDetails && _deleteDep($index)"
-               :title="$t('delete')" >
+               :title="$t('Delete')" >
             </em>
             <m-node-status
               :dependTaskList='dependTaskList'
