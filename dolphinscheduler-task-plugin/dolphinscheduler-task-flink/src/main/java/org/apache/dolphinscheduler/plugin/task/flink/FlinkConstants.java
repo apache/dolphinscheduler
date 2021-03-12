@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.flink;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,5 +15,25 @@ package org.apache.dolphinscheduler.plugin.task.flink;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.flink;
+
 public class FlinkConstants {
+
+    /**
+     * flink
+     */
+    public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
+    public static final String FLINK_RUN_MODE = "-m";
+    public static final String FLINK_YARN_SLOT = "-ys";
+    public static final String FLINK_APP_NAME = "-ynm";
+    public static final String FLINK_QUEUE = "-yqu";
+    public static final String FLINK_TASK_MANAGE = "-yn";
+
+    public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
+    public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
+    public static final String FLINK_MAIN_CLASS = "-c";
+    public static final String FLINK_PARALLELISM = "-p";
+    public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
+
+
 }

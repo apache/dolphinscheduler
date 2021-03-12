@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-
-
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;

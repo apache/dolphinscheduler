@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-
-
+import org.apache.dolphinscheduler.plugin.task.api.ArgsUtils;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -34,6 +33,7 @@ public class FlinkArgsUtils {
 
     /**
      * build args
+     *
      * @param param flink parameters
      * @return argument list
      */
@@ -47,19 +47,19 @@ public class FlinkArgsUtils {
         }
         String others = param.getOthers();
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
-            args.add(Constants.FLINK_RUN_MODE);  //-m
+            args.add(FlinkConstants.FLINK_RUN_MODE);  //-m
 
-            args.add(Constants.FLINK_YARN_CLUSTER);   //yarn-cluster
+            args.add(FlinkConstants.FLINK_YARN_CLUSTER);   //yarn-cluster
 
             int slot = param.getSlot();
             if (slot > 0) {
-                args.add(Constants.FLINK_YARN_SLOT);
+                args.add(FlinkConstants.FLINK_YARN_SLOT);
                 args.add(String.format("%d", slot));   //-ys
             }
 
             String appName = param.getAppName();
             if (StringUtils.isNotEmpty(appName)) { //-ynm
-                args.add(Constants.FLINK_APP_NAME);
+                args.add(FlinkConstants.FLINK_APP_NAME);
                 args.add(ArgsUtils.escape(appName));
             }
 
@@ -68,26 +68,26 @@ public class FlinkArgsUtils {
             if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
                 int taskManager = param.getTaskManager();
                 if (taskManager > 0) {                        //-yn
-                    args.add(Constants.FLINK_TASK_MANAGE);
+                    args.add(FlinkConstants.FLINK_TASK_MANAGE);
                     args.add(String.format("%d", taskManager));
                 }
             }
             String jobManagerMemory = param.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
-                args.add(Constants.FLINK_JOB_MANAGE_MEM);
+                args.add(FlinkConstants.FLINK_JOB_MANAGE_MEM);
                 args.add(jobManagerMemory); //-yjm
             }
 
             String taskManagerMemory = param.getTaskManagerMemory();
             if (StringUtils.isNotEmpty(taskManagerMemory)) { // -ytm
-                args.add(Constants.FLINK_TASK_MANAGE_MEM);
+                args.add(FlinkConstants.FLINK_TASK_MANAGE_MEM);
                 args.add(taskManagerMemory);
             }
 
-            if (StringUtils.isEmpty(others) || !others.contains(Constants.FLINK_QUEUE)) {
+            if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
                 String queue = param.getQueue();
                 if (StringUtils.isNotEmpty(queue)) { // -yqu
-                    args.add(Constants.FLINK_QUEUE);
+                    args.add(FlinkConstants.FLINK_QUEUE);
                     args.add(queue);
                 }
             }
@@ -95,13 +95,13 @@ public class FlinkArgsUtils {
 
         int parallelism = param.getParallelism();
         if (parallelism > 0) {
-            args.add(Constants.FLINK_PARALLELISM);
+            args.add(FlinkConstants.FLINK_PARALLELISM);
             args.add(String.format("%d", parallelism));   // -p
         }
 
         // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated abruptly
         // The task status will be synchronized with the cluster job status
-        args.add(Constants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
+        args.add(FlinkConstants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
 
         // -s -yqu -yat -yD -D
         if (StringUtils.isNotEmpty(others)) {
@@ -111,7 +111,7 @@ public class FlinkArgsUtils {
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
         if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
-            args.add(Constants.FLINK_MAIN_CLASS);    //-c
+            args.add(FlinkConstants.FLINK_MAIN_CLASS);    //-c
             args.add(param.getMainClass());          //main class
         }
 

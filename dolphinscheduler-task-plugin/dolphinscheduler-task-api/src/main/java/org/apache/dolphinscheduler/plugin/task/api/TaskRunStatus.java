@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,11 +15,13 @@ package org.apache.dolphinscheduler.plugin.task.api;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.api;
+
 public enum TaskRunStatus {
 
-    SUCCESS(1,"SUCCESS"),
-    FAIL_AND_NEED_KILL(2,"FAIL_AND_NEED_KILL"),
-    FAIL(3,"FAIL");
+    SUCCESS,
+    FAIL_AND_NEED_KILL,
+    FAIL;
 
 
 

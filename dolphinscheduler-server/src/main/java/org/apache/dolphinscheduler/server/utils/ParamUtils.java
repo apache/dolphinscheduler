@@ -43,11 +43,11 @@ public class ParamUtils {
      * @param scheduleTime      schedule time
      * @return global params
      */
-    public static Map<String,Property> convert(Map<String,Property> globalParams,
-                                                           Map<String,String> globalParamsMap,
-                                                           Map<String,Property> localParams,
-                                                           CommandType commandType,
-                                                           Date scheduleTime){
+    public static Map<String, Property> convert(Map<String, Property> globalParams,
+                                                Map<String,String> globalParamsMap,
+                                                Map<String, Property> localParams,
+                                                CommandType commandType,
+                                                Date scheduleTime){
         if (globalParams == null
                 && localParams == null){
             return null;
@@ -94,7 +94,7 @@ public class ParamUtils {
      * @param paramsMap params map
      * @return Map of converted
      */
-    public static Map<String,String> convert(Map<String,Property> paramsMap){
+    public static Map<String,String> convert(Map<String, Property> paramsMap){
         if(paramsMap == null){
             return null;
         }
@@ -114,9 +114,9 @@ public class ParamUtils {
      * @param definedParams definedParams
      * @return parameters map
      */
-    public static Map<String,Property> getUserDefParamsMap(Map<String,String> definedParams) {
+    public static Map<String, Property> getUserDefParamsMap(Map<String,String> definedParams) {
         if (definedParams != null) {
-            Map<String,Property> userDefParamsMaps = new HashMap<>();
+            Map<String, Property> userDefParamsMaps = new HashMap<>();
             Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
             while (iter.hasNext()){
                 Map.Entry<String, String> en = iter.next();

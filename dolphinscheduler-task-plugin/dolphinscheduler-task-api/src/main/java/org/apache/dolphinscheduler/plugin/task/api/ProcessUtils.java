@@ -17,18 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -305,7 +301,7 @@ public class ProcessUtils {
 
             // find log and kill yarn job
             // 后置该流程
-          //  killYarnJob(request);
+            //  killYarnJob(request);
 
         } catch (Exception e) {
             logger.error("kill task failed", e);
@@ -342,7 +338,7 @@ public class ProcessUtils {
         return sb.toString().trim();
     }
 
-   /* *//**
+    /* *//**
      * find logs and kill yarn tasks.
      * 判断是否是yarn todo
      * @param request request

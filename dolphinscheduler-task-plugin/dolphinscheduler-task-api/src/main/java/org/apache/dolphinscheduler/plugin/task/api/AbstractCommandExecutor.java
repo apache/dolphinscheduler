@@ -19,10 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.SH;
 
-import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -159,7 +157,7 @@ public abstract class AbstractCommandExecutor {
         // parse process output
         parseProcessOutput(process);
 
-        Integer processId = getProcessId(process);
+        int processId = getProcessId(process);
 
         result.setProcessId(processId);
 

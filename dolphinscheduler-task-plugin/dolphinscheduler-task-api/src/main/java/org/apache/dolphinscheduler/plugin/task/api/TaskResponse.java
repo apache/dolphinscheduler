@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-
 public class TaskResponse {
 
     /**

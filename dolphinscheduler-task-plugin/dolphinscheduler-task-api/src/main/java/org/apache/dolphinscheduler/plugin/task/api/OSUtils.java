@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,7 +15,7 @@ package org.apache.dolphinscheduler.plugin.task.api;/*
  * limitations under the License.
  */
 
-import static org.xerial.snappy.OSInfo.getOSName;
+package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -24,8 +24,11 @@ import java.util.StringTokenizer;
 
 public class OSUtils {
 
+
+
     /**
-     *  get sudo command
+     * get sudo command
+     *
      * @param tenantCode tenantCode
      * @param command command
      * @return result of sudo execute command
@@ -67,6 +70,7 @@ public class OSUtils {
         }
         return exeShell(cmdArray);
     }
+
     /**
      * Execute the shell
      *
@@ -78,4 +82,7 @@ public class OSUtils {
         return ShellExecutor.execCommand(command);
     }
 
+    public static String getOSName(){
+       return System.getProperty("os.name");
+    }
 }

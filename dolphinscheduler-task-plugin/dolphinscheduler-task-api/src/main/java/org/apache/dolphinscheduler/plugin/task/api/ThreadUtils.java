@@ -209,8 +209,8 @@ public class ThreadUtils {
         sb.append(indent).append("  Blocked count: ").append(info.getBlockedCount()).append("\n");
         sb.append(indent).append("  Waited count: ").append(info.getWaitedCount()).append("\n");
         if (contention) {
-            sb.append(indent).append("  Blocked time: " + info.getBlockedTime()).append("\n");
-            sb.append(indent).append("  Waited time: " + info.getWaitedTime()).append("\n");
+            sb.append(indent).append("  Blocked time: ").append(info.getBlockedTime()).append("\n");
+            sb.append(indent).append("  Waited time: ").append(info.getWaitedTime()).append("\n");
         }
         if (state == Thread.State.WAITING) {
             sb.append(indent).append("  Waiting on ").append(info.getLockName()).append("\n");

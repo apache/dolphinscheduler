@@ -22,7 +22,7 @@ public interface TaskChannel {
 
     void cancelApplication(boolean status);
 
-    Class<? extends AbstractTask> createTask(TaskRequest taskRequest,Logger logger);
+    AbstractTask createTask(TaskRequest taskRequest,Logger logger);
 
 
 }

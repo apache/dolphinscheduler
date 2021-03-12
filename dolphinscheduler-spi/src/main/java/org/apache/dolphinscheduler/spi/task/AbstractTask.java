@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.spi.task;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -96,7 +97,7 @@ public abstract class AbstractTask {
         return null;
     }
 
-    public void buildCommand(String script) throws Exception {
+    public void setCommand(String command) throws Exception {
 
     }
 

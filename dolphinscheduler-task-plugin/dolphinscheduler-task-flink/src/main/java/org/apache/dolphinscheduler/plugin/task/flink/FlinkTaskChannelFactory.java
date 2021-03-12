@@ -14,22 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.task.api;
 
-/**
- * data types in user define parameter
- */
-public enum DataType {
-    /**
-     * 0 string
-     * 1 integer
-     * 2 long
-     * 3 float
-     * 4 double
-     * 5 date, "YYYY-MM-DD"
-     * 6 time, "HH:MM:SS"
-     * 7 time stamp
-     * 8 Boolean
-     */
-    VARCHAR,INTEGER,LONG,FLOAT,DOUBLE,DATE,TIME,TIMESTAMP,BOOLEAN
+package org.apache.dolphinscheduler.plugin.task.flink;
+
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
+
+import java.util.List;
+
+public class FlinkTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public TaskChannel create() {
+        return new FlinkTaskChannel();
+    }
+
+    @Override
+    public String getName() {
+        return "Flink";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return null;
+    }
 }

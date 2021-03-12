@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.flink;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,33 +15,35 @@ package org.apache.dolphinscheduler.plugin.task.flink;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.flink;
+
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 
-public class FlinkTask  extends AbstractYarnTask {
+public class FlinkTask extends AbstractYarnTask {
 
 
     /**
-     *  flink command
-     *  usage: flink run [OPTIONS] <jar-file> <arguments>
+     * flink command
+     * usage: flink run [OPTIONS] <jar-file> <arguments>
      */
     private static final String FLINK_COMMAND = "flink";
     private static final String FLINK_RUN = "run";
 
     /**
-     *  flink parameters
+     * flink parameters
      */
     private FlinkParameters flinkParameters;
+
+    private String command;
 
 
     private TaskRequest taskRequest;
@@ -53,12 +55,23 @@ public class FlinkTask  extends AbstractYarnTask {
 
     @Override
     public String getPreScript() throws Exception {
-        return super.getPreScript();
+
+        // flink run [OPTIONS] <jar-file> <arguments>
+        List<String> args = new ArrayList<>();
+
+        args.add(FLINK_COMMAND);
+        args.add(FLINK_RUN);
+        logger.info("flink task args : {}", args);
+        // other parameters
+        args.addAll(FlinkArgsUtils.buildArgs(flinkParameters));
+        return String.join(" ", args);
+
     }
 
     @Override
-    public void buildCommand(String script) throws Exception {
-        super.buildCommand(script);
+    public void setCommand(String command) {
+        this.command = command;
+
     }
 
     @Override
@@ -71,50 +84,15 @@ public class FlinkTask  extends AbstractYarnTask {
         if (!flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-        flinkParameters.setQueue(taskRequest.getQueue());
-        setMainJarName();
-
-
-        if (StringUtils.isNotEmpty(flinkParameters.getMainArgs())) {
-            String args = flinkParameters.getMainArgs();
-
-
-            // replace placeholder
-            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                    taskExecutionContext.getDefinedParams(),
-                    flinkParameters.getLocalParametersMap(),
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    taskExecutionContext.getScheduleTime());
-
-            logger.info("param Map : {}", paramsMap);
-            if (paramsMap != null ){
-
-                args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
-                logger.info("param args : {}", args);
-            }
-            flinkParameters.setMainArgs(args);
-        }
     }
 
     /**
      * create command
+     *
      * @return command
      */
     @Override
-    protected String buildCommand() {
-        // flink run [OPTIONS] <jar-file> <arguments>
-        List<String> args = new ArrayList<>();
-
-        args.add(FLINK_COMMAND);
-        args.add(FLINK_RUN);
-        logger.info("flink task args : {}", args);
-        // other parameters
-        args.addAll(FlinkArgsUtils.buildArgs(flinkParameters));
-
-        String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
-
-        logger.info("flink task command : {}", command);
+    protected String getCommand() {
 
         return command;
     }

@@ -1109,5 +1109,7 @@
         <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-task-flink</module>
+        <module>dolphinscheduler-task-python</module>
+        <module>dolphinscheduler-task-spark</module>
     </modules>
 </project>

@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.task.api;
 
+package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
@@ -39,15 +39,16 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     /**
      * For Unix-like, using sh
      */
-    public static final String SH = "sh";
+    private static final String SH = "sh";
 
     /**
      * For Windows, using cmd.exe
      */
-    public static final String CMD = "cmd.exe";
+    private static final String CMD = "cmd.exe";
 
     /**
      * constructor
+     *
      * @param logHandler logHandler
      * @param taskRequest taskRequest
      * @param logger logger
@@ -55,7 +56,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
                                 TaskRequest taskRequest,
                                 Logger logger) {
-        super(logHandler,taskRequest,logger);
+        super(logHandler, taskRequest, logger);
     }
 
     public ShellCommandExecutor(List<String> logBuffer) {
@@ -73,6 +74,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * get command type
+     *
      * @return command type
      */
     @Override
@@ -83,9 +85,10 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * create command file if not exists
-     * @param execCommand   exec command
-     * @param commandFile   command file
-     * @throws IOException  io exception
+     *
+     * @param execCommand exec command
+     * @param commandFile command file
+     * @throws IOException io exception
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {

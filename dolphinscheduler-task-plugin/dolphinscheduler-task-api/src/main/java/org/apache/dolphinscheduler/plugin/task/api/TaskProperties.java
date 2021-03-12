@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,6 +15,7 @@ package org.apache.dolphinscheduler.plugin.task.api;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +30,6 @@ public class TaskProperties {
      * logger
      */
     private static final Logger logger = LoggerFactory.getLogger(TaskProperties.class);
-
-
 
 
     //  初始化 todo

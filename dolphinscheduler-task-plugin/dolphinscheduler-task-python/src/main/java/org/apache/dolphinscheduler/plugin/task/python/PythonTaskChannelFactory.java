@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.plugin.task.python;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.task.api;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.task.TaskChannel;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
-/**
- *  if the process closes, a signal is placed as true, and all threads get this flag to stop working
- */
-public class Stopper {
+import java.util.List;
 
-	private static AtomicBoolean signal = new AtomicBoolean(false);
-	
-	public static final boolean isStopped(){
-		return signal.get();
-	}
-	
-	public static final boolean isRunning(){
-		return !signal.get();
-	}
-	
-	public static final void stop(){
-		signal.set(true);
-	}
+public class PythonTaskChannelFactory implements TaskChannelFactory {
+    @Override
+    public TaskChannel create() {
+        return new PythonTaskChannel();
+    }
+
+    @Override
+    public String getName() {
+        return "Python";
+    }
+
+    @Override
+    public List<PluginParams> getParams() {
+        return null;
+    }
 }

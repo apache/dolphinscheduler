@@ -17,17 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-
+import org.apache.dolphinscheduler.plugin.task.api.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
 import org.apache.dolphinscheduler.spi.task.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.OSUtils;
-import org.apache.dolphinscheduler.plugin.task.api.ParameterUtils;
 import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
-import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.io.File;
@@ -65,7 +63,7 @@ public class ShellTask extends AbstractTask {
      */
     private TaskRequest taskRequest;
 
-    private String script;
+    private String command;
 
     /**
      * constructor
@@ -98,7 +96,7 @@ public class ShellTask extends AbstractTask {
     public void handle() throws Exception {
         try {
             // construct process
-            TaskResponse response = shellCommandExecutor.run(script);
+            TaskResponse response = shellCommandExecutor.run(command);
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
             setProcessId(response.getProcessId());
@@ -117,7 +115,7 @@ public class ShellTask extends AbstractTask {
     }
 
     @Override
-    public String getPreScript(){
+    public String getPreScript() {
         return shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
     }
 
@@ -128,7 +126,7 @@ public class ShellTask extends AbstractTask {
      * @throws Exception exception
      */
     @Override
-    public void buildCommand(String script) throws Exception {
+    public void setCommand(String command) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskRequest.getExecutePath(),
@@ -137,10 +135,11 @@ public class ShellTask extends AbstractTask {
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
-            this.script = fileName;
+            this.command = fileName;
+            return;
         }
-        script = parseScript(script);
-        shellParameters.setRawScript(script);
+        this.command = command;
+        shellParameters.setRawScript(command);
 
         logger.info("raw script : {}", shellParameters.getRawScript());
         logger.info("task execute path : {}", taskRequest.getExecutePath());
@@ -155,7 +154,7 @@ public class ShellTask extends AbstractTask {
         }
 
         Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-        this.script = fileName;
+        this.command = fileName;
     }
 
     @Override
@@ -163,10 +162,6 @@ public class ShellTask extends AbstractTask {
         return shellParameters;
     }
 
-    private String parseScript(String script) {
-
-        return ParameterUtils.convertParameterPlaceholders(script, null);
-    }
 
     public void setResult(String result) {
         Map<String, Property> localParams = shellParameters.getLocalParametersMap();
