@@ -116,6 +116,8 @@ public class MasterRegistry {
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getRegisterOperator().remove(localNodePath);
         logger.info("master node : {} unRegistry to ZK.", address);
+        heartBeatExecutor.shutdown();
+        logger.info("heartbeat executor shutdown");
     }
 
     /**
