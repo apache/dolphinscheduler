@@ -78,6 +78,11 @@ public class CascaderParam extends PluginParams {
             return this;
         }
 
+        public Builder setEmit(List<String> emit) {
+            this.emit = emit;
+            return this;
+        }
+
         public Builder setParamsOptionsList(List<CascaderParamsOptions> paramsOptionsList) {
             if (this.props == null) {
                 this.setProps(new CascaderParamsProps());

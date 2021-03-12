@@ -2080,12 +2080,12 @@ public class ProcessService {
     }
 
     public DqExecuteResult getDqExecuteResultByTaskInstanceId(int taskInstanceId) {
-        return dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq("task_instance_id",taskInstanceId));
+        return dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq(Constants.TASK_INSTANCE_ID,taskInstanceId));
     }
 
     public int updateDqExecuteResultUserId(int taskInstanceId) {
         DqExecuteResult dqExecuteResult =
-                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq("task_instance_id",taskInstanceId));
+                dqExecuteResultMapper.selectOne(new QueryWrapper<DqExecuteResult>().eq(Constants.TASK_INSTANCE_ID,taskInstanceId));
         if (dqExecuteResult == null) {
             return -1;
         }

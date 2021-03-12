@@ -64,6 +64,9 @@ public class PluginParams {
     @JsonProperty("validate")
     protected List<Validate> validateList;
 
+    @JsonProperty("emit")
+    protected List<String> emit;
+
     protected PluginParams(Builder builder) {
 
         requireNonNull(builder, MessageFormat.format(NULL_LOG,"builder"));
@@ -77,6 +80,7 @@ public class PluginParams {
         this.props = builder.props;
         this.value = builder.value;
         this.validateList = builder.validateList;
+        this.emit = builder.emit;
 
     }
 
@@ -94,6 +98,8 @@ public class PluginParams {
         protected Object value;
 
         protected List<Validate> validateList;
+
+        protected List<String> emit;
 
         public Builder(String field,
                        FormType type,
@@ -113,7 +119,8 @@ public class PluginParams {
                        @JsonProperty("title") String title,
                        @JsonProperty("props") Object props,
                        @JsonProperty("value") Object value,
-                       @JsonProperty("validate") List<Validate> validateList
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("emit") List<String> emit
         ) {
             requireNonNull(field, "field is null");
             requireNonNull(type, "type is null");
@@ -124,6 +131,7 @@ public class PluginParams {
             this.props = props;
             this.value = value;
             this.validateList = validateList;
+            this.emit = emit;
         }
 
         public PluginParams build() {
@@ -154,6 +162,10 @@ public class PluginParams {
 
     public List<Validate> getValidateList() {
         return validateList;
+    }
+
+    public List<String> getEmit() {
+        return emit;
     }
 }
 

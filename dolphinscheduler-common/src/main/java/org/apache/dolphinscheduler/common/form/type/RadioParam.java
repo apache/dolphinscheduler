@@ -81,6 +81,11 @@ public class RadioParam extends PluginParams {
             return this;
         }
 
+        public Builder setEmit(List<String> emit) {
+            this.emit = emit;
+            return this;
+        }
+
         public Builder setParamsOptionsList(List<ParamsOptions> paramsOptionsList) {
             this.paramsOptionsList = paramsOptionsList;
             return this;

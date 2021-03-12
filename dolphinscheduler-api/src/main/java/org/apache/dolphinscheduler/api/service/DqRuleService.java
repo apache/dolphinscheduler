@@ -28,19 +28,6 @@ public interface DqRuleService {
 
     Map<String, Object> getRuleFormCreateJsonById(int id);
 
-    Map<String, Object> createRule(User loginUser,
-                                   String name,
-                                   int type,
-                                   String ruleJson);
-
-    Map<String, Object> updateRule(User loginUser,
-                                   int ruleId,
-                                   String name,
-                                   int type,
-                                   String ruleJson);
-
-    Map<String, Object> deleteById(User loginUser, int id);
-
     Map<String, Object> queryDqsRuleListPage(User loginUser,
                                              String searchVal,
                                              Integer pageNo,
@@ -54,4 +41,6 @@ public interface DqRuleService {
                                             String startTime,
                                             String endTime,
                                             Integer pageNo, Integer pageSize);
+
+    Map<String,Object> getDatasourceOptionsById(int datasourceId);
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_OPTIONS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_RULE_FORM_CREATE_JSON_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_ERROR;
@@ -176,5 +177,22 @@ public class DataQualityController extends BaseController {
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = dqExecuteResultService.queryResultListPaging(loginUser, searchVal, state, ruleType, startTime, endTime, pageNo, pageSize);
         return returnDataListPaging(result);
+    }
+
+    /**
+     * get datasource options by id
+     * @param datasourceId datasourceId
+     * @return result
+     */
+    @ApiOperation(value = "getDatasourceOptionsById", notes = "GET_DATASOURCE_OPTIONS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "datasourceId", value = "DATA_SOURCE_ID", dataType = "Int", example = "1")
+    })
+    @GetMapping(value = "/getDatasourceOptionsById")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(GET_DATASOURCE_OPTIONS_ERROR)
+    public Result getDatasourceOptionsById(@RequestParam(value = "datasourceId") int datasourceId) {
+        Map<String, Object> result = dqRuleService.getDatasourceOptionsById(datasourceId);
+        return returnDataList(result);
     }
 }

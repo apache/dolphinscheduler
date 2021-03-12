@@ -295,7 +295,9 @@ public enum Status {
     GET_RULE_FORM_CREATE_JSON_ERROR(120001, "get rule form create json error", "获取规则 FROM-CREATE-JSON 错误"),
     QUERY_RULE_LIST_PAGING_ERROR(120002, "query rule list paging error", "获取规则分页列表错误"),
     QUERY_RULE_LIST_ERROR(120003, "query rule list error", "获取规则列表错误"),
-    QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(120004, "query execute result list paging error", "获取数据质量任务结果分页错误")
+    QUERY_RULE_INPUT_ENTRY_LIST_ERROR(120004, "query rule list error", "获取规则列表错误"),
+    QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(120005, "query execute result list paging error", "获取数据质量任务结果分页错误"),
+    GET_DATASOURCE_OPTIONS_ERROR(120006, "get datasource options error", "获取数据源Options错误")
     ;
 
     private final int code;

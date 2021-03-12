@@ -97,6 +97,11 @@ public class DqRuleInputEntry {
     @TableField(value = "can_edit")
     private Boolean canEdit;
     /**
+     * is emit event
+     */
+    @TableField(value = "is_emit")
+    private Boolean isEmit;
+    /**
      * values map
      */
     @TableField(exist = false)
@@ -210,6 +215,14 @@ public class DqRuleInputEntry {
         this.canEdit = canEdit;
     }
 
+    public Boolean getEmit() {
+        return isEmit;
+    }
+
+    public void setEmit(Boolean emit) {
+        isEmit = emit;
+    }
+
     public String getValuesMap() {
         return valuesMap;
     }
@@ -236,22 +249,23 @@ public class DqRuleInputEntry {
 
     @Override
     public String toString() {
-        return "DqRuleInputEntry{"
-                + "id=" + id
-                + ", field='" + field + '\''
-                + ", type=" + type
-                + ", title='" + title + '\''
-                + ", value='" + value + '\''
-                + ", options='" + options + '\''
-                + ", placeholder='" + placeholder + '\''
-                + ", optionSourceType=" + optionSourceType
-                + ", valueType=" + valueType
-                + ", inputType=" + inputType
-                + ", isShow=" + isShow
-                + ", canEdit=" + canEdit
-                + ", valuesMap='" + valuesMap + '\''
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
+        return "DqRuleInputEntry{" +
+                "id=" + id +
+                ", field='" + field + '\'' +
+                ", type=" + type +
+                ", title='" + title + '\'' +
+                ", value='" + value + '\'' +
+                ", options='" + options + '\'' +
+                ", placeholder='" + placeholder + '\'' +
+                ", optionSourceType=" + optionSourceType +
+                ", valueType=" + valueType +
+                ", inputType=" + inputType +
+                ", isShow=" + isShow +
+                ", canEdit=" + canEdit +
+                ", isEmit=" + isEmit +
+                ", valuesMap='" + valuesMap + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

@@ -86,6 +86,11 @@ public class SelectParam extends PluginParams {
             return this;
         }
 
+        public Builder setEmit(List<String> emit) {
+            this.emit = emit;
+            return this;
+        }
+
         public Builder addParamsOptions(ParamsOptions paramsOptions) {
             if (this.paramsOptionsList == null) {
                 this.paramsOptionsList = new ArrayList<>();

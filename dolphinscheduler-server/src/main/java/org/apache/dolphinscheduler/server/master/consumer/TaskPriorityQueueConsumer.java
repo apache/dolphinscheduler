@@ -18,11 +18,13 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.dq.ConnectorType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -377,7 +379,9 @@ public class TaskPriorityQueueConsumer extends Thread {
         if (StringUtils.isNotEmpty(config.get(Constants.SRC_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.SRC_DATASOURCE_ID)));
             if (dataSource != null) {
-                dataQualityTaskExecutionContext.setSourceConnectorType(config.get(Constants.SRC_CONNECTOR_TYPE));
+                ConnectorType srcConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
                 dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
                 dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
             }
@@ -386,7 +390,9 @@ public class TaskPriorityQueueConsumer extends Thread {
         if (StringUtils.isNotEmpty(config.get(Constants.TARGET_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.TARGET_DATASOURCE_ID)));
             if (dataSource != null) {
-                dataQualityTaskExecutionContext.setTargetConnectorType(config.get(Constants.TARGET_CONNECTOR_TYPE));
+                ConnectorType targetConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.TARGET_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setTargetConnectorType(targetConnectorType.getDescription());
                 dataQualityTaskExecutionContext.setTargetType(dataSource.getType().getCode());
                 dataQualityTaskExecutionContext.setTargetConnectionParams(dataSource.getConnectionParams());
             }
@@ -395,10 +401,12 @@ public class TaskPriorityQueueConsumer extends Thread {
         if (StringUtils.isNotEmpty(config.get(Constants.WRITER_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.WRITER_DATASOURCE_ID)));
             if (dataSource != null) {
-                dataQualityTaskExecutionContext.setWriterConnectorType(config.get(Constants.WRITER_CONNECTOR_TYPE));
+                ConnectorType writerConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.WRITER_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setWriterConnectorType(writerConnectorType.getDescription());
                 dataQualityTaskExecutionContext.setWriterType(dataSource.getType().getCode());
                 dataQualityTaskExecutionContext.setWriterConnectionParams(dataSource.getConnectionParams());
-                dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_result");
+                dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
             }
         }
     }

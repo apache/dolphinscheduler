@@ -73,6 +73,11 @@ public class InputParam extends PluginParams {
             return this;
         }
 
+        public Builder setEmit(List<String> emit) {
+            this.emit = emit;
+            return this;
+        }
+
         public Builder setPlaceholder(String placeholder) {
             if (this.props == null) {
                 this.setProps(new InputParamsProps());

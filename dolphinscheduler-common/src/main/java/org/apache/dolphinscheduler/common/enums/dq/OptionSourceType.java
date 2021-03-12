@@ -32,7 +32,8 @@ public enum OptionSourceType {
      * 1-datasource
      */
     DEFAULT(0,"default"),
-    DATASOURCE(1,"datasource");
+    DATASOURCE_ID(1,"datasource_id"),
+    DATASOURCE_TYPE(2,"datasource_type");
 
     OptionSourceType(int code, String description) {
         this.code = code;

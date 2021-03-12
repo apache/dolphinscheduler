@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
 import org.apache.dolphinscheduler.common.enums.dq.PropsType;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 import org.apache.dolphinscheduler.common.form.CascaderParamsOptions;
 import org.apache.dolphinscheduler.common.form.ParamsOptions;
 import org.apache.dolphinscheduler.common.form.PluginParams;
@@ -54,11 +53,11 @@ import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,81 +100,10 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryMapper.getRuleInputEntryList(id);
 
         if (ruleInputEntryList == null || ruleInputEntryList.isEmpty()) {
-            putMsg(result, Status.EDIT_RESOURCE_FILE_ON_LINE_ERROR);
+            putMsg(result, Status.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
         } else {
             result.put(Constants.DATA_LIST, getRuleFormCreateJson(ruleInputEntryList));
             putMsg(result, Status.SUCCESS);
-        }
-
-        return result;
-    }
-
-    @Override
-    public  Map<String, Object> createRule(User loginUser,
-                                           String name,
-                                           int type,
-                                           String ruleJson) {
-        Map<String, Object> result = new HashMap<>(5);
-
-        DqRule entity = new DqRule();
-        entity.setName(name);
-        entity.setType(RuleType.of(type));
-        entity.setUserId(loginUser.getId());
-        entity.setCreateTime(new Date());
-        entity.setUpdateTime(new Date());
-
-        int insert = dqRuleMapper.insert(entity);
-
-        if (insert > 0) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
-        }
-
-        return result;
-    }
-
-    @Override
-    public  Map<String, Object> updateRule(User loginUser,
-                                           int ruleId,
-                                           String name,
-                                           int type,
-                                           String ruleJson) {
-        Map<String, Object> result = new HashMap<>(5);
-
-        //判断是否有权限进行更新，没有的话直接返回权限不足
-
-        DqRule entity = dqRuleMapper.selectById(ruleId);
-        if (entity == null) {
-            //直接返回报错信息
-            return null;
-        }
-
-        entity.setName(name);
-        entity.setType(RuleType.of(type));
-        entity.setUserId(loginUser.getId());
-        entity.setUpdateTime(new Date());
-
-        int update = dqRuleMapper.updateById(entity);
-
-        if (update > 0) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
-        }
-
-        return result;
-    }
-
-    @Override
-    public  Map<String, Object> deleteById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>(5);
-        int delete = dqRuleMapper.deleteById(id);
-
-        if (delete > 0) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
 
         return result;
@@ -187,7 +115,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
 
         Page<DqRule> page = new Page<>(pageNo, pageSize);
         IPage<DqRule> rulePage =
-                dqRuleMapper.selectPage(page,new QueryWrapper<DqRule>().like(StringUtils.isNotEmpty(searchVal),"name",searchVal));
+                dqRuleMapper.selectPage(page,new QueryWrapper<DqRule>().like(StringUtils.isNotEmpty(searchVal),Constants.NAME,searchVal));
 
         PageInfo<DqRule> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) rulePage.getTotal());
@@ -206,6 +134,28 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 dqRuleMapper.selectList(new QueryWrapper<DqRule>());
 
         result.put(Constants.DATA_LIST, ruleList);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getDatasourceOptionsById(int datasourceId) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<DataSource> dataSourceList = dataSourceMapper.listAllDataSourceByType(datasourceId);
+        List<ParamsOptions> options = null;
+        if (CollectionUtils.isNotEmpty(dataSourceList)) {
+            options = new ArrayList<>();
+
+            for (DataSource dataSource: dataSourceList) {
+                ParamsOptions childrenOption =
+                        new ParamsOptions(dataSource.getName(),dataSource.getId(),false);
+                options.add(childrenOption);
+            }
+        }
+
+        result.put(Constants.DATA_LIST, options);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -252,16 +202,13 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                         end);
 
         List<DqRule> dataList = dqRulePage.getRecords();
-        dataList.forEach(new Consumer<DqRule>() {
-            @Override
-            public void accept(DqRule dqRule) {
-                List<DqRuleInputEntry> ruleInputEntryList =
-                        DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(dqRule.getId()));
-                List<DqRuleExecuteSql> ruleExecuteSqlList = dqRuleExecuteSqlMapper.getExecuteSqlList(dqRule.getId());
+        dataList.forEach(dqRule -> {
+            List<DqRuleInputEntry> ruleInputEntryList =
+                    DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(dqRule.getId()));
+            List<DqRuleExecuteSql> ruleExecuteSqlList = dqRuleExecuteSqlMapper.getExecuteSqlList(dqRule.getId());
 
-                RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList,ruleExecuteSqlList);
-                dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
-            }
+            RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList,ruleExecuteSqlList);
+            dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
         });
 
         pageInfo.setTotalCount((int) dqRulePage.getTotal());
@@ -278,108 +225,19 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
             if (inputEntry.getShow()) {
                 switch (inputEntry.getType()) {
                     case INPUT:
-                        InputParam inputParam = InputParam
-                                        .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                                        .addValidate(Validate.newBuilder()
-                                                             .setRequired(true)
-                                                             .build())
-                                        .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
-                                        .setValue(inputEntry.getValue())
-                                        .setPlaceholder(inputEntry.getPlaceholder())
-                                        .setSize("small")
-                                        .build();
-                        params.add(inputParam);
+                        params.add(getInputParam(inputEntry));
                         break;
                     case SELECT:
-                        List<ParamsOptions> options = null;
-
-                        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
-                            String optionStr = inputEntry.getOptions();
-                            if (StringUtils.isNotEmpty(optionStr)) {
-                                options = JSONUtils.toList(optionStr, ParamsOptions.class);
-                            }
-                        }
-
-                        SelectParam selectParam = SelectParam
-                                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                                .setParamsOptionsList(options)
-                                .setValue(inputEntry.getValue())
-                                .setSize("small")
-                                .build();
-                        params.add(selectParam);
+                        params.add(getSelectParam(inputEntry));
                         break;
                     case RADIO:
-                        List<ParamsOptions> radioOptions = null;
-
-                        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
-                            String optionStr = inputEntry.getOptions();
-                            if (StringUtils.isNotEmpty(optionStr)) {
-                                radioOptions = JSONUtils.toList(optionStr, ParamsOptions.class);
-                            }
-                        }
-
-                        RadioParam radioParam = RadioParam
-                                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                                .setParamsOptionsList(radioOptions)
-                                .setValue(inputEntry.getValue())
-                                .setSize("small")
-                                .build();
-                        params.add(radioParam);
-                        break;
-                    case SWITCH:
+                        params.add(getRadioParam(inputEntry));
                         break;
                     case CASCADER:
-                        List<CascaderParamsOptions> cascaderOptions = null;
-
-                        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
-                            String optionStr = inputEntry.getOptions();
-                            if (StringUtils.isNotEmpty(optionStr)) {
-                                cascaderOptions = JSONUtils.toList(optionStr, CascaderParamsOptions.class);
-                            }
-                        } else if (OptionSourceType.DATASOURCE == inputEntry.getOptionSourceType()) {
-                            cascaderOptions = new ArrayList<>();
-                            for (DbType dbtype: DbType.values()) {
-                                CascaderParamsOptions cascaderParamsOptions =
-                                        new CascaderParamsOptions(dbtype.getDescp(),dbtype.getCode(),false);
-                                List<CascaderParamsOptions> children = null;
-                                List<DataSource> dataSourceList = dataSourceMapper.listAllDataSourceByType(dbtype.getCode());
-                                if (CollectionUtils.isNotEmpty(dataSourceList)) {
-                                    children = new ArrayList<>();
-                                    for (DataSource dataSource: dataSourceList) {
-                                        CascaderParamsOptions childrenOption =
-                                                new CascaderParamsOptions(dataSource.getName(),dataSource.getId(),false);
-                                        children.add(childrenOption);
-                                    }
-                                    cascaderParamsOptions.setChildren(children);
-                                    cascaderOptions.add(cascaderParamsOptions);
-                                }
-
-                            }
-                        }
-
-                        CascaderParam cascaderParam = CascaderParam
-                                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                                .setParamsOptionsList(cascaderOptions)
-                                .setValue(Integer.valueOf(inputEntry.getValue()))
-                                .setSize("small")
-                                .build();
-                        params.add(cascaderParam);
+                        params.add(getCascaderParam(inputEntry));
                         break;
-
                     case TEXTAREA:
-                        InputParam textareaParam = InputParam
-                                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                                .addValidate(Validate.newBuilder()
-                                        .setRequired(true)
-                                        .build())
-                                .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
-                                .setValue(inputEntry.getValue())
-                                .setSize("small")
-                                .setType(PropsType.TEXTAREA)
-                                .setRows(1)
-                                .setPlaceholder(inputEntry.getPlaceholder())
-                                .build();
-                        params.add(textareaParam);
+                        params.add(getTextareaParam(inputEntry));
                         break;
                     default:
                         break;
@@ -399,5 +257,122 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
 
         return result;
     }
-    
+
+    private InputParam getTextareaParam(DqRuleInputEntry inputEntry) {
+        return InputParam
+                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
+                .setValue(inputEntry.getValue())
+                .setSize(Constants.SMALL)
+                .setType(PropsType.TEXTAREA)
+                .setRows(1)
+                .setPlaceholder(inputEntry.getPlaceholder())
+                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .build();
+    }
+
+    private CascaderParam getCascaderParam(DqRuleInputEntry inputEntry) {
+        List<CascaderParamsOptions> cascaderOptions = null;
+
+        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
+            String optionStr = inputEntry.getOptions();
+            if (StringUtils.isNotEmpty(optionStr)) {
+                cascaderOptions = JSONUtils.toList(optionStr, CascaderParamsOptions.class);
+            }
+        } else if (OptionSourceType.DATASOURCE_ID == inputEntry.getOptionSourceType()) {
+            cascaderOptions = new ArrayList<>();
+            for (DbType dbtype: DbType.values()) {
+                CascaderParamsOptions cascaderParamsOptions =
+                        new CascaderParamsOptions(dbtype.getDescp(),dbtype.getCode(),false);
+                List<CascaderParamsOptions> children = null;
+                List<DataSource> dataSourceList = dataSourceMapper.listAllDataSourceByType(dbtype.getCode());
+                if (CollectionUtils.isNotEmpty(dataSourceList)) {
+                    children = new ArrayList<>();
+                    for (DataSource dataSource: dataSourceList) {
+                        CascaderParamsOptions childrenOption =
+                                new CascaderParamsOptions(dataSource.getName(),dataSource.getId(),false);
+                        children.add(childrenOption);
+                    }
+                    cascaderParamsOptions.setChildren(children);
+                    cascaderOptions.add(cascaderParamsOptions);
+                }
+
+            }
+        }
+
+        return CascaderParam
+                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .setParamsOptionsList(cascaderOptions)
+                .setValue(Integer.valueOf(inputEntry.getValue()))
+                .setSize(Constants.SMALL)
+                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .build();
+    }
+
+    private RadioParam getRadioParam(DqRuleInputEntry inputEntry) {
+        List<ParamsOptions> radioOptions = null;
+
+        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
+            String optionStr = inputEntry.getOptions();
+            if (StringUtils.isNotEmpty(optionStr)) {
+                radioOptions = JSONUtils.toList(optionStr, ParamsOptions.class);
+            }
+        }
+
+        return RadioParam
+                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .setParamsOptionsList(radioOptions)
+                .setValue(inputEntry.getValue())
+                .setSize(Constants.SMALL)
+                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .build();
+    }
+
+    private SelectParam getSelectParam(DqRuleInputEntry inputEntry) {
+        List<ParamsOptions> options = null;
+
+        switch (inputEntry.getOptionSourceType()) {
+            case DEFAULT:
+                String optionStr = inputEntry.getOptions();
+                if (StringUtils.isNotEmpty(optionStr)) {
+                    options = JSONUtils.toList(optionStr, ParamsOptions.class);
+                }
+                break;
+            case DATASOURCE_TYPE:
+                options = new ArrayList<>();
+                ParamsOptions paramsOptions = null;
+                for (DbType dbtype: DbType.values()) {
+                    paramsOptions = new ParamsOptions(dbtype.getDescp().toUpperCase(),dbtype.getCode(),false);
+                    options.add(paramsOptions);
+                }
+                break;
+            default:
+                break;
+        }
+
+        return SelectParam
+                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .setParamsOptionsList(options)
+                .setValue(inputEntry.getValue())
+                .setSize(Constants.SMALL)
+                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .build();
+    }
+
+    private InputParam getInputParam(DqRuleInputEntry inputEntry) {
+        return InputParam
+                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .addValidate(Validate.newBuilder()
+                                     .setRequired(true)
+                                     .build())
+                .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
+                .setValue(inputEntry.getValue())
+                .setPlaceholder(inputEntry.getPlaceholder())
+                .setSize(Constants.SMALL)
+                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .build();
+    }
 }

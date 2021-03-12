@@ -907,74 +907,75 @@ CREATE TABLE t_ds_dq_rule_input_entry (
     input_type int DEFAULT NULL,
     is_show int2 DEFAULT '1',
     can_edit int2 DEFAULT '1',
+    is_emit int2 DEFAULT '0',
     create_time timestamp DEFAULT NULL,
     update_time timestamp DEFAULT NULL,
     CONSTRAINT t_ds_dq_rule_input_entry_pk PRIMARY KEY (id)
 );
 
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(1, 'src_connector_type', 2, '源数据类型', 'JDBC', '[{"label":"HIVE","value":"HIVE"},{"label":"JDBC","value":"JDBC"}]', 'please select source connector type', 0, 2, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(1, 'src_connector_type', 2, '源数据类型', 'JDBC', '[{"label":"HIVE","value":"HIVE"},{"label":"JDBC","value":"JDBC"}]', 'please select source connector type', 0, 2, 0, 1, 1, 1,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(2, 'src_datasource_id', 4, '源数据源', '1', 'null', 'please select source datasource id', 1, 2, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(2, 'src_datasource_id', 4, '源数据源', '1', null, 'please select source datasource id', 1, 2, 0, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(3, 'src_table', 0, '源数据表', 'null', 'null', 'Please enter source table name', 0, 0, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(3, 'src_table', 0, '源数据表', null, null, 'Please enter source table name', 0, 0, 0, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(4, 'src_filter', 0, '源表过滤条件', 'null', 'null', 'Please enter filter expression', 0, 3, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(4, 'src_filter', 0, '源表过滤条件', null, null, 'Please enter filter expression', 0, 3, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(5, 'src_field', 0, '源表检测列', 'null', 'null', 'Please enter column, only single column is supported', 0, 0, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(5, 'src_field', 0, '源表检测列', null, null, 'Please enter column, only single column is supported', 0, 0, 0, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(6, 'statistics_name', 0, '统计值', 'null', 'null', 'Please enter statistics name, the alias in statistics execute sql', 0, 0, 1, 0, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(6, 'statistics_name', 0, '统计值', null, null, 'Please enter statistics name, the alias in statistics execute sql', 0, 0, 1, 0, 0, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(7, 'check_type', 2, '检测方式', '0', '[{"label":"统计值与固定值比较","value":"0"},{"label":"统计值与比对值比较","value":"1"},{"label":"统计值占比对值百分比","value":"2"}]', 'please select check type', 0, 0, 3, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(7, 'check_type', 2, '检测方式', '0', '[{"label":"统计值与固定值比较","value":"0"},{"label":"统计值与比对值比较","value":"1"},{"label":"统计值占比对值百分比","value":"2"}]', 'please select check type', 0, 0, 3, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(8, 'operator', 2, '操作符', '0', '[{"label":"=","value":"0"},{"label":"<","value":"1"},{"label":"<=","value":"2"},{"label":">","value":"3"},{"label":">=","value":"4"},{"label":"!=","value":"5"}]', 'please select operator', 0, 0, 3, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(8, 'operator', 2, '操作符', '0', '[{"label":"=","value":"0"},{"label":"<","value":"1"},{"label":"<=","value":"2"},{"label":">","value":"3"},{"label":">=","value":"4"},{"label":"!=","value":"5"}]', 'please select operator', 0, 0, 3, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(9, 'threshold', 0, '阈值', 'null', 'null', 'Please enter threshold, number is needed', 0, 2, 3, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(9, 'threshold', 0, '阈值', null, null, 'Please enter threshold, number is needed', 0, 2, 3, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(10, 'failure_strategy', 2, '失败策略', '0', '[{"label":"结束","value":"0"},{"label":"继续","value":"1"},{"label":"结束并告警","value":"2"},{"label":"继续并告警","value":"3"}]', 'please select failure strategy', 0, 0, 3, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(10, 'failure_strategy', 2, '失败策略', '0', '[{"label":"结束","value":"0"},{"label":"继续","value":"1"},{"label":"结束并告警","value":"2"},{"label":"继续并告警","value":"3"}]', 'please select failure strategy', 0, 0, 3, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(11, 'target_connector_type', 2, '目标数据类型', 'JDBC', '[{"label":"HIVE","value":"HIVE"},{"label":"JDBC","value":"JDBC"}]', 'Please select target connector type', 0, 0, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(11, 'target_connector_type', 2, '目标数据类型', 'JDBC', '[{"label":"HIVE","value":"HIVE"},{"label":"JDBC","value":"JDBC"}]', 'Please select target connector type', 0, 0, 0, 1, 1, 1,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(12, 'target_datasource_id', 4, '目标数据源', '1', 'null', 'Please select target datasource', 1, 2, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(12, 'target_datasource_id', 4, '目标数据源', '1', null, 'Please select target datasource', 1, 2, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(13, 'target_table', 0, '目标数据表', 'null', 'null', 'Please enter target table', 0, 0, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(13, 'target_table', 0, '目标数据表', null, null, 'Please enter target table', 0, 0, 0, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(14, 'target_filter', 0, '目标表过滤条件', 'null', 'null', 'Please enter target filter expression', 0, 3, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(14, 'target_filter', 0, '目标表过滤条件', null, null, 'Please enter target filter expression', 0, 3, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(15, 'mapping_columns', 0, '检查列', 'null', 'null', 'please enter mapping columns', 0, 1, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(15, 'mapping_columns', 0, '检查列', null, null, 'please enter mapping columns', 0, 1, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(16, 'statistics_execute_sql', 5, '统计值计算SQL', 'null', 'null', 'Please enter statistics execute sql', 0, 3, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(16, 'statistics_execute_sql', 5, '统计值计算SQL', null, null, 'Please enter statistics execute sql', 0, 3, 0, 1, 1, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(17, 'comparison_name', 0, '比对值名', 'null', 'null', 'Please enter comparison name, the alias in comparison execute sql', 0, 0, 0, 0, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(17, 'comparison_name', 0, '比对值名', null, null, 'Please enter comparison name, the alias in comparison execute sql', 0, 0, 0, 0, 0, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(18, 'comparison_execute_sql', 5, '比对值计算SQL', 'null', 'null', 'Please enter comparison execute sql', 0, 3, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(18, 'comparison_execute_sql', 5, '比对值计算SQL', null, null, 'Please enter comparison execute sql', 0, 3, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(19, 'comparison_title', 0, '比对值', '表总行数', 'null', 'Please enter comparison title', 0, 0, 2, 1, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(19, 'comparison_title', 0, '比对值', '表总行数', null, 'Please enter comparison title', 0, 0, 2, 1, 0, 0,'2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(20, 'writer_connector_type', 2, '输出数据类型', 'JDBC', '[{"label":"JDBC","value":"JDBC"}]', 'please select writer connector type', 0, 2, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(20, 'writer_connector_type', 2, '输出数据类型', 'JDBC', '[{"label":"JDBC","value":"JDBC"}]', 'please select writer connector type', 0, 2, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 INSERT INTO t_ds_dq_rule_input_entry
-(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, create_time, update_time)
-VALUES(21, 'writer_datasource_id', 4, '输出数据源', '1', 'null', 'please select writer datasource id', 1, 2, 0, 1, 1, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(id, field, type, title, value, options, placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit,create_time, update_time)
+VALUES(21, 'writer_datasource_id', 4, '输出数据源', '1', null, 'please select writer datasource id', 1, 2, 0, 1, 1,0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 
 --
 -- Table structure for t_ds_relation_rule_execute_sql

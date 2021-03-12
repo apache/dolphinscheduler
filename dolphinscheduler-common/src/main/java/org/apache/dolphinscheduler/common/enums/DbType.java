@@ -77,4 +77,9 @@ public enum DbType {
         }
         throw new IllegalArgumentException("invalid type : " + type);
     }
+
+    public boolean isHive() {
+        return this == DbType.HIVE;
+    }
+
 }
