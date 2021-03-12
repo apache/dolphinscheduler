@@ -249,23 +249,23 @@ public class DqRuleInputEntry {
 
     @Override
     public String toString() {
-        return "DqRuleInputEntry{" +
-                "id=" + id +
-                ", field='" + field + '\'' +
-                ", type=" + type +
-                ", title='" + title + '\'' +
-                ", value='" + value + '\'' +
-                ", options='" + options + '\'' +
-                ", placeholder='" + placeholder + '\'' +
-                ", optionSourceType=" + optionSourceType +
-                ", valueType=" + valueType +
-                ", inputType=" + inputType +
-                ", isShow=" + isShow +
-                ", canEdit=" + canEdit +
-                ", isEmit=" + isEmit +
-                ", valuesMap='" + valuesMap + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "DqRuleInputEntry{"
+                + "id=" + id
+                + ", field='" + field + '\''
+                + ", type=" + type
+                + ", title='" + title + '\''
+                + ", value='" + value + '\''
+                + ", options='" + options + '\''
+                + ", placeholder='" + placeholder + '\''
+                + ", optionSourceType=" + optionSourceType
+                + ", valueType=" + valueType
+                + ", inputType=" + inputType
+                + ", isShow=" + isShow
+                + ", canEdit=" + canEdit
+                + ", isEmit=" + isEmit
+                + ", valuesMap='" + valuesMap + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }
