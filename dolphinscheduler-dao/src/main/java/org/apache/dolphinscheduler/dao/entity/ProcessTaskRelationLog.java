@@ -77,4 +77,8 @@ public class ProcessTaskRelationLog extends ProcessTaskRelation {
         this.operateTime = operateTime;
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

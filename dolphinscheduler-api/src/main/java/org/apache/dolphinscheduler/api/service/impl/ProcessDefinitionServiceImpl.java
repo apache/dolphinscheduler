@@ -271,10 +271,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-        records.forEach(processDefinition -> {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-        });
+//        records.forEach(processDefinition -> {
+//            ProcessData processData = processService.genProcessData(processDefinition);
+//            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
+//        });
+//        logger.warn("records: {}", records);
         processDefinitionIPage.setRecords(records);
 
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);

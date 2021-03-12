@@ -17,21 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.ConditionType;
+
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.ConditionType;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * process task relation
@@ -238,5 +231,24 @@ public class ProcessTaskRelation {
 
     public void setPostTaskVersion(int postTaskVersion) {
         this.postTaskVersion = postTaskVersion;
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessTaskRelation{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", processDefinitionVersion=" + processDefinitionVersion
+                + ", projectCode=" + projectCode
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", preTaskCode=" + preTaskCode
+                + ", preTaskVersion=" + preTaskVersion
+                + ", postTaskCode=" + postTaskCode
+                + ", postTaskVersion=" + postTaskVersion
+                + ", conditionType=" + conditionType
+                + ", conditionParams='" + conditionParams + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }
