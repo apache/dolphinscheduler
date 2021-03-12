@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.http;
 
 import org.apache.dolphinscheduler.common.enums.HttpCheckCondition;
@@ -21,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.process.HttpProperty;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class HttpParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return  StringUtils.isNotEmpty(url);
+        return StringUtils.isNotEmpty(url);
     }
 
     @Override

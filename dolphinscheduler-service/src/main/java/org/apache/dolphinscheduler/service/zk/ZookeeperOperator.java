@@ -58,7 +58,7 @@ public class ZookeeperOperator implements InitializingBean {
     protected CuratorFramework zkClient;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         this.zkClient = buildClient();
         initStateListener();
         treeCacheStart();

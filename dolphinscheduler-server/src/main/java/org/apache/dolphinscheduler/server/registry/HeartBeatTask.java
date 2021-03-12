@@ -43,9 +43,8 @@ public class HeartBeatTask implements Runnable {
     private Set<String> heartBeatPaths;
     private String serverType;
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
-    /**
-     * server stop or not
-     */
+
+    // server stop or not
     protected IStoppable stoppable = null;
 
     public HeartBeatTask(String startTime,
