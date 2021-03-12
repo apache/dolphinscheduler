@@ -44,19 +44,4 @@ public class WorkFlowLineageMapperTest {
         List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByName("test",1L);
         Assert.assertNotEquals(workFlowLineages.size(), 0);
     }
-
-
-    @Test
-    public void testQueryByIds() {
-        Set<Integer> ids = new HashSet<>();
-        ids.add(1);
-        List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper.queryByIds(ids,1L);
-        Assert.assertNotEquals(workFlowLineages.size(), 0);
-    }
-
-    @Test
-    public void testQuerySourceTarget() {
-        List<WorkFlowRelation> workFlowRelations = workFlowLineageMapper.querySourceTarget(1);
-        Assert.assertNotEquals(workFlowRelations.size(), 0);
-    }
 }
