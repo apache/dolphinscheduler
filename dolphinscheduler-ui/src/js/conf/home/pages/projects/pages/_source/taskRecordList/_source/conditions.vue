@@ -81,15 +81,15 @@
             code: '成功'
           },
           {
-            label: `${this.$t('waiting')}`,
+            label: `${this.$t('Waiting')}`,
             code: '等待'
           },
           {
-            label: `${this.$t('execution')}`,
+            label: `${this.$t('Execution')}`,
             code: '执行中'
           },
           {
-            label: `${this.$t('finish')}`,
+            label: `${this.$t('Finish')}`,
             code: '完成'
           }, {
             label: `${this.$t('Failed')}`,
