@@ -85,8 +85,8 @@ public class ZKMasterClient extends AbstractZKClient {
             // master registry
             masterRegistry.registry();
             masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
-            String registPath = this.masterRegistry.getMasterPath();
-            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
+            String registryPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();
