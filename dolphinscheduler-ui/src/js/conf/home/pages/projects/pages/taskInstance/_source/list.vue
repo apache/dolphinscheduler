@@ -50,7 +50,7 @@
             <span>{{$t('host')}}</span>
           </th>
           <th scope="col" style="min-width: 70px">
-            <span>{{$t('Duration')}}(s)</span>
+            <span>{{$t('Duration')}}</span>
           </th>
           <th scope="col" style="min-width: 60px">
             <div style="width: 50px">
@@ -88,7 +88,7 @@
             <span v-else>-</span>
           </td>
           <td style="max-width: 600px"><span style="padding-right: 5px">{{item.host || '-'}}</span></td>
-          <td><span>{{item.duration}}</span></td>
+          <td><span>{{item.duration || '-'}}</span></td>
           <td><span>{{item.retryTimes}}</span></td>
           <td>
             <x-button

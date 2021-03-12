@@ -44,7 +44,7 @@
             <span>{{$t('End Time')}}</span>
           </th>
           <th scope="col" style="min-width: 60px">
-            <span>{{$t('Duration')}}s</span>
+            <span>{{$t('Duration')}}</span>
           </th>
           <th scope="col" style="min-width: 60px">
             <span>{{$t('Run Times')}}</span>
