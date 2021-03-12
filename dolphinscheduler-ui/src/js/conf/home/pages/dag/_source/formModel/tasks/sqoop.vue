@@ -15,8 +15,7 @@
 * limitations under the License.
 */
 <template>
-  <div class="sql-model">
-
+  <div class="sqoop-model">
     <m-list-box>
       <div slot="text">{{$t('Custom Job')}}</div>
       <div slot="content">
@@ -574,7 +573,7 @@
   let shellEditor
 
   export default {
-    name: 'sql',
+    name: 'sqoop',
     data () {
       return {
         /**

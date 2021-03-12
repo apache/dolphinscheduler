@@ -25,12 +25,18 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * work group service
@@ -133,7 +139,6 @@ public class WorkerGroupService extends BaseService {
 
         // available workerGroup list
         List<String> availableWorkerGroupList = new ArrayList<>();
-
         List<WorkerGroup> workerGroups = new ArrayList<>();
 
         for (String workerGroup : workerGroupList){
@@ -144,10 +149,10 @@ public class WorkerGroupService extends BaseService {
                 WorkerGroup wg = new WorkerGroup();
                 wg.setName(workerGroup);
                 if (isPaging){
-                    wg.setIpList(childrenNodes);
-                    String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
-                    wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
-                    wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
+                    wg.setIpList(childrenNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList()));
+                    String registeredValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
+                    wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(",")[6]));
+                    wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(",")[7]));
                 }
                 workerGroups.add(wg);
             }
