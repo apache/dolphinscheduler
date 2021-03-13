@@ -15,17 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common;
+package org.apache.dolphinscheduler.common.exception;
 
 /**
- * server stop interface.
+ * Base Exception class for DolphinScheduler
  */
-public interface IStoppable {
+public class BaseException extends Exception {
 
-    /**
-    * Stop this service.
-    * @param cause why stopping
-    */
-    void stop(String cause);
+    public BaseException() {
+    }
 
+    public BaseException(String message) {
+        super(message);
+    }
+
+    public BaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public BaseException(Throwable cause) {
+        super(cause);
+    }
+
+    public BaseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }
