@@ -908,6 +908,7 @@
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
+                        <include>**/server/log/LoggerRequestProcessorTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
                         <include>**/server/log/TaskLogFilterTest.java</include>
                         <include>**/server/log/WorkerLogFilterTest.java</include>
@@ -930,11 +931,13 @@
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
+                        <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/HostTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/LogUtilsTest.java</include>
+                        <include>**/server/utils/MapReduceArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
@@ -961,9 +964,10 @@
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>
+                        <include>**/service/zk/RegisterOperatorTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
-
+                        <include>**/service/log/LogClientServiceTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
@@ -988,6 +992,7 @@
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/datasource/OracleDataSourceTest.java</include>
                         <include>**/dao/datasource/HiveDataSourceTest.java</include>
+                        <include>**/dao/datasource/BaseDataSourceTest.java</include>
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>

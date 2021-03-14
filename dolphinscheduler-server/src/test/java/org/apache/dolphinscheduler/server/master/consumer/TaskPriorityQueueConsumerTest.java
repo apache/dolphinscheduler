@@ -45,7 +45,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class, CuratorZookeeperClient.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class,
+        ZookeeperNodeManager.class, RegisterOperator.class, ZookeeperConfig.class, MasterConfig.class,
         CuratorZookeeperClient.class})
 public class TaskPriorityQueueConsumerTest {
 

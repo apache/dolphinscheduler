@@ -30,11 +30,11 @@ worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 # worker listener port
 worker.listen.port=${WORKER_LISTEN_PORT}
 
-# default worker group
+# default worker groups
 worker.groups=${WORKER_GROUPS}
 
-# default worker weight
-worker.weight=${WORKER_WEIGHT}
+# default worker host weight
+worker.host.weight=${WORKER_HOST_WEIGHT}
 
 # alert server listener host
 alert.listen.host=${ALERT_LISTEN_HOST}
