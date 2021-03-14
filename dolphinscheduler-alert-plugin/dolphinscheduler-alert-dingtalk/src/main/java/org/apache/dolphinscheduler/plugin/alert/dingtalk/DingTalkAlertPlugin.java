@@ -31,10 +31,4 @@ public class DingTalkAlertPlugin implements DolphinSchedulerPlugin {
     public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
         return ImmutableList.of(new DingTalkAlertChannelFactory());
     }
-
-
-
-
-
-
 }

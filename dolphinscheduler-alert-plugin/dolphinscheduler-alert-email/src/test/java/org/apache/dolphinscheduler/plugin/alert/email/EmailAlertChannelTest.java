@@ -26,10 +26,9 @@ import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.RadioParam;
-import org.apache.dolphinscheduler.param.common.base.DataType;
-import org.apache.dolphinscheduler.param.common.base.ParamsOptions;
-import org.apache.dolphinscheduler.param.common.base.PluginParams;
-import org.apache.dolphinscheduler.param.common.base.Validate;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.utils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 
@@ -70,8 +71,8 @@ public class CheckUtils {
   public static Map<String, Object> checkDesc(String desc) {
     Map<String, Object> result = new HashMap<>();
     if (StringUtils.isNotEmpty(desc) && desc.length() > 200) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+      result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+      result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
     }else{
       result.put(Constants.STATUS, Status.SUCCESS);
     }
