@@ -14,16 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if not .Values.postgresql.enabled }}
 apiVersion: v1
-kind: Secret
+kind: Service
 metadata:
-  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
+  name: {{ include "dolphinscheduler.fullname" . }}-alert
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-postgresql
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-type: Opaque
-data:
-  db-password: {{ .Values.externalDatabase.password | b64enc | quote }}
-{{- end }}
+spec:
+  ports:
+    - port: 50052
+      targetPort: alert-port
+      protocol: TCP
+      name: alert-port
+  selector:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: alert

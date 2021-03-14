@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="spark-model">
+  <div class="mr-model">
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
@@ -47,6 +47,18 @@
         <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails"  :placeholder="$t('Please enter main jar package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
+      </div>
+    </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('App Name')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="appName"
+          :placeholder="$t('Please enter app name(optional)')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -122,6 +134,8 @@
         cacheResourceList: [],
         // Custom parameter
         localParams: [],
+        // MR app name
+        appName: '',
         // Main arguments
         mainArgs: '',
         // Option parameters
@@ -282,6 +296,7 @@
             return { id: v }
           }),
           localParams: this.localParams,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -342,6 +357,7 @@
           },
           resourceList: this.resourceIdArr,
           localParams: this.localParams,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -367,6 +383,7 @@
         } else {
           this.mainJar = o.params.mainJar.id || ''
         }
+        this.appName = o.params.appName || ''
         this.mainArgs = o.params.mainArgs || ''
         this.others = o.params.others
         this.programType = o.params.programType || 'JAVA'

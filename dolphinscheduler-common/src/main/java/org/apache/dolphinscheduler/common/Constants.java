@@ -544,9 +544,7 @@ public final class Constants {
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
 
 
-
     /**
-     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -557,12 +555,17 @@ public final class Constants {
     public static final String HADOOP = "hadoop";
 
     /**
-     * -D parameter
+     * -D <property>=<value>
      */
     public static final String D = "-D";
 
     /**
-     * -D mapreduce.job.queuename=ququename
+     * -D mapreduce.job.name=name
+     */
+    public static final String MR_NAME = "mapreduce.job.name";
+
+    /**
+     * -D mapreduce.job.queuename=queuename
      */
     public static final String MR_QUEUE = "mapreduce.job.queuename";
 
@@ -604,6 +607,10 @@ public final class Constants {
      */
     public static final String EXECUTOR_MEMORY = "--executor-memory";
 
+    /**
+     * --name NAME
+     */
+    public static final String SPARK_NAME = "--name";
 
     /**
      * --queue QUEUE
@@ -854,7 +861,6 @@ public final class Constants {
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
-    public static final String FLINK_DETACH = "-d";
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";

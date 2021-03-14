@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.common.task.spark;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +30,12 @@ import java.util.List;
 public class SparkParameters extends AbstractParameters {
 
     /**
-   * major jar
+     * main jar
      */
     private ResourceInfo mainJar;
 
     /**
-   * major class
+     * main class
      */
     private String mainClass;
 
@@ -77,9 +76,9 @@ public class SparkParameters extends AbstractParameters {
     private String executorMemory;
 
     /**
-   * resource list
+     * app name
      */
-  private List<ResourceInfo> resourceList = new ArrayList<>();
+    private String appName;
 
     /**
      * The YARN queue to submit to
@@ -101,6 +100,11 @@ public class SparkParameters extends AbstractParameters {
      * spark version
      */
     private String sparkVersion;
+
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList = new ArrayList<>();
 
     public ResourceInfo getMainJar() {
         return mainJar;
@@ -174,6 +178,13 @@ public class SparkParameters extends AbstractParameters {
         this.executorMemory = executorMemory;
     }
 
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
 
     public String getQueue() {
         return queue;
@@ -183,20 +194,20 @@ public class SparkParameters extends AbstractParameters {
         this.queue = queue;
     }
 
-  public List<ResourceInfo> getResourceList() {
-    return resourceList;
-  }
-
-  public void setResourceList(List<ResourceInfo> resourceList) {
-    this.resourceList = resourceList;
-  }
-
     public String getOthers() {
         return others;
     }
 
     public void setOthers(String others) {
         this.others = others;
+    }
+
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
     }
 
     public ProgramType getProgramType() {

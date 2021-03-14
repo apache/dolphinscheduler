@@ -243,11 +243,11 @@ const positionList = [
 const nodeStatusList = [
   {
     value: 'SUCCESS',
-    label: `${i18n.$t('success')}`
+    label: `${i18n.$t('Success')}`
   },
   {
     value: 'FAILURE',
-    label: `${i18n.$t('failed')}`
+    label: `${i18n.$t('Failed')}`
   }
 ]
 

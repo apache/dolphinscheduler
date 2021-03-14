@@ -1,15 +1,20 @@
-## What is Dolphin Scheduler?
+## What is DolphinScheduler?
 
-Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
+DolphinScheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
-Github URL: https://github.com/apache/incubator-dolphinscheduler
+GitHub URL: https://github.com/apache/incubator-dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
-![Dolphin Scheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
+![DolphinScheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
 
 ## How to use this docker image
 
@@ -23,7 +28,11 @@ The default **postgres** user `root`, postgres password `root` and database `dol
 
 The default **zookeeper** is created in the `docker-compose.yml`.
 
-Access the Web UI：http://192.168.xx.xx:12345/dolphinscheduler
+Access the Web UI: http://192.168.xx.xx:12345/dolphinscheduler
+
+The default username is `admin` and the default password is `dolphinscheduler123`
+
+> **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
 
 #### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
 
@@ -60,7 +69,7 @@ $ docker run -d --name dolphinscheduler-master \
 apache/dolphinscheduler:latest master-server
 ```
 
-* Start a **worker server**, For example:
+* Start a **worker server** (including **logger server**), For example:
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
@@ -116,7 +125,7 @@ Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script
 
 ## Environment Variables
 
-The Dolphin Scheduler image uses several environment variables which are easy to miss. While none of the variables are required, they may significantly aid you in using the image.
+The DolphinScheduler Docker container is configured through environment variables, and the default value will be used if an environment variable is not set.
 
 **`DATABASE_TYPE`**
 
@@ -166,9 +175,41 @@ This environment variable sets the database for database. The default value is `
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 
-**`DOLPHINSCHEDULER_ENV_PATH`**
+**`HADOOP_HOME`**
 
-This environment variable sets the runtime environment for task. The default value is `/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh`.
+This environment variable sets `HADOOP_HOME`. The default value is `/opt/soft/hadoop`.
+
+**`HADOOP_CONF_DIR`**
+
+This environment variable sets `HADOOP_CONF_DIR`. The default value is `/opt/soft/hadoop/etc/hadoop`.
+
+**`SPARK_HOME1`**
+
+This environment variable sets `SPARK_HOME1`. The default value is `/opt/soft/spark1`.
+
+**`SPARK_HOME2`**
+
+This environment variable sets `SPARK_HOME2`. The default value is `/opt/soft/spark2`.
+
+**`PYTHON_HOME`**
+
+This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/python`.
+
+**`JAVA_HOME`**
+
+This environment variable sets `JAVA_HOME`. The default value is `/usr/lib/jvm/java-1.8-openjdk`.
+
+**`HIVE_HOME`**
+
+This environment variable sets `HIVE_HOME`. The default value is `/opt/soft/hive`.
+
+**`FLINK_HOME`**
+
+This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/flink`.
+
+**`DATAX_HOME`**
+
+This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax/bin/datax.py`.
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 
@@ -264,11 +305,11 @@ This environment variable sets reserved memory for `worker-server`. The default 
 
 This environment variable sets port for `worker-server`. The default value is `1234`.
 
-**`WORKER_GROUP`**
+**`WORKER_GROUPS`**
 
-This environment variable sets group for `worker-server`. The default value is `default`.
+This environment variable sets groups for `worker-server`. The default value is `default`.
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 This environment variable sets weight for `worker-server`. The default value is `100`.
 
@@ -298,7 +339,7 @@ server.port=${API_SERVER_PORT}
 `/root/start-init-conf.sh` will dynamically generate config file:
 
 ```sh
-echo "generate app config"
+echo "generate dolphinscheduler config"
 ls ${DOLPHINSCHEDULER_HOME}/conf/ | grep ".tpl" | while read line; do
 eval "cat << EOF
 $(cat ${DOLPHINSCHEDULER_HOME}/conf/${line})
@@ -306,3 +347,142 @@ EOF
 " > ${DOLPHINSCHEDULER_HOME}/conf/${line%.*}
 done
 ```
+
+## FAQ
+
+### How to stop dolphinscheduler by docker-compose?
+
+Stop containers:
+
+```
+docker-compose stop
+```
+
+Stop containers and remove containers, networks and volumes:
+
+```
+docker-compose down -v
+```
+
+### How to deploy dolphinscheduler on Docker Swarm?
+
+Assuming that the Docker Swarm cluster has been created (If there is no Docker Swarm cluster, please refer to [create-swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/))
+
+Start a stack named dolphinscheduler
+
+```
+docker stack deploy -c docker-stack.yml dolphinscheduler
+```
+
+Stop and remove the stack named dolphinscheduler
+
+```
+docker stack rm dolphinscheduler
+```
+
+### How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?
+
+> Because of the commercial license, we cannot directly use the driver and client of MySQL.
+>
+> If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
+
+2. Create a new `Dockerfile` to add MySQL driver and client:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+RUN apk add --update --no-cache mysql-client
+```
+
+3. Build a new docker image including MySQL driver and client:
+
+```
+docker build -t apache/dolphinscheduler:mysql .
+```
+
+4. Modify all `image` fields to `apache/dolphinscheduler:mysql` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+5. Comment the `dolphinscheduler-postgresql` block in `docker-compose.yml`
+
+6. Add `dolphinscheduler-mysql` service in `docker-compose.yml` (**Optional**, you can directly use a external MySQL database)
+
+7. Modify all DATABASE environments in `docker-compose.yml`
+
+```
+DATABASE_TYPE: mysql
+DATABASE_DRIVER: com.mysql.jdbc.Driver
+DATABASE_HOST: dolphinscheduler-mysql
+DATABASE_PORT: 3306
+DATABASE_USERNAME: root
+DATABASE_PASSWORD: root
+DATABASE_DATABASE: dolphinscheduler
+DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
+```
+
+> If you have added `dolphinscheduler-mysql` service in `docker-compose.yml`, just set `DATABASE_HOST` to `dolphinscheduler-mysql`
+
+8. Run a dolphinscheduler (See **How to use this docker image**)
+
+### How to support MySQL datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of MySQL.
+>
+> If you want to add MySQL datasource, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
+
+2. Create a new `Dockerfile` to add MySQL driver:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including MySQL driver:
+
+```
+docker build -t apache/dolphinscheduler:mysql-driver .
+```
+
+4. Modify all `image` fields to `apache/dolphinscheduler:mysql-driver` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+5. Run a dolphinscheduler (See **How to use this docker image**)
+
+6. Add a MySQL datasource in `Datasource manage`
+
+### How to support Oracle datasource in `Datasource manage`?
+
+> Because of the commercial license, we cannot directly use the driver of Oracle.
+>
+> If you want to add Oracle datasource, you can build a new image based on the `apache/dolphinscheduler` image as follows.
+
+1. Download the Oracle driver [ojdbc8.jar](https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc8/) (such as `ojdbc8-19.9.0.0.jar`)
+
+2. Create a new `Dockerfile` to add Oracle driver:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
+```
+
+3. Build a new docker image including Oracle driver:
+
+```
+docker build -t apache/dolphinscheduler:oracle-driver .
+```
+
+4. Modify all `image` fields to `apache/dolphinscheduler:oracle-driver` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+5. Run a dolphinscheduler (See **How to use this docker image**)
+
+6. Add a Oracle datasource in `Datasource manage`
+
+For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.

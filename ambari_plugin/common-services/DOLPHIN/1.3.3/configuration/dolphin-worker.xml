@@ -67,12 +67,12 @@
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
-        <name>worker.weigth</name>
+        <name>worker.host.weigth</name>
         <value>100</value>
         <value-attributes>
             <type>int</type>
         </value-attributes>
-        <description>worker weight</description>
+        <description>worker host weight</description>
         <on-ambari-upgrade add="true"/>
     </property>
 </configuration>

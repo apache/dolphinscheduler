@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -73,17 +74,19 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private MasterRegistry masterRegistry;
 
-    public void start() {
-
+    public void start(MasterServer masterServer) {
         InterProcessMutex mutex = null;
         try {
-            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
+            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
             String znodeLock = getMasterStartUpLockPath();
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
 
-            //  Master registry
+            // master registry
             masterRegistry.registry();
+            masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
+            String registryPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();
@@ -107,8 +110,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
     @Override
     public void close() {
-        super.close();
         masterRegistry.unRegistry();
+        super.close();
     }
 
     /**
@@ -175,9 +178,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if (StringUtils.isEmpty(serverHost)) {
-            return;
-        }
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);
@@ -295,15 +295,6 @@ public class ZKMasterClient extends AbstractZKClient {
         }
         return false;
     }
-
-    /**
-     * failover worker tasks
-     *
-     * 1. kill yarn job if there are yarn jobs in tasks.
-     * 2. change task state from running to need failover.
-     * 3. failover all tasks when workerHost is null
-     * @param workerHost worker host
-     */
 
     /**
      * failover worker tasks
