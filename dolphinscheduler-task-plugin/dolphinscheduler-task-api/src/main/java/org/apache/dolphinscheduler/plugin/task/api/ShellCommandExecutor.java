@@ -82,7 +82,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         return OSUtils.isWindows() ? CMD : SH;
     }
 
-
     /**
      * create command file if not exists
      *
@@ -122,6 +121,5 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
     }
-
 
 }

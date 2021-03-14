@@ -53,7 +53,6 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      */
     public static final String PYTHON = "python";
 
-
     /**
      * constructor
      *
@@ -130,7 +129,6 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         }
         return pythonHome;
     }
-
 
     /**
      * get the absolute path of the Python command

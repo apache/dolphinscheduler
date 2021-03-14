@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.task.spark;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,13 +15,14 @@ package org.apache.dolphinscheduler.plugin.task.spark;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.task.spark;
+
 public class SparkConstants {
 
     /**
      * --class CLASS_NAME
      */
     public static final String MAIN_CLASS = "--class";
-
 
     /**
      * --name NAME
@@ -32,8 +33,6 @@ public class SparkConstants {
      * --queue QUEUE
      */
     public static final String SPARK_QUEUE = "--queue";
-
-
 
     public static final String DEPLOY_MODE = "--deploy-mode";
 

@@ -31,7 +31,6 @@ public abstract class AbstractYarnTask extends AbstractTask {
      */
     private ShellCommandExecutor shellCommandExecutor;
 
-
     /**
      * Abstract Yarn Task
      *

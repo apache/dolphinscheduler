@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskExecutionContextCacheManager {
 
-
     /**
      * taskInstance cache
      */

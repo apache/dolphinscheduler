@@ -38,5 +38,4 @@ public class ShellTaskChannel implements TaskChannel {
         return new ShellTask(taskRequest, logger);
     }
 
-
 }

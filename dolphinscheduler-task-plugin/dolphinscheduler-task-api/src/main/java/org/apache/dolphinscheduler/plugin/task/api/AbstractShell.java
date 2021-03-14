@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * A base class for running a Unix command.
  *
@@ -42,7 +41,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractShell {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractShell.class);
-
 
     /**
      * Time after which the executing script would be timedout
@@ -67,6 +65,7 @@ public abstract class AbstractShell {
      * env for the command execution
      */
     private Map<String, String> environment;
+
     private File dir;
 
     /**
@@ -92,7 +91,6 @@ public abstract class AbstractShell {
         this.interval = interval;
         this.lastTime = (interval < 0) ? 0 : -interval;
     }
-
 
     /**
      * set the environment for the command
@@ -125,7 +123,6 @@ public abstract class AbstractShell {
         exitCode = 0;
         runCommand();
     }
-
 
     /**
      * Run a command   actual work
@@ -193,7 +190,8 @@ public abstract class AbstractShell {
         try {
             errThread.start();
             inThread.start();
-        } catch (IllegalStateException ignored) {
+        } catch (IllegalStateException e) {
+            logger.error(" read error and input streams start error", e);
         }
         try {
             // parse the output
@@ -275,7 +273,6 @@ public abstract class AbstractShell {
     private void setTimedOut() {
         this.timedOut.set(true);
     }
-
 
     /**
      * Timer which is used to timeout scripts spawned off by shell.

@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.task.spark;
 
+package org.apache.dolphinscheduler.plugin.task.spark;
 
 /**
  * support program types
  */
 public enum ProgramType {
+
     /**
      * 0 JAVA,1 SCALA,2 PYTHON
      */

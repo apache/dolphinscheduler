@@ -24,8 +24,6 @@ import java.util.StringTokenizer;
 
 public class OSUtils {
 
-
-
     /**
      * get sudo command
      *
@@ -82,7 +80,7 @@ public class OSUtils {
         return ShellExecutor.execCommand(command);
     }
 
-    public static String getOSName(){
-       return System.getProperty("os.name");
+    public static String getOSName() {
+        return System.getProperty("os.name");
     }
 }

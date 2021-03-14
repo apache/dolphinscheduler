@@ -162,7 +162,6 @@ public class ShellTask extends AbstractTask {
         return shellParameters;
     }
 
-
     public void setResult(String result) {
         Map<String, Property> localParams = shellParameters.getLocalParametersMap();
         List<Map<String, String>> outProperties = new ArrayList<>();

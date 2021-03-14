@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
-import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
 
 import com.google.common.collect.ImmutableList;
 
 public class ShellTaskPlugin implements DolphinSchedulerPlugin {
-
 
     @Override
     public Iterable<TaskChannelFactory> getTaskChannelFactorys() {

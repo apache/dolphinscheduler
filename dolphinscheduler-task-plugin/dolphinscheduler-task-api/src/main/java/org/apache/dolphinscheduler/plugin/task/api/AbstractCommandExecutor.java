@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
-
 /**
  * abstract command executor
  */
@@ -86,7 +85,6 @@ public abstract class AbstractCommandExecutor {
      * taskRequest
      */
     protected TaskRequest taskRequest;
-
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
                                    TaskRequest taskRequest,
@@ -166,6 +164,7 @@ public abstract class AbstractCommandExecutor {
         boolean updateTaskExecutionContextStatus = TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
         if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
             ProcessUtils.kill(taskRequest);
+            result.setStatus(TaskRunStatus.FAIL_AND_NEED_KILL);
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
         }
@@ -191,14 +190,10 @@ public abstract class AbstractCommandExecutor {
             // SHELL task state
             result.setExitStatusCode(process.exitValue());
 
-            // if yarn task , yarn state is final state
-            if (process.exitValue() == 0) {
-                // todo 判断是不是yarn
-                //  result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
-            }
         } else {
             logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
             ProcessUtils.kill(taskRequest);
+            result.setStatus(TaskRunStatus.FAIL_AND_NEED_KILL);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
@@ -206,11 +201,9 @@ public abstract class AbstractCommandExecutor {
 
     }
 
-
     public String getVarPool() {
         return varPool.toString();
     }
-
 
     /**
      * cancel application
@@ -371,37 +364,6 @@ public abstract class AbstractCommandExecutor {
         parseProcessOutputExecutorService.shutdown();
     }
 
-    /**
-     * check yarn state
-     *
-     * @param //appIds application id list
-     * @return is success of yarn task state
-     */
-   /* public boolean isSuccessOfYarnState(List<String> appIds) {
-        boolean result = true;
-        try {
-            for (String appId : appIds) {
-                while (Stopper.isRunning()) {
-                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                    logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
-                    if (applicationStatus.equals(ExecutionStatus.FAILURE)
-                            || applicationStatus.equals(ExecutionStatus.KILL)) {
-                        return false;
-                    }
-
-                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
-                        break;
-                    }
-                    Thread.sleep(TaskConstants.SLEEP_TIME_MILLIS);
-                }
-            }
-        } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()), e);
-            result = false;
-        }
-        return result;
-
-    }*/
     public int getProcessId() {
         return getProcessId(process);
     }

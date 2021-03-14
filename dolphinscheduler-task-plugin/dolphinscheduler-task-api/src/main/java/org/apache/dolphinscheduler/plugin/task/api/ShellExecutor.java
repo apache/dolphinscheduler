@@ -35,7 +35,6 @@ public class ShellExecutor extends AbstractShell {
     private String[] command;
     private StringBuffer output;
 
-
     public ShellExecutor(String... execString) {
         this(execString, null);
     }
@@ -74,7 +73,6 @@ public class ShellExecutor extends AbstractShell {
         }
         timeOutInterval = timeout;
     }
-
 
     /**
      * Static method to execute a shell command.

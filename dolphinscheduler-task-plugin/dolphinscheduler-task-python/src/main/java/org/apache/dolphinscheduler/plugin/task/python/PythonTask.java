@@ -51,7 +51,6 @@ public class PythonTask extends AbstractTask {
 
     private String command;
 
-
     /**
      * constructor
      *
@@ -116,7 +115,6 @@ public class PythonTask extends AbstractTask {
         // cancel process
         pythonCommandExecutor.cancelApplication();
     }
-
 
     @Override
     public AbstractParameters getParameters() {

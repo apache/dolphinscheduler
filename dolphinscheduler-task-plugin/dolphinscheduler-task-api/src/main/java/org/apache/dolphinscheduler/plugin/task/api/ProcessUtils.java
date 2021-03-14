@@ -20,10 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import org.apache.dolphinscheduler.spi.task.TaskConstants;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -65,15 +62,12 @@ public class ProcessUtils {
     /**
      * escape verification.
      */
-    private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
-
-            {' ', '\t', '<', '>'}, {' ', '\t'}};
+    private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'}, {' ', '\t', '<', '>'}, {' ', '\t'}};
 
     /**
      * verification win32.
      */
     private static final int VERIFICATION_WIN32 = 1;
-
 
     /**
      * Lazy Pattern.
@@ -85,7 +79,6 @@ public class ProcessUtils {
          */
         private static final Pattern PATTERN = Pattern.compile("[^\\s\"]+|\"[^\"]*\"");
     }
-
 
     /**
      * build command line characters.
@@ -264,7 +257,6 @@ public class ProcessUtils {
         return fileToRun.getPath();
     }
 
-
     /**
      * get tokens from command.
      *
@@ -279,7 +271,6 @@ public class ProcessUtils {
         }
         return matchList.toArray(new String[0]);
     }
-
 
     /**
      * kill tasks according to different task types.
@@ -300,7 +291,6 @@ public class ProcessUtils {
             OSUtils.exeCmd(cmd);
 
             // find log and kill yarn job
-            // 后置该流程
             //  killYarnJob(request);
 
         } catch (Exception e) {
@@ -336,97 +326,6 @@ public class ProcessUtils {
         }
 
         return sb.toString().trim();
-    }
-
-    /* *//**
-     * find logs and kill yarn tasks.
-     * 判断是否是yarn todo
-     * @param request request
-     *//*
-    private static void killYarnJob(TaskRequest request) {
-        try {
-            Thread.sleep(TaskConstants.SLEEP_TIME_MILLIS);
-
-
-            if (StringUtils.isNotEmpty(request.getAppIds())) {
-                List<String> appIds = Collections.singletonList(request.getAppIds());
-                String workerDir = request.getExecutePath();
-                if (StringUtils.isEmpty(workerDir)) {
-                    logger.error("task instance work dir is empty");
-                    throw new RuntimeException("task instance work dir is empty");
-                }
-                if (CollectionUtils.isNotEmpty(appIds)) {
-                    cancelApplication(appIds, logger, request.getTenantCode(), request.getExecutePath());
-                }
-            }
-
-        } catch (Exception e) {
-            logger.error("kill yarn job failure", e);
-        }
-    }
-*/
-    /**
-     * kill yarn application.
-     *
-     * @param appIds app id list
-     * @param logger logger
-     * @param tenantCode tenant code
-     * @param executePath execute path
-     */
-  /*  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
-        if (CollectionUtils.isNotEmpty(appIds)) {
-
-            for (String appId : appIds) {
-                try {
-                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-
-                    if (!applicationStatus.typeIsFinished()) {
-                        String commandFile = String
-                                .format("%s/%s.kill", executePath, appId);
-                        String cmd = "yarn application -kill " + appId;
-                        execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
-                    }
-                } catch (Exception e) {
-                    logger.error(String.format("Get yarn application app id [%s] status failed: [%s]", appId, e.getMessage()));
-                }
-            }
-        }
-    }*/
-
-    /**
-     * build kill command for yarn application
-     *
-     * @param logger logger
-     * @param tenantCode tenant code
-     * @param appId app id
-     * @param commandFile command file
-     * @param cmd cmd
-     */
-    private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile, String cmd) {
-        try {
-            StringBuilder sb = new StringBuilder();
-            sb.append("#!/bin/sh\n");
-            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-            sb.append("cd $BASEDIR\n");
-            if (TaskProperties.getString(TaskConstants.SYSTEM_ENV_PATH) != null) {
-                sb.append("source ").append(TaskProperties.getString(TaskConstants.SYSTEM_ENV_PATH)).append("\n");
-            }
-            sb.append("\n\n");
-            sb.append(cmd);
-
-            File f = new File(commandFile);
-
-            if (!f.exists()) {
-                FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
-            }
-
-            String runCmd = String.format("%s %s", TaskConstants.SH, commandFile);
-            runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
-            logger.info("kill cmd:{}", runCmd);
-            OSUtils.exeCmd(runCmd);
-        } catch (Exception e) {
-            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
-        }
     }
 
 }

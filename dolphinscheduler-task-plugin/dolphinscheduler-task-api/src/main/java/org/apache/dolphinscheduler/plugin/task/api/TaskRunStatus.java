@@ -23,7 +23,4 @@ public enum TaskRunStatus {
     FAIL_AND_NEED_KILL,
     FAIL;
 
-
-
-
 }

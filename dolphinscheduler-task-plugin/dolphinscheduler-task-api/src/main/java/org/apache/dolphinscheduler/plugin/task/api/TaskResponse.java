@@ -56,6 +56,8 @@ public class TaskResponse {
      */
     private volatile int exitStatusCode = -1;
 
+    private TaskRunStatus status;
+
 
     public String getVarPool() {
         return varPool;
@@ -103,5 +105,21 @@ public class TaskResponse {
 
     public void setExitStatusCode(int exitStatusCode) {
         this.exitStatusCode = exitStatusCode;
+    }
+
+    public Process getProcess() {
+        return process;
+    }
+
+    public void setProcess(Process process) {
+        this.process = process;
+    }
+
+    public TaskRunStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskRunStatus status) {
+        this.status = status;
     }
 }

@@ -35,5 +35,4 @@ public class FlinkConstants {
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
 
-
 }

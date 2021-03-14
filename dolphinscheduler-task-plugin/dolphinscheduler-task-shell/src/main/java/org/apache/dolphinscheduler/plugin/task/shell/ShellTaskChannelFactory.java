@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.shell;
 
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.task.TaskChannel;
 import org.apache.dolphinscheduler.spi.task.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
 
@@ -34,7 +34,6 @@ public class ShellTaskChannelFactory implements TaskChannelFactory {
         return "Shell";
     }
 
-    // todo
     @Override
     public List<PluginParams> getParams() {
         return null;
