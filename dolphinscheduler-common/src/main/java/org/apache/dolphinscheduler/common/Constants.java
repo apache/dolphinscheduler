@@ -549,9 +549,7 @@ public final class Constants {
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
 
 
-
     /**
-     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -562,12 +560,17 @@ public final class Constants {
     public static final String HADOOP = "hadoop";
 
     /**
-     * -D parameter
+     * -D <property>=<value>
      */
     public static final String D = "-D";
 
     /**
-     * -D mapreduce.job.queuename=ququename
+     * -D mapreduce.job.name=name
+     */
+    public static final String MR_NAME = "mapreduce.job.name";
+
+    /**
+     * -D mapreduce.job.queuename=queuename
      */
     public static final String MR_QUEUE = "mapreduce.job.queuename";
 
