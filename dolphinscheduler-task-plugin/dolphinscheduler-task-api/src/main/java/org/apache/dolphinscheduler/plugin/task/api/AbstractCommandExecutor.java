@@ -86,7 +86,7 @@ public abstract class AbstractCommandExecutor {
      */
     protected TaskRequest taskRequest;
 
-    AbstractCommandExecutor(Consumer<List<String>> logHandler,
+    public AbstractCommandExecutor(Consumer<List<String>> logHandler,
                             TaskRequest taskRequest,
                             Logger logger) {
         this.logHandler = logHandler;
@@ -95,7 +95,7 @@ public abstract class AbstractCommandExecutor {
         this.logBuffer = Collections.synchronizedList(new ArrayList<>());
     }
 
-    AbstractCommandExecutor(List<String> logBuffer) {
+    public AbstractCommandExecutor(List<String> logBuffer) {
         this.logBuffer = logBuffer;
     }
 
