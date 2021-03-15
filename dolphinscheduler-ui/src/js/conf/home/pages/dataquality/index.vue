@@ -14,28 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import kinship from './kinship'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-import dataquality from './dataquality'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    kinship,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor,
-    dataquality
+<template>
+  <div class="main-layout-box">
+    <m-secondary-menu :type="'dataQuality'"></m-secondary-menu>
+    <router-view></router-view>
+  </div>
+</template>
+<script>
+  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
+  export default {
+    name: 'data-quality-index',
+    mounted () {
+    },
+    components: { mSecondaryMenu }
   }
-})
+</script>

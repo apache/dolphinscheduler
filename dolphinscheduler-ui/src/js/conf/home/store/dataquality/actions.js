@@ -14,28 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import kinship from './kinship'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-import dataquality from './dataquality'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    kinship,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor,
-    dataquality
+
+import io from '@/module/io'
+
+export default {
+  
+  /**
+   * get result list pages
+   */
+  getResultListPage ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/result/page', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * get rule list pages
+   */
+  getDataQualityRuleListPage ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/rule/page', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
-})
+}

@@ -276,6 +276,13 @@
           :backfill-item="backfillItem"
           :pre-node="nodeData.preNode">
         </m-conditions>
+        <m-data-quality
+          v-if="nodeData.taskType === 'DATA_QUALITY'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="DATA_QUALITY"
+          :backfill-item="backfillItem">
+        </m-data-quality>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
           v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
@@ -310,6 +317,7 @@
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
   import mConditions from './tasks/conditions'
+  import mDataQuality from './tasks/dataquality'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
@@ -811,6 +819,7 @@
       mDatax,
       mSqoop,
       mConditions,
+      mDataQuality,
       mSelectInput,
       mTimeoutAlarm,
       mDependentTimeout,
