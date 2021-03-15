@@ -109,8 +109,8 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     }
 
     /**
-     * get python home
-     * @return python home
+     * Gets the command path to which Python can execute
+     * @return python command path
      */
     @Override
     protected String commandInterpreter() {
@@ -118,21 +118,17 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
         }
-        return pythonHome;
+        return pythonHome + "/bin/python";
     }
 
 
 
     /**
-     *  get the absolute path of the Python command
+     *  get the absolute path of the Python are installed
      *  note :
-     *  common.properties
-     *  PYTHON_HOME configured under common.properties is Python absolute path, not PYTHON_HOME itself
      *
      *  for example :
-     *  your PYTHON_HOM is /opt/python3.7/
-     *  you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
-     *  dolphinscheduler.env.path file.
+     *  your PYTHON_HOM is /opt/python3.7
      *
      * @param envPath env path
      * @return python home

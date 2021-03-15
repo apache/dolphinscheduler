@@ -193,7 +193,7 @@ This environment variable sets `SPARK_HOME2`. The default value is `/opt/soft/sp
 
 **`PYTHON_HOME`**
 
-This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/python`.
+This environment variable sets `PYTHON_HOME`. The default value is `/usr`.
 
 **`JAVA_HOME`**
 
