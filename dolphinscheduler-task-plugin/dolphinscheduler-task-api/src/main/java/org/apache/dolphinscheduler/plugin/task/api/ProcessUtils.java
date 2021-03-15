@@ -31,6 +31,10 @@ import org.slf4j.LoggerFactory;
 
 public class ProcessUtils {
 
+    private ProcessUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * logger
      */

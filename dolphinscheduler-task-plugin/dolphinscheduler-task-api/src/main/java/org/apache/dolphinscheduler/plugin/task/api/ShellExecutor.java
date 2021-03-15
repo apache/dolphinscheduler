@@ -33,7 +33,7 @@ import java.util.Map;
 public class ShellExecutor extends AbstractShell {
 
     private String[] command;
-    private StringBuffer output;
+    private StringBuilder output;
 
     public ShellExecutor(String... execString) {
         this(execString, null);
@@ -137,7 +137,7 @@ public class ShellExecutor extends AbstractShell {
 
     @Override
     protected void parseExecResult(BufferedReader lines) throws IOException {
-        output = new StringBuffer();
+        output = new StringBuilder();
         char[] buf = new char[1024];
         int nRead;
         String line = "";

@@ -79,7 +79,7 @@ public abstract class AbstractShell {
      */
     private AtomicBoolean completed;
 
-    public AbstractShell() {
+    AbstractShell() {
         this(0L);
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractShell {
      * @param interval the minimum duration to wait before re-executing the
      * command.
      */
-    public AbstractShell(long interval) {
+    AbstractShell(long interval) {
         this.interval = interval;
         this.lastTime = (interval < 0) ? 0 : -interval;
     }

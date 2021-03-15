@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 public class FlinkConstants {
 
+    private FlinkConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * flink
      */

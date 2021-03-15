@@ -36,6 +36,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  */
 public class ThreadUtils {
 
+    private ThreadUtils() {
+        throw new IllegalStateException("Utility class");
+    }
 
     private static final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
     private static final int STACK_DEPTH = 20;
@@ -82,7 +85,7 @@ public class ThreadUtils {
                 maxThreadNumber,
                 keepAliveSeconds,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(),
+                new LinkedBlockingQueue<>(),
                 threadFactory);
         threadPool.allowCoreThreadTimeOut(true);
         return threadPool;

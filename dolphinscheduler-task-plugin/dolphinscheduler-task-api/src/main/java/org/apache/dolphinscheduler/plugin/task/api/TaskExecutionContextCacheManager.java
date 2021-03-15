@@ -24,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskExecutionContextCacheManager {
 
+    private TaskExecutionContextCacheManager() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * taskInstance cache
      */

@@ -28,6 +28,11 @@ import java.util.List;
  * flink args utils
  */
 public class FlinkArgsUtils {
+
+    private FlinkArgsUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String LOCAL_DEPLOY_MODE = "local";
     private static final String FLINK_VERSION_BEFORE_1_10 = "<1.10";
 

@@ -100,13 +100,11 @@ public class SparkArgsUtils {
         }
 
         String others = param.getOthers();
-        if (!SPARK_LOCAL.equals(deployMode)) {
-            if (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE)) {
-                String queue = param.getQueue();
-                if (StringUtils.isNotEmpty(queue)) {
-                    args.add(SparkConstants.SPARK_QUEUE);
-                    args.add(queue);
-                }
+        if (!SPARK_LOCAL.equals(deployMode) && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
+            String queue = param.getQueue();
+            if (StringUtils.isNotEmpty(queue)) {
+                args.add(SparkConstants.SPARK_QUEUE);
+                args.add(queue);
             }
         }
 

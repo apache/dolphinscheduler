@@ -24,6 +24,10 @@ import java.util.StringTokenizer;
 
 public class OSUtils {
 
+    private OSUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * get sudo command
      *

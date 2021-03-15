@@ -24,16 +24,10 @@ import java.util.Map;
  */
 public abstract class AbstractParameters implements IParameters {
 
-    @Override
-    public abstract boolean checkParameters();
-
-    @Override
-    public abstract List<ResourceInfo> getResourceFilesList();
-
     /**
      * local parameters
      */
-    public List<Property> localParams;
+    private  List<Property> localParams;
 
     /**
      * get local parameters list

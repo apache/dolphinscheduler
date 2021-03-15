@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 public class SparkConstants {
 
+    private SparkConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * --class CLASS_NAME
      */

@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.spi.task;
 
 public class TaskConstants {
 
+    public TaskConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
 
     /**

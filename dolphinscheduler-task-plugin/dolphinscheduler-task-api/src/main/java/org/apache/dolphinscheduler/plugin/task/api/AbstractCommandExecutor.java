@@ -86,16 +86,16 @@ public abstract class AbstractCommandExecutor {
      */
     protected TaskRequest taskRequest;
 
-    public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   TaskRequest taskRequest,
-                                   Logger logger) {
+    AbstractCommandExecutor(Consumer<List<String>> logHandler,
+                            TaskRequest taskRequest,
+                            Logger logger) {
         this.logHandler = logHandler;
         this.taskRequest = taskRequest;
         this.logger = logger;
         this.logBuffer = Collections.synchronizedList(new ArrayList<>());
     }
 
-    protected AbstractCommandExecutor(List<String> logBuffer) {
+    AbstractCommandExecutor(List<String> logBuffer) {
         this.logBuffer = logBuffer;
     }
 
@@ -321,27 +321,25 @@ public abstract class AbstractCommandExecutor {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskRequest.getTaskAppId());
         ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
         getOutputLogService.submit(() -> {
-            BufferedReader inReader = null;
-            try {
-                inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(")) {
-                        varPool.append(line.substring("${setValue(".length(), line.length() - 2));
+                        varPool.append(line, "${setValue(".length(), line.length() - 2);
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
                         taskResultString = line;
                     }
                 }
+                logOutputIsSuccess = true;
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-            } finally {
                 logOutputIsSuccess = true;
-                close(inReader);
             }
         });
+
         getOutputLogService.shutdown();
 
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
@@ -405,25 +403,15 @@ public abstract class AbstractCommandExecutor {
             return lineList;
         }
 
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
-            String line = null;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
+            String line;
             while ((line = br.readLine()) != null) {
                 lineList.add(line);
             }
         } catch (Exception e) {
             logger.error(String.format("read file: %s failed : ", filename), e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-
         }
+
         return lineList;
     }
 

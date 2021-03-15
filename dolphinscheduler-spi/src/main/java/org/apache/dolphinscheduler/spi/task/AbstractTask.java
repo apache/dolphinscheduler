@@ -122,7 +122,7 @@ public abstract class AbstractTask {
      */
     public void logHandle(List<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
-        if (logs.contains(FINALIZE_SESSION_MARKER)) {
+        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
             logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         } else {
             logger.info(" -> {}", String.join("\n\t", logs));
