@@ -19,17 +19,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-nameOverride: ""
-fullnameOverride: ""
-
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "docker.io"
   repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
-  pullSecrets: []
+  pullSecret: ""
 
 ## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
@@ -52,7 +48,6 @@ externalDatabase:
   username: "root"
   password: "root"
   database: "dolphinscheduler"
-  ## multi params should join with & char
   params: "characterEncoding=utf8"
 
 ## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
@@ -81,12 +76,12 @@ common:
     - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
     - "export SPARK_HOME1=/opt/soft/spark1"
     - "export SPARK_HOME2=/opt/soft/spark2"
-    - "export PYTHON_HOME=/usr/bin/python"
+    #- "export PYTHON_HOME=/opt/soft/python"
     - "export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk"
     - "export HIVE_HOME=/opt/soft/hive"
     - "export FLINK_HOME=/opt/soft/flink"
     - "export DATAX_HOME=/opt/soft/datax/bin/datax.py"
-    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
+    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
     DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
     RESOURCE_STORAGE_TYPE: "HDFS"
     RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
@@ -208,7 +203,7 @@ worker:
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
     WORKER_GROUPS: "default"
-    WORKER_WEIGHT: "100"
+    WORKER_HOST_WEIGHT: "100"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

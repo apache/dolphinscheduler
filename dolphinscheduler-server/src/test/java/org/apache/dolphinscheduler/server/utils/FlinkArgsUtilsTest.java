@@ -53,10 +53,8 @@ public class FlinkArgsUtilsTest {
     public String others = "-s hdfs:///flink/savepoint-1537";
     public String flinkVersion = "<1.10";
 
-
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp() {
         ResourceInfo main = new ResourceInfo();
         main.setRes("testflink-1.0.0-SNAPSHOT.jar");
         mainJar = main;
@@ -67,7 +65,6 @@ public class FlinkArgsUtilsTest {
      */
     @Test
     public void testBuildArgs() {
-
         //Define params
         FlinkParameters param = new FlinkParameters();
         param.setDeployMode(mode);
@@ -98,35 +95,35 @@ public class FlinkArgsUtilsTest {
         assertEquals("yarn-cluster", result.get(1));
 
         assertEquals("-ys", result.get(2));
-        assertSame(Integer.valueOf(result.get(3)),slot);
+        assertSame(slot, Integer.valueOf(result.get(3)));
 
-        assertEquals("-ynm",result.get(4));
-        assertEquals(result.get(5),appName);
+        assertEquals("-ynm", result.get(4));
+        assertEquals(appName, result.get(5));
 
         assertEquals("-yn", result.get(6));
-        assertSame(Integer.valueOf(result.get(7)),taskManager);
+        assertSame(taskManager, Integer.valueOf(result.get(7)));
 
         assertEquals("-yjm", result.get(8));
-        assertEquals(result.get(9),jobManagerMemory);
+        assertEquals(jobManagerMemory, result.get(9));
 
         assertEquals("-ytm", result.get(10));
-        assertEquals(result.get(11),taskManagerMemory);
+        assertEquals(taskManagerMemory, result.get(11));
 
         assertEquals("-yqu", result.get(12));
-        assertEquals(result.get(13),queue);
+        assertEquals(queue, result.get(13));
 
         assertEquals("-p", result.get(14));
-        assertSame(Integer.valueOf(result.get(15)),parallelism);
+        assertSame(parallelism, Integer.valueOf(result.get(15)));
 
         assertEquals("-sae", result.get(16));
 
-        assertEquals(result.get(17),others);
+        assertEquals(others, result.get(17));
 
         assertEquals("-c", result.get(18));
-        assertEquals(result.get(19),mainClass);
+        assertEquals(mainClass, result.get(19));
 
-        assertEquals(result.get(20),mainJar.getRes());
-        assertEquals(result.get(21),mainArgs);
+        assertEquals(mainJar.getRes(), result.get(20));
+        assertEquals(mainArgs, result.get(21));
 
         //Others param without -yqu
         FlinkParameters param1 = new FlinkParameters();
@@ -134,6 +131,6 @@ public class FlinkArgsUtilsTest {
         param1.setDeployMode(mode);
         result = FlinkArgsUtils.buildArgs(param1);
         assertEquals(5, result.size());
-
     }
+
 }

@@ -47,7 +47,6 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
 
-
 /**
  * worker registry
  */
@@ -115,6 +114,7 @@ public class WorkerRegistry {
                         zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
                     } else if (newState == ConnectionState.SUSPENDED) {
                         logger.warn("worker : {} connection SUSPENDED ", address);
+                        zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
                     }
                 });
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
@@ -142,6 +142,7 @@ public class WorkerRegistry {
             logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
         }
         this.heartBeatExecutor.shutdownNow();
+        logger.info("heartbeat executor shutdown");
     }
 
     /**
@@ -152,7 +153,7 @@ public class WorkerRegistry {
 
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
-        int weight = workerConfig.getWeight();
+        int weight = workerConfig.getHostWeight();
         long workerStartTime = System.currentTimeMillis();
 
         for (String workGroup : this.workerGroups) {

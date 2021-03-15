@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="dependence-model">
+  <div class="conditions-model">
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -45,7 +45,7 @@
                data-container="body"
                :class="_isDetails"
                @click="!isDetails && _deleteDep($index)"
-               :title="$t('delete')" >
+               :title="$t('Delete')" >
             </em>
             <m-node-status
               :dependTaskList='dependTaskList'
@@ -178,7 +178,7 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .dependence-model {
+  .conditions-model {
     margin-top: -10px;
     .dep-opt {
       margin-bottom: 10px;

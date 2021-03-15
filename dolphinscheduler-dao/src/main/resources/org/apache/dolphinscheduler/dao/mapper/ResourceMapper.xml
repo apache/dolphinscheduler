@@ -99,8 +99,9 @@
         from t_ds_resources r
         where r.type = 0
         and r.user_id=#{userId}
-        <if test="resNames != null and resNames != ''">
 
+        <if test="resNames != null and resNames.length > 0">
+            and full_name in
             <foreach collection="resNames" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
@@ -129,8 +130,8 @@
         </include>
         from t_ds_resources r
         where  r.user_id=#{userId}
-        <if test="resIds != null and resIds != ''">
-            and r.id in
+        <if test="resIds != null and resIds.length > 0">
+            and id in
             <foreach collection="resIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>

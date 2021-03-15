@@ -95,9 +95,8 @@ public class WorkerServer implements IStoppable {
     private WorkerManagerThread workerManagerThread;
 
     /**
-     * worker server startup
+     * worker server startup, not use web service
      *
-     * worker server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -117,7 +116,7 @@ public class WorkerServer implements IStoppable {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor(alertClientService));
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
@@ -143,12 +142,9 @@ public class WorkerServer implements IStoppable {
         /**
          * register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (Stopper.isRunning()) {
-                    close("shutdownHook");
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
+                close("shutdownHook");
             }
         }));
     }
@@ -156,7 +152,7 @@ public class WorkerServer implements IStoppable {
     public void close(String cause) {
 
         try {
-            //execute only once
+            // execute only once
             if (Stopper.isStopped()) {
                 return;
             }
@@ -167,21 +163,18 @@ public class WorkerServer implements IStoppable {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quitely stop
+                // thread sleep 3 seconds for thread quitely stop
                 Thread.sleep(3000L);
             } catch (Exception e) {
                 logger.warn("thread sleep exception", e);
             }
 
+            // close
             this.nettyRemotingServer.close();
             this.workerRegistry.unRegistry();
-
             this.alertClientService.close();
-
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
-        } finally {
-            System.exit(-1);
         }
     }
 
