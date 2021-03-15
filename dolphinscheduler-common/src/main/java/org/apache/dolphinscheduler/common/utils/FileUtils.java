@@ -132,25 +132,6 @@ public class FileUtils {
     }
 
     /**
-     * directory of process instances
-     *
-     * @param projectId project id
-     * @param processDefineId process definition id
-     * @param processInstanceId process instance id
-     * @return directory of process instances
-     */
-    public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId) {
-        String fileName = String.format("%s/exec/process/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
-                Integer.toString(processDefineId), Integer.toString(processInstanceId));
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
-    }
-
-    /**
      * @return get suffixes for resource files that support online viewing
      */
     public static String getResourceViewSuffixs() {

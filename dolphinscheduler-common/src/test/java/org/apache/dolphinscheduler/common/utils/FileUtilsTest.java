@@ -62,8 +62,6 @@ public class FileUtilsTest {
     public void testGetProcessExecDir() {
         String dir = FileUtils.getProcessExecDir(1,2,3, 4);
         Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3/4", dir);
-        dir = FileUtils.getProcessExecDir(1,2,3);
-        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3", dir);
     }
 
     @Test

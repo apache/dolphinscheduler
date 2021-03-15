@@ -111,7 +111,6 @@ public class MasterExecThreadTest {
         dag.setAccessible(true);
         dag.set(masterExecThread, new DAG());
         PowerMockito.doNothing().when(masterExecThread, "executeProcess");
-        PowerMockito.doNothing().when(masterExecThread, "postHandle");
         PowerMockito.doNothing().when(masterExecThread, "prepareProcess");
         PowerMockito.doNothing().when(masterExecThread, "runProcess");
         PowerMockito.doNothing().when(masterExecThread, "endProcess");
