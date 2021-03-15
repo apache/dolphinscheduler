@@ -66,8 +66,6 @@ public class WorkFlowLineageServiceTest {
         ids.add(1);
         ids.add(2);
 
-        when(workFlowLineageMapper.queryByIds(ids, 1L)).thenReturn(getWorkFlowLineages());
-        when(workFlowLineageMapper.querySourceTarget(1)).thenReturn(getWorkFlowRelation());
         Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(ids,1);
         Map<String, Object> workFlowLists = (Map<String, Object>)result.get(Constants.DATA_LIST);
         List<WorkFlowLineage> workFlowLineages = (List<WorkFlowLineage>)workFlowLists.get("workFlowList");

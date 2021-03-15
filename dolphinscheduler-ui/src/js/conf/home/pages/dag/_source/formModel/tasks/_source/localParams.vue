@@ -70,7 +70,7 @@
       </el-input>
       <span class="lt-add" v-show="!item.ifFixed">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('Delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (localParamsList.length - 1)">

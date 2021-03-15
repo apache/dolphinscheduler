@@ -218,11 +218,11 @@
           if (this.timingData.item.crontab) {
             api = 'dag/updateSchedule'
             searchParams.id = this.timingData.item.id
-            msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
+            msg = `${i18n.$t('Edit')}${i18n.$t('Success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
             searchParams.processDefinitionId = this.timingData.item.id
-            msg = `${i18n.$t('Create')}${i18n.$t('success')}`
+            msg = `${i18n.$t('Create')}${i18n.$t('Success')}`
           }
 
           this.store.dispatch(api, searchParams).then(res => {
