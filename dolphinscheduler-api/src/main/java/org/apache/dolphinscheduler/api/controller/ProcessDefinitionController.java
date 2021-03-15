@@ -126,7 +126,13 @@ public class ProcessDefinitionController extends BaseController {
 
         logger.info("login user {}, create  process definition, project name: {}, process definition name: {}, "
                 + "process_definition_json: {}, desc: {} locations:{}, connects:{}",
-            loginUser.getUserName(), projectName, name, json, description, locations, connects);
+                RegexUtils.escapeNRT(loginUser.getUserName()),
+                RegexUtils.escapeNRT(projectName),
+                RegexUtils.escapeNRT(name),
+                RegexUtils.escapeNRT(json),
+                RegexUtils.escapeNRT(description),
+                RegexUtils.escapeNRT(locations),
+                RegexUtils.escapeNRT(connects));
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
             description, locations, connects);
         return returnDataList(result);
