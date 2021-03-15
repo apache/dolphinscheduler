@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.task;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,12 +15,12 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.spi.task;
+
 import java.util.Date;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import javafx.beans.property.Property;
 
 public class TaskRequest {
 
