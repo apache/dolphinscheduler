@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
@@ -120,14 +121,14 @@ public class PythonTask extends AbstractTask {
                         pythonParameters.getLocalParametersMap(),
                         CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                         taskExecutionContext.getScheduleTime());
-        
+
         try {
             rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
         }
         catch (StringIndexOutOfBoundsException e) {
             logger.error("setShareVar field format error, raw python script : {}", rawPythonScript);
         }
-        
+
         if (paramsMap != null) {
             rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
         }
@@ -142,5 +143,5 @@ public class PythonTask extends AbstractTask {
     public AbstractParameters getParameters() {
         return pythonParameters;
     }
-    
+
 }
