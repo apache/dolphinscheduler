@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -27,13 +29,16 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.log.LogClientService;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,10 +70,16 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      */
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
+    /*
+     * task execute manager
+     */
+    private final WorkerManagerThread workerManager;
+
     public TaskKillProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
     }
 
     /**
@@ -100,13 +111,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @return kill result
      */
     private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
+        boolean processFlag = true;
         List<String> appIds = Collections.emptyList();
+        int taskInstanceId = killCommand.getTaskInstanceId();
+        TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         try {
-            int taskInstanceId = killCommand.getTaskInstanceId();
-            TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-
             Integer processId = taskExecutionContext.getProcessId();
             if (processId.equals(0)) {
+                workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
                 taskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
                 return Pair.of(true, appIds);
@@ -119,14 +131,17 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
                 OSUtils.exeCmd(cmd);
             }
-            // find log and kill yarn job
-            appIds = ProcessUtils.killYarnJob(taskExecutionContext);
 
-            return Pair.of(true, appIds);
         } catch (Exception e) {
+            processFlag = false;
             logger.error("kill task error", e);
         }
-        return Pair.of(false, appIds);
+        // find log and kill yarn job
+        Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()).getIp(),
+                taskExecutionContext.getLogPath(),
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTenantCode());
+        return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
     }
 
     /**
@@ -149,4 +164,42 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         }
         return taskKillResponseCommand;
     }
+
+    /**
+     * kill yarn job
+     *
+     * @param host        host
+     * @param logPath     logPath
+     * @param executePath executePath
+     * @param tenantCode  tenantCode
+     * @return Pair<Boolean, List<String>> yarn kill result
+     */
+    private Pair<Boolean, List<String>> killYarnJob(String host, String logPath, String executePath, String tenantCode) {
+        LogClientService logClient = null;
+        try {
+            logClient = new LogClientService();
+            logger.info("view log host : {},logPath : {}", host, logPath);
+            String log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
+            List<String> appIds = Collections.emptyList();
+            if (StringUtils.isNotEmpty(log)) {
+                appIds = LoggerUtils.getAppIds(log, logger);
+                if (StringUtils.isEmpty(executePath)) {
+                    logger.error("task instance execute path is empty");
+                    throw new RuntimeException("task instance execute path is empty");
+                }
+                if (appIds.size() > 0) {
+                    ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
+                }
+            }
+            return Pair.of(true, appIds);
+        } catch (Exception e) {
+            logger.error("kill yarn job error", e);
+        } finally {
+            if (logClient != null) {
+                logClient.close();
+            }
+        }
+        return Pair.of(false, Collections.emptyList());
+    }
+
 }

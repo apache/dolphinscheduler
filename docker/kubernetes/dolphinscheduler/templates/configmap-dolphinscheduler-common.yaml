@@ -28,7 +28,7 @@ data:
   {{- range .Values.common.configmap.DOLPHINSCHEDULER_ENV }}
     {{ . }}
   {{- end }}
-  DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ include "dolphinscheduler.data.basedir.path" . | quote }}
+  DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ .Values.common.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH | quote }}
   RESOURCE_STORAGE_TYPE: {{ .Values.common.configmap.RESOURCE_STORAGE_TYPE | quote }}
   RESOURCE_UPLOAD_PATH: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
   FS_DEFAULT_FS: {{ .Values.common.configmap.FS_DEFAULT_FS | quote }}

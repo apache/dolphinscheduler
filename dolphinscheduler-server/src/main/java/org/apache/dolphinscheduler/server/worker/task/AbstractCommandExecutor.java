@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
+
 /**
  * abstract command executor
  */
@@ -83,6 +84,13 @@ public abstract class AbstractCommandExecutor {
      * log list
      */
     protected final List<String> logBuffer;
+    
+    protected boolean logOutputIsScuccess = false;
+
+    /**
+     * SHELL result string
+     */
+    protected String taskResultString;
 
     /**
      * taskExecutionContext
@@ -102,6 +110,10 @@ public abstract class AbstractCommandExecutor {
         this.logger = logger;
         this.logBuffer = Collections.synchronizedList(new ArrayList<>());
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+    }
+
+    protected AbstractCommandExecutor(List<String> logBuffer) {
+        this.logBuffer = logBuffer;
     }
 
     /**
@@ -223,6 +235,7 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
+
     /**
      * cancel application
      *
@@ -337,33 +350,46 @@ public abstract class AbstractCommandExecutor {
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
-        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader inReader = null;
-
-                try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
-
-                    long lastFlushTime = System.currentTimeMillis();
-
-                    while ((line = inReader.readLine()) != null) {
-                        if (line.startsWith("${setValue(")) {
-                            varPool.append(line.substring("${setValue(".length(), line.length() - 2));
-                            varPool.append("$VarPool$");
-                        } else {
-                            logBuffer.add(line);
-                            lastFlushTime = flush(lastFlushTime);
-                        }
+        ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
+        getOutputLogService.submit(() -> {
+            BufferedReader inReader = null;
+            try {
+                inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                logBuffer.add("welcome to use bigdata scheduling system...");
+                while ((line = inReader.readLine()) != null) {
+                    if (line.startsWith("${setValue(")) {
+                        varPool.append(line.substring("${setValue(".length(), line.length() - 2));
+                        varPool.append("$VarPool$");
+                    } else {
+                        logBuffer.add(line);
+                        taskResultString = line;
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    clear();
-                    close(inReader);
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                logOutputIsScuccess = true;
+                close(inReader);
+            }
+        });
+        getOutputLogService.shutdown();
+
+        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        parseProcessOutputExecutorService.submit(() -> {
+            try {
+                long lastFlushTime = System.currentTimeMillis();
+                while (logBuffer.size() > 0 || !logOutputIsScuccess) {
+                    if (logBuffer.size() > 0) {
+                        lastFlushTime = flush(lastFlushTime);
+                    } else {
+                        Thread.sleep(Constants.DEFAULT_LOG_FLUSH_INTERVAL);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                clear();
             }
         });
         parseProcessOutputExecutorService.shutdown();
@@ -564,4 +590,12 @@ public abstract class AbstractCommandExecutor {
     protected abstract String commandInterpreter();
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
+
+    public String getTaskResultString() {
+        return taskResultString;
+    }
+
+    public void setTaskResultString(String taskResultString) {
+        this.taskResultString = taskResultString;
+    }
 }

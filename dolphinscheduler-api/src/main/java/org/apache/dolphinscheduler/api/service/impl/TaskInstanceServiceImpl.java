@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -35,7 +34,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,20 +106,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             statusArray = new int[]{stateType.ordinal()};
         }
 
-        Date start = null;
-        Date end = null;
-        if (StringUtils.isNotEmpty(startDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            if (start == null) {
-                return generateInvalidParamRes(result, "startDate");
-            }
+        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
+        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return checkAndParseDateResult;
         }
-        if (StringUtils.isNotEmpty(endDate)) {
-            end = DateUtils.getScheduleDate(endDate);
-            if (end == null) {
-                return generateInvalidParamRes(result, "endDate");
-            }
-        }
+        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
+        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
 
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -177,8 +167,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return result;
         }
 
-        // check whether the task instance state type is failure
-        if (!task.getState().typeIsFailure()) {
+        // check whether the task instance state type is failure or cancel
+        if (!task.getState().typeIsFailure() && !task.getState().typeIsCancel()) {
             putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
             return result;
         }
@@ -192,18 +182,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
 
-        return result;
-    }
-
-    /***
-     * generate {@link org.apache.dolphinscheduler.api.enums.Status#REQUEST_PARAMS_NOT_VALID_ERROR} res with  param name
-     * @param result exist result map
-     * @param params invalid params name
-     * @return update result map
-     */
-    private Map<String, Object> generateInvalidParamRes(Map<String, Object> result, String params) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), params));
         return result;
     }
 }
