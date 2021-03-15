@@ -15,7 +15,6 @@ package org.apache.dolphinscheduler.spi.common;/*
  * limitations under the License.
  */
 
-
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;

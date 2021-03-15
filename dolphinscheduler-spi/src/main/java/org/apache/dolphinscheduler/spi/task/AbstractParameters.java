@@ -15,7 +15,6 @@ package org.apache.dolphinscheduler.spi.task;/*
  * limitations under the License.
  */
 
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

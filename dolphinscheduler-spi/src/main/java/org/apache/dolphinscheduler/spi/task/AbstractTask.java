@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.spi.task;
 
-
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -30,7 +29,6 @@ import org.slf4j.MarkerFactory;
 public abstract class AbstractTask {
 
     public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
-
 
     /**
      * varPool string
@@ -46,7 +44,6 @@ public abstract class AbstractTask {
      * log record
      */
     protected Logger logger;
-
 
     /**
      * SHELL process pid
@@ -107,7 +104,6 @@ public abstract class AbstractTask {
      * @throws Exception exception
      */
     public abstract void handle() throws Exception;
-
 
     /**
      * cancel application
@@ -185,14 +181,12 @@ public abstract class AbstractTask {
      */
     public abstract AbstractParameters getParameters();
 
-
     /**
      * result processing maybe
      */
     public void after() {
 
     }
-
 
     /**
      * get exit status according to exitCode

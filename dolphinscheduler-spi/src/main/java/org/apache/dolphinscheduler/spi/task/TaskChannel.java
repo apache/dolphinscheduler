@@ -19,10 +19,8 @@ import org.slf4j.Logger;
 
 public interface TaskChannel {
 
-
     void cancelApplication(boolean status);
 
     AbstractTask createTask(TaskRequest taskRequest,Logger logger);
-
 
 }

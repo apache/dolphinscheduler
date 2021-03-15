@@ -58,7 +58,6 @@ public class TaskResponse {
 
     private TaskRunStatus status;
 
-
     public String getVarPool() {
         return varPool;
     }

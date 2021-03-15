@@ -39,7 +39,6 @@ public class ResourceInfo {
         this.id = id;
     }
 
-
     public String getRes() {
         return res;
     }
