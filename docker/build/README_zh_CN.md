@@ -193,7 +193,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`PYTHON_HOME`**
 
-配置`dolphinscheduler`的`PYTHON_HOME`，默认值 `/usr/bin/python`。
+配置`dolphinscheduler`的`PYTHON_HOME`，默认值 `/usr`。
 
 **`JAVA_HOME`**
 
