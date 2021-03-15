@@ -30,8 +30,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ResourceUserMapper extends BaseMapper<ResourcesUser> {
 
-
-    List<Integer> queryResourcesIdListByUserId(@Param("userId") int userId);
     /**
      * query resourcesId list by userId and perm
      * @param userId userId
