@@ -238,14 +238,16 @@ public class ResourceMapperTest {
                 0,
                 -1,
                 resource.getType().ordinal(),
-                ""
+                "",
+                new ArrayList<>()
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
                 1110,
                 -1,
                 resource.getType().ordinal(),
-                ""
+                "",
+                null
         );
         Assert.assertNotEquals(resourceIPage.getTotal(), 0);
         Assert.assertNotEquals(resourceIPage1.getTotal(), 0);
