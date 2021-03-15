@@ -174,8 +174,8 @@
           formData.append('file', this.file)
           formData.append('type', this.type)
           formData.append('name', this.name)
-          formData.append('pid', this.pid)
-          formData.append('currentDir', this.currentDir)
+          formData.append('pid', localStore.getItem('pid') || this.id)
+          formData.append('currentDir', localStore.getItem('currentDir') || this.currentDir)
           formData.append('description', this.description)
           io.post('resources/create', res => {
             this.$message.success(res.msg)
