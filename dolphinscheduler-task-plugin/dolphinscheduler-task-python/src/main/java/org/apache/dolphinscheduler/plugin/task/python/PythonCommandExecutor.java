@@ -145,10 +145,9 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * @return python home
      */
     private static String getPythonHome(String envPath) {
-        BufferedReader br = null;
+        // BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.contains(PythonConstants.PYTHON_HOME)) {
@@ -164,17 +163,8 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
             if (arrs.length == 2) {
                 return arrs[1];
             }
-
         } catch (IOException e) {
             logger.error("read file failure", e);
-        } finally {
-            try {
-                if (br != null) {
-                    br.close();
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
         }
         return null;
     }

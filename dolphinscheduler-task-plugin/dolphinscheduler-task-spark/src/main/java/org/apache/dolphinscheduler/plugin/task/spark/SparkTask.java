@@ -78,7 +78,7 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     @Override
-    public String getPreScript() throws Exception {
+    public String getPreScript() {
         // spark-submit [options] <app jar | python file> [app arguments]
         List<String> args = new ArrayList<>();
 

@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.python;
+package org.apache.dolphinscheduler.plugin.task.api;
 
-public class PythonConstants {
+public class TaskException extends RuntimeException {
 
-    private PythonConstants() {
-        throw new IllegalStateException("Utility class");
+    private static final long serialVersionUID = 8155449302457294758L;
+
+    public TaskException() {
+        super();
     }
 
-    /**
-     * python home
-     */
-    public static final String PYTHON_HOME = "PYTHON_HOME";
+    public TaskException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 
-    /**
-     * EQUAL SIGN
-     */
-    public static final String EQUAL_SIGN = "=";
+    public TaskException(String msg) {
+        super(msg);
+    }
 }

@@ -306,7 +306,7 @@ public abstract class AbstractShell {
      * This is an IOException with exit code added.
      */
     public static class ExitCodeException extends IOException {
-        int exitCode;
+        private final int exitCode;
 
         public ExitCodeException(int exitCode, String message) {
             super(message);

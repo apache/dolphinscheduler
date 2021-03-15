@@ -87,8 +87,8 @@ public abstract class AbstractCommandExecutor {
     protected TaskRequest taskRequest;
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                            TaskRequest taskRequest,
-                            Logger logger) {
+                                   TaskRequest taskRequest,
+                                   Logger logger) {
         this.logHandler = logHandler;
         this.taskRequest = taskRequest;
         this.logger = logger;
@@ -486,21 +486,6 @@ public abstract class AbstractCommandExecutor {
             logBuffer.clear();
         }
         return lastFlushTime;
-    }
-
-    /**
-     * close buffer reader
-     *
-     * @param inReader in reader
-     */
-    private void close(BufferedReader inReader) {
-        if (inReader != null) {
-            try {
-                inReader.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
     }
 
     protected List<String> commandOptions() {

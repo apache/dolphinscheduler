@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.python;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
@@ -73,7 +74,7 @@ public class PythonTask extends AbstractTask {
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PythonParameters.class);
 
         if (!pythonParameters.checkParameters()) {
-            throw new RuntimeException("python task params is not valid");
+            throw new TaskException("python task params is not valid");
         }
     }
 
@@ -106,7 +107,7 @@ public class PythonTask extends AbstractTask {
         } catch (Exception e) {
             logger.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("run python task error",e);
         }
     }
 

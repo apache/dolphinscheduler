@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.shell;
 
 import org.apache.dolphinscheduler.plugin.task.api.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskResponse;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.AbstractTask;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.spi.task.TaskRequest;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -93,7 +95,7 @@ public class ShellTask extends AbstractTask {
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle() {
         try {
             // construct process
             TaskResponse response = shellCommandExecutor.run(command);
@@ -104,7 +106,7 @@ public class ShellTask extends AbstractTask {
         } catch (Exception e) {
             logger.error("shell task error", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("shell task error", e);
         }
     }
 
@@ -120,13 +122,12 @@ public class ShellTask extends AbstractTask {
     }
 
     /**
-     * create command
+     * set command
      *
-     * @return file name
-     * @throws Exception exception
+     * @throws IOException exception
      */
     @Override
-    public void setCommand(String command) throws Exception {
+    public void setCommand(String command) throws IOException {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskRequest.getExecutePath(),

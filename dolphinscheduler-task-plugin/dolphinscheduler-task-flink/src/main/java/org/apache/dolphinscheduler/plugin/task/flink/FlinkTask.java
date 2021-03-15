@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
 import org.apache.dolphinscheduler.spi.task.ResourceInfo;
 import org.apache.dolphinscheduler.spi.task.TaskRequest;
@@ -54,7 +55,7 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     @Override
-    public String getPreScript() throws Exception {
+    public String getPreScript() {
 
         // flink run [OPTIONS] <jar-file> <arguments>
         List<String> args = new ArrayList<>();
@@ -82,7 +83,7 @@ public class FlinkTask extends AbstractYarnTask {
         flinkParameters = JSONUtils.parseObject(flinkRequest.getTaskParams(), FlinkParameters.class);
 
         if (!flinkParameters.checkParameters()) {
-            throw new RuntimeException("flink task params is not valid");
+            throw new TaskException("flink task params is not valid");
         }
     }
 

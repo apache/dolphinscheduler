@@ -84,13 +84,11 @@ public abstract class AbstractTask {
 
     /**
      * init task
-     *
-     * @throws Exception exception
      */
-    public void init() throws Exception {
+    public void init() {
     }
 
-    public String getPreScript() throws Exception {
+    public String getPreScript() {
         return null;
     }
 
