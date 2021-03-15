@@ -52,7 +52,7 @@
   </div>
 </template>
 <script>
-  import { ruleType} from '@/conf/home/pages/dataquality/_source/common'
+  import { ruleType } from '@/conf/home/pages/dataquality/_source/common'
   import mTooltipsJSON from '@/module/components/tooltipsJSON/tooltipsJSON'
   export default {
     name: 'rule-list',
