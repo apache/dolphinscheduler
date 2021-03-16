@@ -16,32 +16,31 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.junit.Test;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
-import static org.hamcrest.Matchers.greaterThan;
+
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
-public class WokrerGrouopDaoTest {
-    protected  final DataSource dataSource = getDataSource();
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.junit.Test;
+
+public class WorkerGroupDaoTest {
+    protected final DataSource dataSource = getDataSource();
 
     @Test
-    public void testQueryQueryAllOldWorkerGroup() throws Exception{
+    public void testQueryQueryAllOldWorkerGroup() throws Exception {
         WorkerGroupDao workerGroupDao = new WorkerGroupDao();
 
         Map<Integer, String> workerGroupMap = workerGroupDao.queryAllOldWorkerGroup(dataSource.getConnection());
 
-        assertThat(workerGroupMap.size(),greaterThanOrEqualTo(0));
+        assertThat(workerGroupMap.size(), greaterThanOrEqualTo(0));
     }
 
     @Test(expected = Exception.class)
-    public void testQueryQueryAllOldWorkerGroupException() throws Exception{
+    public void testQueryQueryAllOldWorkerGroupException() throws Exception {
         WorkerGroupDao workerGroupDao = new WorkerGroupDao();
 
         workerGroupDao.queryAllOldWorkerGroup(null);
