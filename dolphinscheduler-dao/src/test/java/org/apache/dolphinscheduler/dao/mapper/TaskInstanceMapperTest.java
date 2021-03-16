@@ -79,13 +79,13 @@ public class TaskInstanceMapperTest {
      */
     private TaskInstance insertOne() {
         //insertOne
-        return insertOne("us task", processInstanceId, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString());
+        return insertOne("us task", processInstanceId, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString(),1);
     }
 
     /**
      * construct a task instance and then insert
      */
-    private TaskInstance insertOne(String taskName, int processInstanceId, ExecutionStatus state, String taskType) {
+    private TaskInstance insertOne(String taskName, int processInstanceId, ExecutionStatus state, String taskType,int processDefinitionId) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setFlag(Flag.YES);
         taskInstance.setName(taskName);
@@ -95,6 +95,7 @@ public class TaskInstanceMapperTest {
         taskInstance.setTaskJson("{}");
         taskInstance.setProcessInstanceId(processInstanceId);
         taskInstance.setTaskType(taskType);
+        taskInstance.setProcessDefinitionId(processDefinitionId);
         taskInstanceMapper.insert(taskInstance);
         return taskInstance;
     }
@@ -300,7 +301,7 @@ public class TaskInstanceMapperTest {
         processInstance.setCommandType(CommandType.START_PROCESS);
         processInstanceMapper.insert(processInstance);
 
-        TaskInstance task = insertOne("us task", processInstance.getId(), ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString());
+        TaskInstance task = insertOne("us task", processInstance.getId(), ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString(),definition.getId());
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
