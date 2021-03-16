@@ -232,4 +232,23 @@ public class ProcessTaskRelation {
     public void setPostTaskVersion(int postTaskVersion) {
         this.postTaskVersion = postTaskVersion;
     }
+
+    @Override
+    public String toString() {
+        return "ProcessTaskRelation{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", processDefinitionVersion=" + processDefinitionVersion
+                + ", projectCode=" + projectCode
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", preTaskCode=" + preTaskCode
+                + ", preTaskVersion=" + preTaskVersion
+                + ", postTaskCode=" + postTaskCode
+                + ", postTaskVersion=" + postTaskVersion
+                + ", conditionType=" + conditionType
+                + ", conditionParams='" + conditionParams + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
+    }
 }
