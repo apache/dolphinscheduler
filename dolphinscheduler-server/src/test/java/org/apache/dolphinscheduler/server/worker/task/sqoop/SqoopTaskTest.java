@@ -96,9 +96,10 @@ public class SqoopTaskTest {
         SqoopJobGenerator generator = new SqoopJobGenerator();
         String mysqlToHdfsScript = generator.generateSqoopJob(mysqlToHdfsParams, mysqlTaskExecutionContext);
         String mysqlToHdfsExpected =
-            "sqoop import -D mapred.job.name=sqoop_import -D mapreduce.map.memory.mb=4096 --direct  -m 1 --connect \"jdbc:mysql://192.168.0.111:3306/test\" "
-                + "--username kylo --password \"123456\" --table person_2 --target-dir /ods/tmp/test/person7 --as-textfile "
-                + "--delete-target-dir --fields-terminated-by '@' --lines-terminated-by '\\n' --null-non-string 'NULL' --null-string 'NULL'";
+                "sqoop import -D mapred.job.name=sqoop_import -D mapreduce.map.memory.mb=4096 --direct  -m 1 --connect "
+                        + "\"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" "
+                        + "--username kylo --password \"123456\" --table person_2 --target-dir /ods/tmp/test/person7 --as-textfile "
+                        + "--delete-target-dir --fields-terminated-by '@' --lines-terminated-by '\\n' --null-non-string 'NULL' --null-string 'NULL'";
         Assert.assertEquals(mysqlToHdfsExpected, mysqlToHdfsScript);
 
         //export hdfs to mysql using update mode
@@ -110,9 +111,10 @@ public class SqoopTaskTest {
         SqoopParameters hdfsToMysqlParams = JSONUtils.parseObject(hdfsToMysql, SqoopParameters.class);
         String hdfsToMysqlScript = generator.generateSqoopJob(hdfsToMysqlParams, mysqlTaskExecutionContext);
         String hdfsToMysqlScriptExpected =
-            "sqoop export -D mapred.job.name=sqoop_import -m 1 --export-dir /ods/tmp/test/person7 --connect \"jdbc:mysql://192.168.0.111:3306/test\" "
-                + "--username kylo --password \"123456\" --table person_3 --columns id,name,age,sex,create_time --fields-terminated-by '@' "
-                + "--lines-terminated-by '\\n' --update-key id --update-mode allowinsert";
+                "sqoop export -D mapred.job.name=sqoop_import -m 1 --export-dir /ods/tmp/test/person7 --connect "
+                        + "\"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" "
+                        + "--username kylo --password \"123456\" --table person_3 --columns id,name,age,sex,create_time --fields-terminated-by '@' "
+                        + "--lines-terminated-by '\\n' --update-key id --update-mode allowinsert";
         Assert.assertEquals(hdfsToMysqlScriptExpected, hdfsToMysqlScript);
 
         //export hive to mysql
@@ -126,9 +128,10 @@ public class SqoopTaskTest {
         SqoopParameters hiveToMysqlParams = JSONUtils.parseObject(hiveToMysql, SqoopParameters.class);
         String hiveToMysqlScript = generator.generateSqoopJob(hiveToMysqlParams, mysqlTaskExecutionContext);
         String hiveToMysqlExpected =
-            "sqoop export -D mapred.job.name=sqoop_import -m 1 --hcatalog-database stg --hcatalog-table person_internal --hcatalog-partition-keys date "
-                + "--hcatalog-partition-values 2020-02-17 --connect \"jdbc:mysql://192.168.0.111:3306/test\" --username kylo --password \"123456\" --table person_3 "
-                + "--fields-terminated-by '@' --lines-terminated-by '\\n'";
+                "sqoop export -D mapred.job.name=sqoop_import -m 1 --hcatalog-database stg --hcatalog-table person_internal --hcatalog-partition-keys date "
+                        + "--hcatalog-partition-values 2020-02-17 --connect \"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile="
+                        + "false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" --username kylo --password \"123456\" --table person_3 "
+                        + "--fields-terminated-by '@' --lines-terminated-by '\\n'";
         Assert.assertEquals(hiveToMysqlExpected, hiveToMysqlScript);
 
         //import mysql to hive
@@ -144,13 +147,9 @@ public class SqoopTaskTest {
                 + "\\\"hiveOverWrite\\\":true,\\\"hiveTargetDir\\\":\\\"/tmp/sqoop_import_hive\\\",\\\"replaceDelimiter\\\":\\\"\\\",\\\"hivePartitionKey\\\":\\\"date\\\",\\\"hivePartitionValue\\\":\\\"2020-02-16\\\"}\",\"localParams\":[]}";
         SqoopParameters mysqlToHiveParams = JSONUtils.parseObject(mysqlToHive, SqoopParameters.class);
         String mysqlToHiveScript = generator.generateSqoopJob(mysqlToHiveParams, mysqlTaskExecutionContext);
-        String mysqlToHiveExpected =
-            "sqoop import -D mapred.job.name=sqoop_import -D mapreduce.map.memory.mb=2048 -D mapreduce.reduce.memory.mb=2048 --delete-target-dir  --direct  -m 1 "
-                + "--connect \"jdbc:mysql://192.168.0.111:3306/test\" --username kylo --password \"123456\" "
-                + "--query \"SELECT * FROM person_2 WHERE \\$CONDITIONS\" --map-column-hive create_time=string,update_time=string --map-column-java create_time=java.sql.Date,update_time=java.sql.Date "
-                + "--hive-import --hive-database stg --hive-table person_internal_2 "
-                + "--create-hive-table --hive-overwrite --delete-target-dir --target-dir /tmp/sqoop_import_hive --hive-partition-key date --hive-partition-value 2020-02-16";
-        Assert.assertEquals(mysqlToHiveExpected, mysqlToHiveScript);
+        String mysqlToHiveExpected ="sqoop import -D mapred.job.name=sqoop_import -D mapreduce.map.memory.mb=2048 -D mapreduce.reduce.memory.mb=2048 --delete-target-dir  --direct  -m 1 --connect \"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" --username kylo --password \"123456\" --query \"SELECT * FROM person_2 WHERE \\$CONDITIONS\" --map-column-hive create_time=string,update_time=string --map-column-java create_time=java.sql.Date,update_time=java.sql.Date --hive-import --hive-database stg --hive-table person_internal_2 --create-hive-table --hive-overwrite --delete-target-dir --target-dir /tmp/sqoop_import_hive --hive-partition-key date --hive-partition-value 2020-02-16";
+
+                      Assert.assertEquals(mysqlToHiveExpected, mysqlToHiveScript);
 
         //sqoop CUSTOM job
         String sqoopCustomString = "{\"jobType\":\"CUSTOM\",\"localParams\":[],\"customShell\":\"sqoop import\"}";

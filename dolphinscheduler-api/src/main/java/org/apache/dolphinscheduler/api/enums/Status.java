@@ -175,6 +175,11 @@ public enum Status {
     QUERY_WORKER_GROUP_FAIL(10146,"query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
+    DATASOURCE_DB_TYPE_ILLEGAL(10169, "datasource type illegal", "数据源类型参数不合法"),
+    DATASOURCE_PORT_ILLEGAL(10170, "datasource port illegal", "数据源端口参数不合法"),
+    DATASOURCE_OTHER_PARAMS_ILLEGAL(10171, "datasource other params illegal", "数据源其他参数不合法"),
+    DATASOURCE_NAME_ILLEGAL(10172, "datasource name illegal", "数据源名称不合法"),
+    DATASOURCE_HOST_ILLEGAL(10173, "datasource host illegal", "数据源HOST不合法"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),

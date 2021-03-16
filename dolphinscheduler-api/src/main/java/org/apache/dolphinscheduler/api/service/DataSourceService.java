@@ -22,6 +22,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,12 +30,15 @@ import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.*;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+
+import org.apache.commons.collections.MapUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
@@ -47,6 +51,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
 
@@ -68,6 +73,14 @@ public class DataSourceService extends BaseService{
     public static final String USER_NAME = "userName";
     public static final String PASSWORD = Constants.PASSWORD;
     public static final String OTHER = "other";
+
+    private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
+
+    private static final Pattern IPV6_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\:\\[\\]]+$");
+
+    private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
+
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
 
 
     @Autowired
@@ -488,7 +501,7 @@ public class DataSourceService extends BaseService{
     public String buildParameter(String name, String desc, DbType type, String host,
                                  String port, String database, String principal, String userName,
                                  String password, DbConnectType connectType, String other) {
-
+        checkParams(type, port, host, database, other);
         String address = buildAddress(type, host, port, connectType);
         Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
         String jdbcUrl = address + "/" + database;
@@ -526,7 +539,10 @@ public class DataSourceService extends BaseService{
         if (other != null && !"".equals(other)) {
             LinkedHashMap<String, String> map = JSON.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
-            if (map.size() > 0) {
+            if (type == DbType.MYSQL) {
+                map = MySQLDataSource.buildOtherParams(map);
+            }
+            if (MapUtils.isNotEmpty(map)) {
                 StringBuilder otherSb = new StringBuilder();
                 for (Map.Entry<String, String> entry: map.entrySet()) {
                     otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
@@ -711,5 +727,41 @@ public class DataSourceService extends BaseService{
         result[0] = hosts.toString();
         result[1] = port;
         return result;
+    }
+
+
+    private void checkParams(DbType type, String port, String host, String database, String other) {
+        if (null == DbType.of(type.getCode())) {
+            throw new ServiceException(Status.DATASOURCE_DB_TYPE_ILLEGAL);
+        }
+        if (!isNumeric(port)) {
+            throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
+        }
+        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+            throw new ServiceException(Status.DATASOURCE_HOST_ILLEGAL);
+        }
+        if (!DATABASE_PATTER.matcher(database).matches()) {
+            throw new ServiceException(Status.DATASOURCE_NAME_ILLEGAL);
+        }
+        if (StringUtils.isBlank(other)) {
+            return;
+        }
+        Map<String, String> map = JSONUtils.toMap(other);
+        if (MapUtils.isEmpty(map)) {
+            return;
+        }
+        boolean paramsCheck = map.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
+        if (!paramsCheck) {
+            throw new ServiceException(Status.DATASOURCE_OTHER_PARAMS_ILLEGAL);
+        }
+    }
+
+    private static boolean isNumeric(String str) {
+        for (int i = str.length(); --i >= 0; ) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
