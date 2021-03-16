@@ -419,6 +419,11 @@ public final class Constants {
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
 
     /**
+     * normal running task
+     */
+    public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
+
+    /**
      * datasource configuration path
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";

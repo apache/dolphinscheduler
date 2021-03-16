@@ -387,6 +387,8 @@ public class TaskNode {
     public String toString() {
         return "TaskNode{"
                 + "id='" + id + '\''
+                + ", code=" + code
+                + ", version=" + version
                 + ", name='" + name + '\''
                 + ", desc='" + desc + '\''
                 + ", type='" + type + '\''
@@ -396,14 +398,16 @@ public class TaskNode {
                 + ", retryInterval=" + retryInterval
                 + ", params='" + params + '\''
                 + ", preTasks='" + preTasks + '\''
+                + ", preTaskNodeList=" + preTaskNodeList
                 + ", extras='" + extras + '\''
                 + ", depList=" + depList
                 + ", dependence='" + dependence + '\''
+                + ", conditionResult='" + conditionResult + '\''
                 + ", taskInstancePriority=" + taskInstancePriority
-                + ", timeout='" + timeout + '\''
                 + ", workerGroup='" + workerGroup + '\''
+                + ", workerGroupId=" + workerGroupId
+                + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime
                 + '}';
     }
-
 }

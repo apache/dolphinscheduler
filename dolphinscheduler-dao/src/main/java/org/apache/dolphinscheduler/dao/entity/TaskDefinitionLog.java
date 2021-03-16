@@ -57,6 +57,8 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setProjectName(taskDefinition.getProjectName());
         this.setResourceIds(taskDefinition.getResourceIds());
         this.setTaskParams(taskDefinition.getTaskParams());
+        this.setTaskParamList(taskDefinition.getTaskParamList());
+        this.setTaskParamMap(taskDefinition.getTaskParamMap());
         this.setTaskPriority(taskDefinition.getTaskPriority());
         this.setTimeoutNotifyStrategy(taskDefinition.getTimeoutNotifyStrategy());
         this.setTaskType(taskDefinition.getTaskType());
@@ -83,5 +85,10 @@ public class TaskDefinitionLog extends TaskDefinition {
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

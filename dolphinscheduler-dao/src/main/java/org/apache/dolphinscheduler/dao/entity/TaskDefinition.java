@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -257,6 +256,14 @@ public class TaskDefinition {
 
     }
 
+    public void setTaskParamList(List<Property> taskParamList) {
+        this.taskParamList = taskParamList;
+    }
+
+    public void setTaskParamMap(Map<String, String> taskParamMap) {
+        this.taskParamMap = taskParamMap;
+    }
+
     public Map<String, String> getTaskParamMap() {
         if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
             List<Property> propList = JSONUtils.toList(JSONUtils.parseObject(taskParams).findValue("localParams").toString(),
@@ -368,5 +375,35 @@ public class TaskDefinition {
 
     public void setResourceIds(String resourceIds) {
         this.resourceIds = resourceIds;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskDefinition{"
+                + "id=" + id
+                + ", code=" + code
+                + ", name='" + name + '\''
+                + ", version=" + version
+                + ", description='" + description + '\''
+                + ", projectCode=" + projectCode
+                + ", userId=" + userId
+                + ", taskType=" + taskType
+                + ", taskParams='" + taskParams + '\''
+                + ", taskParamList=" + taskParamList
+                + ", taskParamMap=" + taskParamMap
+                + ", flag=" + flag
+                + ", taskPriority=" + taskPriority
+                + ", userName='" + userName + '\''
+                + ", projectName='" + projectName + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + ", failRetryTimes=" + failRetryTimes
+                + ", failRetryInterval=" + failRetryInterval
+                + ", timeoutFlag=" + timeoutFlag
+                + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
+                + ", timeout=" + timeout
+                + ", resourceIds='" + resourceIds + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 }
