@@ -78,9 +78,6 @@
       _ckQuery () {
         this.$emit('on-query', this.searchParams)
       },
-      /**
-       * change times
-       */
       _onChangeStartStop (val) {
         if (val === null) {
           this.searchParams.startDate = ''
