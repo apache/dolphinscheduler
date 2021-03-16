@@ -1,6 +1,7 @@
 Dolphin Scheduler Official Website
 [dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
 ============
+
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
 [![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
@@ -12,10 +13,9 @@ Dolphin Scheduler Official Website
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
+## Design Features
 
-### Design Features:
-
-DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`. 
+DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
 
 Its main objectives are as follows:
 
@@ -34,8 +34,7 @@ Its main objectives are as follows:
  - Support internationalization.
  - More features waiting for partners to explore...
 
-
-### What's in DolphinScheduler
+## What's in DolphinScheduler
 
  Stability | Accessibility | Features | Scalability |
  -- | -- | -- | --
@@ -43,8 +42,7 @@ Decentralized multi-master and multi-worker | Visualization of workflow key info
 support HA | Visualization of all workflow operations, dragging tasks to draw DAGs, configuring data sources and resources. At the same time, for third-party systems, provide API mode operations. | Users on DolphinScheduler can achieve many-to-one or one-to-one mapping relationship through tenants and Hadoop users, which is very important for scheduling large data jobs.  | The scheduler supports distributed scheduling, and the overall scheduling capability will increase linearly with the scale of the cluster. Master and Worker support dynamic adjustment.
 Overload processing: By using the task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured. Machine jam can be avoided with high tolerance to numbers of tasks cached in task queue. | One-click deployment | Support traditional shell tasks, and big data platform task scheduling: MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Procedure, Sub_Process |  |
 
-
-### User Interface Screenshots
+## User Interface Screenshots
 
 ![home page](https://user-images.githubusercontent.com/15833811/75218288-bf286400-57d4-11ea-8263-d639c6511d5f.jpg)
 ![dag](https://user-images.githubusercontent.com/15833811/75236750-3374fe80-57f9-11ea-857d-62a66a5a559d.png)
@@ -55,11 +53,15 @@ Overload processing: By using the task queue mechanism, the number of schedulabl
 ![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
 ![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
 
-### QuickStart in Docker
-Please referer the official website document:[[QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/1.3.4/user_doc/docker-deployment.html)]
+## QuickStart in Docker
 
+Please referer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/docker-deployment.html)
 
-### How to Build
+## QuickStart in Kubernetes
+
+Please referer the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/kubernetes-deployment.html)
+
+## How to Build
 
 ```bash
 ./mvnw clean install -Prelease
@@ -72,25 +74,26 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release
 dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
 ```
 
-### Thanks
-DolphinScheduler is based on a lot of excellent open-source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
+## Thanks
+
+DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
 We would like to express our deep gratitude to all the open-source projects used in Dolphin Scheduler. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we hope everyone who have the same enthusiasm and passion for open source could join in and contribute to the open-source community!
 
-### Get Help
-1. Submit an [[issue](https://github.com/apache/incubator-dolphinscheduler/issues/new/choose)]
-1. Subscribe to this mail list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
+## Get Help
 
+1. Submit an [issue](https://github.com/apache/incubator-dolphinscheduler/issues/new/choose)
+1. Subscribe to this mailing list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
 
-### Community
-You are so much welcomed to communicate with the developers and users of Dolphin Scheduler freely. There are two ways to find them:
-1. Join the slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-l8k90ceu-wwUfobaDkJxjzMfZp4y1Ag).
-2. Follow the [twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news just on time.
+## Community
 
+You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
+1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-mzqu52gi-rCggPkSHQ0DZYkwbTxO1Gw).
+2. Follow the [Twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
-### How to Contribute
-The community welcomes everyone to participate in contributing, please refer to this website to find out more: [[How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html)]
+## How to Contribute
 
+The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html).
 
-### License
+## License
+
 Please refer to the [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
-

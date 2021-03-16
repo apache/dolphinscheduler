@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
+import org.apache.dolphinscheduler.common.task.mr.MapReduceParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
@@ -71,7 +71,7 @@ public class TaskParametersUtils {
             case SQL:
                 return JSONUtils.parseObject(parameter, SqlParameters.class);
             case MR:
-                return JSONUtils.parseObject(parameter, MapreduceParameters.class);
+                return JSONUtils.parseObject(parameter, MapReduceParameters.class);
             case SPARK:
                 return JSONUtils.parseObject(parameter, SparkParameters.class);
             case PYTHON:
