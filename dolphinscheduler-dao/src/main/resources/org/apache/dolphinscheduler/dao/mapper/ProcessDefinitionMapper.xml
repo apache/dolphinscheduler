@@ -71,7 +71,7 @@
         and pd.name = #{processDefinitionName}
     </select>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        SELECT td.id, td.name, td.version, td.release_state, td.project_code, td.user_id, td.description,
+        SELECT td.id, td.code, td.name, td.version, td.release_state, td.project_code, td.user_id, td.description,
         td.global_params, td.flag, td.warning_group_id, td.timeout, td.tenant_id, td.update_time, td.create_time,
         sc.schedule_release_state, tu.user_name
         FROM t_ds_process_definition td
