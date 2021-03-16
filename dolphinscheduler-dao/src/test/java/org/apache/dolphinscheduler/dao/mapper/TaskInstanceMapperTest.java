@@ -286,7 +286,6 @@ public class TaskInstanceMapperTest {
      */
     @Test
     public void testQueryTaskInstanceListPaging() {
-        TaskInstance task = insertOne();
 
         ProcessDefinition definition = new ProcessDefinition();
         definition.setProjectId(1111);
@@ -301,9 +300,7 @@ public class TaskInstanceMapperTest {
         processInstance.setCommandType(CommandType.START_PROCESS);
         processInstanceMapper.insert(processInstance);
 
-        task.setProcessDefinitionId(definition.getId());
-        task.setProcessInstanceId(processInstance.getId());
-        taskInstanceMapper.updateById(task);
+        TaskInstance task = insertOne("us task", processInstance.getId(), ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString());
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
