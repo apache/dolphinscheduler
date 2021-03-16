@@ -1807,8 +1807,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      */
     @Override
     public boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version) {
-        ProcessDefinition processDefinition = processDefineMapper.queryDefinitionByIdAndVersion(processDefinitionId, version);
-        return Objects.nonNull(processDefinition);
+        Integer hasAssociatedDefinitionId = processDefineMapper.queryHasAssociatedDefinitionByIdAndVersion(processDefinitionId, version);
+        return Objects.nonNull(hasAssociatedDefinitionId);
     }
 
 }

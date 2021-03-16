@@ -146,10 +146,10 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<Integer> listProjectIds();
 
     /**
-     * query definition by id and version
+     * query has associated definition by id and version
      * @param processDefinitionId process definition id
      * @param version version
-     * @return definition
+     * @return definition id
      */
-    ProcessDefinition queryDefinitionByIdAndVersion(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
+    Integer queryHasAssociatedDefinitionByIdAndVersion(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
 }

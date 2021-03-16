@@ -140,11 +140,10 @@
         where id = #{processDefinitionId}
     </update>
 
-    <select id="queryDefinitionByIdAndVersion" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select
-        <include refid="baseSql"/>
+    <select id="queryHasAssociatedDefinitionByIdAndVersion" resultType="java.lang.Integer">
+        select id
         from t_ds_process_definition
         where id = #{processDefinitionId}
-        and version = #{version}
+        and version = #{version} limit 1
     </select>
 </mapper>
