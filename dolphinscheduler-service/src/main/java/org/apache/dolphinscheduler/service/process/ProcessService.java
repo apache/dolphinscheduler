@@ -2453,7 +2453,7 @@ public class ProcessService {
             v.setName(taskDefinitionLog.getName());
             v.setDesc(taskDefinitionLog.getDescription());
             v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
-            v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
+            v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
             v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
             v.setParams(taskDefinitionLog.getTaskParams());
@@ -2464,7 +2464,7 @@ public class ProcessService {
                     taskDefinitionLog.getTimeout())));
             // TODO name will be remove
             v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
-            v.setPreTasks(StringUtils.join(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList()), ","));
+            v.setPreTasks(JSONUtils.toJsonString(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList())));
         });
         return new ArrayList<>(taskNodeMap.values());
     }
