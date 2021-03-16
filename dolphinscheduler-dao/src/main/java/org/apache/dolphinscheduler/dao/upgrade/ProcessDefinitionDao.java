@@ -18,14 +18,15 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProcessDefinitionDao {
 
@@ -34,12 +35,13 @@ public class ProcessDefinitionDao {
 
     /**
      * queryAllProcessDefinition
+     *
      * @param conn jdbc connection
      * @return ProcessDefinition Json List
      */
-    public Map<Integer,String> queryAllProcessDefinition(Connection conn){
+    public Map<Integer, String> queryAllProcessDefinition(Connection conn) {
 
-        Map<Integer,String> processDefinitionJsonMap = new HashMap<>();
+        Map<Integer, String> processDefinitionJsonMap = new HashMap<>();
 
         String sql = String.format("SELECT id,process_definition_json FROM t_ds_process_definition");
         ResultSet rs = null;
@@ -48,14 +50,14 @@ public class ProcessDefinitionDao {
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
                 Integer id = rs.getInt(1);
                 String processDefinitionJson = rs.getString(2);
-                processDefinitionJsonMap.put(id,processDefinitionJson);
+                processDefinitionJsonMap.put(id, processDefinitionJson);
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
             ConnectionUtils.releaseResource(rs, pstmt, conn);
@@ -67,23 +69,24 @@ public class ProcessDefinitionDao {
 
     /**
      * updateProcessDefinitionJson
+     *
      * @param conn jdbc connection
      * @param processDefinitionJsonMap processDefinitionJsonMap
      */
-    public void updateProcessDefinitionJson(Connection conn,Map<Integer,String> processDefinitionJsonMap){
+    public void updateProcessDefinitionJson(Connection conn, Map<Integer, String> processDefinitionJsonMap) {
         String sql = "UPDATE t_ds_process_definition SET process_definition_json=? where id=?";
         try {
-            for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()){
-                try(PreparedStatement pstmt= conn.prepareStatement(sql)) {
-                    pstmt.setString(1,entry.getValue());
-                    pstmt.setInt(2,entry.getKey());
+            for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()) {
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setString(1, entry.getValue());
+                    pstmt.setInt(2, entry.getKey());
                     pstmt.executeUpdate();
                 }
 
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
             ConnectionUtils.releaseResource(conn);
