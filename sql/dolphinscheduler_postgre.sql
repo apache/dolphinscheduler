@@ -556,7 +556,7 @@ CREATE TABLE t_ds_task_instance (
   name varchar(255) DEFAULT NULL ,
   task_type varchar(64) DEFAULT NULL ,
   process_definition_id int DEFAULT NULL ,
-  process_instance_id int DEFAULT NULL ,
+  process_instance_id int REFERENCES  t_ds_process_instance (id) DEFAULT NULL ,
   task_json text ,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
@@ -578,7 +578,8 @@ CREATE TABLE t_ds_task_instance (
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   var_pool text ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  foreign key("process_instance_id") references "t_ds_process_instance"("id") ON DELETE CASCADE
 ) ;
 
 --
