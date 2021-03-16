@@ -52,6 +52,7 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import { ruleType } from '@/conf/home/pages/dataquality/_source/common'
   import mTooltipsJSON from '@/module/components/tooltipsJSON/tooltipsJSON'
   export default {
@@ -67,7 +68,7 @@
       pageSize: Number
     },
     methods: {
-       _rtRuleType (code) {
+      _rtRuleType (code) {
         return _.filter(ruleType, v => v.code === code)[0].desc
       }
     },
@@ -84,6 +85,6 @@
     },
     mounted () {
     },
-    components: { mTooltipsJSON}
+    components: { mTooltipsJSON }
   }
 </script>

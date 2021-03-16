@@ -75,7 +75,8 @@
   </div>
 </template>
 <script>
-  import { dataQualityTaskState,checkType,ruleType,operator,failureStrategy } from '@/conf/home/pages/dataquality/_source/common'
+  import { dataQualityTaskState, checkType, ruleType, operator, failureStrategy } from '@/conf/home/pages/dataquality/_source/common'
+  import _ from 'lodash'
   export default {
     name: 'result-list',
     data () {
@@ -92,16 +93,16 @@
       _rtTaskState (code) {
         return _.filter(dataQualityTaskState, v => v.code === code)[0].desc
       },
-       _rtCheckType (code) {
+      _rtCheckType (code) {
         return _.filter(checkType, v => v.code === code)[0].desc
       },
-       _rtRuleType (code) {
+      _rtRuleType (code) {
         return _.filter(ruleType, v => v.code === code)[0].desc
       },
-       _rtOperator (code) {
+      _rtOperator (code) {
         return _.filter(operator, v => v.code === code)[0].desc
       },
-       _rtFailureStrategy (code) {
+      _rtFailureStrategy (code) {
         return _.filter(failureStrategy, v => v.code === code)[0].desc
       },
       _go (item) {
@@ -120,6 +121,7 @@
       this.list = this.resultList
     },
     mounted () {
+      //nothing
     },
     components: { }
   }

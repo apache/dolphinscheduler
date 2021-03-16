@@ -38,32 +38,32 @@ const dataQualityTaskState = [
 const operator = [
   {
     id: 0,
-    desc: `=`,
+    desc: '=',
     code: 0
   },
   {
     id: 1,
-    desc: `<`,
+    desc: '<',
     code: 1
   },
   {
     id: 2,
-    desc: `<=`,
+    desc: '<=',
     code: 2
   },
   {
     id: 3,
-    desc: `>`,
+    desc: '>',
     code: 3
   },
   {
     id: 4,
-    desc: `>=`,
+    desc: '>=',
     code: 4
   },
   {
     id: 5,
-    desc: `!=`,
+    desc: '!=',
     code: 5
   }
 ]

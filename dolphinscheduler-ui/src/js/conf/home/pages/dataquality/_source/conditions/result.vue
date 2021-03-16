@@ -61,7 +61,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { ruleType,dataQualityTaskState } from '../common'
+  import { ruleType, dataQualityTaskState } from '../common'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
     name: 'result-conditions',
@@ -96,17 +96,16 @@
        * change times
        */
       _onChangeStartStop (val) {
-        if(val === null){
+        if (val === null) {
           this.searchParams.startDate = ''
           this.searchParams.endDate = ''
           this.dataTime = []
-        }else{
+        } else {
           this.searchParams.startDate = val[0]
           this.searchParams.endDate = val[1]
           this.dataTime[0] = val[0]
           this.dataTime[1] = val[1]
         }
-        
       },
       /**
        * change state

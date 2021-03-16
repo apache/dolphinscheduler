@@ -20,22 +20,22 @@
       <div slot="text">{{$t('Rule Name')}}</div>
       <div slot="content">
         <el-select
-                style="width: 130px;"
-                size="small"
-                v-model="ruleId"
-                :disabled="isDetails" 
-                @change="_handleRuleChange">
+            style="width: 130px;"
+            size="small"
+            v-model="ruleId"
+            :disabled="isDetails"
+            @change="_handleRuleChange">
           <el-option
-                  v-for="rule in ruleNameList"
-                  :key="rule.value"
-                  :value="rule.value"
-                  :label="rule.label">
+            v-for="rule in ruleNameList"
+            :key="rule.value"
+            :value="rule.value"
+            :label="rule.label">
           </el-option>
         </el-select>
       </div>
     </m-list-box>
     <div class="form-box">
-        <form-create v-model="fApi" :rule="rule" :option="option"></form-create>
+      <form-create v-model="fApi" :rule="rule" :option="option"></form-create>
     </div>
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>
@@ -103,7 +103,7 @@
         </el-input>
       </div>
     </m-list-4-box>
-   
+
     <m-list-box>
       <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
@@ -117,15 +117,15 @@
         </el-input>
       </div>
     </m-list-box>
-    
+
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
         <m-local-params
-                ref="refLocalParams"
-                @on-local-params="_onLocalParams"
-                :udp-list="localParams"
-                :hide="false">
+          ref="refLocalParams"
+          @on-local-params="_onLocalParams"
+          :udp-list="localParams"
+          :hide="false">
         </m-local-params>
       </div>
     </m-list-box>
@@ -164,27 +164,25 @@
         // ruleNameList
         ruleNameList: [],
 
-        sparkParam:{},
+        sparkParam: {},
 
-        inputEntryValueMap:{},
-       
+        inputEntryValueMap: {},
+
         normalizer (node) {
           return {
             label: node.name
           }
         },
-        rule:[],
+        rule: [],
         fApi: {},
         option: {
           resetBtn: false,
           submitBtn: false,
-          row:{
-            gutter:0
+          row: {
+            gutter: 0
           }
         }
-
       }
-      
     },
     props: {
       backfillItem: Object
@@ -192,45 +190,45 @@
     mixins: [disabledState],
     methods: {
 
-      _handleRuleChange(o){
+      _handleRuleChange (o) {
         this._getRuluInputEntryList(o)
       },
       /**
        * Get the rule input entry list
        */
-      _getRuluInputEntryList(ruleId) {
+      _getRuluInputEntryList (ruleId) {
         return new Promise((resolve, reject) => {
-          this.store.dispatch('dag/getRuleInputEntryList',ruleId).then(res => {
-              this.rule = JSON.parse(res.data)
-              this.fApi.on("src_connector_type-change",this.srcConnectorTypeChange)
-              this.fApi.on("target_connector_type-change",this.targetConnectorTypeChange)
-              this.fApi.on("writer_connector_type-change",this.writerConnectorTypeChange)
+          this.store.dispatch('dag/getRuleInputEntryList', ruleId).then(res => {
+            this.rule = JSON.parse(res.data)
+            this.fApi.on('src_connector_type-change', this.srcConnectorTypeChange)
+            this.fApi.on('target_connector_type-change', this.targetConnectorTypeChange)
+            this.fApi.on('writer_connector_type-change', this.writerConnectorTypeChange)
           })
         })
       },
 
-      srcConnectorTypeChange(){
+      srcConnectorTypeChange () {
         this._updateDatasourceOptions(
-                            "src_connector_type",
-                            "src_connector_type",
-                            this.fApi.getValue('src_connector_type'),
-                            'src_datasource_id')
+          'src_connector_type',
+          'src_connector_type',
+          this.fApi.getValue('src_connector_type'),
+          'src_datasource_id')
       },
 
-      targetConnectorTypeChange(){
+      targetConnectorTypeChange () {
         this._updateDatasourceOptions(
-                            "target_connector_type",
-                            "target_connector_type",
-                            this.fApi.getValue('target_connector_type'),
-                            'target_datasource_id')
+          'target_connector_type',
+          'target_connector_type',
+          this.fApi.getValue('target_connector_type'),
+          'target_datasource_id')
       },
 
-      writerConnectorTypeChange(){
+      writerConnectorTypeChange () {
         this._updateDatasourceOptions(
-                            "writer_connector_type",
-                            "writer_connector_type",
-                            this.fApi.getValue('writer_connector_type'),
-                            'writer_datasource_id')
+          'writer_connector_type',
+          'writer_connector_type',
+          this.fApi.getValue('writer_connector_type'),
+          'writer_datasource_id')
       },
 
       /**
@@ -239,52 +237,51 @@
       _getRuluList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('dag/getRuleList', 1).then(res => {
-              var ruleList = res.data;
-              this.ruleNameList = new Array();
-              res.data.forEach((item,i) => {
-                var obj = new Object(); 
-                obj.label=item.name 
-                obj.value=item.id
-                this.ruleNameList.push(obj); 
-              })
+            this.ruleNameList = []
+            res.data.forEach((item, i) => {
+              let obj = {}
+              obj.label = item.name
+              obj.value = item.id
+              this.ruleNameList.push(obj)
+            })
 
-              if(this.ruleId === 0){
-                  this.ruleId = this.ruleNameList[0].value
-                  this._getRuluInputEntryList(this.ruleId)
-              }else{
-                  this._getRuluInputEntryList(this.ruleId)
-                  window.setTimeout(() => {
-                  var fields = this.fApi.fields();
-                  fields.forEach(item =>{
-                      if(this.inputEntryValueMap[item]){
-                        this._updateDatasourceOptions(item,"src_connector_type",this.inputEntryValueMap[item],'src_datasource_id')
-                        this._updateDatasourceOptions(item,"target_connector_type",this.inputEntryValueMap[item],'target_datasource_id')
-                        this._updateDatasourceOptions(item,"writer_connector_type",this.inputEntryValueMap[item],'writer_datasource_id')
-                      
-                        this.fApi.setValue(item,this.inputEntryValueMap[item])
-                      }
+            if (this.ruleId === 0) {
+              this.ruleId = this.ruleNameList[0].value
+              this._getRuluInputEntryList(this.ruleId)
+            } else {
+              this._getRuluInputEntryList(this.ruleId)
+              window.setTimeout(() => {
+                let fields = this.fApi.fields()
+                fields.forEach(item => {
+                  if (this.inputEntryValueMap[item]) {
+                    this._updateDatasourceOptions(item, 'src_connector_type', this.inputEntryValueMap[item], 'src_datasource_id')
+                    this._updateDatasourceOptions(item, 'target_connector_type', this.inputEntryValueMap[item], 'target_datasource_id')
+                    this._updateDatasourceOptions(item, 'writer_connector_type', this.inputEntryValueMap[item], 'writer_datasource_id')
 
-                      if(this.isDetails){
-                        this.fApi.disabled(true,item)
-                      }
-                    })
-                  }, 1000);
-              }
+                    this.fApi.setValue(item, this.inputEntryValueMap[item])
+                  }
+
+                  if (this.isDetails) {
+                    this.fApi.disabled(true, item)
+                  }
+                })
+              }, 1000)
+            }
           })
         })
       },
-      
-      _updateDatasourceOptions(item,type,typeValue,id){
-        if(item == type){
-          new Promise((resolve, reject) => {
-            this.store.dispatch('dag/getDatasourceOptionsById',typeValue).then(res => {
-              if(res.data){
+
+      _updateDatasourceOptions (item, type, typeValue, id) {
+        if (item === type) {
+          return new Promise((resolve, reject) => {
+            this.store.dispatch('dag/getDatasourceOptionsById', typeValue).then(res => {
+              if (res.data) {
                 this.fApi.updateRule(id, {
-                    options: res.data
+                  options: res.data
                 }, true)
-              }else{
+              } else {
                 this.fApi.updateRule(id, {
-                    options: []
+                  options: []
                 }, true)
                 this.fApi.setValue(id, null)
               }
@@ -299,12 +296,11 @@
       _onLocalParams (a) {
         this.localParams = a
       },
-     
+
       /**
        * verification
        */
       _verification () {
-
         if (!this.numExecutors) {
           this.$message.warning(`${i18n.$t('Please enter Executor number')}`)
           return false
@@ -352,40 +348,39 @@
           numExecutors: this.numExecutors,
           executorMemory: this.executorMemory,
           executorCores: this.executorCores,
-          others: this.others,
+          others: this.others
         }
 
-        this.inputEntryValueMap = this.fApi.formData();
+        this.inputEntryValueMap = this.fApi.formData()
 
-        var fields = this.fApi.fields();
+        let fields = this.fApi.fields()
         try {
-          fields.forEach(item =>{
-            this.fApi.validateField(item,(errMsg)=>{
-                if(errMsg){
-                  console.log(errMsg)
-                  throw new Error(errMsg);
-                }
-            });
-            
-            this.fApi.setValue(item,this.inputEntryValueMap[item])
-            
+          fields.forEach(item => {
+            this.fApi.validateField(item, (errMsg) => {
+              if (errMsg) {
+                console.log(errMsg)
+                throw new Error(errMsg)
+              }
+            })
+
+            this.fApi.setValue(item, this.inputEntryValueMap[item])
           })
         } catch (error) {
           this.$message.warning(error.message)
-          return false;
+          return false
         }
-        
+
         // storage
         this.$emit('on-params', {
           ruleId: this.ruleId,
           sparkParameters: this.sparkParam,
-          ruleInputParameter:this.inputEntryValueMap
+          ruleInputParameter: this.inputEntryValueMap
         })
         return true
       },
 
       _isArrayFn (o) {
-        return Object.prototype.toString.call(o) === '[object Array]';
+        return Object.prototype.toString.call(o) === '[object Array]'
       }
     },
 
@@ -393,16 +388,16 @@
       // Watch the cacheParams
       cacheParams (val) {
         this.$emit('on-cache-params', val)
-      },
+      }
     },
 
     computed: {
-      
+
       cacheParams () {
         return {
           ruleId: this.ruleId,
           sparkParameters: this.sparkParam,
-          ruleInputParameter:this.inputEntryValueMap
+          ruleInputParameter: this.inputEntryValueMap
         }
       }
     },
@@ -411,7 +406,7 @@
       let o = this.backfillItem
 
       // Non-null objects represent backfill
-      if (!_.isEmpty(o)) { 
+      if (!_.isEmpty(o)) {
         this.deployMode = o.params.sparkParameters.deployMode || ''
         this.driverCores = o.params.sparkParameters.driverCores || 1
         this.driverMemory = o.params.sparkParameters.driverMemory || '512M'
@@ -426,19 +421,20 @@
           this.localParams = localParams
         }
 
-        this.inputEntryValueMap = o.params.ruleInputParameter 
+        this.inputEntryValueMap = o.params.ruleInputParameter
       }
     },
 
     mounted () {
-        this._getRuluList()
+      this._getRuluList()
     },
 
-    components: { 
+    components: {
       mLocalParams,
-      mListBox, 
-      mList4Box}
-       
+      mListBox,
+      mList4Box
+    }
+
   }
 </script>
 

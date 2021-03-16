@@ -73,7 +73,7 @@
           // end date
           endDate: '',
           // search value
-          searchVal: '',
+          searchVal: ''
         },
         isLeft: true,
         item: {}
@@ -123,13 +123,15 @@
       }
     },
     created () {
+      //nothing
     },
     mounted () {
+      //nothing
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mListConstruction, mSpin, mNoData ,mRuleConditions}
+    components: { mList, mListConstruction, mSpin, mNoData, mRuleConditions }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

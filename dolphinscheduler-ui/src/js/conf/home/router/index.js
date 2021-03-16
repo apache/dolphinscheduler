@@ -451,7 +451,7 @@ const router = new Router({
           meta: {
             title: `${i18n.$t('DataQuality Result')}`
           }
-        }, 
+        },
         {
           path: '/dataquality/rule',
           name: 'data-quality-rule',

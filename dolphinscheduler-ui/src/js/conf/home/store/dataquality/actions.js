@@ -18,7 +18,7 @@
 import io from '@/module/io'
 
 export default {
-  
+
   /**
    * get result list pages
    */
