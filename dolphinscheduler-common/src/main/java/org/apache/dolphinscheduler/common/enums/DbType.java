@@ -75,6 +75,6 @@ public enum DbType {
         if(DB_TYPE_MAP.containsKey(type)){
             return DB_TYPE_MAP.get(type);
         }
-        throw new IllegalArgumentException("invalid type : " + type);
+        return null;
     }
 }
