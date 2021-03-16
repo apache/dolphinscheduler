@@ -540,7 +540,7 @@ public class DataSourceService extends BaseService{
             LinkedHashMap<String, String> map = JSON.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
             if (type == DbType.MYSQL) {
-                map = MySQLDataSource.buildOtherParams(map);
+                map = (LinkedHashMap<String, String>) MySQLDataSource.buildOtherParams(map);
             }
             if (MapUtils.isNotEmpty(map)) {
                 StringBuilder otherSb = new StringBuilder();

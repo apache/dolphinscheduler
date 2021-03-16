@@ -14,24 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 
 /**
  * data source of mySQL
@@ -72,7 +68,7 @@ public class MySQLDataSource extends BaseDataSource {
         return DbType.MYSQL;
     }
 
-    public static LinkedHashMap<String, String> buildOtherParams(LinkedHashMap<String, String> paramMap) {
+    public static Map<String, String> buildOtherParams(Map<String, String> paramMap) {
 
         if (MapUtils.isEmpty(paramMap)) {
             return null;
