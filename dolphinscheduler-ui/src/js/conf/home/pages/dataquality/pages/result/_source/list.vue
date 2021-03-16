@@ -121,7 +121,6 @@
       this.list = this.resultList
     },
     mounted () {
-      //nothing
     },
     components: { }
   }

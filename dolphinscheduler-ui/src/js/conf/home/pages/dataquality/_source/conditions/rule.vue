@@ -109,7 +109,6 @@
       }
     },
     mounted () {
-      //nothing
     },
     computed: {
     },

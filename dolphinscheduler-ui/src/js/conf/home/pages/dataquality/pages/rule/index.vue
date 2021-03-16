@@ -123,10 +123,8 @@
       }
     },
     created () {
-      //nothing
     },
     mounted () {
-      //nothing
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
