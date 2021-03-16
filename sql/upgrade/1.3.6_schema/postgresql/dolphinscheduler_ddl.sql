@@ -15,4 +15,4 @@
  * limitations under the License.
 */
 -- Add foreign key constraints for t_ds_task_instance --
-alter table t_ds_task_instance add FOREIGN key(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE;
+ALTER TABLE t_ds_task_instance ADD FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE;
