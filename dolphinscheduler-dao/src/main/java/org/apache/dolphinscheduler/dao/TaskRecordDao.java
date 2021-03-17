@@ -14,27 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
-import org.apache.dolphinscheduler.dao.utils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * task record dao
@@ -44,12 +48,17 @@ public class TaskRecordDao {
 
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
+    static {
+        PropertyUtils.loadPropertyFile(DATASOURCE_PROPERTIES);
+    }
+
     /**
-     *  get task record flag
+     * get task record flag
+     *
      * @return whether startup taskrecord
      */
-    public static boolean getTaskRecordFlag(){
-       return PropertyUtils.getBoolean(Constants.TASK_RECORD_FLAG,false);
+    public static boolean getTaskRecordFlag() {
+        return PropertyUtils.getBoolean(Constants.TASK_RECORD_FLAG, false);
     }
 
     /**
@@ -132,7 +141,7 @@ public class TaskRecordDao {
      * count task record
      *
      * @param filterMap filterMap
-     * @param table     table
+     * @param table table
      * @return task record count
      */
     public static int countTaskRecord(Map<String, String> filterMap, String table) {
@@ -150,13 +159,13 @@ public class TaskRecordDao {
             sql += getWhereString(filterMap);
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 count = rs.getInt("count");
                 break;
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
-        }finally {
+        } finally {
             ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return count;
@@ -166,7 +175,7 @@ public class TaskRecordDao {
      * query task record by filter map paging
      *
      * @param filterMap filterMap
-     * @param table     table
+     * @param table table
      * @return task record list
      */
     public static List<TaskRecord> queryAllTaskRecord(Map<String, String> filterMap, String table) {
@@ -241,7 +250,7 @@ public class TaskRecordDao {
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
-        }finally {
+        } finally {
             ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return recordList;
