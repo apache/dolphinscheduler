@@ -55,77 +55,79 @@ fi
 log=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command-$HOSTNAME.out
 pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
 
-# print logs to /dev/null in docker
-if [ "$DOCKER" = "true" ]; then
-  echo "start in docker"
-  log=/dev/null
-fi
-
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
   HEAP_INITIAL_SIZE=1g
   HEAP_MAX_SIZE=1g
-  HEAP_NEW_GENERATION__SIZE=500m
+  HEAP_NEW_GENERATION_SIZE=512m
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
   HEAP_INITIAL_SIZE=4g
   HEAP_MAX_SIZE=4g
-  HEAP_NEW_GENERATION__SIZE=2g
+  HEAP_NEW_GENERATION_SIZE=2g
   LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
   HEAP_INITIAL_SIZE=2g
   HEAP_MAX_SIZE=2g
-  HEAP_NEW_GENERATION__SIZE=1g
+  HEAP_NEW_GENERATION_SIZE=1g
   LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
   HEAP_INITIAL_SIZE=1g
   HEAP_MAX_SIZE=1g
-  HEAP_NEW_GENERATION__SIZE=500m
+  HEAP_NEW_GENERATION_SIZE=512m
   LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   HEAP_INITIAL_SIZE=1g
   HEAP_MAX_SIZE=1g
-  HEAP_NEW_GENERATION__SIZE=500m
+  HEAP_NEW_GENERATION_SIZE=512m
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
 else
   echo "Error: No command named \`$command' was found."
   exit 1
 fi
 
-if [ "$SKYWALKING_ENABLE" = "true" ]; then
-  SKYWALKING_OPTS="-javaagent:$DOLPHINSCHEDULER_HOME/skywalking-agent/skywalking-agent.jar -DSW_AGENT_NAME=dolphinscheduler::$command -DSW_LOGGING_FILE_NAME=skywalking-dolphinscheduler-$command.log"
+export DOLPHINSCHEDULER_OPTS="-server -Xms$HEAP_INITIAL_SIZE -Xmx$HEAP_MAX_SIZE -Xmn$HEAP_NEW_GENERATION_SIZE -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:$DOLPHINSCHEDULER_LOG_DIR/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof -XshowSettings:vm $DOLPHINSCHEDULER_OPTS"
 
+if [ "$SKYWALKING_ENABLE" = "true" ]; then
+  SKYWALKING_OPTS="-javaagent:$DOLPHINSCHEDULER_HOME/skywalking-agent/skywalking-agent.jar -DSW_AGENT_NAME=dolphinscheduler::$command -DSW_LOGGING_FILE_NAME=$DOLPHINSCHEDULER_LOG_DIR/skywalking-dolphinscheduler-$command.log"
   export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS $SKYWALKING_OPTS"
   echo "Info: Skywalking enabled opts: $SKYWALKING_OPTS"
 else
   echo "Info: Skywalking not enabled."
 fi
 
-export DOLPHINSCHEDULER_OPTS="-server -Xms$HEAP_INITIAL_SIZE -Xmx$HEAP_MAX_SIZE -Xmn$HEAP_NEW_GENERATION__SIZE -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m  -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof $DOLPHINSCHEDULER_OPTS"
-
 case $startStop in
   (start)
-    [ -w "$DOLPHINSCHEDULER_PID_DIR" ] ||  mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
-
-    if [ -f $pid ]; then
-      if kill -0 `cat $pid` > /dev/null 2>&1; then
-        echo $command running as process `cat $pid`.  Stop it first.
-        exit 1
+    if [ "$DOCKER" = "true" ]; then
+      echo start $command in docker
+      export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      if [ "$command" = "logger-server" ]; then
+        LOGGER_SERVER_OPTS=${LOGGER_SERVER_OPTS:-"-Xms$HEAP_INITIAL_SIZE -Xmx$HEAP_MAX_SIZE -Xmn$HEAP_NEW_GENERATION_SIZE"}
+        export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS $LOGGER_SERVER_OPTS"
       fi
+      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
+      $JAVA_HOME/bin/java $exec_command
+    else
+      [ -w "$DOLPHINSCHEDULER_PID_DIR" ] || mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
+
+      if [ -f $pid ]; then
+        if kill -0 `cat $pid` > /dev/null 2>&1; then
+          echo $command running as process `cat $pid`.  Stop it first.
+          exit 1
+        fi
+      fi
+
+      echo starting $command, logging to $log
+      exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
+      echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
+      nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
+      echo $! > $pid
     fi
-
-    echo starting $command, logging to $log
-
-    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
-
-    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
-    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
-    echo $! > $pid
     ;;
 
   (stop)

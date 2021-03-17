@@ -43,6 +43,10 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/component: alert
+      {{- if .Values.alert.annotations }}
+      annotations:
+        {{- toYaml .Values.alert.annotations | nindent 8 }}
+      {{- end }}
     spec:
       {{- if .Values.alert.affinity }}
       affinity: {{- toYaml .Values.alert.affinity | nindent 8 }}
@@ -53,15 +57,24 @@ spec:
       {{- if .Values.alert.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecret }}
+      {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
-          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          image: {{ include "dolphinscheduler.image.fullname" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "alert-server"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: DOLPHINSCHEDULER_OPTS
+              valueFrom:
+                configMapKeyRef:
+                  key: DOLPHINSCHEDULER_OPTS
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
             - name: XLS_FILE_PATH
               valueFrom:
                 configMapKeyRef:
@@ -132,6 +145,18 @@ spec:
                 configMapKeyRef:
                   key: ENTERPRISE_WECHAT_USERS
                   name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: DATABASE_TYPE
+              {{- if .Values.postgresql.enabled }}
+              value: "postgresql"
+              {{- else }}
+              value: {{ .Values.externalDatabase.type | quote }}
+              {{- end }}
+            - name: DATABASE_DRIVER
+              {{- if .Values.postgresql.enabled }}
+              value: "org.postgresql.Driver"
+              {{- else }}
+              value: {{ .Values.externalDatabase.driver | quote }}
+              {{- end }}
             - name: DATABASE_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
@@ -142,7 +167,7 @@ spec:
               {{- if .Values.postgresql.enabled }}
               value: "5432"
               {{- else }}
-              value: {{ .Values.externalDatabase.port }}
+              value: {{ .Values.externalDatabase.port | quote }}
               {{- end }}
             - name: DATABASE_USERNAME
               {{- if .Values.postgresql.enabled }}
@@ -157,8 +182,8 @@ spec:
                   name: {{ template "dolphinscheduler.postgresql.fullname" . }}
                   key: postgresql-password
                   {{- else }}
-                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
-                  key: db-password
+                  name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+                  key: database-password
                   {{- end }}
             - name: DATABASE_DATABASE
               {{- if .Values.postgresql.enabled }}
@@ -166,6 +191,21 @@ spec:
               {{- else }}
               value: {{ .Values.externalDatabase.database | quote }}
               {{- end }}
+            - name: DATABASE_PARAMS
+              {{- if .Values.postgresql.enabled }}
+              value: "characterEncoding=utf8"
+              {{- else }}
+              value: {{ .Values.externalDatabase.params | quote }}
+              {{- end }}
+          {{- if .Values.alert.resources }}
+          resources:
+            limits:
+              memory: {{ .Values.alert.resources.limits.memory }}
+              cpu: {{ .Values.alert.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.alert.resources.requests.memory }}
+              cpu: {{ .Values.alert.resources.requests.cpu }}
+          {{- end }}
           {{- if .Values.alert.livenessProbe.enabled }}
           livenessProbe:
             exec:

@@ -14,16 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if not .Values.postgresql.enabled }}
+{{- if .Values.common.fsFileResourcePersistence.enabled }}
 apiVersion: v1
-kind: Secret
+kind: PersistentVolumeClaim
 metadata:
-  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
+  name: {{ include "dolphinscheduler.fullname" . }}-fs-file
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-postgresql
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-fs-file
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-type: Opaque
-data:
-  db-password: {{ .Values.externalDatabase.password | b64enc | quote }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+  {{- range .Values.common.fsFileResourcePersistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  storageClassName: {{ .Values.common.fsFileResourcePersistence.storageClassName | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.common.fsFileResourcePersistence.storage | quote }}
 {{- end }}

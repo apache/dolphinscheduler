@@ -40,6 +40,10 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/component: worker
+      {{- if .Values.alert.annotations }}
+      annotations:
+        {{- toYaml .Values.alert.annotations | nindent 8 }}
+      {{- end }}
     spec:
       {{- if .Values.worker.affinity }}
       affinity: {{- toYaml .Values.worker.affinity | nindent 8 }}
@@ -50,9 +54,14 @@ spec:
       {{- if .Values.worker.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecret }}
+      {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker
-          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          image: {{ include "dolphinscheduler.image.fullname" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "worker-server"
           ports:
@@ -60,10 +69,19 @@ spec:
               name: "worker-port"
             - containerPort: 50051
               name: "logger-port"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: DOLPHINSCHEDULER_OPTS
+              valueFrom:
+                configMapKeyRef:
+                  key: DOLPHINSCHEDULER_OPTS
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+            - name: LOGGER_SERVER_OPTS
+              valueFrom:
+                configMapKeyRef:
+                  key: LOGGER_SERVER_OPTS
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
             - name: WORKER_EXEC_THREADS
               valueFrom:
                 configMapKeyRef:
@@ -94,11 +112,6 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
                   key: WORKER_GROUPS
-            - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
             - name: XLS_FILE_PATH
               valueFrom:
                 configMapKeyRef:
@@ -144,6 +157,18 @@ spec:
                 configMapKeyRef:
                   key: MAIL_SMTP_SSL_TRUST
                   name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: DATABASE_TYPE
+              {{- if .Values.postgresql.enabled }}
+              value: "postgresql"
+              {{- else }}
+              value: {{ .Values.externalDatabase.type | quote }}
+              {{- end }}
+            - name: DATABASE_DRIVER
+              {{- if .Values.postgresql.enabled }}
+              value: "org.postgresql.Driver"
+              {{- else }}
+              value: {{ .Values.externalDatabase.driver | quote }}
+              {{- end }}
             - name: DATABASE_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
@@ -154,7 +179,7 @@ spec:
               {{- if .Values.postgresql.enabled }}
               value: "5432"
               {{- else }}
-              value: {{ .Values.externalDatabase.port }}
+              value: {{ .Values.externalDatabase.port | quote }}
               {{- end }}
             - name: DATABASE_USERNAME
               {{- if .Values.postgresql.enabled }}
@@ -169,8 +194,8 @@ spec:
                   name: {{ template "dolphinscheduler.postgresql.fullname" . }}
                   key: postgresql-password
                   {{- else }}
-                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
-                  key: db-password
+                  name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+                  key: database-password
                   {{- end }}
             - name: DATABASE_DATABASE
               {{- if .Values.postgresql.enabled }}
@@ -178,9 +203,15 @@ spec:
               {{- else }}
               value: {{ .Values.externalDatabase.database | quote }}
               {{- end }}
+            - name: DATABASE_PARAMS
+              {{- if .Values.postgresql.enabled }}
+              value: "characterEncoding=utf8"
+              {{- else }}
+              value: {{ .Values.externalDatabase.params | quote }}
+              {{- end }}
             - name: ZOOKEEPER_QUORUM
               {{- if .Values.zookeeper.enabled }}
-              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
+              value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
               {{- else }}
               value: {{ .Values.externalZookeeper.zookeeperQuorum }}
               {{- end }}
@@ -190,38 +221,52 @@ spec:
               {{- else }}
               value: {{ .Values.externalZookeeper.zookeeperRoot }}
               {{- end }}
+            - name: DATA_BASEDIR_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+                  key: DATA_BASEDIR_PATH
             - name: RESOURCE_STORAGE_TYPE
               valueFrom:
                 configMapKeyRef:
                   key: RESOURCE_STORAGE_TYPE
-                  name: {{ include "dolphinscheduler.fullname" . }}-resource
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
             - name: RESOURCE_UPLOAD_PATH
               valueFrom:
                 configMapKeyRef:
                   key: RESOURCE_UPLOAD_PATH
-                  name: {{ include "dolphinscheduler.fullname" . }}-resource
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
             - name: FS_DEFAULT_FS
               valueFrom:
                 configMapKeyRef:
                   key: FS_DEFAULT_FS
-                  name: {{ include "dolphinscheduler.fullname" . }}-resource
-            {{- if eq .Values.resource.resourceStorageType "S3" }}
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            {{- if eq .Values.common.configmap.RESOURCE_STORAGE_TYPE "S3" }}
             - name: FS_S3A_ENDPOINT
               valueFrom:
                 configMapKeyRef:
                   key: FS_S3A_ENDPOINT
-                  name: {{ include "dolphinscheduler.fullname" . }}-resource
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
             - name: FS_S3A_ACCESS_KEY
               valueFrom:
                 configMapKeyRef:
                   key: FS_S3A_ACCESS_KEY
-                  name: {{ include "dolphinscheduler.fullname" . }}-resource
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
             - name: FS_S3A_SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   key: fs-s3a-secret-key
-                  name: {{ printf "%s-%s" .Release.Name "resource-s3"  }}
+                  name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
             {{- end }}
+          {{- if .Values.worker.resources }}
+          resources:
+            limits:
+              memory: {{ .Values.worker.resources.limits.memory | quote }}
+              cpu: {{ .Values.worker.resources.limits.cpu | quote }}
+            requests:
+              memory: {{ .Values.worker.resources.requests.memory | quote }}
+              cpu: {{ .Values.worker.resources.requests.cpu | quote }}
+          {{- end }}
           {{- if .Values.worker.livenessProbe.enabled }}
           livenessProbe:
             exec:
@@ -249,16 +294,16 @@ spec:
             failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
           {{- end }}
           volumeMounts:
-            - mountPath: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
+            - mountPath: {{ .Values.common.configmap.DATA_BASEDIR_PATH | quote }}
               name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
             - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
               subPath: "dolphinscheduler_env.sh"
-              name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
-            {{- if .Values.resource.persistentVolumeClaim.enabled }}
-            - mountPath: {{ .Values.resource.resourceUploadPath }}
-              name: {{ include "dolphinscheduler.fullname" . }}-resource
+              name: {{ include "dolphinscheduler.fullname" . }}-common-env
+            {{- if .Values.common.fsFileResourcePersistence.enabled }}
+            - mountPath: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
+              name: {{ include "dolphinscheduler.fullname" . }}-fs-file
             {{- end }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
@@ -275,17 +320,17 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
+        - name: {{ include "dolphinscheduler.fullname" . }}-common-env
           configMap:
             defaultMode: 0777
-            name: {{ include "dolphinscheduler.fullname" . }}-worker
+            name: {{ include "dolphinscheduler.fullname" . }}-common
             items:
-              - key: dolphinscheduler_env.sh
+              - key: DOLPHINSCHEDULER_ENV
                 path: dolphinscheduler_env.sh
-        {{- if .Values.resource.persistentVolumeClaim.enabled }}
-        - name: {{ include "dolphinscheduler.fullname" . }}-resource
+        {{- if .Values.common.fsFileResourcePersistence.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-fs-file
           persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-resource
+            claimName: {{ include "dolphinscheduler.fullname" . }}-fs-file
         {{- end }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:

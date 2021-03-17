@@ -15,14 +15,14 @@
 # limitations under the License.
 #
 
-# resource storage type : HDFS,S3,NONE
+# resource storage type : HDFS, S3, NONE
 resource.storage.type=${RESOURCE_STORAGE_TYPE}
 
 # resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
 resource.upload.path=${RESOURCE_UPLOAD_PATH}
 
 # user data local directory path, please make sure the directory exists and have read write permissions
-data.basedir.path=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH}
+data.basedir.path=${DATA_BASEDIR_PATH}
 
 # whether kerberos starts
 hadoop.security.authentication.startup.state=false
@@ -37,12 +37,12 @@ login.user.keytab.username=hdfs-mycluster@ESZ.COM
 login.user.keytab.path=/opt/hdfs.headless.keytab
 
 #resource.view.suffixs
-#resource.view.suffixs=txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties
+#resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
 # if resource.storage.type=HDFS, the user need to have permission to create directories under the HDFS root path
 hdfs.root.user=hdfs
 
-# if resource.storage.type=S3, the value like: s3a://dolphinscheduler ; if resource.storage.type=HDFS, When namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
+# if resource.storage.type=S3, the value like: s3a://dolphinscheduler; if resource.storage.type=HDFS, When namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
 fs.defaultFS=${FS_DEFAULT_FS}
 
 # if resource.storage.type=S3, s3 endpoint
@@ -61,6 +61,6 @@ yarn.resourcemanager.ha.rm.ids=192.168.xx.xx,192.168.xx.xx
 yarn.application.status.address=http://ds1:8088/ws/v1/cluster/apps/%s
 
 # system env path
-dolphinscheduler.env.path=${DOLPHINSCHEDULER_ENV_PATH}
+#dolphinscheduler.env.path=env/dolphinscheduler_env.sh
 development.state=false
-kerberos.expire.time=7
+kerberos.expire.time=1

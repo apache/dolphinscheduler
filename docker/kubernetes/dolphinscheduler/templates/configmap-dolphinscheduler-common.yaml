@@ -14,16 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if eq .Values.resource.resourceStorageType "S3" }}
+{{- if .Values.common.configmap }}
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: {{ printf "%s-%s" .Release.Name "resource-s3"  }}
+  name: {{ include "dolphinscheduler.fullname" . }}-common
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-resource-s3
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-common
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-type: Opaque
 data:
-  fs-s3a-secret-key: {{ .Values.resource.fsS3aSecretKey | b64enc | quote }}
+  DATA_BASEDIR_PATH: {{ .Values.common.configmap.DATA_BASEDIR_PATH | quote }}
+  RESOURCE_STORAGE_TYPE: {{ .Values.common.configmap.RESOURCE_STORAGE_TYPE | quote }}
+  RESOURCE_UPLOAD_PATH: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
+  FS_DEFAULT_FS: {{ .Values.common.configmap.FS_DEFAULT_FS | quote }}
+  FS_S3A_ENDPOINT: {{ .Values.common.configmap.FS_S3A_ENDPOINT | quote }}
+  FS_S3A_ACCESS_KEY: {{ .Values.common.configmap.FS_S3A_ACCESS_KEY | quote }}
+  DOLPHINSCHEDULER_ENV: |-
+  {{- range .Values.common.configmap.DOLPHINSCHEDULER_ENV }}
+    {{ . }}
+  {{- end }}
 {{- end }}

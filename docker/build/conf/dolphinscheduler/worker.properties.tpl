@@ -30,5 +30,5 @@ worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 # worker listener port
 worker.listen.port=${WORKER_LISTEN_PORT}
 
-# default worker group,if this worker belongs different groups,you can config the following like that 'worker.groups=default,test'
+# default worker groups, if this worker belongs different groups, you can config the following like that 'worker.groups=default,test'
 worker.groups=${WORKER_GROUPS}
