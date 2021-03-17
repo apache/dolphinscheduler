@@ -27,7 +27,7 @@ public class DataxParametersTest {
     /**
      * jvm parameters
      */
-    public static final String JVM_EVN = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+    public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
     @Test
     public void testLoadJvmEnv()   {
@@ -88,6 +88,6 @@ public class DataxParametersTest {
     public String loadJvmEnvTest(DataxParameters dataXParameters) {
         int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
         int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
-        return String.format(JVM_EVN, xms, xmx);
+        return String.format(JVM_PARAM, xms, xmx);
     }
 }
