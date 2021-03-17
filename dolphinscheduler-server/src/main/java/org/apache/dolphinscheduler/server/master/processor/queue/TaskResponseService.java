@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.math.BigDecimal;
@@ -75,6 +76,11 @@ public class TaskResponseService {
      * task response worker
      */
     private Thread taskResponseWorker;
+
+    /**
+     * alert manager
+     */
+    private AlertManager alertManager = new AlertManager();
 
     @PostConstruct
     public void start() {
@@ -178,53 +184,7 @@ public class TaskResponseService {
                             logger.info("DQ Task Result : " + JSONUtils.toJsonString(dqExecuteResult));
                             if (dqExecuteResult != null) {
                                 //check the result ,if result is failure do some operator by failure strategy
-                                CheckType checkType = dqExecuteResult.getCheckType();
-
-                                double statisticsValue = dqExecuteResult.getStatisticsValue();
-                                double comparisonValue = dqExecuteResult.getComparisonValue();
-                                double threshold = dqExecuteResult.getThreshold();
-                                boolean isFailure = false;
-
-                                OperatorType operatorType = OperatorType.of(dqExecuteResult.getOperator());
-
-                                if (operatorType != null) {
-                                    if (CheckType.STATISTICS_COMPARE_FIXED_VALUE == checkType) {
-                                        isFailure = getCompareResult(operatorType,statisticsValue,threshold);
-                                    } else if (CheckType.STATISTICS_COMPARE_COMPARISON == checkType) {
-                                        isFailure = getCompareResult(operatorType,statisticsValue,comparisonValue);
-                                    } else if (CheckType.STATISTICS_COMPARISON_PERCENTAGE == checkType) {
-                                        isFailure = getCompareResult(operatorType,statisticsValue / comparisonValue * 100,threshold);
-                                    }
-                                }
-
-                                if (isFailure) {
-                                    DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
-                                    if (dqFailureStrategy != null) {
-                                        switch (dqFailureStrategy) {
-                                            case END:
-                                                taskResponseEvent.setState(ExecutionStatus.FAILURE);
-                                                logger.info("task is failre and end");
-                                                break;
-                                            case CONTINUE:
-                                                logger.info("task is failre and continue");
-                                                break;
-                                            case END_ALTER:
-                                                taskResponseEvent.setState(ExecutionStatus.FAILURE);
-                                                logger.info("task is failre and end and alert");
-                                                break;
-                                            case CONTINUE_ALTER:
-                                                logger.info("task is failre and continue and alert");
-                                                break;
-                                            default:
-                                                break;
-                                        }
-                                    }
-                                    dqExecuteResult.setState(DqTaskState.FAILURE);
-                                } else {
-                                    dqExecuteResult.setState(DqTaskState.SUCCESS);
-                                }
-
-                                processService.updateDqExecuteResultState(dqExecuteResult);
+                                operateDqExecuteResult(taskResponseEvent, dqExecuteResult);
                             }
                         }
 
@@ -248,6 +208,69 @@ public class TaskResponseService {
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
         }
+    }
+
+    private void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, DqExecuteResult dqExecuteResult) {
+
+        if (isFailure(dqExecuteResult)) {
+            DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
+            if (dqFailureStrategy != null) {
+                switch (dqFailureStrategy) {
+                    case END:
+                        taskResponseEvent.setState(ExecutionStatus.FAILURE);
+                        logger.info("task is failre and end");
+                        break;
+                    case CONTINUE:
+                        logger.info("task is failre and continue");
+                        break;
+                    case END_ALTER:
+                        taskResponseEvent.setState(ExecutionStatus.FAILURE);
+                        sendAlert(dqExecuteResult);
+                        logger.info("task is failre and end and alert");
+                        break;
+                    case CONTINUE_ALTER:
+                        sendAlert(dqExecuteResult);
+                        logger.info("task is failre and continue and alert");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            dqExecuteResult.setState(DqTaskState.FAILURE);
+        } else {
+            dqExecuteResult.setState(DqTaskState.SUCCESS);
+        }
+
+        processService.updateDqExecuteResultState(dqExecuteResult);
+    }
+
+    private boolean isFailure(DqExecuteResult dqExecuteResult) {
+        CheckType checkType = dqExecuteResult.getCheckType();
+
+        double statisticsValue = dqExecuteResult.getStatisticsValue();
+        double comparisonValue = dqExecuteResult.getComparisonValue();
+        double threshold = dqExecuteResult.getThreshold();
+
+        OperatorType operatorType = OperatorType.of(dqExecuteResult.getOperator());
+
+        boolean isFailure = false;
+        if (operatorType != null) {
+            if (CheckType.STATISTICS_COMPARE_FIXED_VALUE == checkType) {
+                isFailure = getCompareResult(operatorType,statisticsValue,threshold);
+            } else if (CheckType.STATISTICS_COMPARE_COMPARISON == checkType) {
+                isFailure = getCompareResult(operatorType,statisticsValue,comparisonValue);
+            } else if (CheckType.STATISTICS_COMPARISON_PERCENTAGE == checkType) {
+                isFailure = getCompareResult(operatorType,statisticsValue / comparisonValue * 100,threshold);
+            }
+        }
+        return isFailure;
+    }
+
+    private void sendAlert(DqExecuteResult dqExecuteResult) {
+        alertManager.
+                sendAlterDataQualityTask(dqExecuteResult,
+                        processService.findProcessInstanceDetailById(
+                                Integer.parseInt(String.valueOf(dqExecuteResult.getProcessInstanceId()))));
     }
 
     public BlockingQueue<TaskResponseEvent> getEventQueue() {

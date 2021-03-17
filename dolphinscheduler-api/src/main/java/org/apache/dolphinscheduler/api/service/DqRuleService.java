@@ -28,11 +28,6 @@ public interface DqRuleService {
 
     Map<String, Object> getRuleFormCreateJsonById(int id);
 
-    Map<String, Object> queryDqsRuleListPage(User loginUser,
-                                             String searchVal,
-                                             Integer pageNo,
-                                             Integer pageSize);
-
     Map<String, Object> queryAllRuleList();
 
     Map<String, Object> queryRuleListPaging(User loginUser,

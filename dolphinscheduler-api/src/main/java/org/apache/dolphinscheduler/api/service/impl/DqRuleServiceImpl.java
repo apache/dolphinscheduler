@@ -28,14 +28,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
 import org.apache.dolphinscheduler.common.enums.dq.PropsType;
-import org.apache.dolphinscheduler.common.form.CascaderParamsOptions;
 import org.apache.dolphinscheduler.common.form.ParamsOptions;
 import org.apache.dolphinscheduler.common.form.PluginParams;
 import org.apache.dolphinscheduler.common.form.Validate;
 import org.apache.dolphinscheduler.common.form.props.InputParamsProps;
-import org.apache.dolphinscheduler.common.form.type.CascaderParam;
 import org.apache.dolphinscheduler.common.form.type.InputParam;
-import org.apache.dolphinscheduler.common.form.type.RadioParam;
 import org.apache.dolphinscheduler.common.form.type.SelectParam;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -90,12 +87,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
     @Override
     public  Map<String, Object> getRuleFormCreateJsonById(int id) {
 
-        Map<String, Object> result = new HashMap<>(5);
-
-        DqRule dqRule = dqRuleMapper.selectById(id);
-        if (dqRule == null) {
-            return null;
-        }
+        Map<String, Object> result = new HashMap<>();
 
         List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryMapper.getRuleInputEntryList(id);
 
@@ -110,28 +102,11 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
     }
 
     @Override
-    public Map<String, Object> queryDqsRuleListPage(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-
-        Page<DqRule> page = new Page<>(pageNo, pageSize);
-        IPage<DqRule> rulePage =
-                dqRuleMapper.selectPage(page,new QueryWrapper<DqRule>().like(StringUtils.isNotEmpty(searchVal),Constants.NAME,searchVal));
-
-        PageInfo<DqRule> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) rulePage.getTotal());
-        pageInfo.setLists(rulePage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    @Override
     public Map<String, Object> queryAllRuleList() {
         Map<String, Object> result = new HashMap<>();
 
         List<DqRule> ruleList =
-                dqRuleMapper.selectList(new QueryWrapper<DqRule>());
+                dqRuleMapper.selectList(new QueryWrapper<>());
 
         result.put(Constants.DATA_LIST, ruleList);
         putMsg(result, Status.SUCCESS);
@@ -200,19 +175,21 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                         ruleType,
                         start,
                         end);
+        if (dqRulePage != null) {
+            List<DqRule> dataList = dqRulePage.getRecords();
+            dataList.forEach(dqRule -> {
+                List<DqRuleInputEntry> ruleInputEntryList =
+                        DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(dqRule.getId()));
+                List<DqRuleExecuteSql> ruleExecuteSqlList = dqRuleExecuteSqlMapper.getExecuteSqlList(dqRule.getId());
 
-        List<DqRule> dataList = dqRulePage.getRecords();
-        dataList.forEach(dqRule -> {
-            List<DqRuleInputEntry> ruleInputEntryList =
-                    DqRuleUtils.transformInputEntry(dqRuleInputEntryMapper.getRuleInputEntryList(dqRule.getId()));
-            List<DqRuleExecuteSql> ruleExecuteSqlList = dqRuleExecuteSqlMapper.getExecuteSqlList(dqRule.getId());
+                RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList,ruleExecuteSqlList);
+                dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
+            });
 
-            RuleDefinition ruleDefinition = new RuleDefinition(ruleInputEntryList,ruleExecuteSqlList);
-            dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
-        });
+            pageInfo.setTotalCount((int) dqRulePage.getTotal());
+            pageInfo.setLists(dataList);
+        }
 
-        pageInfo.setTotalCount((int) dqRulePage.getTotal());
-        pageInfo.setLists(dataList);
         result.put(DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -229,12 +206,6 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                         break;
                     case SELECT:
                         params.add(getSelectParam(inputEntry));
-                        break;
-                    case RADIO:
-                        params.add(getRadioParam(inputEntry));
-                        break;
-                    case CASCADER:
-                        params.add(getCascaderParam(inputEntry));
                         break;
                     case TEXTAREA:
                         params.add(getTextareaParam(inputEntry));
@@ -270,63 +241,6 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 .setType(PropsType.TEXTAREA)
                 .setRows(1)
                 .setPlaceholder(inputEntry.getPlaceholder())
-                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
-                .build();
-    }
-
-    private CascaderParam getCascaderParam(DqRuleInputEntry inputEntry) {
-        List<CascaderParamsOptions> cascaderOptions = null;
-
-        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
-            String optionStr = inputEntry.getOptions();
-            if (StringUtils.isNotEmpty(optionStr)) {
-                cascaderOptions = JSONUtils.toList(optionStr, CascaderParamsOptions.class);
-            }
-        } else if (OptionSourceType.DATASOURCE_ID == inputEntry.getOptionSourceType()) {
-            cascaderOptions = new ArrayList<>();
-            for (DbType dbtype: DbType.values()) {
-                CascaderParamsOptions cascaderParamsOptions =
-                        new CascaderParamsOptions(dbtype.getDescp(),dbtype.getCode(),false);
-                List<CascaderParamsOptions> children = null;
-                List<DataSource> dataSourceList = dataSourceMapper.listAllDataSourceByType(dbtype.getCode());
-                if (CollectionUtils.isNotEmpty(dataSourceList)) {
-                    children = new ArrayList<>();
-                    for (DataSource dataSource: dataSourceList) {
-                        CascaderParamsOptions childrenOption =
-                                new CascaderParamsOptions(dataSource.getName(),dataSource.getId(),false);
-                        children.add(childrenOption);
-                    }
-                    cascaderParamsOptions.setChildren(children);
-                    cascaderOptions.add(cascaderParamsOptions);
-                }
-
-            }
-        }
-
-        return CascaderParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                .setParamsOptionsList(cascaderOptions)
-                .setValue(Integer.valueOf(inputEntry.getValue()))
-                .setSize(Constants.SMALL)
-                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
-                .build();
-    }
-
-    private RadioParam getRadioParam(DqRuleInputEntry inputEntry) {
-        List<ParamsOptions> radioOptions = null;
-
-        if (OptionSourceType.DEFAULT == inputEntry.getOptionSourceType()) {
-            String optionStr = inputEntry.getOptions();
-            if (StringUtils.isNotEmpty(optionStr)) {
-                radioOptions = JSONUtils.toList(optionStr, ParamsOptions.class);
-            }
-        }
-
-        return RadioParam
-                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
-                .setParamsOptionsList(radioOptions)
-                .setValue(inputEntry.getValue())
-                .setSize(Constants.SMALL)
                 .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
                 .build();
     }

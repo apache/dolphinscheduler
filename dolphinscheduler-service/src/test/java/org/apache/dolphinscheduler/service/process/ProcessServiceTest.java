@@ -25,11 +25,22 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
+import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
+import org.apache.dolphinscheduler.common.enums.dq.FormType;
+import org.apache.dolphinscheduler.common.enums.dq.InputType;
+import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
+import org.apache.dolphinscheduler.common.enums.dq.RuleType;
+import org.apache.dolphinscheduler.common.enums.dq.ValueType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -37,11 +48,16 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
@@ -59,7 +75,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -73,22 +91,35 @@ public class ProcessServiceTest {
     @InjectMocks
     private ProcessService processService;
 
-
     @Mock
     private CommandMapper commandMapper;
-
 
     @Mock
     private ErrorCommandMapper errorCommandMapper;
 
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
+
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
+
     @Mock
     private UserMapper userMapper;
+
     @Mock
     TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
+    private DqExecuteResultMapper dqExecuteResultMapper;
+
+    @Mock
+    private DqRuleMapper dqRuleMapper;
+
+    @Mock
+    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+
+    @Mock
+    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -441,5 +472,102 @@ public class ProcessServiceTest {
 
         Assert.assertEquals(expect, processService.changeJson(newProcessData,oldJson));
 
+    }
+
+    @Test
+    public void getDqRule() {
+        Mockito.when(dqRuleMapper.selectById(1)).thenReturn(new DqRule());
+        Assert.assertNotNull(processService.getDqRule(1));
+    }
+
+    @Test
+    public void getRuleInputEntry() {
+        Mockito.when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
+        Assert.assertNotNull(processService.getRuleInputEntry(1));
+    }
+
+    @Test
+    public void getDqExecuteSql() {
+        Mockito.when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
+        Assert.assertNotNull(processService.getRuleInputEntry(1));
+    }
+
+    private List<DqRuleInputEntry> getRuleInputEntryList() {
+        List<DqRuleInputEntry> list = new ArrayList<>();
+
+        DqRuleInputEntry srcConnectorType = new DqRuleInputEntry();
+        srcConnectorType.setTitle("源数据类型");
+        srcConnectorType.setField("src_connector_type");
+        srcConnectorType.setType(FormType.SELECT);
+        srcConnectorType.setCanEdit(true);
+        srcConnectorType.setShow(true);
+        srcConnectorType.setValue("JDBC");
+        srcConnectorType.setPlaceholder("Please select the source connector type");
+        srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT);
+        srcConnectorType.setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
+        srcConnectorType.setInputType(InputType.DEFAULT);
+        srcConnectorType.setValueType(ValueType.NUMBER);
+        srcConnectorType.setEmit(true);
+
+        DqRuleInputEntry statisticsName = new DqRuleInputEntry();
+        statisticsName.setTitle("统计值名");
+        statisticsName.setField("statistics_name");
+        statisticsName.setType(FormType.INPUT);
+        statisticsName.setCanEdit(true);
+        statisticsName.setShow(true);
+        statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
+        statisticsName.setOptionSourceType(OptionSourceType.DEFAULT);
+        statisticsName.setInputType(InputType.DEFAULT);
+        statisticsName.setValueType(ValueType.STRING);
+        statisticsName.setEmit(false);
+
+        DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
+        statisticsExecuteSql.setTitle("统计值计算SQL");
+        statisticsExecuteSql.setField("statistics_execute_sql");
+        statisticsExecuteSql.setType(FormType.TEXTAREA);
+        statisticsExecuteSql.setCanEdit(true);
+        statisticsExecuteSql.setShow(true);
+        statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
+        statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT);
+        statisticsExecuteSql.setValueType(ValueType.LIKE_SQL);
+        statisticsExecuteSql.setEmit(false);
+
+        list.add(srcConnectorType);
+        list.add(statisticsName);
+        list.add(statisticsExecuteSql);
+
+        return list;
+    }
+
+    private List<DqRuleExecuteSql> getRuleExecuteSqlList() {
+        List<DqRuleExecuteSql> list = new ArrayList<>();
+
+        DqRuleExecuteSql executeSqlDefinition = new DqRuleExecuteSql();
+        executeSqlDefinition.setIndex(0);
+        executeSqlDefinition.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
+        executeSqlDefinition.setTableAlias("total_count");
+        executeSqlDefinition.setExecuteSqlType(ExecuteSqlType.COMPARISON);
+        list.add(executeSqlDefinition);
+
+        return list;
+    }
+
+    public DqExecuteResult getExecuteResult() {
+        DqExecuteResult dqExecuteResult = new DqExecuteResult();
+        dqExecuteResult.setId(1);
+        dqExecuteResult.setState(DqTaskState.FAILURE);
+
+        return dqExecuteResult;
+    }
+
+    public List<DqExecuteResult> getExecuteResultList() {
+
+        List<DqExecuteResult> list = new ArrayList<>();
+        DqExecuteResult dqExecuteResult = new DqExecuteResult();
+        dqExecuteResult.setId(1);
+        dqExecuteResult.setState(DqTaskState.FAILURE);
+        list.add(dqExecuteResult);
+
+        return list;
     }
 }

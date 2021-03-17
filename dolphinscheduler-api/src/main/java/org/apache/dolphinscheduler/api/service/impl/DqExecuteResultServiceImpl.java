@@ -114,5 +114,4 @@ public class DqExecuteResultServiceImpl extends BaseService implements DqExecute
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 }

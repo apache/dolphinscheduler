@@ -20,10 +20,16 @@ package org.apache.dolphinscheduler.server.utils;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.dq.CheckType;
+import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
+import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent.Builder;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -248,5 +254,53 @@ public class AlertManager {
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    }
+
+    /**
+     * send data quality task alert
+     */
+    public void sendAlterDataQualityTask(DqExecuteResult result,ProcessInstance processInstance) {
+        Alert alert = new Alert();
+
+        String taskName = result.getTaskName();
+        String ruleName = result.getRuleName();
+        String state = result.getState().getDescription();
+        alert.setTitle(taskName + " " + ruleName + " " + state);
+        String content = getDataQualityAlterContent(result);
+        alert.setContent(content);
+        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setCreateTime(new Date());
+        alertDao.addAlert(alert);
+        logger.info("add alert to db , alert: {}", alert.toString());
+    }
+
+    /**
+     * getDataQualityAlterContent
+     * @param result DqExecuteResult
+     * @return String String
+     */
+    public String getDataQualityAlterContent(DqExecuteResult result) {
+
+        DqExecuteResultAlertContent content = DqExecuteResultAlertContent.newBuilder()
+                .processDefinitionId(result.getProcessDefinitionId())
+                .processDefinitionName(result.getProcessDefinitionName())
+                .processInstanceId(result.getProcessInstanceId())
+                .processInstanceName(result.getProcessInstanceName())
+                .taskInstanceId(result.getTaskInstanceId())
+                .taskName(result.getTaskName())
+                .ruleType(result.getRuleType())
+                .ruleName(result.getRuleName())
+                .statisticsValue(result.getStatisticsValue())
+                .comparisonValue(result.getComparisonValue())
+                .checkType(result.getCheckType())
+                .threshold(result.getThreshold())
+                .operator(result.getOperator())
+                .failureStrategy(result.getFailureStrategy())
+                .userId(result.getUserId())
+                .userName(result.getUserName())
+                .state(result.getState())
+                .build();
+
+        return JSONUtils.toJsonString(content);
     }
 }
