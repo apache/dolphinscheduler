@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 
 import org.junit.Test;
@@ -119,15 +120,15 @@ public class PropertyUtilsTest {
     public void testGetDouble() {
 
         //Expected 3.0
-        double result = PropertyUtils.getDouble("test.server.factor");
+        double result = PropertyUtils.getDouble("test.server.factor", 3.0);
         assertEquals(3.0, result, 0);
 
         //If key is null, then return -1.0
-        result = PropertyUtils.getDouble(null);
+        result = PropertyUtils.getDouble(null, -1.0);
         assertEquals(-1.0, result, 0);
 
         //If key is undefine in alert.properties, then return -1
-        result = PropertyUtils.getDouble("abc");
+        result = PropertyUtils.getDouble("abc", -1.0);
         assertEquals(-1.0, result, 0);
 
         //If key is undefine in alert.properties, and there is a defaultval, then return defaultval
@@ -135,7 +136,7 @@ public class PropertyUtilsTest {
         assertEquals(5.0, result, 0);
 
         //If the value can not parse to double ,it will log the error and return -1.0
-        result = PropertyUtils.getDouble("test.server.testnumber");
+        result = PropertyUtils.getDouble("test.server.testnumber", -1.0);
         assertEquals(-1.0, result, 0);
     }
 
