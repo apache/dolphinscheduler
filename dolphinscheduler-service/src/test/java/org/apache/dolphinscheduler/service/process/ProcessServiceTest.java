@@ -485,7 +485,7 @@ public class ProcessServiceTest {
     @Test
     public void getDqExecuteSql() {
         Mockito.when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
-        Assert.assertNotNull(processService.getRuleInputEntry(1));
+        Assert.assertNotNull(processService.getDqExecuteSql(1));
     }
 
     private List<DqRuleInputEntry> getRuleInputEntryList() {
