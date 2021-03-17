@@ -209,7 +209,7 @@ This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/fli
 
 **`DATAX_HOME`**
 
-This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax/bin/datax.py`.
+This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax`.
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 
