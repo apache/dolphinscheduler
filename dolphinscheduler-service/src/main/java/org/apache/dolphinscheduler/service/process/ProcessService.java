@@ -1631,7 +1631,7 @@ public class ProcessService {
                 if (property == null) {
                     continue;
                 }
-                String value = String.valueOf(row.get(paramName));
+                String value = row.get(paramName);
                 if (StringUtils.isNotEmpty(value)) {
                     property.setValue(value);
                     info.setValue(value);
