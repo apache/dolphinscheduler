@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SqlUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
@@ -49,7 +50,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +133,7 @@ public class SqlTask extends AbstractTask {
                     sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
-            List<SqlBinds> mainSqlBinds = Arrays.asList(sqlParameters.getSql().split(";"))
+            List<SqlBinds> mainSqlBinds = SqlUtils.splitStatements(sqlParameters.getSql())
                     .stream()
                     .filter(o -> o != null && o.trim().length() >= 1)
                     .map(this::getSqlAndSqlParamsMap)
