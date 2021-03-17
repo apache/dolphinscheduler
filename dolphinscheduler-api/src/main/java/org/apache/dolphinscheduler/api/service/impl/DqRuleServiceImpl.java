@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
 import org.apache.dolphinscheduler.common.enums.dq.PropsType;
 import org.apache.dolphinscheduler.common.form.ParamsOptions;
 import org.apache.dolphinscheduler.common.form.PluginParams;

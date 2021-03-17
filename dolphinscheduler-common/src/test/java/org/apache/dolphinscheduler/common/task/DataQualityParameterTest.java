@@ -95,8 +95,6 @@ public class DataQualityParameterTest {
                 .setValue("JDBC")
                 .build();
 
-
-
         InputParam srcTable = InputParam.newBuilder("src_table","源数据表")
                 .setProps(new InputParamsProps()
                         .setPlaceholder("Please enter source table name")

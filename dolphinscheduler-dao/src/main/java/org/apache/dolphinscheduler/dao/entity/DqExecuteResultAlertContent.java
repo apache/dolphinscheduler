@@ -159,7 +159,6 @@ public class DqExecuteResultAlertContent implements Serializable {
         private String userName;
         private DqTaskState state;
 
-
         public Builder processDefinitionId(long processDefinitionId) {
             this.processDefinitionId = processDefinitionId;
             return this;

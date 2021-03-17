@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
 import org.apache.dolphinscheduler.common.enums.dq.FormType;
 import org.apache.dolphinscheduler.common.enums.dq.InputType;
 import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
-import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 import org.apache.dolphinscheduler.common.enums.dq.ValueType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
@@ -57,7 +56,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
@@ -75,9 +73,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
