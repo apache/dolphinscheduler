@@ -34,25 +34,7 @@
           </el-option>
         </el-select>
       </div>
-      <div class="cont-box">
-        <div class="label-box">
-          <el-select
-                  style="width: 100%;"
-                  size="small"
-                  filterable
-                  v-model="wdiCurr"
-                  :disabled="isDetails"
-                  @change="_handleWdiChanged">
-            <el-option
-                  v-for="city in processDefinitionList"
-                  :key="city.code"
-                  :value="city.id"
-                  :label="city.code">
-            </el-option>
-          </el-select>
-        </div>
-      </div>
-    </div>
+    </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
