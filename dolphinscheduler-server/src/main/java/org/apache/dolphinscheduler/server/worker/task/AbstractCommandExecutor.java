@@ -84,6 +84,9 @@ public abstract class AbstractCommandExecutor {
      */
     protected TaskExecutionContext taskExecutionContext;
 
+
+    protected boolean logOutputIsSuccess = false;
+
     /**
      * taskExecutionContextCacheManager
      */
@@ -349,28 +352,40 @@ public abstract class AbstractCommandExecutor {
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
-        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable(){
-            @Override
-            public void run() {
-                BufferedReader inReader = null;
-
-                try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
-
-                    long lastFlushTime = System.currentTimeMillis();
-
-                    while ((line = inReader.readLine()) != null) {
+        ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
+        getOutputLogService.submit(() -> {
+            BufferedReader inReader = null;
+            try {
+                inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                logBuffer.add("welcome to use bigdata scheduling system...");
+                while ((line = inReader.readLine()) != null) {
                         logBuffer.add(line);
-                        lastFlushTime = flush(lastFlushTime);
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
-                } finally {
-                    clear();
-                    close(inReader);
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                logOutputIsSuccess = true;
+                close(inReader);
+            }
+        });
+        getOutputLogService.shutdown();
+        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        parseProcessOutputExecutorService.submit(() -> {
+            try {
+                long lastFlushTime = System.currentTimeMillis();
+                while (logBuffer.size() > 0 || !logOutputIsSuccess) {
+                    if (logBuffer.size() > 0) {
+                        lastFlushTime = flush(lastFlushTime);
+                    } else {
+                        Thread.sleep(Constants.DEFAULT_LOG_FLUSH_INTERVAL);
+
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                clear();
             }
         });
         parseProcessOutputExecutorService.shutdown();
