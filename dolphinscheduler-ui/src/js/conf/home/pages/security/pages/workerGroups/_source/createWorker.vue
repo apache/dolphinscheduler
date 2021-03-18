@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit worker group') : $t('Create worker group')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-worker-model">
         <m-list-box-f>
@@ -51,12 +51,12 @@
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -114,17 +114,18 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs.popup.spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
         this.store.dispatch('security/saveWorkerGroups', param).then(res => {
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},
@@ -137,7 +138,7 @@
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

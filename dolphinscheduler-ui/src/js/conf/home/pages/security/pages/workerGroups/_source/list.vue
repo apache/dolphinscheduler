@@ -22,7 +22,7 @@
         <el-table-column prop="name" :label="$t('Group')"></el-table-column>
         <el-table-column label="IPList" min-width="300">
           <template slot-scope="scope">
-            <span>{{scope.row.ipList.join(',')}}</span>
+            <span>{{scope.row.ipList}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
@@ -33,6 +33,25 @@
         <el-table-column :label="$t('Update Time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="100">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Edit')" placement="top">
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('Delete')" placement="top">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
