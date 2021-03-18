@@ -156,7 +156,7 @@ public class AlertGroupServiceTest {
         //group name not exist
         boolean result = alertGroupService.existGroupName(groupName);
         Assert.assertFalse(result);
-        Mockito.when(alertGroupMapper.queryByGroupName(groupName)).thenReturn(getList());
+        Mockito.when(alertGroupMapper.existGroupName(groupName)).thenReturn(true);
 
         //group name exist
         result = alertGroupService.existGroupName(groupName);
