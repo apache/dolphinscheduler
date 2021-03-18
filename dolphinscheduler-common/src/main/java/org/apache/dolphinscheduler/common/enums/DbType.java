@@ -65,6 +65,6 @@ public enum DbType {
                 return ty;
             }
         }
-        throw new IllegalArgumentException("invalid type : " + type);
+        return null;
     }
 }

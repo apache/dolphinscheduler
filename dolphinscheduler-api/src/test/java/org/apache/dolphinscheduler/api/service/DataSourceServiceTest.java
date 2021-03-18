@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -97,4 +98,23 @@ public class DataSourceServiceTest {
 
         return dataSource;
     }
+
+    @Test
+    public void buildParameterWithDecodePassword() {
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+        String other = "{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}";
+        String param = dataSourceService.buildParameter("root","test",DbType.MYSQL, "192.168.9.1", "1521", "im"
+                , "", "test", "123456", null, other);
+        String expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
+                + "\"user\":\"test\",\"password\":\"123456\"}";
+        Assert.assertEquals(expected, param);
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
+        param = dataSourceService.buildParameter("root","test",DbType.MYSQL, "192.168.9.1", "1521", "im"
+                , "", "test", "123456", null, other);
+        expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
+                + "\"user\":\"test\",\"password\":\"123456\"}";
+        Assert.assertEquals(expected, param);
+    }
+
 }
