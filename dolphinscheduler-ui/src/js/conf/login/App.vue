@@ -138,6 +138,9 @@
       }
     },
     created () {
+      console.log(process.env.NODE_ENV)
+      console.log(process.env.API_BASE)
+      console.log(process.env.VUE_APP_API_BASE)
     },
     mounted () {
     }
