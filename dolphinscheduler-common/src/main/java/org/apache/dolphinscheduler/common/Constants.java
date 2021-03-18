@@ -469,6 +469,8 @@ public final class Constants {
 
     public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
+    public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
+
     /**
      * complement data start date
      */
