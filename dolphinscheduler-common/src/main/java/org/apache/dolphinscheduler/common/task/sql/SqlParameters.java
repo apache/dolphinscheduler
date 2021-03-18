@@ -215,6 +215,8 @@ public class SqlParameters extends AbstractParameters {
                 + ", datasource=" + datasource
                 + ", sql='" + sql + '\''
                 + ", sqlType=" + sqlType
+                + ", sendEmail=" + sendEmail
+                + ", displayRows=" + displayRows
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
