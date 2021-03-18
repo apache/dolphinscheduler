@@ -16,22 +16,24 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.apache.dolphinscheduler.plugin.model.PluginName;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EmailAlertPluginTest {
 
@@ -75,7 +77,6 @@ public class EmailAlertPluginTest {
         List<String> list = new ArrayList<String>(){{ add("xx@xx.com"); }};
         alertInfo.addProp("receivers", list);
         Map<String, Object> ret = plugin.process(alertInfo);
-        assertFalse(Boolean.parseBoolean(String.valueOf(ret.get(Constants.MAIL_ENABLED))));
-        assertTrue(Boolean.parseBoolean(String.valueOf(ret.get(Constants.STATUS))));
+        assertFalse(Boolean.parseBoolean(String.valueOf(ret.get(Constants.STATUS))));
     }
 }

@@ -76,7 +76,7 @@
         activeIndex: null,
         emailList: [],
         index: 0,
-        emailWidth: 100,
+        emailWidth: 150,
         isCn: false
       }
     },
