@@ -83,7 +83,7 @@
             <el-tooltip :content="$t('Cron Manage')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -108,7 +108,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top">
+    <el-tooltip :content="$t('Delete')" placement="top">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"

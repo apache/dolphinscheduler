@@ -87,7 +87,7 @@
               <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
                 <span><el-button type="warning" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
-              <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+              <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
                 <el-popconfirm
                   :confirmButtonText="$t('Confirm')"
                   :cancelButtonText="$t('Cancel')"
@@ -220,7 +220,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+    <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"
