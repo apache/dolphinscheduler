@@ -101,7 +101,7 @@ public class MasterRegistry {
                 masterConfig.getMasterMaxCpuloadAvg(),
                 masterConfig.getMasterReservedMemory(),
                 Sets.newHashSet(getMasterPath()),
-                Constants.MASTER_PREFIX,
+                Constants.MASTER_TYPE,
                 zookeeperRegistryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);

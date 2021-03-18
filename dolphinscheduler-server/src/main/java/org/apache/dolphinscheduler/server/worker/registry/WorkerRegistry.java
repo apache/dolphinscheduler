@@ -125,7 +125,7 @@ public class WorkerRegistry {
                 workerConfig.getWorkerReservedMemory(),
                 workerConfig.getHostWeight(),
                 workerZkPaths,
-                Constants.WORKER_PREFIX,
+                Constants.WORKER_TYPE,
                 zookeeperRegistryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
