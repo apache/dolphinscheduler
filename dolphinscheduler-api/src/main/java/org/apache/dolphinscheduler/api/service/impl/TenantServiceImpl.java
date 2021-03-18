@@ -89,7 +89,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
-        if (RegexUtils.isNumeric(tenantCode)) {
+        if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
             putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
             return result;
         }
