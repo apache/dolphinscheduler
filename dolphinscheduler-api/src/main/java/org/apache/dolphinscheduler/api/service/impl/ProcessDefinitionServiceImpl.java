@@ -57,6 +57,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
@@ -68,6 +70,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.collections.map.HashedMap;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -1235,6 +1239,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
          * List of process instances
          */
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(processDefinition.getCode(), limit);
+        List<TaskDefinitionLog> taskDefinitionList = processService.queryTaskDefinitionList(processDefinition.getCode(),
+                processDefinition.getVersion());
+        Map<Long, TaskDefinition> taskDefinitionMap = new HashedMap();
+        taskDefinitionList.forEach(taskDefinitionLog -> taskDefinitionMap.put(taskDefinitionLog.getCode(), taskDefinitionLog));
 
         for (ProcessInstance processInstance : processInstanceList) {
             processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
@@ -1291,11 +1299,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         /**
                          * if process is sub process, the return sub id, or sub id=0
                          */
-                        if (taskInstance.getTaskType().equals(TaskType.SUB_PROCESS.name())) {
-                            String taskJson = taskInstance.getTaskJson();
-                            taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+                        if(taskInstance.isSubProcess()){
+                            TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
                             subProcessId = Integer.parseInt(JSONUtils.parseObject(
-                                    taskNode.getParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
+                                    taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
                                 , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));

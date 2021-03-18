@@ -251,6 +251,11 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
+    /**
+     * task params
+     */
+    private String taskParams;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -643,5 +648,13 @@ public class TaskInstance implements Serializable {
 
     public void setTaskDefinitionVersion(int taskDefinitionVersion) {
         this.taskDefinitionVersion = taskDefinitionVersion;
+    }
+
+    public String getTaskParams() {
+        return taskParams;
+    }
+
+    public void setTaskParams(String taskParams) {
+        this.taskParams = taskParams;
     }
 }

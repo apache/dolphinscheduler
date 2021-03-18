@@ -1137,8 +1137,10 @@ public class ProcessService {
                                            ProcessInstanceMap instanceMap,
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
-        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
-        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
+        TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                task.getTaskCode(), task.getTaskDefinitionVersion()
+        );
+        Map<String, String> subProcessParam = JSONUtils.toMap(taskDefinition.getTaskParams());
         Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
         String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance);
 
@@ -1631,8 +1633,7 @@ public class ProcessService {
         if (row == null || row.size() == 0) {
             return;
         }
-        TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
-        Map<String, Object> taskParams = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+        Map<String, Object> taskParams = JSONUtils.toMap(taskInstance.getTaskParams(), String.class, Object.class);
         Object localParams = taskParams.get(LOCAL_PARAMS);
         if (localParams == null) {
             return;
@@ -1657,9 +1658,7 @@ public class ProcessService {
             }
         }
         taskParams.put(LOCAL_PARAMS, allParam);
-        taskNode.setParams(JSONUtils.toJsonString(taskParams));
-        // task instance node json
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParams));
         String params4ProcessString = JSONUtils.toJsonString(params4Property);
         int updateCount = this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId());
         logger.info("updateCount:{}, params4Process:{}, processInstanceId:{}", updateCount, params4ProcessString, processInstance.getId());
@@ -2548,5 +2547,20 @@ public class ProcessService {
      */
     public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
         return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
+    }
+
+    public List<TaskDefinitionLog> queryTaskDefinitionList(Long processCode, int processVersion) {
+        List<ProcessTaskRelationLog> processTaskRelationLogs =
+                processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
+        Map<Long, TaskDefinition> postTaskDefinitionMap = new HashedMap();
+        processTaskRelationLogs.forEach(processTaskRelationLog -> {
+            Long code = processTaskRelationLog.getPostTaskCode();
+            int version = processTaskRelationLog.getPostTaskVersion();
+            if(postTaskDefinitionMap.containsKey(code)){
+                TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
+                postTaskDefinitionMap.putIfAbsent(code, taskDefinition);
+            }
+        });
+        return new ArrayList(postTaskDefinitionMap.values());
     }
 }
