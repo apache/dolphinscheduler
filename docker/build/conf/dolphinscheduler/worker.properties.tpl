@@ -21,6 +21,9 @@ worker.exec.threads=${WORKER_EXEC_THREADS}
 # worker heartbeat interval
 worker.heartbeat.interval=${WORKER_HEARTBEAT_INTERVAL}
 
+# worker tenant auto create
+worker.tenant.auto.create=true
+
 # only less than cpu avg load, worker server can work. default value -1: the number of cpu cores * 2
 worker.max.cpuload.avg=${WORKER_MAX_CPULOAD_AVG}
 
