@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -82,7 +83,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
         Map<String, Object> result = new HashMap<>();
 
-        if (CollectionUtils.isNotEmpty(alertPluginInstanceMapper.queryByInstanceName(alertPluginInstance.getInstanceName()))) {
+        if (BooleanUtils.isTrue(alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()))) {
             putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
             return result;
         }
@@ -183,7 +184,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
     @Override
     public boolean checkExistPluginInstanceName(String pluginInstanceName) {
-        return CollectionUtils.isNotEmpty(alertPluginInstanceMapper.queryByInstanceName(pluginInstanceName));
+        return BooleanUtils.isTrue(alertPluginInstanceMapper.existInstanceName(pluginInstanceName));
     }
 
     @Override

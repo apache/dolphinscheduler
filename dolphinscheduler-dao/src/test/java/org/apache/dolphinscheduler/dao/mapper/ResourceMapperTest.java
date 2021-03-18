@@ -412,4 +412,14 @@ public class ResourceMapperTest {
             Assert.fail("batch update resource  data error");
         }
     }
+
+    @Test
+    public void existResourceTest() {
+        String fullName = "/ut-resource";
+        int userId = 111;
+        int type = ResourceType.FILE.getCode();
+        Assert.assertNull(resourceMapper.existResource(fullName, userId, type));
+        insertOne();
+        Assert.assertTrue(resourceMapper.existResource(fullName, userId, type));
+    }
 }

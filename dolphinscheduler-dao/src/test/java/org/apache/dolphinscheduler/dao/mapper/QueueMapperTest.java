@@ -14,12 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+
+import java.util.Date;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,8 +35,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,7 +51,7 @@ public class QueueMapperTest {
      * insert
      * @return Queue
      */
-    private Queue insertOne(){
+    private Queue insertOne() {
         //insertOne
         Queue queue = new Queue();
         queue.setQueueName("queue");
@@ -62,7 +66,7 @@ public class QueueMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         Queue queue = insertOne();
         queue.setCreateTime(new Date());
@@ -75,7 +79,7 @@ public class QueueMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Queue queue = insertOne();
         int delete = queueMapper.deleteById(queue.getId());
         Assert.assertEquals(1, delete);
@@ -122,5 +126,14 @@ public class QueueMapperTest {
 
         queues = queueMapper.queryAllQueueList(null, queue.getQueueName());
         Assert.assertNotEquals(queues.size(), 0);
+    }
+
+    @Test
+    public void existQueue() {
+        Assert.assertNull(queueMapper.existQueue("queue", null));
+        Assert.assertNull(queueMapper.existQueue(null, "queue"));
+        Queue queue = insertOne();
+        Assert.assertTrue(BooleanUtils.isTrue(queueMapper.existQueue(queue.getQueue(), null)));
+        Assert.assertTrue(BooleanUtils.isTrue(queueMapper.existQueue(null, queue.getQueueName())));
     }
 }

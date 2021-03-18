@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
@@ -56,7 +57,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         for (int id : ids) {
             sourceIds.addAll(ids);
             List<WorkFlowRelation> workFlowRelationsTmp = workFlowLineageMapper.querySourceTarget(id);
-            if (workFlowRelationsTmp != null && !workFlowRelationsTmp.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(workFlowRelationsTmp)) {
                 Set<Integer> idsTmp = new HashSet<>();
                 for (WorkFlowRelation workFlowRelation:workFlowRelationsTmp) {
                     if (!sourceIds.contains(workFlowRelation.getTargetWorkFlowId())) {
