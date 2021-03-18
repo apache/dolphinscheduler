@@ -31,57 +31,55 @@ public class HostWeight {
 
     private final int LOAD_AVERAGE_FACTOR = 70;
 
-    private final Host host;
+    private final HostWorker hostWorker;
 
     private final double weight;
 
     private double currentWeight;
 
-    public HostWeight(Host host, double cpu, double memory, double loadAverage) {
-        this.weight = getWeight(cpu, memory, loadAverage, host);
-        this.host = host;
-        this.currentWeight = weight;
-    }
-
-    public double getCurrentWeight() {
-        return currentWeight;
+    public HostWeight(HostWorker hostWorker, double cpu, double memory, double loadAverage, long startTime) {
+        this.hostWorker = hostWorker;
+        this.weight = calculateWeight(cpu, memory, loadAverage, startTime);
+        this.currentWeight = this.weight;
     }
 
     public double getWeight() {
         return weight;
     }
 
+    public double getCurrentWeight() {
+        return currentWeight;
+    }
+
     public void setCurrentWeight(double currentWeight) {
         this.currentWeight = currentWeight;
     }
 
+    public HostWorker getHostWorker() {
+        return hostWorker;
+    }
+
     public Host getHost() {
-        return host;
+        return (Host)hostWorker;
     }
 
     @Override
     public String toString() {
         return "HostWeight{"
-            + "host=" + host
+            + "hostWorker=" + hostWorker
             + ", weight=" + weight
             + ", currentWeight=" + currentWeight
             + '}';
     }
 
-    private double getWeight(double cpu, double memory, double loadAverage, Host host) {
-        double calculateWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
-        return getWarmUpWeight(host, calculateWeight);
-    }
-
-    /**
-     * If the warm-up is not over, add the weight
-     */
-    private double getWarmUpWeight(Host host, double weight) {
-        long startTime = host.getStartTime();
+    private double calculateWeight(double cpu, double memory, double loadAverage, long startTime) {
+        double calculatedWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
         long uptime = System.currentTimeMillis() - startTime;
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
-            return weight * Constants.WARM_UP_TIME / uptime;
+            // If the warm-up is not over, add the weight
+            return calculatedWeight * Constants.WARM_UP_TIME / uptime;
         }
-        return weight;
+        return calculatedWeight;
     }
+
 }

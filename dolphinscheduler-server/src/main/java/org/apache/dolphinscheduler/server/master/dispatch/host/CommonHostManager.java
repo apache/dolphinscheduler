@@ -17,26 +17,32 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.ResInfo;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *  round robin host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
-    private final Logger logger = LoggerFactory.getLogger(CommonHostManager.class);
+    /**
+     * zookeeper registry center
+     */
+    @Autowired
+    protected ZookeeperRegistryCenter registryCenter;
 
     /**
      * zookeeperNodeManager
@@ -50,16 +56,15 @@ public abstract class CommonHostManager implements HostManager {
      * @return host
      */
     @Override
-    public Host select(ExecutionContext context){
+    public Host select(ExecutionContext context) {
         Host host = new Host();
         Collection<String> nodes = null;
-        /**
-         * executor type
-         */
+        String workerGroup = context.getWorkerGroup();
+        // executor type
         ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
+        switch (executorType) {
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
+                nodes = zookeeperNodeManager.getWorkerGroupNodes(workerGroup);
                 break;
             case CLIENT:
                 break;
@@ -67,21 +72,26 @@ public abstract class CommonHostManager implements HostManager {
                 throw new IllegalArgumentException("invalid executorType : " + executorType);
 
         }
-        if(CollectionUtils.isEmpty(nodes)){
+        if (nodes == null || nodes.isEmpty()) {
             return host;
         }
-        List<Host> candidateHosts = new ArrayList<>(nodes.size());
+        List<HostWorker> candidateHosts = new ArrayList<>();
         nodes.forEach(node -> {
-            Host nodeHost=Host.of(node);
-            nodeHost.setWorkGroup(context.getWorkerGroup());
-            candidateHosts.add(nodeHost);
+            String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
+            String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
+            int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
+            if (StringUtils.isNotEmpty(heartbeat)) {
+                String[] parts = heartbeat.split(Constants.COMMA);
+                if (ResInfo.isNewHeartbeatWithWeight(parts)) {
+                    hostWeight = Integer.parseInt(parts[10]);
+                }
+            }
+            candidateHosts.add(HostWorker.of(node, hostWeight, workerGroup));
         });
-
-
         return select(candidateHosts);
     }
 
-    protected abstract Host select(Collection<Host> nodes);
+    protected abstract HostWorker select(Collection<HostWorker> nodes);
 
     public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
         this.zookeeperNodeManager = zookeeperNodeManager;

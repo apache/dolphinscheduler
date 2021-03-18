@@ -69,10 +69,10 @@ public class RegisterOperator extends ZookeeperCachedOperator {
     }
 
     /**
-     * get host ip, string format: masterParentPath/ip
+     * get host ip:port, string format: parentPath/ip:port
      *
      * @param path path
-     * @return host ip, string format: masterParentPath/ip
+     * @return host ip:port, string format: parentPath/ip:port
      */
     protected String getHostByEventDataPath(String path) {
         if (StringUtils.isEmpty(path)) {
