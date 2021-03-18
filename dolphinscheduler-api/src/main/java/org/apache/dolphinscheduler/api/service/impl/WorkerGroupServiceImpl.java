@@ -27,13 +27,16 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * worker group service impl
@@ -55,10 +58,88 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceImpl.class);
 
     @Autowired
+    WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
     protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    /**
+     * create or update a worker group
+     *
+     * @param loginUser login user
+     * @param id worker group id
+     * @param name worker group name
+     * @param ipList ip list
+     * @return create or update result code
+     */
+    @Override
+    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String ipList) {
+        Map<String, Object> result = new HashMap<>();
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        if (Constants.DOCKER_MODE && !Constants.KUBERNETES_MODE) {
+            putMsg(result, Status.CREATE_WORKER_GROUP_FORBIDDEN_IN_DOCKER);
+            return result;
+        }
+        if (StringUtils.isEmpty(name)) {
+            putMsg(result, Status.NAME_NULL);
+            return result;
+        }
+        Date now = new Date();
+        WorkerGroup workerGroup;
+        if (id != 0) {
+            workerGroup = workerGroupMapper.selectById(id);
+            // check exist
+            if (workerGroup == null) {
+                workerGroup = new WorkerGroup();
+                workerGroup.setCreateTime(now);
+            }
+        } else {
+            workerGroup = new WorkerGroup();
+            workerGroup.setCreateTime(now);
+        }
+        workerGroup.setName(name);
+        workerGroup.setIpList(ipList);
+        workerGroup.setUpdateTime(now);
+
+        if (checkWorkerGroupNameExists(workerGroup)) {
+            putMsg(result, Status.NAME_EXIST, workerGroup.getName());
+            return result;
+        }
+        if (workerGroup.getId() != 0 ) {
+            workerGroupMapper.updateById(workerGroup);
+        } else {
+            workerGroupMapper.insert(workerGroup);
+        }
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * check worker group name exists
+     * @param workerGroup worker group
+     * @return boolean
+     */
+    private boolean checkWorkerGroupNameExists(WorkerGroup workerGroup) {
+        List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
+        if (CollectionUtils.isNotEmpty(workerGroupList)) {
+            // new group has same name
+            if (workerGroup.getId() == 0) {
+                return true;
+            }
+            // update group
+            for (WorkerGroup group : workerGroupList) {
+                if (group.getId() != workerGroup.getId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * query worker group paging
@@ -82,7 +163,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         List<WorkerGroup> workerGroups = getWorkerGroups(true);
-
         List<WorkerGroup> resultDataList = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(workerGroups)) {
@@ -98,10 +178,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 searchValDataList = workerGroups;
             }
 
-            if (searchValDataList.size() < pageSize) {
-                toIndex = (pageNo - 1) * pageSize + searchValDataList.size();
+            if (fromIndex < searchValDataList.size()) {
+                if (toIndex > searchValDataList.size()) {
+                    toIndex = searchValDataList.size();
+                }
+                resultDataList = searchValDataList.subList(fromIndex, toIndex);
             }
-            resultDataList = searchValDataList.subList(fromIndex, toIndex);
         }
 
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -121,7 +203,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> queryAllGroup() {
         Map<String, Object> result = new HashMap<>();
-
         List<WorkerGroup> workerGroups = getWorkerGroups(false);
 
         Set<String> availableWorkerGroupSet = workerGroups.stream()
@@ -140,13 +221,14 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
         String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
-        List<WorkerGroup> workerGroups = new ArrayList<>();
         List<String> workerGroupList = null;
         try {
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
             logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
         }
+
+        List<WorkerGroup> workerGroups = new ArrayList<>();
 
         if (workerGroupList == null || workerGroupList.isEmpty()) {
             if (!isPaging) {
@@ -166,7 +248,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
             if (isPaging) {
-                wg.setIpList(childrenNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList()));
+                List<String> ipList = childrenNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList());
+                wg.setIpList(String.join(",", ipList));
                 String registeredValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(",")[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(",")[7]));
@@ -174,6 +257,38 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroups.add(wg);
         }
         return workerGroups;
+    }
+
+    /**
+     * delete worker group by id
+     * @param id worker group id
+     * @return delete result code
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
+        Map<String, Object> result = new HashMap<>();
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        if (Constants.DOCKER_MODE && !Constants.KUBERNETES_MODE) {
+            putMsg(result, Status.DELETE_WORKER_GROUP_FORBIDDEN_IN_DOCKER);
+            return result;
+        }
+        WorkerGroup workerGroup = workerGroupMapper.selectById(id);
+        if (workerGroup == null) {
+            putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
+            return result;
+        }
+        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(), Constants.NOT_TERMINATED_STATES);
+        if (CollectionUtils.isNotEmpty(processInstances)) {
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+            return result;
+        }
+        workerGroupMapper.deleteById(id);
+        processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
 }

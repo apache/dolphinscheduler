@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
@@ -52,10 +54,15 @@ public class WorkerGroupServiceTest {
     private WorkerGroupServiceImpl workerGroupService;
 
     @Mock
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Mock
     private ProcessInstanceMapper processInstanceMapper;
 
     @Mock
     private ZookeeperCachedOperator zookeeperCachedOperator;
+
+    private String groupName="groupName000001";
 
     @Before
     public void init() {
@@ -80,6 +87,28 @@ public class WorkerGroupServiceTest {
     }
 
     /**
+     *  create or update a worker group
+     */
+    @Test
+    public void testSaveWorkerGroup() {
+        User user = new User();
+        // general user add
+        user.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(),(String) result.get(Constants.MSG));
+
+        // success
+        user.setUserType(UserType.ADMIN_USER);
+        result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
+        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
+        // group name exist
+        Mockito.when(workerGroupMapper.selectById(2)).thenReturn(getWorkerGroup(2));
+        Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
+        result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1");
+        Assert.assertEquals(Status.NAME_EXIST, result.get(Constants.STATUS));
+    }
+
+    /**
      * query worker group paging
      */
     @Test
@@ -100,10 +129,31 @@ public class WorkerGroupServiceTest {
     }
 
     /**
+     * delete group by id
+     */
+    @Test
+    public  void testDeleteWorkerGroupById() {
+        User user = new User();
+        user.setUserType(UserType.ADMIN_USER);
+        WorkerGroup wg2 = getWorkerGroup(2);
+        Mockito.when(workerGroupMapper.selectById(2)).thenReturn(wg2);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg2.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(getProcessInstanceList());
+        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(user, 1);
+        Assert.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        result = workerGroupService.deleteWorkerGroupById(user, 2);
+        Assert.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        // correct
+        WorkerGroup wg3 = getWorkerGroup(3);
+        Mockito.when(workerGroupMapper.selectById(3)).thenReturn(wg3);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(wg3.getName(), Constants.NOT_TERMINATED_STATES)).thenReturn(new ArrayList<>());
+        result = workerGroupService.deleteWorkerGroupById(user, 3);
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.get(Constants.MSG));
+    }
+
+    /**
      * get processInstances
      */
     private List<ProcessInstance> getProcessInstanceList() {
-
         List<ProcessInstance> processInstances = new ArrayList<>();
         processInstances.add(new ProcessInstance());
         return processInstances;
@@ -115,6 +165,27 @@ public class WorkerGroupServiceTest {
         Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(1, workerGroups.size());
         Assert.assertEquals("default", workerGroups.toArray()[0]);
+    }
+
+    /**
+     * get Group
+     * @return
+     */
+    private WorkerGroup getWorkerGroup(int id) {
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setName(groupName);
+        workerGroup.setId(id);
+        return workerGroup;
+    }
+
+    private WorkerGroup getWorkerGroup() {
+        return getWorkerGroup(1);
+    }
+
+    private List<WorkerGroup> getList() {
+        List<WorkerGroup> list = new ArrayList<>();
+        list.add(getWorkerGroup());
+        return list;
     }
 
 }

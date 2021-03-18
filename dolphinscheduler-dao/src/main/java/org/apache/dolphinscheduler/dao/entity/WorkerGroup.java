@@ -14,30 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * worker group
  */
+@TableName("t_ds_worker_group")
 public class WorkerGroup {
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private int id;
 
     private String name;
 
-    private List<String> ipList;
+    private String ipList;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getIpList() {
+        return ipList;
+    }
+
+    public void setIpList(String ipList) {
+        this.ipList = ipList;
+    }
 
     public Date getCreateTime() {
         return createTime;
@@ -63,13 +83,15 @@ public class WorkerGroup {
         this.name = name;
     }
 
-    public List<String> getIpList() {
-        return ipList;
+    @Override
+    public String toString() {
+        return "WorkerGroup{"
+                + "id= " + id
+                + ", name= " + name
+                + ", ipList= " + ipList
+                + ", createTime= " + createTime
+                + ", updateTime= " + updateTime
+                + "}";
     }
-
-    public void setIpList(List<String> ipList) {
-        this.ipList = ipList;
-    }
-
 
 }
