@@ -557,7 +557,7 @@ public class MasterExecThread implements Runnable {
     private void setProcessGlobal(TaskNode taskNode, TaskInstance taskInstance) {
         String globalParams = this.processInstance.getGlobalParams();
         if (StringUtils.isNotEmpty(globalParams)) {
-            Map<String, String> globalMap = getGlobalParamMap(globalParams);
+            Map<String, String> globalMap = processService.getGlobalParamMap(globalParams);
             if (globalMap != null && globalMap.size() != 0) {
                 setGlobalMapToTask(taskNode, taskInstance, globalMap);
             }
@@ -584,17 +584,6 @@ public class MasterExecThread implements Runnable {
             // task instance node json
             taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         }
-    }
-
-    public Map<String, String> getGlobalParamMap(String globalParams) {
-        List<Property> propList;
-        Map<String,String> globalParamMap = new HashMap<>();
-        if (StringUtils.isNotEmpty(globalParams)) {
-            propList = JSONUtils.toList(globalParams, Property.class);
-            globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
-        }
-
-        return globalParamMap;
     }
 
     private void submitPostNode(String parentNodeName) {
