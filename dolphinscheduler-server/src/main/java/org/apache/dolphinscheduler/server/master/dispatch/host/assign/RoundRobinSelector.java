@@ -16,20 +16,21 @@
  */
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.stereotype.Service;
+
 /**
  * Smooth Weight Round Robin
  */
 @Service
-public class RoundRobinSelector extends AbstractSelector<Host> {
+public class RoundRobinSelector extends AbstractSelector<HostWorker> {
 
     private ConcurrentMap<String, ConcurrentMap<String, WeightedRoundRobin>> workGroupWeightMap = new ConcurrentHashMap<>();
 
@@ -69,12 +70,11 @@ public class RoundRobinSelector extends AbstractSelector<Host> {
 
     }
 
-
     @Override
-    public Host doSelect(Collection<Host> source) {
+    public HostWorker doSelect(Collection<HostWorker> source) {
 
-        List<Host> hosts = new ArrayList<>(source);
-        String key = hosts.get(0).getWorkGroup();
+        List<HostWorker> hosts = new ArrayList<>(source);
+        String key = hosts.get(0).getWorkerGroup();
         ConcurrentMap<String, WeightedRoundRobin> map = workGroupWeightMap.get(key);
         if (map == null) {
             workGroupWeightMap.putIfAbsent(key, new ConcurrentHashMap<>());
@@ -84,13 +84,13 @@ public class RoundRobinSelector extends AbstractSelector<Host> {
         int totalWeight = 0;
         long maxCurrent = Long.MIN_VALUE;
         long now = System.currentTimeMillis();
-        Host selectedHost = null;
+        HostWorker selectedHost = null;
         WeightedRoundRobin selectWeightRoundRobin = null;
 
-        for (Host host : hosts) {
-            String workGroupHost = host.getWorkGroup() + host.getAddress();
+        for (HostWorker host : hosts) {
+            String workGroupHost = host.getWorkerGroup() + host.getAddress();
             WeightedRoundRobin weightedRoundRobin = map.get(workGroupHost);
-            int weight = host.getWeight();
+            int weight = host.getHostWeight();
             if (weight < 0) {
                 weight = 0;
             }
@@ -116,7 +116,6 @@ public class RoundRobinSelector extends AbstractSelector<Host> {
 
             totalWeight += weight;
         }
-
 
         if (!updateLock.get() && hosts.size() != map.size() && updateLock.compareAndSet(false, true)) {
             try {

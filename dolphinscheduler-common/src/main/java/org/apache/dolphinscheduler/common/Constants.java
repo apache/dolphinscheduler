@@ -385,6 +385,10 @@ public final class Constants {
      */
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
+    /**
+     * worker host weight
+     */
+    public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
      * default log cache rows num,output when reach the number
@@ -544,7 +548,7 @@ public final class Constants {
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-
+    public static final int HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH = 11;
 
     /**
      * jar
