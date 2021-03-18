@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote;
+package org.apache.dolphinscheduler.common.exception;
 
-import junit.framework.Assert;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
-import org.junit.Test;
+/**
+ * Base Exception class for DolphinScheduler
+ */
+public class BaseException extends Exception {
 
-public class RemoveTaskLogRequestCommandTest {
+    public BaseException() {
+    }
 
-    @Test
-    public void testConvert2Command(){
-        RemoveTaskLogResponseCommand removeTaskLogResponseCommand = new RemoveTaskLogResponseCommand();
-        removeTaskLogResponseCommand.setStatus(true);
-        Command command = removeTaskLogResponseCommand.convert2Command(122);
-        Assert.assertNotNull(command);
+    public BaseException(String message) {
+        super(message);
+    }
+
+    public BaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public BaseException(Throwable cause) {
+        super(cause);
+    }
+
+    public BaseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -76,23 +76,23 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release
 
 ## Thanks
 
-DolphinScheduler is based on a lot of excellent open-source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
+DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
 We would like to express our deep gratitude to all the open-source projects used in Dolphin Scheduler. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we hope everyone who have the same enthusiasm and passion for open source could join in and contribute to the open-source community!
 
 ## Get Help
 
-1. Submit an [[issue](https://github.com/apache/incubator-dolphinscheduler/issues/new/choose)]
-1. Subscribe to this mail list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
+1. Submit an [issue](https://github.com/apache/incubator-dolphinscheduler/issues/new/choose)
+1. Subscribe to this mailing list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
 
 ## Community
 
-You are so much welcomed to communicate with the developers and users of Dolphin Scheduler freely. There are two ways to find them:
-1. Join the slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-mzqu52gi-rCggPkSHQ0DZYkwbTxO1Gw).
-2. Follow the [twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news just on time.
+You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
+1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-mzqu52gi-rCggPkSHQ0DZYkwbTxO1Gw).
+2. Follow the [Twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
 ## How to Contribute
 
-The community welcomes everyone to participate in contributing, please refer to this website to find out more: [[How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html)]
+The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html).
 
 ## License
 

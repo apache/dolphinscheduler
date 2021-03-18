@@ -47,11 +47,11 @@ public class WorkerConfig {
     @Value("#{'${worker.groups:default}'.split(',')}")
     private Set<String> workerGroups;
 
-    @Value("${worker.listen.port: 1234}")
+    @Value("${worker.listen.port:1234}")
     private int listenPort;
 
-    @Value("${worker.weight:100}")
-    private int weight;
+    @Value("${worker.host.weight:100}")
+    private int hostWeight;
 
     @Value("${alert.listen.host:localhost}")
     private String alertListenHost;
@@ -115,12 +115,12 @@ public class WorkerConfig {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getHostWeight() {
+        return hostWeight;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setHostWeight(int hostWeight) {
+        this.hostWeight = hostWeight;
     }
 
     public String getAlertListenHost() {

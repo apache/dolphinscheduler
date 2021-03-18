@@ -893,21 +893,23 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/datasource/MySQLDataSourceTest.java</include>
                         <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/entity/UdfFuncTest.java</include>
-                        <include>**/remote/JsonSerializerTest.java</include>
-                        <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
-                        <include>**/rpc/RpcTest.java</include>
-                        <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
-                        <include>**/remote/NettyRemotingClientTest.java</include>
-                        <include>**/remote/NettyUtilTest.java</include>
-                        <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/remote/command/alert/AlertSendRequestCommandTest.java</include>
                         <include>**/remote/command/alert/AlertSendResponseCommandTest.java</include>
+                        <include>**/remote/command/future/ResponseFutureTest.java</include>
+                        <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
+                        <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/utils/HostTest.java</include>
+                        <include>**/remote/utils/NettyUtilTest.java</include>
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/rpc/RpcTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
+                        <include>**/server/log/LoggerRequestProcessorTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
                         <include>**/server/log/TaskLogFilterTest.java</include>
                         <include>**/server/log/WorkerLogFilterTest.java</include>
@@ -917,6 +919,7 @@
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
@@ -933,9 +936,9 @@
                         <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
-                        <include>**/server/utils/HostTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/LogUtilsTest.java</include>
+                        <include>**/server/utils/MapReduceArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
@@ -965,7 +968,7 @@
                         <include>**/service/zk/RegisterOperatorTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
-
+                        <include>**/service/log/LogClientServiceTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->

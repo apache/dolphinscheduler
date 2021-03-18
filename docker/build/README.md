@@ -193,7 +193,7 @@ This environment variable sets `SPARK_HOME2`. The default value is `/opt/soft/sp
 
 **`PYTHON_HOME`**
 
-This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/python`.
+This environment variable sets `PYTHON_HOME`. The default value is `/usr`.
 
 **`JAVA_HOME`**
 
@@ -209,7 +209,7 @@ This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/fli
 
 **`DATAX_HOME`**
 
-This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax/bin/datax.py`.
+This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax`.
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 
@@ -309,7 +309,7 @@ This environment variable sets port for `worker-server`. The default value is `1
 
 This environment variable sets groups for `worker-server`. The default value is `default`.
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 This environment variable sets weight for `worker-server`. The default value is `100`.
 

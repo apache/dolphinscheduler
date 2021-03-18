@@ -98,8 +98,8 @@ public class MasterRegistry {
             });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
-                masterConfig.getMasterReservedMemory(),
                 masterConfig.getMasterMaxCpuloadAvg(),
+                masterConfig.getMasterReservedMemory(),
                 Sets.newHashSet(getMasterPath()),
                 Constants.MASTER_PREFIX,
                 zookeeperRegistryCenter);
@@ -116,6 +116,8 @@ public class MasterRegistry {
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getRegisterOperator().remove(localNodePath);
         logger.info("master node : {} unRegistry to ZK.", address);
+        heartBeatExecutor.shutdown();
+        logger.info("heartbeat executor shutdown");
     }
 
     /**
@@ -130,9 +132,7 @@ public class MasterRegistry {
      * get local address
      */
     private String getLocalAddress() {
-
         return NetUtils.getAddr(masterConfig.getListenPort());
-
     }
 
     /**

@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
@@ -34,6 +33,7 @@ import org.apache.curator.framework.state.ConnectionState;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
-
 
 /**
  * worker registry
@@ -115,17 +114,19 @@ public class WorkerRegistry {
                         zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
                     } else if (newState == ConnectionState.SUSPENDED) {
                         logger.warn("worker : {} connection SUSPENDED ", address);
+                        zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
                     }
                 });
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 
-        HeartBeatTask heartBeatTask = new HeartBeatTask(this.startTime,
-                this.workerConfig.getWorkerReservedMemory(),
-                this.workerConfig.getWorkerMaxCpuloadAvg(),
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+                workerConfig.getWorkerMaxCpuloadAvg(),
+                workerConfig.getWorkerReservedMemory(),
+                workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_PREFIX,
-                this.zookeeperRegistryCenter);
+                zookeeperRegistryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
@@ -142,6 +143,7 @@ public class WorkerRegistry {
             logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
         }
         this.heartBeatExecutor.shutdownNow();
+        logger.info("heartbeat executor shutdown");
     }
 
     /**
@@ -149,22 +151,19 @@ public class WorkerRegistry {
      */
     public Set<String> getWorkerZkPaths() {
         Set<String> workerZkPaths = Sets.newHashSet();
-
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
-        int weight = workerConfig.getWeight();
-        long workerStartTime = System.currentTimeMillis();
 
         for (String workGroup : this.workerGroups) {
-            StringBuilder workerZkPathBuilder = new StringBuilder(100);
-            workerZkPathBuilder.append(workerZkPathPrefix).append(SLASH);
+            StringJoiner workerZkPathJoiner = new StringJoiner(SLASH);
+            workerZkPathJoiner.add(workerZkPathPrefix);
             if (StringUtils.isEmpty(workGroup)) {
                 workGroup = DEFAULT_WORKER_GROUP;
             }
             // trim and lower case is need
-            workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
-            workerZkPathBuilder.append(Host.generate(address, weight, workerStartTime));
-            workerZkPaths.add(workerZkPathBuilder.toString());
+            workerZkPathJoiner.add(workGroup.trim().toLowerCase());
+            workerZkPathJoiner.add(address);
+            workerZkPaths.add(workerZkPathJoiner.toString());
         }
         return workerZkPaths;
     }

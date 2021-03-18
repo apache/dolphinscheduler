@@ -165,17 +165,17 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUPS: "default"
-      WORKER_WEIGHT: "100"
+      WORKER_HOST_WEIGHT: "100"
       ALERT_LISTEN_HOST: dolphinscheduler-alert
       HADOOP_HOME: "/opt/soft/hadoop"
       HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
       SPARK_HOME1: "/opt/soft/spark1"
       SPARK_HOME2: "/opt/soft/spark2"
-      PYTHON_HOME: "/usr/bin/python"
+      #PYTHON_HOME: "/opt/soft/python"
       JAVA_HOME: "/usr/lib/jvm/java-1.8-openjdk"
       HIVE_HOME: "/opt/soft/hive"
       FLINK_HOME: "/opt/soft/flink"
-      DATAX_HOME: "/opt/soft/datax/bin/datax.py"
+      DATAX_HOME: "/opt/soft/datax"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: /tmp/dolphinscheduler
       DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
       DATABASE_TYPE: postgresql
