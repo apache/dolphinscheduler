@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -55,6 +56,9 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private ProcessDefinitionService processDefinitionService;
 
     /**
      * add the newest version of one process definition
@@ -178,8 +182,19 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
         if (resultStatus != Status.SUCCESS) {
             return checkResult;
         }
+
+        // check has associated process definition
+        boolean hasAssociatedProcessDefinition = processDefinitionService.checkHasAssociatedProcessDefinition(processDefinitionId, version);
+        if (hasAssociatedProcessDefinition) {
+            putMsg(result, Status.PROCESS_DEFINITION_VERSION_IS_USED);
+            return result;
+        }
+
         processDefinitionVersionMapper.deleteByProcessDefinitionIdAndVersion(processDefinitionId, version);
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+
+
 }
