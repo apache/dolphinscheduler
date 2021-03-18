@@ -376,17 +376,26 @@ public class TaskPriorityQueueConsumer extends Thread {
         dataQualityTaskExecutionContext.setRuleInputEntryList(ruleInputEntryList);
         dataQualityTaskExecutionContext.setExecuteSqlList(processService.getDqExecuteSql(ruleId));
 
-        if (StringUtils.isNotEmpty(config.get(Constants.SRC_DATASOURCE_ID))) {
-            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.SRC_DATASOURCE_ID)));
+        setSourceConfig(dataQualityTaskExecutionContext, config);
+        setTargetConfig(dataQualityTaskExecutionContext, config);
+        setWriterConfig(dataQualityTaskExecutionContext, config);
+    }
+
+    private void setWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(Constants.WRITER_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.WRITER_DATASOURCE_ID)));
             if (dataSource != null) {
-                ConnectorType srcConnectorType = ConnectorType.of(
-                        DbType.of(Integer.parseInt(config.get(Constants.SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
-                dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
-                dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
-                dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+                ConnectorType writerConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.WRITER_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setWriterConnectorType(writerConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setWriterType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setWriterConnectionParams(dataSource.getConnectionParams());
+                dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
             }
         }
+    }
 
+    private void setTargetConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
         if (StringUtils.isNotEmpty(config.get(Constants.TARGET_DATASOURCE_ID))) {
             DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.TARGET_DATASOURCE_ID)));
             if (dataSource != null) {
@@ -397,16 +406,17 @@ public class TaskPriorityQueueConsumer extends Thread {
                 dataQualityTaskExecutionContext.setTargetConnectionParams(dataSource.getConnectionParams());
             }
         }
+    }
 
-        if (StringUtils.isNotEmpty(config.get(Constants.WRITER_DATASOURCE_ID))) {
-            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.WRITER_DATASOURCE_ID)));
+    private void setSourceConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(Constants.SRC_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.SRC_DATASOURCE_ID)));
             if (dataSource != null) {
-                ConnectorType writerConnectorType = ConnectorType.of(
-                        DbType.of(Integer.parseInt(config.get(Constants.WRITER_CONNECTOR_TYPE))).isHive() ? 1 : 0);
-                dataQualityTaskExecutionContext.setWriterConnectorType(writerConnectorType.getDescription());
-                dataQualityTaskExecutionContext.setWriterType(dataSource.getType().getCode());
-                dataQualityTaskExecutionContext.setWriterConnectionParams(dataSource.getConnectionParams());
-                dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
+                ConnectorType srcConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
             }
         }
     }

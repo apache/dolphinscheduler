@@ -55,10 +55,7 @@ public class DataQualityTask extends AbstractYarnTask {
     private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark2-submit";
 
     private DataQualityParameters dataQualityParameters;
-    /**
-     * taskExecutionContext
-     */
-    private final TaskExecutionContext taskExecutionContext;
+
 
     public DataQualityTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
@@ -112,9 +109,7 @@ public class DataQualityTask extends AbstractYarnTask {
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs(
-                        "\""
-                        + replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
-                        + "\"");
+                        "\"" + replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
 
         dataQualityParameters
                 .getSparkParameters()

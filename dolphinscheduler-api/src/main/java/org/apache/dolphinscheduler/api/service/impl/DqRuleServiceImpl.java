@@ -55,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +72,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Service
 public class DqRuleServiceImpl extends BaseService implements DqRuleService {
+
+    private final Logger logger = LoggerFactory.getLogger(DqRuleServiceImpl.class);
 
     @Autowired
     private DqRuleMapper dqRuleMapper;
@@ -198,7 +202,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         List<PluginParams> params = new ArrayList<>();
 
         for (DqRuleInputEntry inputEntry : ruleInputEntryList) {
-            if (inputEntry.getShow()) {
+            if (Boolean.TRUE.equals(inputEntry.getShow())) {
                 switch (inputEntry.getType()) {
                     case INPUT:
                         params.add(getInputParam(inputEntry));
@@ -222,7 +226,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         try {
             result = mapper.writeValueAsString(params);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("json parse error : {}", e.getMessage(), e);
         }
 
         return result;
@@ -240,7 +244,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 .setType(PropsType.TEXTAREA)
                 .setRows(1)
                 .setPlaceholder(inputEntry.getPlaceholder())
-                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
                 .build();
     }
 
@@ -271,7 +275,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 .setParamsOptionsList(options)
                 .setValue(inputEntry.getValue())
                 .setSize(Constants.SMALL)
-                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
                 .build();
     }
 
@@ -285,7 +289,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 .setValue(inputEntry.getValue())
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setSize(Constants.SMALL)
-                .setEmit(inputEntry.getEmit() ? Collections.singletonList(Constants.CHANGE) : null)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
                 .build();
     }
 }

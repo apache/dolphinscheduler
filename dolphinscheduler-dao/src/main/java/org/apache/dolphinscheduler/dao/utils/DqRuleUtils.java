@@ -29,6 +29,10 @@ import java.util.Map;
  */
 public class DqRuleUtils {
 
+    private DqRuleUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static List<DqRuleInputEntry> transformInputEntry(List<DqRuleInputEntry> ruleInputEntryList) {
         for (DqRuleInputEntry dqRuleInputEntry : ruleInputEntryList) {
             Map<String,Object> valuesMap = JSONUtils.toMap(dqRuleInputEntry.getValuesMap(),String.class,Object.class);

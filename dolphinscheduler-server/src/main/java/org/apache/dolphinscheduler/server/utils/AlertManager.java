@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -267,7 +268,7 @@ public class AlertManager {
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert.toString());
+        logger.info(MessageFormat.format("add alert to db , alert: {0}.", alert));
     }
 
     /**

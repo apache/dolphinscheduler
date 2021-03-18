@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.enums.dq.DqFailureStrategy;
 import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
 import org.apache.dolphinscheduler.common.enums.dq.OperatorType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
@@ -175,18 +174,7 @@ public class TaskResponseService {
                     TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
                     if (taskInstance != null) {
 
-                        //add dqs result operate
-                        if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
-                            processService.updateDqExecuteResultUserId(taskResponseEvent.getTaskInstanceId());
-                            //get the dqs result by task instance id
-                            DqExecuteResult dqExecuteResult =
-                                    processService.getDqExecuteResultByTaskInstanceId(taskResponseEvent.getTaskInstanceId());
-                            logger.info("DQ Task Result : " + JSONUtils.toJsonString(dqExecuteResult));
-                            if (dqExecuteResult != null) {
-                                //check the result ,if result is failure do some operator by failure strategy
-                                operateDqExecuteResult(taskResponseEvent, dqExecuteResult);
-                            }
-                        }
+                        operateDqExecuteResult(taskResponseEvent, taskInstance);
 
                         processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
                                 taskResponseEvent.getEndTime(),
@@ -210,7 +198,19 @@ public class TaskResponseService {
         }
     }
 
-    private void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, DqExecuteResult dqExecuteResult) {
+    private void operateDqExecuteResult(TaskResponseEvent taskResponseEvent, TaskInstance taskInstance) {
+        if (TaskType.DATA_QUALITY == TaskType.valueOf(taskInstance.getTaskType())) {
+            processService.updateDqExecuteResultUserId(taskResponseEvent.getTaskInstanceId());
+            DqExecuteResult dqExecuteResult =
+                    processService.getDqExecuteResultByTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+            if (dqExecuteResult != null) {
+                //check the result ,if result is failure do some operator by failure strategy
+                checkDqExecuteResult(taskResponseEvent, dqExecuteResult);
+            }
+        }
+    }
+
+    private void checkDqExecuteResult(TaskResponseEvent taskResponseEvent, DqExecuteResult dqExecuteResult) {
 
         if (isFailure(dqExecuteResult)) {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
@@ -273,13 +273,9 @@ public class TaskResponseService {
                                 Integer.parseInt(String.valueOf(dqExecuteResult.getProcessInstanceId()))));
     }
 
-    public BlockingQueue<TaskResponseEvent> getEventQueue() {
-        return eventQueue;
-    }
-
     private static boolean getCompareResult(OperatorType operatorType, double srcValue, double targetValue) {
-        BigDecimal src = new BigDecimal(srcValue);
-        BigDecimal target = new BigDecimal(targetValue);
+        BigDecimal src = BigDecimal.valueOf(srcValue);
+        BigDecimal target = BigDecimal.valueOf(targetValue);
         switch (operatorType) {
             case EQ:
                 return src.compareTo(target) == 0;
@@ -296,5 +292,9 @@ public class TaskResponseService {
             default:
                 return true;
         }
+    }
+
+    public BlockingQueue<TaskResponseEvent> getEventQueue() {
+        return eventQueue;
     }
 }

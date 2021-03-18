@@ -39,7 +39,7 @@ public class RuleManager {
     private final Map<String, String> inputParameterValue;
     private final DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 
-    public static final String DEFAULT_COMPARISON_WRITER_SQL =
+    private static final String BASE_SQL =
             "SELECT ${rule_type} as rule_type,"
                     + "${rule_name} as rule_name,"
                     + "${process_definition_id} as process_definition_id,"
@@ -52,41 +52,19 @@ public class RuleManager {
                     + "${operator} as operator, "
                     + "${failure_strategy} as failure_strategy, "
                     + "${create_time} as create_time,"
-                    + "${update_time} as update_time "
-                    + "from ${statistics_table} FULL JOIN ${comparison_table}";
+                    + "${update_time} as update_time ";
+
+    public static final String DEFAULT_COMPARISON_WRITER_SQL =
+                    BASE_SQL + "from ${statistics_table} FULL JOIN ${comparison_table}";
 
     public static final String MULTI_TABLE_COMPARISON_WRITER_SQL =
-            "SELECT ${rule_type} as rule_type,"
-                    + "${rule_name} as rule_name,"
-                    + "${process_definition_id} as process_definition_id,"
-                    + "${process_instance_id} as process_instance_id,"
-                    + "${task_instance_id} as task_instance_id,"
-                    + "${statistics_name} AS statistics_value, "
-                    + "${comparison_name} AS comparison_value,"
-                    + "${check_type} as check_type,"
-                    + "${threshold} as threshold, "
-                    + "${operator} as operator, "
-                    + "${failure_strategy} as failure_strategy, "
-                    + "${create_time} as create_time,"
-                    + "${update_time} as update_time "
+                    BASE_SQL
                     + "from ( ${statistics_execute_sql} ) tmp1 "
                     + "join "
                     + "( ${comparison_execute_sql} ) tmp2 ";
 
     public static final String SINGLE_TABLE_CUSTOM_SQL_WRITER_SQL =
-            "SELECT ${rule_type} as rule_type,"
-                    + "${rule_name} as rule_name,"
-                    + "${process_definition_id} as process_definition_id,"
-                    + "${process_instance_id} as process_instance_id,"
-                    + "${task_instance_id} as task_instance_id,"
-                    + "${statistics_name} AS statistics_value, "
-                    + "${comparison_name} AS comparison_value,"
-                    + "${check_type} as check_type,"
-                    + "${threshold} as threshold, "
-                    + "${operator} as operator, "
-                    + "${failure_strategy} as failure_strategy, "
-                    + "${create_time} as create_time,"
-                    + "${update_time} as update_time "
+                    BASE_SQL
                     + "from ( ${statistics_execute_sql} ) tmp1 "
                     + "join "
                     + "${comparison_table}";

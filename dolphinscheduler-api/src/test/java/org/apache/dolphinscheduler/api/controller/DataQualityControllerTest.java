@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -47,16 +46,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * process definition controller test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class DataQualityControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(DataQualityControllerTest.class);
 
     @InjectMocks
     private DataQualityController dataQualityController;
@@ -134,7 +129,7 @@ public class DataQualityControllerTest {
         result.put(Constants.DATA_LIST, pageInfo);
 
         when(dqRuleService.queryRuleListPaging(
-                eq(user), eq(searchVal), eq(ruleType), eq(start), eq(end),eq(1), eq(10))).thenReturn(result);
+                user, searchVal, ruleType, start, end,1, 10)).thenReturn(result);
 
         Result response = dataQualityController.queryRuleListPaging(user, searchVal, ruleType,start,end,1,10);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
@@ -169,7 +164,7 @@ public class DataQualityControllerTest {
         result.put(Constants.DATA_LIST, pageInfo);
 
         when(dqExecuteResultService.queryResultListPaging(
-                eq(user), eq(searchVal), any(),eq(ruleType), eq(start), eq(end),eq(1), eq(10))).thenReturn(result);
+                user, searchVal, any(),ruleType, start, end,1, 10)).thenReturn(result);
 
         Result response = dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType,0,start,end,1,10);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());

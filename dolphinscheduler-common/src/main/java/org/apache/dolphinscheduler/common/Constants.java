@@ -1105,4 +1105,6 @@ public final class Constants {
     public static final String NAME = "";
     public static final String SMALL = "small";
     public static final String CHANGE = "change";
+
+    public static final String RULE_NAME = "rule_name";
 }

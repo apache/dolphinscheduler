@@ -71,39 +71,10 @@ public class StringUtils {
         return str1 == null ? str2 == null : str1.equalsIgnoreCase(str2);
     }
 
-    // Java and JavaScript
-    //--------------------------------------------------------------------------
-    /**
-     * <p>Escapes the characters in a <code>String</code> using Java String rules.</p>
-     *
-     * <p>Deals correctly with quotes and control-chars (tab, backslash, cr, ff, etc.) </p>
-     *
-     * <p>So a tab becomes the characters <code>'\\'</code> and
-     * <code>'t'</code>.</p>
-     *
-     * <p>The only difference between Java strings and JavaScript strings
-     * is that in JavaScript, a single quote must be escaped.</p>
-     *
-     * <p>Example:
-     * <pre>
-     * input string: He didn't say, "Stop!"
-     * output string: He didn't say, \"Stop!\"
-     * </pre>
-     * </p>
-     *
-     * @param str  String to escape values in, may be null
-     * @return String with escaped values, <code>null</code> if null string input
-     */
     public static String escapeJava(String str) {
         return escapeJavaStyleString(str, false, false);
     }
 
-    /**
-     * @param str String to escape values in, may be null
-     * @param escapeSingleQuotes escapes single quotes if <code>true</code>
-     * @param escapeForwardSlash TODO
-     * @return the escaped string
-     */
     private static String escapeJavaStyleString(String str, boolean escapeSingleQuotes, boolean escapeForwardSlash) {
         if (str == null) {
             return null;
@@ -118,13 +89,6 @@ public class StringUtils {
         }
     }
 
-    /**
-     * @param out write to receieve the escaped string
-     * @param str String to escape values in, may be null
-     * @param escapeSingleQuote escapes single quotes if <code>true</code>
-     * @param escapeForwardSlash TODO
-     * @throws IOException if an IOException occurs
-     */
     private static void escapeJavaStyleString(Writer out, String str, boolean escapeSingleQuote,
                                               boolean escapeForwardSlash) throws IOException {
         if (out == null) {
@@ -205,13 +169,6 @@ public class StringUtils {
         }
     }
 
-    /**
-     * <p>Returns an upper case hexadecimal <code>String</code> for the given
-     * character.</p>
-     *
-     * @param ch The character to convert.
-     * @return An upper case hexadecimal <code>String</code>
-     */
     private static String hex(char ch) {
         return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
     }

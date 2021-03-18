@@ -112,7 +112,6 @@ public class DataQualityController extends BaseController {
                                       @RequestParam(value = "endDate", required = false) String endTime,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        logger.info("query rule list paging, login user:{}", loginUser.getUserName());
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -169,7 +168,6 @@ public class DataQualityController extends BaseController {
                                        @RequestParam(value = "endDate", required = false) String endTime,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam("pageSize") Integer pageSize) {
-        logger.info("query task result paging, login user:{}", loginUser.getUserName());
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);

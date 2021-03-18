@@ -44,8 +44,9 @@ public class CommonUtils {
 
     public static String getDqJarName() {
         String dqsJarName = PropertyUtils.getString(Constants.DOLPHINSCHEDULER_DQ_JAR_NAME);
+
         if (StringUtils.isEmpty(dqsJarName)) {
-            return StringUtils.EMPTY;
+            return "dolphinscheduler-data-quality.jar";
         }
 
         return dqsJarName;

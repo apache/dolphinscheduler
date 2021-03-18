@@ -50,7 +50,7 @@ public abstract class AbstractTask {
     /**
      * taskExecutionContext
      **/
-    TaskExecutionContext taskExecutionContext;
+    protected TaskExecutionContext taskExecutionContext;
 
     /**
      * log record

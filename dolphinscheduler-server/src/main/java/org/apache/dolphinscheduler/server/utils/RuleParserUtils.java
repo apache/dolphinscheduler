@@ -55,6 +55,15 @@ import java.util.stream.Collectors;
  */
 public class RuleParserUtils {
 
+    private RuleParserUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final String AND_SRC_FILTER = "AND (${src_filter})";
+    private static final String WHERE_SRC_FILTER = "WHERE (${src_filter})";
+    private static final String AND_TARGET_FILTER = "AND (${target_filter})";
+    private static final String WHERE_TARGET_FILTER = "WHERE (${target_filter})";
+
     public static List<ConnectorParameter> getConnectorParameterList(
                                             Map<String, String> inputParameterValue,
                                             DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws Exception {
@@ -62,7 +71,8 @@ public class RuleParserUtils {
         List<ConnectorParameter> connectorParameterList = new ArrayList<>();
 
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getSourceConnectorType())) {
-            BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.of(dataQualityTaskExecutionContext.getSourceType()),
+            BaseDataSource baseDataSource = DataSourceFactory.getDatasource
+                    (DbType.of(dataQualityTaskExecutionContext.getSourceType()),
                     dataQualityTaskExecutionContext.getSourceConnectionParams());
             ConnectorParameter sourceConnectorParameter = new ConnectorParameter();
             sourceConnectorParameter.setType(dataQualityTaskExecutionContext.getSourceConnectorType());
@@ -102,7 +112,7 @@ public class RuleParserUtils {
         return connectorParameterList;
     }
 
-    public static  int replaceExecuteSqlPlaceholder(List<DqRuleExecuteSql> executeSqlList,
+    public static int replaceExecuteSqlPlaceholder(List<DqRuleExecuteSql> executeSqlList,
                                              int index, Map<String, String> inputParameterValueResult,
                                              List<ExecutorParameter> executorParameterList) {
         List<DqRuleExecuteSql> midExecuteSqlDefinitionList
@@ -111,37 +121,15 @@ public class RuleParserUtils {
         List<DqRuleExecuteSql> statisticsExecuteSqlDefinitionList
                 = getExecuteSqlListByType(executeSqlList, ExecuteSqlType.STATISTICS);
 
-        if (StringUtils.isEmpty(inputParameterValueResult.get(SRC_FILTER))) {
-            if (midExecuteSqlDefinitionList != null) {
-                for (DqRuleExecuteSql executeSql:midExecuteSqlDefinitionList) {
-                    String sql = executeSql.getSql();
-                    sql = sql.replace("AND (${src_filter})","").replace("WHERE (${src_filter})","");
-                    executeSql.setSql(sql);
-                }
-            }
+        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),AND_SRC_FILTER);
+        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),WHERE_SRC_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),AND_SRC_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(SRC_FILTER),WHERE_SRC_FILTER);
 
-            for (DqRuleExecuteSql executeSqlDefinition:statisticsExecuteSqlDefinitionList) {
-                String sql = executeSqlDefinition.getSql();
-                sql = sql.replace("AND (${src_filter})","").replace("WHERE (${src_filter})","");
-                executeSqlDefinition.setSql(sql);
-            }
-        }
-
-        if (StringUtils.isEmpty(inputParameterValueResult.get(TARGET_FILTER))) {
-            if (midExecuteSqlDefinitionList != null) {
-                for (DqRuleExecuteSql executeSqlDefinition:midExecuteSqlDefinitionList) {
-                    String sql = executeSqlDefinition.getSql();
-                    sql = sql.replace("AND (${target_filter})","").replace("WHERE (${target_filter})","");
-                    executeSqlDefinition.setSql(sql);
-                }
-            }
-
-            for (DqRuleExecuteSql executeSqlDefinition:statisticsExecuteSqlDefinitionList) {
-                String sql = executeSqlDefinition.getSql();
-                sql = sql.replace("AND (${target_filter})","").replace("WHERE (${target_filter})","");
-                executeSqlDefinition.setSql(sql);
-            }
-        }
+        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
+        checkAndReplace(midExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
+        checkAndReplace(statisticsExecuteSqlDefinitionList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
 
         if (midExecuteSqlDefinitionList != null) {
             for (DqRuleExecuteSql executeSqlDefinition:midExecuteSqlDefinitionList) {
@@ -255,27 +243,16 @@ public class RuleParserUtils {
                                                   List<ExecutorParameter> executorParameterList,
                                                   DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
                                                   String writerSql) throws Exception {
-        List<DqRuleExecuteSql>  comparisonExecuteSqlList =
+        List<DqRuleExecuteSql> comparisonExecuteSqlList =
                 getExecuteSqlListByType(dataQualityTaskExecutionContext.getExecuteSqlList(), ExecuteSqlType.COMPARISON);
 
         DqRuleExecuteSql comparisonSql = comparisonExecuteSqlList.get(0);
         inputParameterValueResult.put(COMPARISON_TABLE,comparisonSql.getTableAlias());
 
-        if (StringUtils.isEmpty(inputParameterValueResult.get(SRC_FILTER))) {
-            for (DqRuleExecuteSql executeSqlDefinition:comparisonExecuteSqlList) {
-                String sql = executeSqlDefinition.getSql();
-                sql = sql.replace("AND (${src_filter})","").replace("WHERE (${src_filter})","");
-                executeSqlDefinition.setSql(sql);
-            }
-        }
-
-        if (StringUtils.isEmpty(inputParameterValueResult.get(TARGET_FILTER))) {
-            for (DqRuleExecuteSql executeSqlDefinition:comparisonExecuteSqlList) {
-                String sql = executeSqlDefinition.getSql();
-                sql = sql.replace("AND (${target_filter})","").replace("WHERE (${target_filter})","");
-                executeSqlDefinition.setSql(sql);
-            }
-        }
+        checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(SRC_FILTER),AND_SRC_FILTER);
+        checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(SRC_FILTER),WHERE_SRC_FILTER);
+        checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(TARGET_FILTER),AND_TARGET_FILTER);
+        checkAndReplace(comparisonExecuteSqlList,inputParameterValueResult.get(TARGET_FILTER),WHERE_TARGET_FILTER);
 
         for (DqRuleExecuteSql executeSqlDefinition:comparisonExecuteSqlList) {
             index = setExecutorParameter(
@@ -297,5 +274,15 @@ public class RuleParserUtils {
                 .stream()
                 .filter(x -> x.getExecuteSqlType() == executeSqlType)
                 .collect(Collectors.toList());
+    }
+
+    private static void checkAndReplace(List<DqRuleExecuteSql> list, String checkValue, String replaceSrc) {
+        if (StringUtils.isEmpty(checkValue)) {
+            for (DqRuleExecuteSql executeSqlDefinition:list) {
+                String sql = executeSqlDefinition.getSql();
+                sql = sql.replace(replaceSrc,"");
+                executeSqlDefinition.setSql(sql);
+            }
+        }
     }
 }

@@ -21,13 +21,14 @@ import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * DataQualityTaskExecutionContext
  */
-public class DataQualityTaskExecutionContext {
+public class DataQualityTaskExecutionContext implements Serializable {
 
     /**
      * ruleName
