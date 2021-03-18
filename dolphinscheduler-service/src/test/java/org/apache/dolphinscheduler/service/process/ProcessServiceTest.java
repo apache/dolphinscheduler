@@ -71,7 +71,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -356,7 +355,7 @@ public class ProcessServiceTest {
 
         ProcessData processData = new ProcessData();
 
-        ProcessDefinition processDefinition =new ProcessDefinition();
+        ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setId(123);
         processDefinition.setName("test");
