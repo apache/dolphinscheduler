@@ -16,7 +16,7 @@
  */
 <template>
   <div class="month-model">
-    <div class="v-crontab-from-model">
+    <div class="v-crontab-form-model">
       <x-radio-group v-model="radioMonth" vertical>
         <div class="list-box">
           <x-radio label="everyMonth">
