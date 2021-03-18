@@ -56,7 +56,6 @@ public class DataQualityTask extends AbstractYarnTask {
 
     private DataQualityParameters dataQualityParameters;
 
-
     public DataQualityTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
         this.taskExecutionContext = taskExecutionContext;
