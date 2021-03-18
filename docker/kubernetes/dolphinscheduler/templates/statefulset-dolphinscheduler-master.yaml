@@ -217,6 +217,13 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-master
+            - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
+              subPath: "dolphinscheduler_env.sh"
+              name: {{ include "dolphinscheduler.fullname" . }}-common-env
+            {{- if .Values.common.sharedStoragePersistence.enabled }}
+            - mountPath: {{ .Values.common.sharedStoragePersistence.mountPath | quote }}
+              name: {{ include "dolphinscheduler.fullname" . }}-shared
+            {{- end }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.persistentVolumeClaim.enabled }}
@@ -225,6 +232,18 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-common-env
+          configMap:
+            defaultMode: 0777
+            name: {{ include "dolphinscheduler.fullname" . }}-common
+            items:
+              - key: DOLPHINSCHEDULER_ENV
+                path: dolphinscheduler_env.sh
+        {{- if .Values.common.sharedStoragePersistence.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-shared
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-shared
+        {{- end }}
   {{- if .Values.master.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     - metadata:

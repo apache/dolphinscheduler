@@ -301,6 +301,10 @@ spec:
             - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
               subPath: "dolphinscheduler_env.sh"
               name: {{ include "dolphinscheduler.fullname" . }}-common-env
+            {{- if .Values.common.sharedStoragePersistence.enabled }}
+            - mountPath: {{ .Values.common.sharedStoragePersistence.mountPath | quote }}
+              name: {{ include "dolphinscheduler.fullname" . }}-shared
+            {{- end }}
             {{- if .Values.common.fsFileResourcePersistence.enabled }}
             - mountPath: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
               name: {{ include "dolphinscheduler.fullname" . }}-fs-file
@@ -327,6 +331,11 @@ spec:
             items:
               - key: DOLPHINSCHEDULER_ENV
                 path: dolphinscheduler_env.sh
+        {{- if .Values.common.sharedStoragePersistence.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-shared
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-shared
+        {{- end }}
         {{- if .Values.common.fsFileResourcePersistence.enabled }}
         - name: {{ include "dolphinscheduler.fullname" . }}-fs-file
           persistentVolumeClaim:
