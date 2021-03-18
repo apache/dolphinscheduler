@@ -52,7 +52,7 @@ public class RegexUtils {
      * @param str input
      * @return boolean
      */
-    public static boolean isValidLinuxUserName(String str){
+    public static boolean isValidLinuxUserName(String str) {
         Pattern pattern = Pattern.compile(LINUX_USERNAME_PATTERN);
         return pattern.matcher(str).matches();
     }
