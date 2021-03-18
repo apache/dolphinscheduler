@@ -896,15 +896,15 @@
                         <include>**/dao/datasource/MySQLDataSourceTest.java</include>
                         <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/entity/UdfFuncTest.java</include>
-                        <include>**/remote/JsonSerializerTest.java</include>
-                        <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
-                        <include>**/rpc/RpcTest.java</include>
-                        <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
-                        <include>**/remote/NettyRemotingClientTest.java</include>
-                        <include>**/remote/NettyUtilTest.java</include>
-                        <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/remote/command/alert/AlertSendRequestCommandTest.java</include>
                         <include>**/remote/command/alert/AlertSendResponseCommandTest.java</include>
+                        <include>**/remote/command/future/ResponseFutureTest.java</include>
+                        <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
+                        <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/utils/HostTest.java</include>
+                        <include>**/remote/utils/NettyUtilTest.java</include>
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/rpc/RpcTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
@@ -919,6 +919,7 @@
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
@@ -935,7 +936,6 @@
                         <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
-                        <include>**/server/utils/HostTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/LogUtilsTest.java</include>
                         <include>**/server/utils/MapReduceArgsUtilsTest.java</include>

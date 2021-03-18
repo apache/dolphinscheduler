@@ -15,30 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote;
-
-import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
-
-import org.apache.dolphinscheduler.remote.utils.NettyUtils;
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.netty.channel.epoll.Epoll;
-
-/**
- * NettyUtilTest
- */
-public class NettyUtilTest {
-
+public class HostWorkerTest {
 
     @Test
-    public void testUserEpoll() {
-        if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
-            Assert.assertTrue(NettyUtils.useEpoll());
-        } else {
-            Assert.assertFalse(NettyUtils.useEpoll());
-        }
+    public void testHostWorker1() {
+        HostWorker hostWorker = new HostWorker("192.158.2.2", 11, 20, "default");
+        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assert.assertEquals(11, hostWorker.getPort());
+        Assert.assertEquals(20, hostWorker.getHostWeight());
+        Assert.assertEquals("default", hostWorker.getWorkerGroup());
+    }
+
+    @Test
+    public void testHostWorker2() {
+        HostWorker hostWorker = HostWorker.of("192.158.2.2:22", 80, "default");
+        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assert.assertEquals(22, hostWorker.getPort());
+        Assert.assertEquals(80, hostWorker.getHostWeight());
+        Assert.assertEquals("default", hostWorker.getWorkerGroup());
     }
 
 }
