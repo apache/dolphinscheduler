@@ -206,7 +206,7 @@ public abstract class AbstractTask {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
         }
     }
-    
+
     /**
      * get exit status according to exitCode
      *

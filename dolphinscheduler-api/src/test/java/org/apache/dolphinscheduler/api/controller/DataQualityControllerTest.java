@@ -164,7 +164,7 @@ public class DataQualityControllerTest {
         result.put(Constants.DATA_LIST, pageInfo);
 
         when(dqExecuteResultService.queryResultListPaging(
-                user, searchVal, any(),ruleType, start, end,1, 10)).thenReturn(result);
+                user, searchVal, 0,ruleType, start, end,1, 10)).thenReturn(result);
 
         Result response = dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType,0,start,end,1,10);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
