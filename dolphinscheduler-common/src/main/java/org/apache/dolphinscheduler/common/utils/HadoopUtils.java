@@ -418,6 +418,7 @@ public class HadoopUtils implements Closeable {
         }
 
         String result = Constants.FAILED;
+        String resultState = RUNNING;
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
@@ -428,6 +429,7 @@ public class HadoopUtils implements Closeable {
                 return ExecutionStatus.FAILURE;
             }
             result = jsonObject.path("app").path("finalStatus").asText();
+            resultState = jsonObject.path("app").path("State").asText();
 
         } else {
             //may be in job history
@@ -451,6 +453,10 @@ public class HadoopUtils implements Closeable {
                 return ExecutionStatus.SUBMITTED_SUCCESS;
             case Constants.SUCCEEDED:
                 return ExecutionStatus.SUCCESS;
+            case UNDEFINED:
+                if(resultState.equals(FINISHED)){
+                    return ExecutionStatus.FAILURE;
+                }
             case Constants.NEW:
             case Constants.NEW_SAVING:
             case Constants.SUBMITTED:
@@ -461,7 +467,7 @@ public class HadoopUtils implements Closeable {
 
             case Constants.RUNNING:
             default:
-                return ExecutionStatus.RUNNING_EXECUTION;
+                return ExecutionStatus.RUNNING_EXEUTION;
         }
     }
 
