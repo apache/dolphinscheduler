@@ -673,6 +673,15 @@ public final class Constants {
      * SUCCEEDED
      */
     public static final String SUCCEEDED = "SUCCEEDED";
+    
+        /**
+     * FINISHED
+     */
+    public static final String FINISHED = "FINISHED";
+    /**
+     * UNDEFINED
+     */
+    public static final String UNDEFINED = "UNDEFINED";
     /**
      * NEW
      */
