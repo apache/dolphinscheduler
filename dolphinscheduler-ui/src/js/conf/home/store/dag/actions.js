@@ -836,5 +836,36 @@ export default {
         reject(e)
       })
     })
+  },
+  getRuleInputEntryList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/getRuleFormCreateJson', {
+        ruleId: payload
+      }, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  getRuleList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/ruleList', {}, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  getDatasourceOptionsById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('data-quality/getDatasourceOptionsById', {
+        datasourceId: payload
+      }, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
   }
 }
