@@ -272,7 +272,7 @@ public class RuleParserUtils {
             List<DqRuleExecuteSql> allExecuteSqlList, ExecuteSqlType executeSqlType) {
         return allExecuteSqlList
                 .stream()
-                .filter(x -> x.getExecuteSqlType() == executeSqlType)
+                .filter(x -> x.getType() == executeSqlType)
                 .collect(Collectors.toList());
     }
 

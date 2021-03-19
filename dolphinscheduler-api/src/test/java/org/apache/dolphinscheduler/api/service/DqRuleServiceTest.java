@@ -226,7 +226,7 @@ public class DqRuleServiceTest {
         executeSqlDefinition.setIndex(0);
         executeSqlDefinition.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
         executeSqlDefinition.setTableAlias("total_count");
-        executeSqlDefinition.setExecuteSqlType(ExecuteSqlType.COMPARISON);
+        executeSqlDefinition.setType(ExecuteSqlType.COMPARISON);
         list.add(executeSqlDefinition);
 
         return list;

@@ -294,14 +294,14 @@ public class DataQualityTaskTest {
         executeSqlDefinition2.setIndex(0);
         executeSqlDefinition2.setSql("SELECT count(*) AS miss FROM ${src_table} WHERE (${src_field} is null or ${src_field} = '') AND (${src_filter}) ");
         executeSqlDefinition2.setTableAlias("miss_count");
-        executeSqlDefinition2.setExecuteSqlType(ExecuteSqlType.STATISTICS);
+        executeSqlDefinition2.setType(ExecuteSqlType.STATISTICS);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition2);
 
         DqRuleExecuteSql executeSqlDefinition3 = new DqRuleExecuteSql();
         executeSqlDefinition3.setIndex(0);
         executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
         executeSqlDefinition3.setTableAlias("total_count");
-        executeSqlDefinition3.setExecuteSqlType(ExecuteSqlType.COMPARISON);
+        executeSqlDefinition3.setType(ExecuteSqlType.COMPARISON);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
 
         DqRuleInputEntry comparisonTitle = new DqRuleInputEntry();
@@ -514,7 +514,7 @@ public class DataQualityTaskTest {
         executeSqlDefinition3.setIndex(0);
         executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${src_table} WHERE (${src_filter})");
         executeSqlDefinition3.setTableAlias("total_count");
-        executeSqlDefinition3.setExecuteSqlType(ExecuteSqlType.COMPARISON);
+        executeSqlDefinition3.setType(ExecuteSqlType.COMPARISON);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
 
         DqRuleInputEntry comparisonTitle = new DqRuleInputEntry();
@@ -999,21 +999,21 @@ public class DataQualityTaskTest {
                 + "${src_table} LEFT JOIN (SELECT * FROM ${target_table} WHERE (${target_filter})) "
                 + "${target_table} ON ${on_clause} WHERE ${where_clause}");
         executeSqlDefinition1.setTableAlias("miss_items");
-        executeSqlDefinition1.setExecuteSqlType(ExecuteSqlType.MIDDLE);
+        executeSqlDefinition1.setType(ExecuteSqlType.MIDDLE);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition1);
 
         DqRuleExecuteSql executeSqlDefinition2 = new DqRuleExecuteSql();
         executeSqlDefinition2.setIndex(0);
         executeSqlDefinition2.setSql("SELECT COUNT(*) AS miss FROM miss_items");
         executeSqlDefinition2.setTableAlias("miss_count");
-        executeSqlDefinition2.setExecuteSqlType(ExecuteSqlType.STATISTICS);
+        executeSqlDefinition2.setType(ExecuteSqlType.STATISTICS);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition2);
 
         DqRuleExecuteSql executeSqlDefinition3 = new DqRuleExecuteSql();
         executeSqlDefinition3.setIndex(0);
         executeSqlDefinition3.setSql("SELECT COUNT(*) AS total FROM ${target_table} WHERE (${target_filter})");
         executeSqlDefinition3.setTableAlias("total_count");
-        executeSqlDefinition3.setExecuteSqlType(ExecuteSqlType.COMPARISON);
+        executeSqlDefinition3.setType(ExecuteSqlType.COMPARISON);
         dataQualityTaskExecutionContext.addExecuteSql(executeSqlDefinition3);
 
         DqRuleInputEntry comparisonTitle = new DqRuleInputEntry();
