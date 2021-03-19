@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 package org.apache.dolphinscheduler.common.utils;
-
+import java.lang.reflect.Method;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Assert;
@@ -24,7 +24,6 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
