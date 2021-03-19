@@ -24,11 +24,10 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.lang.reflect.Method;
 
 @RunWith(MockitoJUnitRunner.class)
 //todo there is no hadoop environment
