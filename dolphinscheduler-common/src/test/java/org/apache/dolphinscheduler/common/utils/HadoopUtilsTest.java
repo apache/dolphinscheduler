@@ -217,6 +217,7 @@ public class HadoopUtilsTest {
         }
         logger.info(Arrays.toString(content));
     }
+	
     @Test
     public void testGetApplicationUrl() {
         Class<HadoopUtils> hadoopUtilsClass = HadoopUtils.class;
@@ -225,7 +226,7 @@ public class HadoopUtilsTest {
             method.setAccessible(true);
             Object[] args = {"11111"};
             HadoopUtils hadoopUtils = HadoopUtils.getInstance();
-			hadoopUtils.close();
+	    hadoopUtils.close();
             method.invoke(hadoopUtils, args);
         } catch (Exception e) {
             logger.error(e.getMessage());
