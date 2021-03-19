@@ -14,20 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static java.util.stream.Collectors.toList;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,12 +46,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -310,7 +315,6 @@ public class ResourceMapperTest {
     @Test
     public void testQueryTenantCodeByResourceName() {
 
-
         Tenant tenant = new Tenant();
         tenant.setTenantCode("ut tenant code for resource");
         int tenantInsertStatus = tenantMapper.insert(tenant);
@@ -327,7 +331,6 @@ public class ResourceMapperTest {
         if (userInsertStatus != 1) {
             Assert.fail("insert user data error");
         }
-
 
         Resource resource = insertOne();
         resource.setUserId(user.getId());
@@ -362,7 +365,6 @@ public class ResourceMapperTest {
 
         Assert.assertEquals(generalUser2.getId(), resource.getUserId());
         Assert.assertFalse(resources.stream().map(t -> t.getFullName()).collect(toList()).containsAll(Arrays.asList(resNames)));
-
 
         // authorize object unauthorizedResource to generalUser
         createResourcesUser(unauthorizedResource, generalUser2);
