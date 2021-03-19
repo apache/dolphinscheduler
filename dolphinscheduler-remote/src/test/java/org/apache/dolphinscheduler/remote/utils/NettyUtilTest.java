@@ -14,32 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+package org.apache.dolphinscheduler.remote.utils;
 
-import java.util.Collection;
+import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import io.netty.channel.epoll.Epoll;
 
 /**
- *  AbstractSelector
+ * NettyUtilTest
  */
-public  abstract class AbstractSelector<T> implements Selector<T> {
-    @Override
-    public T select(Collection<T> source) {
+public class NettyUtilTest {
 
-        if (CollectionUtils.isEmpty(source)) {
-            throw new IllegalArgumentException("Empty source.");
+    @Test
+    public void testUserEpoll() {
+        if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
+            Assert.assertTrue(NettyUtils.useEpoll());
+        } else {
+            Assert.assertFalse(NettyUtils.useEpoll());
         }
-
-        /**
-         * if only one , return directly
-         */
-        if (source.size() == 1) {
-            return (T)source.toArray()[0];
-        }
-        return doSelect(source);
     }
-
-    protected abstract T doSelect(Collection<T> source);
 
 }

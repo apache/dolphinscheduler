@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -251,8 +252,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return true if resource exists
      */
     private boolean checkResourceExists(String fullName, int userId, int type) {
-        List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        return resources != null && !resources.isEmpty();
+        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
+        return BooleanUtils.isTrue(existResource);
     }
 
     /**
@@ -361,6 +362,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Date now = new Date();
 
         resource.setAlias(name);
+        resource.setFileName(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);

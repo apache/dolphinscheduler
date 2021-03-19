@@ -43,5 +43,15 @@
             and queue_name =#{queueName}
         </if>
     </select>
-
+    <select id="existQueue" resultType="java.lang.Boolean">
+        select 1 = 1
+        from t_ds_queue
+        where 1 = 1
+        <if test="queue != null and queue != ''">
+            and queue = #{queue}
+        </if>
+        <if test="queueName != null and queueName != ''">
+            and queue_name =#{queueName}
+        </if>
+    </select>
 </mapper>

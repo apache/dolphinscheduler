@@ -135,4 +135,15 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return update num
      */
     int batchUpdateResource(@Param("resourceList") List<Resource> resourceList);
+
+    /**
+     * check resource exist
+     * @param fullName full name
+     * @param userId userId
+     * @param type type
+     * @return true if exist else return null
+     */
+    Boolean existResource(@Param("fullName") String fullName,
+                              @Param("userId") int userId,
+                              @Param("type") int type);
 }
