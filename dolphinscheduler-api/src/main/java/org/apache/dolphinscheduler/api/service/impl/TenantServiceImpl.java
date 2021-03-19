@@ -101,11 +101,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Tenant tenant = new Tenant();
         Date now = new Date();
-
-        if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")) {
-            putMsg(result, Status.VERIFY_OS_TENANT_CODE_ERROR);
-            return result;
-        }
         tenant.setTenantCode(tenantCode);
         tenant.setQueueId(queueId);
         tenant.setDescription(desc);
