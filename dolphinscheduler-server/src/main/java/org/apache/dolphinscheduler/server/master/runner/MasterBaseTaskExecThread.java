@@ -209,7 +209,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 return true;
             }
             // task cannot submit when running
-            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
+            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION){
                 logger.info(String.format("submit to task, but task [%s] state already be running. ", taskInstance.getName()));
                 return true;
             }

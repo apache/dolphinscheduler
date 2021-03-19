@@ -845,7 +845,7 @@ public final class Constants {
 
     public static final int[] NOT_TERMINATED_STATES = new int[]{
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal(),
             ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),

@@ -116,7 +116,7 @@ public class ProcessUtilsTest {
         appIds.add("application_1598885606600_3677");
         String tenantCode = "dev";
         String executePath = "/ds-exec/1/1/1";
-        ExecutionStatus running = ExecutionStatus.RUNNING_EXEUTION;
+        ExecutionStatus running = ExecutionStatus.RUNNING_EXECUTION;
 
         PowerMockito.mockStatic(HadoopUtils.class);
         HadoopUtils hadoop = HadoopUtils.getInstance();
