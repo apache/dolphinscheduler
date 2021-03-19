@@ -270,19 +270,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
                 page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
-        List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-
-        records.forEach(pd -> {
-            ProcessData processData = processService.genProcessData(pd);
-            String processDefinitionJson = JSONUtils.toJsonString(processData);
-            pd.setProcessDefinitionJson(processDefinitionJson);
-        });
-
-        processDefinitionIPage.setRecords(records);
+        processDefinitionIPage.setRecords(processDefinitionIPage.getRecords());
 
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) processDefinitionIPage.getTotal());
-        pageInfo.setLists(records);
+        pageInfo.setLists(processDefinitionIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
