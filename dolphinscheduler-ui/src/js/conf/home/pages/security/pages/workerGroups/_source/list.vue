@@ -22,7 +22,7 @@
         <el-table-column prop="name" :label="$t('Group')"></el-table-column>
         <el-table-column :label="$t('Host List')" min-width="300">
           <template slot-scope="scope">
-            <span>{{scope.row.ipList}}</span>
+            <span style="display: inline-block; margin-right: 10px">{{scope.row.ipList}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">

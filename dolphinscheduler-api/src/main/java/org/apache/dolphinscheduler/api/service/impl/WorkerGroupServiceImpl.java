@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.SLASH;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -62,6 +61,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     protected ZookeeperCachedOperator zookeeperCachedOperator;
+
+    @Autowired
+    private ZookeeperMonitor zookeeperMonitor;
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
@@ -110,7 +112,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.NAME_EXIST, workerGroup.getName());
             return result;
         }
-        if (workerGroup.getId() != 0 ) {
+        String invalidIp = checkWorkerGroupIpList(workerGroup);
+        if (invalidIp != null) {
+            putMsg(result, Status.HOST_ADDRESS_INVALID, invalidIp);
+            return result;
+        }
+        if (workerGroup.getId() != 0) {
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
@@ -131,14 +138,36 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             if (workerGroup.getId() == 0) {
                 return true;
             }
-            // update group
+            // check group id
             for (WorkerGroup group : workerGroupList) {
                 if (group.getId() != workerGroup.getId()) {
                     return true;
                 }
             }
         }
-        return false;
+        // check zookeeper
+        String workerGroupPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
+        return zookeeperCachedOperator.isExisted(workerGroupPath);
+    }
+
+    /**
+     * check worker group ip list
+     * @param workerGroup worker group
+     * @return boolean
+     */
+    private String checkWorkerGroupIpList(WorkerGroup workerGroup) {
+        List<String> workerIps = new ArrayList<>();
+        Map<String, String> workerServers = zookeeperMonitor.getServerMaps(ZKNodeType.WORKER);
+        for (Map.Entry<String, String> entry : workerServers.entrySet()) {
+            String[] items = entry.getKey().split(Constants.COLON)[0].split(Constants.DIVISION_STRING);
+            workerIps.add(items[items.length - 1]);
+        }
+        for (String ip : workerGroup.getIpList().split(",")) {
+            if (!workerIps.contains(ip)) {
+                return ip;
+            }
+        }
+        return null;
     }
 
     /**
@@ -231,27 +260,31 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
         }
 
-        if (workerGroupList == null || workerGroupList.isEmpty()) {
-            if (workerGroups.isEmpty() && !isPaging) {
+        if (CollectionUtils.isEmpty(workerGroupList)) {
+            if (CollectionUtils.isEmpty(workerGroups) && !isPaging) {
                 WorkerGroup wg = new WorkerGroup();
-                wg.setName(DEFAULT_WORKER_GROUP);
+                wg.setName(Constants.DEFAULT_WORKER_GROUP);
                 workerGroups.add(wg);
             }
             return workerGroups;
         }
 
         for (String workerGroup : workerGroupList) {
-            String workerGroupPath = workerPath + SLASH + workerGroup;
-            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
+            String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
+            List<String> childrenNodes = null;
+            try {
+                childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
+            } catch (Exception e) {
+                logger.error("getChildrenNodes exception: {}, workerGroupPath: {}", e.getMessage(), workerGroupPath);
+            }
             if (CollectionUtils.isEmpty(childrenNodes)) {
                 continue;
             }
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
             if (isPaging) {
-                List<String> ipList = childrenNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList());
-                wg.setIpList(String.join(",", ipList));
-                String registeredValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + childrenNodes.get(0));
+                wg.setIpList(String.join(",", getIpListFromZkNodes(childrenNodes)));
+                String registeredValue = zookeeperCachedOperator.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(",")[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(",")[7]));
                 wg.setZkRegistered(true);
@@ -259,6 +292,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroups.add(wg);
         }
         return workerGroups;
+    }
+
+    /**
+     * get ip list from zk nodes
+     *
+     * @param zkNodes zk nodes
+     * @return ip list
+     */
+    public List<String> getIpListFromZkNodes(List<String> zkNodes) {
+        return zkNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList());
     }
 
     /**
