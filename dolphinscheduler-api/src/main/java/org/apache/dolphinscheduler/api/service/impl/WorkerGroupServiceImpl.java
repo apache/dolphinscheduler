@@ -38,7 +38,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -232,11 +231,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     public Map<String, Object> queryAllGroup() {
         Map<String, Object> result = new HashMap<>();
         List<WorkerGroup> workerGroups = getWorkerGroups(false);
-
-        Set<String> availableWorkerGroupSet = workerGroups.stream()
+        List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
-                .collect(Collectors.toSet());
-        result.put(Constants.DATA_LIST, availableWorkerGroupSet);
+                .collect(Collectors.toList());
+        int index = availableWorkerGroupList.indexOf(Constants.DEFAULT_WORKER_GROUP);
+        if (index > -1) {
+            availableWorkerGroupList.remove(index);
+            availableWorkerGroupList.add(0, Constants.DEFAULT_WORKER_GROUP);
+        }
+        result.put(Constants.DATA_LIST, availableWorkerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
