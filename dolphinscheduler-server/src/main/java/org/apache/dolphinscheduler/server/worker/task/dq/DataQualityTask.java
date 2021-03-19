@@ -111,7 +111,6 @@ public class DataQualityTask extends AbstractYarnTask {
                 .getSparkParameters()
                 .setMainArgs(
                         "\"" + replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
-        logger.info("mainArgs: "+ "\"" + replaceDoubleBrackets(StringUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration))) + "\"");
 
         dataQualityParameters
                 .getSparkParameters()
