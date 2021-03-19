@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -43,12 +44,23 @@ public class WorkerGroup {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
+    @TableField(exist = false)
+    private boolean zkRegistered;
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getIpList() {
@@ -75,12 +87,12 @@ public class WorkerGroup {
         this.updateTime = updateTime;
     }
 
-    public String getName() {
-        return name;
+    public boolean getZkRegistered() {
+        return zkRegistered;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setZkRegistered(boolean zkRegistered) {
+        this.zkRegistered = zkRegistered;
     }
 
     @Override
@@ -91,6 +103,7 @@ public class WorkerGroup {
                 + ", ipList= " + ipList
                 + ", createTime= " + createTime
                 + ", updateTime= " + updateTime
+                + ", zkRegistered= " + zkRegistered
                 + "}";
     }
 

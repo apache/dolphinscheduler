@@ -20,7 +20,7 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="name" :label="$t('Group')"></el-table-column>
-        <el-table-column label="IPList" min-width="300">
+        <el-table-column :label="$t('Host List')" min-width="300">
           <template slot-scope="scope">
             <span>{{scope.row.ipList}}</span>
           </template>
@@ -37,10 +37,10 @@
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
-            <el-tooltip :content="$t('Edit')" placement="top">
+            <el-tooltip :content="$t('Edit')" placement="top" v-if="!scope.row.zkRegistered">
               <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
             </el-tooltip>
-            <el-tooltip :content="$t('Delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top" v-if="!scope.row.zkRegistered">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"

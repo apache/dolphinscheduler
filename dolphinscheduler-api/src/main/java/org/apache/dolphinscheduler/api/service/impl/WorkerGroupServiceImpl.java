@@ -220,6 +220,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return WorkerGroup list
      */
     private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
+        // worker groups from database
+        List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
+        // worker groups from zookeeper
         String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
         List<String> workerGroupList = null;
         try {
@@ -228,10 +231,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
         }
 
-        List<WorkerGroup> workerGroups = new ArrayList<>();
-
         if (workerGroupList == null || workerGroupList.isEmpty()) {
-            if (!isPaging) {
+            if (workerGroups.isEmpty() && !isPaging) {
                 WorkerGroup wg = new WorkerGroup();
                 wg.setName(DEFAULT_WORKER_GROUP);
                 workerGroups.add(wg);
@@ -253,6 +254,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 String registeredValue = zookeeperCachedOperator.get(workerGroupPath + SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(",")[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(",")[7]));
+                wg.setZkRegistered(true);
             }
             workerGroups.add(wg);
         }

@@ -35,17 +35,17 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>IP</template>
+          <template slot="name"><strong>*</strong>Host</template>
           <template slot="content">
             <el-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
                     size="mini"
-                    v-model="ipList"
-                    :placeholder="$t('Please enter the IP address separated by commas')">
+                    v-model.trim="ipList"
+                    :placeholder="$t('Please enter the Host address separated by commas')">
             </el-input>
             <div class="ipt-tip">
-              <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
+              <span>{{$t('Note: Multiple Host addresses have been comma separated')}}</span>
             </div>
           </template>
         </m-list-box-f>
@@ -89,6 +89,16 @@
         }
         return true
       },
+      checkIsFqdns (fqdns) {
+        let reg = /^([\w-]+\.)*[\w-]+$/i
+        let valdata = fqdns.split(',')
+        for (let i = 0; i < valdata.length; i++) {
+          if (reg.test(valdata[i]) === false) {
+            return false
+          }
+        }
+        return true
+      },
       _verification () {
         // group name
         if (!this.name) {
@@ -96,11 +106,11 @@
           return false
         }
         if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
+          this.$message.warning(`${i18n.$t('Host address cannot be empty')}`)
           return false
         }
-        if (!this.checkIsIps(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
+        if (!this.checkIsIps(this.ipList) && !this.checkIsFqdns(this.ipList)) {
+          this.$message.warning(`${i18n.$t('Please enter the correct Host')}`)
           return false
         }
         return true
