@@ -93,7 +93,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             return false;
         }
 
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         return true;

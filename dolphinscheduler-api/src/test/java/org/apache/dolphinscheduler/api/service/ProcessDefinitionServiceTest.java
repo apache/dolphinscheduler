@@ -494,7 +494,7 @@ public class ProcessDefinitionServiceTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setName("test_instance");
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setHost("192.168.xx.xx");
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
@@ -506,7 +506,7 @@ public class ProcessDefinitionServiceTest {
         taskInstance.setTaskType("SHELL");
         taskInstance.setId(1);
         taskInstance.setName("test_task_instance");
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setHost("192.168.xx.xx");
 
         //task instance not exist

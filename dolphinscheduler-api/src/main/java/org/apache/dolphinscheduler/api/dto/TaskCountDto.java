@@ -44,7 +44,7 @@ public class TaskCountDto {
 
     private void countTaskDtos(List<ExecuteStatusCount> taskInstanceStateCounts){
         int submittedSuccess = 0;
-        int runningExeution = 0;
+        int runningExecution = 0;
         int readyPause = 0;
         int pause = 0;
         int readyStop = 0;
@@ -62,8 +62,8 @@ public class TaskCountDto {
                 case SUBMITTED_SUCCESS:
                     submittedSuccess += taskInstanceStateCount.getCount();
                     break;
-                case RUNNING_EXEUTION:
-                    runningExeution += taskInstanceStateCount.getCount();
+                case RUNNING_EXECUTION:
+                    runningExecution += taskInstanceStateCount.getCount();
                     break;
                 case READY_PAUSE:
                     readyPause += taskInstanceStateCount.getCount();
@@ -99,7 +99,7 @@ public class TaskCountDto {
         }
         this.taskCountDtos = new ArrayList<>();
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.SUBMITTED_SUCCESS, submittedSuccess));
-        this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.RUNNING_EXEUTION, runningExeution));
+        this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.RUNNING_EXECUTION, runningExecution));
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.READY_PAUSE, readyPause));
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.PAUSE, pause));
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.READY_STOP, readyStop));
