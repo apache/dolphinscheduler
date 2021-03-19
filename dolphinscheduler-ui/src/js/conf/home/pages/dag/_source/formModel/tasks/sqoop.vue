@@ -25,7 +25,7 @@
     <m-list-box v-show="isCustomTask">
       <div slot="text">{{$t('Custom Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea id="code-shell-mirror" name="code-shell-mirror" style="opacity: 0;"></textarea>
         </div>
       </div>
@@ -223,10 +223,10 @@
         </m-list-box>
       </template>
       <template v-if="sourceType === 'MYSQL'">
-        <m-list-box v-if="srcQueryType === '1'">
+        <m-list-box v-show="srcQueryType === '1'">
           <div slot="text">{{$t('SQL Statement')}}</div>
           <div slot="content">
-            <div class="from-mirror">
+            <div class="form-mirror">
               <textarea
                       id="code-sqoop-mirror"
                       name="code-sqoop-mirror"
@@ -710,10 +710,32 @@
       getSriptBoxValue (val) {
         editor.setValue(val)
       },
+      _onSwitch (is) {
+        if (is) {
+          this.jobType = 'CUSTOM'
+          this.isCustomTask = true
+          setTimeout(() => {
+            this._handlerShellEditor()
+          }, 200)
+        } else {
+          this.jobType = 'TEMPLATE'
+          this.isCustomTask = false
+          if (this.srcQueryType === '1') {
+            setTimeout(() => {
+              this._handlerEditor()
+            }, 200)
+          }
+        }
+      },
       _handleQueryType (o) {
         this.sourceMysqlParams.srcQueryType = this.srcQueryType
         this._getTargetTypeList(this.sourceType)
         this.targetType = this.targetTypeList[0].code
+        if (this.srcQueryType === '1') {
+          setTimeout(() => {
+            this._handlerEditor()
+          }, 200)
+        }
       },
 
       _handleModelTypeChange (a) {

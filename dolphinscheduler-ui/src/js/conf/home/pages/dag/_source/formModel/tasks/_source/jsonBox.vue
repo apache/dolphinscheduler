@@ -18,7 +18,7 @@
   <div class="script-model">
     <m-list-box>
       <div slot="content">
-        <div class="from-mirror1">
+        <div class="form-mirror1">
           <textarea
             id="code-shell-mirror1"
             name="code-shell-mirror1"
@@ -107,7 +107,7 @@
   .script-model {
     width:100%;
   }
-  .from-mirror1 {
+  .form-mirror1 {
     .CodeMirror {
       min-height: 600px;
       max-height: 700px;
