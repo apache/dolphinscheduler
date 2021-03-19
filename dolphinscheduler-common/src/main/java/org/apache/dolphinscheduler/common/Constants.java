@@ -674,7 +674,7 @@ public final class Constants {
      */
     public static final String SUCCEEDED = "SUCCEEDED";
     
-        /**
+    /**
      * FINISHED
      */
     public static final String FINISHED = "FINISHED";
