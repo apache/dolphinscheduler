@@ -454,7 +454,7 @@ public class HadoopUtils implements Closeable {
             case Constants.SUCCEEDED:
                 return ExecutionStatus.SUCCESS;
             case UNDEFINED:
-                if(resultState.equals(FINISHED)){
+                if (resultState.equals(FINISHED)) {
                     return ExecutionStatus.FAILURE;
                 }
             case Constants.NEW:
