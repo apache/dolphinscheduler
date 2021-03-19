@@ -253,11 +253,10 @@
               window.setTimeout(() => {
                 let fields = this.fApi.fields()
                 fields.forEach(item => {
-                  if (this.inputEntryValueMap[item]) {
+                  if (this.inputEntryValueMap[item] != null) {
                     this._updateDatasourceOptions(item, 'src_connector_type', this.inputEntryValueMap[item], 'src_datasource_id')
                     this._updateDatasourceOptions(item, 'target_connector_type', this.inputEntryValueMap[item], 'target_datasource_id')
                     this._updateDatasourceOptions(item, 'writer_connector_type', this.inputEntryValueMap[item], 'writer_datasource_id')
-
                     this.fApi.setValue(item, this.inputEntryValueMap[item])
                   }
 
