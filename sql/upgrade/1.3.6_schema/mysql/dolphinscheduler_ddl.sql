@@ -27,7 +27,7 @@ BEGIN
         AND TABLE_SCHEMA=(SELECT DATABASE())
         AND COLUMN_NAME ='ip_list')
     THEN
-        ALTER TABLE t_ds_worker_group MODIFY COLUMN `ip_list` text;
+        ALTER TABLE t_ds_worker_group CHANGE COLUMN `ip_list` `addr_list` text;
     END IF;
 END;
 

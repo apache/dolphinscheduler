@@ -796,7 +796,7 @@ DROP TABLE IF EXISTS `t_ds_worker_group`;
 CREATE TABLE `t_ds_worker_group` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `name` varchar(256) NULL DEFAULT NULL COMMENT 'worker group name',
-  `ip_list` text NULL DEFAULT NULL COMMENT 'worker ip list. split by [,] ',
+  `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
   `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)

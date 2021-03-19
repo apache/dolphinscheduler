@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 
 import java.util.ArrayList;
@@ -74,11 +73,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @param loginUser login user
      * @param id worker group id
      * @param name worker group name
-     * @param ipList ip list
+     * @param addrList addr list
      * @return create or update result code
      */
     @Override
-    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String ipList) {
+    public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -105,16 +104,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroup.setCreateTime(now);
         }
         workerGroup.setName(name);
-        workerGroup.setIpList(ipList);
+        workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
 
         if (checkWorkerGroupNameExists(workerGroup)) {
             putMsg(result, Status.NAME_EXIST, workerGroup.getName());
             return result;
         }
-        String invalidIp = checkWorkerGroupIpList(workerGroup);
-        if (invalidIp != null) {
-            putMsg(result, Status.HOST_ADDRESS_INVALID, invalidIp);
+        String invalidAddr = checkWorkerGroupAddrList(workerGroup);
+        if (invalidAddr != null) {
+            putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
         if (workerGroup.getId() != 0) {
@@ -151,20 +150,20 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     }
 
     /**
-     * check worker group ip list
+     * check worker group addr list
      * @param workerGroup worker group
      * @return boolean
      */
-    private String checkWorkerGroupIpList(WorkerGroup workerGroup) {
-        List<String> workerIps = new ArrayList<>();
+    private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
+        List<String> workerAddrs = new ArrayList<>();
         Map<String, String> workerServers = zookeeperMonitor.getServerMaps(ZKNodeType.WORKER);
         for (Map.Entry<String, String> entry : workerServers.entrySet()) {
-            String[] items = entry.getKey().split(Constants.COLON)[0].split(Constants.DIVISION_STRING);
-            workerIps.add(items[items.length - 1]);
+            String[] items = entry.getKey().split(Constants.DIVISION_STRING);
+            workerAddrs.add(items[items.length - 1]);
         }
-        for (String ip : workerGroup.getIpList().split(",")) {
-            if (!workerIps.contains(ip)) {
-                return ip;
+        for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
+            if (!workerAddrs.contains(addr)) {
+                return addr;
             }
         }
         return null;
@@ -283,25 +282,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             WorkerGroup wg = new WorkerGroup();
             wg.setName(workerGroup);
             if (isPaging) {
-                wg.setIpList(String.join(",", getIpListFromZkNodes(childrenNodes)));
+                wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
                 String registeredValue = zookeeperCachedOperator.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
-                wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(",")[6]));
-                wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(",")[7]));
+                wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
+                wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setZkRegistered(true);
             }
             workerGroups.add(wg);
         }
         return workerGroups;
-    }
-
-    /**
-     * get ip list from zk nodes
-     *
-     * @param zkNodes zk nodes
-     * @return ip list
-     */
-    public List<String> getIpListFromZkNodes(List<String> zkNodes) {
-        return zkNodes.stream().map(node -> Host.of(node).getIp()).collect(Collectors.toList());
     }
 
     /**

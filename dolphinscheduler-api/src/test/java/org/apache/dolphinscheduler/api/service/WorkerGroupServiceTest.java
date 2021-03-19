@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
@@ -31,6 +33,7 @@ import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +65,10 @@ public class WorkerGroupServiceTest {
     @Mock
     private ZookeeperCachedOperator zookeeperCachedOperator;
 
-    private String groupName="groupName000001";
+    @Mock
+    private ZookeeperMonitor zookeeperMonitor;
+
+    private String groupName = "groupName000001";
 
     @Before
     public void init() {
@@ -91,20 +97,25 @@ public class WorkerGroupServiceTest {
      */
     @Test
     public void testSaveWorkerGroup() {
+        // worker servers
+        Map<String, String> workerServers = new HashMap<>();
+        workerServers.put("default/127.0.0.1:1234", "0.3,0.07,4.4,7.42,16.0,0.3,2021-03-19 20:17:58,2021-03-19 20:25:29,0,79214");
+        Mockito.when(zookeeperMonitor.getServerMaps(ZKNodeType.WORKER)).thenReturn(workerServers);
+
         User user = new User();
         // general user add
         user.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(),(String) result.get(Constants.MSG));
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1:1234");
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(), result.get(Constants.MSG));
 
         // success
         user.setUserType(UserType.ADMIN_USER);
-        result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
+        result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1:1234");
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.get(Constants.MSG));
         // group name exist
         Mockito.when(workerGroupMapper.selectById(2)).thenReturn(getWorkerGroup(2));
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
-        result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1");
+        result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1:1234");
         Assert.assertEquals(Status.NAME_EXIST, result.get(Constants.STATUS));
     }
 

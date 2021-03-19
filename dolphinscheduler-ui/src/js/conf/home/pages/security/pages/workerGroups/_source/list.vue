@@ -20,9 +20,9 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="name" :label="$t('Group')"></el-table-column>
-        <el-table-column :label="$t('Host List')" min-width="300">
+        <el-table-column :label="$t('Addresses')" min-width="300">
           <template slot-scope="scope">
-            <span style="display: inline-block; margin-right: 10px">{{scope.row.ipList}}</span>
+            <span style="display: inline-block; margin-right: 10px">{{scope.row.addrList}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">

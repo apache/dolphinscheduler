@@ -24,7 +24,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * worker group mapper interface
@@ -43,14 +42,5 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
      * @return worker group list
      */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
-
-    /**
-     * worker group page
-     * @param page page
-     * @param searchVal searchVal
-     * @return worker group IPage
-     */
-    IPage<WorkerGroup> queryListPaging(IPage<WorkerGroup> page,
-                                       @Param("searchVal") String searchVal);
 
 }

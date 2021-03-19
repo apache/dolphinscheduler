@@ -28,13 +28,4 @@
         from t_ds_worker_group
         where name = #{name}
     </select>
-    <select id="queryListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
-        select *
-        from t_ds_worker_group
-        where 1 = 1
-        <if test="searchVal != null and searchVal != ''">
-            and name like concat('%', #{searchVal}, '%')
-        </if>
-        order by update_time desc
-    </select>
 </mapper>

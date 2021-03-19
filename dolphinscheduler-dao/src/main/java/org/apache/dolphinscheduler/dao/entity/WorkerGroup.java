@@ -36,12 +36,12 @@ public class WorkerGroup {
 
     private String name;
 
-    private String ipList;
+    private String addrList;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @TableField(exist = false)
@@ -63,12 +63,12 @@ public class WorkerGroup {
         this.name = name;
     }
 
-    public String getIpList() {
-        return ipList;
+    public String getAddrList() {
+        return addrList;
     }
 
-    public void setIpList(String ipList) {
-        this.ipList = ipList;
+    public void setAddrList(String addrList) {
+        this.addrList = addrList;
     }
 
     public Date getCreateTime() {
@@ -100,7 +100,7 @@ public class WorkerGroup {
         return "WorkerGroup{"
                 + "id= " + id
                 + ", name= " + name
-                + ", ipList= " + ipList
+                + ", addrList= " + addrList
                 + ", createTime= " + createTime
                 + ", updateTime= " + updateTime
                 + ", zkRegistered= " + zkRegistered

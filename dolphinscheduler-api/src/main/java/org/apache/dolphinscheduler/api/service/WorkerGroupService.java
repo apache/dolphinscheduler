@@ -32,10 +32,10 @@ public interface WorkerGroupService {
      * @param loginUser login user
      * @param id worker group id
      * @param name worker group name
-     * @param ipList ip list
+     * @param addrList addr list
      * @return create or update result code
      */
-    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String ipList);
+    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList);
 
     /**
      * query worker group paging

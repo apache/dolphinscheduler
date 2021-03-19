@@ -35,17 +35,17 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>Host</template>
+          <template slot="name"><strong>*</strong>{{$t('Worker Addresses')}}</template>
           <template slot="content">
             <el-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
                     size="mini"
-                    v-model.trim="ipList"
-                    :placeholder="$t('Please enter the Host address separated by commas')">
+                    v-model.trim="addrList"
+                    :placeholder="$t('Please enter the worker addresses separated by commas')">
             </el-input>
-            <div class="ipt-tip">
-              <span>{{$t('Note: Multiple Host addresses have been comma separated')}}</span>
+            <div class="cwm-tip">
+              <span>{{$t('Note: Multiple worker addresses have been comma separated')}}</span>
             </div>
           </template>
         </m-list-box-f>
@@ -66,7 +66,7 @@
         store,
         id: 0,
         name: '',
-        ipList: ''
+        addrList: ''
       }
     },
     props: {
@@ -79,9 +79,9 @@
           this._submit()
         }
       },
-      checkIsIps (ips) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',')
+      checkIpAndPorts (addrs) {
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):\d{1,5}$/
+        let valdata = addrs.split(',')
         for (let i = 0; i < valdata.length; i++) {
           if (reg.test(valdata[i]) === false) {
             return false
@@ -89,9 +89,9 @@
         }
         return true
       },
-      checkIsFqdns (fqdns) {
-        let reg = /^([\w-]+\.)*[\w-]+$/i
-        let valdata = fqdns.split(',')
+      checkFqdnAndPorts (addrs) {
+        let reg = /^([\w-]+\.)*[\w-]+:\d{1,5}$/i
+        let valdata = addrs.split(',')
         for (let i = 0; i < valdata.length; i++) {
           if (reg.test(valdata[i]) === false) {
             return false
@@ -105,12 +105,12 @@
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('Host address cannot be empty')}`)
+        if (!this.addrList) {
+          this.$message.warning(`${i18n.$t('Worker addresses cannot be empty')}`)
           return false
         }
-        if (!this.checkIsIps(this.ipList) && !this.checkIsFqdns(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct Host')}`)
+        if (!this.checkIpAndPorts(this.addrList) && !this.checkFqdnAndPorts(this.addrList)) {
+          this.$message.warning(`${i18n.$t('Please enter the correct worker addresses')}`)
           return false
         }
         return true
@@ -119,7 +119,7 @@
         let param = {
           id: this.id,
           name: this.name,
-          ipList: this.ipList
+          addrList: this.addrList
         }
         if (this.item) {
           param.id = this.item.id
@@ -143,7 +143,7 @@
       if (this.item) {
         this.id = this.item.id
         this.name = this.item.name
-        this.ipList = this.item.ipList
+        this.addrList = this.item.addrList
       }
     },
     mounted () {
@@ -153,7 +153,7 @@
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .create-worker-model {
-    .ipt-tip {
+    .cwm-tip {
       color: #999;
       padding-top: 4px;
       display: block;

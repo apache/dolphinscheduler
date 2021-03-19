@@ -658,7 +658,7 @@ DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
   name varchar(256) DEFAULT NULL ,
-  ip_list text DEFAULT NULL ,
+  addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)

@@ -23,7 +23,8 @@ BEGIN
         WHERE TABLE_NAME='t_ds_worker_group'
         AND COLUMN_NAME ='ip_list')
     THEN
-        ALTER TABLE t_ds_worker_group ALTER COLUMN ip_list type text;
+        ALTER TABLE t_ds_worker_group rename ip_list TO addr_list;
+        ALTER TABLE t_ds_worker_group ALTER column addr_list type text;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
