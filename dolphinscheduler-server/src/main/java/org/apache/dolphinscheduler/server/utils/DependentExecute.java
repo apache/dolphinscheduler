@@ -104,7 +104,11 @@ public class DependentExecute {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionId(),
                                                     dateInterval);
             if(processInstance == null){
-                return DependResult.WAITING;
+                ProcessDefinition processDefinition = processService.findProcessDefineById(dependentItem.getDefinitionId());
+                if (null != processDefinition && processDefinition.getFlag().equals(Flag.YES)) {
+                    logger.info("processDefinition is not run ,DependResult calculateResultForTasks wait processDefinition id:{} to run...", dependentItem.getDefinitionId());
+                    return DependResult.WAITING;
+                }
             }
             // need to check workflow for updates, so get all task and check the task state
             if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
