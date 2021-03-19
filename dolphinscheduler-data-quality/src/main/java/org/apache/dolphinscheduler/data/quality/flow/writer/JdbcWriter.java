@@ -58,7 +58,7 @@ public class JdbcWriter implements IWriter {
                 .format("jdbc")
                 .option("driver",jdbcBaseConfig.getDriver())
                 .option("url",jdbcBaseConfig.getUrl())
-                .option("dbtable", jdbcBaseConfig.getDbTable())
+                .option("dbtable", jdbcBaseConfig.getTable())
                 .option("user", jdbcBaseConfig.getUser())
                 .option("password", jdbcBaseConfig.getPassword())
                 .mode(SaveMode.Append)

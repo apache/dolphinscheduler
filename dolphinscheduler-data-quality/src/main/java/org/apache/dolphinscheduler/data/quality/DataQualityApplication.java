@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +50,6 @@ public class DataQualityApplication {
         }
 
         String dataQualityParameter = args[0];
-        logger.info(MessageFormat.format("DataQualityParameter is {}.", dataQualityParameter));
 
         DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(dataQualityParameter,DataQualityConfiguration.class);
         if (dataQualityConfiguration == null) {
