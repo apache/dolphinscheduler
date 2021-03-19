@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
 import java.util.HashMap;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * data base types
@@ -62,19 +63,23 @@ public enum DbType {
         return descp;
     }
 
-
-    private static HashMap<Integer, DbType> DB_TYPE_MAP =new HashMap<>();
+    private  static final HashMap<Integer, DbType> DB_TYPE_MAP = new HashMap<>();
 
     static {
-        for (DbType dbType:DbType.values()){
+        for (DbType dbType:DbType.values()) {
             DB_TYPE_MAP.put(dbType.getCode(),dbType);
         }
     }
 
-    public static DbType of(int type){
-        if(DB_TYPE_MAP.containsKey(type)){
+    public static DbType of(int type) {
+        if (DB_TYPE_MAP.containsKey(type)) {
             return DB_TYPE_MAP.get(type);
         }
         throw new IllegalArgumentException("invalid type : " + type);
     }
+
+    public boolean isHive() {
+        return this == DbType.HIVE;
+    }
+
 }

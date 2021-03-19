@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
@@ -25,12 +26,11 @@ import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -50,13 +50,12 @@ public abstract class AbstractTask {
     /**
      * taskExecutionContext
      **/
-    TaskExecutionContext taskExecutionContext;
+    protected TaskExecutionContext taskExecutionContext;
 
     /**
      * log record
      */
     protected Logger logger;
-
 
     /**
      * SHELL process pid
@@ -67,7 +66,6 @@ public abstract class AbstractTask {
      * other resource manager appId , for example : YARN etc
      */
     protected String appIds;
-
 
     /**
      * cancel
@@ -104,7 +102,6 @@ public abstract class AbstractTask {
      * @throws Exception exception
      */
     public abstract void handle() throws Exception;
-
 
     /**
      * cancel application
@@ -174,7 +171,6 @@ public abstract class AbstractTask {
      */
     public abstract AbstractParameters getParameters();
 
-
     /**
      * result processing
      */
@@ -210,7 +206,6 @@ public abstract class AbstractTask {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
         }
     }
-
 
     /**
      * get exit status according to exitCode
