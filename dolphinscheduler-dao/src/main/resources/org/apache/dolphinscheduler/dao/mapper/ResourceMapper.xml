@@ -18,27 +18,25 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ResourceMapper">
-    <sql id="baseSql">
-       id, alias, file_name, description, user_id, type, size, create_time, update_time,
-       pid, full_name, is_directory
-    </sql>
     <sql id="baseSqlV2">
        ${alias}.id, ${alias}.alias, ${alias}.file_name, ${alias}.description, ${alias}.user_id, ${alias}.type, ${alias}.size, ${alias}.create_time, ${alias}.update_time,
        ${alias}.pid, ${alias}.full_name, ${alias}.is_directory
     </sql>
     <select id="queryResourceList" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        from t_ds_resources r
         where 1= 1
         <if test="fullName != null and fullName != ''">
-            and full_name = #{fullName}
+            and r.full_name = #{fullName}
         </if>
         <if test="type != -1">
-            and type = #{type}
+            and r.type = #{type}
         </if>
         <if test="userId != 0">
-            and user_id = #{userId}
+            and r.user_id = #{userId}
         </if>
     </select>
     <select id="queryResourceListAuthored" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
@@ -60,10 +58,8 @@
         <include refid="baseSqlV2">
             <property name="alias" value="d"/>
         </include>
-        ,u.user_name as user_name
-        from t_ds_resources d, t_ds_user u
-        where d.user_id = u.id
-        and d.type=#{type} and d.pid=#{id}
+        from t_ds_resources d
+        where d.type=#{type} and d.pid=#{id}
         <if test="userId != 0">
             and (
             <if test="resIds != null and resIds.size() > 0">
@@ -79,26 +75,16 @@
         </if>
         order by d.update_time desc
     </select>
-    <select id="queryAuthorizedResourceList" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+
+    <select id="queryResourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
         </include>
-        from t_ds_resources r, t_ds_relation_resources_user rel
-        where r.id = rel.resources_id AND rel.user_id = #{userId} and perm=7
+        from t_ds_resources r
+        where r.user_id <![CDATA[ <> ]]> #{userId}
     </select>
-    <select id="queryResourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
-        select
-        <include refid="baseSql"/>
-        from t_ds_resources
-        where user_id <![CDATA[ <> ]]> #{userId}
-    </select>
-    <select id="queryTenantCodeByResourceName" resultType="java.lang.String">
-        select tenant_code
-        from t_ds_tenant t, t_ds_user u, t_ds_resources res
-        where t.id = u.tenant_id and u.id = res.user_id and res.type=#{resType}
-        and res.full_name= #{resName}
-    </select>
+
     <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
         <include refid="baseSqlV2">
@@ -120,9 +106,7 @@
         <include refid="baseSqlV2">
             <property name="alias" value="r"/>
         </include>
-        ,u.user_name as user_name
         from t_ds_resources r
-        join t_ds_user u on r.user_id = u.id
         where 1 = 1
         <if test="resIds != null and resIds.size() > 0">
             and r.id in
@@ -161,10 +145,12 @@
 
     <select id="queryResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
-        where type = #{type}
-        and full_name = #{fullName}
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        from t_ds_resources r
+        where r.type = #{type}
+        and r.full_name = #{fullName}
     </select>
 
     <update id="batchUpdateResource" parameterType="java.util.List">
@@ -182,9 +168,11 @@
 
     <select id="listResourceByIds" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
-        <include refid="baseSql"/>
-        from t_ds_resources
-        where id in
+        <include refid="baseSqlV2">
+            <property name="alias" value="r"/>
+        </include>
+        from t_ds_resources r
+        where r.id in
         <foreach collection="resIds" item="i" open="(" close=")" separator=",">
             #{i}
         </foreach>

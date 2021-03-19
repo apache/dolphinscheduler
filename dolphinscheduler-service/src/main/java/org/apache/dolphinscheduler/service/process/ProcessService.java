@@ -1768,7 +1768,21 @@ public class ProcessService {
     public String queryTenantCodeByResName(String resName, ResourceType resourceType) {
         // in order to query tenant code successful although the version is older
         String fullName = resName.startsWith("/") ? resName : String.format("/%s", resName);
-        return resourceMapper.queryTenantCodeByResourceName(fullName, resourceType.ordinal());
+
+        List<Resource> resourceList = resourceMapper.queryResource(fullName, resourceType.ordinal());
+        if (CollectionUtils.isEmpty(resourceList)) {
+            return StringUtils.EMPTY;
+        }
+        int userId = resourceList.get(0).getUserId();
+        User user = userMapper.selectById(userId);
+        if (Objects.isNull(user)) {
+            return StringUtils.EMPTY;
+        }
+        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        if (Objects.isNull(tenant)) {
+            return StringUtils.EMPTY;
+        }
+        return tenant.getTenantCode();
     }
 
     /**

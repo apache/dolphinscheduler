@@ -1166,8 +1166,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Resource> list;
         if (resourceList != null && !resourceList.isEmpty()) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
-            List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
-
+            List<Resource> authedResourceList = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
             getAuthorizedResourceList(resourceSet, authedResourceList);
             list = new ArrayList<>(resourceSet);
         } else {
@@ -1242,7 +1241,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
+        List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
         String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
@@ -1336,14 +1335,25 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             relationResources = new ArrayList<>();
         } else {
             // query resource relation
-            List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-            relationResources = CollectionUtils.isNotEmpty(resourcesIds) ? resourcesMapper.queryResourceListById(resourcesIds) : new ArrayList<>();
+            relationResources = queryResourceList(userId, 0);
         }
 
         List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
         ownResourceList.addAll(relationResources);
 
         return ownResourceList;
+    }
+
+    /**
+     *  query resource list by userId and perm
+     * @param userId userId
+     * @param perm perm
+     * @return resource list
+     */
+    private List<Resource> queryResourceList(Integer userId, int perm) {
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
+        List<Resource> authedResources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
+        return authedResources;
     }
 
 }

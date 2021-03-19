@@ -616,7 +616,8 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //SUCCESS
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcesMapper.queryAuthorizedResourceList(1)).thenReturn(getResourceList());
+
+        Mockito.when(resourcesMapper.queryResourceListById(Mockito.any())).thenReturn(getResourceList());
         result = resourcesService.authorizedFile(user, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

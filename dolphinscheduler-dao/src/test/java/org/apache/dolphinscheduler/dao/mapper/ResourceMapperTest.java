@@ -22,6 +22,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -35,10 +37,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.greaterThan;
@@ -261,7 +260,8 @@ public class ResourceMapperTest {
     public void testQueryResourceListAuthored() {
         Resource resource = insertOne();
 
-        List<Resource> resources = resourceMapper.queryAuthorizedResourceList(resource.getUserId());
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(), Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
 
         ResourcesUser resourcesUser = new ResourcesUser();
 
@@ -270,7 +270,8 @@ public class ResourceMapperTest {
         resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         resourceUserMapper.insert(resourcesUser);
 
-        List<Resource> resources1 = resourceMapper.queryAuthorizedResourceList(1110);
+        List<Integer> resIds1 = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(1110, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources1 = CollectionUtils.isEmpty(resIds1) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds1);
 
         Assert.assertEquals(0, resources.size());
         Assert.assertNotEquals(0, resources1.size());
@@ -284,7 +285,8 @@ public class ResourceMapperTest {
     public void testQueryAuthorizedResourceList() {
         Resource resource = insertOne();
 
-        List<Resource> resources = resourceMapper.queryAuthorizedResourceList(resource.getUserId());
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(resource.getUserId(), Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> resources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
 
         resourceMapper.deleteById(resource.getId());
         Assert.assertEquals(0, resources.size());
@@ -334,12 +336,13 @@ public class ResourceMapperTest {
             Assert.fail("update user data error");
         }
 
-        String resource1 = resourceMapper.queryTenantCodeByResourceName(
-                resource.getFullName(), ResourceType.FILE.ordinal()
-        );
+        List<Resource> resourceList = resourceMapper.queryResource(resource.getFullName(), ResourceType.FILE.ordinal());
 
+        int resourceUserId = resourceList.get(0).getUserId();
+        User resourceUser = userMapper.selectById(resourceUserId);
+        Tenant resourceTenant = tenantMapper.selectById(resourceUser.getTenantId());
 
-        Assert.assertEquals("ut tenant code for resource", resource1);
+        Assert.assertEquals("ut tenant code for resource", resourceTenant.getTenantCode());
 
     }
 

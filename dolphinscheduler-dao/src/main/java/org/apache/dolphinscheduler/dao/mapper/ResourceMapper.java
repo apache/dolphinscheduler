@@ -14,14 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * resource mapper interface
@@ -66,26 +69,11 @@ public interface ResourceMapper extends BaseMapper<Resource> {
                                         @Param("resIds") List<Integer> resIds);
 
     /**
-     * query Authed resource list
-     * @param userId userId
-     * @return resource list
-     */
-    List<Resource> queryAuthorizedResourceList(@Param("userId") int userId);
-
-    /**
      *  query resource except userId
      * @param userId userId
      * @return resource list
      */
     List<Resource> queryResourceExceptUserId(@Param("userId") int userId);
-
-    /**
-     * query tenant code by name
-     * @param resName resource name
-     * @param resType resource type
-     * @return tenant code
-     */
-    String queryTenantCodeByResourceName(@Param("resName") String resName,@Param("resType") int resType);
 
     /**
      * list authorized resource
