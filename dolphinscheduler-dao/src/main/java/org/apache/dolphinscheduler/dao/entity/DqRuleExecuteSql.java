@@ -56,7 +56,7 @@ public class DqRuleExecuteSql {
      * input entry type: default,statistics,comparison,check
      */
     @TableField(value = "type")
-    private ExecuteSqlType executeSqlType = ExecuteSqlType.MIDDLE;
+    private ExecuteSqlType type = ExecuteSqlType.MIDDLE;
     /**
      * create_time
      */
@@ -102,12 +102,12 @@ public class DqRuleExecuteSql {
         this.tableAlias = tableAlias;
     }
 
-    public ExecuteSqlType getExecuteSqlType() {
-        return executeSqlType;
+    public ExecuteSqlType getType() {
+        return type;
     }
 
-    public void setExecuteSqlType(ExecuteSqlType executeSqlType) {
-        this.executeSqlType = executeSqlType;
+    public void setType(ExecuteSqlType type) {
+        this.type = type;
     }
 
     public Date getCreateTime() {
@@ -133,7 +133,7 @@ public class DqRuleExecuteSql {
                 + ", index=" + index
                 + ", sql='" + sql + '\''
                 + ", tableAlias='" + tableAlias + '\''
-                + ", executeSqlType=" + executeSqlType
+                + ", type=" + type
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';
