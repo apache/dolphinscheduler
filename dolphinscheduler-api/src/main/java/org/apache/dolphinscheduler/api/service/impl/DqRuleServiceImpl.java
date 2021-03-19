@@ -97,7 +97,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         if (ruleInputEntryList == null || ruleInputEntryList.isEmpty()) {
             putMsg(result, Status.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
         } else {
-            result.put(Constants.DATA_LIST, getRuleFormCreateJson(ruleInputEntryList));
+            result.put(Constants.DATA_LIST, getRuleFormCreateJson(DqRuleUtils.transformInputEntry(ruleInputEntryList)));
             putMsg(result, Status.SUCCESS);
         }
 
