@@ -100,7 +100,7 @@ public class QueueControllerTest extends AbstractControllerTest {
     public void testUpdateQueue() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id","2");
+        paramsMap.add("id","1");
         paramsMap.add("queue","queue2");
         paramsMap.add("queueName","root.queue2");
 
