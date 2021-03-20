@@ -258,16 +258,15 @@ public class AlertManager {
     public void sendAlterDataQualityTask(DqExecuteResult result,ProcessInstance processInstance) {
         Alert alert = new Alert();
 
-        String taskName = result.getTaskName();
         String ruleName = result.getRuleName();
         String state = result.getState().getDescription();
-        alert.setTitle(taskName + " " + ruleName + " " + state);
+        alert.setTitle(ruleName + " " + state);
         String content = getDataQualityAlterContent(result);
         alert.setContent(content);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alertDao.addAlert(alert);
-        logger.info("An exception occurred with message: {}", alert);
+        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**

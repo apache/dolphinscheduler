@@ -236,7 +236,7 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         return InputParam
                 .newBuilder(inputEntry.getField(),inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
-                        .setRequired(true)
+                        .setRequired(inputEntry.getValidate())
                         .build())
                 .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
                 .setValue(inputEntry.getValue())
@@ -283,12 +283,13 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
         return InputParam
                 .newBuilder(inputEntry.getField(),inputEntry.getTitle())
                 .addValidate(Validate.newBuilder()
-                                     .setRequired(true)
+                                     .setRequired(inputEntry.getValidate())
                                      .build())
                 .setProps(new InputParamsProps().setDisabled(!inputEntry.getCanEdit()))
                 .setValue(inputEntry.getValue())
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setSize(Constants.SMALL)
+                .setRows(2)
                 .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
                 .build();
     }
