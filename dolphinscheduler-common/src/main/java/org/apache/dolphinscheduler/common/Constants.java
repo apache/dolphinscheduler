@@ -1002,6 +1002,17 @@ public final class Constants {
     public static final String START_END_DATE = "startDate,endDate";
 
     /**
+     * Network system properties
+     */
+    public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
+
+    /**
+     * Network IP gets priority, default inner outer
+     */
+    public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+
+
+    /**
      * datasource encryption salt
      */
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";

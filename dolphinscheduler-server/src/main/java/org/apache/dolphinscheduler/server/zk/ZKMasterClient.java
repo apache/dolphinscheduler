@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -90,7 +90,7 @@ public class ZKMasterClient extends AbstractZKClient {
             // init system znode
             this.initSystemZNode();
 
-            while (!checkZKNodeExists(OSUtils.getHost(), ZKNodeType.MASTER)) {
+            while (!checkZKNodeExists(NetUtils.getHost(), ZKNodeType.MASTER)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
             // startup tolerant

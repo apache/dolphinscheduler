@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.registry;
 
 
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -26,15 +26,16 @@ import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * zookeeper node manager test
@@ -74,7 +75,7 @@ public class ZookeeperNodeManagerTest {
         Set<String> masterNodes = zookeeperNodeManager.getMasterNodes();
         Assert.assertTrue(CollectionUtils.isNotEmpty(masterNodes));
         Assert.assertEquals(1, masterNodes.size());
-        Assert.assertEquals(OSUtils.getAddr(masterConfig.getListenPort()), masterNodes.iterator().next());
+        Assert.assertEquals(NetUtils.getAddr(masterConfig.getListenPort()), masterNodes.iterator().next());
     }
 
     @Test
@@ -102,6 +103,6 @@ public class ZookeeperNodeManagerTest {
         Set<String> workerNodes = zookeeperNodeManager.getWorkerGroupNodes("default");
         Assert.assertTrue(CollectionUtils.isNotEmpty(workerNodes));
         Assert.assertEquals(1, workerNodes.size());
-        Assert.assertEquals(OSUtils.getAddr(workerConfig.getListenPort()), workerNodes.iterator().next());
+        Assert.assertEquals(NetUtils.getAddr(workerConfig.getListenPort()), workerNodes.iterator().next());
     }
 }

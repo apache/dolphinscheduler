@@ -29,8 +29,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -413,56 +411,6 @@ public class OSUtils {
   public static int getProcessID() {
     RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     return Integer.parseInt(runtimeMXBean.getName().split("@")[0]);
-  }
-
-  /**
-   * get local addr
-   * @return addr like host:port
-   */
-  public static String getAddr(int port) {
-    return getAddr(getHost(), port);
-  }
-
-  /**
-   * get addr
-   * @return addr like host:port
-   */
-  public static String getAddr(String host, int port) {
-    return String.format("%s:%d", host, port);
-  }
-
-  /**
-   * get local host
-   * @return host
-   */
-  public static String getHost(){
-    try {
-      return getHost(InetAddress.getLocalHost());
-    } catch (UnknownHostException e) {
-      logger.error(e.getMessage(),e);
-    }
-    return null;
-  }
-
-  /**
-   * get local host
-   * @return host
-   */
-  public static String getHost(InetAddress inetAddress){
-    if (inetAddress != null) {
-      if (Constants.KUBERNETES_MODE) {
-        String canonicalHost = inetAddress.getCanonicalHostName();
-        if (!canonicalHost.contains(".") || IP_PATTERN.matcher(canonicalHost).matches()) {
-          String host = inetAddress.getHostName();
-          if (STS_PATTERN.matcher(host).find()) {
-            return String.format("%s.%s", host, host.replaceFirst("\\d+$", "headless"));
-          }
-        }
-        return canonicalHost;
-      }
-      return inetAddress.getHostAddress();
-    }
-    return null;
   }
 
   /**

@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
@@ -98,7 +98,7 @@ public class WorkerRegistry {
      * registry
      */
     public void registry() {
-        String address = OSUtils.getHost();
+        String address = NetUtils.getHost();
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
 
@@ -172,7 +172,7 @@ public class WorkerRegistry {
      * @return local address
      */
     private String getLocalAddress() {
-        return OSUtils.getAddr(workerConfig.getListenPort());
+        return NetUtils.getAddr(workerConfig.getListenPort());
     }
 
 }

@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
@@ -81,7 +81,7 @@ public class MasterRegistry {
      * registry
      */
     public void registry() {
-        String address = OSUtils.getHost();
+        String address = NetUtils.getHost();
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
@@ -133,7 +133,7 @@ public class MasterRegistry {
      * @return
      */
     private String getLocalAddress() {
-        return OSUtils.getAddr(masterConfig.getListenPort());
+        return NetUtils.getAddr(masterConfig.getListenPort());
     }
 
     /**

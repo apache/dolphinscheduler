@@ -16,17 +16,12 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.apache.dolphinscheduler.common.CommonTest;
 import org.apache.dolphinscheduler.common.Constants;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.List;
 
 import org.junit.Assert;
@@ -93,30 +88,6 @@ public class OSUtilsTest {
     public void getProcessID(){
         int processId = OSUtils.getProcessID();
         Assert.assertNotEquals(0, processId);
-    }
-    @Test
-    public void getAddr(){
-        Assert.assertEquals(OSUtils.getHost() + ":5678", OSUtils.getAddr(5678));
-        Assert.assertEquals("127.0.0.1:5678", OSUtils.getAddr("127.0.0.1", 5678));
-        Assert.assertEquals("localhost:1234", OSUtils.getAddr("localhost", 1234));
-    }
-    @Test
-    public void getHost() throws Exception {
-        String host = OSUtils.getHost();
-        Assert.assertNotNull(host);
-        Assert.assertNotEquals("", host);
-        InetAddress address = mock(InetAddress.class);
-        when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local");
-        when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
-        when(address.getHostAddress()).thenReturn("172.17.0.15");
-        Assert.assertEquals("172.17.0.15", OSUtils.getHost(address));
-        CommonTest.setFinalStatic(Constants.class.getDeclaredField("KUBERNETES_MODE"), true);
-        Assert.assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local", OSUtils.getHost(address));
-        address = mock(InetAddress.class);
-        when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0");
-        when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
-        CommonTest.setFinalStatic(Constants.class.getDeclaredField("KUBERNETES_MODE"), true);
-        Assert.assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless", OSUtils.getHost(address));
     }
     @Test
     public void checkResource(){
