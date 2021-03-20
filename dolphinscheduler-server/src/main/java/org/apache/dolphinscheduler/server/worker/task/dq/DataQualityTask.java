@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.dq;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -56,18 +57,18 @@ public class DataQualityTask extends AbstractYarnTask {
 
     private DataQualityParameters dataQualityParameters;
 
-    private final TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext dqTaskExecutionContext;
 
     public DataQualityTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
-        this.taskExecutionContext = taskExecutionContext;
+        this.dqTaskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() throws Exception {
-        logger.info(" data quality task params {}", taskExecutionContext.getTaskParams());
+        logger.info(" data quality task params {}", dqTaskExecutionContext.getTaskParams());
 
-        dataQualityParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataQualityParameters.class);
+        dataQualityParameters = JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
 
         if (null == dataQualityParameters) {
             logger.error("data quality params is null");
@@ -75,7 +76,7 @@ public class DataQualityTask extends AbstractYarnTask {
         }
 
         if (!dataQualityParameters.checkParameters()) {
-            throw new RuntimeException("data quality task params is not valid");
+            throw new DolphinException("data quality task params is not valid");
         }
 
         Map<String,String> inputParameter = dataQualityParameters.getRuleInputParameter();
@@ -86,7 +87,7 @@ public class DataQualityTask extends AbstractYarnTask {
         }
 
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext
-                        = taskExecutionContext.getDataQualityTaskExecutionContext();
+                        = dqTaskExecutionContext.getDataQualityTaskExecutionContext();
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime time = LocalDateTime.now();
@@ -96,9 +97,9 @@ public class DataQualityTask extends AbstractYarnTask {
         inputParameter.put("rule_name","'" + dataQualityTaskExecutionContext.getRuleName() + "'");
         inputParameter.put("create_time","'" + now + "'");
         inputParameter.put("update_time","'" + now + "'");
-        inputParameter.put("process_definition_id",taskExecutionContext.getProcessDefineId() + "");
-        inputParameter.put("process_instance_id",taskExecutionContext.getProcessInstanceId() + "");
-        inputParameter.put("task_instance_id",taskExecutionContext.getTaskInstanceId() + "");
+        inputParameter.put("process_definition_id",dqTaskExecutionContext.getProcessDefineId() + "");
+        inputParameter.put("process_instance_id",dqTaskExecutionContext.getProcessInstanceId() + "");
+        inputParameter.put("task_instance_id",dqTaskExecutionContext.getTaskInstanceId() + "");
 
         RuleManager ruleManager = new RuleManager(
                 inputParameter,
@@ -114,13 +115,13 @@ public class DataQualityTask extends AbstractYarnTask {
 
         dataQualityParameters
                 .getSparkParameters()
-                .setQueue(taskExecutionContext.getQueue());
+                .setQueue(dqTaskExecutionContext.getQueue());
 
         setMainJarName();
     }
 
     @Override
-    protected String buildCommand() throws Exception {
+    protected String buildCommand() {
         List<String> args = new ArrayList<>();
 
         args.add(SPARK2_COMMAND);
@@ -130,11 +131,11 @@ public class DataQualityTask extends AbstractYarnTask {
 
         // replace placeholder
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(
-                taskExecutionContext.getDefinedParams()),
-                taskExecutionContext.getDefinedParams(),
+                dqTaskExecutionContext.getDefinedParams()),
+                dqTaskExecutionContext.getDefinedParams(),
                 dataQualityParameters.getSparkParameters().getLocalParametersMap(),
-                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                taskExecutionContext.getScheduleTime());
+                CommandType.of(dqTaskExecutionContext.getCmdTypeIfComplement()),
+                dqTaskExecutionContext.getScheduleTime());
 
         String command = null;
 

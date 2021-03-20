@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq.rule.parser;
 
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager;
@@ -36,7 +37,7 @@ public class SingleTableCustomSqlRuleParser implements IRuleParser {
 
     @Override
     public DataQualityConfiguration parse(Map<String, String> inputParameterValue,
-                                          DataQualityTaskExecutionContext context) throws Exception {
+                                          DataQualityTaskExecutionContext context) throws DolphinException {
         int index = 1;
 
         List<ConnectorParameter> connectorParameterList =

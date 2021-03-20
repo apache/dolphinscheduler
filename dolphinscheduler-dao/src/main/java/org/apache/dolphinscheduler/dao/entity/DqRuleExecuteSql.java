@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -31,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * RuleExecuteSql
  */
 @TableName("t_ds_dq_rule_execute_sql")
-public class DqRuleExecuteSql {
+public class DqRuleExecuteSql implements Serializable {
     /**
      * primary key
      */

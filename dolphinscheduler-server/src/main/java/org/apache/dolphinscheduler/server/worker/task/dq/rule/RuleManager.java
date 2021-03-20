@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.task.dq.rule;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
@@ -78,7 +79,7 @@ public class RuleManager {
      * @return DataQualityConfiguration
      * @throws Exception Exception
      */
-    public DataQualityConfiguration generateDataQualityParameter() throws Exception {
+    public DataQualityConfiguration generateDataQualityParameter() throws DolphinException {
 
         Map<String, String> inputParameterValueResult =
                 RuleParserUtils.getInputParameterMapFromEntryList(dataQualityTaskExecutionContext.getRuleInputEntryList());
@@ -101,7 +102,7 @@ public class RuleManager {
                 ruleParser = new MultiTableComparisonRuleParser();
                 break;
             default:
-                throw new Exception("rule type is not support");
+                throw new DolphinException("rule type is not support");
         }
 
         return ruleParser.parse(inputParameterValueResult, dataQualityTaskExecutionContext);

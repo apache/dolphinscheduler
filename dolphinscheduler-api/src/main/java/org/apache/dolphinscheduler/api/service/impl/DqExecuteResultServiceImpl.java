@@ -69,7 +69,9 @@ public class DqExecuteResultServiceImpl extends BaseService implements DqExecute
                                                      Integer state,
                                                      Integer ruleType,
                                                      String startTime,
-                                                     String endTime, Integer pageNo, Integer pageSize) {
+                                                     String endTime,
+                                                     Integer pageNo,
+                                                     Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         int[] statusArray = null;
         // filter by state

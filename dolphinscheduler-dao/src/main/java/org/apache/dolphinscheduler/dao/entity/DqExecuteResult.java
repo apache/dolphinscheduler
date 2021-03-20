@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.dq.CheckType;
 import org.apache.dolphinscheduler.common.enums.dq.DqTaskState;
 import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -30,7 +31,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @TableName("t_ds_dq_execute_result")
-public class DqExecuteResult {
+public class DqExecuteResult implements Serializable {
     /**
      * primary key
      */

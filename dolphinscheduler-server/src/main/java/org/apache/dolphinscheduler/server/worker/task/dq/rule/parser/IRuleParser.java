@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.dq.rule.parser;
 
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.DataQualityConfiguration;
 
@@ -28,5 +29,5 @@ import java.util.Map;
 public interface IRuleParser {
 
     DataQualityConfiguration parse(Map<String,String> inputParameterValue,
-                                   DataQualityTaskExecutionContext context) throws Exception;
+                                   DataQualityTaskExecutionContext context) throws DolphinException;
 }

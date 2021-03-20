@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.exception.DolphinException;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -85,7 +87,7 @@ public class StringUtils {
             return writer.toString();
         } catch (IOException ioe) {
             // this should never ever happen while writing to a StringWriter
-            throw new RuntimeException(ioe);
+            throw new DolphinException(ioe);
         }
     }
 

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 
 import java.util.List;
@@ -37,19 +36,18 @@ public class DqRuleUtils {
         for (DqRuleInputEntry dqRuleInputEntry : ruleInputEntryList) {
             Map<String,Object> valuesMap = JSONUtils.toMap(dqRuleInputEntry.getValuesMap(),String.class,Object.class);
             if (valuesMap != null) {
-                String value = String.valueOf(valuesMap.get(dqRuleInputEntry.getField()));
-                if (StringUtils.isNotEmpty(value)) {
+
+                if (valuesMap.get(dqRuleInputEntry.getField()) != null) {
+                    String value = String.valueOf(valuesMap.get(dqRuleInputEntry.getField()));
                     dqRuleInputEntry.setValue(value);
                 }
 
-                String isShow = String.valueOf(valuesMap.get("is_show"));
-                if (StringUtils.isNotEmpty(value)) {
-                    dqRuleInputEntry.setShow(Boolean.parseBoolean(isShow));
+                if (valuesMap.get("is_show") != null) {
+                    dqRuleInputEntry.setShow(Boolean.parseBoolean(String.valueOf(valuesMap.get("is_show"))));
                 }
 
-                String canEdit = String.valueOf(valuesMap.get("can_edit"));
-                if (StringUtils.isNotEmpty(value)) {
-                    dqRuleInputEntry.setCanEdit(Boolean.parseBoolean(canEdit));
+                if (valuesMap.get("can_edit") != null) {
+                    dqRuleInputEntry.setCanEdit(Boolean.parseBoolean(String.valueOf(valuesMap.get("can_edit"))));
                 }
             }
         }

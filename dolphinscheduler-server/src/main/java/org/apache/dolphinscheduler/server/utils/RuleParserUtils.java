@@ -33,6 +33,7 @@ import static org.apache.dolphinscheduler.common.Constants.USER;
 
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
@@ -66,7 +67,7 @@ public class RuleParserUtils {
 
     public static List<ConnectorParameter> getConnectorParameterList(
                                             Map<String, String> inputParameterValue,
-                                            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws Exception {
+                                            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DolphinException {
 
         List<ConnectorParameter> connectorParameterList = new ArrayList<>();
 
@@ -189,7 +190,7 @@ public class RuleParserUtils {
 
     public static List<WriterParameter> getWriterParameterList(
             String sql,
-            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws Exception {
+            DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DolphinException {
 
         List<WriterParameter> writerParameterList = new ArrayList<>();
 
@@ -242,7 +243,7 @@ public class RuleParserUtils {
                                                   Map<String, String> inputParameterValueResult,
                                                   List<ExecutorParameter> executorParameterList,
                                                   DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
-                                                  String writerSql) throws Exception {
+                                                  String writerSql) throws DolphinException {
         List<DqRuleExecuteSql> comparisonExecuteSqlList =
                 getExecuteSqlListByType(dataQualityTaskExecutionContext.getExecuteSqlList(), ExecuteSqlType.COMPARISON);
 
