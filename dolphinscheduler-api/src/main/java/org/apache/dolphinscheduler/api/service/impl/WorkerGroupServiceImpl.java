@@ -279,7 +279,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             } catch (Exception e) {
                 logger.error("getChildrenNodes exception: {}, workerGroupPath: {}", e.getMessage(), workerGroupPath);
             }
-            if (CollectionUtils.isEmpty(childrenNodes)) {
+            if (childrenNodes == null || childrenNodes.isEmpty()) {
                 continue;
             }
             WorkerGroup wg = new WorkerGroup();

@@ -81,23 +81,11 @@
       },
       checkIpAndPorts (addrs) {
         let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):\d{1,5}$/
-        let valdata = addrs.split(',')
-        for (let i = 0; i < valdata.length; i++) {
-          if (reg.test(valdata[i]) === false) {
-            return false
-          }
-        }
-        return true
+        return addrs.split(',').every(item => reg.test(item))
       },
       checkFqdnAndPorts (addrs) {
         let reg = /^([\w-]+\.)*[\w-]+:\d{1,5}$/i
-        let valdata = addrs.split(',')
-        for (let i = 0; i < valdata.length; i++) {
-          if (reg.test(valdata[i]) === false) {
-            return false
-          }
-        }
-        return true
+        return addrs.split(',').every(item => reg.test(item))
       },
       _verification () {
         // group name

@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -133,9 +132,9 @@ public class WorkerGroupServiceTest {
     }
 
     @Test
-    public void testQueryAllGroup() throws Exception {
+    public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup();
-        Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
+        List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(workerGroups.size(), 1);
     }
 
@@ -173,7 +172,7 @@ public class WorkerGroupServiceTest {
     @Test
     public void testQueryAllGroupWithDefault() {
         Map<String, Object> result = workerGroupService.queryAllGroup();
-        Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
+        List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
         Assert.assertEquals(1, workerGroups.size());
         Assert.assertEquals("default", workerGroups.toArray()[0]);
     }
