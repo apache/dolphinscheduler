@@ -616,6 +616,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //SUCCESS
         user.setUserType(UserType.ADMIN_USER);
+
         List<Integer> resIds = new ArrayList<>();
         resIds.add(1);
         Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt())).thenReturn(resIds);
