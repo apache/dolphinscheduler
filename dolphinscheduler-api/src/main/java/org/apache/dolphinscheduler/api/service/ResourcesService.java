@@ -423,6 +423,7 @@ public class ResourcesService extends BaseService {
         Date now = new Date();
 
         resource.setAlias(name);
+        resource.setFileName(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
