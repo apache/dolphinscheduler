@@ -76,6 +76,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -154,6 +155,9 @@ public class ProcessService {
 
     @Autowired
     private ResourceMapper resourceMapper;
+
+    @Autowired
+    private ResourceUserMapper resourceUserMapper;
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -1794,7 +1798,21 @@ public class ProcessService {
     public String queryTenantCodeByResName(String resName, ResourceType resourceType) {
         // in order to query tenant code successful although the version is older
         String fullName = resName.startsWith("/") ? resName : String.format("/%s", resName);
-        return resourceMapper.queryTenantCodeByResourceName(fullName, resourceType.ordinal());
+
+        List<Resource> resourceList = resourceMapper.queryResource(fullName, resourceType.ordinal());
+        if (CollectionUtils.isEmpty(resourceList)) {
+            return StringUtils.EMPTY;
+        }
+        int userId = resourceList.get(0).getUserId();
+        User user = userMapper.selectById(userId);
+        if (Objects.isNull(user)) {
+            return StringUtils.EMPTY;
+        }
+        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        if (Objects.isNull(tenant)) {
+            return StringUtils.EMPTY;
+        }
+        return tenant.getTenantCode();
     }
 
     /**
@@ -2036,11 +2054,15 @@ public class ProcessService {
             switch (authorizationType) {
                 case RESOURCE_FILE_ID:
                 case UDF_FILE:
-                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(Resource::getId).collect(toSet());
+                    List<Resource> ownUdfResources = resourceMapper.listAuthorizedResourceById(userId, needChecks);
+                    addAuthorizedResources(ownUdfResources, userId);
+                    Set<Integer> authorizedResourceFiles = ownUdfResources.stream().map(Resource::getId).collect(toSet());
                     originResSet.removeAll(authorizedResourceFiles);
                     break;
                 case RESOURCE_FILE_NAME:
-                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(Resource::getFullName).collect(toSet());
+                    List<Resource> ownResources = resourceMapper.listAuthorizedResource(userId, needChecks);
+                    addAuthorizedResources(ownResources, userId);
+                    Set<String> authorizedResources = ownResources.stream().map(Resource::getFullName).collect(toSet());
                     originResSet.removeAll(authorizedResources);
                     break;
                 case DATASOURCE:
@@ -2162,5 +2184,16 @@ public class ProcessService {
             }
         }
         return JSONUtils.toJsonString(processData);
+    }
+
+    /**
+     * add authorized resources
+     * @param ownResources own resources
+     * @param userId userId
+     */
+    private void addAuthorizedResources(List<Resource> ownResources, int userId) {
+        List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
+        List<Resource> relationResources = CollectionUtils.isNotEmpty(relationResourceIds) ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
+        ownResources.addAll(relationResources);
     }
 }

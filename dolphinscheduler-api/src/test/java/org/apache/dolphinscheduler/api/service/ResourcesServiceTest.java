@@ -266,8 +266,9 @@ public class ResourcesServiceTest {
         IPage<Resource> resourcePage = new Page<>(1, 10);
         resourcePage.setTotal(1);
         resourcePage.setRecords(getResourceList());
+
         Mockito.when(resourcesMapper.queryResourcePaging(Mockito.any(Page.class),
-                Mockito.eq(0), Mockito.eq(-1), Mockito.eq(0), Mockito.eq("test"))).thenReturn(resourcePage);
+                Mockito.eq(0), Mockito.eq(-1), Mockito.eq(0), Mockito.eq("test"), Mockito.any())).thenReturn(resourcePage);
         Map<String, Object> result = resourcesService.queryResourceListPaging(loginUser, -1, ResourceType.FILE, "test", 1, 10);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -281,7 +282,7 @@ public class ResourcesServiceTest {
         User loginUser = new User();
         loginUser.setId(0);
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 0, 0)).thenReturn(getResourceList());
+        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 0)).thenReturn(getResourceList());
         Map<String, Object> result = resourcesService.queryResourceList(loginUser, ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -615,7 +616,11 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //SUCCESS
         user.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcesMapper.queryAuthorizedResourceList(1)).thenReturn(getResourceList());
+
+        List<Integer> resIds = new ArrayList<>();
+        resIds.add(1);
+        Mockito.when(resourceUserMapper.queryResourcesIdListByUserIdAndPerm(Mockito.anyInt(), Mockito.anyInt())).thenReturn(resIds);
+        Mockito.when(resourcesMapper.queryResourceListById(Mockito.any())).thenReturn(getResourceList());
         result = resourcesService.authorizedFile(user, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
