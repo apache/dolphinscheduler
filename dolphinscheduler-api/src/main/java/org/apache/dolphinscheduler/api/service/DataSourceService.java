@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
@@ -33,26 +34,20 @@ public interface DataSourceService {
      * create data source
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
-     * @param parameter datasource parameters
+     * @param datasourceParam datasource parameter
      * @return create result code
      */
-    Result<Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter);
+    Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
     /**
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
-     * @param parameter datasource parameters
-     * @param id        data source id
+     * @param id data source id
+     * @param dataSourceParam data source params
      * @return update result code
      */
-    Result<Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter);
+    Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
      * updateProcessInstance datasource
@@ -106,24 +101,6 @@ public interface DataSourceService {
      * @return connect result code
      */
     Result<Object> connectionTest(int id);
-
-    /**
-     * build paramters
-     *
-     * @param type      data source  type
-     * @param host      data source  host
-     * @param port      data source port
-     * @param database  data source database name
-     * @param userName  user name
-     * @param password  password
-     * @param other     other parameters
-     * @param principal principal
-     * @return datasource parameter
-     */
-    String buildParameter(DbType type, String host,
-                          String port, String database, String principal, String userName,
-                          String password, DbConnectType connectType, String other,
-                          String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath);
 
     /**
      * delete datasource

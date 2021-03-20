@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.datasource.DatasourceParamUtil;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
@@ -97,23 +99,23 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * create data source
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param desc data source description
-     * @param type data source type
-     * @param parameter datasource parameters
+     * @param datasourceParam datasource parameters
      * @return create result code
      */
     @Override
-    public Result<Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
-
+    public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
+        DatasourceParamUtil.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
         // check name can use or not
-        if (checkName(name)) {
+        if (checkName(datasourceParam.getName())) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
-        Result<Object> isConnection = checkConnection(type, parameter);
+        // check connect
+        String connectionParams = DatasourceParamUtil.buildConnectionParams(datasourceParam);
+        Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParams);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
+            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
             return result;
         }
 
@@ -121,12 +123,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         DataSource dataSource = new DataSource();
         Date now = new Date();
 
-        dataSource.setName(name.trim());
-        dataSource.setNote(desc);
+        dataSource.setName(datasourceParam.getName().trim());
+        dataSource.setNote(datasourceParam.getNote());
         dataSource.setUserId(loginUser.getId());
         dataSource.setUserName(loginUser.getUserName());
-        dataSource.setType(type);
-        dataSource.setConnectionParams(parameter);
+        dataSource.setType(datasourceParam.getType());
+        dataSource.setConnectionParams(connectionParams);
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
         dataSourceMapper.insert(dataSource);
@@ -148,8 +150,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return update result code
      */
     @Override
-    public Result<Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
-
+    public Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam) {
+        DatasourceParamUtil.checkDatasourceParam(dataSourceParam);
         Result<Object> result = new Result<>();
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
@@ -164,11 +166,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         //check name can use or not
-        if (!name.trim().equals(dataSource.getName()) && checkName(name)) {
+        if (!dataSource.getName().trim().equals(dataSource.getName()) && checkName(dataSource.getName())) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
         //check password，if the password is not updated, set to the old password.
+        String parameter = DatasourceParamUtil.buildConnectionParams(dataSourceParam);
         ObjectNode paramObject = JSONUtils.parseObject(parameter);
         String password = paramObject.path(Constants.PASSWORD).asText();
         if (StringUtils.isBlank(password)) {
@@ -179,17 +182,17 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         // connectionParams json
         String connectionParams = paramObject.toString();
 
-        Result<Object> isConnection = checkConnection(type, parameter);
+        Result<Object> isConnection = checkConnection(dataSource.getType(), parameter);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             return result;
         }
 
         Date now = new Date();
 
-        dataSource.setName(name.trim());
-        dataSource.setNote(desc);
+        dataSource.setName(dataSource.getName().trim());
+        dataSource.setNote(dataSource.getNote());
         dataSource.setUserName(loginUser.getUserName());
-        dataSource.setType(type);
+        dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(connectionParams);
         dataSource.setUpdateTime(now);
         dataSourceMapper.updateById(dataSource);
@@ -438,134 +441,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     /**
-     * build paramters
-     *
-     * @param type data source  type
-     * @param host data source  host
-     * @param port data source port
-     * @param database data source database name
-     * @param userName user name
-     * @param password password
-     * @param other other parameters
-     * @param principal principal
-     * @return datasource parameter
-     */
-    @Override
-    public String buildParameter(DbType type, String host,
-                                 String port, String database, String principal, String userName,
-                                 String password, DbConnectType connectType, String other,
-                                 String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) {
-        checkParams(type, port, host, database, other);
-        String address = buildAddress(type, host, port, connectType);
-        Map<String, Object> parameterMap = new LinkedHashMap<>();
-        String jdbcUrl;
-        if (DbType.SQLSERVER == type) {
-            jdbcUrl = address + ";databaseName=" + database;
-        } else {
-            jdbcUrl = address + "/" + database;
-        }
-
-        if (Constants.ORACLE.equals(type.name())) {
-            parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
-        }
-
-        if (CommonUtils.getKerberosStartupState()
-                && (type == DbType.HIVE || type == DbType.SPARK)) {
-            jdbcUrl += ";principal=" + principal;
-        }
-
-        String separator = "";
-        if (Constants.MYSQL.equals(type.name())
-                || Constants.POSTGRESQL.equals(type.name())
-                || Constants.CLICKHOUSE.equals(type.name())
-                || Constants.ORACLE.equals(type.name())
-                || Constants.PRESTO.equals(type.name())) {
-            separator = "&";
-        } else if (Constants.HIVE.equals(type.name())
-                || Constants.SPARK.equals(type.name())
-                || Constants.DB2.equals(type.name())
-                || Constants.SQLSERVER.equals(type.name())) {
-            separator = ";";
-        }
-
-        parameterMap.put(Constants.ADDRESS, address);
-        parameterMap.put(Constants.DATABASE, database);
-        parameterMap.put(Constants.JDBC_URL, jdbcUrl);
-        parameterMap.put(Constants.USER, userName);
-        parameterMap.put(Constants.PASSWORD, CommonUtils.encodePassword(password));
-        if (CommonUtils.getKerberosStartupState()
-                && (type == DbType.HIVE || type == DbType.SPARK)) {
-            parameterMap.put(Constants.PRINCIPAL, principal);
-            parameterMap.put(Constants.KERBEROS_KRB5_CONF_PATH, javaSecurityKrb5Conf);
-            parameterMap.put(Constants.KERBEROS_KEY_TAB_USERNAME, loginUserKeytabUsername);
-            parameterMap.put(Constants.KERBEROS_KEY_TAB_PATH, loginUserKeytabPath);
-        }
-
-        Map<String, String> map = JSONUtils.toMap(other);
-        if (type == DbType.MYSQL) {
-            map = MySQLDataSource.buildOtherParams(other);
-        }
-
-        if (MapUtils.isNotEmpty(map)) {
-            StringBuilder otherSb = new StringBuilder();
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
-            }
-            if (!Constants.DB2.equals(type.name())) {
-                otherSb.deleteCharAt(otherSb.length() - 1);
-            }
-            parameterMap.put(Constants.OTHER, otherSb);
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.info("parameters map:{}", JSONUtils.toJsonString(parameterMap));
-        }
-        return JSONUtils.toJsonString(parameterMap);
-
-    }
-
-    private String buildAddress(DbType type, String host, String port, DbConnectType connectType) {
-        StringBuilder sb = new StringBuilder();
-        if (Constants.MYSQL.equals(type.name())) {
-            sb.append(Constants.JDBC_MYSQL);
-            sb.append(host).append(":").append(port);
-        } else if (Constants.POSTGRESQL.equals(type.name())) {
-            sb.append(Constants.JDBC_POSTGRESQL);
-            sb.append(host).append(":").append(port);
-        } else if (Constants.HIVE.equals(type.name()) || Constants.SPARK.equals(type.name())) {
-            sb.append(Constants.JDBC_HIVE_2);
-            String[] hostArray = host.split(",");
-            if (hostArray.length > 0) {
-                for (String zkHost : hostArray) {
-                    sb.append(String.format("%s:%s,", zkHost, port));
-                }
-                sb.deleteCharAt(sb.length() - 1);
-            }
-        } else if (Constants.CLICKHOUSE.equals(type.name())) {
-            sb.append(Constants.JDBC_CLICKHOUSE);
-            sb.append(host).append(":").append(port);
-        } else if (Constants.ORACLE.equals(type.name())) {
-            if (connectType == DbConnectType.ORACLE_SID) {
-                sb.append(Constants.JDBC_ORACLE_SID);
-            } else {
-                sb.append(Constants.JDBC_ORACLE_SERVICE_NAME);
-            }
-            sb.append(host).append(":").append(port);
-        } else if (Constants.SQLSERVER.equals(type.name())) {
-            sb.append(Constants.JDBC_SQLSERVER);
-            sb.append(host).append(":").append(port);
-        } else if (Constants.DB2.equals(type.name())) {
-            sb.append(Constants.JDBC_DB2);
-            sb.append(host).append(":").append(port);
-        } else if (Constants.PRESTO.equals(type.name())) {
-            sb.append(Constants.JDBC_PRESTO);
-            sb.append(host).append(":").append(port);
-        }
-
-        return sb.toString();
-    }
-
-    /**
      * delete datasource
      *
      * @param loginUser login user
@@ -684,6 +559,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return result;
     }
 
+    @Deprecated
     private void checkParams(DbType type, String port, String host, String database, String other) {
         if (null == DbType.of(type.getCode())) {
             throw new ServiceException(Status.DATASOURCE_DB_TYPE_ILLEGAL);

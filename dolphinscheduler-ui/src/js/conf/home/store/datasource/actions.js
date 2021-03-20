@@ -29,7 +29,7 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/create', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => { }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
@@ -42,7 +42,7 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/connect', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => { }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
@@ -94,7 +94,7 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/update', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => { }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })

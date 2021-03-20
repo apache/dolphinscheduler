@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.datasource.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -46,20 +47,19 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     @Ignore
     @Test
     public void testCreateDataSource() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","mysql");
-        paramsMap.add("node","mysql data source test");
-        paramsMap.add("type","MYSQL");
-        paramsMap.add("host","192.168.xxxx.xx");
-        paramsMap.add("port","3306");
-        paramsMap.add("principal","");
-        paramsMap.add("database","dolphinscheduler");
-        paramsMap.add("userName","root");
-        paramsMap.add("password","root@123");
-        paramsMap.add("other","");
+        MysqlDatasourceParamDTO mysqlDatasourceParam = new MysqlDatasourceParamDTO();
+        mysqlDatasourceParam.setName("mysql");
+        mysqlDatasourceParam.setNote("mysql data source test");
+        mysqlDatasourceParam.setHost("192.168.xxxx.xx");
+        mysqlDatasourceParam.setPort(3306);
+        mysqlDatasourceParam.setDatabase("dolphinscheduler");
+        mysqlDatasourceParam.setUserName("root");
+        mysqlDatasourceParam.setPassword("root@123");
+        mysqlDatasourceParam.setOther("");
         MvcResult mvcResult = mockMvc.perform(post("/datasources/create")
                 .header("sessionId", sessionId)
-                .params(paramsMap))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JSONUtils.toJsonString(mysqlDatasourceParam)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
@@ -91,7 +91,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

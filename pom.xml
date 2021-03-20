@@ -850,6 +850,15 @@
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/ResultTest.java</include>
+                        <include>**/api/utils/datasource/ClickHouseDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/Db2DatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/HiveDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/MysqlDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/OracleDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/PostgreSqlDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/PrestoDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/SparkDatasourceProcessorTest.java</include>
+                        <include>**/api/utils/datasource/SqlServerDatasourceProcessorTest.java</include>
                         <include>**/common/graph/DAGTest.java</include>
                         <include>**/common/os/OshiTest.java</include>
                         <include>**/common/os/OSUtilsTest.java</include>
