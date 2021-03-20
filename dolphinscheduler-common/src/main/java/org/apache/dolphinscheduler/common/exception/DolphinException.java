@@ -22,21 +22,23 @@ package org.apache.dolphinscheduler.common.exception;
  */
 public class DolphinException extends RuntimeException {
 
-    /**
-     * Construct a new runtime exception with the detail message
-     *
-     * @param   message  detail message
-     */
+    public DolphinException() {
+        super();
+    }
+
     public DolphinException(String message) {
         super(message);
     }
 
-    /**
-     * Construct a new runtime exception with the detail message and cause
-     *
-     * @param   message  detail message
-     */
     public DolphinException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public DolphinException(Throwable cause) {
+        super(cause);
+    }
+
+    protected DolphinException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
