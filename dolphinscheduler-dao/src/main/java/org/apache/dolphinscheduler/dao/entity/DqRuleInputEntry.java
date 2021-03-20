@@ -103,6 +103,11 @@ public class DqRuleInputEntry implements Serializable {
     @TableField(value = "is_emit")
     private Boolean isEmit;
     /**
+     * is validate
+     */
+    @TableField(value = "is_validate")
+    private Boolean isValidate;
+    /**
      * values map
      */
     @TableField(exist = false)
@@ -224,6 +229,14 @@ public class DqRuleInputEntry implements Serializable {
         isEmit = emit;
     }
 
+    public Boolean getValidate() {
+        return isValidate;
+    }
+
+    public void setValidate(Boolean validate) {
+        isValidate = validate;
+    }
+
     public String getValuesMap() {
         return valuesMap;
     }
@@ -264,6 +277,7 @@ public class DqRuleInputEntry implements Serializable {
                 + ", isShow=" + isShow
                 + ", canEdit=" + canEdit
                 + ", isEmit=" + isEmit
+                + ", isValidate=" + isValidate
                 + ", valuesMap='" + valuesMap + '\''
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime

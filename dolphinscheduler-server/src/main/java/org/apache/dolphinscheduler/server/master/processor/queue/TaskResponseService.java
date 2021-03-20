@@ -64,7 +64,6 @@ public class TaskResponseService {
      */
     private final BlockingQueue<TaskResponseEvent> eventQueue = new LinkedBlockingQueue<>(5000);
 
-
     /**
      * process service
      */
@@ -215,6 +214,7 @@ public class TaskResponseService {
         if (isFailure(dqExecuteResult)) {
             DqFailureStrategy dqFailureStrategy = DqFailureStrategy.of(dqExecuteResult.getFailureStrategy());
             if (dqFailureStrategy != null) {
+                dqExecuteResult.setState(DqTaskState.FAILURE);
                 switch (dqFailureStrategy) {
                     case END:
                         taskResponseEvent.setState(ExecutionStatus.FAILURE);
@@ -226,17 +226,16 @@ public class TaskResponseService {
                     case END_ALTER:
                         taskResponseEvent.setState(ExecutionStatus.FAILURE);
                         sendAlert(dqExecuteResult);
-                        logger.info("task is failre and end and alert");
+                        logger.info("task is failre, end and alert");
                         break;
                     case CONTINUE_ALTER:
                         sendAlert(dqExecuteResult);
-                        logger.info("task is failre and continue and alert");
+                        logger.info("task is failre, continue and alert");
                         break;
                     default:
                         break;
                 }
             }
-            dqExecuteResult.setState(DqTaskState.FAILURE);
         } else {
             dqExecuteResult.setState(DqTaskState.SUCCESS);
         }
