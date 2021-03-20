@@ -42,11 +42,11 @@ export HADOOP_HOME=${HADOOP_HOME:-"/opt/soft/hadoop"}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/opt/soft/hadoop/etc/hadoop"}
 export SPARK_HOME1=${SPARK_HOME1:-"/opt/soft/spark1"}
 export SPARK_HOME2=${SPARK_HOME2:-"/opt/soft/spark2"}
-export PYTHON_HOME=${PYTHON_HOME:-"/usr/bin/python"}
+export PYTHON_HOME=${PYTHON_HOME:-"/usr"}
 export JAVA_HOME=${JAVA_HOME:-"/usr/lib/jvm/java-1.8-openjdk"}
 export HIVE_HOME=${HIVE_HOME:-"/opt/soft/hive"}
 export FLINK_HOME=${FLINK_HOME:-"/opt/soft/flink"}
-export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax/bin/datax.py"}
+export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax"}
 # common env
 export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
 export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-""}

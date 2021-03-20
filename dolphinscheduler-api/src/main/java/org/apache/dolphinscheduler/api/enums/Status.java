@@ -22,14 +22,14 @@ import java.util.Locale;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * status enum
+ * status enum      // todo #4855 One category one interval
  */
 public enum Status {
 
     SUCCESS(0, "success", "成功"),
 
     /**
-     *Distinguish status codes by business: First category(2 digits)-Secondary category(2 digits)-Three-level category(3 digits)
+     * Distinguish status codes by business: First category(2 digits)-Secondary category(2 digits)-Three-level category(3 digits)
      */
 
     //other-other(10-00)
@@ -87,7 +87,7 @@ public enum Status {
     PROCESS_DEFINITION_NAME_EXIST(2001018, "process definition name {0} already exists", "工作流定义名称[{0}]已存在"),
     BATCH_COPY_PROCESS_DEFINITION_ERROR(2001019, "batch copy process definition error", "复制工作流错误"),
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(2001020, "batch move process definition error", "移动工作流错误"),
-    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(2001021,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(2001021, "delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
     PROCESS_INSTANCE_NOT_EXIST(2001022, "process instance {0} does not exist", "工作流实例[{0}]不存在"),
     PROCESS_INSTANCE_EXIST(2001023, "process instance {0} already exists", "工作流实例[{0}]已存在"),
     PROCESS_DEFINE_NOT_EXIST(2001024, "process definition {0} does not exist", "工作流定义[{0}]不存在"),
@@ -99,12 +99,13 @@ public enum Status {
     DELETE_PROCESS_DEFINE_BY_ID_ERROR(2001030, "delete process definition by id error", "删除工作流定义错误"),
     BATCH_DELETE_PROCESS_DEFINE_ERROR(2001031, "batch delete process definition error", "批量删除工作流定义错误"),
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(2001032, "export process definition by id error", "导出工作流定义错误"),
-    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(2001033,"batch export process definition by ids error", "批量导出工作流定义错误"),
+    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(2001033, "batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(2001034, "import process definition error", "导入工作流定义错误"),
     PROCESS_NODE_HAS_CYCLE(2001035, "process node has cycle", "流程节点间存在循环依赖"),
     BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(2001036, "batch delete process definition by ids {0} error", "批量删除工作流定义[{0}]错误"),
     PROCESS_NODE_S_PARAMETER_INVALID(2001037, "process node {0} parameter invalid", "流程节点[{0}]参数无效"),
     QUERY_RECIPIENTS_AND_COPYERS_BY_PROCESS_DEFINITION_ERROR(2001038, "query recipients and copyers by process definition error", "查询收件人和抄送人错误"),
+    PROCESS_DEFINITION_VERSION_IS_USED(2001039, "this process definition version is used", "此工作流定义版本被使用"),
     //project-processInstance(20-02)
     QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR(2002000, "query process instance list paging error", "分页查询工作流实例列表错误"),
     UPDATE_PROCESS_INSTANCE_ERROR(2002001, "update process instance error", "更新工作流实例错误"),
@@ -223,7 +224,7 @@ public enum Status {
     //monitor-worker(50-01)
     LIST_WORKERS_ERROR(5001000, "list workers error", "查询worker列表错误"),
     //monitor-db(50-02)
-    UERY_DATABASE_STATE_ERROR(5002000, "query database state error", "查询数据库状态错误"),
+    QUERY_DATABASE_STATE_ERROR(5002000, "query database state error", "查询数据库状态错误"),
     //monitor-zookeeper(50-03)
     QUERY_ZOOKEEPER_STATE_ERROR(5003000, "query zookeeper state error", "查询zookeeper状态错误"),
     //security-user(60-00)
@@ -275,9 +276,10 @@ public enum Status {
     GET_ALERT_PLUGIN_INSTANCE_ERROR(6002010, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
     CREATE_ALERT_PLUGIN_INSTANCE_ERROR(6002011, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
     QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(6002012, "query all alert plugin instance error", "查询所有告警实例失败"),
-    PLUGIN_INSTANCE_ALREADY_EXIT(6002013,"plugin instance already exit","该告警插件实例已存在"),
-    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(6002014,"query plugin instance page error","分页查询告警实例失败"),
-    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(6002015,"failed to delete the alert instance, there is an alarm group associated with this alert instance","删除告警实例失败，存在与此告警实例关联的警报组"),
+    PLUGIN_INSTANCE_ALREADY_EXIT(6002013, "plugin instance already exit", "该告警插件实例已存在"),
+    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(6002014, "query plugin instance page error", "分页查询告警实例失败"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(6002015,
+            "failed to delete the alert instance, there is an alarm group associated with this alert instance", "删除告警实例失败，存在与此告警实例关联的警报组"),
     //security-workerGroup(60-03)
     DELETE_WORKER_GROUP_BY_ID_FAIL(6003000, "delete worker group by id fail, for there are {0} process instances in executing using it", "删除Worker分组失败，有[{0}]个运行中的工作流实例正在使用"),
     QUERY_WORKER_GROUP_FAIL(6003001, "query worker group fail ", "查询worker分组失败"),
@@ -304,8 +306,7 @@ public enum Status {
     QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(6006002, "query access token list paging error", "分页查询访问token列表错误"),
     UPDATE_ACCESS_TOKEN_ERROR(6006003, "update access token error", "更新访问token错误"),
     DELETE_ACCESS_TOKEN_ERROR(6006004, "delete access token error", "删除访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(6006005, "access token not exist", "访问token不存在"),
-    ;
+    ACCESS_TOKEN_NOT_EXIST(6006005, "access token not exist", "访问token不存在"),;
 
     private final int code;
     private final String enMsg;

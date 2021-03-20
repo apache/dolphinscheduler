@@ -49,6 +49,13 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
     List<AlertGroup> queryByGroupName(@Param("groupName") String groupName);
 
     /**
+     * Judge whether the alert group exist
+     * @param groupName groupName
+     * @return if exist return true else return null
+     */
+    Boolean existGroupName(@Param("groupName") String groupName);
+
+    /**
      * query by userId
      * @param userId userId
      * @return alertgroup list

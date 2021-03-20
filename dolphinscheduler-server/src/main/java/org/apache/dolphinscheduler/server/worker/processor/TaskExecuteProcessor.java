@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -146,6 +147,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirIfAbsent(execLocalPath);
+            if (workerConfig.getWorkerTenantAutoCreate()) {
+                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+            }
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.of(logger), errorLog, ex);
