@@ -289,7 +289,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 String registeredValue = zookeeperCachedOperator.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
-                wg.setZkRegistered(true);
+                wg.setSystemDefault(true);
             }
             workerGroups.add(wg);
         }

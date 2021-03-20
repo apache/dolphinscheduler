@@ -45,7 +45,7 @@ public class WorkerGroup {
     private Date updateTime;
 
     @TableField(exist = false)
-    private boolean zkRegistered;
+    private boolean systemDefault;
 
     public int getId() {
         return id;
@@ -87,12 +87,12 @@ public class WorkerGroup {
         this.updateTime = updateTime;
     }
 
-    public boolean getZkRegistered() {
-        return zkRegistered;
+    public boolean getSystemDefault() {
+        return systemDefault;
     }
 
-    public void setZkRegistered(boolean zkRegistered) {
-        this.zkRegistered = zkRegistered;
+    public void setSystemDefault(boolean systemDefault) {
+        this.systemDefault = systemDefault;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class WorkerGroup {
                 + ", addrList= " + addrList
                 + ", createTime= " + createTime
                 + ", updateTime= " + updateTime
-                + ", zkRegistered= " + zkRegistered
+                + ", systemDefault= " + systemDefault
                 + "}";
     }
 

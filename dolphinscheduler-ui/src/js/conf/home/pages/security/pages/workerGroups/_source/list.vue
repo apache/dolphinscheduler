@@ -37,10 +37,10 @@
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
-            <el-tooltip :content="$t('Edit')" placement="top" v-if="!scope.row.zkRegistered">
+            <el-tooltip :content="$t('Edit')" placement="top" v-if="!scope.row.systemDefault">
               <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
             </el-tooltip>
-            <el-tooltip :content="$t('Delete')" placement="top" v-if="!scope.row.zkRegistered">
+            <el-tooltip :content="$t('Delete')" placement="top" v-if="!scope.row.systemDefault">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
