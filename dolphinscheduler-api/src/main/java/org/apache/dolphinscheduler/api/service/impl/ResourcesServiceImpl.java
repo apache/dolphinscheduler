@@ -1354,8 +1354,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      */
     private List<Resource> queryResourceList(Integer userId, int perm) {
         List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
-        List<Resource> authedResources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
-        return authedResources;
+        return CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
     }
 
 }
