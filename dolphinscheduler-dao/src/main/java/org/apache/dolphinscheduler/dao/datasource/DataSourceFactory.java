@@ -108,9 +108,8 @@ public class DataSourceFactory {
     /**
      * load class
      * @param dbType
-     * @throws Exception
      */
-    public static String getDriver(DbType dbType) throws Exception {
+    public static String getDriver(DbType dbType) {
         switch (dbType) {
             case MYSQL :
                 return Constants.COM_MYSQL_JDBC_DRIVER;

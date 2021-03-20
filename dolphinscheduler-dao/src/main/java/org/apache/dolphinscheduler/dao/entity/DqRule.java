@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.dq.RuleType;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -27,7 +28,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("t_ds_dq_rule")
-public class DqRule {
+public class DqRule implements Serializable {
     /**
      * primary key
      */

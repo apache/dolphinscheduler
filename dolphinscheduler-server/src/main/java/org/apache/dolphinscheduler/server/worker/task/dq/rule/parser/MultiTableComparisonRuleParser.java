@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.dq.rule.parser;
 
 import static org.apache.dolphinscheduler.server.worker.task.dq.rule.RuleManager.MULTI_TABLE_COMPARISON_WRITER_SQL;
 
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
@@ -38,7 +39,7 @@ public class MultiTableComparisonRuleParser implements IRuleParser {
 
     @Override
     public DataQualityConfiguration parse(Map<String, String> inputParameterValue,
-                                          DataQualityTaskExecutionContext context) throws Exception {
+                                          DataQualityTaskExecutionContext context) throws DolphinException {
 
         List<ConnectorParameter> connectorParameterList =
                 RuleParserUtils.getConnectorParameterList(inputParameterValue,context);

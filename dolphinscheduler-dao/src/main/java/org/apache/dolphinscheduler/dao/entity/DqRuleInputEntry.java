@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.dq.InputType;
 import org.apache.dolphinscheduler.common.enums.dq.OptionSourceType;
 import org.apache.dolphinscheduler.common.enums.dq.ValueType;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -34,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * RuleInputEntry
  */
 @TableName("t_ds_dq_rule_input_entry")
-public class DqRuleInputEntry {
+public class DqRuleInputEntry implements Serializable {
     /**
      * primary key
      */

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.task.dq.rule.parser;
 import static org.apache.dolphinscheduler.common.Constants.STATISTICS_TABLE;
 
 import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
+import org.apache.dolphinscheduler.common.exception.DolphinException;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.RuleParserUtils;
@@ -40,7 +41,7 @@ public class SingleTableRuleParser implements IRuleParser {
 
     @Override
     public DataQualityConfiguration parse(Map<String, String> inputParameterValue,
-                                          DataQualityTaskExecutionContext context) throws Exception {
+                                          DataQualityTaskExecutionContext context) throws DolphinException {
         DqRuleExecuteSql statisticsSql =
                 RuleParserUtils.getExecuteSqlListByType(context.getExecuteSqlList(), ExecuteSqlType.STATISTICS).get(0);
         inputParameterValue.put(STATISTICS_TABLE,statisticsSql.getTableAlias());

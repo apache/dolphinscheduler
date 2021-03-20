@@ -15,20 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
-
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
+package org.apache.dolphinscheduler.common.exception;
 
 /**
- * DqExecuteResultMapperTest
+ * Custom runtime exception
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class DqExecuteResultMapperTest {
+public class DolphinException extends RuntimeException {
+
+    /**
+     * Construct a new runtime exception with the detail message
+     *
+     * @param   message  detail message
+     */
+    public DolphinException(String message) {
+        super(message);
+    }
+
+    /**
+     * Construct a new runtime exception with the detail message and cause
+     *
+     * @param   message  detail message
+     */
+    public DolphinException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
