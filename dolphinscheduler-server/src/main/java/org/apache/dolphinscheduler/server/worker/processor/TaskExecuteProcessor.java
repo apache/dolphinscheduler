@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.sift.SiftingAppender;
-import com.alibaba.fastjson.JSONObject;
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -28,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -45,12 +41,18 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.alibaba.fastjson.JSONObject;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
+import io.netty.channel.Channel;
 
 /**
  *  worker request processor
@@ -126,7 +128,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()));
 
-        taskExecutionContext.setHost(OSUtils.getAddr(workerConfig.getListenPort()));
+        taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath(getTaskLogPath(taskExecutionContext));
 

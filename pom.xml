@@ -769,6 +769,7 @@
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
+                        <include>**/common/utils/NetUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
                         <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
                         <include>**/common/utils/PreconditionsTest.java</include>

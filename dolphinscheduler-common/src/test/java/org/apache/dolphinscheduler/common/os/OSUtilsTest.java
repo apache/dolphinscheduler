@@ -18,14 +18,15 @@ package org.apache.dolphinscheduler.common.os;
 
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import oshi.hardware.GlobalMemory;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import oshi.hardware.GlobalMemory;
 
 /**
  * OSUtilsTest
@@ -33,13 +34,6 @@ import java.text.DecimalFormat;
 public class OSUtilsTest {
 
     private static Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
-
-
-    @Test
-    public void getHost(){
-        logger.info(OSUtils.getHost());
-    }
-
 
     @Test
     public void memoryUsage() {

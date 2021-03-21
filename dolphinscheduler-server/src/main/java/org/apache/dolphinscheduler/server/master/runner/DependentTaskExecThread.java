@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -25,14 +27,17 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-
-import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 
 public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
@@ -174,7 +179,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
     private void initTaskParameters() {
         taskInstance.setLogPath(getTaskLogPath(taskInstance));
-        taskInstance.setHost(OSUtils.getAddr(masterConfig.getListenPort()));
+        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);

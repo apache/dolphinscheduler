@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +74,6 @@ public class RoundRobinHostManagerTest {
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));
-        Assert.assertTrue(host.getAddress().equalsIgnoreCase(OSUtils.getAddr(workerConfig.getListenPort())));
+        Assert.assertTrue(host.getAddress().equalsIgnoreCase(NetUtils.getAddr(workerConfig.getListenPort())));
     }
 }

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -171,6 +172,6 @@ public class MasterSchedulerService extends Thread {
         }
 
     private String getLocalAddress() {
-        return OSUtils.getAddr(masterConfig.getListenPort());
+        return NetUtils.getAddr(masterConfig.getListenPort());
     }
 }
