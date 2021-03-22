@@ -14,32 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+package org.apache.dolphinscheduler.remote.command.log;
 
-import java.util.Collection;
+import org.apache.dolphinscheduler.remote.command.Command;
 
-/**
- *  AbstractSelector
- */
-public  abstract class AbstractSelector<T> implements Selector<T> {
-    @Override
-    public T select(Collection<T> source) {
+import org.junit.Test;
 
-        if (CollectionUtils.isEmpty(source)) {
-            throw new IllegalArgumentException("Empty source.");
-        }
+import junit.framework.Assert;
 
-        /**
-         * if only one , return directly
-         */
-        if (source.size() == 1) {
-            return (T)source.toArray()[0];
-        }
-        return doSelect(source);
+public class RemoveTaskLogResponseCommandTest {
+
+    @Test
+    public void testConvert2Command() {
+        RemoveTaskLogRequestCommand removeTaskLogRequestCommand = new RemoveTaskLogRequestCommand();
+        removeTaskLogRequestCommand.setPath("/opt/zhangsan");
+        Command command = removeTaskLogRequestCommand.convert2Command();
+        Assert.assertNotNull(command);
     }
-
-    protected abstract T doSelect(Collection<T> source);
-
 }

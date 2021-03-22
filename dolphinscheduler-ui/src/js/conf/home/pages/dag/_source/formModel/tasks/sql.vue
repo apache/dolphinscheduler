@@ -32,9 +32,18 @@
         <div style="display: inline-block;">
           <m-sql-type @on-sqlType="_onSqlType" :sql-type="sqlType"></m-sql-type>
         </div>
+        <div style="display: inline-block;" v-if="sqlType === '0'">
+          <span class="text-b">{{$t('Send Email')}}</span>
+          <el-switch size="small" v-model="sendEmail"></el-switch>
+        </div>
+        <div style="display: inline-block;" v-if="sqlType === '0'">
+          <span class="text-b">{{$t('Display query result')}}</span>
+          <m-select-input v-model="displayRows" :list="[1,10,25,50,100]" style="width: 70px;"></m-select-input>
+          <span>({{$t('Rows')}})</span>
+        </div>
       </div>
     </m-list-box>
-    <template v-if="sqlType === 0">
+    <template v-if="sqlType === '0' && sendEmail">
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
@@ -54,7 +63,7 @@
         </div>
       </m-list-box>
     </template>
-    <m-list-box v-if="type === 'HIVE'">
+    <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
         <el-input
@@ -69,7 +78,7 @@
     <m-list-box>
       <div slot="text">{{$t('SQL Statement')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea
                   id="code-sql-mirror"
                   name="code-sql-mirror"
@@ -141,6 +150,7 @@
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
   import mWarningGroups from './_source/warningGroups'
+  import mSelectInput from '../_source/selectInput'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
@@ -164,6 +174,10 @@
         udfs: '',
         // Sql type
         sqlType: '0',
+        // Send email
+        sendEmail: false,
+        // Display rows
+        displayRows: 10,
         // Email title
         title: '',
         // Sql parameter
@@ -240,11 +254,11 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType === '0' && !this.title) {
+        if (this.sqlType === '0' && this.sendEmail && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType === '0' && (this.groupId === '' || this.groupId === null)) {
+        if (this.sqlType === '0' && this.sendEmail && (this.groupId === '' || this.groupId === null)) {
           this.$message.warning(`${i18n.$t('Alarm group required')}`)
           return false
         }
@@ -277,6 +291,8 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
           title: this.title,
           groupId: this.groupId,
           localParams: this.localParams,
@@ -326,6 +342,8 @@
           sql: editor ? editor.getValue() : '',
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
           title: this.title,
           groupId: this.groupId,
           localParams: this.localParams,
@@ -345,7 +363,7 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val !== 0) {
+        if (val !== '0') {
           this.title = ''
           this.groupId = null
         }
@@ -372,6 +390,8 @@
         this.sql = o.params.sql || ''
         this.udfs = o.params.udfs || ''
         this.sqlType = o.params.sqlType
+        this.sendEmail = o.params.sendEmail || false
+        this.displayRows = o.params.displayRows || 10
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         this.preStatements = o.params.preStatements || []
@@ -402,6 +422,8 @@
           datasource: this.rtDatasource,
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
           title: this.title,
           groupId: this.groupId,
           localParams: this.localParams,
@@ -411,6 +433,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox, mWarningGroups }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mScriptBox, mWarningGroups, mSelectInput }
   }
 </script>

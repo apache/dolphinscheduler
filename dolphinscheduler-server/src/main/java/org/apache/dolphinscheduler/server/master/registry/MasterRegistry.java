@@ -98,8 +98,8 @@ public class MasterRegistry {
             });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
-                masterConfig.getMasterReservedMemory(),
                 masterConfig.getMasterMaxCpuloadAvg(),
+                masterConfig.getMasterReservedMemory(),
                 Sets.newHashSet(getMasterPath()),
                 Constants.MASTER_PREFIX,
                 zookeeperRegistryCenter);
@@ -132,9 +132,7 @@ public class MasterRegistry {
      * get local address
      */
     private String getLocalAddress() {
-
         return NetUtils.getAddr(masterConfig.getListenPort());
-
     }
 
     /**

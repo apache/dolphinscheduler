@@ -16,16 +16,18 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.dolphinscheduler.common.Constants;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.List;
 
 public class OSUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
@@ -73,6 +75,12 @@ public class OSUtilsTest {
         } else {
             Assert.assertTrue("create user test123 fail", true);
         }
+    }
+
+    @Test
+    public void createUserIfAbsent() {
+        OSUtils.createUserIfAbsent("test123");
+        Assert.assertTrue("create user test123 success", true);
     }
 
     @Test

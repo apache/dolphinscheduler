@@ -46,7 +46,7 @@ export PYTHON_HOME=${PYTHON_HOME:-"/usr"}
 export JAVA_HOME=${JAVA_HOME:-"/usr/lib/jvm/java-1.8-openjdk"}
 export HIVE_HOME=${HIVE_HOME:-"/opt/soft/hive"}
 export FLINK_HOME=${FLINK_HOME:-"/opt/soft/flink"}
-export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax/bin/datax.py"}
+export DATAX_HOME=${DATAX_HOME:-"/opt/soft/datax"}
 # common env
 export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
 export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-""}

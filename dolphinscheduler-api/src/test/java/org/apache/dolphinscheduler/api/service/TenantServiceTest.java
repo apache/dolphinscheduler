@@ -79,7 +79,7 @@ public class TenantServiceTest {
     public void testCreateTenant() {
 
         User loginUser = getLoginUser();
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         try {
             //check tenantCode
             Map<String, Object> result =
@@ -90,7 +90,7 @@ public class TenantServiceTest {
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.OS_TENANT_CODE_EXIST, result.get(Constants.STATUS));
 
             // success
             result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
@@ -186,7 +186,7 @@ public class TenantServiceTest {
     @Test
     public void testVerifyTenantCode() {
 
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         // tenantCode not exist
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         logger.info(result.toString());

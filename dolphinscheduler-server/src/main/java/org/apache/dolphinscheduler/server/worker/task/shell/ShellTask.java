@@ -106,6 +106,7 @@ public class ShellTask extends AbstractTask {
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
             setResult(shellCommandExecutor.getTaskResultString());
+            setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("shell task error", e);
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);

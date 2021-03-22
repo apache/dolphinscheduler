@@ -76,7 +76,7 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void testQueryList(){
+    public void testQueryList() {
 
         Mockito.when(queueMapper.selectList(null)).thenReturn(getQueueList());
         Map<String, Object> result = queueService.queryList(getLoginUser());
@@ -86,7 +86,7 @@ public class QueueServiceTest {
 
     }
     @Test
-    public void testQueryListPage(){
+    public void testQueryListPage() {
 
         IPage<Queue> page = new Page<>(1,10);
         page.setTotal(1L);
@@ -98,7 +98,7 @@ public class QueueServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
     }
     @Test
-    public void testCreateQueue(){
+    public void testCreateQueue() {
 
         // queue is null
         Map<String, Object> result = queueService.createQueue(getLoginUser(),null,queueName);
@@ -114,13 +114,13 @@ public class QueueServiceTest {
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
     }
+
     @Test
-    public void testUpdateQueue(){
+    public void testUpdateQueue() {
 
         Mockito.when(queueMapper.selectById(1)).thenReturn(getQueue());
-        Mockito.when(queueMapper.queryAllQueueList("test", null)).thenReturn(getQueueList());
-        Mockito.when(queueMapper.queryAllQueueList(null, "test")).thenReturn(getQueueList());
-        Mockito.when(userMapper.queryUserListByQueue(queueName)).thenReturn(getUserList());
+        Mockito.when(queueMapper.existQueue("test", null)).thenReturn(true);
+        Mockito.when(queueMapper.existQueue(null, "test")).thenReturn(true);
 
         // not exist
         Map<String, Object> result = queueService.updateQueue(getLoginUser(),0,"queue",queueName);
@@ -144,11 +144,12 @@ public class QueueServiceTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),((Status)result.get(Constants.STATUS)).getCode());
 
     }
-    @Test
-    public void testVerifyQueue(){
 
-        Mockito.when(queueMapper.queryAllQueueList(queueName, null)).thenReturn(getQueueList());
-        Mockito.when(queueMapper.queryAllQueueList(null, queueName)).thenReturn(getQueueList());
+    @Test
+    public void testVerifyQueue() {
+
+        Mockito.when(queueMapper.existQueue(queueName, null)).thenReturn(true);
+        Mockito.when(queueMapper.existQueue(null, queueName)).thenReturn(true);
 
         //queue null
         Result result = queueService.verifyQueue(null,queueName);
@@ -175,13 +176,13 @@ public class QueueServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
 
-
     }
+
     /**
      * create admin user
      * @return
      */
-    private User getLoginUser(){
+    private User getLoginUser() {
 
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -189,7 +190,7 @@ public class QueueServiceTest {
         return loginUser;
     }
 
-    private List<User> getUserList(){
+    private List<User> getUserList() {
         List<User> list = new ArrayList<>();
         list.add(getLoginUser());
         return list;
@@ -200,7 +201,7 @@ public class QueueServiceTest {
      * get queue
      * @return
      */
-    private Queue getQueue(){
+    private Queue getQueue() {
         Queue queue = new Queue();
         queue.setId(1);
         queue.setQueue(queueName);
@@ -208,7 +209,7 @@ public class QueueServiceTest {
         return queue;
     }
 
-    private List<Queue> getQueueList(){
+    private List<Queue> getQueueList() {
         List<Queue> queueList = new ArrayList<>();
         queueList.add(getQueue());
         return queueList;

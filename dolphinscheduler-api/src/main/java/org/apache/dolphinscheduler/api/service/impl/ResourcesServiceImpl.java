@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -251,8 +252,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return true if resource exists
      */
     private boolean checkResourceExists(String fullName, int userId, int type) {
-        List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        return resources != null && !resources.isEmpty();
+        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
+        return BooleanUtils.isTrue(existResource);
     }
 
     /**
@@ -361,6 +362,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Date now = new Date();
 
         resource.setAlias(name);
+        resource.setFileName(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
@@ -527,8 +529,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
-                userId,directoryId, type.ordinal(), searchVal);
+        List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
+
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal,resourcesIds);
+
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
@@ -613,15 +617,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
-
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
+        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }
@@ -636,11 +635,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Map<String, Object> result = new HashMap<>();
+
+        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
+
         String suffix = ".jar";
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
         if (programType != null) {
             switch (programType) {
                 case JAVA:
@@ -652,11 +650,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 default:
             }
         }
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
-        List<Resource> resources = new ResourceFilter(suffix,new ArrayList<>(allResourceList)).filter();
+        List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }
@@ -1171,8 +1168,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Resource> list;
         if (resourceList != null && !resourceList.isEmpty()) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
-            List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
-
+            List<Resource> authedResourceList = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
             getAuthorizedResourceList(resourceSet, authedResourceList);
             list = new ArrayList<>(resourceSet);
         } else {
@@ -1247,7 +1243,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
+        List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
         String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
@@ -1325,6 +1321,40 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             childList.add(childId);
             listAllChildren(childId, childList);
         }
+    }
+
+    /**
+     *  query authored resource list (own and authorized)
+     * @param loginUser login user
+     * @param type ResourceType
+     * @return all authored resource list
+     */
+    private List<Resource> queryAuthoredResourceList(User loginUser, ResourceType type) {
+        List<Resource> relationResources;
+        int userId = loginUser.getId();
+        if (isAdmin(loginUser)) {
+            userId = 0;
+            relationResources = new ArrayList<>();
+        } else {
+            // query resource relation
+            relationResources = queryResourceList(userId, 0);
+        }
+
+        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        ownResourceList.addAll(relationResources);
+
+        return ownResourceList;
+    }
+
+    /**
+     *  query resource list by userId and perm
+     * @param userId userId
+     * @param perm perm
+     * @return resource list
+     */
+    private List<Resource> queryResourceList(Integer userId, int perm) {
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
+        return CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
     }
 
 }

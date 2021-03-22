@@ -46,4 +46,11 @@ public interface QueueMapper extends BaseMapper<Queue> {
     List<Queue> queryAllQueueList(@Param("queue") String queue,
                              @Param("queueName") String queueName);
 
+    /**
+     * check the target queue exist
+     * @param queue queue
+     * @param queueName queueName
+     * @return true if exist else return null
+     */
+    Boolean existQueue(@Param("queue") String queue, @Param("queueName") String queueName);
 }
