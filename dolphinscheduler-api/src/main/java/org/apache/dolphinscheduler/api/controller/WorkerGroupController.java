@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -84,7 +85,7 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "addrList") String addrList
     ) {
         logger.info("save worker group: login user {}, id:{}, name: {}, addrList: {} ",
-                loginUser.getUserName(), id, name, addrList);
+                RegexUtils.escapeNRT(loginUser.getUserName()), id, RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(addrList));
         Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList);
         return returnDataList(result);
     }
@@ -113,7 +114,7 @@ public class WorkerGroupController extends BaseController {
                                              @RequestParam(value = "searchVal", required = false) String searchVal
     ) {
         logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
-                loginUser.getUserName(), pageNo, pageSize, searchVal);
+                RegexUtils.escapeNRT(loginUser.getUserName()), pageNo, pageSize, searchVal);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
         return returnDataListPaging(result);
@@ -130,7 +131,7 @@ public class WorkerGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("query all worker group: login user {}", loginUser.getUserName());
+        logger.info("query all worker group: login user {}", RegexUtils.escapeNRT(loginUser.getUserName()));
         Map<String, Object> result = workerGroupService.queryAllGroup();
         return returnDataList(result);
     }
@@ -152,7 +153,7 @@ public class WorkerGroupController extends BaseController {
     public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam("id") Integer id
     ) {
-        logger.info("delete worker group: login user {}, id:{} ", loginUser.getUserName(), id);
+        logger.info("delete worker group: login user {}, id:{} ", RegexUtils.escapeNRT(loginUser.getUserName()), id);
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
         return returnDataList(result);
     }

@@ -111,7 +111,6 @@ public class LowerWeightHostManager extends CommonHostManager {
      */
     @Override
     public Host select(ExecutionContext context) {
-        System.out.println(context.getWorkerGroup());
         Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
         if (CollectionUtils.isNotEmpty(workerHostWeights)) {
             return selector.select(workerHostWeights).getHost();

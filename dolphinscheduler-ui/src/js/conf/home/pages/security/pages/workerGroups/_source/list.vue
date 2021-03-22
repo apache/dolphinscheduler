@@ -34,7 +34,7 @@
           <th>
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="70">
+          <th scope="col" width="70">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

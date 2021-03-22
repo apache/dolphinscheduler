@@ -88,7 +88,7 @@ public abstract class AbstractZKClient extends RegisterOperator {
             }
             String key = entry.getKey();
             server.setZkDirectory(parentPath + "/" + key);
-            //set host and port
+            // set host and port
             String[] hostAndPort = key.split(COLON);
             String[] hosts = hostAndPort[0].split(DIVISION_STRING);
             // fetch the last one
