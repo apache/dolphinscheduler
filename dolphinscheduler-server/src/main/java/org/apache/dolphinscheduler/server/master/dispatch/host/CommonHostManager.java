@@ -103,12 +103,14 @@ public abstract class CommonHostManager implements HostManager {
         List<HostWorker> hostWorkers = new ArrayList<>();
         List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(workerGroup);
         if (CollectionUtils.isNotEmpty(workerGroups)) {
-            Map<String, String> workerServers = zkMasterClient.getServerMaps(ZKNodeType.WORKER);
+            Map<String, String> serverMaps = zkMasterClient.getServerMaps(ZKNodeType.WORKER, true);
             for (WorkerGroup wg : workerGroups) {
                 for (String addr : wg.getAddrList().split(Constants.COMMA)) {
-                    String heartbeat = getHeartbeatFromWorkerServers(workerServers, addr);
-                    int hostWeight = getWorkerHostWeightFromHeartbeat(heartbeat);
-                    hostWorkers.add(HostWorker.of(addr, hostWeight, workerGroup));
+                    if (serverMaps.containsKey(addr)) {
+                        String heartbeat = serverMaps.get(addr);
+                        int hostWeight = getWorkerHostWeightFromHeartbeat(heartbeat);
+                        hostWorkers.add(HostWorker.of(addr, hostWeight, workerGroup));
+                    }
                 }
             }
         }
@@ -127,15 +129,6 @@ public abstract class CommonHostManager implements HostManager {
             }
         }
         return hostWorkers;
-    }
-
-    protected String getHeartbeatFromWorkerServers(Map<String, String> workerServers, String addr) {
-        for (Map.Entry<String, String> entry : workerServers.entrySet()) {
-            if (entry.getKey().endsWith(addr)) {
-                return entry.getValue();
-            }
-        }
-        return "";
     }
 
     protected int getWorkerHostWeightFromHeartbeat(String heartbeat) {

@@ -145,16 +145,18 @@ public class LowerWeightHostManager extends CommonHostManager {
                 // from database
                 List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
                 if (CollectionUtils.isNotEmpty(workerGroups)) {
-                    Map<String, String> workerServers = zkMasterClient.getServerMaps(ZKNodeType.WORKER);
+                    Map<String, String> serverMaps = zkMasterClient.getServerMaps(ZKNodeType.WORKER, true);
                     for (WorkerGroup wg : workerGroups) {
                         String workerGroup = wg.getName();
                         List<String> addrs = Arrays.asList(wg.getAddrList().split(Constants.COMMA));
                         Set<HostWeight> hostWeights = new HashSet<>(addrs.size());
                         for (String addr : addrs) {
-                            String heartbeat = getHeartbeatFromWorkerServers(workerServers, addr);
-                            HostWeight hostWeight = getHostWeight(addr, workerGroup, heartbeat);
-                            if (hostWeight != null) {
-                                hostWeights.add(hostWeight);
+                            if (serverMaps.containsKey(addr)) {
+                                String heartbeat = serverMaps.get(addr);
+                                HostWeight hostWeight = getHostWeight(addr, workerGroup, heartbeat);
+                                if (hostWeight != null) {
+                                    hostWeights.add(hostWeight);
+                                }
                             }
                         }
                         workerHostWeights.put(workerGroup, hostWeights);
