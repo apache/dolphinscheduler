@@ -154,6 +154,8 @@ services:
       DATABASE_DATABASE: dolphinscheduler
       DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      HADOOP_HOME: "/opt/soft/hadoop"
+      HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
       interval: 30s
@@ -164,6 +166,7 @@ services:
     - dolphinscheduler-zookeeper
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-shared-local:/opt/soft
     restart: unless-stopped
     networks:
     - dolphinscheduler
@@ -226,6 +229,7 @@ services:
     volumes:
     - dolphinscheduler-worker-data:/tmp/dolphinscheduler
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-shared-local:/opt/soft
     - dolphinscheduler-resource-local:/dolphinscheduler
     restart: unless-stopped
     networks:
@@ -241,4 +245,5 @@ volumes:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
   dolphinscheduler-logs:
+  dolphinscheduler-shared-local:
   dolphinscheduler-resource-local:

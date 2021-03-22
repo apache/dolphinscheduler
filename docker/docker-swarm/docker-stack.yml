@@ -150,6 +150,8 @@ services:
       DATABASE_DATABASE: dolphinscheduler
       DATABASE_PARAMS: characterEncoding=utf8
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      HADOOP_HOME: "/opt/soft/hadoop"
+      HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
       interval: 30s
