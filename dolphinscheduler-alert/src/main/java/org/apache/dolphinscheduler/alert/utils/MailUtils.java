@@ -19,17 +19,33 @@ package org.apache.dolphinscheduler.alert.utils;
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.template.AlertTemplateFactory;
 import org.apache.dolphinscheduler.common.enums.ShowType;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.io.*;
-import java.util.*;
 
 
 /**
@@ -85,15 +101,6 @@ public class MailUtils {
      */
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType) {
         Map<String,Object> retMap = new HashMap<>();
-
-        // if mail is default config, no need to process
-        if (StringUtils.isEmpty(MAIL_SERVER_HOST) || "xxx.xxx.com".equals(MAIL_SERVER_HOST)) {
-            retMap.put(Constants.MAIL_ENABLED, false);
-            retMap.put(Constants.STATUS, true);
-            return retMap;
-        }
-
-        retMap.put(Constants.MAIL_ENABLED, true);
         retMap.put(Constants.STATUS, false);
 
         // if there is no receivers && no receiversCc, no need to process

@@ -16,7 +16,7 @@
  */
 <template>
   <div class="minute-model">
-    <div class="v-crontab-from-model">
+    <div class="v-crontab-form-model">
       <x-radio-group v-model="radioMinute" vertical>
         <div class="list-box">
           <x-radio label="everyMinute">

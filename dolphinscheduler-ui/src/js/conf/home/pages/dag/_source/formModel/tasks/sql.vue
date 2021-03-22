@@ -35,15 +35,29 @@
                   :sql-type="sqlType">
           </m-sql-type>
         </div>
-        <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
-          <x-checkbox-group v-model="showType">
-            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
-            <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
-          </x-checkbox-group>
+        <div style="display: inline-block;" v-if="sqlType==0">
+          <span class="text-b">{{$t('Send Email')}}</span>
+          <x-switch v-model="sendEmail" style="margin-top: -4px;"></x-switch>
+        </div>
+        <div style="display: inline-block;" v-if="sqlType==0">
+          <span class="text-b">{{$t('Log display')}}</span>
+          <m-select-input v-model="displayRows" :list="[1,10,25,50,100]" style="width: 70px;"></m-select-input>
+          <span>{{$t('rows of result')}}</span>
         </div>
       </div>
     </m-list-box>
-    <template v-if="sqlType==0">
+    <template v-if="sqlType==0 && sendEmail">
+      <m-list-box>
+        <div slot="text">{{$t('Show Type')}}</div>
+        <div slot="content">
+          <div style="margin-top: 6px;">
+            <x-checkbox-group v-model="showType">
+              <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
+              <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
+            </x-checkbox-group>
+          </div>
+        </div>
+      </m-list-box>
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
@@ -58,7 +72,7 @@
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Recipient')}}</div>
         <div slot="content">
-          <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
+          <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc" style="min-width: 300px;"></m-email>
         </div>
       </m-list-box>
       <m-list-box>
@@ -83,7 +97,7 @@
     <m-list-box>
       <div slot="text">{{$t('SQL Statement')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea
                   id="code-sql-mirror"
                   name="code-sql-mirror"
@@ -144,6 +158,7 @@
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
+  import mSelectInput from '../_source/selectInput'
   import disabledState from '@/module/mixin/disabledState'
   import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
@@ -168,6 +183,10 @@
         udfs: '',
         // Sql type
         sqlType: '0',
+        // Send email
+        sendEmail: false,
+        // Display rows
+        displayRows: 10,
         // Email title
         title: '',
         // Form/attachment
@@ -243,24 +262,24 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType==0 && !this.showType.length) {
+        if (this.sqlType==0 && this.sendEmail && !this.showType.length) {
           this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
           return false
         }
-        if (this.sqlType==0 && !this.title) {
+        if (this.sqlType==0 && this.sendEmail && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType==0 && !this.receivers.length) {
+        if (this.sqlType==0 && this.sendEmail && !this.receivers.length) {
           this.$message.warning(`${i18n.$t('Recipient required')}`)
           return false
         }
         // receivers Subcomponent verification
-        if (this.sqlType==0 && !this.$refs.refEmail._manualEmail()) {
+        if (this.sqlType==0 && this.sendEmail && !this.$refs.refEmail._manualEmail()) {
           return false
         }
         // receiversCc Subcomponent verification
-        if (this.sqlType==0 && !this.$refs.refCc._manualEmail()) {
+        if (this.sqlType==0 && this.sendEmail && !this.$refs.refCc._manualEmail()) {
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -292,6 +311,8 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
           title: this.title,
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
@@ -367,6 +388,8 @@
           sql: editor ? editor.getValue() : '',
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
           title: this.title,
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
@@ -427,6 +450,8 @@
         this.sql = o.params.sql || ''
         this.udfs = o.params.udfs || ''
         this.sqlType = o.params.sqlType
+        this.sendEmail = o.params.sendEmail || false
+        this.displayRows = o.params.displayRows || 10
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         if(o.params.showType == '') {
@@ -471,6 +496,8 @@
           datasource: this.rtDatasource,
           udfs: this.udfs,
           sqlType: this.sqlType,
+          sendEmail: this.sendEmail,
+          displayRows: this.displayRows,
           title: this.title,
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
@@ -490,7 +517,7 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mSelectInput, mEmail }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

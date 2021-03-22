@@ -26,10 +26,15 @@ import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.apache.dolphinscheduler.plugin.model.PluginName;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * EmailAlertPlugin
@@ -104,12 +109,8 @@ public class EmailAlertPlugin implements AlertPlugin {
             return retMaps;
         }
 
-        boolean enabled = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.MAIL_ENABLED)));
         boolean status = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
-        if (!enabled) {
-            logger.warn("mail wasn't sent since the mail config isn't set");
-            retMaps.put(Constants.MESSAGE, "mail wasn't sent since the mail config isn't set");
-        } else if (status) {
+        if (status) {
             logger.info("alert send success");
             retMaps.put(Constants.MESSAGE, "email send success.");
             if (EnterpriseWeChatUtils.isEnable()) {

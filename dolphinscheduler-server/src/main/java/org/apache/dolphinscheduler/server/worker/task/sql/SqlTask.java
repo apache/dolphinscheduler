@@ -16,12 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.Constants.HIVE_CONF;
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.SEMICOLON;
+import static org.apache.dolphinscheduler.common.Constants.STATUS;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
+
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -30,7 +35,11 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.EnumUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -41,17 +50,30 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.slf4j.Logger;
 
-import java.sql.*;
-import java.util.*;
+import org.apache.commons.lang.StringUtils;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.apache.dolphinscheduler.alert.utils.Constants.MAIL_ENABLED;
-import static org.apache.dolphinscheduler.common.Constants.*;
-import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
+import org.slf4j.Logger;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 /**
  * sql task
  */
@@ -142,7 +164,7 @@ public class SqlTask extends AbstractTask {
 
         } catch (Exception e) {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-            logger.error("sql task error", e);
+            logger.error("sql task error: {}", e.toString());
             throw e;
         }
     }
@@ -208,7 +230,7 @@ public class SqlTask extends AbstractTask {
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                         List<SqlBinds> preStatementsBinds,
                                         List<SqlBinds> postStatementsBinds,
-                                        List<String> createFuncs){
+                                        List<String> createFuncs) throws Exception {
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
@@ -240,8 +262,8 @@ public class SqlTask extends AbstractTask {
             postSql(connection,postStatementsBinds);
 
         } catch (Exception e) {
-            logger.error("execute sql error",e);
-            throw new RuntimeException("execute sql error");
+            logger.error("execute sql error: {}", e.getMessage());
+            throw e;
         } finally {
             close(resultSet,stmt,connection);
         }
@@ -269,15 +291,20 @@ public class SqlTask extends AbstractTask {
             rowCount++;
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
-        logger.debug("execute sql : {}", result);
+        logger.debug("execute sql result : {}", result);
 
-        try {
-            sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
-                    JSONUtils.toJsonString(resultJSONArray));
-        } catch (Exception e) {
-            logger.warn("sql task sendAttachment error! msg : {} ", e.getMessage());
+        int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
+        displayRows = Math.min(displayRows, resultJSONArray.size());
+        logger.info("display sql result {} rows as follows:", displayRows);
+        for (int i = 0; i < displayRows; i++) {
+            String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+            logger.info("row {} : {}", i + 1, row);
         }
 
+        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
+            sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
+                    JSONUtils.toJsonString(resultJSONArray));
+        }
     }
 
     /**
@@ -457,10 +484,7 @@ public class SqlTask extends AbstractTask {
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
                     receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
-            if(!(boolean) mailResult.get(MAIL_ENABLED)){
-                logger.info("mail info : {} {}", title, content);
-                logger.warn("mail wasn't sent since the mail config isn't set");
-            }else if(!(boolean) mailResult.get(STATUS)){
+            if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{

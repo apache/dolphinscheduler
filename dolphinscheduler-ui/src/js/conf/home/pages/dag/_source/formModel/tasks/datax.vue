@@ -41,7 +41,7 @@
       <m-list-box>
         <div slot="text">{{$t('SQL Statement')}}</div>
         <div slot="content">
-          <div class="from-mirror">
+          <div class="form-mirror">
             <textarea
               id="code-sql-mirror"
               name="code-sql-mirror"
@@ -117,7 +117,7 @@
       <m-list-box>
         <div slot="text">json</div>
         <div slot="content">
-          <div class="from-mirror">
+          <div class="form-mirror">
             <textarea
               id="code-json-mirror"
               name="code-json-mirror"

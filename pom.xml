@@ -753,6 +753,7 @@
                         <include>**/common/shell/ShellExecutorTest.java</include>
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
+                        <include>**/common/task/SqlParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
                         <include>**/common/threadutils/ThreadUtilsTest.java</include>

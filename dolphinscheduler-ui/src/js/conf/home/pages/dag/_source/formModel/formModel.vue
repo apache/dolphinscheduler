@@ -28,7 +28,7 @@
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
-      <div class="from-model">
+      <div class="form-model">
         <!-- Node name -->
         <div class="clearfix list">
           <div class="text-box"><span>{{$t('Node name')}}</span></div>

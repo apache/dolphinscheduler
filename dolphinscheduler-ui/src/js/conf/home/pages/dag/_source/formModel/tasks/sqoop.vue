@@ -30,7 +30,7 @@
     <m-list-box v-show="isCustomTask">
       <div slot="text">{{$t('Custom Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea
             id="code-shell-mirror"
             name="code-shell-mirror"
@@ -243,7 +243,7 @@
       <m-list-box v-show="srcQueryType === '1' && sourceType ==='MYSQL'">
         <div slot="text">{{$t('SQL Statement')}}</div>
         <div slot="content">
-          <div class="from-mirror">
+          <div class="form-mirror">
             <textarea
               id="code-sqoop-mirror"
               name="code-sqoop-mirror"

@@ -39,8 +39,6 @@ public class Constants {
 
     public static final String MESSAGE = "message";
 
-    public static final String MAIL_ENABLED = "mail.enabled";
-
     public static final String MAIL_PROTOCOL = "mail.protocol";
 
     public static final String MAIL_SERVER_HOST = "mail.server.host";
