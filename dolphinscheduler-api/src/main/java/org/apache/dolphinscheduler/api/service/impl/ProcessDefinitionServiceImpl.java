@@ -1683,6 +1683,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
         }
     }
+    /**
+     * check has associated process definition
+     *
+     * @param processDefinitionId process definition id
+     * @param version version
+     * @return The query result has a specific process definition return true
+     */
+    @Override
+    public boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version) {
+        Integer hasAssociatedDefinitionId = processDefinitionMapper.queryHasAssociatedDefinitionByIdAndVersion(processDefinitionId, version);
+        return Objects.nonNull(hasAssociatedDefinitionId);
+    }
 
     /**
      * query the pagination versions info by one certain process definition id

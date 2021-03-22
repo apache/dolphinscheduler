@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -128,6 +129,11 @@ public class DependencyConfig {
     @Bean
     public ResourceMapper resourceMapper() {
         return Mockito.mock(ResourceMapper.class);
+    }
+
+    @Bean
+    public ResourceUserMapper resourceUserMapper() {
+        return Mockito.mock(ResourceUserMapper.class);
     }
 
     @Bean

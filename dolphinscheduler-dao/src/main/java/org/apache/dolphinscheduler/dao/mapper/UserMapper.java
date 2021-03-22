@@ -100,7 +100,14 @@ public interface UserMapper extends BaseMapper<User> {
      * @param queueName queue name
      * @return user list
      */
-    List<User> queryUserListByQueue(@Param("queueName") String queueName);
+    List<User> queryUserListByQueue(@Param("queue") String queueName);
+
+    /**
+     * check the user exist
+     * @param queueName queue name
+     * @return true if exist else return null
+     */
+    Boolean existUser(@Param("queue") String queue);
 
     /**
      * update user with old queue
