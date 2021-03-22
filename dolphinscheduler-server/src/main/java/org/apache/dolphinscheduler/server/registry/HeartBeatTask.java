@@ -48,17 +48,17 @@ public class HeartBeatTask implements Runnable {
     protected IStoppable stoppable = null;
 
     public HeartBeatTask(String startTime,
-                         double reservedMemory,
                          double maxCpuloadAvg,
+                         double reservedMemory,
                          Set<String> heartBeatPaths,
                          String serverType,
                          ZookeeperRegistryCenter zookeeperRegistryCenter) {
         this.startTime = startTime;
-        this.reservedMemory = reservedMemory;
         this.maxCpuloadAvg = maxCpuloadAvg;
+        this.reservedMemory = reservedMemory;
         this.heartBeatPaths = heartBeatPaths;
-        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
         this.serverType = serverType;
+        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
     }
 
     @Override

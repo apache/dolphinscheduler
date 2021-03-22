@@ -17,7 +17,11 @@
 <template>
   <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
-      <m-conditions @on-conditions="_onConditions"></m-conditions>
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group" v-if="isADMIN">
+          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create worker group')}}</x-button>
+        </template>
+      </m-conditions>
     </template>
     <template slot="content">
       <template v-if="workerGroupList.length || total>0">

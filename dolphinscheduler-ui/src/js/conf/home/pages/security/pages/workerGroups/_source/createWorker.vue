@@ -34,16 +34,16 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>IP</template>
+          <template slot="name"><strong>*</strong>{{$t('Worker Addresses')}}</template>
           <template slot="content">
             <x-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
-                    v-model="ipList"
-                    :placeholder="$t('Please enter the IP address separated by commas')">
+                    v-model.trim="addrList"
+                    :placeholder="$t('Please enter the worker addresses separated by commas')">
             </x-input>
-            <div class="ipt-tip">
-              <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
+            <div class="cwm-tip">
+              <span>{{$t('Note: Multiple worker addresses have been comma separated')}}</span>
             </div>
           </template>
         </m-list-box-f>
@@ -64,7 +64,7 @@
         store,
         id: 0,
         name: '',
-        ipList: ''
+        addrList: ''
       }
     },
     props: {
@@ -77,15 +77,13 @@
           this._submit()
         }
       },
-      checkIsIps(ips) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',');
-        for(let i=0;i<valdata.length;i++){
-            if(reg.test(valdata[i])== false){
-                return false;
-            }
-        }
-        return true
+      checkIpAndPorts (addrs) {
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):\d{1,5}$/
+        return addrs.split(',').every(item => reg.test(item))
+      },
+      checkFqdnAndPorts (addrs) {
+        let reg = /^([\w-]+\.)*[\w-]+:\d{1,5}$/i
+        return addrs.split(',').every(item => reg.test(item))
       },
       _verification () {
         // group name
@@ -93,12 +91,12 @@
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
+        if (!this.addrList) {
+          this.$message.warning(`${i18n.$t('Worker addresses cannot be empty')}`)
           return false
         }
-        if(!this.checkIsIps(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
+        if (!this.checkIpAndPorts(this.addrList) && !this.checkFqdnAndPorts(this.addrList)) {
+          this.$message.warning(`${i18n.$t('Please enter the correct worker addresses')}`)
           return false
         }
         return true
@@ -107,7 +105,7 @@
         let param = {
           id: this.id,
           name: this.name,
-          ipList: this.ipList
+          addrList: this.addrList
         }
         if (this.item) {
           param.id = this.item.id
@@ -130,7 +128,7 @@
       if (this.item) {
         this.id = this.item.id
         this.name = this.item.name
-        this.ipList = this.item.ipList
+        this.addrList = this.item.addrList
       }
     },
     mounted () {
@@ -140,7 +138,7 @@
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .create-worker-model {
-    .ipt-tip {
+    .cwm-tip {
       color: #999;
       padding-top: 4px;
       display: block;

@@ -17,32 +17,45 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *  round robin host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
-    private final Logger logger = LoggerFactory.getLogger(CommonHostManager.class);
-
     /**
-     * zookeeperNodeManager
+     * zookeeper node manager
      */
     @Autowired
     protected ZookeeperNodeManager zookeeperNodeManager;
+
+    /**
+     * zk master client
+     */
+    @Autowired
+    protected ZKMasterClient zkMasterClient;
+
+    /**
+     * worker group mapper
+     */
+    @Autowired
+    protected WorkerGroupMapper workerGroupMapper;
 
     /**
      * select host
@@ -51,15 +64,15 @@ public abstract class CommonHostManager implements HostManager {
      */
     @Override
     public Host select(ExecutionContext context){
-        Host host = new Host();
-        Collection<String> nodes = null;
-        /**
-         * executor type
-         */
+        List<Host> candidates = null;
+        String workerGroup = context.getWorkerGroup();
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
+                candidates = getHostWorkersFromDatabase(workerGroup);
+                if (candidates.isEmpty()) {
+                    candidates = getHostWorkersFromZookeeper(workerGroup);
+                }
                 break;
             case CLIENT:
                 break;
@@ -67,16 +80,47 @@ public abstract class CommonHostManager implements HostManager {
                 throw new IllegalArgumentException("invalid executorType : " + executorType);
 
         }
-        if(CollectionUtils.isEmpty(nodes)){
-            return host;
-        }
-        List<Host> candidateHosts = new ArrayList<>(nodes.size());
-        nodes.stream().forEach(node -> candidateHosts.add(Host.of(node)));
 
-        return select(candidateHosts);
+        if (CollectionUtils.isEmpty(candidates)) {
+            return new Host();
+        }
+        return select(candidates);
     }
 
     protected abstract Host select(Collection<Host> nodes);
+
+    protected List<Host> getHostWorkersFromDatabase(String workerGroup) {
+        List<Host> hosts = new ArrayList<>();
+        List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(workerGroup);
+        if (CollectionUtils.isNotEmpty(workerGroups)) {
+            for (WorkerGroup wg : workerGroups) {
+                for (String addr : wg.getAddrList().split(Constants.COMMA)) {
+                    hosts.add(Host.of(addr));
+                }
+            }
+        }
+        return hosts;
+    }
+
+    protected List<Host> getHostWorkersFromZookeeper(String workerGroup) {
+        List<Host> hosts = new ArrayList<>();
+        Collection<String> nodes = zookeeperNodeManager.getWorkerGroupNodes(workerGroup);
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            for (String node : nodes) {
+                hosts.add(Host.of(node));
+            }
+        }
+        return hosts;
+    }
+
+    protected String getHeartbeatFromWorkerServers(Map<String, String> workerServers, String addr) {
+        for (Map.Entry<String, String> entry : workerServers.entrySet()) {
+            if (entry.getKey().endsWith(addr)) {
+                return entry.getValue();
+            }
+        }
+        return "";
+    }
 
     public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
         this.zookeeperNodeManager = zookeeperNodeManager;
@@ -85,4 +129,5 @@ public abstract class CommonHostManager implements HostManager {
     public ZookeeperNodeManager getZookeeperNodeManager() {
         return zookeeperNodeManager;
     }
+
 }
