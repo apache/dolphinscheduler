@@ -93,7 +93,7 @@ public class RuleParserUtils {
 
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getTargetConnectorType())) {
             BaseDataSource targetDataSource = DataSourceFactory.getDatasource(DbType.of(dataQualityTaskExecutionContext.getTargetType()),
-                    dataQualityTaskExecutionContext.getSourceConnectionParams());
+                    dataQualityTaskExecutionContext.getTargetConnectionParams());
             ConnectorParameter targetConnectorParameter = new ConnectorParameter();
             targetConnectorParameter.setType(dataQualityTaskExecutionContext.getTargetConnectorType());
             Map<String,Object> config = new HashMap<>();
