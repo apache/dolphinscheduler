@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * round robin selector
@@ -39,18 +37,16 @@ public class RoundRobinSelectorTest {
     @Test
     public void testSelect1() {
         RoundRobinSelector selector = new RoundRobinSelector();
-        // dismiss of server warm-up time
-        long startTime = System.currentTimeMillis() - 60 * 10 * 1000;
-        List<Host> hostOneList = Arrays.asList(
-            new Host("192.168.1.1", 80, 20, startTime, "kris"),
-            new Host("192.168.1.2", 80, 10, startTime, "kris"));
+        List<HostWorker> hostOneList = Arrays.asList(
+            new HostWorker("192.168.1.1", 80, 20, "kris"),
+            new HostWorker("192.168.1.2", 80, 10, "kris"));
 
-        List<Host> hostTwoList = Arrays.asList(
-            new Host("192.168.1.1", 80, 20, startTime, "kris"),
-            new Host("192.168.1.2", 80, 10, startTime, "kris"),
-            new Host("192.168.1.3", 80, 10, startTime, "kris"));
+        List<HostWorker> hostTwoList = Arrays.asList(
+            new HostWorker("192.168.1.1", 80, 20, "kris"),
+            new HostWorker("192.168.1.2", 80, 10, "kris"),
+            new HostWorker("192.168.1.3", 80, 10, "kris"));
 
-        Host result;
+        HostWorker result;
         result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.1", result.getIp());
 
@@ -93,17 +89,15 @@ public class RoundRobinSelectorTest {
 
         result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.1", result.getIp());
-
     }
 
     @Test
-    public void testWarmUpRoundRobinSelector() {
+    public void testWeightRoundRobinSelector() {
         RoundRobinSelector selector = new RoundRobinSelector();
-        Host result;
+        HostWorker result;
         result = selector.select(
-            Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis() - 60 * 1000 * 2, "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis() - 60 * 1000 * 10, "kris")));
+            Arrays.asList(new HostWorker("192.168.1.1", 11, 20, "kris"), new HostWorker("192.168.1.2", 22, 80, "kris")));
         Assert.assertEquals("192.168.1.2", result.getIp());
-
     }
 
 }

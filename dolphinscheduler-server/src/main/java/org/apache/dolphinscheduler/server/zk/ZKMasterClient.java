@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.MasterServer;
@@ -308,7 +307,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
-        workerHost = Host.of(workerHost).getAddress();
         logger.info("start worker[{}] failover ...", workerHost);
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
