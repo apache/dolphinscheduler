@@ -428,7 +428,6 @@ public class ResourcesService extends BaseService {
         resource.setDescription(desc);
         resource.setUpdateTime(now);
         if (file != null) {
-            resource.setFileName(file.getOriginalFilename());
             resource.setSize(file.getSize());
         }
 
