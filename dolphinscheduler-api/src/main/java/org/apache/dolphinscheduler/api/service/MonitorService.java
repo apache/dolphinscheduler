@@ -18,12 +18,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
 import org.apache.dolphinscheduler.common.Constants;
@@ -34,8 +28,16 @@ import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.google.common.collect.Sets;
 
 /**
@@ -150,7 +152,7 @@ public class MonitorService extends BaseService {
 
     checkNotNull(zookeeperMonitor);
     ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-    return zookeeperMonitor.getServersList(zkNodeType);
+    return zookeeperMonitor.getServerList(zkNodeType);
   }
 
 }

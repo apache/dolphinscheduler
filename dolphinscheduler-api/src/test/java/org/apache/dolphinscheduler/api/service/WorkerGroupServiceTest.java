@@ -92,9 +92,9 @@ public class WorkerGroupServiceTest {
     @Test
     public void testSaveWorkerGroup() {
         // worker servers
-        Map<String, String> workerServers = new HashMap<>();
-        workerServers.put("default/127.0.0.1:1234", "0.3,0.07,4.4,7.42,16.0,0.3,2021-03-19 20:17:58,2021-03-19 20:25:29,0,79214");
-        Mockito.when(zookeeperMonitor.getServerMaps(ZKNodeType.WORKER)).thenReturn(workerServers);
+        Map<String, String> serverMaps = new HashMap<>();
+        serverMaps.put("127.0.0.1:1234", "0.3,0.07,4.4,7.42,16.0,0.3,2021-03-19 20:17:58,2021-03-19 20:25:29,0,79214");
+        Mockito.when(zookeeperMonitor.getServerMaps(ZKNodeType.WORKER, true)).thenReturn(serverMaps);
 
         User user = new User();
         // general user add

@@ -17,17 +17,18 @@
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -57,7 +58,7 @@ public class ZookeeperMonitor extends AbstractZKClient {
 	 * @return master server information
 	 */
 	public List<Server> getMasterServers(){
-	    return getServersList(ZKNodeType.MASTER);
+	    return getServerList(ZKNodeType.MASTER);
 	}
 
 	/**
@@ -65,7 +66,7 @@ public class ZookeeperMonitor extends AbstractZKClient {
 	 * @return worker server informations
 	 */
 	public List<Server> getWorkerServers(){
-	    return getServersList(ZKNodeType.WORKER);
+	    return getServerList(ZKNodeType.WORKER);
 	}
 
 	private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {

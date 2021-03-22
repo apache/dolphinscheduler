@@ -151,14 +151,9 @@ public class WorkerGroupService extends BaseService {
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
-        List<String> workerAddrs = new ArrayList<>();
-        Map<String, String> workerServers = zookeeperMonitor.getServerMaps(ZKNodeType.WORKER);
-        for (Map.Entry<String, String> entry : workerServers.entrySet()) {
-            String[] items = entry.getKey().split(Constants.DIVISION_STRING);
-            workerAddrs.add(items[items.length - 1]);
-        }
+        Map<String, String> serverMaps = zookeeperMonitor.getServerMaps(ZKNodeType.WORKER, true);
         for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
-            if (!workerAddrs.contains(addr)) {
+            if (!serverMaps.containsKey(addr)) {
                 return addr;
             }
         }

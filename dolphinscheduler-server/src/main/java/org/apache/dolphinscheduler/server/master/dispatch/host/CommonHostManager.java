@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
@@ -93,9 +94,12 @@ public abstract class CommonHostManager implements HostManager {
         List<Host> hosts = new ArrayList<>();
         List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(workerGroup);
         if (CollectionUtils.isNotEmpty(workerGroups)) {
+            Map<String, String> serverMaps = zkMasterClient.getServerMaps(ZKNodeType.WORKER, true);
             for (WorkerGroup wg : workerGroups) {
                 for (String addr : wg.getAddrList().split(Constants.COMMA)) {
-                    hosts.add(Host.of(addr));
+                    if (serverMaps.containsKey(addr)) {
+                        hosts.add(Host.of(addr));
+                    }
                 }
             }
         }
@@ -111,15 +115,6 @@ public abstract class CommonHostManager implements HostManager {
             }
         }
         return hosts;
-    }
-
-    protected String getHeartbeatFromWorkerServers(Map<String, String> workerServers, String addr) {
-        for (Map.Entry<String, String> entry : workerServers.entrySet()) {
-            if (entry.getKey().endsWith(addr)) {
-                return entry.getValue();
-            }
-        }
-        return "";
     }
 
     public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
