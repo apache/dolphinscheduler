@@ -81,7 +81,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
         Map<String,String> inputParameter = dataQualityParameters.getRuleInputParameter();
         for (Map.Entry<String,String> entry: inputParameter.entrySet()) {
-            if (entry != null) {
+            if (entry != null && entry.getValue() != null) {
                 entry.setValue(entry.getValue().trim());
             }
         }
