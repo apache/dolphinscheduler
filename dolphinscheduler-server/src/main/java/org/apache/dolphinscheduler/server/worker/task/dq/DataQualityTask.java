@@ -175,7 +175,7 @@ public class DataQualityTask extends AbstractYarnTask {
     private static Map<String,Property> replaceDateExpressionInLocalParam(Map<String,Property> localParams) {
 
         if (localParams == null) {
-            return localParams;
+            return null;
         }
 
         for (Map.Entry<String,Property> entry : localParams.entrySet()) {
