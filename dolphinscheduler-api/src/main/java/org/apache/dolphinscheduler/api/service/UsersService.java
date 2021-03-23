@@ -71,6 +71,14 @@ public interface UsersService {
     User queryUser(int id);
 
     /**
+     * query user by ids
+     *
+     * @param ids id list
+     * @return user list
+     */
+    List<User> queryUser(List<Integer> ids);
+
+    /**
      * query user
      *
      * @param name name

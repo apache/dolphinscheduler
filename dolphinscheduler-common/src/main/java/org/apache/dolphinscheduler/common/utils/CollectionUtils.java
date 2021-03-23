@@ -27,6 +27,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Provides utility methods and decorators for {@link Collection} instances.
@@ -124,6 +126,38 @@ public class CollectionUtils {
             }
         }
         return map;
+    }
+
+    /**
+     * Transform item in collection
+     *
+     * @param collection origin collection
+     * @param transformFunc transform function
+     * @param <R> origin item type
+     * @param <T> target type
+     * @return transform list
+     */
+    public static <R, T> List<T> transformToList(Collection<R> collection, Function<R, T> transformFunc) {
+        if (isEmpty(collection)) {
+            return new ArrayList<>();
+        }
+        return collection.stream().map(transformFunc).collect(Collectors.toList());
+    }
+
+    /**
+     * Collect collection to map
+     *
+     * @param collection origin collection
+     * @param keyTransformFunction key transform function
+     * @param <K> target k type
+     * @param <V> value
+     * @return map
+     */
+    public static <K, V> Map<K, V> collectionToMap(Collection<V> collection, Function<V, K> keyTransformFunction) {
+        if (isEmpty(collection)) {
+            return new HashMap<>();
+        }
+        return collection.stream().collect(Collectors.toMap(keyTransformFunction, Function.identity()));
     }
 
     /**
