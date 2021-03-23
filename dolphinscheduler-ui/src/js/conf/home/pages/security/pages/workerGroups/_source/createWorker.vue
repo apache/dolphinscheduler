@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 <template>
-  <m-popup
-          ref="popup"
+  <m-popover
+          ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit worker group') : $t('Create worker group')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-worker-model">
         <m-list-box-f>
@@ -35,28 +35,28 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>IP</template>
+          <template slot="name"><strong>*</strong>{{$t('Worker Addresses')}}</template>
           <template slot="content">
             <el-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
                     size="mini"
-                    v-model="ipList"
-                    :placeholder="$t('Please enter the IP address separated by commas')">
+                    v-model.trim="addrList"
+                    :placeholder="$t('Please enter the worker addresses separated by commas')">
             </el-input>
-            <div class="ipt-tip">
-              <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
+            <div class="cwm-tip">
+              <span>{{$t('Note: Multiple worker addresses have been comma separated')}}</span>
             </div>
           </template>
         </m-list-box-f>
       </div>
     </template>
-  </m-popup>
+  </m-popover>
 </template>
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
+  import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -66,7 +66,7 @@
         store,
         id: 0,
         name: '',
-        ipList: ''
+        addrList: ''
       }
     },
     props: {
@@ -79,15 +79,13 @@
           this._submit()
         }
       },
-      checkIsIps (ips) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',')
-        for (let i = 0; i < valdata.length; i++) {
-          if (reg.test(valdata[i]) === false) {
-            return false
-          }
-        }
-        return true
+      checkIpAndPorts (addrs) {
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):\d{1,5}$/
+        return addrs.split(',').every(item => reg.test(item))
+      },
+      checkFqdnAndPorts (addrs) {
+        let reg = /^([\w-]+\.)*[\w-]+:\d{1,5}$/i
+        return addrs.split(',').every(item => reg.test(item))
       },
       _verification () {
         // group name
@@ -95,12 +93,12 @@
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
+        if (!this.addrList) {
+          this.$message.warning(`${i18n.$t('Worker addresses cannot be empty')}`)
           return false
         }
-        if (!this.checkIsIps(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
+        if (!this.checkIpAndPorts(this.addrList) && !this.checkFqdnAndPorts(this.addrList)) {
+          this.$message.warning(`${i18n.$t('Please enter the correct worker addresses')}`)
           return false
         }
         return true
@@ -109,22 +107,23 @@
         let param = {
           id: this.id,
           name: this.name,
-          ipList: this.ipList
+          addrList: this.addrList
         }
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs.popup.spinnerLoading = true
+        this.$refs.popover.spinnerLoading = true
         this.store.dispatch('security/saveWorkerGroups', param).then(res => {
+          this.$refs.popover.spinnerLoading = false
           this.$emit('onUpdate')
           this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
+          this.$refs.popover.spinnerLoading = false
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},
@@ -132,17 +131,17 @@
       if (this.item) {
         this.id = this.item.id
         this.name = this.item.name
-        this.ipList = this.item.ipList
+        this.addrList = this.item.addrList
       }
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopover, mListBoxF }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .create-worker-model {
-    .ipt-tip {
+    .cwm-tip {
       color: #999;
       padding-top: 4px;
       display: block;

@@ -37,9 +37,9 @@
           <el-switch size="small" v-model="sendEmail"></el-switch>
         </div>
         <div style="display: inline-block;" v-if="sqlType === '0'">
-          <span class="text-b">{{$t('Display query result')}}</span>
+          <span class="text-b">{{$t('Log display')}}</span>
           <m-select-input v-model="displayRows" :list="[1,10,25,50,100]" style="width: 70px;"></m-select-input>
-          <span>({{$t('Rows')}})</span>
+          <span>{{$t('rows of result')}}</span>
         </div>
       </div>
     </m-list-box>
