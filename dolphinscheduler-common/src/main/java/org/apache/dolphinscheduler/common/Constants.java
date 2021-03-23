@@ -1107,4 +1107,12 @@ public final class Constants {
     public static final String CHANGE = "change";
 
     public static final String RULE_NAME = "rule_name";
+
+    public static final String YEAR = "YEAR";
+    public static final String MONTH = "MONTH";
+    public static final String DAY = "DAY";
+    public static final String HOUR = "HOUR";
+    public static final String MINUTE = "MINUTE";
+    public static final String SECOND = "SECOND";
+    public static final String WEEK = "WEEK";
 }
