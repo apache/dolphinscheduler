@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.MASTER_PREFIX;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-import static org.apache.dolphinscheduler.common.Constants.WORKER_PREFIX;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
@@ -230,9 +228,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
         // ip_sequence_no
         String[] zNodesPath = zNode.split("\\/");
         String ipSeqNo = zNodesPath[zNodesPath.length - 1];
-
-        String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
-        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
+        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
 
         return !registerOperator.isExisted(zNode) || registerOperator.isExisted(deadServerPath);
     }

@@ -13,18 +13,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.common.enums;
+*/
 
-/**
- * zk node type
- */
-public enum ZKNodeType {
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
-    /**
-     * 0 master node;
-     * 1 worker node;
-     * 2 dead_server node;
-     */
-    MASTER, WORKER, DEAD_SERVER;
-}
+-- uc_dolphin_T_t_ds_worker_group_R_ip_list
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_worker_group_R_ip_list;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_worker_group_R_ip_list()
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_NAME='t_ds_worker_group'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME ='ip_list')
+    THEN
+        ALTER TABLE t_ds_worker_group CHANGE COLUMN `ip_list` `addr_list` text;
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_worker_group_R_ip_list;
+DROP PROCEDURE uc_dolphin_T_t_ds_worker_group_R_ip_list;
