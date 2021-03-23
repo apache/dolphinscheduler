@@ -97,9 +97,4 @@ public class DateExpressionReplaceUtil {
                 return -1;
         }
     }
-
-    public static void main(String[] args) {
-        replaceDateExpression("${yyyy-MM-dd,DAY,-1}");
-        replaceDateExpression("2132132131");
-    }
 }

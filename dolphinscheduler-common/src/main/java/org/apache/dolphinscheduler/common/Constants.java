@@ -1100,12 +1100,10 @@ public final class Constants {
     public static final String AND = " AND ";
     public static final String WRITER_CONNECTOR_TYPE = "writer_connector_type";
     public static final String WRITER_DATASOURCE_ID = "writer_datasource_id";
-
     public static final String TASK_INSTANCE_ID = "task_instance_id";
     public static final String NAME = "";
     public static final String SMALL = "small";
     public static final String CHANGE = "change";
-
     public static final String RULE_NAME = "rule_name";
 
     public static final String YEAR = "YEAR";

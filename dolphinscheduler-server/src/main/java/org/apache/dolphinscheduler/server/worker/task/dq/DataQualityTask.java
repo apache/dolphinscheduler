@@ -173,6 +173,11 @@ public class DataQualityTask extends AbstractYarnTask {
     }
 
     private static Map<String,Property> replaceDateExpressionInLocalParam(Map<String,Property> localParams) {
+
+        if (localParams == null) {
+            return null;
+        }
+
         for (Map.Entry<String,Property> entry : localParams.entrySet()) {
             Property property = entry.getValue();
             property.setValue(DateExpressionReplaceUtil.replaceDateExpression(property.getValue()));
