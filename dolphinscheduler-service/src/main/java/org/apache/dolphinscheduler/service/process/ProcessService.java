@@ -2187,7 +2187,8 @@ public class ProcessService {
     }
 
     private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
-        taskDefinition.setName(taskNode.getName());
+        // TODO for the front-end UI, name with id
+        taskDefinition.setName(taskNode.getId() + "|" + taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
         taskDefinition.setTaskParams(TaskType.of(taskNode.getType()) == TaskType.DEPENDENT ? taskNode.getDependence() : taskNode.getParams());
@@ -2447,9 +2448,10 @@ public class ProcessService {
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream().collect(Collectors.toMap(TaskDefinitionLog::getCode, log -> log));
         taskNodeMap.forEach((k, v) -> {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
-            v.setId("task-" + taskDefinitionLog.getId());
+            // TODO split from name
+            v.setId(StringUtils.substringBefore(taskDefinitionLog.getName(), "|"));
             v.setCode(taskDefinitionLog.getCode());
-            v.setName(taskDefinitionLog.getName());
+            v.setName(StringUtils.substringAfter(taskDefinitionLog.getName(), "|"));
             v.setDesc(taskDefinitionLog.getDescription());
             v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
             v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
