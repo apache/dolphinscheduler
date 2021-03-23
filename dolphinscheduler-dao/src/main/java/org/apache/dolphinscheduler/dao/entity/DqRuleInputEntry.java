@@ -112,6 +112,12 @@ public class DqRuleInputEntry implements Serializable {
      */
     @TableField(exist = false)
     private String valuesMap;
+
+    /**
+     * values map
+     */
+    @TableField(exist = false)
+    private Integer index;
     /**
      * create_time
      */
@@ -245,6 +251,14 @@ public class DqRuleInputEntry implements Serializable {
         this.valuesMap = valuesMap;
     }
 
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -279,6 +293,7 @@ public class DqRuleInputEntry implements Serializable {
                 + ", isEmit=" + isEmit
                 + ", isValidate=" + isValidate
                 + ", valuesMap='" + valuesMap + '\''
+                + ", index=" + index
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime
                 + '}';

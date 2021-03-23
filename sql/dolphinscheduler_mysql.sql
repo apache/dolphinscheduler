@@ -970,10 +970,10 @@ INSERT INTO `t_ds_dq_rule_input_entry`
 VALUES(5, 'src_field', 0, '源表检测列', NULL, NULL, 'Please enter column, only single column is supported', 0, 0, 0, 1, 1, 0, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_dq_rule_input_entry`
 (id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
-VALUES(6, 'statistics_name', 0, '统计值', NULL, NULL, 'Please enter statistics name, the alias in statistics execute sql', 0, 0, 1, 0, 0, 0, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(6, 'statistics_name', 0, '统计值名', NULL, NULL, 'Please enter statistics name, the alias in statistics execute sql', 0, 0, 1, 0, 0, 0, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_dq_rule_input_entry`
 (id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
-VALUES(7, 'check_type', 2, '检测方式', '0', '[{"label":"统计值与固定值比较","value":"0"},{"label":"统计值与比对值比较","value":"1"},{"label":"统计值占比对值百分比","value":"2"}]', 'please select check type', 0, 0, 3, 1, 1, 0, 0, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+VALUES(7, 'check_type', 2, '检测方式', '0', '[{"label":"统计值与固定值比较","value":"0"},{"label":"统计值与比对值比较","value":"1"},{"label":"统计值占比对值百分比","value":"2"}]', 'please select check type', 0, 0, 3, 1, 1, 1, 0, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_dq_rule_input_entry`
 (id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
 VALUES(8, 'operator', 2, '操作符', '0', '[{"label":"=","value":"0"},{"label":"<","value":"1"},{"label":"<=","value":"2"},{"label":">","value":"3"},{"label":">=","value":"4"},{"label":"!=","value":"5"}]', 'please select operator', 0, 0, 3, 1, 1, 0, 0, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
@@ -1064,191 +1064,194 @@ CREATE TABLE `t_ds_relation_rule_input_entry` (
     `rule_id` int(11) DEFAULT NULL COMMENT 'rule id',
     `rule_input_entry_id` int(11) DEFAULT NULL COMMENT 'rule input entry id',
     `values_map` text COMMENT 'input entry value map',
+    `index` int(11) DEFAULT NULL COMMENT 'index',
     `create_time` datetime DEFAULT NULL COMMENT 'create time',
     `update_time` datetime DEFAULT NULL COMMENT 'update time',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8;
-
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(1, 1, 1, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(1, 1, 1, NULL, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(2, 1, 2, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(2, 1, 2, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(3, 1, 3, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(3, 1, 3, NULL, 3, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(4, 1, 4, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(4, 1, 4, NULL, 4, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(5, 1, 5, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(5, 1, 5, NULL, 5, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(6, 1, 6, '{"statistics_name":"miss_count.miss"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(6, 1, 6, '{"statistics_name":"miss_count.miss"}', 6, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(7, 1, 7, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(7, 1, 7, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(8, 1, 8, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(8, 1, 8, NULL, 8, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(9, 1, 9, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(9, 1, 9, NULL, 9, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(10, 1, 10, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(10, 1, 10, NULL, 10, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(11, 1, 17, '{"comparison_name":"total_count.total"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(11, 1, 17, '{"comparison_name":"total_count.total"}', 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(12, 1, 19, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(12, 1, 19, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(13, 2, 1, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(13, 2, 1, NULL, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(14, 2, 2, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(14, 2, 2, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(15, 2, 3, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(15, 2, 3, NULL, 3, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(16, 2, 6, '{"is_show":"true","can_edit":"true"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(16, 2, 6, '{"is_show":"true","can_edit":"true"}', 4, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(17, 2, 16, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(17, 2, 16, NULL, 5, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(18, 2, 4, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(18, 2, 4, NULL, 6, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(19, 2, 7, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(19, 2, 7, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(20, 2, 8, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(20, 2, 8, NULL, 8, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(21, 2, 9, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(21, 2, 9, NULL, 9, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(22, 2, 10, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(22, 2, 10, NULL, 10, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(23, 2, 17, '{"comparison_name":"total_count.total"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(23, 2, 17, '{"comparison_name":"total_count.total"}', 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(24, 2, 19, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(24, 2, 19, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(25, 3, 1, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(25, 3, 1, NULL, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(26, 3, 2, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(26, 3, 2, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(27, 3, 3, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(27, 3, 3, NULL, 3, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(28, 3, 4, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(28, 3, 4, NULL, 4, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(29, 3, 11, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(29, 3, 11, NULL, 5, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(30, 3, 12, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(30, 3, 12, NULL, 6, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(31, 3, 13, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(31, 3, 13, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(32, 3, 14, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(32, 3, 14, NULL, 8, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(33, 3, 15, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(33, 3, 15, NULL, 9, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(34, 3, 7, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(34, 3, 7, NULL, 10, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(35, 3, 8, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(35, 3, 8, NULL, 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(36, 3, 9, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(36, 3, 9, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(37, 3, 10, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(37, 3, 10, NULL, 13, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(38, 3, 17, '{"comparison_name":"total_count.total"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(38, 3, 17, '{"comparison_name":"total_count.total"}', 14, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(39, 3, 19, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(39, 3, 19, NULL, 15, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(40, 4, 1, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(40, 4, 1, NULL, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(41, 4, 2, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(41, 4, 2, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(42, 4, 3, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(42, 4, 3, NULL, 3, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(43, 4, 6, '{"is_show":"true","can_edit":"true"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(43, 4, 6, '{"is_show":"true","can_edit":"true"}', 4, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(44, 4, 16, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(44, 4, 16, NULL, 5, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(45, 4, 11, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(45, 4, 11, NULL, 6, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(46, 4, 12, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(46, 4, 12, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(47, 4, 13, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(47, 4, 13, NULL, 8, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(48, 4, 17, '{"is_show":"true","can_edit":"true"}', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(48, 4, 17, '{"is_show":"true","can_edit":"true"}', 9, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(49, 4, 18, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(49, 4, 18, NULL, 10, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(50, 4, 7, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(50, 4, 7, NULL, 11, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(51, 4, 8, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(51, 4, 8, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(52, 4, 9, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(52, 4, 9, NULL, 13, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(53, 4, 10, '', '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(53, 4, 10, NULL, 14, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(54, 1, 20, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(54, 1, 20, NULL, 13, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(55, 1, 21, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(55, 1, 21, NULL, 14, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(56, 2, 20, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(56, 2, 20, NULL, 13, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(57, 2, 21, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(57, 2, 21, NULL, 14, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(58, 3, 20, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(58, 3, 20, NULL, 16, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(59, 3, 21, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(59, 3, 21, NULL, 17, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(60, 4, 20, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(60, 4, 20, NULL, 15, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 INSERT INTO `t_ds_relation_rule_input_entry`
-(id, rule_id, rule_input_entry_id, values_map, create_time, update_time)
-VALUES(61, 4, 21, NULL, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(61, 4, 21, NULL, 16, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO `t_ds_relation_rule_input_entry`
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(62, 3, 6, '{"statistics_name":"miss_count.miss"}', 18, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
