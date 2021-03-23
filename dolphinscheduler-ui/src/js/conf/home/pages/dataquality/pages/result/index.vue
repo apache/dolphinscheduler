@@ -77,7 +77,7 @@
           endDate: '',
           // search value
           searchVal: '',
-          // host
+
           ruleType: ''
         },
         isLeft: true,
