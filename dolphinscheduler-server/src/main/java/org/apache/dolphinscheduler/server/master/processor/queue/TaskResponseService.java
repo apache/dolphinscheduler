@@ -257,7 +257,7 @@ public class TaskResponseService {
             if (CheckType.STATISTICS_COMPARE_FIXED_VALUE == checkType) {
                 isFailure = getCompareResult(operatorType,statisticsValue,threshold);
             } else if (CheckType.STATISTICS_COMPARE_COMPARISON == checkType) {
-                isFailure = getCompareResult(operatorType,statisticsValue,comparisonValue);
+                isFailure = getCompareResult(operatorType,comparisonValue - statisticsValue,threshold);
             } else if (CheckType.STATISTICS_COMPARISON_PERCENTAGE == checkType) {
                 isFailure = getCompareResult(operatorType,statisticsValue / comparisonValue * 100,threshold);
             }
