@@ -75,6 +75,9 @@ export default {
   setDesc (state, payload) {
     state.description = payload
   },
+  setReleaseState (state, payload) {
+    state.releaseState = payload
+  },
   /**
    * Whether to update the process definition
    */
@@ -159,5 +162,16 @@ export default {
     } else {
       state.cacheTasks[payload.id] = payload
     }
+  },
+  resetLocalParam (state, payload) {
+    const tasks = state.tasks
+    tasks.forEach((task, index) => {
+      payload.forEach(p => {
+        if (p.id === task.id) {
+          tasks[index].params.localParams = p.localParam
+        }
+      })
+    })
+    state.tasks = tasks
   }
 }

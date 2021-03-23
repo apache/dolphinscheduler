@@ -91,7 +91,7 @@ body{
         position: absolute;
         right: 8px;
         top: 13px;
-        .from-box {
+        .form-box {
           .list {
             float: right;
             margin-right: 4px;
@@ -102,6 +102,9 @@ body{
   }
   .main-layout-model {
     &.dag-screen {
+      .m-top {
+        position: unset;
+      }
       .m-bottom {
         z-index: 2;
       }
@@ -359,7 +362,11 @@ body::-webkit-scrollbar-thumb {
   max-height: 200px;
   overflow: auto;
 }
-
-
-
-
+.el-dialog__body {
+  padding: 10px;
+}
+.el-dialog__header {
+  .el-dialog__headerbtn {
+    right: 10px;
+  }
+}

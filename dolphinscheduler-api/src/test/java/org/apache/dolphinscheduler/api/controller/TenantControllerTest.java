@@ -14,11 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,15 +35,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * tenant controller test
  */
 public class TenantControllerTest extends AbstractControllerTest{
+
     private static Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
 
     @Test
@@ -131,7 +134,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
+        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }

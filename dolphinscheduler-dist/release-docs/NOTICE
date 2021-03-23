@@ -1,5 +1,5 @@
 Apache DolphinScheduler (incubating)
-Copyright 2019-2020 The Apache Software Foundation
+Copyright 2019-2021 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -30,6 +30,24 @@ Jetty is dual licensed under both
 Jetty may be distributed under either license.
 
 ------
+
+plexus-cipher
+
+The code in this component contains a class - Base64 taken from http://juliusdavies.ca/svn/not-yet-commons-ssl/tags/commons-ssl-0.3.10/src/java/org/apache/commons/ssl/Base64.java
+which is Apache license: http://www.apache.org/licenses/LICENSE-2.0
+
+The PBE key processing routine PBECipher.createCipher() is adopted from http://juliusdavies.ca/svn/not-yet-commons-ssl/tags/commons-ssl-0.3.10/src/java/org/apache/commons/ssl/OpenSSL.java
+ which is also Apache APL-2.0 license: http://www.apache.org/licenses/LICENSE-2.0
+
+------
+plexus-utils
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+------
+
+
 Eclipse
 
 The following artifacts are EPL.
@@ -542,6 +560,34 @@ This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 --------------------------------------------------------------------------------
+
+==============================================================
+ protostuff
+ Copyright 2009 David Yu dyuproject@gmail.com
+==============================================================
+
+protobuf is copyright Google inc unless otherwise noted.
+It is licensed under the BSD license.
+
+jackson-core-asl is copyright FasterXml unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
+antlr is copyright Terence Parr unless otherwise noted.
+It is licensed under the BSD license.
+
+stringtemplate is copyright Terence Parr unless otherwise noted.
+It is licensed under the BSD license.
+
+velocity is licensed under the apache 2.0 license.
+
+B64Code.java is copyright Mort Bay Consulting Pty Ltd unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
+jarjar is copyright Google inc unless otherwise noted.
+It is licensed under the apache 2.0 license.
+
+guava is copyright Google inc unless otherwise noted.
+It is licensed under the apache 2.0 license.
 
 This product includes parquet-tools, initially developed at ARRIS, Inc. with
 the following copyright notice:
@@ -1917,26 +1963,3 @@ ANT NOTICE
 
    Please read the different LICENSE files present in the root directory of
    this distribution.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

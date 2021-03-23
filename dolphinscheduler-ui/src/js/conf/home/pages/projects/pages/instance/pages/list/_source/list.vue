@@ -17,15 +17,15 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
+      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
         <el-table-column type="selection" width="50"></el-table-column>
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links" :title="scope.row.name">{{scope.row.name}}</router-link>
+                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -56,11 +56,15 @@
             <span>{{scope.row.endTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="duration" :label="$t('Duration')"></el-table-column>
+        <el-table-column :label="$t('Duration')">
+          <template slot-scope="scope">
+            <span>{{scope.row.duration | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="runTimes" :label="$t('Run Times')"></el-table-column>
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
-        <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
+        <el-table-column prop="host" :label="$t('host')" min-width="190"></el-table-column>
         <el-table-column :label="$t('Operation')" width="240" fixed="right">
           <template slot-scope="scope">
             <div v-show="scope.row.disabled">
@@ -78,13 +82,12 @@
                 </span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">
-                <span><el-button type="warning" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
+                <span><el-button type="danger" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
-                <span><el-button type="error" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
+                <span><el-button type="warning" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
-              <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
+              <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
                 <el-popconfirm
                   :confirmButtonText="$t('Confirm')"
                   :cancelButtonText="$t('Cancel')"
@@ -92,7 +95,7 @@
                   iconColor="red"
                   :title="$t('Delete?')"
                   @onConfirm="_delete(scope.row,scope.row.id)">
-                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.releaseState === 'ONLINE'" circle slot="reference"></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP' && scope.row.state !== 'PAUSE'" circle slot="reference"></el-button>
                 </el-popconfirm>
               </el-tooltip>
               <el-tooltip :content="$t('Gantt')" placement="top" :enterable="false">
@@ -102,35 +105,34 @@
             <div v-show="!scope.row.disabled">
               <!--Edit-->
               <el-button
-                      type="info"
-                      size="mini"
-                      icon="el-icon-edit-outline"
-                      disabled="true"
-                      circle>
+                  type="info"
+                  size="mini"
+                  icon="el-icon-edit-outline"
+                  disabled="true"
+                  circle>
               </el-button>
 
               <!--Rerun-->
-              <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
-                <span>
-                  <el-button
-                    v-show="buttonType === 'run'"
-                    type="info"
-                    size="mini"
-                    disabled="true"
-                    circle>
-                    <span style="padding: 0 2px">{{scope.row.count}}</span>
-                  </el-button>
-                </span>
-              </el-tooltip>
+              <span>
+                <el-button
+                  v-show="buttonType === 'run'"
+                  type="info"
+                  size="mini"
+                  disabled="true"
+                  circle>
+                  <span style="padding: 0 2px">{{scope.row.count}}</span>
+                </el-button>
+              </span>
               <el-button
-                      v-show="buttonType !== 'run'"
-                      type="info"
-                      size="mini"
-                      icon="el-icon-refresh"
-                      disabled="true"
-                      circle>
+                  v-show="buttonType !== 'run'"
+                  type="info"
+                  size="mini"
+                  icon="el-icon-refresh"
+                  disabled="true"
+                  circle>
               </el-button>
 
+              <!--Store-->
               <span>
                 <el-button
                   v-show="buttonType === 'store'"
@@ -153,13 +155,12 @@
               <!--Recovery Suspend/Pause-->
               <span>
                 <el-button
-                  style="padding: 0 3px"
                   v-show="(scope.row.state === 'PAUSE' || scope.row.state === 'STOP') && buttonType === 'suspend'"
                   type="warning"
                   size="mini"
                   circle
                   disabled="true">
-                  {{scope.row.count}}
+                  <span style="padding: 0 3px">{{scope.row.count}}</span>
                 </el-button>
               </span>
 
@@ -185,7 +186,19 @@
                 </el-button>
               </span>
 
-              <!--delete-->
+              <!--Stop-->
+              <span>
+                <el-button
+                  v-show="scope.row.state !== 'STOP'"
+                  type="warning"
+                  size="mini"
+                  circle
+                  icon="el-icon-video-pause"
+                  disabled="true">
+                </el-button>
+              </span>
+
+              <!--Delete-->
               <el-button
                   type="danger"
                   circle
@@ -207,7 +220,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+    <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"
@@ -286,7 +299,6 @@
        * @param REPEAT_RUNNING
        */
       _reRun (item, index) {
-        console.log(index)
         this._countDownFn({
           id: item.id,
           executeType: 'REPEAT_RUNNING',
@@ -429,22 +441,9 @@
         })
         this._arrDelChange()
       },
-      // _arrDelChange (v) {
-      //   let arr = []
-      //   this.list.forEach((item)=>{
-      //     if (item.isCheck) {
-      //       arr.push(item.id)
-      //     }
-      //   })
-      //   this.strDelete = _.join(arr, ',')
-      //   if (v === false) {
-      //     this.checkAll = false
-      //   }
-      // },
       _arrDelChange (v) {
         let arr = []
         arr = _.map(v, 'id')
-        console.log(arr)
         this.strDelete = _.join(arr, ',')
       },
       _batchDelete () {

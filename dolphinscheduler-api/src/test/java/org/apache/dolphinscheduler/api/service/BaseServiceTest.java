@@ -14,14 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,13 +39,10 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mock.web.MockCookie;
-import org.springframework.mock.web.MockHttpServletRequest;
 
-import javax.servlet.http.Cookie;
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * base service test
+ */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
 @PrepareForTest({HadoopUtils.class})
@@ -47,14 +50,14 @@ public class BaseServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
 
-    private BaseService baseService;
+    private BaseServiceImpl baseService;
 
     @Mock
     private HadoopUtils hadoopUtils;
 
     @Before
     public void setUp() {
-        baseService = new BaseService();
+        baseService = new BaseServiceImpl();
     }
 
     @Test
@@ -71,6 +74,8 @@ public class BaseServiceTest {
         Assert.assertFalse(isAdmin);
 
     }
+
+
 
     @Test
     public void testPutMsg(){
@@ -90,20 +95,6 @@ public class BaseServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
         //has params
         baseService.putMsg(result,Status.PROJECT_NOT_FOUNT,"test");
-    }
-    @Test
-    public void testGetCookie(){
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockCookie mockCookie = new MockCookie("userId","1");
-        request.setCookies(mockCookie);
-        //cookie is not null
-        Cookie cookie = BaseService.getCookie(request,"userId");
-        Assert.assertNotNull(cookie);
-        //cookie is null
-        cookie = BaseService.getCookie(request,"userName");
-        Assert.assertNull(cookie);
-
     }
     @Test
     public void testCreateTenantDirIfNotExists(){

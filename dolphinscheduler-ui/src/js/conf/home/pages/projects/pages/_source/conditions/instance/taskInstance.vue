@@ -53,7 +53,7 @@
         <el-input v-model="searchParams.processInstanceName" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Process Instance')"></el-input>
       </div>
       <div class="list">
-        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('name')"></el-input>
+        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 160px;" size="mini" :placeholder="$t('Name')"></el-input>
       </div>
     </template>
   </m-conditions>

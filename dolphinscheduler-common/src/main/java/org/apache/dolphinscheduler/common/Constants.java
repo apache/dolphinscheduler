@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -146,7 +147,7 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
 
-    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties";
+    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
     /**
      * development.state
@@ -331,6 +332,11 @@ public final class Constants {
     public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[_|\\-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
+     * default display rows
+     */
+    public static final int DEFAULT_DISPLAY_ROWS = 10;
+
+    /**
      * read permission
      */
     public static final int READ_PERMISSION = 2 * 1;
@@ -384,6 +390,10 @@ public final class Constants {
      */
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
+    /**
+     * worker host weight
+     */
+    public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
      * default log cache rows num,output when reach the number
@@ -401,12 +411,16 @@ public final class Constants {
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
-
     /***
      *
      * rpc port
      */
     public static final int RPC_PORT = 50051;
+
+    /***
+     * alert rpc port
+     */
+    public static final int ALERT_RPC_PORT = 50052;
 
     /**
      * forbid running task
@@ -457,6 +471,10 @@ public final class Constants {
     public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
     public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
+
+    public static final String CMD_PARAM_START_PARAMS = "StartParams";
+
+    public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
 
     /**
      * complement data start date
@@ -535,11 +553,9 @@ public final class Constants {
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-
-
+    public static final int HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH = 11;
 
     /**
-     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -550,12 +566,17 @@ public final class Constants {
     public static final String HADOOP = "hadoop";
 
     /**
-     * -D parameter
+     * -D <property>=<value>
      */
     public static final String D = "-D";
 
     /**
-     * -D mapreduce.job.queuename=ququename
+     * -D mapreduce.job.name=name
+     */
+    public static final String MR_NAME = "mapreduce.job.name";
+
+    /**
+     * -D mapreduce.job.queuename=queuename
      */
     public static final String MR_QUEUE = "mapreduce.job.queuename";
 
@@ -597,6 +618,10 @@ public final class Constants {
      */
     public static final String EXECUTOR_MEMORY = "--executor-memory";
 
+    /**
+     * --name NAME
+     */
+    public static final String SPARK_NAME = "--name";
 
     /**
      * --queue QUEUE
@@ -745,9 +770,17 @@ public final class Constants {
     public static final String SUBTRACT_STRING = "-";
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
+    public static final String LOCAL_PARAMS_LIST = "localParamsList";
+    public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
+    public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
+    public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
     public static final String RWXR_XR_X = "rwxr-xr-x";
+    public static final String QUEUE = "queue";
+    public static final String QUEUE_NAME = "queueName";
+    public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
+    public static final int LOG_QUERY_LIMIT = 4096;
 
     /**
      * master/worker server use for zk
@@ -827,7 +860,9 @@ public final class Constants {
      */
     public static final String HIVE_CONF = "hiveconf:";
 
-    //flink ??
+    /**
+     * flink
+     */
     public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
@@ -837,8 +872,9 @@ public final class Constants {
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
-    public static final String FLINK_DETACH = "-d";
     public static final String FLINK_MAIN_CLASS = "-c";
+    public static final String FLINK_PARALLELISM = "-p";
+    public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
 
 
     public static final int[] NOT_TERMINATED_STATES = new int[] {
@@ -892,6 +928,12 @@ public final class Constants {
     public static final String TOTAL = "total";
 
     /**
+     * workflow
+     */
+    public static final String WORKFLOW_LIST = "workFlowList";
+    public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
+
+    /**
      * session user
      */
     public static final String SESSION_USER = "session.user";
@@ -899,6 +941,11 @@ public final class Constants {
     public static final String SESSION_ID = "sessionId";
 
     public static final String PASSWORD_DEFAULT = "******";
+
+    /**
+     * locale
+     */
+    public static final String LOCALE_LANGUAGE = "language";
 
     /**
      * driver
@@ -945,7 +992,9 @@ public final class Constants {
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
-
+    public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
+    public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
+    public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 
     /**
      * session timeout
@@ -990,11 +1039,13 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
-    public static final int NORAML_NODE_STATUS = 0;
+    public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
+    public static final String START_END_DATE = "startDate,endDate";
+
     /**
      * system line separator
      */
@@ -1005,6 +1056,8 @@ public final class Constants {
      */
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
+
+    public static final String EXCEL_SUFFIX_XLS = ".xls";
 
     /**
      * datasource encryption salt
@@ -1027,4 +1080,11 @@ public final class Constants {
      * pstree, get pud and sub pid
      */
     public static final String PSTREE = "pstree";
+
+    /**
+     * docker & kubernetes
+     */
+    public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
+    public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+
 }

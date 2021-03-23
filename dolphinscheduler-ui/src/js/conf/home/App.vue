@@ -42,7 +42,7 @@
     },
     mounted () {
       visibility.change((evt, hidden) => {
-        if (hidden === false) {
+        if (hidden === false && this.$route.meta.refreshInSwitchedTab) {
           this.reload()
         }
       })

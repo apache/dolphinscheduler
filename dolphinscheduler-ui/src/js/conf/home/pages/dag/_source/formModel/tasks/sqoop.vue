@@ -15,8 +15,7 @@
 * limitations under the License.
 */
 <template>
-  <div class="sql-model">
-
+  <div class="sqoop-model">
     <m-list-box>
       <div slot="text">{{$t('Custom Job')}}</div>
       <div slot="content">
@@ -26,7 +25,7 @@
     <m-list-box v-show="isCustomTask">
       <div slot="text">{{$t('Custom Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea id="code-shell-mirror" name="code-shell-mirror" style="opacity: 0;"></textarea>
         </div>
       </div>
@@ -78,99 +77,88 @@
           </m-local-params>
         </div>
       </m-list-box>
-
-      <template>
+      <m-list-box>
+        <div slot="text" style="font-weight:bold">{{$t('Data Source')}}</div>
+      </m-list-box>
+      <hr style="margin-left: 60px;">
+      <m-list-box>
+        <div slot="text">{{$t('Type')}}</div>
+        <div slot="content">
+          <el-select
+            style="width: 130px;"
+            size="small"
+            v-model="sourceType"
+            :disabled="isDetails"
+            @change="_handleSourceTypeChange">
+            <el-option
+              v-for="city in sourceTypeList"
+              :key="city.code"
+              :value="city.code"
+              :label="city.code">
+            </el-option>
+          </el-select>
+        </div>
+      </m-list-box>
+      <template v-if="sourceType === 'MYSQL'">
         <m-list-box>
-          <div slot="text" style="font-weight:bold">{{$t('Data Source')}}</div>
-        </m-list-box>
-        <hr style="margin-left: 60px;">
-        <m-list-box>
-          <div slot="text">{{$t('Type')}}</div>
+          <div slot="text">{{$t('Datasource')}}</div>
           <div slot="content">
-            <el-select
-              style="width: 130px;"
-              size="small"
-              v-model="sourceType"
-              :disabled="isDetails"
-              @change="_handleSourceTypeChange">
-              <el-option
-                v-for="city in sourceTypeList"
-                :key="city.code"
-                :value="city.code"
-                :label="city.code">
-              </el-option>
-            </el-select>
+            <m-datasource
+              ref="refSourceDs"
+              @on-dsData="_onSourceDsData"
+              :data="{type:sourceMysqlParams.srcType,
+                    typeList: [{id: 0, code: 'MYSQL', disabled: false}],
+                    datasource:sourceMysqlParams.srcDatasource }"
+            >
+            </m-datasource>
           </div>
         </m-list-box>
-
-        <template v-if="sourceType ==='MYSQL'">
-
+        <m-list-box>
+          <div slot="text">{{$t('ModelType')}}</div>
+          <div slot="content">
+            <el-radio-group v-model="srcQueryType" size="small" @change="_handleQueryType">
+              <el-radio label="0">{{$t('Form')}}</el-radio>
+              <el-radio label="1">SQL</el-radio>
+            </el-radio-group>
+          </div>
+        </m-list-box>
+        <template v-if="sourceMysqlParams.srcQueryType === '0'">
           <m-list-box>
-            <div slot="text">{{$t('Datasource')}}</div>
+            <div slot="text">{{$t('Table')}}</div>
             <div slot="content">
-              <m-datasource
-                ref="refSourceDs"
-                @on-dsData="_onSourceDsData"
-                :data="{type:sourceMysqlParams.srcType,
-                      typeList: [{id: 0, code: 'MYSQL', disabled: false}],
-                      datasource:sourceMysqlParams.srcDatasource }"
-              >
-              </m-datasource>
+              <el-input
+                :disabled="isDetails"
+                type="text"
+                size="small"
+                v-model="sourceMysqlParams.srcTable"
+                :placeholder="$t('Please enter Mysql Table(required)')">
+              </el-input>
             </div>
           </m-list-box>
-
           <m-list-box>
-            <div slot="text">{{$t('ModelType')}}</div>
+            <div slot="text">{{$t('ColumnType')}}</div>
             <div slot="content">
-              <el-radio-group v-model="srcQueryType" size="small" @change="_handleQueryType">
-                <el-radio label="0">{{$t('Form')}}</el-radio>
-                <el-radio label="1">SQL</el-radio>
+              <el-radio-group v-model="sourceMysqlParams.srcColumnType" size="small" style="vertical-align: sub;">
+                <el-radio label="0">{{$t('All Columns')}}</el-radio>
+                <el-radio label="1">{{$t('Some Columns')}}</el-radio>
               </el-radio-group>
             </div>
           </m-list-box>
-
-          <template v-if="sourceMysqlParams.srcQueryType=='0'">
-
-            <m-list-box>
-              <div slot="text">{{$t('Table')}}</div>
-              <div slot="content">
-                <el-input
-                  :disabled="isDetails"
-                  type="text"
-                  size="small"
-                  v-model="sourceMysqlParams.srcTable"
-                  :placeholder="$t('Please enter Mysql Table(required)')">
-                </el-input>
-              </div>
-            </m-list-box>
-
-            <m-list-box>
-              <div slot="text">{{$t('ColumnType')}}</div>
-              <div slot="content">
-                <el-radio-group v-model="sourceMysqlParams.srcColumnType" size="small" style="vertical-align: sub;">
-                  <el-radio label="0">{{$t('All Columns')}}</el-radio>
-                  <el-radio label="1">{{$t('Some Columns')}}</el-radio>
-                </el-radio-group>
-              </div>
-            </m-list-box>
-
-            <m-list-box v-if="sourceMysqlParams.srcColumnType=='1'">
-              <div slot="text">{{$t('Column')}}</div>
-              <div slot="content">
-                <el-input
-                  :disabled="isDetails"
-                  type="text"
-                  size="small"
-                  v-model="sourceMysqlParams.srcColumns"
-                  :placeholder="$t('Please enter Columns (Comma separated)')">
-                </el-input>
-              </div>
-            </m-list-box>
-          </template>
+          <m-list-box v-if="sourceMysqlParams.srcColumnType === '1'">
+            <div slot="text">{{$t('Column')}}</div>
+            <div slot="content">
+              <el-input
+                :disabled="isDetails"
+                type="text"
+                size="small"
+                v-model="sourceMysqlParams.srcColumns"
+                :placeholder="$t('Please enter Columns (Comma separated)')">
+              </el-input>
+            </div>
+          </m-list-box>
         </template>
       </template>
-
-      <template v-if="sourceType=='HIVE'">
+      <template v-if="sourceType === 'HIVE'">
         <m-list-box>
           <div slot="text">{{$t('Database')}}</div>
           <div slot="content">
@@ -220,8 +208,7 @@
           </div>
         </m-list-box>
       </template>
-
-      <template v-if="sourceType=='HDFS'">
+      <template v-if="sourceType === 'HDFS'">
         <m-list-box>
           <div slot="text">{{$t('Export Dir')}}</div>
           <div slot="content">
@@ -235,25 +222,23 @@
           </div>
         </m-list-box>
       </template>
-
-    <m-list-box v-show="srcQueryType === '1' && sourceType ==='MYSQL'">
-      <div slot="text">{{$t('SQL Statement')}}</div>
-      <div slot="content">
-        <div class="from-mirror">
-          <textarea
-                  id="code-sqoop-mirror"
-                  name="code-sqoop-mirror"
-                  style="opacity: 0;">
-          </textarea>
-          <a class="ans-modal-box-max">
-            <em class="el-icon-full-screen" @click="setEditorVal"></em>
-          </a>
-        </div>
-      </div>
-    </m-list-box>
-
-      <template>
-        <m-list-box v-show="sourceType === 'MYSQL'">
+      <template v-if="sourceType === 'MYSQL'">
+        <m-list-box v-show="srcQueryType === '1'">
+          <div slot="text">{{$t('SQL Statement')}}</div>
+          <div slot="content">
+            <div class="form-mirror">
+              <textarea
+                      id="code-sqoop-mirror"
+                      name="code-sqoop-mirror"
+                      style="opacity: 0;">
+              </textarea>
+              <a class="ans-modal-box-max">
+                <em class="el-icon-full-screen" @click="setEditorVal"></em>
+              </a>
+            </div>
+          </div>
+        </m-list-box>
+        <m-list-box>
           <div slot="text">{{$t('Map Column Hive')}}</div>
           <div slot="content">
             <m-local-params
@@ -264,7 +249,7 @@
             </m-local-params>
           </div>
         </m-list-box>
-        <m-list-box v-show="sourceType === 'MYSQL'">
+        <m-list-box>
           <div slot="text">{{$t('Map Column Java')}}</div>
           <div slot="content">
             <m-local-params
@@ -276,12 +261,10 @@
           </div>
         </m-list-box>
       </template>
-
       <m-list-box>
         <div slot="text" style="font-weight:bold">{{$t('Data Target')}}</div>
       </m-list-box>
       <hr style="margin-left: 60px;">
-
       <m-list-box>
         <div slot="text">{{$t('Type')}}</div>
         <div slot="content">
@@ -299,7 +282,7 @@
           </el-select>
         </div>
       </m-list-box>
-      <div v-show="targetType==='HIVE'">
+      <template v-if="targetType === 'HIVE'">
         <m-list-box>
           <div slot="text">{{$t('Database')}}</div>
           <div slot="content">
@@ -378,8 +361,8 @@
             </el-input>
           </div>
         </m-list-box>
-      </div>
-      <div v-show="targetType==='HDFS'">
+      </template>
+      <template v-if="targetType === 'HDFS'">
         <m-list-box>
           <div slot="text">{{$t('Target Dir')}}</div>
           <div slot="content">
@@ -444,8 +427,8 @@
             </el-input>
           </div>
         </m-list-box>
-      </div>
-      <div v-show="targetType==='MYSQL'">
+      </template>
+      <template v-if="targetType === 'MYSQL'">
         <m-list-box>
           <div slot="text">{{$t('Datasource')}}</div>
           <div slot="content">
@@ -534,8 +517,7 @@
             </el-radio-group>
           </div>
         </m-list-box>
-
-      </div>
+      </template>
       <m-list-box>
         <div slot="text">{{$t('Concurrency')}}</div>
         <div slot="content">
@@ -728,10 +710,32 @@
       getSriptBoxValue (val) {
         editor.setValue(val)
       },
+      _onSwitch (is) {
+        if (is) {
+          this.jobType = 'CUSTOM'
+          this.isCustomTask = true
+          setTimeout(() => {
+            this._handlerShellEditor()
+          }, 200)
+        } else {
+          this.jobType = 'TEMPLATE'
+          this.isCustomTask = false
+          if (this.srcQueryType === '1') {
+            setTimeout(() => {
+              this._handlerEditor()
+            }, 200)
+          }
+        }
+      },
       _handleQueryType (o) {
         this.sourceMysqlParams.srcQueryType = this.srcQueryType
         this._getTargetTypeList(this.sourceType)
         this.targetType = this.targetTypeList[0].code
+        if (this.srcQueryType === '1') {
+          setTimeout(() => {
+            this._handlerEditor()
+          }, 200)
+        }
       },
 
       _handleModelTypeChange (a) {
@@ -1175,8 +1179,6 @@
         }
         if (val !== 0) {
           this.title = ''
-          this.receivers = []
-          this.receiversCc = []
         }
       },
       // Listening data source

@@ -45,6 +45,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
+/**
+ * process definition version service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionVersionServiceTest {
 
@@ -59,6 +62,9 @@ public class ProcessDefinitionVersionServiceTest {
 
     @Mock
     private ProjectServiceImpl projectService;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
 
     @Test
     public void testAddProcessDefinitionVersion() {
@@ -198,6 +204,8 @@ public class ProcessDefinitionVersionServiceTest {
                 .thenReturn(1);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName))
                 .thenReturn(res);
+        Mockito.when(processDefinitionService.checkHasAssociatedProcessDefinition(processDefinitionId, version))
+                .thenReturn(false);
 
         Map<String, Object> resultMap2 = processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(
                 loginUser
@@ -207,6 +215,14 @@ public class ProcessDefinitionVersionServiceTest {
 
         Assert.assertEquals(Status.SUCCESS, resultMap2.get(Constants.STATUS));
 
+        Mockito.when(processDefinitionService.checkHasAssociatedProcessDefinition(processDefinitionId, version))
+                .thenReturn(true);
+        Map<String, Object> resultMap3 = processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(
+                loginUser
+                , projectName
+                , processDefinitionId
+                , version);
+        Assert.assertEquals(Status.PROCESS_DEFINITION_VERSION_IS_USED, resultMap3.get(Constants.STATUS));
     }
 
     /**
@@ -216,18 +232,17 @@ public class ProcessDefinitionVersionServiceTest {
      */
     private ProcessDefinitionVersion getProcessDefinitionVersion(ProcessDefinition processDefinition) {
         return ProcessDefinitionVersion
-                .newBuilder()
-                .processDefinitionId(processDefinition.getId())
-                .version(1)
-                .processDefinitionJson(processDefinition.getProcessDefinitionJson())
-                .description(processDefinition.getDescription())
-                .locations(processDefinition.getLocations())
-                .connects(processDefinition.getConnects())
-                .timeout(processDefinition.getTimeout())
-                .globalParams(processDefinition.getGlobalParams())
-                .createTime(processDefinition.getUpdateTime())
-                .receivers(processDefinition.getReceivers())
-                .receiversCc(processDefinition.getReceiversCc())
+            .newBuilder()
+            .processDefinitionId(processDefinition.getId())
+            .version(1)
+            .processDefinitionJson(processDefinition.getProcessDefinitionJson())
+            .description(processDefinition.getDescription())
+            .locations(processDefinition.getLocations())
+            .connects(processDefinition.getConnects())
+            .timeout(processDefinition.getTimeout())
+            .globalParams(processDefinition.getGlobalParams())
+            .createTime(processDefinition.getUpdateTime())
+            .warningGroupId(processDefinition.getWarningGroupId())
                 .resourceIds(processDefinition.getResourceIds())
                 .build();
     }

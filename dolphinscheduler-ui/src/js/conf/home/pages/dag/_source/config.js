@@ -150,7 +150,7 @@ const tasksState = {
     id: 0,
     desc: `${i18n.$t('Submitted successfully')}`,
     color: '#A9A9A9',
-    icoUnicode: 'fa fa-dot-circle-o',
+    icoUnicode: 'ri-record-circle-fill',
     isSpin: false
   },
   RUNNING_EXECUTION: {
@@ -164,7 +164,7 @@ const tasksState = {
     id: 2,
     desc: `${i18n.$t('Ready to pause')}`,
     color: '#07b1a3',
-    icoUnicode: 'fa-pause-circle',
+    icoUnicode: 'ri-settings-3-line',
     isSpin: false
   },
   PAUSE: {
@@ -178,26 +178,26 @@ const tasksState = {
     id: 4,
     desc: `${i18n.$t('Ready to stop')}`,
     color: '#FE0402',
-    icoUnicode: 'fa-stop-circle-o',
+    icoUnicode: 'ri-stop-circle-fill',
     isSpin: false
   },
   STOP: {
     id: 5,
     desc: `${i18n.$t('Stop')}`,
     color: '#e90101',
-    icoUnicode: 'fa-stop-circle',
+    icoUnicode: 'ri-stop-circle-line',
     isSpin: false
   },
   FAILURE: {
     id: 6,
-    desc: `${i18n.$t('failed')}`,
+    desc: `${i18n.$t('Failed')}`,
     color: '#000000',
     icoUnicode: 'el-icon-circle-close',
     isSpin: false
   },
   SUCCESS: {
     id: 7,
-    desc: `${i18n.$t('success')}`,
+    desc: `${i18n.$t('Success')}`,
     color: '#33cc00',
     icoUnicode: 'el-icon-circle-check',
     isSpin: false
@@ -211,7 +211,7 @@ const tasksState = {
   },
   KILL: {
     id: 9,
-    desc: `${i18n.$t('kill')}`,
+    desc: `${i18n.$t('Kill')}`,
     color: '#a70202',
     icoUnicode: 'el-icon-remove-outline',
     isSpin: false
@@ -220,21 +220,21 @@ const tasksState = {
     id: 10,
     desc: `${i18n.$t('Waiting for thread')}`,
     color: '#912eed',
-    icoUnicode: 'fa-hourglass-end',
+    icoUnicode: 'ri-time-line',
     isSpin: false
   },
   WAITTING_DEPEND: {
     id: 11,
     desc: `${i18n.$t('Waiting for dependence')}`,
     color: '#5101be',
-    icoUnicode: 'fa-window-restore',
+    icoUnicode: 'ri-send-to-back',
     isSpin: false
   },
   DELAY_EXECUTION: {
     id: 12,
     desc: `${i18n.$t('Delay execution')}`,
     color: '#5102ce',
-    icoUnicode: 'fa-stop-circle-o',
+    icoUnicode: 'ri-pause-circle-fill',
     isSpin: false
   },
   FORCED_SUCCESS: {

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.service.queue;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
 
@@ -59,6 +60,20 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
     @Override
     public TaskPriority take() throws TaskPriorityQueueException, InterruptedException {
         return queue.take();
+    }
+
+    /**
+     * poll taskInfo with timeout
+     *
+     * @param timeout
+     * @param unit
+     * @return
+     * @throws TaskPriorityQueueException
+     * @throws InterruptedException
+     */
+    @Override
+    public TaskPriority poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException, InterruptedException {
+        return queue.poll(timeout,unit);
     }
 
     /**

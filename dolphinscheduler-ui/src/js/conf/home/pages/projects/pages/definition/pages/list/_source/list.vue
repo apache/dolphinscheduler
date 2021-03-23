@@ -19,14 +19,14 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
         <el-table-column type="selection" width="50" :selectable="selectable"></el-table-column>
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links" :title="scope.row.name">
-                  {{scope.row.name}}
+                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links">
+                  <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
             </el-popover>
@@ -63,28 +63,27 @@
         <el-table-column :label="$t('Operation')" width="335" fixed="right">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.releaseState === 'ONLINE'" @click="_edit(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.releaseState === 'ONLINE'" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Start')" placement="top" :enterable="false">
               <span><el-button type="success" size="mini" :disabled="scope.row.releaseState !== 'ONLINE'"  icon="el-icon-video-play" @click="_start(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Timing')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-time" :disabled="scope.row.releaseState !== 'ONLINE' || scope.row.scheduleReleaseState !== null" @click="_timing(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('online')" placement="top" :enterable="false">
               <span><el-button type="warning" size="mini" v-if="scope.row.releaseState === 'OFFLINE'"  icon="el-icon-upload2" @click="_poponline(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('offline')" placement="top" :enterable="false">
-              <el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button>
+              <span><el-button type="danger" size="mini" icon="el-icon-download" v-if="scope.row.releaseState === 'ONLINE'" @click="_downline(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Copy Workflow')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" :disabled="scope.row.releaseState === 'ONLINE'"  icon="el-icon-document-copy" @click="_copyProcess(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Cron Manage')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
-              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -97,19 +96,19 @@
               </el-popconfirm>
             </el-tooltip>
             <el-tooltip :content="$t('TreeView')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-s-data" @click="_treeView(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-s-data" @click="_treeView(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Export')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-s-unfold" @click="_export(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Version Info')" placement="top" :enterable="false">
-              <el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button></span>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top">
+    <el-tooltip :content="$t('Delete')" placement="top">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"
@@ -130,6 +129,7 @@
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
+      v-if="startDialog"
       :visible.sync="startDialog"
       width="auto">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
@@ -177,8 +177,6 @@
         timingDialog: false,
         timingData: {
           item: {},
-          receiversD: [],
-          receiversCcD: [],
           type: ''
         },
         relatedItemsDialog: false,
@@ -191,7 +189,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
 
       selectable (row, index) {
@@ -227,29 +225,12 @@
         this.startDialog = false
       },
       /**
-       * get emial
-       */
-      _getReceiver (id) {
-        return new Promise((resolve, reject) => {
-          this.getReceiver({ processDefinitionId: id }).then(res => {
-            resolve({
-              receivers: res.receivers && res.receivers.split(',') || [],
-              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
-            })
-          })
-        })
-      },
-      /**
        * timing
        */
       _timing (item) {
-        this._getReceiver(item.id).then(res => {
-          this.timingData.item = item
-          this.timingData.receiversD = res.receivers
-          this.timingData.receiversCcD = res.receiversCc
-          this.timingData.type = 'timing'
-          this.timingDialog = true
-        })
+        this.timingData.item = item
+        this.timingData.type = 'timing'
+        this.timingDialog = true
       },
       onUpdateTiming () {
         this._onUpdate()
@@ -295,7 +276,7 @@
       _downline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 0
+          releaseState: 'OFFLINE'
         })
       },
       /**
@@ -304,7 +285,7 @@
       _poponline (item) {
         this._upProcessState({
           processId: item.id,
-          releaseState: 1
+          releaseState: 'ONLINE'
         })
       },
       /**

@@ -29,7 +29,7 @@
                     :placeholder="$t('Please enter name')">
             </el-input>
             <div class="p1" style="position: absolute;">
-              <input name="file" id="file" type="file" class="file-update" v-if="!progress">
+              <input ref="file" name="file" type="file" class="file-update" @change="_onChange" v-if="!progress">
               <el-button type="dashed" size="small" :disabled="progress !== 0">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
             </div>
           </div>
@@ -124,11 +124,13 @@
           this.spinnerLoading = false
           this.progress = 0
           this.$emit('on-update', res.data)
+          this.reset()
         }, e => {
           this.spinnerLoading = false
           this.progress = 0
           this.$message.error(e.msg || '')
           this.$emit('on-update', e)
+          this.reset()
         }, {
           data: formData,
           emulateJSON: false,
@@ -148,26 +150,23 @@
             this._formDataUpdate()
           })
         }
-      }
-    },
-    watch: {},
-    created () {
-    },
-    mounted () {
-      $('#file').change(() => {
-        let file = $('#file')[0].files[0]
+      },
+      reset () {
+        this.udfName = ''
+        this.udfDesc = ''
+        this.file = ''
+        this.progress = 0
+        this.spinnerLoading = false
+        this.pid = null
+        this.currentDir = ''
+      },
+      _onChange () {
+        let file = this.$refs.file.files[0]
         this.file = file
         this.udfName = file.name
-      })
-    },
-    updated () {
-    },
-    beforeDestroy () {
-    },
-    destroyed () {
-    },
-    computed: {},
-    components: {}
+        this.$refs.file.value = null
+      }
+    }
   }
 </script>
 

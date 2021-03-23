@@ -74,6 +74,11 @@
     </div>
     <div class="bottom">
       <div class="submit">
+        <template v-if="router.history.current.name === 'projects-definition-details'">
+          <div class="lint-pt">
+            <el-checkbox v-model="releaseState" size="small" :false-label="'OFFLINE'" :true-label="'ONLINE'">{{$t('Whether to go online the process definition')}}</el-checkbox>
+          </div>
+        </template>
         <template v-if="router.history.current.name === 'projects-instance-details'">
           <div class="lint-pt">
             <el-checkbox v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
@@ -106,6 +111,8 @@
         udpList: [],
         // Global custom parameters
         udpListCache: [],
+        // Whether to go online the process definition
+        releaseState: 'ONLINE',
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
@@ -135,12 +142,18 @@
         return true
       },
       _accuStore () {
-        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        const udp = _.cloneDeep(this.udpList)
+        udp.forEach(u => {
+          delete u.ifFixed
+        })
+        this.store.commit('dag/setGlobalParams', udp)
+
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
         this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
+        this.store.commit('dag/setReleaseState', this.releaseState)
       },
       /**
        * submit
@@ -183,6 +196,46 @@
        */
       close () {
         this.$emit('close')
+      },
+      /**
+       * reload localParam
+       */
+      reloadParam () {
+        const dag = _.cloneDeep(this.store.state.dag)
+        let fixedParam = []
+        const tasks = this.store.state.dag.tasks
+        for (const task of tasks) {
+          const localParam = task.params ? task.params.localParams : []
+          localParam.forEach(l => {
+            if (!fixedParam.some(f => { return f.prop === l.prop })) {
+              fixedParam.push(Object.assign({
+                ifFixed: true
+              }, l))
+            }
+          })
+        }
+
+        let globalParams = _.cloneDeep(dag.globalParams)
+
+        globalParams = globalParams.map(g => {
+          if (fixedParam.some(f => { return g.prop === f.prop })) {
+            fixedParam = fixedParam.filter(f => { return g.prop !== f.prop })
+            return Object.assign(g, {
+              ifFixed: true
+            })
+          } else {
+            return g
+          }
+        })
+        let udpList = [...fixedParam, ...globalParams].sort(s => {
+          if (s.ifFixed) {
+            return -1
+          } else {
+            return 1
+          }
+        })
+        this.udpList = udpList
+        this.udpListCache = udpList
       }
     },
     watch: {
@@ -195,19 +248,19 @@
     },
     created () {
       const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
+
       this.name = dag.name
       this.originalName = dag.name
       this.description = dag.description
       this.syncDefine = dag.syncDefine
+      this.releaseState = dag.releaseState
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {
-        if (dag.tenantId === -1) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        } else {
+        if (dag.tenantId > -1) {
           this.tenantId = dag.tenantId
+        } else if (this.store.state.user.userInfo.tenantId) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
         }
       })
     },

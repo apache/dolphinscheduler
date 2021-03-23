@@ -78,15 +78,16 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Notification group')}}
+        {{$t('Alarm group')}}
       </div>
       <div class="cont">
         <el-select
            style="width: 200px;"
+           clearable
            size="small"
            v-model="warningGroupId"
           :disabled="!notifyGroupList.length">
-          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
             <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
             <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
           </el-input>
@@ -97,22 +98,6 @@
                   :label="city.code">
           </el-option>
         </el-select>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
-        {{$t('Recipient')}}
-      </div>
-      <div class="cont" style="width: 688px;">
-        <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
-        {{$t('Cc')}}
-      </div>
-      <div class="cont" style="width: 688px;">
-        <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
       </div>
     </div>
     <div class="clearfix list">
@@ -156,6 +141,21 @@
         </div>
       </div>
     </template>
+    <div class="clearfix list">
+      <div class="text">
+        <span>{{$t('Startup parameter')}}</span>
+      </div>
+      <div class="cont" style="width: 688px;">
+        <div style="padding-top: 6px;">
+          <m-local-params
+            ref="refLocalParams"
+            @on-local-params="_onLocalParams"
+            :udp-list="udpList"
+            :hide="false">
+          </m-local-params>
+        </div>
+      </div>
+    </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
       <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </el-button>
@@ -163,12 +163,15 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import dayjs from 'dayjs'
-  import mEmail from './email.vue'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
+  import mLocalParams from '@/conf/home/pages/dag/_source/formModel/tasks/_source/localParams'
+  import disabledState from '@/module/mixin/disabledState'
+  import { mapMutations } from 'vuex'
 
   export default {
     name: 'start-process',
@@ -186,14 +189,15 @@
         spinnerLoading: false,
         execType: false,
         taskDependType: 'TASK_POST',
-        receivers: [],
-        receiversCc: [],
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
-        workerGroup: 'default'
-
+        workerGroup: 'default',
+        // Global custom parameters
+        definitionGlobalParams: [],
+        udpList: []
       }
     },
+    mixins: [disabledState],
     props: {
       startData: Object,
       startNodeList: {
@@ -203,11 +207,21 @@
       sourceType: String
     },
     methods: {
+      ...mapMutations('dag', ['setIsDetails', 'resetParams']),
+      _onLocalParams (a) {
+        this.udpList = a
+      },
       _datepicker (val) {
         this.scheduleTime = val
       },
       _start () {
         this.spinnerLoading = true
+        let startParams = {}
+        for (const item of this.udpList) {
+          if (item.value !== '') {
+            startParams[item.prop] = item.value
+          }
+        }
         let param = {
           processDefinitionId: this.startData.id,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
@@ -219,9 +233,8 @@
           taskDependType: this.taskDependType,
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
-          receivers: this.receivers.join(',') || '',
-          receiversCc: this.receiversCc.join(',') || '',
-          workerGroup: this.workerGroup
+          workerGroup: this.workerGroup,
+          startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : ''
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
@@ -230,6 +243,8 @@
         this.store.dispatch('dag/processStart', param).then(res => {
           this.$message.success(res.msg)
           this.$emit('onUpdateStart')
+          // recovery
+          this.udpList = _.cloneDeep(this.definitionGlobalParams)
           setTimeout(() => {
             this.spinnerLoading = false
             this.close()
@@ -247,10 +262,10 @@
           })
         })
       },
-      _getReceiver () {
-        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.startData.id }).then(res => {
-          this.receivers = res.receivers && res.receivers.split(',') || []
-          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+      _getGlobalParams () {
+        this.store.dispatch('dag/getProcessDetails', this.startData.id).then(res => {
+          this.definitionGlobalParams = _.cloneDeep(this.store.state.dag.globalParams)
+          this.udpList = _.cloneDeep(this.store.state.dag.globalParams)
         })
       },
       ok () {
@@ -268,8 +283,7 @@
     created () {
       this.warningType = this.warningTypeList[0].id
       this.workflowName = this.startData.name
-
-      this._getReceiver()
+      this._getGlobalParams()
       let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
       if (stateWorkerGroupsList.length) {
         this.workerGroup = stateWorkerGroupsList[0].id
@@ -292,7 +306,7 @@
       this.workflowName = this.startData.name
     },
     computed: {},
-    components: { mEmail, mPriority, mWorkerGroups }
+    components: { mPriority, mWorkerGroups, mLocalParams }
   }
 </script>
 

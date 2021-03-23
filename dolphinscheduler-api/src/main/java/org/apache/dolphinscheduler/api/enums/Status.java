@@ -22,7 +22,7 @@ import java.util.Locale;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * status enum
+ * status enum      // todo #4855 One category one interval
  */
 public enum Status {
 
@@ -36,7 +36,7 @@ public enum Status {
     USER_NAME_NULL(10004, "user name is null", "用户名不能为空"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),
     TASK_INSTANCE_NOT_FOUND(10008, "task instance not found", "任务实例不存在"),
-    TENANT_CODE_EXIST(10009, "tenant code {0} already exists", "租户编码[{0}]已存在"),
+    OS_TENANT_CODE_EXIST(10009, "os tenant code {0} already exists", "操作系统租户[{0}]已存在"),
     USER_NOT_EXIST(10010, "user {0} not exists", "用户[{0}]不存在"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found", "告警组不存在"),
     ALERT_GROUP_EXIST(10012, "alarm group already exists", "告警组名称已存在"),
@@ -116,7 +116,7 @@ public enum Status {
     QUERY_TENANT_LIST_ERROR(10086, "query tenant list error", "查询租户列表错误"),
     UPDATE_TENANT_ERROR(10087, "update tenant error", "更新租户错误"),
     DELETE_TENANT_BY_ID_ERROR(10088, "delete tenant by id error", "删除租户错误"),
-    VERIFY_TENANT_CODE_ERROR(10089, "verify tenant code error", "租户编码验证错误"),
+    VERIFY_OS_TENANT_CODE_ERROR(10089, "verify os tenant code error", "操作系统租户验证错误"),
     CREATE_USER_ERROR(10090, "create user error", "创建用户错误"),
     QUERY_USER_LIST_PAGING_ERROR(10091, "query user list paging error", "分页查询用户列表错误"),
     UPDATE_USER_ERROR(10092, "update user error", "更新用户错误"),
@@ -133,7 +133,7 @@ public enum Status {
     QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error", "查询任务实例日志错误"),
     DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR(10104, "download task instance log file error", "下载任务日志文件错误"),
     CREATE_PROCESS_DEFINITION(10105, "create process definition", "创建工作流错误"),
-    VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR(10106, "verify process definition name unique error", "工作流定义名称已存在"),
+    VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR(10106, "verify process definition name unique error", "工作流定义名称验证错误"),
     UPDATE_PROCESS_DEFINITION_ERROR(10107, "update process definition error", "更新工作流定义错误"),
     RELEASE_PROCESS_DEFINITION_ERROR(10108, "release process definition error", "上线工作流错误"),
     QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR(10109, "query datail of process definition error", "查询工作流详细信息错误"),
@@ -151,7 +151,7 @@ public enum Status {
     ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR(10121, "encapsulation process instance gantt structure error", "查询工作流实例甘特图数据错误"),
     QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR(10122, "query process definition list paging error", "分页查询工作流定义列表错误"),
     SIGN_OUT_ERROR(10123, "sign out error", "退出错误"),
-    TENANT_CODE_HAS_ALREADY_EXISTS(10124, "tenant code has already exists", "租户编码已存在"),
+    OS_TENANT_CODE_HAS_ALREADY_EXISTS(10124, "os tenant code has already exists", "操作系统租户已存在"),
     IP_IS_EMPTY(10125, "ip is empty", "IP地址不能为空"),
     SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE(10126, "schedule release is already {0}", "调度配置上线错误[{0}]"),
     CREATE_QUEUE_ERROR(10127, "create queue error", "创建队列错误"),
@@ -194,8 +194,17 @@ public enum Status {
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR(10162, "query authorized and user created project error error", "查询授权的和用户创建的项目错误"),
-    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
-    CHECK_TENANT_CODE_ERROR(10164, "Please enter the English tenant code", "请输入英文租户编码"),
+    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163, "delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    CHECK_OS_TENANT_CODE_ERROR(10164, "Please enter the English os tenant code", "请输入英文操作系统租户"),
+    FORCE_TASK_SUCCESS_ERROR(10165, "force task success error", "强制成功任务实例错误"),
+    TASK_INSTANCE_STATE_OPERATION_ERROR(10166, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
+    DATASOURCE_TYPE_NOT_EXIST(10167, "data source type not exist", "数据源类型不存在"),
+    PROCESS_DEFINITION_NAME_EXIST(10168, "process definition name {0} already exists", "工作流定义名称[{0}]已存在"),
+    DATASOURCE_DB_TYPE_ILLEGAL(10169, "datasource type illegal", "数据源类型参数不合法"),
+    DATASOURCE_PORT_ILLEGAL(10170, "datasource port illegal", "数据源端口参数不合法"),
+    DATASOURCE_OTHER_PARAMS_ILLEGAL(10171, "datasource other params illegal", "数据源其他参数不合法"),
+    DATASOURCE_NAME_ILLEGAL(10172, "datasource name illegal", "数据源名称不合法"),
+    DATASOURCE_HOST_ILLEGAL(10173, "datasource host illegal", "数据源HOST不合法"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -273,13 +282,30 @@ public enum Status {
     QUEUE_COUNT_ERROR(90001, "queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
-    ;
+
+    //plugin
+    PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
+    QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
+    QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
+    QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
+
+    UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(110005, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR(110006, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
+    GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
+    CREATE_ALERT_PLUGIN_INSTANCE_ERROR(110008, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
+    QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
+    PLUGIN_INSTANCE_ALREADY_EXIT(110010, "plugin instance already exit", "该告警插件实例已存在"),
+    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012, "failed to delete the alert instance, there is an alarm group associated with this alert instance",
+            "删除告警实例失败，存在与此告警实例关联的警报组"),
+    PROCESS_DEFINITION_VERSION_IS_USED(110013,"this process definition version is used","此工作流定义版本被使用");
+
 
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    private Status(int code, String enMsg, String zhMsg) {
+    Status(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

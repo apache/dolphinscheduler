@@ -18,15 +18,19 @@
 package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
@@ -234,13 +238,14 @@ public class ProcessServiceTest {
         processDefinition.setId(123);
         processDefinition.setName("test");
         processDefinition.setVersion(1);
-        processDefinition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
+        processDefinition.setProcessDefinitionJson("{\"globalParams\":[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"tasks\":[{\"conditionResult\":"
                 + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
                 + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
                 + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
                 + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
                 + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
                 + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
+        processDefinition.setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
         Mockito.when(processDefineMapper.selectById(command1.getProcessDefinitionId())).thenReturn(processDefinition);
@@ -265,6 +270,17 @@ public class ProcessServiceTest {
         command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
         command4.setCommandType(CommandType.REPEAT_RUNNING);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command4));
+
+        Command command5 = new Command();
+        command5.setProcessDefinitionId(123);
+        HashMap<String, String> startParams = new HashMap<>();
+        startParams.put("startParam1", "testStartParam1");
+        HashMap<String, String> commandParams = new HashMap<>();
+        commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
+        command5.setCommandParam(JSONUtils.toJsonString(commandParams));
+        command5.setCommandType(CommandType.START_PROCESS);
+        ProcessInstance processInstance1 = processService.handleCommand(logger, host, validThreadNum, command5);
+        Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
     }
 
     @Test
@@ -322,4 +338,130 @@ public class ProcessServiceTest {
         processService.recurseFindSubProcessId(parentId, ids);
 
     }
+
+    @Test
+    public void testChangeJson() {
+
+        ProcessData oldProcessData = new ProcessData();
+        ConditionsParameters conditionsParameters = new ConditionsParameters();
+        ArrayList<TaskNode> tasks = new ArrayList<>();
+        TaskNode taskNode = new TaskNode();
+        TaskNode taskNode11 = new TaskNode();
+        TaskNode taskNode111 = new TaskNode();
+        ArrayList<String> successNode = new ArrayList<>();
+        ArrayList<String> faildNode = new ArrayList<>();
+
+        taskNode.setName("bbb");
+        taskNode.setType("SHELL");
+        taskNode.setId("222");
+
+        taskNode11.setName("vvv");
+        taskNode11.setType("CONDITIONS");
+        taskNode11.setId("444");
+        successNode.add("bbb");
+        faildNode.add("ccc");
+
+        taskNode111.setName("ccc");
+        taskNode111.setType("SHELL");
+        taskNode111.setId("333");
+
+        conditionsParameters.setSuccessNode(successNode);
+        conditionsParameters.setFailedNode(faildNode);
+        taskNode11.setConditionResult(conditionsParameters.getConditionResult());
+        tasks.add(taskNode);
+        tasks.add(taskNode11);
+        tasks.add(taskNode111);
+        oldProcessData.setTasks(tasks);
+
+        ProcessData newProcessData = new ProcessData();
+        ConditionsParameters conditionsParameters2 = new ConditionsParameters();
+        TaskNode taskNode2 = new TaskNode();
+        TaskNode taskNode22 = new TaskNode();
+        TaskNode taskNode222 = new TaskNode();
+        ArrayList<TaskNode> tasks2 = new ArrayList<>();
+        ArrayList<String> successNode2 = new ArrayList<>();
+        ArrayList<String> faildNode2 = new ArrayList<>();
+
+        taskNode2.setName("bbbchange");
+        taskNode2.setType("SHELL");
+        taskNode2.setId("222");
+
+        taskNode22.setName("vv");
+        taskNode22.setType("CONDITIONS");
+        taskNode22.setId("444");
+        successNode2.add("bbb");
+        faildNode2.add("ccc");
+
+        taskNode222.setName("ccc");
+        taskNode222.setType("SHELL");
+        taskNode222.setId("333");
+
+        conditionsParameters2.setSuccessNode(successNode2);
+        conditionsParameters2.setFailedNode(faildNode2);
+        taskNode22.setConditionResult(conditionsParameters2.getConditionResult());
+        tasks2.add(taskNode2);
+        tasks2.add(taskNode22);
+        tasks2.add(taskNode222);
+
+        newProcessData.setTasks(tasks2);
+
+        ProcessData exceptProcessData = new ProcessData();
+        ConditionsParameters conditionsParameters3 = new ConditionsParameters();
+        TaskNode taskNode3 = new TaskNode();
+        TaskNode taskNode33 = new TaskNode();
+        TaskNode taskNode333 = new TaskNode();
+        ArrayList<TaskNode> tasks3 = new ArrayList<>();
+        ArrayList<String> successNode3 = new ArrayList<>();
+        ArrayList<String> faildNode3 = new ArrayList<>();
+
+        taskNode3.setName("bbbchange");
+        taskNode3.setType("SHELL");
+        taskNode3.setId("222");
+
+        taskNode33.setName("vv");
+        taskNode33.setType("CONDITIONS");
+        taskNode33.setId("444");
+        successNode3.add("bbbchange");
+        faildNode3.add("ccc");
+
+        taskNode333.setName("ccc");
+        taskNode333.setType("SHELL");
+        taskNode333.setId("333");
+
+        conditionsParameters3.setSuccessNode(successNode3);
+        conditionsParameters3.setFailedNode(faildNode3);
+        taskNode33.setConditionResult(conditionsParameters3.getConditionResult());
+        tasks3.add(taskNode3);
+        tasks3.add(taskNode33);
+        tasks3.add(taskNode333);
+        exceptProcessData.setTasks(tasks3);
+
+        String expect = JSONUtils.toJsonString(exceptProcessData);
+        String oldJson = JSONUtils.toJsonString(oldProcessData);
+
+        Assert.assertEquals(expect, processService.changeJson(newProcessData,oldJson));
+
+    }
+
+    @Test
+    public void testChangeOutParam() {
+        String result = "[{\"d\":\"20210203\"}]";
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setProcessInstanceId(62);
+        taskInstance.setTaskJson("{\"id\":\"tasks-86175\",\"name\":\"wew\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,"
+                + "\"retryInterval\":1,\"params\":{\"rawScript\":\"echo 20210203\",\"localParams\":[{\"prop\":\"d\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],"
+                + "\"resourceList\":[]},\"preTasks\":[],\"extras\":null,\"depList\":[],\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,"
+                + "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0}");
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(62);
+        processInstance.setGlobalParams("[{\"prop\":\"sql2\",\"direct\":null,\"type\":null,\"value\":\"\"},{\"prop\":\"out\",\"direct\":null,\"type\":null,\"value\":\"\"},"
+                + "{\"prop\":\"d\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
+        String params4ProcessString = "[{\"prop\":\"sql2\",\"direct\":null,\"type\":null,\"value\":\"\"},{\"prop\":\"out\",\"direct\":null,\"type\":null,\"value\":\"\"},"
+                + "{\"prop\":\"d\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20210203\"}]";
+        Mockito.when(processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
+        Mockito.when(this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId())).thenReturn(1);
+        processService.changeOutParam(result,taskInstance);
+    }
+
 }

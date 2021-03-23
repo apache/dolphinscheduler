@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "A vue.js project",
   "author": "DolphinScheduler",
+  "repository": "https://github.com/apache/incubator-dolphinscheduler",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
@@ -13,6 +15,7 @@
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
+    "@form-create/element-ui": "^1.0.18",
     "@riophae/vue-treeselect": "^0.4.0",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
@@ -24,7 +27,6 @@
     "dayjs": "^1.7.8",
     "echarts": "4.1.0",
     "element-ui": "2.13.2",
-    "font-awesome": "^4.7.0",
     "html2canvas": "^0.5.0-beta4",
     "jquery": "3.3.1",
     "jquery-ui": "^1.12.1",
@@ -32,12 +34,14 @@
     "jsplumb": "^2.8.6",
     "lodash": "^4.17.11",
     "normalize.css": "^8.0.1",
+    "remixicon": "^2.5.0",
     "vue": "^2.5.17",
     "vue-router": "^3.0.0",
     "vuex": "^3.0.0",
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
+    "acorn": "^7.4.1",
     "autoprefixer": "^9.1.0",
     "babel-core": "^6.25.0",
     "babel-helper-vue-jsx-merge-props": "^2.0.2",

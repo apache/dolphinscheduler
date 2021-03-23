@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import org.apache.commons.configuration.Configuration;
 
+import java.lang.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -130,11 +131,17 @@ public class OSUtils {
      * @return load average
      */
     public static double loadAverage() {
-        double loadAverage = hal.getProcessor().getSystemLoadAverage();
-        if (Double.isNaN(loadAverage)) {
-            return NEGATIVE_ONE;
+        double loadAverage;
+        try {
+            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+            loadAverage = osBean.getSystemLoadAverage();
+        } catch (Exception e) {
+            logger.error("get operation system load average exception, try another method ", e);
+            loadAverage = hal.getProcessor().getSystemLoadAverage();
+            if (Double.isNaN(loadAverage)) {
+                return NEGATIVE_ONE;
+            }
         }
-
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(loadAverage));
@@ -254,11 +261,28 @@ public class OSUtils {
      * create user
      *
      * @param userName user name
+     */
+    public static void createUserIfAbsent(String userName) {
+        // if not exists this user, then create
+        taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
+        if (!getUserList().contains(userName)) {
+            boolean isSuccess = createUser(userName);
+            String infoLog = String.format("create user %s %s", userName, isSuccess ? "success" : "fail");
+            LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
+            LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
+        }
+        taskLoggerThreadLocal.remove();
+    }
+
+    /**
+     * create user
+     *
+     * @param userName user name
      * @return true if creation was successful, otherwise false
      */
     public static boolean createUser(String userName) {
         try {
-            String userGroup = OSUtils.getGroup();
+            String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
                 String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
                 LoggerUtils.logError(Optional.ofNullable(logger), errorLog);
@@ -297,7 +321,7 @@ public class OSUtils {
         String infoLog2 = String.format("execute cmd : %s", cmd);
         LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
-        OSUtils.exeCmd(cmd);
+        exeCmd(cmd);
     }
 
     /**
@@ -308,7 +332,6 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createMacUser(String userName, String userGroup) throws IOException {
-
         Optional<Logger> optionalLogger = Optional.ofNullable(logger);
         Optional<Logger> optionalTaskLogger = Optional.ofNullable(taskLoggerThreadLocal.get());
 
@@ -320,13 +343,13 @@ public class OSUtils {
         String infoLog2 = String.format("create user command : %s", createUserCmd);
         LoggerUtils.logInfo(optionalLogger, infoLog2);
         LoggerUtils.logInfo(optionalTaskLogger, infoLog2);
-        OSUtils.exeCmd(createUserCmd);
+        exeCmd(createUserCmd);
 
         String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
         String infoLog3 = String.format("append user to group : %s", appendGroupCmd);
         LoggerUtils.logInfo(optionalLogger, infoLog3);
         LoggerUtils.logInfo(optionalTaskLogger, infoLog3);
-        OSUtils.exeCmd(appendGroupCmd);
+        exeCmd(appendGroupCmd);
     }
 
     /**
@@ -345,13 +368,13 @@ public class OSUtils {
         String infoLog2 = String.format("execute create user command : %s", userCreateCmd);
         LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
-        OSUtils.exeCmd(userCreateCmd);
+        exeCmd(userCreateCmd);
 
         String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
         String infoLog3 = String.format("execute append user to group : %s", appendGroupCmd);
         LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog3);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog3);
-        OSUtils.exeCmd(appendGroupCmd);
+        exeCmd(appendGroupCmd);
     }
 
     /**
@@ -380,6 +403,16 @@ public class OSUtils {
         }
 
         return null;
+    }
+
+    /**
+     *  get sudo command
+     * @param tenantCode tenantCode
+     * @param command command
+     * @return result of sudo execute command
+     */
+    public static String getSudoCmd(String tenantCode, String command) {
+        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
     }
 
     /**
@@ -455,9 +488,9 @@ public class OSUtils {
      */
     public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory) {
         // system load average
-        double loadAverage = OSUtils.loadAverage();
+        double loadAverage = loadAverage();
         // system available physical memory
-        double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
+        double availablePhysicalMemorySize = availablePhysicalMemorySize();
 
         if (loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory) {
             logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize, loadAverage);

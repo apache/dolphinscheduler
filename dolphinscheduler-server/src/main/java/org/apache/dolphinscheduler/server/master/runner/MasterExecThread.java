@@ -22,11 +22,13 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DependResult;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -36,6 +38,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -47,6 +50,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
@@ -66,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +78,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -371,7 +377,8 @@ public class MasterExecThread implements Runnable {
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
-        alertManager.sendAlertProcessInstance(processInstance, taskInstances);
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        alertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
     }
 
     /**
@@ -489,7 +496,8 @@ public class MasterExecThread implements Runnable {
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
                                             TaskNode taskNode) {
-
+        //update processInstance for update the globalParams
+        this.processInstance = this.processService.findProcessInstanceById(this.processInstance.getId());
         TaskInstance taskInstance = findTaskIfExists(nodeName);
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
@@ -538,11 +546,44 @@ public class MasterExecThread implements Runnable {
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
-
+            //get process global
+            setProcessGlobal(taskNode, taskInstance);
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
         return taskInstance;
+    }
+
+    private void setProcessGlobal(TaskNode taskNode, TaskInstance taskInstance) {
+        String globalParams = this.processInstance.getGlobalParams();
+        if (StringUtils.isNotEmpty(globalParams)) {
+            Map<String, String> globalMap = processService.getGlobalParamMap(globalParams);
+            if (globalMap != null && globalMap.size() != 0) {
+                setGlobalMapToTask(taskNode, taskInstance, globalMap);
+            }
+        }
+    }
+
+    private void setGlobalMapToTask(TaskNode taskNode, TaskInstance taskInstance, Map<String, String> globalMap) {
+        // the param save in localParams
+        Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+        Object localParams = result.get(LOCAL_PARAMS);
+        if (localParams != null) {
+            List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+            for (Property info : allParam) {
+                if (info.getDirect().equals(Direct.IN)) {
+                    String paramName = info.getProp();
+                    String value = globalMap.get(paramName);
+                    if (StringUtils.isNotEmpty(value)) {
+                        info.setValue(value);
+                    }
+                }
+            }
+            result.put(LOCAL_PARAMS, allParam);
+            taskNode.setParams(JSONUtils.toJsonString(result));
+            // task instance node json
+            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+        }
     }
 
     private void submitPostNode(String parentNodeName) {
@@ -949,6 +990,7 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
+                    processInstance = processService.findProcessInstanceById(processInstance.getId());
                     processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
@@ -987,6 +1029,7 @@ public class MasterExecThread implements Runnable {
             // updateProcessInstance completed task status
             // failure priority is higher than pause
             // if a task fails, other suspended tasks need to be reset kill
+            // check if there exists forced success nodes in errorTaskList
             if (errorTaskList.size() > 0) {
                 for (Map.Entry<String, TaskInstance> entry : completeTaskList.entrySet()) {
                     TaskInstance completeTask = entry.getValue();
@@ -994,6 +1037,22 @@ public class MasterExecThread implements Runnable {
                         completeTask.setState(ExecutionStatus.KILL);
                         completeTaskList.put(entry.getKey(), completeTask);
                         processService.updateTaskInstance(completeTask);
+                    }
+                }
+                for (Map.Entry<String, TaskInstance> entry : errorTaskList.entrySet()) {
+                    TaskInstance errorTask = entry.getValue();
+                    TaskInstance currentTask = processService.findTaskInstanceById(errorTask.getId());
+                    if (currentTask == null) {
+                        continue;
+                    }
+                    // for nodes that have been forced success
+                    if (errorTask.getState().typeIsFailure() && currentTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                        // update state in this thread and remove from errorTaskList
+                        errorTask.setState(currentTask.getState());
+                        logger.info("task: {} has been forced success, remove it from error task list", errorTask.getName());
+                        errorTaskList.remove(errorTask.getName());
+                        // submit post nodes
+                        submitPostNode(errorTask.getName());
                     }
                 }
             }
@@ -1096,6 +1155,18 @@ public class MasterExecThread implements Runnable {
             int length = readyToSubmitTaskQueue.size();
             for (int i = 0; i < length; i++) {
                 TaskInstance task = readyToSubmitTaskQueue.peek();
+                // stop tasks which is retrying if forced success happens
+                if (task.taskCanRetry()) {
+                    TaskInstance retryTask = processService.findTaskInstanceById(task.getId());
+                    if (retryTask != null && retryTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                        task.setState(retryTask.getState());
+                        logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
+                        removeTaskFromStandbyList(task);
+                        completeTaskList.put(task.getName(), task);
+                        submitPostNode(task.getName());
+                        continue;
+                    }
+                }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
                     if (retryTaskIntervalOverTime(task)) {

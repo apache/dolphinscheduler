@@ -24,22 +24,39 @@ server.servlet.session.timeout=7200
 # servlet config
 server.servlet.context-path=/dolphinscheduler/
 
+# time zone
+spring.jackson.time-zone=GMT+8
+
 # file size limit for upload
 spring.servlet.multipart.max-file-size=1024MB
 spring.servlet.multipart.max-request-size=1024MB
 
+# enable response compression
+server.compression.enabled=true
+server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+
 # post content
-server.jetty.max-http-post-size=5000000
+server.jetty.max-http-form-post-size=5000000
 
 # i18n
 spring.messages.encoding=UTF-8
 
-#i18n classpath folder , file prefix messages， if have many files, use "," seperator
+# i18n classpath folder , file prefix messages， if have many files, use "," seperator
 spring.messages.basename=i18n/messages
 
 # Authentication types (supported types: PASSWORD)
 security.authentication.type=PASSWORD
 
-
-
-
+#============================================================================
+# LDAP Config
+# mock ldap server from https://www.forumsys.com/tutorials/integration-how-to/ldap/online-ldap-test-server/
+#============================================================================
+# admin userId
+#security.authentication.ldap.user.admin=read-only-admin
+# ldap server config
+#ldap.urls=ldap://ldap.forumsys.com:389/
+#ldap.base.dn=dc=example,dc=com
+#ldap.username=cn=read-only-admin,dc=example,dc=com
+#ldap.password=password
+#ldap.user.identity.attribute=uid
+#ldap.user.email.attribute=mail

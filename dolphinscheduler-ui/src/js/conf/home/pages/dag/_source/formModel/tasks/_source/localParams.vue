@@ -21,7 +21,7 @@
          :key="item.id"
          @click="_getIndex($index)">
       <el-input
-              :disabled="isDetails"
+              :disabled="isDetails || item.ifFixed"
               type="text"
               size="small"
               v-model="localParamsList[$index].prop"
@@ -68,9 +68,9 @@
               @blur="_handleValue()"
               :style="inputStyle">
       </el-input>
-      <span class="lt-add">
+      <span class="lt-add" v-show="!item.ifFixed">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('Delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (localParamsList.length - 1)">

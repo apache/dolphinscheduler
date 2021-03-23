@@ -19,7 +19,7 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column prop="tenantCode" :label="$t('Tenant Code')" min-width="100"></el-table-column>
+        <el-table-column prop="tenantCode" :label="$t('OS Tenant Code')" min-width="100"></el-table-column>
         <el-table-column :label="$t('Description')" min-width="100">
           <template slot-scope="scope">
             <span>{{scope.row.description | filterNull}}</span>
@@ -41,7 +41,7 @@
             <el-tooltip :content="$t('Edit')" placement="top">
               <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top">
               <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"

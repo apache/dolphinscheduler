@@ -24,105 +24,89 @@
           <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon el-icon-alarm-clock"></em><em>{{$t('View history')}}</em></a></template>
           <template slot="log"><a href="javascript:"><em class="ansicon el-icon-document"></em><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon fa fa-tasks"></em><em>{{$t('Enter this child node')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ri-node-tree"></em><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="form-model">
         <!-- Node name -->
-        <div class="clearfix list">
-          <div class="text-box"><span>{{$t('Node name')}}</span></div>
-          <div class="cont-box">
-            <label class="label-box">
-              <el-input
-                type="text"
-                v-model="name"
-                size="small"
-                :disabled="isDetails"
-                :placeholder="$t('Please enter name (required)')"
-                maxlength="100"
-                @blur="_verifName()">
-              </el-input>
-            </label>
+        <m-list-box>
+          <div slot="text">{{$t('Node name')}}</div>
+          <div slot="content">
+            <el-input
+              type="text"
+              v-model="name"
+              size="small"
+              :disabled="isDetails"
+              :placeholder="$t('Please enter name (required)')"
+              maxlength="100"
+              @blur="_verifName()">
+            </el-input>
           </div>
-        </div>
+        </m-list-box>
 
         <!-- Running sign -->
-        <div class="clearfix list">
-          <div class="text-box"><span>{{$t('Run flag')}}</span></div>
-          <div class="cont-box">
-            <label class="label-box">
-              <el-radio-group v-model="runFlag" size="small">
-                <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
-                <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
-              </el-radio-group>
-            </label>
+        <m-list-box>
+          <div slot="text">{{$t('Run flag')}}</div>
+          <div slot="content">
+            <el-radio-group v-model="runFlag" size="small">
+              <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
+              <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
+            </el-radio-group>
           </div>
-        </div>
+        </m-list-box>
 
         <!-- description -->
-        <div class="clearfix list">
-          <div class="text-box">
-            <span>{{$t('Description')}}</span>
+        <m-list-box>
+          <div slot="text">{{$t('Description')}}</div>
+          <div slot="content">
+            <el-input
+              :rows="2"
+              type="textarea"
+              :disabled="isDetails"
+              v-model="description"
+              :placeholder="$t('Please enter description')">
+            </el-input>
           </div>
-          <div class="cont-box">
-            <label class="label-box">
-              <el-input
-                :rows="2"
-                type="textarea"
-                :disabled="isDetails"
-                v-model="description"
-                :placeholder="$t('Please enter description')">
-              </el-input>
-            </label>
-          </div>
-        </div>
+        </m-list-box>
 
         <!-- Task priority -->
-        <div class="clearfix list">
-          <div class="text-box">
-            <span>{{$t('Task priority')}}</span>
-          </div>
-          <div class="cont-box">
+        <m-list-box>
+          <div slot="text">{{$t('Task priority')}}</div>
+          <div slot="content">
             <span class="label-box" style="width: 193px;display: inline-block;">
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
             <span class="text-b">{{$t('Worker group')}}</span>
             <m-worker-groups v-model="workerGroup"></m-worker-groups>
           </div>
-        </div>
+        </m-list-box>
 
         <!-- Number of failed retries -->
-        <div class="clearfix list" v-if="nodeData.taskType !== 'SUB_PROCESS'">
-          <div class="text-box">
-            <span>{{$t('Number of failed retries')}}</span>
-          </div>
-          <div class="cont-box">
+        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS'">
+          <div slot="text">{{$t('Number of failed retries')}}</div>
+          <div slot="content">
             <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]"></m-select-input>
             <span>({{$t('Times')}})</span>
             <span class="text-b">{{$t('Failed retry interval')}}</span>
             <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]"></m-select-input>
             <span>({{$t('Minute')}})</span>
           </div>
-        </div>
+        </m-list-box>
 
         <!-- Delay execution time -->
-        <div class="clearfix list" v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'">
-          <div class="text-box">
-            <span>{{$t('Delay execution time')}}</span>
-          </div>
-          <div class="cont-box">
+        <m-list-box v-if="nodeData.taskType !== 'SUB_PROCESS' && nodeData.taskType !== 'CONDITIONS' && nodeData.taskType !== 'DEPENDENT'">
+          <div slot="text">{{$t('Delay execution time')}}</div>
+          <div slot="content">
             <m-select-input v-model="delayTime" :list="[0,1,5,10]"></m-select-input>
             <span>({{$t('Minute')}})</span>
           </div>
-        </div>
+        </m-list-box>
 
         <!-- Branch flow -->
-        <div class="clearfix list" v-if="nodeData.taskType === 'CONDITIONS'">
-          <div class="text-box">
-            <span>{{$t('State')}}</span>
-          </div>
-          <div class="cont-box">
+        <m-list-box v-if="nodeData.taskType === 'CONDITIONS'">
+          <div slot="text">{{$t('State')}}</div>
+          <div slot="content">
             <span class="label-box" style="width: 193px;display: inline-block;">
               <el-select style="width: 157px;" size="small" v-model="successNode" :disabled="true">
                 <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
@@ -133,12 +117,10 @@
               <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
             </el-select>
           </div>
-        </div>
-        <div class="clearfix list" v-if="nodeData.taskType === 'CONDITIONS'">
-          <div class="text-box">
-            <span>{{$t('State')}}</span>
-          </div>
-          <div class="cont-box">
+        </m-list-box>
+        <m-list-box v-if="nodeData.taskType === 'CONDITIONS'">
+          <div slot="text">{{$t('State')}}</div>
+          <div slot="content">
             <span class="label-box" style="width: 193px;display: inline-block;">
               <el-select style="width: 157px;" size="small" v-model="failedNode" :disabled="true">
                 <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
@@ -149,7 +131,7 @@
               <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
             </el-select>
           </div>
-        </div>
+        </m-list-box>
 
         <!-- Task timeout alarm -->
         <m-timeout-alarm
@@ -299,6 +281,7 @@
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
+  import mListBox from './tasks/_source/listBox'
   import mShell from './tasks/shell'
   import mWaterdrop from './tasks/waterdrop'
   import mSpark from './tasks/spark'
@@ -372,11 +355,11 @@
         stateList: [
           {
             value: 'success',
-            label: `${i18n.$t('success')}`
+            label: `${i18n.$t('Success')}`
           },
           {
             value: 'failed',
-            label: `${i18n.$t('failed')}`
+            label: `${i18n.$t('Failed')}`
           }
         ],
         // preTasks
@@ -796,6 +779,7 @@
       }
     },
     components: {
+      mListBox,
       mMr,
       mShell,
       mWaterdrop,

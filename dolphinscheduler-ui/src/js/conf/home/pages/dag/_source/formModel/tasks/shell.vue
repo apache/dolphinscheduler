@@ -19,7 +19,7 @@
     <m-list-box>
       <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea
             id="code-shell-mirror"
             name="code-shell-mirror"
@@ -46,7 +46,7 @@
                 ref="refLocalParams"
                 @on-local-params="_onLocalParams"
                 :udp-list="localParams"
-                :hide="false">
+                :hide="true">
         </m-local-params>
       </div>
     </m-list-box>

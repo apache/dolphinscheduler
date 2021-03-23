@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -42,7 +43,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -59,7 +59,7 @@ import org.springframework.stereotype.Service;
  * data analysis service impl
  */
 @Service
-public class DataAnalysisServiceImpl extends BaseService implements DataAnalysisService {
+public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -94,6 +94,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @param endDate end date
      * @return task state count data
      */
+    @Override
     public Map<String, Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
         return countStateByProject(
@@ -101,7 +102,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
                 projectId,
                 startDate,
                 endDate,
-                (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
+            (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
     }
 
     /**
@@ -113,18 +114,24 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @param endDate end date
      * @return process instance state count data
      */
+    @Override
     public Map<String, Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
-        return this.countStateByProject(
+        Map<String, Object> result =  this.countStateByProject(
                 loginUser,
                 projectId,
                 startDate,
                 endDate,
-                (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+            (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+        // process state count needs to remove state of forced success
+        if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
+            ((TaskCountDto)result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
+        }
+        return result;
     }
 
     private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
             , TriFunction<Date, Date, Integer[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
             return result;
@@ -136,7 +143,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
-                putErrorRequestParamsMsg(result);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
@@ -161,9 +168,9 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @param projectId project id
      * @return definition count data
      */
+    @Override
     public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
-
 
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
@@ -185,9 +192,10 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @param endDate end date
      * @return command state count data
      */
+    @Override
     public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
             return result;
@@ -201,7 +209,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
         if (StringUtils.isNotEmpty(startDate)) {
             start = DateUtils.getScheduleDate(startDate);
             if (Objects.isNull(start)) {
-                putErrorRequestParamsMsg(result);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
@@ -209,7 +217,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
         if (StringUtils.isNotEmpty(endDate)) {
             end = DateUtils.getScheduleDate(endDate);
             if (Objects.isNull(end)) {
-                putErrorRequestParamsMsg(result);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
         }
@@ -257,8 +265,9 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @param projectId project id
      * @return queue state count data
      */
+    @Override
     public Map<String, Object> countQueueState(User loginUser, int projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
@@ -282,8 +291,4 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
         return true;
     }
 
-    private void putErrorRequestParamsMsg(Map<String, Object> result) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
-    }
 }
