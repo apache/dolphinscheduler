@@ -54,4 +54,9 @@
         </if>
         order by t.update_time desc
     </select>
+    <select id="existTenant" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_tenant
+        where tenant_code = #{tenantCode} limit 1
+    </select>
 </mapper>

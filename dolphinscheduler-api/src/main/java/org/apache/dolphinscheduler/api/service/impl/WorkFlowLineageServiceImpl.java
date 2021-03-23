@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,6 +92,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                         workFlowLineage.setSourceWorkFlowId(String.valueOf(pre.getWorkFlowId()));
                     } else {
                         workFlowLineage.setSourceWorkFlowId(sourceWorkFlowId + "," + pre.getWorkFlowId());
+
                     }
 
                 } else {
@@ -110,7 +110,6 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                 getRelation(workFlowLineageMap, workFlowRelations, relation);
             }
         }
-
     }
 
     @Override
