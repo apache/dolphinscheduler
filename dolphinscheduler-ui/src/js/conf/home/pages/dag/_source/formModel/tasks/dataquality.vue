@@ -159,7 +159,7 @@
         executorCores: 2,
         // Other parameters
         others: '',
-        // Program type
+
         ruleId: 0,
         // ruleNameList
         ruleNameList: [],
@@ -203,6 +203,7 @@
             this.fApi.on('src_connector_type-change', this.srcConnectorTypeChange)
             this.fApi.on('target_connector_type-change', this.targetConnectorTypeChange)
             this.fApi.on('writer_connector_type-change', this.writerConnectorTypeChange)
+            this.fApi.on('check_type-change', this.checkTypeChange)
           })
         })
       },
@@ -229,6 +230,19 @@
           'writer_connector_type',
           this.fApi.getValue('writer_connector_type'),
           'writer_datasource_id')
+      },
+
+      checkTypeChange () {
+        let type = this.fApi.getValue('check_type')
+        if (type === '0') {
+          this.fApi.updateValidate('threshold', [
+            { required: true, message: 'please input threshold', trigger: 'blur' }
+          ])
+        } else {
+          this.fApi.updateRule('threshold', {
+            validate: []
+          }, true)
+        }
       },
 
       /**
