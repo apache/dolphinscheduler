@@ -13,18 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.common.enums;
-
-/**
- * zk node type
- */
-public enum ZKNodeType {
-
-    /**
-     * 0 master node;
-     * 1 worker node;
-     * 2 dead_server node;
-     */
-    MASTER, WORKER, DEAD_SERVER;
-}
+*/

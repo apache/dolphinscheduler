@@ -14,92 +14,93 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
- *	monitor zookeeper info
+ * monitor zookeeper info
  */
 @Component
 public class ZookeeperMonitor extends AbstractZKClient {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
 
-	/**
-	 *
-	 * @return zookeeper info list
-	 */
-	public List<ZookeeperRecord> zookeeperInfoList(){
-		String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
-		try{
-			return zookeeperInfoList(zookeeperServers);
-		}catch(Exception e){
-			LOG.error(e.getMessage(),e);
-		}
-		return null;
-	}
+    /**
+     *
+     * @return zookeeper info list
+     */
+    public List<ZookeeperRecord> zookeeperInfoList() {
+        String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
+        try {
+            return zookeeperInfoList(zookeeperServers);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(),e);
+        }
+        return null;
+    }
 
-	/**
-	 * get master servers
-	 * @return master server information
-	 */
-	public List<Server> getMasterServers(){
-	    return getServersList(ZKNodeType.MASTER);
-	}
+    /**
+     * get master servers
+     * @return master server information
+     */
+    public List<Server> getMasterServers() {
+        return getServerList(ZKNodeType.MASTER);
+    }
 
-	/**
-	 * master construct is the same with worker, use the master instead
-	 * @return worker server informations
-	 */
-	public List<Server> getWorkerServers(){
-	    return getServersList(ZKNodeType.WORKER);
-	}
+    /**
+     * master construct is the same with worker, use the master instead
+     * @return worker server informations
+     */
+    public List<Server> getWorkerServers() {
+        return getServerList(ZKNodeType.WORKER);
+    }
 
-	private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
+    private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
 
-		List<ZookeeperRecord> list = new ArrayList<>(5);
+        List<ZookeeperRecord> list = new ArrayList<>(5);
 
-		if(StringUtils.isNotBlank(zookeeperServers)){
-			String[] zookeeperServersArray = zookeeperServers.split(",");
-			
-			for (String zookeeperServer : zookeeperServersArray) {
-				ZooKeeperState state = new ZooKeeperState(zookeeperServer);
-				boolean ok = state.ruok();
-				if(ok){
-					state.getZookeeperInfo();
-				}
+        if (StringUtils.isNotBlank(zookeeperServers)) {
+            String[] zookeeperServersArray = zookeeperServers.split(",");
 
-				int connections = state.getConnections();
-				int watches = state.getWatches();
-				long sent = state.getSent();
-				long received = state.getReceived();
-				String mode =  state.getMode();
-				float minLatency =  state.getMinLatency();
-				float avgLatency = state.getAvgLatency();
-				float maxLatency = state.getMaxLatency();
-				int nodeCount = state.getNodeCount();
-				int status = ok ? 1 : 0;
-				Date date = new Date();
+            for (String zookeeperServer : zookeeperServersArray) {
+                ZooKeeperState state = new ZooKeeperState(zookeeperServer);
+                boolean ok = state.ruok();
+                if (ok) {
+                    state.getZookeeperInfo();
+                }
 
-				ZookeeperRecord zookeeperRecord = new ZookeeperRecord(zookeeperServer,connections,watches,sent,received,mode,minLatency,avgLatency,maxLatency,nodeCount,status,date);
-				list.add(zookeeperRecord);
+                int connections = state.getConnections();
+                int watches = state.getWatches();
+                long sent = state.getSent();
+                long received = state.getReceived();
+                String mode =  state.getMode();
+                float minLatency =  state.getMinLatency();
+                float avgLatency = state.getAvgLatency();
+                float maxLatency = state.getMaxLatency();
+                int nodeCount = state.getNodeCount();
+                int status = ok ? 1 : 0;
+                Date date = new Date();
 
-			}
-		}
+                ZookeeperRecord zookeeperRecord = new ZookeeperRecord(zookeeperServer,connections,watches,sent,received,mode,minLatency,avgLatency,maxLatency,nodeCount,status,date);
+                list.add(zookeeperRecord);
 
-		return list;
-	}
+            }
+        }
+
+        return list;
+    }
 }

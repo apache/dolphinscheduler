@@ -159,7 +159,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
 
         checkNotNull(zookeeperMonitor);
         ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-        return zookeeperMonitor.getServersList(zkNodeType);
+        return zookeeperMonitor.getServerList(zkNodeType);
     }
 
 }

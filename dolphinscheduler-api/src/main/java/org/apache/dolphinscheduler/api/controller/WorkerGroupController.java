@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKER_GROUP_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
+import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,6 +63,35 @@ public class WorkerGroupController extends BaseController {
     WorkerGroupService workerGroupService;
 
     /**
+     * create or update a worker group
+     *
+     * @param loginUser login user
+     * @param id        worker group id
+     * @param name      worker group name
+     * @param addrList  addr list
+     * @return create or update result code
+     */
+    @ApiOperation(value = "saveWorkerGroup", notes = "CREATE_WORKER_GROUP_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "addrList", value = "WORKER_ADDR_LIST", required = true, dataType = "String")
+    })
+    @PostMapping(value = "/save")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(SAVE_ERROR)
+    public Result saveWorkerGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                  @RequestParam(value = "id", required = false, defaultValue = "0") int id,
+                                  @RequestParam(value = "name") String name,
+                                  @RequestParam(value = "addrList") String addrList
+    ) {
+        logger.info("save worker group: login user {}, id:{}, name: {}, addrList: {} ",
+                RegexUtils.escapeNRT(loginUser.getUserName()), id, RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(addrList));
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList);
+        return returnDataList(result);
+    }
+
+    /**
      * query worker groups paging
      *
      * @param loginUser login user
@@ -69,21 +102,20 @@ public class WorkerGroupController extends BaseController {
      */
     @ApiOperation(value = "queryAllWorkerGroupsPaging", notes = "QUERY_WORKER_GROUP_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
-            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "ipList", value = "WORKER_IP_LIST", required = true, dataType = "String")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     public Result queryAllWorkerGroupsPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("pageNo") Integer pageNo,
-                                             @RequestParam(value = "searchVal", required = false) String searchVal,
-                                             @RequestParam("pageSize") Integer pageSize
+                                             @RequestParam("pageSize") Integer pageSize,
+                                             @RequestParam(value = "searchVal", required = false) String searchVal
     ) {
         logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
-                loginUser.getUserName(), pageNo, pageSize, searchVal);
-
+                RegexUtils.escapeNRT(loginUser.getUserName()), pageNo, pageSize, searchVal);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
         return returnDataListPaging(result);
@@ -99,14 +131,32 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/all-groups")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
-    public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser
-    ) {
-        logger.info("query all worker group: login user {}",
-                loginUser.getUserName());
-
+    public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        logger.info("query all worker group: login user {}", RegexUtils.escapeNRT(loginUser.getUserName()));
         Map<String, Object> result = workerGroupService.queryAllGroup();
         return returnDataList(result);
     }
 
+    /**
+     * delete worker group by id
+     *
+     * @param loginUser login user
+     * @param id        group id
+     * @return delete result code
+     */
+    @ApiOperation(value = "deleteById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
+    })
+    @PostMapping(value = "/delete-by-id")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_WORKER_GROUP_FAIL)
+    public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @RequestParam("id") Integer id
+    ) {
+        logger.info("delete worker group: login user {}, id:{} ", RegexUtils.escapeNRT(loginUser.getUserName()), id);
+        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
+        return returnDataList(result);
+    }
 
 }

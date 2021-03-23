@@ -27,6 +27,17 @@ import java.util.Map;
 public interface WorkerGroupService {
 
     /**
+     * create or update a worker group
+     *
+     * @param loginUser login user
+     * @param id worker group id
+     * @param name worker group name
+     * @param addrList addr list
+     * @return create or update result code
+     */
+    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList);
+
+    /**
      * query worker group paging
      *
      * @param loginUser login user
@@ -43,5 +54,12 @@ public interface WorkerGroupService {
      * @return all worker group list
      */
     Map<String, Object> queryAllGroup();
+
+    /**
+     * delete worker group by id
+     * @param id worker group id
+     * @return delete result code
+     */
+    Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id);
 
 }
