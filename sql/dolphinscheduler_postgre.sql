@@ -578,7 +578,8 @@ CREATE TABLE t_ds_task_instance (
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   var_pool text ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
 
 --
