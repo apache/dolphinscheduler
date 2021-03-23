@@ -2222,7 +2222,6 @@ public class ProcessService {
      * update task definition
      */
     public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
-
         Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode());
         Date now = new Date();
         taskDefinition.setProjectCode(projectCode);
@@ -2243,7 +2242,7 @@ public class ProcessService {
         taskDefinition.setName(taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
-        taskDefinition.setTaskParams(taskNode.getParams());
+        taskDefinition.setTaskParams(TaskType.of(taskNode.getType()) == TaskType.DEPENDENT ? taskNode.getDependence() : taskNode.getParams());
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
@@ -2508,7 +2507,8 @@ public class ProcessService {
             v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
             v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
-            v.setParams(taskDefinitionLog.getTaskParams());
+            v.setParams(taskDefinitionLog.getTaskType() == TaskType.DEPENDENT ? "" : taskDefinitionLog.getTaskParams());
+            v.setDependence(taskDefinitionLog.getTaskType() == TaskType.DEPENDENT ? taskDefinitionLog.getTaskParams() : "");
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,

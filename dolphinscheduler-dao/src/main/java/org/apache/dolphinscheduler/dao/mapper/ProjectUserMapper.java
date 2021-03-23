@@ -17,8 +17,10 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * project user mapper interface
@@ -27,19 +29,21 @@ public interface ProjectUserMapper extends BaseMapper<ProjectUser> {
 
     /**
      * delte prject user relation
-     * @param projectCode projectCode
+     *
+     * @param projectId projectId
      * @param userId userId
      * @return delete result
      */
-    int deleteProjectRelation(@Param("projectCode") Long projectCode,
+    int deleteProjectRelation(@Param("projectId") int projectId,
                               @Param("userId") int userId);
 
     /**
      * query project relation
-     * @param projectCode projectCode
+     *
+     * @param projectId projectId
      * @param userId userId
      * @return project user relation
      */
-    ProjectUser queryProjectRelation(@Param("projectCode") Long projectCode,
+    ProjectUser queryProjectRelation(@Param("projectId") int projectId,
                                      @Param("userId") int userId);
 }

@@ -29,7 +29,7 @@
             </foreach>
         </if>
         <if test="startTime != null and endTime != null">
-            and cmd.startTime <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
+            and cmd.start_time <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
         </if>
         group by cmd.command_type
     </select>

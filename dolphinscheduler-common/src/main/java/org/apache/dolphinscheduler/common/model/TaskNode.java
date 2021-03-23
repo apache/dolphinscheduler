@@ -138,12 +138,6 @@ public class TaskNode {
     private String workerGroup;
 
     /**
-     * worker group id
-     */
-    private Integer workerGroupId;
-
-
-    /**
      * task time out
      */
     @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
@@ -325,14 +319,6 @@ public class TaskNode {
         this.conditionResult = conditionResult;
     }
 
-    public Integer getWorkerGroupId() {
-        return workerGroupId;
-    }
-
-    public void setWorkerGroupId(Integer workerGroupId) {
-        this.workerGroupId = workerGroupId;
-    }
-
     public int getDelayTime() {
         return delayTime;
     }
@@ -405,7 +391,6 @@ public class TaskNode {
                 + ", conditionResult='" + conditionResult + '\''
                 + ", taskInstancePriority=" + taskInstancePriority
                 + ", workerGroup='" + workerGroup + '\''
-                + ", workerGroupId=" + workerGroupId
                 + ", timeout='" + timeout + '\''
                 + ", delayTime=" + delayTime
                 + '}';
