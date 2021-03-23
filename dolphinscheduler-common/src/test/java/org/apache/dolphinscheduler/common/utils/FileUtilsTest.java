@@ -16,13 +16,14 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DateUtils.class)
@@ -52,10 +53,8 @@ public class FileUtilsTest {
 
     @Test
     public void testGetProcessExecDir() {
-        String dir = FileUtils.getProcessExecDir(1,2,3, 4);
+        String dir = FileUtils.getProcessExecDir(1, 2, 3, 4);
         Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3/4", dir);
-        dir = FileUtils.getProcessExecDir(1,2,3);
-        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3", dir);
     }
 
     @Test

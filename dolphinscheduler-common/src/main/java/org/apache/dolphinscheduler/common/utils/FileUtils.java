@@ -21,6 +21,10 @@ import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS
 import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE;
 import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -36,9 +40,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Optional;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,26 +114,8 @@ public class FileUtils {
      * @return directory of process execution
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId, int taskInstanceId) {
-        String fileName = String.format("%s/exec/process/%s/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
-                Integer.toString(processDefineId), Integer.toString(processInstanceId),Integer.toString(taskInstanceId));
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()){
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
-    }
-
-    /**
-     * directory of process instances
-     * @param projectId project id
-     * @param processDefineId process definition id
-     * @param processInstanceId process instance id
-     * @return directory of process instances
-     */
-    public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId) {
-        String fileName = String.format("%s/exec/process/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
-                Integer.toString(processDefineId), Integer.toString(processInstanceId));
+        String fileName = String.format("%s/exec/process/%d/%d/%d/%d", DATA_BASEDIR,
+                projectId, processDefineId, processInstanceId, taskInstanceId);
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
