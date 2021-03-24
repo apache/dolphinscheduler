@@ -16,8 +16,15 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.DependentRelation;
+import org.apache.dolphinscheduler.common.model.DependentItem;
+import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,25 +64,31 @@ public class TaskInstanceTest {
         TaskNode taskNode;
 
         taskInstance = new TaskInstance();
-        taskInstance.setTaskJson(null);
         Assert.assertNull(taskInstance.getDependency());
 
         taskInstance = new TaskInstance();
         taskNode = new TaskNode();
         taskNode.setDependence(null);
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         Assert.assertNull(taskInstance.getDependency());
 
         taskInstance = new TaskInstance();
-        taskNode = new TaskNode();
-        // expect a JSON here, and will be unwrap when toJsonString
-        taskNode.setDependence("\"A\"");
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
-        Assert.assertEquals("A", taskInstance.getDependency());
-
-        taskInstance = new TaskInstance();
-        taskInstance.setTaskJson(null);
-        taskInstance.setDependency("{}");
-        Assert.assertEquals("{}", taskInstance.getDependency());
+        taskInstance.setTaskParams(JSONUtils.toJsonString(getDependentParameters()));
+        taskInstance.getDependency();
     }
+
+    private DependentParameters getDependentParameters(){
+        DependentParameters dependentParameters = new DependentParameters();
+        List<DependentTaskModel> dependTaskList = new ArrayList<>();
+        List<DependentItem> dependentItems = new ArrayList<>();
+        DependentItem dependentItem = new DependentItem();
+        dependentItem.setDepTasks("A");
+        dependentItem.setDefinitionCode(222L);
+        dependentItem.setCycle("today");
+        dependentItems.add(dependentItem);
+        dependentParameters.setDependTaskList(dependTaskList);
+        dependentParameters.setRelation(DependentRelation.AND);
+        return dependentParameters;
+    }
+
+
 }

@@ -514,8 +514,6 @@ public class MasterExecThread implements Runnable {
             taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
-            // task instance node json
-            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert
@@ -585,9 +583,7 @@ public class MasterExecThread implements Runnable {
                 }
             }
             result.put(LOCAL_PARAMS, allParam);
-            taskNode.setParams(JSONUtils.toJsonString(result));
-            // task instance node json
-            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+            taskInstance.setTaskParams(JSONUtils.toJsonString(result));
         }
     }
 

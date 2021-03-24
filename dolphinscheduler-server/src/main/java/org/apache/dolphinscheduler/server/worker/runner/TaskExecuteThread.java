@@ -130,8 +130,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 return;
             }
 
-            // task node
-            TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
@@ -146,12 +144,9 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getResources(),
                     logger);
 
-            taskExecutionContext.setTaskParams(taskNode.getParams());
+            taskExecutionContext.setTaskParams(taskExecutionContext.getTaskParams());
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
             taskExecutionContext.setDefinedParams(getGlobalParamsMap());
-
-            // set task timeout
-            setTaskTimeout(taskExecutionContext, taskNode);
 
             taskExecutionContext.setTaskAppId(String.format("%s_%s_%s",
                     taskExecutionContext.getProcessDefineId(),
@@ -207,38 +202,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
         return globalParamsMap;
     }
 
-    /**
-     * set task timeout
-     * @param taskExecutionContext TaskExecutionContext
-     * @param taskNode
-     */
-    private void setTaskTimeout(TaskExecutionContext taskExecutionContext, TaskNode taskNode) {
-        // the default timeout is the maximum value of the integer
-        taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
-        TaskTimeoutParameter taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
-        if (taskTimeoutParameter.getEnable()) {
-            // get timeout strategy
-            taskExecutionContext.setTaskTimeoutStrategy(taskTimeoutParameter.getStrategy().getCode());
-            switch (taskTimeoutParameter.getStrategy()) {
-                case WARN:
-                    break;
-                case FAILED:
-                    if (Integer.MAX_VALUE > taskTimeoutParameter.getInterval() * 60) {
-                        taskExecutionContext.setTaskTimeout(taskTimeoutParameter.getInterval() * 60);
-                    }
-                    break;
-                case WARNFAILED:
-                    if (Integer.MAX_VALUE > taskTimeoutParameter.getInterval() * 60) {
-                        taskExecutionContext.setTaskTimeout(taskTimeoutParameter.getInterval() * 60);
-                    }
-                    break;
-                default:
-                    logger.error("not support task timeout strategy: {}", taskTimeoutParameter.getStrategy());
-                    throw new IllegalArgumentException("not support task timeout strategy");
-
-            }
-        }
-    }
 
     /**
      *  kill task

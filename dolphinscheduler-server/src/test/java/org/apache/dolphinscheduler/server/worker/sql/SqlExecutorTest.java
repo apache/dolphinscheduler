@@ -110,9 +110,7 @@ public class SqlExecutorTest {
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
-        String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        taskProps.setTaskParams(taskNode.getParams());
+        taskProps.setTaskParams(taskInstance.getTaskParams());
 
 
         // custom logger

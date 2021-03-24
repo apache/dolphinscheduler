@@ -96,7 +96,6 @@ public class TaskInstanceMapperTest {
         taskInstance.setState(state);
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
-        taskInstance.setTaskJson("{}");
         taskInstance.setProcessInstanceId(processInstanceId);
         taskInstance.setTaskType(taskType);
         taskInstance.setProcessDefinitionCode(1L);

@@ -76,7 +76,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
         taskInstance.setStartTime(taskExecutionContext.getStartTime());
         taskInstance.setTaskType(taskInstance.getTaskType());
         taskInstance.setExecutePath(taskInstance.getExecutePath());
-        taskInstance.setTaskJson(taskInstance.getTaskJson());
         taskInstanceCache.put(taskExecutionContext.getTaskInstanceId(), taskInstance);
     }
 

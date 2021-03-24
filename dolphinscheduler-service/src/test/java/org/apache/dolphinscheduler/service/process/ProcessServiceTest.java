@@ -98,7 +98,7 @@ public class ProcessServiceTest {
         parentInstance.setWarningGroupId(0);
 
         TaskInstance task = new TaskInstance();
-        task.setTaskJson("{\"params\":{\"processDefinitionId\":100}}");
+        task.setTaskParams("{\"processDefinitionId\":100}}");
         task.setId(10);
 
         ProcessInstance childInstance = null;

@@ -148,7 +148,9 @@ public class SubProcessTaskTest {
     private TaskInstance getTaskInstance(TaskNode taskNode, ProcessInstance processInstance) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+        taskInstance.setName("S");
+        taskInstance.setTaskType(TaskType.SUB_PROCESS.toString());
+//        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskType(taskNode.getType());
         taskInstance.setProcessInstanceId(processInstance.getId());

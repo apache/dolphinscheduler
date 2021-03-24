@@ -837,38 +837,7 @@ public class ProcessDefinitionServiceTest {
         taskInstance.setName("test_task_instance");
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setHost("192.168.xx.xx");
-        taskInstance.setTaskJson("{\n"
-                + "  \"conditionResult\": {\n"
-                + "    \"failedNode\": [\n"
-                + "      \"\"\n"
-                + "    ],\n"
-                + "    \"successNode\": [\n"
-                + "      \"\"\n"
-                + "    ]\n"
-                + "  },\n"
-                + "  \"delayTime\": \"0\",\n"
-                + "  \"dependence\": {},\n"
-                + "  \"description\": \"\",\n"
-                + "  \"id\": \"1\",\n"
-                + "  \"maxRetryTimes\": \"0\",\n"
-                + "  \"name\": \"test_task_instance\",\n"
-                + "  \"params\": {\n"
-                + "    \"processDefinitionId\": \"222\",\n"
-                + "    \"resourceList\": []\n"
-                + "  },\n"
-                + "  \"preTasks\": [],\n"
-                + "  \"retryInterval\": \"1\",\n"
-                + "  \"runFlag\": \"NORMAL\",\n"
-                + "  \"taskInstancePriority\": \"MEDIUM\",\n"
-                + "  \"timeout\": {\n"
-                + "    \"enable\": false,\n"
-                + "    \"interval\": null,\n"
-                + "    \"strategy\": \"\"\n"
-                + "  },\n"
-                + "  \"type\": \"SUB_PROCESS\",\n"
-                + "  \"workerGroup\": \"default\"\n"
-                + "}");
-        //task instance exist
+        taskInstance.setTaskParams("\"processDefinitionId\": \"222\",\n");
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Mockito.when(processInstanceService.queryByProcessDefineCode(46L, 10)).thenReturn(processInstanceList);
