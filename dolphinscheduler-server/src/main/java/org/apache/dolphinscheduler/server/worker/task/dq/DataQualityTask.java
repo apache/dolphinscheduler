@@ -54,7 +54,7 @@ public class DataQualityTask extends AbstractYarnTask {
     /**
      * spark2 command
      */
-    private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark2-submit";
+    private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark-submit";
 
     private DataQualityParameters dataQualityParameters;
 

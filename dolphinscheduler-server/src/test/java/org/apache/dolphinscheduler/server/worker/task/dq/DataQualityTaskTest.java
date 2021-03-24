@@ -832,7 +832,7 @@ public class DataQualityTaskTest {
         dataQualityTaskExecutionContext.setTargetConnectorType("HIVE");
         dataQualityTaskExecutionContext.setTargetType(2);
         dataQualityTaskExecutionContext.setTargetConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\","
+                "{\"address\":\"jdbc:hive2://localhost:10000\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost:10000/default\","
                         + "\"user\":\"test\",\"password\":\"test\",\"other\":\"autoReconnect=true\"}");
 
         dataQualityTaskExecutionContext.setWriterType(0);
@@ -845,8 +845,8 @@ public class DataQualityTaskTest {
         String expect = "{\"name\":\"跨表值比对\",\"connectors\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\","
                 + "\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"test1\",\"url\":"
                 + "\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}},{\"type\":\"HIVE\",\"config\":{\"database\":"
-                + "\"test\",\"password\":\"test\",\"driver\":\"org.apache.hive.jdbc.HiveDriver\",\"user\":\"test\","
-                + "\"table\":\"test1_1\",\"url\":\"jdbc:mysql://localhost:3306/test;autoReconnect=true\"}}],\"writers\":"
+                + "\"default\",\"password\":\"test\",\"driver\":\"org.apache.hive.jdbc.HiveDriver\",\"user\":\"test\","
+                + "\"table\":\"test1_1\",\"url\":\"jdbc:hive2://localhost:10000/default;autoReconnect=true\"}}],\"writers\":"
                 + "[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
                 + "\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"dqs_result\",\"url\":"
                 + "\"jdbc:mysql://localhost:3306/test?autoReconnect=true\",\"sql\":\"SELECT 3 as rule_type,'跨表值比对'"
@@ -1126,8 +1126,8 @@ public class DataQualityTaskTest {
         dataQualityTaskExecutionContext.setTargetConnectorType("HIVE");
         dataQualityTaskExecutionContext.setTargetType(2);
         dataQualityTaskExecutionContext.setTargetConnectionParams(
-                "{\"address\":\"jdbc:mysql://localhost:3306\",\"database\":\"default\","
-                        + "\"jdbcUrl\":\"jdbc:mysql://localhost:3306/test\",\"user\":\"test\",\"password\":\"test\","
+                "{\"address\":\"jdbc:hive2://localhost:10000\",\"database\":\"default\","
+                        + "\"jdbcUrl\":\"jdbc:hive2://localhost:10000/default\",\"user\":\"test\",\"password\":\"test\","
                         + "\"other\":\"autoReconnect=true\"}");
 
         dataQualityTaskExecutionContext.setWriterType(0);
@@ -1143,9 +1143,9 @@ public class DataQualityTaskTest {
         String expect = "{\"name\":\"跨表准确性\",\"connectors\":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":"
                 + "\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":\"test1\",\"url\":"
                 + "\"jdbc:mysql://localhost:3306/test?autoReconnect=true\"}},{\"type\":\"HIVE\","
-                + "\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
+                + "\"config\":{\"database\":\"default\",\"password\":\"test\",\"driver\":"
                 + "\"org.apache.hive.jdbc.HiveDriver\",\"user\":\"test\",\"table\":\"test1_1\",\"url\":"
-                + "\"jdbc:mysql://localhost:3306/test;autoReconnect=true\"}}],\"writers\":[{\"type\":\"JDBC\",\"config\":"
+                + "\"jdbc:hive2://localhost:10000/default;autoReconnect=true\"}}],\"writers\":[{\"type\":\"JDBC\",\"config\":"
                 + "{\"database\":\"test\",\"password\":\"test\",\"driver\":\"com.mysql.jdbc.Driver\",\"user\":\"test\",\"table\":"
                 + "\"dqs_result\",\"url\":\"jdbc:mysql://localhost:3306/test?autoReconnect=true\",\"sql\":\"SELECT 2 as rule_type,"
                 + "'跨表准确性' as rule_name,1 as process_definition_id,1 as process_instance_id,1 as task_instance_id,miss_count.miss "
