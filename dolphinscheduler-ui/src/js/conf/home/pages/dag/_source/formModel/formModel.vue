@@ -64,7 +64,7 @@
               :rows="2"
               type="textarea"
               :disabled="isDetails"
-              v-model="description"
+              v-model="desc"
               :placeholder="$t('Please enter description')">
             </el-input>
           </div>
@@ -314,7 +314,7 @@
         // node name
         name: '',
         // description
-        description: '',
+        desc: '',
         // Node echo data
         backfillItem: {},
         cacheBackfillItem: {},
@@ -332,8 +332,8 @@
         dependence: {},
         // cache dependence
         cacheDependence: {},
-        //task code
-        code:'',
+        // task code
+        code: '',
         // Current node params data
         params: {},
         // Running sign
@@ -475,9 +475,9 @@
             type: this.nodeData.taskType,
             id: this.nodeData.id,
             name: this.name,
-            code:this.code,
+            code: this.code,
             params: this.params,
-            description: this.description,
+            desc: this.desc,
             runFlag: this.runFlag,
             conditionResult: this.conditionResult,
             dependence: this.cacheDependence,
@@ -601,7 +601,7 @@
             name: this.name,
             code: this.code,
             params: this.params,
-            description: this.description,
+            desc: this.desc,
             runFlag: this.runFlag,
             conditionResult: this.conditionResult,
             dependence: this.dependence,
@@ -696,7 +696,7 @@
         this.name = o.name
         this.taskInstancePriority = o.taskInstancePriority
         this.runFlag = o.runFlag || 'NORMAL'
-        this.description = o.description
+        this.desc = o.desc
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
         this.delayTime = o.delayTime
@@ -767,7 +767,7 @@
           type: this.nodeData.taskType,
           id: this.nodeData.id,
           name: this.name,
-          description: this.description,
+          desc: this.desc,
           runFlag: this.runFlag,
           dependence: this.cacheDependence,
           maxRetryTimes: this.maxRetryTimes,

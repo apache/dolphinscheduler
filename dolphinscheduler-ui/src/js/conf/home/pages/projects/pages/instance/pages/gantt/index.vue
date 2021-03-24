@@ -29,7 +29,7 @@
             </a>
           </div>
         </div>
-        <template v-show="!isNodata">
+        <template v-if="!isNodata">
           <div class="gantt"></div>
         </template>
         <template v-if="isNodata">
