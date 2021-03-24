@@ -299,5 +299,13 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName,
                                                               int processDefinitionId, long version);
+    /**
+     * check has associated process definition
+     *
+     * @param processDefinitionId process definition id
+     * @param version version
+     * @return The query result has a specific process definition return true
+     */
+    boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version);
 }
 

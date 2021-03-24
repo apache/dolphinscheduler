@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -207,7 +207,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      */
     @Override
     public boolean existGroupName(String groupName) {
-        List<AlertGroup> alertGroup = alertGroupMapper.queryByGroupName(groupName);
-        return CollectionUtils.isNotEmpty(alertGroup);
+        return BooleanUtils.isTrue(alertGroupMapper.existGroupName(groupName));
     }
 }
