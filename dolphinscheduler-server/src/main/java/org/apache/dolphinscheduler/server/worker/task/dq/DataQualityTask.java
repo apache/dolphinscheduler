@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.DateExpressionReplaceUtil;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -134,7 +133,7 @@ public class DataQualityTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(
                 dqTaskExecutionContext.getDefinedParams()),
                 dqTaskExecutionContext.getDefinedParams(),
-                replaceDateExpressionInLocalParam(dataQualityParameters.getLocalParametersMap()),
+                dataQualityParameters.getLocalParametersMap(),
                 CommandType.of(dqTaskExecutionContext.getCmdTypeIfComplement()),
                 dqTaskExecutionContext.getScheduleTime());
 
@@ -170,19 +169,5 @@ public class DataQualityTask extends AbstractYarnTask {
         } else {
             return  mainParameter;
         }
-    }
-
-    private static Map<String,Property> replaceDateExpressionInLocalParam(Map<String,Property> localParams) {
-
-        if (localParams == null) {
-            return null;
-        }
-
-        for (Map.Entry<String,Property> entry : localParams.entrySet()) {
-            Property property = entry.getValue();
-            property.setValue(DateExpressionReplaceUtil.replaceDateExpression(property.getValue()));
-        }
-
-        return localParams;
     }
 }
