@@ -56,6 +56,14 @@
         where code = #{processDefinitionCode}
     </select>
 
+    <select id="queryMaxVersionDefinitionLog" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
+
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition_log
+        where code = #{processDefinitionCode} order by version desc limit 1
+    </select>
+
     <select id="queryProcessDefinitionVersionsPaging"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog">
         select

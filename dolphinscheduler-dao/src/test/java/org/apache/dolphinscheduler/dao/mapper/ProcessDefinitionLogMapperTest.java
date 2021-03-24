@@ -107,7 +107,7 @@ public class ProcessDefinitionLogMapperTest {
 
     @Test
     public void testQueryByDefinitionName() {
-        ProcessDefinitionLog processDefinitionLog = insertOne();
+        insertOne();
         Project project = new Project();
         project.setCode(1L);
         project.setName("ut project");
@@ -130,7 +130,7 @@ public class ProcessDefinitionLogMapperTest {
 
     @Test
     public void testQueryByDefinitionCode() {
-        ProcessDefinitionLog processDefinitionLog = insertOne();
+        insertOne();
 
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
                 .queryByDefinitionCode(1L);
@@ -139,7 +139,7 @@ public class ProcessDefinitionLogMapperTest {
 
     @Test
     public void testQueryByDefinitionCodeAndVersion() {
-        ProcessDefinitionLog processDefinitionLog = insertOne();
+        insertOne();
 
         ProcessDefinitionLog processDefinitionLogs = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(1L, 1);
@@ -148,8 +148,8 @@ public class ProcessDefinitionLogMapperTest {
 
     @Test
     public void testQueryMaxVersionForDefinition() {
-        ProcessDefinitionLog processDefinitionLog = insertOne();
-        ProcessDefinitionLog processDefinitionLog1 = insertTwo();
+        insertOne();
+        insertTwo();
 
         Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(1L);
         Assert.assertEquals(2, version == null ? 1 : version);
@@ -157,7 +157,7 @@ public class ProcessDefinitionLogMapperTest {
 
     @Test
     public void testQueryProcessDefinitionVersionsPaging() {
-        ProcessDefinitionLog processDefinitionLog = insertOne();
+        insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
         IPage<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L);
         Assert.assertNotEquals(processDefinitionLogs.getTotal(), 0);
@@ -165,10 +165,19 @@ public class ProcessDefinitionLogMapperTest {
 
     @Test
     public void testDeleteByProcessDefinitionCodeAndVersion() {
-        ProcessDefinitionLog processDefinitionLog = insertOne();
+        insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
         int processDefinitionLogs = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(1L, 1);
         Assert.assertNotEquals(processDefinitionLogs, 0);
+    }
+
+    @Test
+    public void testQueryMaxVersionDefinitionLog() {
+        insertOne();
+        insertTwo();
+
+        ProcessDefinitionLog processDefinitionLog2 = processDefinitionLogMapper.queryMaxVersionDefinitionLog(1L);
+        Assert.assertEquals(2, processDefinitionLog2.getVersion());
     }
 
 }
