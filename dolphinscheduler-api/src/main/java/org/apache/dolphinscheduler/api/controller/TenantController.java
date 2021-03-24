@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERR
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_ENABLED_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -228,7 +229,7 @@ public class TenantController extends BaseController {
     @ApiOperation(value = "verifyTenantEnable", notes = "VERIFY_TENANT_ENABLE_NOTES")
     @GetMapping(value = "/verify-tenant-enable")
     @ResponseStatus(HttpStatus.OK)
-    //@ApiException(KERBEROS_STARTUP_STATE)
+    @ApiException(VERIFY_TENANT_ENABLED_ERROR)
     public Result verifyTenantEnable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}, verify tenant enable.",loginUser.getUserName());
         return success(Status.SUCCESS.getMsg(), CommonUtils.isMultiTenantEnable());
