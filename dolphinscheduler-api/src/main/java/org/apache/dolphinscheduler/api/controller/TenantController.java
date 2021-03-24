@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TENANT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
@@ -46,8 +53,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * tenant controller
