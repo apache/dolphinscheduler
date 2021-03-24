@@ -35,12 +35,6 @@
         WHERE t.queue_id = q.id
         and t.id = #{tenantId}
     </select>
-    <select id="queryByTenantCode" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
-        select
-        <include refid="baseSql"/>
-        from t_ds_tenant
-        where tenant_code = #{tenantCode}
-    </select>
     <select id="queryTenantPaging" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
         SELECT
         <include refid="baseSqlV2">

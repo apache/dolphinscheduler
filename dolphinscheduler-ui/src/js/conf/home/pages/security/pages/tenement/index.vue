@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
+          <el-button size="mini" :disabled="!multiTenantEnable" @click="_create('')">{{$t('Create Tenant')}}</el-button>
           <el-dialog
             :title="item ? $t('Edit Tenant') : $t('Create Tenant')"
             v-if="createTenementDialog"
@@ -34,6 +34,7 @@
       <template v-if="tenementList.length || total>0">
         <m-list @on-edit="_onEdit"
                 @on-update="_onUpdate"
+                :multi-tenant-enable="multiTenantEnable"
                 :tenement-list="tenementList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
@@ -85,13 +86,14 @@
         isLeft: true,
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
         createTenementDialog: false,
-        item: {}
+        item: {},
+        multiTenantEnable: true
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getTenantListP']),
+      ...mapActions('security', ['getTenantListP', 'verifyTenantEnable']),
       /**
        * Query
        */
@@ -151,6 +153,11 @@
       }
     },
     created () {
+      this.verifyTenantEnable().then(res => {
+        this.multiTenantEnable = res
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
     },
     mounted () {
     },

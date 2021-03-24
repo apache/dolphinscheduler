@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -37,10 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,6 +84,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
+
+        if (!isMultiTenantEnable(result)) {
+            return result;
+        }
+
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
@@ -144,12 +147,17 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
 
         Page<Tenant> page = new Page<>(pageNo, pageSize);
-        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) tenantIPage.getTotal());
-        pageInfo.setLists(tenantIPage.getRecords());
+        if (CommonUtils.isMultiTenantEnable()) {
+            IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
+            pageInfo.setTotalCount((int) tenantIPage.getTotal());
+            pageInfo.setLists(tenantIPage.getRecords());
+        } else {
+            Tenant tenant = Tenant.generateDefaultTenant();
+            pageInfo.setTotalCount(1);
+            pageInfo.setLists(Arrays.asList(tenant));
+        }
         result.put(Constants.DATA_LIST, pageInfo);
-
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -172,6 +180,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
+
+        if (!isMultiTenantEnable(result)) {
+            return result;
+        }
 
         if (isNotAdmin(loginUser, result)) {
             return result;
@@ -235,6 +247,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
+        if (!isMultiTenantEnable(result)) {
+            return result;
+        }
+
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
@@ -286,26 +302,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * query tenant list
      *
-     * @param tenantCode tenant code
-     * @return tenant list
-     */
-    public Map<String, Object> queryTenantList(String tenantCode) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
-        if (CollectionUtils.isNotEmpty(resourceList)) {
-            result.put(Constants.DATA_LIST, resourceList);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-        }
-        return result;
-    }
-
-    /**
-     * query tenant list
-     *
      * @param loginUser login user
      * @return tenant list
      */
@@ -314,7 +310,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         Map<String, Object> result = new HashMap<>();
 
-        List<Tenant> resourceList = tenantMapper.selectList(null);
+        List<Tenant> resourceList = CommonUtils.isMultiTenantEnable() ? tenantMapper.selectList(null) : Arrays.asList(Tenant.generateDefaultTenant());
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result, Status.SUCCESS);
 
@@ -348,4 +344,19 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Boolean existTenant = tenantMapper.existTenant(tenantCode);
         return BooleanUtils.isTrue(existTenant);
     }
+
+    /**
+     * check multi tenant enable
+     * @param result result code
+     * @return when the result is true, the multi-tenant function is enabled
+     */
+    private boolean isMultiTenantEnable(Map<String, Object> result) {
+        // Check whether the multi-tenancy function is enabled
+        if (!CommonUtils.isMultiTenantEnable()) {
+            putMsg(result, Status.CHECK_MULTI_TENANT_NOT_ENABLED);
+            return false;
+        }
+        return true;
+    }
+
 }

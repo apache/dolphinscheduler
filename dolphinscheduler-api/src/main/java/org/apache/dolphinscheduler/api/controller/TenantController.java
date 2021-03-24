@@ -17,19 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TENANT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -52,6 +46,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * tenant controller
@@ -140,7 +136,7 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
-    public Result queryTenantlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result queryTenantList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}, query tenant list", loginUser.getUserName());
         Map<String, Object> result = tenantService.queryTenantList(loginUser);
         return returnDataList(result);
@@ -219,9 +215,18 @@ public class TenantController extends BaseController {
     @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
     public Result verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "tenantCode") String tenantCode) {
-        logger.info("login user {}, verfiy tenant code: {}",
+        logger.info("login user {}, verify tenant code: {}",
                 loginUser.getUserName(), tenantCode);
         return tenantService.verifyTenantCode(tenantCode);
+    }
+
+    @ApiOperation(value = "verifyTenantEnable", notes = "VERIFY_TENANT_ENABLE_NOTES")
+    @GetMapping(value = "/verify-tenant-enable")
+    @ResponseStatus(HttpStatus.OK)
+    //@ApiException(KERBEROS_STARTUP_STATE)
+    public Result verifyTenantEnable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        logger.info("login user {}, verify tenant enable.",loginUser.getUserName());
+        return success(Status.SUCCESS.getMsg(), CommonUtils.isMultiTenantEnable());
     }
 
 }

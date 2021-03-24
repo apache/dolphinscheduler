@@ -80,6 +80,10 @@ public class CommonUtils {
         return resUploadType == ResUploadType.HDFS && kerberosStartupState;
     }
 
+    public static boolean isMultiTenantEnable() {
+        return PropertyUtils.getBoolean(Constants.MULTI_TENANT_ENABLE, true);
+    }
+
     /**
      * load kerberos configuration
      *

@@ -134,9 +134,8 @@ public abstract class AbstractCommandExecutor {
         processBuilder.redirectErrorStream(true);
 
         // setting up user to run commands
-        command.add("sudo");
-        command.add("-u");
-        command.add(taskExecutionContext.getTenantCode());
+        OSUtils.generateSudoCmd(taskExecutionContext.getTenantCode(), command);
+
         command.add(commandInterpreter());
         command.addAll(commandOptions());
         command.add(commandFile);
@@ -280,7 +279,7 @@ public abstract class AbstractCommandExecutor {
             try {
                 // sudo -u user command to run command
                 String cmd = String.format("kill %d", processId);
-                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+                cmd = OSUtils.generateSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("soft kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -301,7 +300,7 @@ public abstract class AbstractCommandExecutor {
         if (processId != 0 && process.isAlive()) {
             try {
                 String cmd = String.format("kill -9 %d", processId);
-                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+                cmd = OSUtils.generateSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);

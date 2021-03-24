@@ -363,7 +363,7 @@ public class ProcessUtils {
             }
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
-            runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
+            runCmd = OSUtils.generateSudoCmd(tenantCode, runCmd);
             logger.info("kill cmd:{}", runCmd);
             OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
@@ -386,7 +386,7 @@ public class ProcessUtils {
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+            cmd = OSUtils.generateSudoCmd(taskExecutionContext.getTenantCode(), cmd);
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);

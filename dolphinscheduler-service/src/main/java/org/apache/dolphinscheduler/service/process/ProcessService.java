@@ -616,28 +616,34 @@ public class ProcessService {
 
     /**
      * get process tenant
-     * there is tenant id in definition, use the tenant of the definition.
-     * if there is not tenant id in the definiton or the tenant not exist
-     * use definition creator's tenant.
+     *
+     * <p>
+     *     1.when tenantId is equal to -1, it is the default tenant.
+     *     2.tenant id in definition, use the tenant of the definition.
+     *     3.if there is not tenant id in the definition or the tenant not exist, use definition creator's tenant.
+     * </p>
      *
      * @param tenantId tenantId
      * @param userId   userId
      * @return tenant
      */
     public Tenant getTenantForProcess(int tenantId, int userId) {
-        Tenant tenant = null;
-        if (tenantId >= 0) {
-            tenant = tenantMapper.queryById(tenantId);
+        Tenant tenant;
+        // default tenant
+        if (tenantId == -1) {
+            return Tenant.generateDefaultTenant();
+        }
+        tenant = tenantMapper.queryById(tenantId);
+        if (Objects.nonNull(tenant)) {
+            return tenant;
         }
 
         if (userId == 0) {
             return null;
         }
+        User user = userMapper.selectById(userId);
+        tenant = tenantMapper.queryById(user.getTenantId());
 
-        if (tenant == null) {
-            User user = userMapper.selectById(userId);
-            tenant = tenantMapper.queryById(user.getTenantId());
-        }
         return tenant;
     }
 

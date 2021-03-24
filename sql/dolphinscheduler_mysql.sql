@@ -528,7 +528,8 @@ CREATE TABLE `t_ds_queue` (
 -- ----------------------------
 -- Records of t_ds_queue
 -- ----------------------------
-INSERT INTO `t_ds_queue` VALUES ('1', 'default', 'default', null, null);
+INSERT INTO `t_ds_queue`(queue_name, queue, create_time, update_time)
+VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- ----------------------------
 -- Table structure for t_ds_relation_datasource_user
@@ -832,8 +833,8 @@ VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', 
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
-INSERT INTO `t_ds_user`
-VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
+INSERT INTO `t_ds_user`(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time)
+VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define

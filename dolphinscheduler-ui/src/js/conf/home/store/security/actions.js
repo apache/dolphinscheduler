@@ -286,12 +286,20 @@ export default {
     return new Promise((resolve, reject) => {
       io.get('tenant/list', payload, res => {
         const list = res.data
-        list.unshift({
-          id: -1,
-          tenantCode: 'default'
-        })
         state.tenantAllList = list
         resolve(list)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Tenant list - no paging
+   */
+  verifyTenantEnable ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('tenant/verify-tenant-enable', payload, res => {
+        resolve(res.data)
       }).catch(e => {
         reject(e)
       })

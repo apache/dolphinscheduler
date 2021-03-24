@@ -14,16 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_QUEUE;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_TENANT_CODE;
+
+import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.Date;
-import java.util.Objects;
 
 /**
  * tenant
@@ -34,7 +38,7 @@ public class Tenant {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -67,14 +71,13 @@ public class Tenant {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date updateTime;
-
 
     public int getId() {
         return id;
@@ -134,15 +137,15 @@ public class Tenant {
 
     @Override
     public String toString() {
-        return "Tenant{" +
-                "id=" + id +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", queueId=" + queueId +
-                ", queueName='" + queueName + '\'' +
-                ", queue='" + queue + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "Tenant{"
+                + "id=" + id
+                + ", tenantCode='" + tenantCode + '\''
+                + ", queueId=" + queueId
+                + ", queueName='" + queueName + '\''
+                + ", queue='" + queue + '\''
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 
     public String getDescription() {
@@ -170,5 +173,19 @@ public class Tenant {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    /**
+     * generate default tenant
+     *
+     * @return default tenant
+     */
+    public static Tenant generateDefaultTenant() {
+        Tenant tenant = new Tenant();
+        tenant.setId(-1);
+        tenant.setTenantCode(DEFAULT_TENANT_CODE);
+        tenant.setQueue(DEFAULT_QUEUE);
+        tenant.setQueueName(DEFAULT_QUEUE);
+        return tenant;
     }
 }

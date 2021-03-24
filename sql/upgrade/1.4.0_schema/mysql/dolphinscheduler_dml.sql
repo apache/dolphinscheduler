@@ -14,3 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- ----------------------------
+-- Records of t_ds_tenant
+-- ----------------------------
+INSERT INTO `t_ds_tenant`(tenant_code, description, queue_id, create_time, update_time)
+VALUES ('default', 'default tenant', 1, '2018-11-29 10:22:33', '2018-11-29 10:22:33');

@@ -39,10 +39,9 @@
         <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="!multiTenantEnable" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top">
-              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -51,7 +50,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference" :disabled="!multiTenantEnable"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -73,7 +72,8 @@
     props: {
       tenementList: Array,
       pageNo: Number,
-      pageSize: Number
+      pageSize: Number,
+      multiTenantEnable: Boolean
     },
     methods: {
       ...mapActions('security', ['deleteQueue']),

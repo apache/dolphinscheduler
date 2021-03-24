@@ -69,6 +69,7 @@
   import store from '@/conf/home/store'
   import mPopover from '@/module/components/popup/popover'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+
   export default {
     name: 'create-tenement',
     data () {
@@ -157,15 +158,6 @@
     watch: {
     },
     created () {
-      this._getQueueList().then(res => {
-        if (this.item) {
-          this.$nextTick(() => {
-            this.queueId = this.item.queueId
-          })
-          this.tenantCode = this.item.tenantCode
-          this.description = this.item.description
-        }
-      })
     },
     mounted () {
     },

@@ -206,7 +206,6 @@ public final class Constants {
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
-
     /**
      * comma ,
      */
@@ -1087,4 +1086,7 @@ public final class Constants {
     public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
     public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
+    public static final String MULTI_TENANT_ENABLE = "multi.tenant.enable";
+    public static final String DEFAULT_TENANT_CODE = "default";
+    public static final String DEFAULT_QUEUE = "default";
 }

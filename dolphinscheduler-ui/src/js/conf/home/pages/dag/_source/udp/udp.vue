@@ -248,7 +248,6 @@
     },
     created () {
       const dag = _.cloneDeep(this.store.state.dag)
-
       this.name = dag.name
       this.originalName = dag.name
       this.description = dag.description
@@ -256,13 +255,6 @@
       this.releaseState = dag.releaseState
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
-      this.$nextTick(() => {
-        if (dag.tenantId > -1) {
-          this.tenantId = dag.tenantId
-        } else if (this.store.state.user.userInfo.tenantId) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        }
-      })
     },
     mounted () {},
     components: { FormTenant, mLocalParams }

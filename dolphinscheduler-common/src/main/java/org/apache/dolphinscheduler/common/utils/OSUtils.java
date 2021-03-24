@@ -406,13 +406,41 @@ public class OSUtils {
     }
 
     /**
-     *  get sudo command
-     * @param tenantCode tenantCode
+     *  generate sudo command
+     *
+     * @param tenantCode tenant code
      * @param command command
      * @return result of sudo execute command
      */
-    public static String getSudoCmd(String tenantCode, String command) {
-        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
+    public static String generateSudoCmd(String tenantCode, String command) {
+        return getSudoCmd(tenantCode) + " " + command;
+    }
+
+    /**
+     *  generate sudo command
+     *
+     * @param tenantCode tenant code
+     * @param command command
+     * @return result of sudo execute command
+     */
+    public static void generateSudoCmd(String tenantCode, List<String> command) {
+        command.add(getSudoCmd(tenantCode));
+    }
+
+    /**
+     *  get sudo command
+     *
+     *  <p>
+     *      when tenant code is empty or tenant code is default, Sudo permission is not used.
+     *  </p>
+     * @param tenantCode tenant code
+     * @return
+     */
+    public static String getSudoCmd(String tenantCode) {
+        if (StringUtils.isEmpty(tenantCode) || Constants.DEFAULT_TENANT_CODE.equals(tenantCode)) {
+            return StringUtils.EMPTY;
+        }
+        return "sudo -u " + tenantCode;
     }
 
     /**
