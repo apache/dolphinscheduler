@@ -157,8 +157,6 @@
     },
     watch: {
     },
-    created () {
-    },
     mounted () {
     },
     components: { mPopover, mListBoxF }

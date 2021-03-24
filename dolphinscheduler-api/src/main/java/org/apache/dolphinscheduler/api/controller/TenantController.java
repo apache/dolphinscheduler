@@ -87,7 +87,7 @@ public class TenantController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TENANT_ERROR)
-    public Result createTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> createTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
@@ -116,7 +116,7 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
-    public Result queryTenantlistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryTenantlistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "searchVal", required = false) String searchVal,
                                         @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam("pageSize") Integer pageSize) {
@@ -131,7 +131,6 @@ public class TenantController extends BaseController {
         return returnDataListPaging(result);
     }
 
-
     /**
      * tenant list
      *
@@ -142,12 +141,11 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
-    public Result queryTenantList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result<Object> queryTenantList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}, query tenant list", loginUser.getUserName());
         Map<String, Object> result = tenantService.queryTenantList(loginUser);
         return returnDataList(result);
     }
-
 
     /**
      * udpate tenant
@@ -170,7 +168,7 @@ public class TenantController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TENANT_ERROR)
-    public Result updateTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> updateTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "id") int id,
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
@@ -198,7 +196,7 @@ public class TenantController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
-    public Result deleteTenantById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> deleteTenantById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) throws Exception {
         logger.info("login user {}, delete tenant, tenantId: {},", loginUser.getUserName(), id);
         Map<String, Object> result = tenantService.deleteTenantById(loginUser, id);
@@ -219,19 +217,22 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/verify-tenant-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
-    public Result verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "tenantCode") String tenantCode) {
-        logger.info("login user {}, verify tenant code: {}",
-                loginUser.getUserName(), tenantCode);
         return tenantService.verifyTenantCode(tenantCode);
     }
 
+    /**
+     *  verify that multi tenant is enable
+     *
+     * @param loginUser login user
+     * @return multi tenant is enable, true is enable
+     */
     @ApiOperation(value = "verifyTenantEnable", notes = "VERIFY_TENANT_ENABLE_NOTES")
     @GetMapping(value = "/verify-tenant-enable")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_TENANT_ENABLED_ERROR)
-    public Result verifyTenantEnable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, verify tenant enable.",loginUser.getUserName());
+    public Result<Object> verifyTenantEnable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return success(Status.SUCCESS.getMsg(), CommonUtils.isMultiTenantEnable());
     }
 
