@@ -89,7 +89,7 @@ public class DqRuleServiceTest {
                 + "\"type\":\"select\",\"title\":\"源数据类型\",\"value\":\"JDBC\",\"emit\":[\"change\"],\"options\":"
                 + "[{\"label\":\"HIVE\",\"value\":\"HIVE\",\"disabled\":false},{\"label\":\"JDBC\",\"value\":\"JDBC\","
                 + "\"disabled\":false}]},{\"field\":\"statistics_name\",\"props\":{\"placeholder\":\"Please enter statistics name, "
-                + "the alias in statistics execute sql\",\"rows\":0,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":"
+                + "the alias in statistics execute sql\",\"rows\":2,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":"
                 + "\"统计值名\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]},{\"field\":"
                 + "\"statistics_execute_sql\",\"props\":{\"type\":\"textarea\",\"placeholder\":\"Please enter the statistics execute sql\","
                 + "\"rows\":1,\"disabled\":false,\"size\":\"small\"},\"type\":\"input\",\"title\":\"统计值计算SQL\",\"validate\":"
@@ -188,6 +188,7 @@ public class DqRuleServiceTest {
         srcConnectorType.setInputType(InputType.DEFAULT);
         srcConnectorType.setValueType(ValueType.NUMBER);
         srcConnectorType.setEmit(true);
+        srcConnectorType.setValidate(true);
 
         DqRuleInputEntry statisticsName = new DqRuleInputEntry();
         statisticsName.setTitle("统计值名");
@@ -200,6 +201,7 @@ public class DqRuleServiceTest {
         statisticsName.setInputType(InputType.DEFAULT);
         statisticsName.setValueType(ValueType.STRING);
         statisticsName.setEmit(false);
+        statisticsName.setValidate(true);
 
         DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
         statisticsExecuteSql.setTitle("统计值计算SQL");
@@ -211,6 +213,7 @@ public class DqRuleServiceTest {
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT);
         statisticsExecuteSql.setValueType(ValueType.LIKE_SQL);
         statisticsExecuteSql.setEmit(false);
+        statisticsExecuteSql.setValidate(true);
 
         list.add(srcConnectorType);
         list.add(statisticsName);
