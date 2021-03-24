@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +160,14 @@ public class AlertGroupMapperTest {
         List<AlertGroup> alertGroupList = alertGroupMapper.queryByGroupName("testGroup");
 
         compareAlertGroups(alertGroupMap, alertGroupList);
+    }
+
+    @Test
+    public void testExistGroupName() {
+        String groupName = "testGroup";
+        createAlertGroups(1, groupName);
+
+        Assert.assertTrue(alertGroupMapper.existGroupName(groupName));
     }
 
     /**

@@ -525,10 +525,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-        //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteProjectRelation(0L, userId);
 
+        //if the selected projectIds are empty, delete all items associated with the user
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 
@@ -586,7 +586,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         //get the authorized resource id list by user id
-        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> oldAuthorizedRes = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
         //if resource type is UDF,need check whether it is bound by UDF function
         Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 

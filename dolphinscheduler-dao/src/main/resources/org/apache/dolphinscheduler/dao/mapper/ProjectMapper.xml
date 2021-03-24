@@ -19,7 +19,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectMapper">
     <sql id="baseSql">
-
         id, name, code, description, user_id, flag, create_time, update_time
     </sql>
     <sql id="baseSqlV2">
@@ -83,9 +82,9 @@
         join t_ds_user u on u.id=p.user_id
         where 1=1
         <if test="userId != 0">
-            and p.code in
-            (select project_code from t_ds_relation_project_user where user_id=#{userId}
-            union select id as project_code from t_ds_project where user_id=#{userId}
+            and p.id in
+            (select project_id from t_ds_relation_project_user where user_id=#{userId}
+            union select id as project_id from t_ds_project where user_id=#{userId}
             )
         </if>
         <if test="searchName!=null and searchName != ''">
@@ -101,6 +100,18 @@
         from t_ds_project p,t_ds_relation_project_user rel
         where p.id = rel.project_id and rel.user_id= #{userId}
     </select>
+    <select id="queryRelationProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        from t_ds_project p left join t_ds_relation_project_user rel
+        on p.id = rel.project_id
+        where 1=1
+        <if test="userId != 0 ">
+            and rel.user_id= #{userId}
+        </if>
+    </select>
     <select id="queryProjectExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
         <include refid="baseSql"/>
@@ -114,16 +125,18 @@
         where user_id = #{userId}
     </select>
     <select id="queryProjectCreatedAndAuthorizedByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select * from t_ds_project where id in
+        select
+        <include refid="baseSql"/>
+        from t_ds_project where id in
            (select project_id from t_ds_relation_project_user  where user_id=#{userId}
              union select id as project_id  from t_ds_project where user_id=#{userId})
     </select>
 
     <select id="queryProjectWithUserByProcessInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
         select
-            dp.code projectCode,
-            dp.name projectName,
-            u.user_name userName
+            dp.id project_id,
+            dp.name project_name,
+            u.user_name user_name
         from t_ds_process_instance di
         join t_ds_process_definition dpd on di.process_definition_code = dpd.code
         join t_ds_project dp on dpd.project_code = dp.code

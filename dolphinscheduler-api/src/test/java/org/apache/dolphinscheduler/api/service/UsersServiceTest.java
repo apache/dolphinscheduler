@@ -305,7 +305,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        when(projectUserMapper.deleteProjectRelation(Mockito.anyLong(), Mockito.anyInt())).thenReturn(1);
+        when(projectUserMapper.deleteProjectRelation(Mockito.anyInt(), Mockito.anyInt())).thenReturn(1);
         result = usersService.grantProject(loginUser, 1, projectIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -325,7 +325,6 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        when(resourceMapper.queryAuthorizedResourceList(1)).thenReturn(new ArrayList<Resource>());
         when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
         when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
         result = usersService.grantResources(loginUser, 1, resourceIds);

@@ -19,5 +19,7 @@
  */
 export default {
   // task record switch
-  recordSwitch: false
+  recordSwitch: false,
+  // refresh in switched tab
+  refreshInSwitchedTab: false
 }
