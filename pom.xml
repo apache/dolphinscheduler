@@ -923,7 +923,6 @@
                         <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
-                        <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
                         <include>**/server/master/ConditionsTaskTest.java</include>
@@ -971,6 +970,7 @@
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
+                        <include>**/service/alert/ProcessAlertManagerTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>

@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master;
+
+package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -25,24 +26,20 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.server.utils.AlertManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
-/**
- *  alert manager test
- */
 @Ignore
-public class AlertManagerTest {
+public class ProcessAlertManagerTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertManagerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManagerTest.class);
 
     @Autowired
     ProcessDefinitionMapper processDefinitionMapper;
@@ -56,20 +53,19 @@ public class AlertManagerTest {
     @Autowired
     ProjectMapper projectMapper;
 
-    AlertManager alertManager;
+    ProcessAlertManager processAlertManager;
 
     /**
      * send worker alert fault tolerance
      */
     @Test
-    public void sendWarnningWorkerleranceFaultTest(){
+    public void sendWarningWorkerLeranceFaultTest() {
         // process instance
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
 
         // set process definition
         ProcessDefinition processDefinition = processDefinitionMapper.selectById(47);
         processInstance.setProcessDefinition(processDefinition);
-
 
         // fault task instance
         TaskInstance toleranceTask1 = taskInstanceMapper.selectById(5038);
@@ -79,7 +75,7 @@ public class AlertManagerTest {
         toleranceTaskList.add(toleranceTask1);
         toleranceTaskList.add(toleranceTask2);
 
-        alertManager.sendAlertWorkerToleranceFault(processInstance, toleranceTaskList);
+        processAlertManager.sendAlertWorkerToleranceFault(processInstance, toleranceTaskList);
     }
 
 
@@ -87,7 +83,7 @@ public class AlertManagerTest {
      * send worker alert fault tolerance
      */
     @Test
-    public void sendWarnningOfProcessInstanceTest(){
+    public void sendWarnningOfProcessInstanceTest() {
         // process instance
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
 
@@ -107,7 +103,7 @@ public class AlertManagerTest {
 
         ProjectUser projectUser = projectMapper.queryProjectWithUserByProcessInstanceId(processInstance.getId());
 
-        alertManager.sendAlertProcessInstance(processInstance, toleranceTaskList, projectUser);
+        processAlertManager.sendAlertProcessInstance(processInstance, toleranceTaskList, projectUser);
     }
 
 }

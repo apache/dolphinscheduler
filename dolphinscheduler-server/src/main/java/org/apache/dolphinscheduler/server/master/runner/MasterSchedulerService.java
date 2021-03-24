@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.curator.framework.imps.CuratorFrameworkState;
@@ -76,7 +76,8 @@ public class MasterSchedulerService extends Thread {
     /**
      * alert manager
      */
-    private AlertManager alertManager = new AlertManager();
+    @Autowired
+    private ProcessAlertManager processAlertManager;
 
     /**
      *  netty remoting client
@@ -165,7 +166,7 @@ public class MasterSchedulerService extends Thread {
                                         processInstance
                                         , processService
                                         , nettyRemotingClient
-                                        , alertManager
+                                        , processAlertManager
                                         , masterConfig));
                     }
                 } catch (Exception e) {
