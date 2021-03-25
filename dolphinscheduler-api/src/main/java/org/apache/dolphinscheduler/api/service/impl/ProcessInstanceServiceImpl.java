@@ -259,9 +259,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefineId);
 
-        IPage<ProcessInstance> processInstanceList =
-                processInstanceMapper.queryProcessInstanceListPaging(page,
-                        project.getCode(), processDefinition.getCode(), searchVal, executorId, statusArray, host, start, end);
+        IPage<ProcessInstance> processInstanceList = processInstanceMapper.queryProcessInstanceListPaging(page,
+                        project.getCode(), processDefinition == null ? 0L : processDefinition.getCode(), searchVal,
+                        executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
         List<Integer> userIds = CollectionUtils.transformToList(processInstances, ProcessInstance::getExecutorId);
