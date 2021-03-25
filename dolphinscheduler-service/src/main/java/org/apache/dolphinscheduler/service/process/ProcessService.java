@@ -413,9 +413,7 @@ public class ProcessService {
                 logClient.removeTaskLog(ip, port, taskLogPath);
             }
         } finally {
-            if (logClient != null) {
-                logClient.close();
-            }
+            logClient.close();
         }
     }
 
