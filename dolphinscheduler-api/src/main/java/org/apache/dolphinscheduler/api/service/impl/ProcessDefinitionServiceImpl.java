@@ -1583,6 +1583,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             } catch (Exception e) {
                 setFailedProcessList(failedProcessList, processDefinitionId);
+                logger.error("move processDefinition error: {}", e.getMessage(), e);
+
             }
         }
     }
@@ -1606,7 +1608,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             } catch (Exception e) {
                 setFailedProcessList(failedProcessList, processDefinitionId);
-                logger.error(e.getMessage());
+                logger.error("copy processDefinition error: {}", e.getMessage(), e);
 
             }
         }
