@@ -2298,6 +2298,7 @@ public class ProcessService {
                                                            String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
+        processDefinitionLog.setUserId(operator.getId());
         processDefinitionLog.setCode(processDefinitionCode);
         processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version);
         processDefinitionLog.setName(processDefinitionName);
