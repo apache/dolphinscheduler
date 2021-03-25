@@ -297,7 +297,9 @@ public enum Status {
     QUERY_RULE_LIST_ERROR(120003, "query rule list error", "获取规则列表错误"),
     QUERY_RULE_INPUT_ENTRY_LIST_ERROR(120004, "query rule list error", "获取规则列表错误"),
     QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(120005, "query execute result list paging error", "获取数据质量任务结果分页错误"),
-    GET_DATASOURCE_OPTIONS_ERROR(120006, "get datasource options error", "获取数据源Options错误")
+    GET_DATASOURCE_OPTIONS_ERROR(120006, "get datasource options error", "获取数据源Options错误"),
+    GET_DATASOURCE_TABLES_ERROR(120007, "get datasource tables error", "获取数据源表列表错误"),
+    GET_DATASOURCE_TABLE_COLUMNS_ERROR(120008, "get datasource table columns error", "获取数据源表列名错误")
     ;
 
     private final int code;

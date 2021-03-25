@@ -56,8 +56,7 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
                 RuleParserUtils.getConnectorParameterList(inputParameterValue,context);
         List<ExecutorParameter> executorParameterList = new ArrayList<>();
 
-        String mappingColumns = inputParameterValue.get(MAPPING_COLUMNS);
-        String[] mappingColumnList = mappingColumns.split(",");
+        List<MappingColumn> mappingColumnList = RuleParserUtils.getMappingColumnList(inputParameterValue.get(MAPPING_COLUMNS));
 
         //get on clause
         inputParameterValue.put(ON_CLAUSE, RuleParserUtils.getOnClause(mappingColumnList,inputParameterValue));

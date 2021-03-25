@@ -30,7 +30,9 @@ import org.apache.dolphinscheduler.common.enums.dq.PropsType;
 import org.apache.dolphinscheduler.common.form.ParamsOptions;
 import org.apache.dolphinscheduler.common.form.PluginParams;
 import org.apache.dolphinscheduler.common.form.Validate;
+import org.apache.dolphinscheduler.common.form.props.GroupParamsProps;
 import org.apache.dolphinscheduler.common.form.props.InputParamsProps;
+import org.apache.dolphinscheduler.common.form.type.GroupParam;
 import org.apache.dolphinscheduler.common.form.type.InputParam;
 import org.apache.dolphinscheduler.common.form.type.SelectParam;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -213,6 +215,9 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                     case TEXTAREA:
                         params.add(getTextareaParam(inputEntry));
                         break;
+                    case GROUP:
+                        params.add(getGroupParam(inputEntry));
+                        break;
                     default:
                         break;
                 }
@@ -290,6 +295,17 @@ public class DqRuleServiceImpl extends BaseService implements DqRuleService {
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setSize(Constants.SMALL)
                 .setRows(2)
+                .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
+                .build();
+    }
+
+    private GroupParam getGroupParam(DqRuleInputEntry inputEntry) {
+        return GroupParam
+                .newBuilder(inputEntry.getField(),inputEntry.getTitle())
+                .addValidate(Validate.newBuilder()
+                        .setRequired(inputEntry.getValidate())
+                        .build())
+                .setProps(new GroupParamsProps().setRules(JSONUtils.toList(inputEntry.getOptions(),PluginParams.class)).setFontSize(20))
                 .setEmit(Boolean.TRUE.equals(inputEntry.getEmit()) ? Collections.singletonList(Constants.CHANGE) : null)
                 .build();
     }

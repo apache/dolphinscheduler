@@ -40,7 +40,8 @@ public enum FormType {
     SELECT(2,"select"),
     SWITCH(3,"checkbox"),
     CASCADER(4,"cascader"),
-    TEXTAREA(5,"textarea");
+    TEXTAREA(5,"textarea"),
+    GROUP(6,"group");
 
     FormType(int code, String description) {
         this.code = code;

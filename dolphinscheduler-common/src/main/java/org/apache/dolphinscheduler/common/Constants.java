@@ -1082,7 +1082,7 @@ public final class Constants {
     public static final String TARGET_DATASOURCE_ID = "target_datasource_id";
     public static final String TARGET_TABLE = "target_table";
     public static final String TARGET_FILTER = "target_filter";
-    public static final String TARGET_FILED = "target_filed";
+    public static final String TARGET_FIELD = "target_field";
     public static final String STATISTICS_NAME = "statistics_name";
     public static final String STATISTICS_EXECUTE_SQL = "statistics_execute_sql";
     public static final String COMPARISON_NAME = "comparison_name";
@@ -1105,12 +1105,4 @@ public final class Constants {
     public static final String SMALL = "small";
     public static final String CHANGE = "change";
     public static final String RULE_NAME = "rule_name";
-
-    public static final String YEAR = "YEAR";
-    public static final String MONTH = "MONTH";
-    public static final String DAY = "DAY";
-    public static final String HOUR = "HOUR";
-    public static final String MINUTE = "MINUTE";
-    public static final String SECOND = "SECOND";
-    public static final String WEEK = "WEEK";
 }
