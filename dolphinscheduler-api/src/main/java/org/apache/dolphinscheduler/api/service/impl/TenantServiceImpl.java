@@ -163,7 +163,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
