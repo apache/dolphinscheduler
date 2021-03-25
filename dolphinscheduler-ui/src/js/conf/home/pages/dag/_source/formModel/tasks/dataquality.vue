@@ -203,32 +203,105 @@
             this.fApi.on('src_connector_type-change', this.srcConnectorTypeChange)
             this.fApi.on('target_connector_type-change', this.targetConnectorTypeChange)
             this.fApi.on('writer_connector_type-change', this.writerConnectorTypeChange)
+            this.fApi.on('src_datasource_id-change', this.srcDatasourceIdChange)
+            this.fApi.on('target_datasource_id-change', this.targetDatasourceIdChange)
+            this.fApi.on('src_table-change', this.srcTableChange)
+            this.fApi.on('target_table-change', this.targetTableChange)
           })
         })
       },
 
       srcConnectorTypeChange () {
-        this._updateDatasourceOptions(
+        this._updateSelectFieldOptions(
+          'dag/getDatasourceOptionsById',
           'src_connector_type',
           'src_connector_type',
           this.fApi.getValue('src_connector_type'),
-          'src_datasource_id')
+          'src_datasource_id', ['src_datasource_id', 'src_table', 'src_field'])
       },
 
       targetConnectorTypeChange () {
-        this._updateDatasourceOptions(
+        this._updateSelectFieldOptions(
+          'dag/getDatasourceOptionsById',
           'target_connector_type',
           'target_connector_type',
           this.fApi.getValue('target_connector_type'),
-          'target_datasource_id')
+          'target_datasource_id', ['target_datasource_id', 'target_table', 'target_field'])
       },
 
       writerConnectorTypeChange () {
-        this._updateDatasourceOptions(
+        this._updateSelectFieldOptions(
+          'dag/getDatasourceOptionsById',
           'writer_connector_type',
           'writer_connector_type',
           this.fApi.getValue('writer_connector_type'),
-          'writer_datasource_id')
+          'writer_datasource_id', ['writer_datasource_id'])
+      },
+
+      srcDatasourceIdChange () {
+        this._updateSelectFieldOptions(
+          'dag/getTablesById',
+          'src_datasource_id',
+          'src_datasource_id',
+          { datasourceId: this.fApi.getValue('src_datasource_id') },
+          'src_table', ['src_table', 'src_field'])
+      },
+
+      targetDatasourceIdChange () {
+        this._updateSelectFieldOptions(
+          'dag/getTablesById',
+          'target_datasource_id',
+          'target_datasource_id',
+          { datasourceId: this.fApi.getValue('target_datasource_id') },
+          'target_table', ['target_table', 'target_field'])
+      },
+
+      targetTableChange () {
+        this._updateSelectFieldOptions(
+          'dag/getTableColumsByIdAndName',
+          'target_table',
+          'target_table',
+          { datasourceId: this.fApi.getValue('target_datasource_id'), tableName: this.fApi.getValue('target_table') },
+          'target_field', ['target_field'])
+      },
+
+      srcTableChange () {
+        this._updateSelectFieldOptions(
+          'dag/getTableColumsByIdAndName',
+          'src_table',
+          'src_table',
+          { datasourceId: this.fApi.getValue('src_datasource_id'), tableName: this.fApi.getValue('src_table') },
+          'src_field', ['src_field'])
+      },
+
+      _updateSelectFieldOptions (url, item, type, typeValue, id, clearList) {
+        if (item === type) {
+          return new Promise((resolve, reject) => {
+            this.store.dispatch(url, typeValue).then(res => {
+              if (res.data) {
+                this.fApi.updateRule(id, {
+                  options: res.data
+                }, true)
+
+                if (clearList !== undefined && clearList.length > 0) {
+                  clearList.forEach(item => {
+                    if (item !== id) {
+                      this.fApi.updateRule(item, {
+                        options: []
+                      }, true)
+                    }
+                    this.fApi.setValue(item, null)
+                  })
+                }
+              } else {
+                this.fApi.updateRule(id, {
+                  options: []
+                }, true)
+                this.fApi.setValue(id, null)
+              }
+            })
+          })
+        }
       },
 
       /**
@@ -253,10 +326,49 @@
               window.setTimeout(() => {
                 let fields = this.fApi.fields()
                 fields.forEach(item => {
-                  if (this.inputEntryValueMap[item] != null) {
-                    this._updateDatasourceOptions(item, 'src_connector_type', this.inputEntryValueMap[item], 'src_datasource_id')
-                    this._updateDatasourceOptions(item, 'target_connector_type', this.inputEntryValueMap[item], 'target_datasource_id')
-                    this._updateDatasourceOptions(item, 'writer_connector_type', this.inputEntryValueMap[item], 'writer_datasource_id')
+                  if (this.inputEntryValueMap[item] !== null) {
+                    this._updateSelectFieldOptions(
+                      'dag/getDatasourceOptionsById',
+                      item, 'src_connector_type',
+                      this.inputEntryValueMap[item],
+                      'src_datasource_id', [])
+
+                    this._updateSelectFieldOptions(
+                      'dag/getDatasourceOptionsById',
+                      item, 'target_connector_type',
+                      this.inputEntryValueMap[item],
+                      'target_datasource_id', [])
+
+                    this._updateSelectFieldOptions(
+                      'dag/getDatasourceOptionsById',
+                      item, 'writer_connector_type',
+                      this.inputEntryValueMap[item],
+                      'writer_datasource_id', [])
+
+                    this._updateSelectFieldOptions(
+                      'dag/getTablesById',
+                      item, 'src_datasource_id',
+                      { datasourceId: this.inputEntryValueMap[item] },
+                      'src_table', [])
+
+                    this._updateSelectFieldOptions(
+                      'dag/getTablesById',
+                      item, 'target_datasource_id',
+                      { datasourceId: this.inputEntryValueMap[item] },
+                      'target_table', [])
+
+                    this._updateSelectFieldOptions(
+                      'dag/getTableColumsByIdAndName',
+                      item, 'target_table',
+                      { datasourceId: this.inputEntryValueMap.target_datasource_id, tableName: this.inputEntryValueMap[item] },
+                      'target_field', [])
+
+                    this._updateSelectFieldOptions(
+                      'dag/getTableColumsByIdAndName',
+                      item, 'src_table',
+                      { datasourceId: this.inputEntryValueMap.src_datasource_id, tableName: this.inputEntryValueMap[item] },
+                      'src_field', [])
+
                     this.fApi.setValue(item, this.inputEntryValueMap[item])
                   }
 
@@ -268,25 +380,6 @@
             }
           })
         })
-      },
-
-      _updateDatasourceOptions (item, type, typeValue, id) {
-        if (item === type) {
-          return new Promise((resolve, reject) => {
-            this.store.dispatch('dag/getDatasourceOptionsById', typeValue).then(res => {
-              if (res.data) {
-                this.fApi.updateRule(id, {
-                  options: res.data
-                }, true)
-              } else {
-                this.fApi.updateRule(id, {
-                  options: []
-                }, true)
-                this.fApi.setValue(id, null)
-              }
-            })
-          })
-        }
       },
 
       /**
@@ -341,7 +434,6 @@
 
         this.sparkParam = {
           deployMode: this.deployMode,
-          localParams: this.localParams,
           driverCores: this.driverCores,
           driverMemory: this.driverMemory,
           numExecutors: this.numExecutors,
@@ -355,14 +447,17 @@
         let fields = this.fApi.fields()
         try {
           fields.forEach(item => {
-            this.fApi.validateField(item, (errMsg) => {
-              if (errMsg) {
-                console.log(errMsg)
-                throw new Error(errMsg)
-              }
-            })
-
             this.fApi.setValue(item, this.inputEntryValueMap[item])
+            if (item !== 'mapping_columns') {
+              this.fApi.validateField(item, (errMsg) => {
+                if (errMsg) {
+                  console.log(errMsg)
+                  throw new Error(errMsg)
+                }
+              })
+            } else {
+              this.inputEntryValueMap.mapping_columns = JSON.stringify(this.inputEntryValueMap.mapping_columns)
+            }
           })
         } catch (error) {
           this.$message.warning(error.message)
@@ -373,6 +468,7 @@
         this.$emit('on-params', {
           ruleId: this.ruleId,
           sparkParameters: this.sparkParam,
+          localParams: this.localParams,
           ruleInputParameter: this.inputEntryValueMap
         })
         return true
@@ -396,6 +492,7 @@
         return {
           ruleId: this.ruleId,
           sparkParameters: this.sparkParam,
+          localParams: this.localParams,
           ruleInputParameter: this.inputEntryValueMap
         }
       }
@@ -414,13 +511,15 @@
         this.executorCores = o.params.sparkParameters.executorCores || 2
         this.others = o.params.sparkParameters.others
         this.ruleId = o.params.ruleId || 0
-        // backfill localParams
-        let localParams = o.params.sparkParameters.localParams || []
+        let localParams = o.params.localParams || []
         if (localParams.length) {
           this.localParams = localParams
         }
 
         this.inputEntryValueMap = o.params.ruleInputParameter
+        if (this.inputEntryValueMap.mapping_columns !== null) {
+          this.inputEntryValueMap.mapping_columns = JSON.parse(this.inputEntryValueMap.mapping_columns)
+        }
       }
     },
 

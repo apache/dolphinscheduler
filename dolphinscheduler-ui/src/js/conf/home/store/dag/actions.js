@@ -837,6 +837,7 @@ export default {
       })
     })
   },
+
   getRuleInputEntryList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get('data-quality/getRuleFormCreateJson', {
@@ -848,6 +849,7 @@ export default {
       })
     })
   },
+
   getRuleList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get('data-quality/ruleList', {}, res => {
@@ -857,11 +859,32 @@ export default {
       })
     })
   },
+
   getDatasourceOptionsById ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get('data-quality/getDatasourceOptionsById', {
         datasourceId: payload
       }, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+
+  getTablesById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('datasources/tables', payload, res => {
+        resolve(res)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+
+  getTableColumsByIdAndName ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('datasources/tableColumns', payload, res => {
         resolve(res)
       }).catch(res => {
         reject(res)
