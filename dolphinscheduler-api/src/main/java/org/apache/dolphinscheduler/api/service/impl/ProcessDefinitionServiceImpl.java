@@ -281,6 +281,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             int operator = processDefinitionLog.getOperator();
             User user = userMapper.selectById(operator);
             pd.setModifyBy(user.getUserName());
+            pd.setProjectId(project.getId());
         }
 
         processDefinitionIPage.setRecords(records);
@@ -1397,7 +1398,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
-            taskNodeList.forEach(taskNode -> taskNode.setCode(0L));
+            taskNodeList.forEach(taskNode -> {
+                taskNode.setName(taskNode.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                taskNode.setCode(0L);
+            });
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             return createProcessDefinition(
@@ -1579,6 +1583,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             } catch (Exception e) {
                 setFailedProcessList(failedProcessList, processDefinitionId);
+                logger.error("move processDefinition error: {}", e.getMessage(), e);
+
             }
         }
     }
@@ -1602,6 +1608,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             } catch (Exception e) {
                 setFailedProcessList(failedProcessList, processDefinitionId);
+                logger.error("copy processDefinition error: {}", e.getMessage(), e);
+
             }
         }
     }
@@ -1689,6 +1697,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
         }
     }
+
     /**
      * check has associated process definition
      *
