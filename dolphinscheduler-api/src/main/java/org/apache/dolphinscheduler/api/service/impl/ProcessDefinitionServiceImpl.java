@@ -1399,7 +1399,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
             taskNodeList.forEach(taskNode -> {
-                taskNode.setName(taskNode.getName()+ "_copy_" + DateUtils.getCurrentTimeStamp());
+                taskNode.setName(taskNode.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
                 taskNode.setCode(0L);
             });
             processData.setTasks(taskNodeList);
