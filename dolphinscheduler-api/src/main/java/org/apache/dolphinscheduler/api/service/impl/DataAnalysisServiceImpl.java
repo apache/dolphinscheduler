@@ -43,13 +43,14 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,8 +149,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Project project = projectMapper.selectById(projectId);
-        Long[] projectCodeArray = getProjectCodesArrays(loginUser, project.getCode());
+        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectMapper.selectById(projectId).getCode() };
         List<ExecuteStatusCount> processInstanceStateCounts =
                 instanceStateCounter.apply(start, end, projectCodeArray);
 
@@ -172,9 +173,12 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     @Override
     public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
-
-        Project project = projectMapper.selectById(projectId);
-        Long[] projectCodeArray = getProjectCodesArrays(loginUser, project.getCode());
+        boolean checkProject = checkProject(loginUser, projectId, result);
+        if (!checkProject) {
+            return result;
+        }
+        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectMapper.selectById(projectId).getCode() };
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
                 loginUser.getId(), projectCodeArray, isAdmin(loginUser));
 
@@ -203,8 +207,6 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return result;
         }
 
-        Project project = projectMapper.selectById(projectId);
-
         /**
          * find all the task lists in the project under the user
          * statistics based on task status execution, failure, completion, wait, total
@@ -226,7 +228,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Long[] projectCodeArray = getProjectCodesArrays(loginUser, project.getCode());
+        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectMapper.selectById(projectId).getCode() };
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectCodeArray)
                 .stream()
@@ -249,15 +252,14 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Long[] getProjectCodesArrays(User loginUser, Long projectCode) {
-        List<Long> projectCodes = new ArrayList<>();
-        if (projectCode != 0) {
-            projectCodes.add(projectCode);
-        } else if (loginUser.getUserType() == UserType.GENERAL_USER) {
-            projectCodes = processService.getProjectIdListHavePerm(loginUser.getId());
-            if (projectCodes.isEmpty()) {
-                projectCodes.add(0L);
-            }
+    private Long[] getProjectCodesArrays(User loginUser) {
+        List<Project> projectList = projectMapper.queryRelationProjectListByUserId(
+                loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId());
+        Set<Long> projectCodes = new HashSet<>();
+        projectList.forEach(project -> projectCodes.add(project.getCode()));
+        if (loginUser.getUserType() == UserType.GENERAL_USER) {
+            List<Project> createProjects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
+            createProjects.forEach(project -> projectCodes.add(project.getCode()));
         }
         return projectCodes.toArray(new Long[0]);
     }
