@@ -1105,7 +1105,7 @@ public class DataQualityTaskTest {
         inputParameterValue.put("target_table","test1_1");
         inputParameterValue.put("target_filter","b=1");
 
-        inputParameterValue.put("mapping_columns","id,company");
+        inputParameterValue.put("mapping_columns","[{\"src_field\":\"id\",\"operator\":\"=\",\"target_field\":\"id\"},{\"src_field\":\"company\",\"operator\":\"=\",\"target_field\":\"company\"}]");
 
         inputParameterValue.put("rule_type","2");
         inputParameterValue.put("rule_name","'跨表准确性'");

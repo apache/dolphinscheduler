@@ -31,9 +31,11 @@ import static org.apache.dolphinscheduler.common.Constants.TARGET_TABLE;
 import static org.apache.dolphinscheduler.common.Constants.URL;
 import static org.apache.dolphinscheduler.common.Constants.USER;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.dq.ExecuteSqlType;
 import org.apache.dolphinscheduler.common.exception.DolphinException;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
@@ -44,12 +46,15 @@ import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.ConnectorParameter;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.ExecutorParameter;
 import org.apache.dolphinscheduler.server.worker.task.dq.rule.parameter.WriterParameter;
+import org.apache.dolphinscheduler.server.worker.task.dq.rule.parser.MappingColumn;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * RuleParserUtils
@@ -169,10 +174,10 @@ public class RuleParserUtils {
         return "coalesce(" + table + "." + column + ", '')";
     }
 
-    private static String getSrcColumnIsNullStr(String table,String[] columns) {
-        String[] columnList = new String[columns.length];
-        for (int i = 0; i < columns.length; i++) {
-            String column = columns[i];
+    private static String getSrcColumnIsNullStr(String table,List<String> columns) {
+        String[] columnList = new String[columns.size()];
+        for (int i = 0; i < columns.size(); i++) {
+            String column = columns.get(i);
             columnList[i] = table + "." + column + " IS NULL";
         }
         return  String.join(AND, columnList);
@@ -218,22 +223,22 @@ public class RuleParserUtils {
 
     }
 
-    public static String getOnClause(String[] mappingColumnList,Map<String,String> inputParameterValueResult) {
+    public static String getOnClause(List<MappingColumn> mappingColumnList,Map<String,String> inputParameterValueResult) {
         //get on clause
-        String[] columnList = new String[mappingColumnList.length];
-        for (int i = 0; i < mappingColumnList.length; i++) {
-            String column = mappingColumnList[i];
-            columnList[i] = getCoalesceString(inputParameterValueResult.get(SRC_TABLE),column)
-                    + " = "
-                    + getCoalesceString(inputParameterValueResult.get(TARGET_TABLE),column);
+        String[] columnList = new String[mappingColumnList.size()];
+        for (int i = 0; i < mappingColumnList.size(); i++) {
+            MappingColumn column = mappingColumnList.get(i);
+            columnList[i] = getCoalesceString(inputParameterValueResult.get(SRC_TABLE),column.getSrcField())
+                    + column.getOperator()
+                    + getCoalesceString(inputParameterValueResult.get(TARGET_TABLE),column.getTargetField());
         }
 
         return String.join(AND,columnList);
     }
 
-    public static String getWhereClause(String[] mappingColumnList,Map<String,String> inputParameterValueResult) {
-        String srcColumnNotNull = "( NOT (" + getSrcColumnIsNullStr(inputParameterValueResult.get(SRC_TABLE),mappingColumnList) + " ))";
-        String targetColumnIsNull = "( " + getSrcColumnIsNullStr(inputParameterValueResult.get(TARGET_TABLE),mappingColumnList) + " )";
+    public static String getWhereClause(List<MappingColumn> mappingColumnList,Map<String,String> inputParameterValueResult) {
+        String srcColumnNotNull = "( NOT (" + getSrcColumnIsNullStr(inputParameterValueResult.get(SRC_TABLE),getSrcColumnList(mappingColumnList)) + " ))";
+        String targetColumnIsNull = "( " + getSrcColumnIsNullStr(inputParameterValueResult.get(TARGET_TABLE),getTargetColumnList(mappingColumnList)) + " )";
 
         return srcColumnNotNull + AND + targetColumnIsNull;
     }
@@ -285,5 +290,37 @@ public class RuleParserUtils {
                 executeSqlDefinition.setSql(sql);
             }
         }
+    }
+
+    public static List<MappingColumn> getMappingColumnList(String mappingColumns) {
+        ArrayNode mappingColumnList = JSONUtils.parseArray(mappingColumns);
+        List<MappingColumn> list = new ArrayList<>();
+        mappingColumnList.forEach(item -> {
+            MappingColumn column = new MappingColumn(
+                    String.valueOf(item.get(Constants.SRC_FIELD)).replace("\"",""),
+                    String.valueOf(item.get(Constants.OPERATOR)).replace("\""," "),
+                    String.valueOf(item.get(Constants.TARGET_FIELD)).replace("\"",""));
+            list.add(column);
+        });
+
+        return list;
+    }
+
+    public static List<String> getSrcColumnList(List<MappingColumn> mappingColumns) {
+        List<String> list = new ArrayList<>();
+        mappingColumns.forEach(item -> {
+            list.add(item.getSrcField());
+        });
+
+        return list;
+    }
+
+    public static List<String> getTargetColumnList(List<MappingColumn> mappingColumns) {
+        List<String> list = new ArrayList<>();
+        mappingColumns.forEach(item -> {
+            list.add(item.getTargetField());
+        });
+
+        return list;
     }
 }
