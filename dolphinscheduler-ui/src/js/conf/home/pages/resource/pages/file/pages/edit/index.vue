@@ -21,7 +21,7 @@
         <h2>
           <span>{{name}}</span>
         </h2>
-        <template v-show="isViewType">
+        <template v-if="isViewType">
           <template v-if="!msg">
             <div class="code-mirror-model">
               <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
@@ -34,7 +34,7 @@
           <m-no-data :msg="msg" v-if="msg"></m-no-data>
 
         </template>
-        <template v-if="!isViewType">
+        <template v-else>
           <m-no-type></m-no-type>
         </template>
       </div>
