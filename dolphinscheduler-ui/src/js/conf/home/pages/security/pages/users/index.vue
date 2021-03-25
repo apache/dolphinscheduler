@@ -113,16 +113,13 @@
         this.item = item
         this.createUserDialog = true
       },
-
       onUpdate () {
         this._debounceGET('false')
         this.createUserDialog = false
       },
-
       close () {
         this.createUserDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false

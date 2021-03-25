@@ -245,6 +245,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         return userMapper.selectById(id);
     }
 
+    @Override
+    public List<User> queryUser(List<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return userMapper.selectByIds(ids);
+    }
+
     /**
      * query user
      *

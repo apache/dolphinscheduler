@@ -64,14 +64,12 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                    @Param("states") int[] states);
 
     /**
-     * query process instance by worker group and stateArray
-     *
-     * @param workerGroupId workerGroupId
+     * @param workerGroupName workerGroupName
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByWorkerGroupIdAndStatus(@Param("workerGroupId") int workerGroupId,
-                                                        @Param("states") int[] states);
+    List<ProcessInstance> queryByWorkerGroupNameAndStatus(@Param("workerGroupName") String workerGroupName,
+                                                          @Param("states") int[] states);
 
     /**
      * process instance page
@@ -144,11 +142,12 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     /**
      * update process instance by worker groupId
      *
-     * @param originWorkerGroupId originWorkerGroupId
-     * @param destWorkerGroupId destWorkerGroupId
+     * @param originWorkerGroupName originWorkerGroupName
+     * @param destWorkerGroupName destWorkerGroupName
      * @return update result
      */
-    int updateProcessInstanceByWorkerGroupId(@Param("originWorkerGroupId") int originWorkerGroupId, @Param("destWorkerGroupId") int destWorkerGroupId);
+    int updateProcessInstanceByWorkerGroupName(@Param("originWorkerGroupName") String originWorkerGroupName,
+                                               @Param("destWorkerGroupName") String destWorkerGroupName);
 
     /**
      * count process instance state by user

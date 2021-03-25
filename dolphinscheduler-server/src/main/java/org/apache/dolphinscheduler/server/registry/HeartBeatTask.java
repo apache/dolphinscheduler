@@ -113,7 +113,7 @@ public class HeartBeatTask implements Runnable {
             // save process id
             builder.append(OSUtils.getProcessID());
             // worker host weight
-            if (Constants.WORKER_PREFIX.equals(serverType)) {
+            if (Constants.WORKER_TYPE.equals(serverType)) {
                 builder.append(Constants.COMMA).append(hostWeight);
             }
 

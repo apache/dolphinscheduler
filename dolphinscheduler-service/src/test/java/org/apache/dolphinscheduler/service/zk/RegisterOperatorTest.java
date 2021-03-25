@@ -97,7 +97,7 @@ public class RegisterOperatorTest {
         testAfterPropertiesSet();
         registerOperator.handleDeadServer(MASTER_NODE, ZKNodeType.MASTER,Constants.ADD_ZK_OP);
         String path = registerOperator.getDeadZNodeParentPath();
-        Assert.assertTrue(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
+        Assert.assertTrue(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_TYPE,MASTER_NODE)));
 
     }
 
@@ -107,10 +107,10 @@ public class RegisterOperatorTest {
         String path = registerOperator.getDeadZNodeParentPath();
 
         registerOperator.handleDeadServer(MASTER_NODE, ZKNodeType.MASTER,Constants.ADD_ZK_OP);
-        Assert.assertTrue(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
+        Assert.assertTrue(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_TYPE,MASTER_NODE)));
 
-        registerOperator.removeDeadServerByHost(MASTER_NODE,Constants.MASTER_PREFIX);
-        Assert.assertFalse(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_PREFIX,MASTER_NODE)));
+        registerOperator.removeDeadServerByHost(MASTER_NODE,Constants.MASTER_TYPE);
+        Assert.assertFalse(registerOperator.getChildrenKeys(path).contains(String.format("%s_%s",Constants.MASTER_TYPE,MASTER_NODE)));
     }
 
     @Test

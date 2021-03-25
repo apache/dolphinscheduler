@@ -119,11 +119,9 @@
         this._debounceGET('false')
         this.createTenementDialog = false
       },
-
       close () {
         this.createTenementDialog = false
       },
-
       _getList (flag) {
         if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
