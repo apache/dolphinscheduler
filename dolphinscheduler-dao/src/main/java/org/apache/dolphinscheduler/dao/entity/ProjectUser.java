@@ -34,11 +34,8 @@ public class ProjectUser {
     @TableField("user_id")
     private int userId;
 
-    @TableField(exist = false)
+    @TableField("project_id")
     private int projectId;
-
-    @TableField("project_code")
-    private long projectCode;
 
     /**
      * project name
@@ -62,14 +59,6 @@ public class ProjectUser {
 
     @TableField("update_time")
     private Date updateTime;
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
-    }
 
     public int getId() {
         return id;
@@ -141,7 +130,6 @@ public class ProjectUser {
                + "id=" + id
                + ", userId=" + userId
                + ", projectId=" + projectId
-               + ", projectCode=" + projectCode
                + ", projectName='" + projectName + '\''
                + ", userName='" + userName + '\''
                + ", perm=" + perm

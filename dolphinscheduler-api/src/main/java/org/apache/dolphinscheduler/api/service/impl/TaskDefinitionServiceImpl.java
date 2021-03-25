@@ -271,25 +271,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
-        taskDefinition.setVersion(version);
-        taskDefinition.setCode(taskCode);
-        taskDefinition.setName(taskDefinitionLog.getName());
-        taskDefinition.setDescription(taskDefinitionLog.getDescription());
-        taskDefinition.setProjectCode(taskDefinitionLog.getProjectCode());
-        taskDefinition.setUserId(loginUser.getId());
-        taskDefinition.setTaskType(taskDefinitionLog.getTaskType());
-        taskDefinition.setTaskParams(taskDefinitionLog.getTaskParams());
-        taskDefinition.setFlag(taskDefinitionLog.getFlag());
-        taskDefinition.setTaskPriority(taskDefinitionLog.getTaskPriority());
-        taskDefinition.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
-        taskDefinition.setFailRetryTimes(taskDefinitionLog.getFailRetryTimes());
-        taskDefinition.setFailRetryInterval(taskDefinitionLog.getFailRetryInterval());
-        taskDefinition.setTimeoutFlag(taskDefinitionLog.getTimeoutFlag());
-        taskDefinition.setTimeoutNotifyStrategy(taskDefinitionLog.getTimeoutNotifyStrategy());
-        taskDefinition.setTimeout(taskDefinitionLog.getTimeout());
-        taskDefinition.setUpdateTime(new Date());
-        taskDefinition.setResourceIds(taskDefinitionLog.getResourceIds());
-        taskDefinitionMapper.updateById(taskDefinition);
+        taskDefinitionLog.setUserId(loginUser.getId());
+        taskDefinitionLog.setUpdateTime(new Date());
+        taskDefinitionMapper.updateById(taskDefinitionLog);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
