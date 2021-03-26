@@ -72,20 +72,6 @@ public class TaskTimeoutParameter {
         this.interval = interval;
     }
 
-    /**
-     * timeout parameter covert
-     * @param timeoutParameter
-     * @return
-     */
-    public TaskTimeoutParameter getTaskTimeoutParameter(String timeoutParameter){
-        if (StringUtils.isNotEmpty(timeoutParameter)) {
-            String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
-            String taskTimeout = timeoutParameter.replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
-            return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
-        }
-        return new TaskTimeoutParameter(false);
-    }
-
     @Override
     public String toString() {
         return "TaskTimeoutParameter{" +

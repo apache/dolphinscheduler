@@ -329,7 +329,6 @@ public class DependentTaskTest {
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
                 .thenReturn(dependentProcessInstance);
 
-
         DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
 
         // for DependentExecute.getDependTaskResult
@@ -368,7 +367,7 @@ public class DependentTaskTest {
         return taskNode;
     }
 
-    private TaskDefinition getTaskDefinition(){
+    private TaskDefinition getTaskDefinition() {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setCode(TASK_CODE);
         taskDefinition.setVersion(TASK_VERSION);
@@ -424,7 +423,6 @@ public class DependentTaskTest {
         taskInstance.setName(taskName);
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-//        taskInstance.setTaskJson("{}");
         taskInstance.setState(state);
         return taskInstance;
     }
