@@ -264,10 +264,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                         executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
+        List<Integer> userIds = CollectionUtils.transformToList(processInstances, ProcessInstance::getExecutorId);
+        Map<Integer, User> idToUserMap = CollectionUtils.collectionToMap(usersService.queryUser(userIds), User::getId);
 
         for (ProcessInstance processInstance : processInstances) {
             processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
-            User executor = usersService.queryUser(processInstance.getExecutorId());
+            User executor = idToUserMap.get(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
             }
