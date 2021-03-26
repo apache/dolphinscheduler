@@ -134,7 +134,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
-        logger.info("task instance  local execute path : {} ", execLocalPath);
+        logger.info("task instance local execute path : {}", execLocalPath);
         taskExecutionContext.setExecutePath(execLocalPath);
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
