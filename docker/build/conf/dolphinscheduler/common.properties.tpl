@@ -15,14 +15,14 @@
 # limitations under the License.
 #
 
-# resource storage type : HDFS, S3, NONE
+# user data local directory path, please make sure the directory exists and have read write permissions
+data.basedir.path=${DATA_BASEDIR_PATH}
+
+# resource storage type: HDFS, S3, NONE
 resource.storage.type=${RESOURCE_STORAGE_TYPE}
 
 # resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
 resource.upload.path=${RESOURCE_UPLOAD_PATH}
-
-# user data local directory path, please make sure the directory exists and have read write permissions
-data.basedir.path=${DATA_BASEDIR_PATH}
 
 # whether kerberos starts
 hadoop.security.authentication.startup.state=false

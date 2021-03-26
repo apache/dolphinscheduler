@@ -258,7 +258,7 @@ This environment variable sets zookeeper root directory for dolphinscheduler. Th
 
 **`MASTER_EXEC_THREADS`**
 
-This environment variable sets exec thread num for `master-server`. The default value is `100`.
+This environment variable sets exec thread number for `master-server`. The default value is `100`.
 
 **`MASTER_EXEC_TASK_NUM`**
 
@@ -290,7 +290,7 @@ This environment variable sets port for `master-server`. The default value is `5
 
 **`WORKER_EXEC_THREADS`**
 
-This environment variable sets exec thread num for `worker-server`. The default value is `100`.
+This environment variable sets exec thread number for `worker-server`. The default value is `100`.
 
 **`WORKER_HEARTBEAT_INTERVAL`**
 
