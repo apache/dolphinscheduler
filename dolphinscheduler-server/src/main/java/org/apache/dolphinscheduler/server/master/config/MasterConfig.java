@@ -37,7 +37,7 @@ public class MasterConfig {
     @Value("${master.task.commit.retryTimes:5}")
     private int masterTaskCommitRetryTimes;
 
-    @Value("${master.dispatch.task.num :3}")
+    @Value("${master.dispatch.task.num:3}")
     private int masterDispatchTaskNumber;
 
     @Value("${master.task.commit.interval:1000}")
