@@ -2225,7 +2225,6 @@ public class ProcessService {
      * update task definition
      */
     public int updateTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
-
         Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode());
         Date now = new Date();
         taskDefinition.setProjectCode(projectCode);
@@ -2243,10 +2242,11 @@ public class ProcessService {
     }
 
     private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
-        taskDefinition.setName(taskNode.getName());
+        // TODO for the front-end UI, name with id
+        taskDefinition.setName(taskNode.getId() + "|" + taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
-        taskDefinition.setTaskParams(taskNode.getParams());
+        taskDefinition.setTaskParams(TaskType.of(taskNode.getType()) == TaskType.DEPENDENT ? taskNode.getDependence() : taskNode.getParams());
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
@@ -2301,6 +2301,7 @@ public class ProcessService {
                                                            String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
+        processDefinitionLog.setUserId(operator.getId());
         processDefinitionLog.setCode(processDefinitionCode);
         processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version);
         processDefinitionLog.setName(processDefinitionName);
@@ -2503,15 +2504,17 @@ public class ProcessService {
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream().collect(Collectors.toMap(TaskDefinitionLog::getCode, log -> log));
         taskNodeMap.forEach((k, v) -> {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
-            v.setId("task-" + taskDefinitionLog.getId());
+            // TODO split from name
+            v.setId(StringUtils.substringBefore(taskDefinitionLog.getName(), "|"));
             v.setCode(taskDefinitionLog.getCode());
-            v.setName(taskDefinitionLog.getName());
+            v.setName(StringUtils.substringAfter(taskDefinitionLog.getName(), "|"));
             v.setDesc(taskDefinitionLog.getDescription());
             v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
             v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
             v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
-            v.setParams(taskDefinitionLog.getTaskParams());
+            v.setParams(taskDefinitionLog.getTaskType() == TaskType.DEPENDENT ? "" : taskDefinitionLog.getTaskParams());
+            v.setDependence(taskDefinitionLog.getTaskType() == TaskType.DEPENDENT ? taskDefinitionLog.getTaskParams() : null);
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,

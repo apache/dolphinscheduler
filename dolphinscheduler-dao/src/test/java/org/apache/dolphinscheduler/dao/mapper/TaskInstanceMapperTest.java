@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -30,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +41,10 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-@Rollback(true)
+@Rollback
 public class TaskInstanceMapperTest {
 
     @Autowired
@@ -58,6 +58,17 @@ public class TaskInstanceMapperTest {
 
     @Autowired
     ProcessInstanceMapMapper processInstanceMapMapper;
+
+    private int processInstanceId;
+
+    @Before
+    public void before() {
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setWarningGroupId(0);
+        processInstance.setCommandParam("");
+        processInstanceMapper.insert(processInstance);
+        processInstanceId = processInstance.getId();
+    }
 
     /**
      * insert
@@ -99,6 +110,7 @@ public class TaskInstanceMapperTest {
         taskInstance.setProcessInstanceId(processInstanceId);
         taskInstance.setTaskType(taskType);
         taskInstance.setProcessDefinitionCode(1L);
+//        taskInstance.setProcessDefinitionId(processDefinitionId);
         taskInstanceMapper.insert(taskInstance);
         return taskInstance;
     }
@@ -349,10 +361,6 @@ public class TaskInstanceMapperTest {
 
         // insert taskInstance
         TaskInstance task = insertTaskInstance(processInstance.getId());
-
-        task.setProcessDefinitionId(definition.getId());
-        task.setProcessInstanceId(processInstance.getId());
-        taskInstanceMapper.updateById(task);
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(

@@ -68,6 +68,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -126,6 +127,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
@@ -274,11 +278,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         IPage<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryDefineListPaging(
                 page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
-        processDefinitionIPage.setRecords(processDefinitionIPage.getRecords());
+        List<ProcessDefinition> records = processDefinitionIPage.getRecords();
+
+        for (ProcessDefinition pd : records) {
+            ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryMaxVersionDefinitionLog(pd.getCode());
+            int operator = processDefinitionLog.getOperator();
+            User user = userMapper.selectById(operator);
+            pd.setModifyBy(user.getUserName());
+            pd.setProjectId(project.getId());
+        }
+
+        processDefinitionIPage.setRecords(records);
 
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) processDefinitionIPage.getTotal());
-        pageInfo.setLists(processDefinitionIPage.getRecords());
+        pageInfo.setLists(records);
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -1391,7 +1405,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
-            taskNodeList.forEach(taskNode -> taskNode.setCode(0L));
+            taskNodeList.forEach(taskNode -> {
+                taskNode.setName(taskNode.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                taskNode.setCode(0L);
+            });
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             return createProcessDefinition(
@@ -1573,6 +1590,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             } catch (Exception e) {
                 setFailedProcessList(failedProcessList, processDefinitionId);
+                logger.error("move processDefinition error: {}", e.getMessage(), e);
+
             }
         }
     }
@@ -1596,6 +1615,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             } catch (Exception e) {
                 setFailedProcessList(failedProcessList, processDefinitionId);
+                logger.error("copy processDefinition error: {}", e.getMessage(), e);
+
             }
         }
     }
@@ -1683,6 +1704,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
         }
     }
+
     /**
      * check has associated process definition
      *

@@ -699,7 +699,8 @@ CREATE TABLE t_ds_task_instance (
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   var_pool text ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
 
 --
@@ -779,7 +780,7 @@ DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
   name varchar(256) DEFAULT NULL ,
-  ip_list varchar(256) DEFAULT NULL ,
+  addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)

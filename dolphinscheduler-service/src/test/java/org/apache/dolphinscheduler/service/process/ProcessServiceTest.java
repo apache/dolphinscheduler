@@ -21,27 +21,37 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PRO
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
@@ -87,7 +97,13 @@ public class ProcessServiceTest {
     @Mock
     private UserMapper userMapper;
     @Mock
-    TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceMapper taskInstanceMapper;
+    @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    @Mock
+    private ProcessTaskRelationMapper processTaskRelationMapper;
+    @Mock
+    private ProcessDefinitionLogMapper processDefineLogMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -326,6 +342,165 @@ public class ProcessServiceTest {
                 .thenReturn(relationLogList);
 
         processService.recurseFindSubProcessId(parentId, ids);
+
+    }
+
+    @Test
+    public void testSaveProcessDefinition() {
+        User user = new User();
+        user.setId(1);
+
+        Project project = new Project();
+        project.setCode(1L);
+
+        ProcessData processData = new ProcessData();
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setId(123);
+        processDefinition.setName("test");
+        processDefinition.setVersion(1);
+        processDefinition.setCode(11L);
+
+        Mockito.when(processDefineMapper.updateById(any())).thenReturn(1);
+        Mockito.when(processDefineLogMapper.insert(any())).thenReturn(1);
+
+        int i = processService.saveProcessDefinition(user, project, "name", "desc", "locations", "connects", processData, processDefinition);
+        Assert.assertEquals(1, i);
+
+    }
+
+    @Test
+    public void testSwitchVersion() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setId(123);
+        processDefinition.setName("test");
+        processDefinition.setVersion(1);
+        processDefinition.setCode(11L);
+
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        processDefinitionLog.setCode(1L);
+
+        Mockito.when(processDefineMapper.updateById(any())).thenReturn(1);
+
+        int i = processService.switchVersion(processDefinition, processDefinitionLog);
+
+        Assert.assertEquals(1, i);
+
+    }
+
+    @Test
+    public void testGenDagGraph() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setId(123);
+        processDefinition.setName("test");
+        processDefinition.setVersion(1);
+        processDefinition.setCode(11L);
+
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setName("def 1");
+        processTaskRelationLog.setProcessDefinitionVersion(1);
+        processTaskRelationLog.setProjectCode(1L);
+        processTaskRelationLog.setProcessDefinitionCode(1L);
+        processTaskRelationLog.setPostTaskCode(3L);
+        processTaskRelationLog.setPreTaskCode(2L);
+        processTaskRelationLog.setUpdateTime(new Date());
+        processTaskRelationLog.setCreateTime(new Date());
+        List<ProcessTaskRelationLog> list = new ArrayList<>();
+        list.add(processTaskRelationLog);
+
+        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
+        taskDefinition.setCode(3L);
+        taskDefinition.setName("1-test");
+        taskDefinition.setProjectCode(1L);
+        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setUserId(1);
+        taskDefinition.setVersion(2);
+        taskDefinition.setCreateTime(new Date());
+        taskDefinition.setUpdateTime(new Date());
+
+        TaskDefinitionLog td2 = new TaskDefinitionLog();
+        td2.setCode(2L);
+        td2.setName("unit-test");
+        td2.setProjectCode(1L);
+        td2.setTaskType(TaskType.SHELL);
+        td2.setUserId(1);
+        td2.setVersion(1);
+        td2.setCreateTime(new Date());
+        td2.setUpdateTime(new Date());
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        taskDefinitionLogs.add(taskDefinition);
+        taskDefinitionLogs.add(td2);
+
+        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
+
+        DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG = processService.genDagGraph(processDefinition);
+        Assert.assertNotEquals(0, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
+
+    }
+
+    @Test
+    public void testGenProcessData() {
+        String processDefinitionJson = "{\"tasks\":[{\"id\":\"task-0\",\"code\":3,\"version\":0,\"name\":\"1-test\""
+                + ",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"FORBIDDEN\",\"loc\":null,\"maxRetryTimes\":0"
+                + ",\"retryInterval\":0,\"params\":null,\"preTasks\":[\"unit-test\"],\"preTaskNodeList\":[{\"code\":2"
+                + ",\"name\":\"unit-test\",\"version\":0}],\"extras\":null,\"depList\":[\"unit-test\"],\"dependence\":null"
+                + ",\"conditionResult\":null,\"taskInstancePriority\":null,\"workerGroup\":null,\"workerGroupId\":null"
+                + ",\"timeout\":{\"enable\":false,\"strategy\":null,\"interval\":0},\"delayTime\":0}]"
+                + ",\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setId(123);
+        processDefinition.setName("test");
+        processDefinition.setVersion(1);
+        processDefinition.setCode(11L);
+
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setName("def 1");
+        processTaskRelationLog.setProcessDefinitionVersion(1);
+        processTaskRelationLog.setProjectCode(1L);
+        processTaskRelationLog.setProcessDefinitionCode(1L);
+        processTaskRelationLog.setPostTaskCode(3L);
+        processTaskRelationLog.setPreTaskCode(2L);
+        processTaskRelationLog.setUpdateTime(new Date());
+        processTaskRelationLog.setCreateTime(new Date());
+        List<ProcessTaskRelationLog> list = new ArrayList<>();
+        list.add(processTaskRelationLog);
+
+        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
+        taskDefinition.setCode(3L);
+        taskDefinition.setName("1-test");
+        taskDefinition.setProjectCode(1L);
+        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setUserId(1);
+        taskDefinition.setVersion(2);
+        taskDefinition.setCreateTime(new Date());
+        taskDefinition.setUpdateTime(new Date());
+
+        TaskDefinitionLog td2 = new TaskDefinitionLog();
+        td2.setCode(2L);
+        td2.setName("unit-test");
+        td2.setProjectCode(1L);
+        td2.setTaskType(TaskType.SHELL);
+        td2.setUserId(1);
+        td2.setVersion(1);
+        td2.setCreateTime(new Date());
+        td2.setUpdateTime(new Date());
+
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        taskDefinitionLogs.add(taskDefinition);
+        taskDefinitionLogs.add(td2);
+
+        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
+        String json = JSONUtils.toJsonString(processService.genProcessData(processDefinition));
+
+        Assert.assertEquals(processDefinitionJson, json);
 
     }
 }

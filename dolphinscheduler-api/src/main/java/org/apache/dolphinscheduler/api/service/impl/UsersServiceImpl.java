@@ -245,6 +245,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         return userMapper.selectById(id);
     }
 
+    @Override
+    public List<User> queryUser(List<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return userMapper.selectByIds(ids);
+    }
+
     /**
      * query user
      *
@@ -525,10 +533,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-        //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteProjectRelation(0L, userId);
 
+        //if the selected projectIds are empty, delete all items associated with the user
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 

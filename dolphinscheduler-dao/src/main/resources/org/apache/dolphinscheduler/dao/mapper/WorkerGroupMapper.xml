@@ -17,20 +17,15 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper">
-    <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
-        select cmd.command_type as command_type, count(1) as count
-        from t_ds_error_command cmd, t_ds_process_definition process
-        where cmd.process_definition_id = process.id
-        <if test="projectCodeArray != null and projectCodeArray.length != 0">
-            and process.project_code in
-            <foreach collection="projectCodeArray" index="index" item="i" open="(" close=")" separator=",">
-                #{i}
-            </foreach>
-        </if>
-        <if test="startTime != null and endTime != null">
-            and cmd.start_time <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
-        </if>
-        group by cmd.command_type
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper">
+    <select id="queryAllWorkerGroup" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        select *
+        from t_ds_worker_group
+        order by update_time desc
+    </select>
+    <select id="queryWorkerGroupByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        select *
+        from t_ds_worker_group
+        where name = #{name}
     </select>
 </mapper>
