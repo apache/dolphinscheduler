@@ -110,25 +110,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,"
-//                + "\"depList\":[],"
-//                + "\"dependence\":\"{}\","
-//                + "\"forbidden\":false,"
-//                + "\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,"
-//                + "\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,"
-//                + "\"interval\":0},"
-//                + "\"timeout\":\"{\\\"enable\\\":false,"
-//                + "\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"default\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -161,13 +142,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,\"id\":\"tasks-3655\",\"maxRetryTimes\":0,\"name\":\"UDF测试\","
-//                + "\"params\":\"{\\\"postStatements\\\":[],\\\"connParams\\\":\\\"\\\",\\\"receiversCc\\\":\\\"\\\",\\\"udfs\\\":\\\"1\\\",\\\"type\\\":\\\"HIVE\\\",\\\"title\\\":\\\"test\\\","
-//                + "\\\"sql\\\":\\\"select id,name,ds,zodia(ds) from t_journey_user\\\",\\\"preStatements\\\":[],"
-//                + "\\\"sqlType\\\":0,\\\"receivers\\\":\\\"825193156@qq.com\\\",\\\"datasource\\\":3,\\\"showType\\\":\\\"TABLE\\\",\\\"localParams\\\":[]}\","
-//                + "\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\",\"type\":\"SQL\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -212,26 +186,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\","
-//                + "\"forbidden\":false,\"id\":\"tasks-97625\","
-//                + "\"maxRetryTimes\":0,\"name\":\"MySQL数据相互导入\","
-//                + "\"params\":\"{\\\"targetTable\\\":\\\"pv2\\\","
-//                + "    \\\"postStatements\\\":[],"
-//                + "    \\\"jobSpeedRecord\\\":1000,"
-//                + "    \\\"customConfig\\\":0,"
-//                + "    \\\"dtType\\\":\\\"MYSQL\\\","
-//                + "    \\\"dsType\\\":\\\"MYSQL\\\","
-//                + "    \\\"jobSpeedByte\\\":0,"
-//                + "    \\\"dataSource\\\":80,"
-//                + "    \\\"dataTarget\\\":80,"
-//                + "    \\\"sql\\\":\\\"SELECT dt,count FROM pv\\\","
-//                + "    \\\"preStatements\\\":[]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"DATAX\","
-//                + "\"workerGroup\":\"default\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -274,32 +228,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\",\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\","
-//                + "\"forbidden\":false,\"id\":\"tasks-63634\","
-//                + "\"maxRetryTimes\":0,\"name\":\"MySQL数据导入HDSF\","
-//                + "\"params\":\"{\\\"sourceType\\\":\\\"MYSQL\\\","
-//                + "    \\\"targetType\\\":\\\"HDFS\\\","
-//                + "    \\\"targetParams\\\":\\\"{\\\\\\\"targetPath\\\\\\\":\\\\\\\"/test/datatest\\\\\\\","
-//                + "        \\\\\\\"deleteTargetDir\\\\\\\":true,\\\\\\\"fileType\\\\\\\":\\\\\\\"--as-textfile\\\\\\\","
-//                + "        \\\\\\\"compressionCodec\\\\\\\":\\\\\\\"\\\\\\\","
-//                + "        \\\\\\\"fieldsTerminated\\\\\\\":\\\\\\\",\\\\\\\","
-//                + "        \\\\\\\"linesTerminated\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\\n\\\\\\\"}\\\","
-//                + "    \\\"modelType\\\":\\\"import\\\","
-//                + "    \\\"sourceParams\\\":\\\"{\\\\\\\"srcType\\\\\\\":\\\\\\\"MYSQL\\\\\\\","
-//                + "        \\\\\\\"srcDatasource\\\\\\\":1,\\\\\\\"srcTable\\\\\\\":\\\\\\\"t_ds_user\\\\\\\","
-//                + "        \\\\\\\"srcQueryType\\\\\\\":\\\\\\\"0\\\\\\\","
-//                + "        \\\\\\\"srcQuerySql\\\\\\\":\\\\\\\"\\\\\\\","
-//                + "        \\\\\\\"srcColumnType\\\\\\\":\\\\\\\"0\\\\\\\","
-//                + "        \\\\\\\"srcColumns\\\\\\\":\\\\\\\"\\\\\\\","
-//                + "        \\\\\\\"srcConditionList\\\\\\\":[],\\\\\\\"mapColumnHive\\\\\\\":[],\\\\\\\"mapColumnJava\\\\\\\":[]}\\\","
-//                + "    \\\"localParams\\\":[],\\\"concurrency\\\":1}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SQOOP\","
-//                + "\"workerGroup\":\"default\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -342,16 +270,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\","
-//                + "\"forbidden\":false,\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\",\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"default\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("default");
         taskInstance.setExecutorId(2);
@@ -370,24 +288,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,"
-//                + "\"depList\":[],"
-//                + "\"dependence\":\"{}\","
-//                + "\"forbidden\":false,"
-//                + "\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,"
-//                + "\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-//                + "\"timeout\":\"{\\\"enable\\\":false,"
-//                + "\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"NoWorkGroup\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -424,24 +324,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,"
-//                + "\"depList\":[],"
-//                + "\"dependence\":\"{}\","
-//                + "\"forbidden\":false,"
-//                + "\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,"
-//                + "\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-//                + "\"timeout\":\"{\\\"enable\\\":false,"
-//                + "\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"NoWorkGroup\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -477,24 +359,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,"
-//                + "\"depList\":[],"
-//                + "\"dependence\":\"{}\","
-//                + "\"forbidden\":false,"
-//                + "\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,"
-//                + "\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-//                + "\"timeout\":\"{\\\"enable\\\":false,"
-//                + "\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"NoWorkGroup\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -527,25 +391,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,"
-//                + "\"depList\":[],"
-//                + "\"dependence\":\"{}\","
-//                + "\"forbidden\":false,"
-//                + "\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,"
-//                + "\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[{\\\"id\\\":123},{\\\"res\\\":\\\"/data/file\\\"}]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-//                + "\"timeout\":\"{\\\"enable\\\":false,"
-//                + "\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"NoWorkGroup\"}");
-
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -619,24 +464,6 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
-//        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
-//                + "\"conditionsTask\":false,"
-//                + "\"depList\":[],"
-//                + "\"dependence\":\"{}\","
-//                + "\"forbidden\":false,"
-//                + "\"id\":\"tasks-55201\","
-//                + "\"maxRetryTimes\":0,"
-//                + "\"name\":\"测试任务\","
-//                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
-//                + "\"preTasks\":\"[]\","
-//                + "\"retryInterval\":1,"
-//                + "\"runFlag\":\"NORMAL\","
-//                + "\"taskInstancePriority\":\"MEDIUM\","
-//                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
-//                + "\"timeout\":\"{\\\"enable\\\":false,"
-//                + "\\\"strategy\\\":\\\"\\\"}\","
-//                + "\"type\":\"SHELL\","
-//                + "\"workerGroup\":\"NoWorkGroup\"}");
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);

@@ -76,7 +76,7 @@ public class TaskInstance implements Serializable {
     private long taskCode;
 
     /**
-     *  process definition code
+     * process definition code
      */
     private long processDefinitionCode;
 
@@ -236,7 +236,7 @@ public class TaskInstance implements Serializable {
      * varPool string
      */
     private String varPool;
-    
+
     /**
      * executor name
      */
@@ -270,7 +270,7 @@ public class TaskInstance implements Serializable {
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
-    
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }
@@ -435,8 +435,8 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-    public DependentParameters getDependency(){
-        if(this.dependency == null){
+    public DependentParameters getDependency() {
+        if (this.dependency == null) {
             this.dependency = JSONUtils.parseObject(this.getTaskParams(), DependentParameters.class);
         }
         return this.dependency;

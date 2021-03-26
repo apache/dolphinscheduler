@@ -2539,7 +2539,7 @@ public class ProcessService {
         TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 taskInstance.getTaskCode(),
                 taskInstance.getTaskDefinitionVersion());
-        if(taskDefinition == null){
+        if (taskDefinition == null) {
             return null;
         }
         List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
@@ -2605,6 +2605,12 @@ public class ProcessService {
         return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
     }
 
+    /**
+     * query taks definition list by process code and process version
+     * @param processCode
+     * @param processVersion
+     * @return
+     */
     public List<TaskDefinitionLog> queryTaskDefinitionList(Long processCode, int processVersion) {
         List<ProcessTaskRelationLog> processTaskRelationLogs =
                 processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
@@ -2612,7 +2618,7 @@ public class ProcessService {
         processTaskRelationLogs.forEach(processTaskRelationLog -> {
             Long code = processTaskRelationLog.getPostTaskCode();
             int version = processTaskRelationLog.getPostTaskVersion();
-            if(postTaskDefinitionMap.containsKey(code)){
+            if (postTaskDefinitionMap.containsKey(code)) {
                 TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
                 postTaskDefinitionMap.putIfAbsent(code, taskDefinition);
             }
@@ -2622,8 +2628,9 @@ public class ProcessService {
 
     /**
      * add authorized resources
+     *
      * @param ownResources own resources
-     * @param userId userId
+     * @param userId       userId
      */
     private void addAuthorizedResources(List<Resource> ownResources, int userId) {
         List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
