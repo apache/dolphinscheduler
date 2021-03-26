@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,7 +81,6 @@ public class DataSourceService extends BaseService {
     private static final String VIEW = "VIEW";
     private static final String[] TABLE_TYPES = new String[]{TABLE, VIEW};
     private static final String TABLE_NAME = "TABLE_NAME";
-    private static final String TABLE_TYPE = "TABLE_TYPE";
     private static final String COLUMN_NAME = "COLUMN_NAME";
 
     @Autowired
@@ -690,8 +690,8 @@ public class DataSourceService extends BaseService {
             String schema = null;
             try {
                 schema = metaData.getConnection().getSchema();
-            } catch (Throwable t) {
-                // ignore
+            } catch (SQLException e) {
+                logger.error("cant not get the schema : {}", e.getMessage(), e);
             }
 
             tables = metaData.getTables(

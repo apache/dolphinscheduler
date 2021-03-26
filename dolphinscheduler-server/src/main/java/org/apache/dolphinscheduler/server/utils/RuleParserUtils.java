@@ -308,18 +308,18 @@ public class RuleParserUtils {
 
     public static List<String> getSrcColumnList(List<MappingColumn> mappingColumns) {
         List<String> list = new ArrayList<>();
-        mappingColumns.forEach(item -> {
-            list.add(item.getSrcField());
-        });
+        mappingColumns.forEach(item ->
+            list.add(item.getSrcField())
+        );
 
         return list;
     }
 
     public static List<String> getTargetColumnList(List<MappingColumn> mappingColumns) {
         List<String> list = new ArrayList<>();
-        mappingColumns.forEach(item -> {
-            list.add(item.getTargetField());
-        });
+        mappingColumns.forEach(item ->
+            list.add(item.getTargetField())
+        );
 
         return list;
     }
