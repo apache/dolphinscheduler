@@ -25,7 +25,7 @@ metadata:
 spec:
   clusterIP: "None"
   ports:
-    - port: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+    - port: 5678
       targetPort: master-port
       protocol: TCP
       name: master-port

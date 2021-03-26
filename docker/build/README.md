@@ -264,6 +264,14 @@ This environment variable sets exec thread number for `master-server`. The defau
 
 This environment variable sets exec task num for `master-server`. The default value is `20`.
 
+**`MASTER_DISPATCH_TASK_NUM`**
+
+This environment variable sets dispatch task num for `master-server`. The default value is `3`.
+
+**`MASTER_HOST_SELECTOR`**
+
+This environment variable sets host selector for `master-server`. Optional values include `Random`, `RoundRobin` and `LowerWeight`. The default value is `LowerWeight`.
+
 **`MASTER_HEARTBEAT_INTERVAL`**
 
 This environment variable sets heartbeat interval for `master-server`. The default value is `10`.
@@ -278,15 +286,11 @@ This environment variable sets task commit interval for `master-server`. The def
 
 **`MASTER_MAX_CPULOAD_AVG`**
 
-This environment variable sets max cpu load avg for `master-server`. The default value is `100`.
+This environment variable sets max cpu load avg for `master-server`. The default value is `-1`.
 
 **`MASTER_RESERVED_MEMORY`**
 
-This environment variable sets reserved memory for `master-server`. The default value is `0.1`.
-
-**`MASTER_LISTEN_PORT`**
-
-This environment variable sets port for `master-server`. The default value is `5678`.
+This environment variable sets reserved memory for `master-server`. The default value is `0.3`.
 
 **`WORKER_EXEC_THREADS`**
 
@@ -298,15 +302,11 @@ This environment variable sets heartbeat interval for `worker-server`. The defau
 
 **`WORKER_MAX_CPULOAD_AVG`**
 
-This environment variable sets max cpu load avg for `worker-server`. The default value is `100`.
+This environment variable sets max cpu load avg for `worker-server`. The default value is `-1`.
 
 **`WORKER_RESERVED_MEMORY`**
 
-This environment variable sets reserved memory for `worker-server`. The default value is `0.1`.
-
-**`WORKER_LISTEN_PORT`**
-
-This environment variable sets port for `worker-server`. The default value is `1234`.
+This environment variable sets reserved memory for `worker-server`. The default value is `0.3`.
 
 **`WORKER_GROUPS`**
 
@@ -370,17 +370,17 @@ This environment variable sets enterprise wechat users for `alert-server`. The d
 
 ## Initialization scripts
 
-If you would like to do additional initialization in an image derived from this one, add one or more environment variable under `/root/start-init-conf.sh`, and modify template files in `/opt/dolphinscheduler/conf/*.tpl`.
+If you would like to do additional initialization in an image derived from this one, add one or more environment variables under `/root/start-init-conf.sh`, and modify template files in `/opt/dolphinscheduler/conf/*.tpl`.
 
-For example, to add an environment variable `API_SERVER_PORT` in `/root/start-init-conf.sh`:
+For example, to add an environment variable `SECURITY_AUTHENTICATION_TYPE` in `/root/start-init-conf.sh`:
 
 ```
-export API_SERVER_PORT=5555
+export SECURITY_AUTHENTICATION_TYPE=PASSWORD
 ```
 
-and to modify `/opt/dolphinscheduler/conf/application-api.properties.tpl` template file, add server port:
+and to modify `application-api.properties.tpl` template file, add the `SECURITY_AUTHENTICATION_TYPE`:
 ```
-server.port=${API_SERVER_PORT}
+security.authentication.type=${SECURITY_AUTHENTICATION_TYPE}
 ```
 
 `/root/start-init-conf.sh` will dynamically generate config file:

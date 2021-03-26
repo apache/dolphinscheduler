@@ -30,6 +30,5 @@ data:
   WORKER_HEARTBEAT_INTERVAL: {{ .Values.worker.configmap.WORKER_HEARTBEAT_INTERVAL | quote }}
   WORKER_MAX_CPULOAD_AVG: {{ .Values.worker.configmap.WORKER_MAX_CPULOAD_AVG | quote }}
   WORKER_RESERVED_MEMORY: {{ .Values.worker.configmap.WORKER_RESERVED_MEMORY | quote }}
-  WORKER_LISTEN_PORT: {{ .Values.worker.configmap.WORKER_LISTEN_PORT | quote }}
   WORKER_GROUPS: {{ .Values.worker.configmap.WORKER_GROUPS | quote }}
 {{- end }}

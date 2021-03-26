@@ -65,7 +65,7 @@ spec:
           args:
             - "master-server"
           ports:
-            - containerPort: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+            - containerPort: 5678
               name: "master-port"
           env:
             - name: TZ
@@ -85,6 +85,16 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-master
                   key: MASTER_EXEC_TASK_NUM
+            - name: MASTER_DISPATCH_TASK_NUM
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_DISPATCH_TASK_NUM
+            - name: MASTER_HOST_SELECTOR
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_HOST_SELECTOR
             - name: MASTER_HEARTBEAT_INTERVAL
               valueFrom:
                 configMapKeyRef:
@@ -110,11 +120,6 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-master
                   key: MASTER_RESERVED_MEMORY
-            - name: MASTER_LISTEN_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-master
-                  key: MASTER_LISTEN_PORT
             - name: DATABASE_TYPE
               {{- if .Values.postgresql.enabled }}
               value: "postgresql"

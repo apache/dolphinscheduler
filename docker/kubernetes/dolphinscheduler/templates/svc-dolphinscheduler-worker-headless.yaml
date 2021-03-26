@@ -25,7 +25,7 @@ metadata:
 spec:
   clusterIP: "None"
   ports:
-    - port: {{ .Values.worker.configmap.WORKER_LISTEN_PORT }}
+    - port: 1234
       targetPort: worker-port
       protocol: TCP
       name: worker-port

@@ -65,7 +65,7 @@ spec:
           args:
             - "worker-server"
           ports:
-            - containerPort: {{ .Values.worker.configmap.WORKER_LISTEN_PORT }}
+            - containerPort: 1234
               name: "worker-port"
             - containerPort: 50051
               name: "logger-port"
@@ -102,11 +102,6 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
                   key: WORKER_RESERVED_MEMORY
-            - name: WORKER_LISTEN_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_LISTEN_PORT
             - name: WORKER_GROUPS
               valueFrom:
                 configMapKeyRef:

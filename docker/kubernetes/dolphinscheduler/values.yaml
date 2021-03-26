@@ -140,12 +140,13 @@ master:
     DOLPHINSCHEDULER_OPTS: ""
     MASTER_EXEC_THREADS: "100"
     MASTER_EXEC_TASK_NUM: "20"
+    MASTER_DISPATCH_TASK_NUM: "3"
+    MASTER_HOST_SELECTOR: "LowerWeight"
     MASTER_HEARTBEAT_INTERVAL: "10"
     MASTER_TASK_COMMIT_RETRYTIMES: "5"
     MASTER_TASK_COMMIT_INTERVAL: "1000"
-    MASTER_MAX_CPULOAD_AVG: "100"
-    MASTER_RESERVED_MEMORY: "0.1"
-    MASTER_LISTEN_PORT: "5678"
+    MASTER_MAX_CPULOAD_AVG: "-1"
+    MASTER_RESERVED_MEMORY: "0.3"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -209,9 +210,8 @@ worker:
     LOGGER_SERVER_OPTS: ""
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10"
-    WORKER_MAX_CPULOAD_AVG: "100"
-    WORKER_RESERVED_MEMORY: "0.1"
-    WORKER_LISTEN_PORT: "1234"
+    WORKER_MAX_CPULOAD_AVG: "-1"
+    WORKER_RESERVED_MEMORY: "0.3"
     WORKER_GROUPS: "default"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes

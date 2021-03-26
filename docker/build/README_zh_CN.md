@@ -264,6 +264,14 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 配置`master-server`中的执行任务数量，默认值 `20`。
 
+**`MASTER_DISPATCH_TASK_NUM`**
+
+配置`master-server`中的派发任务数量，默认值 `3`。
+
+**`MASTER_HOST_SELECTOR`**
+
+配置`master-server`中派发任务时worker host的选择器，可选值为`Random`, `RoundRobin`和`LowerWeight`，默认值 `LowerWeight`。
+
 **`MASTER_HEARTBEAT_INTERVAL`**
 
 配置`master-server`中的心跳交互时间，默认值 `10`。
@@ -278,15 +286,11 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`MASTER_MAX_CPULOAD_AVG`**
 
-配置`master-server`中的CPU中的`load average`值，默认值 `100`。
+配置`master-server`中的CPU中的`load average`值，默认值 `-1`。
 
 **`MASTER_RESERVED_MEMORY`**
 
-配置`master-server`的保留内存，默认值 `0.1`。
-
-**`MASTER_LISTEN_PORT`**
-
-配置`master-server`的端口，默认值 `5678`。
+配置`master-server`的保留内存，默认值 `0.3`。
 
 **`WORKER_EXEC_THREADS`**
 
@@ -298,15 +302,11 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`WORKER_MAX_CPULOAD_AVG`**
 
-配置`worker-server`中的CPU中的最大`load average`值，默认值 `100`。
+配置`worker-server`中的CPU中的最大`load average`值，默认值 `-1`。
 
 **`WORKER_RESERVED_MEMORY`**
 
-配置`worker-server`的保留内存，默认值 `0.1`。
-
-**`WORKER_LISTEN_PORT`**
-
-配置`worker-server`的端口，默认值 `1234`。
+配置`worker-server`的保留内存，默认值 `0.3`。
 
 **`WORKER_GROUPS`**
 
@@ -372,15 +372,15 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 如果你想在编译的时候或者运行的时候附加一些其它的操作及新增一些环境变量，你可以在`/root/start-init-conf.sh`文件中进行修改，同时如果涉及到配置文件的修改，请在`/opt/dolphinscheduler/conf/*.tpl`中修改相应的配置文件
 
-例如，在`/root/start-init-conf.sh`添加一个环境变量`API_SERVER_PORT`：
+例如，在`/root/start-init-conf.sh`添加一个环境变量`SECURITY_AUTHENTICATION_TYPE`：
 
 ```
-export API_SERVER_PORT=5555
+export SECURITY_AUTHENTICATION_TYPE=PASSWORD
 ```
 
-当添加以上环境变量后，你应该在相应的模板文件`/opt/dolphinscheduler/conf/application-api.properties.tpl`中添加这个环境变量配置:
+当添加以上环境变量后，你应该在相应的模板文件`application-api.properties.tpl`中添加这个环境变量配置:
 ```
-server.port=${API_SERVER_PORT}
+security.authentication.type=${SECURITY_AUTHENTICATION_TYPE}
 ```
 
 `/root/start-init-conf.sh`将根据模板文件动态的生成配置文件：
