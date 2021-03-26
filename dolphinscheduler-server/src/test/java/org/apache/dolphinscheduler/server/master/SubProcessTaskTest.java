@@ -150,7 +150,6 @@ public class SubProcessTaskTest {
         taskInstance.setId(1000);
         taskInstance.setName("S");
         taskInstance.setTaskType(TaskType.SUB_PROCESS.toString());
-//        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskType(taskNode.getType());
         taskInstance.setProcessInstanceId(processInstance.getId());

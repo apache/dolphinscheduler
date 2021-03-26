@@ -171,7 +171,6 @@ public class ConditionsTaskTest {
     private TaskInstance getTaskInstance(TaskNode taskNode, ProcessInstance processInstance) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
-//        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskType(taskNode.getType());
         taskInstance.setProcessInstanceId(processInstance.getId());

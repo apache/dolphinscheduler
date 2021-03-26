@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -2530,10 +2529,11 @@ public class ProcessService {
     /**
      * getTaskNodeFromTaskInstance
      * return null if task definition do not exists
+     *
      * @param taskInstance
      * @return
      */
-    public TaskNode getTaskNodeFromTaskInstance(TaskInstance taskInstance){
+    public TaskNode getTaskNodeFromTaskInstance(TaskInstance taskInstance) {
         TaskNode taskNode = new TaskNode();
         ProcessInstance processInstance = processInstanceMapper.selectById(taskInstance.getProcessInstanceId());
         TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
@@ -2564,39 +2564,11 @@ public class ProcessService {
         taskNode.setTaskInstancePriority(taskDefinition.getTaskPriority());
         taskNode.setWorkerGroup(taskDefinition.getWorkerGroup());
         return taskNode;
-//        taskNode.setPreTaskNodeList();
-//        List<PreviousTaskNode> previousTaskNodes =
-//
-//
-//        v.setCode(processTaskRelation.getPostTaskCode());
-//        v.setVersion(processTaskRelation.getPostTaskVersion());
-//        v.setConditionResult(processTaskRelation.getConditionParams());
-//        List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
-//        if (processTaskRelation.getPreTaskCode() > 0) {
-//            preTaskNodeList.add(new PreviousTaskNode(processTaskRelation.getPreTaskCode(), "", processTaskRelation.getPreTaskVersion()));
-//        }
-//        v.setPreTaskNodeList(preTaskNodeList);
-//
-//        v.setId("task-" + taskDefinitionLog.getId());
-//        v.setCode(taskDefinitionLog.getCode());
-//        v.setName(taskDefinitionLog.getName());
-//        v.setDesc(taskDefinitionLog.getDescription());
-//        v.setType(taskDefinitionLog.getTaskType().getDescp());
-//        v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
-//        v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
-//        v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
-//        v.setParams(taskDefinitionLog.getTaskParams());
-//        v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
-//        v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
-//        v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
-//                taskDefinitionLog.getTaskTimeoutStrategy(),
-//                taskDefinitionLog.getTimeout())));
-//        // TODO name will be remove
-//        v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
     }
 
     /**
-     *  find task definition by code and verision
+     * find task definition by code and verision
+     *
      * @param taskCode
      * @param taskDefinitionVersion
      * @return
@@ -2607,6 +2579,7 @@ public class ProcessService {
 
     /**
      * query taks definition list by process code and process version
+     *
      * @param processCode
      * @param processVersion
      * @return

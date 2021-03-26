@@ -1313,7 +1313,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         /**
                          * if process is sub process, the return sub id, or sub id=0
                          */
-                        if(taskInstance.isSubProcess()){
+                        if (taskInstance.isSubProcess()) {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
                             subProcessId = Integer.parseInt(JSONUtils.parseObject(
                                     taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
