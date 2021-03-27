@@ -389,6 +389,22 @@ api:
     - "ReadWriteOnce"
     storageClassName: "-"
     storage: "20Gi"
+  service:
+    ## type determines how the Service is exposed. Defaults to ClusterIP. Valid options are ExternalName, ClusterIP, NodePort, and LoadBalancer
+    type: "ClusterIP"
+    ## clusterIP is the IP address of the service and is usually assigned randomly by the master
+    clusterIP: ""
+    ## nodePort is the port on each node on which this service is exposed when type=NodePort
+    nodePort: ""
+    ## externalIPs is a list of IP addresses for which nodes in the cluster will also accept traffic for this service
+    externalIPs: []
+    ## externalName is the external reference that kubedns or equivalent will return as a CNAME record for this service, requires Type to be ExternalName
+    externalName: ""
+    ## loadBalancerIP when service.type is LoadBalancer. LoadBalancer will get created with the IP specified in this field
+    loadBalancerIP: ""
+    ## annotations may need to be set when service.type is LoadBalancer
+    ## service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:EXAMPLE_CERT
+    annotations: {}
 
 ingress:
   enabled: false
