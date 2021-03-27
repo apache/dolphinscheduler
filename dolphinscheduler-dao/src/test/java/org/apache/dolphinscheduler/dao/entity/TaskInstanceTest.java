@@ -76,7 +76,11 @@ public class TaskInstanceTest {
         taskInstance.getDependency();
     }
 
-    private DependentParameters getDependentParameters(){
+    /**
+     *
+     * @return
+     */
+    private DependentParameters getDependentParameters() {
         DependentParameters dependentParameters = new DependentParameters();
         List<DependentTaskModel> dependTaskList = new ArrayList<>();
         List<DependentItem> dependentItems = new ArrayList<>();

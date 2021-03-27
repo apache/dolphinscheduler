@@ -17,8 +17,6 @@
 package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 /**
  * task timeout parameter
