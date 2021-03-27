@@ -34,15 +34,15 @@ The default username is `admin` and the default password is `dolphinscheduler123
 
 > **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
 
-#### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
+#### Or via Environment Variables **`DATABASE_HOST`**, **`DATABASE_PORT`**, **`ZOOKEEPER_QUORUM`**
 
 You can specify **existing postgres and zookeeper service**. Example:
 
 ```
 $ docker run -d --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -p 12345:12345 \
 apache/dolphinscheduler:latest all
 ```
@@ -63,9 +63,9 @@ docker volume create dolphinscheduler-resource-local
 
 ```
 $ docker run -d --name dolphinscheduler-master \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 apache/dolphinscheduler:latest master-server
 ```
 
@@ -73,9 +73,9 @@ apache/dolphinscheduler:latest master-server
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 apache/dolphinscheduler:latest worker-server
 ```
@@ -84,9 +84,9 @@ apache/dolphinscheduler:latest worker-server
 
 ```
 $ docker run -d --name dolphinscheduler-api \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
 apache/dolphinscheduler:latest api-server
@@ -101,7 +101,7 @@ $ docker run -d --name dolphinscheduler-alert \
 apache/dolphinscheduler:latest alert-server
 ```
 
-**Note**: You must be specify `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
+**Note**: You must be specify `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
 
 ## How to build a docker image
 
@@ -125,6 +125,8 @@ Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script
 ## Environment Variables
 
 The DolphinScheduler Docker container is configured through environment variables, and the default value will be used if an environment variable is not set.
+
+### Database
 
 **`DATABASE_TYPE`**
 
@@ -174,13 +176,23 @@ This environment variable sets the database for database. The default value is `
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 
+### ZooKeeper
+
+**`ZOOKEEPER_QUORUM`**
+
+This environment variable sets zookeeper quorum. The default value is `127.0.0.1:2181`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`.
+
+**`ZOOKEEPER_ROOT`**
+
+This environment variable sets zookeeper root directory for dolphinscheduler. The default value is `/dolphinscheduler`.
+
+### Common
+
 **`DOLPHINSCHEDULER_OPTS`**
 
-This environment variable sets jvm options for `master-server`, `worker-server`, `api-server` or `alert-server`. The default value is empty.
-
-**`LOGGER_SERVER_OPTS`**
-
-This environment variable sets jvm options for `logger-server` (since `logger-server` is deployed with `worker-server`, it needs to be set separately). The default value is empty.
+This environment variable sets jvm options for dolphinscheduler, suitable for `master-server`, `worker-server`, `api-server`, `alert-server`, `logger-server`. The default value is empty.
 
 **`DATA_BASEDIR_PATH`**
 
@@ -209,6 +221,38 @@ This environment variable sets s3 access key for resource storage. The default v
 **`FS_S3A_SECRET_KEY`**
 
 This environment variable sets s3 secret key for resource storage. The default value is `xxxxxxx`.
+
+**`HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE`**
+
+This environment variable sets whether to startup kerberos. The default value is `false`.
+
+**`JAVA_SECURITY_KRB5_CONF_PATH`**
+
+This environment variable sets java.security.krb5.conf path. The default value is `/opt/krb5.conf`.
+
+**`LOGIN_USER_KEYTAB_USERNAME`**
+
+This environment variable sets login user from keytab username. The default value is `hdfs@HADOOP.COM`.
+
+**`LOGIN_USER_KEYTAB_PATH`**
+
+This environment variable sets login user from keytab path. The default value is `/opt/hdfs.keytab`.
+
+**`KERBEROS_EXPIRE_TIME`**
+
+This environment variable sets kerberos expire time, the unit is hour. The default value is `2`.
+
+**`HDFS_ROOT_USER`**
+
+This environment variable sets hdfs root user when resource.storage.type=HDFS. The default value is `hdfs`.
+
+**`YARN_RESOURCEMANAGER_HA_RM_IDS`**
+
+This environment variable sets yarn resourcemanager ha rm ids. The default value is empty.
+
+**`YARN_APPLICATION_STATUS_ADDRESS`**
+
+This environment variable sets yarn application status address. The default value is `http://ds1:8088/ws/v1/cluster/apps/%s`.
 
 **`HADOOP_HOME`**
 
@@ -246,15 +290,11 @@ This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/fli
 
 This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax`.
 
-**`ZOOKEEPER_QUORUM`**
+### Master Server
 
-This environment variable sets zookeeper quorum for `master-server` and `worker-serverr`. The default value is `127.0.0.1:2181`.
+**`MASTER_SERVER_OPTS`**
 
-**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`.
-
-**`ZOOKEEPER_ROOT`**
-
-This environment variable sets zookeeper root directory for dolphinscheduler. The default value is `/dolphinscheduler`.
+This environment variable sets jvm options for `master-server`. The default value is `-Xms1g -Xmx1g -Xmn512m`.
 
 **`MASTER_EXEC_THREADS`**
 
@@ -290,7 +330,13 @@ This environment variable sets max cpu load avg for `master-server`. The default
 
 **`MASTER_RESERVED_MEMORY`**
 
-This environment variable sets reserved memory for `master-server`. The default value is `0.3`.
+This environment variable sets reserved memory for `master-server`, the unit is G. The default value is `0.3`.
+
+### Worker Server
+
+**`WORKER_SERVER_OPTS`**
+
+This environment variable sets jvm options for `worker-server`. The default value is `-Xms1g -Xmx1g -Xmn512m`.
 
 **`WORKER_EXEC_THREADS`**
 
@@ -306,11 +352,17 @@ This environment variable sets max cpu load avg for `worker-server`. The default
 
 **`WORKER_RESERVED_MEMORY`**
 
-This environment variable sets reserved memory for `worker-server`. The default value is `0.3`.
+This environment variable sets reserved memory for `worker-server`, the unit is G. The default value is `0.3`.
 
 **`WORKER_GROUPS`**
 
 This environment variable sets groups for `worker-server`. The default value is `default`.
+
+### Alert Server
+
+**`ALERT_SERVER_OPTS`**
+
+This environment variable sets jvm options for `alert-server`. The default value is `-Xms512m -Xmx512m -Xmn256m`.
 
 **`XLS_FILE_PATH`**
 
@@ -367,6 +419,18 @@ This environment variable sets enterprise wechat agent id for `alert-server`. Th
 **`ENTERPRISE_WECHAT_USERS`**
 
 This environment variable sets enterprise wechat users for `alert-server`. The default value is empty.
+
+### Api Server
+
+**`API_SERVER_OPTS`**
+
+This environment variable sets jvm options for `api-server`. The default value is `-Xms512m -Xmx512m -Xmn256m`.
+
+### Logger Server
+
+**`LOGGER_SERVER_OPTS`**
+
+This environment variable sets jvm options for `logger-server`. The default value is `-Xms512m -Xmx512m -Xmn256m`.
 
 ## Initialization scripts
 
@@ -457,17 +521,17 @@ docker build -t apache/dolphinscheduler:mysql .
 
 6. Add `dolphinscheduler-mysql` service in `docker-compose.yml` (**Optional**, you can directly use a external MySQL database)
 
-7. Modify all DATABASE environments in `docker-compose.yml`
+7. Modify DATABASE environments in `config.env`
 
 ```
-DATABASE_TYPE: mysql
-DATABASE_DRIVER: com.mysql.jdbc.Driver
-DATABASE_HOST: dolphinscheduler-mysql
-DATABASE_PORT: 3306
-DATABASE_USERNAME: root
-DATABASE_PASSWORD: root
-DATABASE_DATABASE: dolphinscheduler
-DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
+DATABASE_TYPE=mysql
+DATABASE_DRIVER=com.mysql.jdbc.Driver
+DATABASE_HOST=dolphinscheduler-mysql
+DATABASE_PORT=3306
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=root
+DATABASE_DATABASE=dolphinscheduler
+DATABASE_PARAMS=useUnicode=true&characterEncoding=UTF-8
 ```
 
 > If you have added `dolphinscheduler-mysql` service in `docker-compose.yml`, just set `DATABASE_HOST` to `dolphinscheduler-mysql`

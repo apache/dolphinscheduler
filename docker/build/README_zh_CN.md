@@ -34,15 +34,15 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 
 > **提示**: 为了在docker中快速开始，你可以创建一个名为`ds`的租户，并将这个租户`ds`关联到用户`admin`
 
-#### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
+#### 或者通过环境变量 **`DATABASE_HOST`**, **`DATABASE_PORT`**, **`ZOOKEEPER_QUORUM`**
 
 你可以指定已经存在的 **`Postgres`** 和 **`Zookeeper`** 服务. 如下:
 
 ```
 $ docker run -d --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -p 12345:12345 \
 apache/dolphinscheduler:latest all
 ```
@@ -63,9 +63,9 @@ docker volume create dolphinscheduler-resource-local
 
 ```
 $ docker run -d --name dolphinscheduler-master \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 apache/dolphinscheduler:latest master-server
 ```
 
@@ -73,9 +73,9 @@ apache/dolphinscheduler:latest master-server
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 apache/dolphinscheduler:latest worker-server
 ```
@@ -84,9 +84,9 @@ apache/dolphinscheduler:latest worker-server
 
 ```
 $ docker run -d --name dolphinscheduler-api \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
 apache/dolphinscheduler:latest api-server
@@ -101,7 +101,7 @@ $ docker run -d --name dolphinscheduler-alert \
 apache/dolphinscheduler:latest alert-server
 ```
 
-**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM`。
+**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM`。
 
 ## 如何构建一个docker镜像
 
@@ -125,6 +125,8 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ## 环境变量
 
 DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会使用默认值
+
+### 数据库
 
 **`DATABASE_TYPE`**
 
@@ -174,13 +176,23 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
 
+### ZooKeeper
+
+**`ZOOKEEPER_QUORUM`**
+
+配置`dolphinscheduler`的`Zookeeper`地址, 默认值 `127.0.0.1:2181`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`ZOOKEEPER_ROOT`**
+
+配置`dolphinscheduler`在`zookeeper`中数据存储的根目录，默认值 `/dolphinscheduler`。
+
+### 通用
+
 **`DOLPHINSCHEDULER_OPTS`**
 
-配置`master-server`、`worker-server`、`api-server`或`alert-server`的`jvm options`，默认值 `""`、
-
-**`LOGGER_SERVER_OPTS`**
-
-配置`logger-server`的`jvm options`（由于`logger-server`和`worker-server`共同部署，因此它需要单独设置），默认值 `""`、
+配置`dolphinscheduler`的`jvm options`，适用于`master-server`、`worker-server`、`api-server`、`alert-server`、`logger-server`，默认值 `""`、
 
 **`DATA_BASEDIR_PATH`**
 
@@ -209,6 +221,38 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 **`FS_S3A_SECRET_KEY`**
 
 当`RESOURCE_STORAGE_TYPE=S3`时，需要配置`S3`的`s3 secret key`，默认值 `xxxxxxx`。
+
+**`HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE`**
+
+配置`dolphinscheduler`是否启用kerberos，默认值 `false`。
+
+**`JAVA_SECURITY_KRB5_CONF_PATH`**
+
+配置`dolphinscheduler`的java.security.krb5.conf路径，默认值 `/opt/krb5.conf`。
+
+**`LOGIN_USER_KEYTAB_USERNAME`**
+
+配置`dolphinscheduler`登录用户的keytab用户名，默认值 `hdfs@HADOOP.COM`。
+
+**`LOGIN_USER_KEYTAB_PATH`**
+
+配置`dolphinscheduler`登录用户的keytab路径，默认值 `/opt/hdfs.keytab`。
+
+**`KERBEROS_EXPIRE_TIME`**
+
+配置`dolphinscheduler`的kerberos过期时间，单位为小时，默认值 `2`。
+
+**`HDFS_ROOT_USER`**
+
+当`RESOURCE_STORAGE_TYPE=HDFS`时，配置`dolphinscheduler`的hdfs的root用户名，默认值 `hdfs`。
+
+**`YARN_RESOURCEMANAGER_HA_RM_IDS`**
+
+配置`dolphinscheduler`的yarn resourcemanager ha rm ids，默认值 `空`。
+
+**`YARN_APPLICATION_STATUS_ADDRESS`**
+
+配置`dolphinscheduler`的yarn application status地址，默认值 `http://ds1:8088/ws/v1/cluster/apps/%s`。
 
 **`HADOOP_HOME`**
 
@@ -246,15 +290,11 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 配置`dolphinscheduler`的`DATAX_HOME`，默认值 `/opt/soft/datax`。
 
-**`ZOOKEEPER_QUORUM`**
+### Master Server
 
-配置`master-server`和`worker-serverr`的`Zookeeper`地址, 默认值 `127.0.0.1:2181`。
+**`MASTER_SERVER_OPTS`**
 
-**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
-
-**`ZOOKEEPER_ROOT`**
-
-配置`dolphinscheduler`在`zookeeper`中数据存储的根目录，默认值 `/dolphinscheduler`。
+配置`master-server`的`jvm options`，默认值 `-Xms1g -Xmx1g -Xmn512m`。
 
 **`MASTER_EXEC_THREADS`**
 
@@ -290,7 +330,13 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`MASTER_RESERVED_MEMORY`**
 
-配置`master-server`的保留内存，默认值 `0.3`。
+配置`master-server`的保留内存，单位为G，默认值 `0.3`。
+
+### Worker Server
+
+**`WORKER_SERVER_OPTS`**
+
+配置`worker-server`的`jvm options`，默认值 `-Xms1g -Xmx1g -Xmn512m`。
 
 **`WORKER_EXEC_THREADS`**
 
@@ -306,11 +352,17 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`WORKER_RESERVED_MEMORY`**
 
-配置`worker-server`的保留内存，默认值 `0.3`。
+配置`worker-server`的保留内存，单位为G，默认值 `0.3`。
 
 **`WORKER_GROUPS`**
 
 配置`worker-server`的分组，默认值 `default`。
+
+### Alert Server
+
+**`ALERT_SERVER_OPTS`**
+
+配置`alert-server`的`jvm options`，默认值 `-Xms512m -Xmx512m -Xmn256m`。
 
 **`XLS_FILE_PATH`**
 
@@ -367,6 +419,18 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 **`ENTERPRISE_WECHAT_USERS`**
 
 配置`alert-server`的邮件服务企业微信`USERS`，默认值 `空`。
+
+### Api Server
+
+**`API_SERVER_OPTS`**
+
+配置`api-server`的`jvm options`，默认值 `-Xms512m -Xmx512m -Xmn256m`。
+
+### Logger Server
+
+**`LOGGER_SERVER_OPTS`**
+
+配置`logger-server`的`jvm options`，默认值 `-Xms512m -Xmx512m -Xmn256m`。
 
 ## 初始化脚本
 
@@ -457,17 +521,17 @@ docker build -t apache/dolphinscheduler:mysql .
 
 6. 在 `docker-compose.yml` 文件中添加 `dolphinscheduler-mysql` 服务（**可选**，你可以直接使用一个外部的 MySQL 数据库）
 
-7. 修改 `docker-compose.yml` 文件中的所有 DATABASE 环境变量
+7. 修改 `config.env` 文件中的 DATABASE 环境变量
 
 ```
-DATABASE_TYPE: mysql
-DATABASE_DRIVER: com.mysql.jdbc.Driver
-DATABASE_HOST: dolphinscheduler-mysql
-DATABASE_PORT: 3306
-DATABASE_USERNAME: root
-DATABASE_PASSWORD: root
-DATABASE_DATABASE: dolphinscheduler
-DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
+DATABASE_TYPE=mysql
+DATABASE_DRIVER=com.mysql.jdbc.Driver
+DATABASE_HOST=dolphinscheduler-mysql
+DATABASE_PORT=3306
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=root
+DATABASE_DATABASE=dolphinscheduler
+DATABASE_PARAMS=useUnicode=true&characterEncoding=UTF-8
 ```
 
 > 如果你已经添加了 `dolphinscheduler-mysql` 服务，设置 `DATABASE_HOST` 为 `dolphinscheduler-mysql` 即可

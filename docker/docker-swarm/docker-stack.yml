@@ -54,20 +54,7 @@ services:
     - 12345:12345
     environment:
       TZ: Asia/Shanghai
-      DOLPHINSCHEDULER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
-      DATABASE_TYPE: postgresql
-      DATABASE_DRIVER: org.postgresql.Driver
-      DATABASE_HOST: dolphinscheduler-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: root
-      DATABASE_DATABASE: dolphinscheduler
-      DATABASE_PARAMS: characterEncoding=utf8
-      ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      DATA_BASEDIR_PATH: /tmp/dolphinscheduler
-      RESOURCE_STORAGE_TYPE: HDFS
-      RESOURCE_UPLOAD_PATH: /dolphinscheduler
-      FS_DEFAULT_FS: file:///
+    env_file: config.env
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
       interval: 30s
@@ -75,6 +62,8 @@ services:
       retries: 3
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-shared-local:/opt/soft
+    - dolphinscheduler-resource-local:/dolphinscheduler
     networks:
     - dolphinscheduler
     deploy:
@@ -86,29 +75,7 @@ services:
     command: alert-server
     environment:
       TZ: Asia/Shanghai
-      DOLPHINSCHEDULER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
-      XLS_FILE_PATH: "/tmp/xls"
-      MAIL_SERVER_HOST: ""
-      MAIL_SERVER_PORT: ""
-      MAIL_SENDER: ""
-      MAIL_USER: ""
-      MAIL_PASSWD: ""
-      MAIL_SMTP_STARTTLS_ENABLE: "false"
-      MAIL_SMTP_SSL_ENABLE: "false"
-      MAIL_SMTP_SSL_TRUST: ""
-      ENTERPRISE_WECHAT_ENABLE: "false"
-      ENTERPRISE_WECHAT_CORP_ID: ""
-      ENTERPRISE_WECHAT_SECRET: ""
-      ENTERPRISE_WECHAT_AGENT_ID: ""
-      ENTERPRISE_WECHAT_USERS: ""
-      DATABASE_TYPE: postgresql
-      DATABASE_DRIVER: org.postgresql.Driver
-      DATABASE_HOST: dolphinscheduler-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: root
-      DATABASE_DATABASE: dolphinscheduler
-      DATABASE_PARAMS: characterEncoding=utf8
+    env_file: config.env
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
       interval: 30s
@@ -127,27 +94,7 @@ services:
     command: master-server
     environment:
       TZ: Asia/Shanghai
-      DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
-      MASTER_EXEC_THREADS: "100"
-      MASTER_EXEC_TASK_NUM: "20"
-      MASTER_DISPATCH_TASK_NUM: "3"
-      MASTER_HOST_SELECTOR: "LowerWeight"
-      MASTER_HEARTBEAT_INTERVAL: "10"
-      MASTER_TASK_COMMIT_RETRYTIMES: "5"
-      MASTER_TASK_COMMIT_INTERVAL: "1000"
-      MASTER_MAX_CPULOAD_AVG: "-1"
-      MASTER_RESERVED_MEMORY: "0.3"
-      DATABASE_TYPE: postgresql
-      DATABASE_DRIVER: org.postgresql.Driver
-      DATABASE_HOST: dolphinscheduler-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: root
-      DATABASE_DATABASE: dolphinscheduler
-      DATABASE_PARAMS: characterEncoding=utf8
-      ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      HADOOP_HOME: "/opt/soft/hadoop"
-      HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
+    env_file: config.env
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
       interval: 30s
@@ -155,6 +102,7 @@ services:
       retries: 3
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-shared-local:/opt/soft
     networks:
     - dolphinscheduler
     deploy:
@@ -166,44 +114,7 @@ services:
     command: worker-server
     environment:
       TZ: Asia/Shanghai
-      DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
-      LOGGER_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
-      WORKER_EXEC_THREADS: "100"
-      WORKER_HEARTBEAT_INTERVAL: "10"
-      WORKER_MAX_CPULOAD_AVG: "-1"
-      WORKER_RESERVED_MEMORY: "0.3"
-      WORKER_GROUPS: "default"
-      XLS_FILE_PATH: "/tmp/xls"
-      MAIL_SERVER_HOST: ""
-      MAIL_SERVER_PORT: ""
-      MAIL_SENDER: ""
-      MAIL_USER: ""
-      MAIL_PASSWD: ""
-      MAIL_SMTP_STARTTLS_ENABLE: "false"
-      MAIL_SMTP_SSL_ENABLE: "false"
-      MAIL_SMTP_SSL_TRUST: ""
-      DATABASE_TYPE: postgresql
-      DATABASE_DRIVER: org.postgresql.Driver
-      DATABASE_HOST: dolphinscheduler-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: root
-      DATABASE_DATABASE: dolphinscheduler
-      DATABASE_PARAMS: characterEncoding=utf8
-      ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
-      DATA_BASEDIR_PATH: /tmp/dolphinscheduler
-      RESOURCE_STORAGE_TYPE: HDFS
-      RESOURCE_UPLOAD_PATH: /dolphinscheduler
-      FS_DEFAULT_FS: file:///
-      HADOOP_HOME: "/opt/soft/hadoop"
-      HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
-      SPARK_HOME1: "/opt/soft/spark1"
-      SPARK_HOME2: "/opt/soft/spark2"
-      PYTHON_HOME: "/usr/bin/python"
-      JAVA_HOME: "/usr/lib/jvm/java-1.8-openjdk"
-      HIVE_HOME: "/opt/soft/hive"
-      FLINK_HOME: "/opt/soft/flink"
-      DATAX_HOME: "/opt/soft/datax"
+    env_file: config.env
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
       interval: 30s
@@ -212,6 +123,8 @@ services:
     volumes:
     - dolphinscheduler-worker-data:/tmp/dolphinscheduler
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-shared-local:/opt/soft
+    - dolphinscheduler-resource-local:/dolphinscheduler
     networks:
     - dolphinscheduler
     deploy:
@@ -227,3 +140,5 @@ volumes:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
   dolphinscheduler-logs:
+  dolphinscheduler-shared-local:
+  dolphinscheduler-resource-local:
