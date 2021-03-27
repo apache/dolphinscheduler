@@ -41,7 +41,7 @@ If `ingress.enabled` in `values.yaml` is set to `true`, you just access `http://
 
 > **Tip**: If there is a problem with ingress access, please contact the Kubernetes administrator and refer to the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
-Otherwise, you need to execute port-forward command like:
+Otherwise, when `api.service.type=ClusterIP` you need to execute port-forward command like:
 
 ```bash
 $ kubectl port-forward --address 0.0.0.0 svc/dolphinscheduler-api 12345:12345
@@ -51,6 +51,16 @@ $ kubectl port-forward --address 0.0.0.0 -n test svc/dolphinscheduler-api 12345:
 > **Tip**: If the error of `unable to do port forwarding: socat not found` appears, you need to install `socat` at first
 
 And then access the web: http://192.168.xx.xx:12345/dolphinscheduler
+
+Or when `api.service.type=NodePort` you need to execute the command:
+
+```bash
+NODE_IP=$(kubectl get no -n {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+NODE_PORT=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}")
+echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
+```
+
+And then access the web: http://$NODE_IP:$NODE_PORT/dolphinscheduler
 
 The default username is `admin` and the default password is `dolphinscheduler123`
 
@@ -284,6 +294,13 @@ The configuration file is `values.yaml`, and the following tables lists the conf
 | `api.persistentVolumeClaim.accessModes`                                           | `PersistentVolumeClaim` access modes                                                                                           | `[ReadWriteOnce]`                                     |
 | `api.persistentVolumeClaim.storageClassName`                                      | `api` logs data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning      | `-`                                                   |
 | `api.persistentVolumeClaim.storage`                                               | `PersistentVolumeClaim` size                                                                                                   | `20Gi`                                                |
+| `api.service.type`                                                                | `type` determines how the Service is exposed. Valid options are ExternalName, ClusterIP, NodePort, and LoadBalancer            | `ClusterIP`                                           |
+| `api.service.clusterIP`                                                           | `clusterIP` is the IP address of the service and is usually assigned randomly by the master                                    | `nil`                                                 |
+| `api.service.nodePort`                                                            | `nodePort` is the port on each node on which this service is exposed when type=NodePort                                        | `nil`                                                 |
+| `api.service.externalIPs`                                                         | `externalIPs` is a list of IP addresses for which nodes in the cluster will also accept traffic for this service               | `[]`                                                  |
+| `api.service.externalName`                                                        | `externalName` is the external reference that kubedns or equivalent will return as a CNAME record for this service             | `nil`                                                 |
+| `api.service.loadBalancerIP`                                                      | `loadBalancerIP` when service.type is LoadBalancer. LoadBalancer will get created with the IP specified in this field          | `nil`                                                 |
+| `api.service.annotations`                                                         | `annotations` may need to be set when service.type is LoadBalancer                                                             | `{}`                                                  |
 |                                                                                   |                                                                                                                                |                                                       |
 | `ingress.enabled`                                                                 | Enable ingress                                                                                                                 | `false`                                               |
 | `ingress.host`                                                                    | Ingress host                                                                                                                   | `dolphinscheduler.org`                                |
