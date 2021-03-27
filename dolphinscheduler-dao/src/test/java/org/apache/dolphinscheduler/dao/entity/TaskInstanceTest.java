@@ -93,6 +93,4 @@ public class TaskInstanceTest {
         dependentParameters.setRelation(DependentRelation.AND);
         return dependentParameters;
     }
-
-
 }
