@@ -21,7 +21,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>worker execute thread number</description>
+		<description>worker execute thread num</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>

@@ -21,7 +21,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master execute thread number</description>
+		<description>master execute thread num</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>

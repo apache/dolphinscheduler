@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-# worker execute thread number
+# worker execute thread num
 worker.exec.threads=${WORKER_EXEC_THREADS}
 
 # worker heartbeat interval

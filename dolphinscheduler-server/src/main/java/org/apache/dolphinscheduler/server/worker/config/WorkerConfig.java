@@ -17,10 +17,9 @@
  */
 package org.apache.dolphinscheduler.server.worker.config;
 
-import org.apache.dolphinscheduler.common.Constants;
-
 import java.util.Set;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -35,17 +34,20 @@ public class WorkerConfig {
     @Value("${worker.heartbeat.interval:10}")
     private int workerHeartbeatInterval;
 
+    @Value("${worker.fetch.task.num:3}")
+    private int workerFetchTaskNum;
+
     @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
 
     @Value("${worker.reserved.memory:0.3}")
     private double workerReservedMemory;
 
-    @Value("${worker.listen.port: 1234}")
-    private int listenPort;
-
     @Value("#{'${worker.groups:default}'.split(',')}")
     private Set<String> workerGroups;
+
+    @Value("${worker.listen.port: 1234}")
+    private int listenPort;
 
     public int getListenPort() {
         return listenPort;
@@ -77,6 +79,14 @@ public class WorkerConfig {
 
     public void setWorkerHeartbeatInterval(int workerHeartbeatInterval) {
         this.workerHeartbeatInterval = workerHeartbeatInterval;
+    }
+
+    public int getWorkerFetchTaskNum() {
+        return workerFetchTaskNum;
+    }
+
+    public void setWorkerFetchTaskNum(int workerFetchTaskNum) {
+        this.workerFetchTaskNum = workerFetchTaskNum;
     }
 
     public double getWorkerReservedMemory() {

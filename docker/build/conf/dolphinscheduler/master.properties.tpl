@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-# master execute thread number
+# master execute thread num
 master.exec.threads=${MASTER_EXEC_THREADS}
 
 # master execute task number in parallel
