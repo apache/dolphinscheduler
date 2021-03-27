@@ -16,10 +16,18 @@
   -->
 <configuration>
     <property>
+        <name>data.basedir.path</name>
+        <value>/tmp/dolphinscheduler</value>
+        <description>
+            user data local directory path, please make sure the directory exists and have read write permissions
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
         <name>resource.storage.type</name>
         <display-name>Choose Resource Upload Startup Type</display-name>
         <description>
-            Resource upload startup type : HDFS,S3,NONE
+            resource storage type: HDFS, S3, NONE
         </description>
         <value>NONE</value>
         <value-attributes>
@@ -46,19 +54,10 @@
         <name>resource.upload.path</name>
         <value>/dolphinscheduler</value>
         <description>
-            resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
+            resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
-    <property>
-        <name>data.basedir.path</name>
-        <value>/tmp/dolphinscheduler</value>
-        <description>
-            user data local directory path, please make sure the directory exists and have read write permissions
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-
     <property>
         <name>hadoop.security.authentication.startup.state</name>
         <value>false</value>
@@ -76,7 +75,9 @@
             </entries>
             <selection-cardinality>1</selection-cardinality>
         </value-attributes>
-        <description>whether kerberos starts</description>
+        <description>
+            whether to startup kerberos
+        </description>
     </property>
     <property>
         <name>java.security.krb5.conf.path</name>
@@ -90,7 +91,7 @@
         <name>login.user.keytab.username</name>
         <value>hdfs-mycluster@ESZ.COM</value>
         <description>
-            LoginUserFromKeytab user
+            login user from keytab username
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
@@ -98,20 +99,29 @@
         <name>login.user.keytab.path</name>
         <value>/opt/hdfs.headless.keytab</value>
         <description>
-            LoginUserFromKeytab path
+            login user from keytab path
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
+        <name>kerberos.expire.time</name>
+        <value>2</value>
+        <description>
+            kerberos expire time, the unit is hour
+        </description>
+    </property>
+    <property>
         <name>resource.view.suffixs</name>
-        <value>txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties</value>
-        <description></description>
+        <value>txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js</value>
+        <description>
+            resource view suffixs
+        </description>
     </property>
     <property>
         <name>hdfs.root.user</name>
         <value>hdfs</value>
         <description>
-            Users who have permission to create directories under the HDFS root path
+            if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
@@ -119,9 +129,7 @@
         <name>fs.defaultFS</name>
         <value>hdfs://mycluster:8020</value>
         <description>
-            HA or single namenode,
-            If namenode ha needs to copy core-site.xml and hdfs-site.xml to the conf directory，
-            support s3，for example : s3a://dolphinscheduler
+            if resource.storage.type=S3, the value like: s3a://dolphinscheduler; if resource.storage.type=HDFS and namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
@@ -129,7 +137,7 @@
         <name>fs.s3a.endpoint</name>
         <value>http://host:9010</value>
         <description>
-            s3 need，s3 endpoint
+            s3 required，s3 endpoint
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
@@ -137,7 +145,7 @@
         <name>fs.s3a.access.key</name>
         <value>A3DXS30FO22544RE</value>
         <description>
-            s3 need，s3 access key
+            s3 required，s3 access key
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
@@ -145,14 +153,32 @@
         <name>fs.s3a.secret.key</name>
         <value>OloCLq3n+8+sdPHUhJ21XrSxTC+JK</value>
         <description>
-            s3 need，s3 secret key
+            s3 required，s3 secret key
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
-        <name>kerberos.expire.time</name>
-        <value>7</value>
-        <description></description>
+        <name>yarn.resourcemanager.ha.rm.ids</name>
+        <value>192.168.xx.xx,192.168.xx.xx</value>
+        <description>
+            if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty
+        </description>
+        <on-ambari-upgrade add="true"/>
     </property>
-
+    <property>
+        <name>yarn.application.status.address</name>
+        <value>http://ds1:8088/ws/v1/cluster/apps/%s</value>
+        <description>
+            if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
+    <property>
+        <name>dolphinscheduler.env.path</name>
+        <value>env/dolphinscheduler_env.sh</value>
+        <description>
+            system env path
+        </description>
+        <on-ambari-upgrade add="true"/>
+    </property>
 </configuration>
