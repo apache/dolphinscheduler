@@ -21,8 +21,6 @@ services:
   dolphinscheduler-postgresql:
     image: bitnami/postgresql:latest
     container_name: dolphinscheduler-postgresql
-    ports:
-    - 5432:5432
     environment:
       TZ: Asia/Shanghai
       POSTGRESQL_USERNAME: root
@@ -38,8 +36,6 @@ services:
   dolphinscheduler-zookeeper:
     image: bitnami/zookeeper:latest
     container_name: dolphinscheduler-zookeeper
-    ports:
-    - 2181:2181
     environment:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"
@@ -133,8 +129,6 @@ services:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-master
     command: master-server
-    ports:
-    - 5678:5678
     environment:
       TZ: Asia/Shanghai
       DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
@@ -177,9 +171,6 @@ services:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-worker
     command: worker-server
-    ports:
-    - 1234:1234
-    - 50051:50051
     environment:
       TZ: Asia/Shanghai
       DOLPHINSCHEDULER_OPTS: "-Xms1g -Xmx1g -Xmn512m"

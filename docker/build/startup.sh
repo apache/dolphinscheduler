@@ -63,7 +63,7 @@ initDatabase() {
 # check ds version
 checkDSVersion() {
     if [ ${DATABASE_TYPE} = "mysql" ]; then
-        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "SELECT * FROM public.t_ds_version" 2>/dev/null)
+        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "SELECT * FROM t_ds_version" 2>/dev/null)
     else
         v=$(PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "SELECT * FROM public.t_ds_version" 2>/dev/null)
     fi
