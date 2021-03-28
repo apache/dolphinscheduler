@@ -254,6 +254,22 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 配置`dolphinscheduler`的yarn application status地址，默认值 `http://ds1:8088/ws/v1/cluster/apps/%s`。
 
+**`SKYWALKING_ENABLE`**
+
+配置`skywalking`是否启用. 默认值 `false`。
+
+**`SW_AGENT_COLLECTOR_BACKEND_SERVICES`**
+
+配置`skywalking`的collector后端地址. 默认值 `127.0.0.1:11800`。
+
+**`SW_GRPC_LOG_SERVER_HOST`**
+
+配置`skywalking`的grpc服务主机或IP. 默认值 `127.0.0.1`。
+
+**`SW_GRPC_LOG_SERVER_PORT`**
+
+配置`skywalking`的grpc服务端口. 默认值 `11800`。
+
 **`HADOOP_HOME`**
 
 配置`dolphinscheduler`的`HADOOP_HOME`，默认值 `/opt/soft/hadoop`。

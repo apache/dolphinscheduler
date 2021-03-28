@@ -254,6 +254,22 @@ This environment variable sets yarn resourcemanager ha rm ids. The default value
 
 This environment variable sets yarn application status address. The default value is `http://ds1:8088/ws/v1/cluster/apps/%s`.
 
+**`SKYWALKING_ENABLE`**
+
+This environment variable sets whether to enable skywalking. The default value is `false`.
+
+**`SW_AGENT_COLLECTOR_BACKEND_SERVICES`**
+
+This environment variable sets agent collector backend services for skywalking. The default value is `127.0.0.1:11800`.
+
+**`SW_GRPC_LOG_SERVER_HOST`**
+
+This environment variable sets grpc log server host for skywalking. The default value is `127.0.0.1`.
+
+**`SW_GRPC_LOG_SERVER_PORT`**
+
+This environment variable sets grpc log server port for skywalking. The default value is `11800`.
+
 **`HADOOP_HOME`**
 
 This environment variable sets `HADOOP_HOME`. The default value is `/opt/soft/hadoop`.
