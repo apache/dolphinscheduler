@@ -318,11 +318,11 @@ This environment variable sets exec thread number for `master-server`. The defau
 
 **`MASTER_EXEC_TASK_NUM`**
 
-This environment variable sets exec task num for `master-server`. The default value is `20`.
+This environment variable sets exec task number for `master-server`. The default value is `20`.
 
 **`MASTER_DISPATCH_TASK_NUM`**
 
-This environment variable sets dispatch task num for `master-server`. The default value is `3`.
+This environment variable sets dispatch task number for `master-server`. The default value is `3`.
 
 **`MASTER_HOST_SELECTOR`**
 
@@ -537,7 +537,7 @@ docker build -t apache/dolphinscheduler:mysql .
 
 6. Add `dolphinscheduler-mysql` service in `docker-compose.yml` (**Optional**, you can directly use a external MySQL database)
 
-7. Modify DATABASE environments in `config.env`
+7. Modify DATABASE environments in `config.env.sh`
 
 ```
 DATABASE_TYPE=mysql

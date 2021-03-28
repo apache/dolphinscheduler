@@ -537,7 +537,7 @@ docker build -t apache/dolphinscheduler:mysql .
 
 6. 在 `docker-compose.yml` 文件中添加 `dolphinscheduler-mysql` 服务（**可选**，你可以直接使用一个外部的 MySQL 数据库）
 
-7. 修改 `config.env` 文件中的 DATABASE 环境变量
+7. 修改 `config.env.sh` 文件中的 DATABASE 环境变量
 
 ```
 DATABASE_TYPE=mysql
