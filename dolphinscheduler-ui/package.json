@@ -17,6 +17,7 @@
   "dependencies": {
     "@form-create/element-ui": "^1.0.18",
     "@riophae/vue-treeselect": "^0.4.0",
+    "async-validator": "^3.5.1",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
     "canvg": "1.5.1",
@@ -25,6 +26,7 @@
     "d3": "^3.5.17",
     "dagre": "^0.8.5",
     "dayjs": "^1.7.8",
+    "deepmerge": "^1.5.2",
     "echarts": "4.1.0",
     "element-ui": "2.13.2",
     "html2canvas": "^0.5.0-beta4",
@@ -35,6 +37,7 @@
     "lodash": "^4.17.11",
     "normalize.css": "^8.0.1",
     "remixicon": "^2.5.0",
+    "throttle-debounce": "^1.0.1",
     "vue": "^2.5.17",
     "vue-router": "^3.0.0",
     "vuex": "^3.0.0",
