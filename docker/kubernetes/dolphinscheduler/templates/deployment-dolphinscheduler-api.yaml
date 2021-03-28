@@ -40,13 +40,16 @@ spec:
       {{- end }}
     spec:
       {{- if .Values.api.affinity }}
-      affinity: {{- toYaml .Values.api.affinity | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.api.affinity | nindent 8 }}
       {{- end }}
       {{- if .Values.api.nodeSelector }}
-      nodeSelector: {{- toYaml .Values.api.nodeSelector | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.api.nodeSelector | nindent 8 }}
       {{- end }}
       {{- if .Values.api.tolerations }}
-      tolerations: {{- toYaml . | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.api.tolerations | nindent 8 }}
       {{- end }}
       {{- if .Values.image.pullSecret }}
       imagePullSecrets:
@@ -74,17 +77,12 @@ spec:
                 name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.resources }}
           resources:
-            limits:
-              memory: {{ .Values.api.resources.limits.memory | quote }}
-              cpu: {{ .Values.api.resources.limits.cpu | quote }}
-            requests:
-              memory: {{ .Values.api.resources.requests.memory | quote }}
-              cpu: {{ .Values.api.resources.requests.cpu | quote }}
+            {{- toYaml .Values.api.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.api.livenessProbe.enabled }}
           livenessProbe:
-            tcpSocket:
-              port: 12345
+            exec:
+              command: ["bash", "/root/checkpoint.sh", "ApiApplicationServer"]
             initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
@@ -93,8 +91,8 @@ spec:
           {{- end }}
           {{- if .Values.api.readinessProbe.enabled }}
           readinessProbe:
-            tcpSocket:
-              port: 12345
+            exec:
+              command: ["bash", "/root/checkpoint.sh", "ApiApplicationServer"]
             initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}

@@ -37,13 +37,16 @@ spec:
       {{- end }}
     spec:
       {{- if .Values.master.affinity }}
-      affinity: {{- toYaml .Values.master.affinity | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.master.affinity | nindent 8 }}
       {{- end }}
       {{- if .Values.master.nodeSelector }}
-      nodeSelector: {{- toYaml .Values.master.nodeSelector | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.master.nodeSelector | nindent 8 }}
       {{- end }}
       {{- if .Values.master.tolerations }}
-      tolerations: {{- toYaml . | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.master.tolerations | nindent 8 }}
       {{- end }}
       {{- if .Values.image.pullSecret }}
       imagePullSecrets:
@@ -71,20 +74,12 @@ spec:
                 name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.resources }}
           resources:
-            limits:
-              memory: {{ .Values.master.resources.limits.memory | quote }}
-              cpu: {{ .Values.master.resources.limits.cpu | quote }}
-            requests:
-              memory: {{ .Values.master.resources.requests.memory | quote }}
-              cpu: {{ .Values.master.resources.requests.cpu | quote }}
+            {{- toYaml .Values.master.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.master.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command:
-                - sh
-                - /root/checkpoint.sh
-                - MasterServer
+              command: ["bash", "/root/checkpoint.sh", "MasterServer"]
             initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
@@ -94,10 +89,7 @@ spec:
           {{- if .Values.master.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command:
-                - sh
-                - /root/checkpoint.sh
-                - MasterServer
+              command: ["bash", "/root/checkpoint.sh", "MasterServer"]
             initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}

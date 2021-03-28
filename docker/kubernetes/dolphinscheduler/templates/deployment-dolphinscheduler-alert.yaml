@@ -40,13 +40,16 @@ spec:
       {{- end }}
     spec:
       {{- if .Values.alert.affinity }}
-      affinity: {{- toYaml .Values.alert.affinity | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.alert.affinity | nindent 8 }}
       {{- end }}
       {{- if .Values.alert.nodeSelector }}
-      nodeSelector: {{- toYaml .Values.alert.nodeSelector | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.alert.nodeSelector | nindent 8 }}
       {{- end }}
       {{- if .Values.alert.tolerations }}
-      tolerations: {{- toYaml . | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.alert.tolerations | nindent 8 }}
       {{- end }}
       {{- if .Values.image.pullSecret }}
       imagePullSecrets:
@@ -69,20 +72,12 @@ spec:
                 name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.alert.resources }}
           resources:
-            limits:
-              memory: {{ .Values.alert.resources.limits.memory }}
-              cpu: {{ .Values.alert.resources.limits.cpu }}
-            requests:
-              memory: {{ .Values.alert.resources.requests.memory }}
-              cpu: {{ .Values.alert.resources.requests.cpu }}
+            {{- toYaml .Values.alert.resources | nindent 12 }}
           {{- end }}
           {{- if .Values.alert.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command:
-                - sh
-                - /root/checkpoint.sh
-                - AlertServer
+              command: ["bash", "/root/checkpoint.sh", "AlertServer"]
             initialDelaySeconds: {{ .Values.alert.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.alert.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.alert.livenessProbe.timeoutSeconds }}
@@ -92,10 +87,7 @@ spec:
           {{- if .Values.alert.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command:
-                - sh
-                - /root/checkpoint.sh
-                - AlertServer
+              command: ["bash", "/root/checkpoint.sh", "AlertServer"]
             initialDelaySeconds: {{ .Values.alert.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.alert.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.alert.readinessProbe.timeoutSeconds }}
