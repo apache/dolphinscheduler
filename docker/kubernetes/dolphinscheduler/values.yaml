@@ -54,8 +54,6 @@ externalDatabase:
 zookeeper:
   enabled: true
   fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
-  service:
-    port: "2181"
   persistence:
     enabled: false
     size: "20Gi"
@@ -71,6 +69,7 @@ externalZookeeper:
 common:
   ## ConfigMap
   configmap:
+    DOLPHINSCHEDULER_OPTS: ""
     DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
     RESOURCE_STORAGE_TYPE: "HDFS"
     RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
@@ -78,17 +77,24 @@ common:
     FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
     FS_S3A_ACCESS_KEY: "xxxxxxx"
     FS_S3A_SECRET_KEY: "xxxxxxx"
-    DOLPHINSCHEDULER_ENV:
-    - "export HADOOP_HOME=/opt/soft/hadoop"
-    - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
-    - "export SPARK_HOME1=/opt/soft/spark1"
-    - "export SPARK_HOME2=/opt/soft/spark2"
-    - "export PYTHON_HOME=/usr/bin/python"
-    - "export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk"
-    - "export HIVE_HOME=/opt/soft/hive"
-    - "export FLINK_HOME=/opt/soft/flink"
-    - "export DATAX_HOME=/opt/soft/datax"
-    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH"
+    HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE: "false"
+    JAVA_SECURITY_KRB5_CONF_PATH: "/opt/krb5.conf"
+    LOGIN_USER_KEYTAB_USERNAME: "hdfs@HADOOP.COM"
+    LOGIN_USER_KEYTAB_PATH: "/opt/hdfs.keytab"
+    KERBEROS_EXPIRE_TIME: "2"
+    HDFS_ROOT_USER: "hdfs"
+    YARN_RESOURCEMANAGER_HA_RM_IDS: ""
+    YARN_APPLICATION_STATUS_ADDRESS: "http://ds1:8088/ws/v1/cluster/apps/%s"
+    # dolphinscheduler env
+    HADOOP_HOME: "/opt/soft/hadoop"
+    HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
+    SPARK_HOME1: "/opt/soft/spark1"
+    SPARK_HOME2: "/opt/soft/spark2"
+    PYTHON_HOME: "/usr/bin/python"
+    JAVA_HOME: "/usr/lib/jvm/java-1.8-openjdk"
+    HIVE_HOME: "/opt/soft/hive"
+    FLINK_HOME: "/opt/soft/flink"
+    DATAX_HOME: "/opt/soft/datax"
   ## Shared storage persistence mounted into master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     enabled: false
@@ -137,7 +143,7 @@ master:
   #     cpu: "500m"
   ## ConfigMap
   configmap:
-    DOLPHINSCHEDULER_OPTS: ""
+    MASTER_SERVER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
     MASTER_EXEC_THREADS: "100"
     MASTER_EXEC_TASK_NUM: "20"
     MASTER_DISPATCH_TASK_NUM: "3"
@@ -206,8 +212,8 @@ worker:
   #     cpu: "500m"
   ## ConfigMap
   configmap:
-    DOLPHINSCHEDULER_OPTS: ""
-    LOGGER_SERVER_OPTS: ""
+    LOGGER_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
+    WORKER_SERVER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10"
     WORKER_MAX_CPULOAD_AVG: "-1"
@@ -286,7 +292,7 @@ alert:
   #     cpu: "500m"
   ## ConfigMap
   configmap:
-    DOLPHINSCHEDULER_OPTS: ""
+    ALERT_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
     XLS_FILE_PATH: "/tmp/xls"
     MAIL_SERVER_HOST: ""
     MAIL_SERVER_PORT: ""
@@ -362,7 +368,7 @@ api:
   #     cpu: "500m"
   ## ConfigMap
   configmap:
-    DOLPHINSCHEDULER_OPTS: ""
+    API_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

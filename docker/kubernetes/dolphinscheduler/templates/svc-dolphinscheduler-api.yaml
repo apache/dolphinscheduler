@@ -20,8 +20,7 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-api
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   ports:
     - port: 12345
@@ -29,7 +28,4 @@ spec:
       protocol: TCP
       name: api-port
   selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: api
+    {{- include "dolphinscheduler.api.labels" . | nindent 4 }}
