@@ -65,7 +65,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     private final ExecutorService executor;
 
     public LoggerRequestProcessor() {
-        this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2);
+        this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
     }
 
     @Override
