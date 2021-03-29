@@ -1400,7 +1400,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<TaskNode> taskNodeList = processData.getTasks();
             taskNodeList.forEach(taskNode -> {
                 taskNode.setName(taskNode.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
-                taskNode.setCode(0L);
+                taskNode.setCode("0");
             });
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
