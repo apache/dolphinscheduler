@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.registry.DependencyConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
+import org.apache.dolphinscheduler.server.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.utils.ExecutionContextTestUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -44,12 +44,8 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, WorkerRegistry.class, ZookeeperRegistryCenter.class, WorkerConfig.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
+        ServerNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 public class RoundRobinHostManagerTest {
-
-
-    @Autowired
-    private ZookeeperNodeManager zookeeperNodeManager;
 
     @Autowired
     private WorkerRegistry workerRegistry;
@@ -58,19 +54,17 @@ public class RoundRobinHostManagerTest {
     private WorkerConfig workerConfig;
 
     @Test
-    public void testSelectWithEmptyResult(){
+    public void testSelectWithEmptyResult() {
         RoundRobinHostManager roundRobinHostManager = new RoundRobinHostManager();
-        roundRobinHostManager.setZookeeperNodeManager(zookeeperNodeManager);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host emptyHost = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isEmpty(emptyHost.getAddress()));
     }
 
     @Test
-    public void testSelectWithResult(){
+    public void testSelectWithResult() {
         workerRegistry.registry();
         RoundRobinHostManager roundRobinHostManager = new RoundRobinHostManager();
-        roundRobinHostManager.setZookeeperNodeManager(zookeeperNodeManager);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));

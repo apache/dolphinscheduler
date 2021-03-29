@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -29,17 +28,21 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.dolphinscheduler.server.registry.ServerNodeManager;
 
-import javax.annotation.PostConstruct;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *  netty executor manager
@@ -50,10 +53,10 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
     /**
-     * zookeeper node manager
+     * server node manager
      */
     @Autowired
-    private ZookeeperNodeManager zookeeperNodeManager;
+    private ServerNodeManager serverNodeManager;
 
     /**
      * netty remote client
@@ -183,7 +186,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
+                nodes = serverNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;
             case CLIENT:
                 break;

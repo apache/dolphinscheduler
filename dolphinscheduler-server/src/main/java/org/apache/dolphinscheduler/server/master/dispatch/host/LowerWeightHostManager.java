@@ -18,22 +18,17 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,25 +43,13 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *  round robin host manager
+ *  lower weight host manager
  */
 public class LowerWeightHostManager extends CommonHostManager {
 
     private final Logger logger = LoggerFactory.getLogger(LowerWeightHostManager.class);
-
-    /**
-     * zookeeper registry center
-     */
-    @Autowired
-    private ZookeeperRegistryCenter registryCenter;
-
-    /**
-     * round robin host manager
-     */
-    private RoundRobinHostManager roundRobinHostManager;
 
     /**
      * selector
@@ -95,8 +78,6 @@ public class LowerWeightHostManager extends CommonHostManager {
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
         this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),0, 5, TimeUnit.SECONDS);
-        this.roundRobinHostManager = new RoundRobinHostManager();
-        this.roundRobinHostManager.setZookeeperNodeManager(getZookeeperNodeManager());
     }
 
     @PreDestroy
@@ -148,42 +129,21 @@ public class LowerWeightHostManager extends CommonHostManager {
         public void run() {
             try {
                 Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
-                // from database
-                List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
-                if (CollectionUtils.isNotEmpty(workerGroups)) {
-                    Map<String, String> serverMaps = zkMasterClient.getServerMaps(ZKNodeType.WORKER, true);
-                    for (WorkerGroup wg : workerGroups) {
-                        String workerGroup = wg.getName();
-                        List<String> addrs = Arrays.asList(wg.getAddrList().split(Constants.COMMA));
-                        Set<HostWeight> hostWeights = new HashSet<>(addrs.size());
-                        for (String addr : addrs) {
-                            if (serverMaps.containsKey(addr)) {
-                                String heartbeat = serverMaps.get(addr);
-                                HostWeight hostWeight = getHostWeight(addr, heartbeat);
-                                if (hostWeight != null) {
-                                    hostWeights.add(hostWeight);
-                                }
-                            }
-                        }
-                        workerHostWeights.put(workerGroup, hostWeights);
-                    }
-                }
-                // from zookeeper
-                Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
-                Set<Map.Entry<String, Set<String>>> entries = workerGroupNodes.entrySet();
-                for (Map.Entry<String, Set<String>> entry : entries) {
+                Map<String, Set<String>> workerGroupNodes = serverNodeManager.getWorkerGroupNodes();
+                for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
                     String workerGroup = entry.getKey();
                     Set<String> nodes = entry.getValue();
-                    String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for (String node : nodes) {
-                        String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
+                        String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
                         HostWeight hostWeight = getHostWeight(node, heartbeat);
                         if (hostWeight != null) {
                             hostWeights.add(hostWeight);
                         }
                     }
-                    workerHostWeights.put(workerGroup, hostWeights);
+                    if (!hostWeights.isEmpty()) {
+                        workerHostWeights.put(workerGroup, hostWeights);
+                    }
                 }
                 syncWorkerHostWeight(workerHostWeights);
             } catch (Throwable ex) {
