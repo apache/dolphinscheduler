@@ -15,56 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.dao.mapper;
 
-public class PreviousTaskNode {
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * worker group mapper interface
+ */
+public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
     /**
-     * code
+     * query all worker group
+     * @return worker group list
      */
-    private long code;
+    List<WorkerGroup> queryAllWorkerGroup();
 
     /**
-     * name
+     * query worer grouop by name
+     * @param name name
+     * @return worker group list
      */
-    private String name;
+    List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
 
-    /**
-     * version
-     */
-    private int version;
-
-    public PreviousTaskNode() {
-
-    }
-    
-    public PreviousTaskNode(long code, String name, int version) {
-        this.code = code;
-        this.name = name;
-        this.version = version;
-    }
-
-    public long getCode() {
-        return code;
-    }
-
-    public void setCode(long code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
 }

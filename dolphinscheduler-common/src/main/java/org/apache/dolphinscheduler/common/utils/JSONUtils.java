@@ -206,7 +206,7 @@ public class JSONUtils {
             return null;
         }
 
-        return node.toString();
+        return node.asText();
     }
 
     /**

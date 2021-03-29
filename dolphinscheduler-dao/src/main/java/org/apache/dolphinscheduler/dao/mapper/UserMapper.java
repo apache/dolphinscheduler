@@ -116,4 +116,12 @@ public interface UserMapper extends BaseMapper<User> {
      * @return update rows
      */
     Integer updateUserQueue(@Param("oldQueue") String oldQueue, @Param("newQueue") String newQueue);
+
+    /**
+     * query user by ids
+     *
+     * @param ids id list
+     * @return user list
+     */
+    List<User> selectByIds(@Param("ids") List<Integer> ids);
 }

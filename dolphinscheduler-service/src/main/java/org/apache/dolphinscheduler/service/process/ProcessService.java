@@ -120,6 +120,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -1121,7 +1122,7 @@ public class ProcessService {
     /**
      * complement data needs transform parent parameter to child.
      */
-    private String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance,Map<String,String> fatherParams) {
+    private String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance, Map<String, String> fatherParams) {
         // set sub work process command
         String processMapStr = JSONUtils.toJsonString(instanceMap);
         Map<String, String> cmdParam = JSONUtils.toMap(processMapStr);
@@ -1165,13 +1166,13 @@ public class ProcessService {
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
         Map<String, String> globalMap = this.getGlobalParamMap(parentProcessInstance.getGlobalParams());
-        Map<String,String> fatherParams = new HashMap<>();
+        Map<String, String> fatherParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(allParam)) {
             for (Property info : allParam) {
                 fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
             }
         }
-        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance,fatherParams);
+        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);
 
         return new Command(
                 commandType,
@@ -2239,8 +2240,7 @@ public class ProcessService {
     }
 
     private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
-        // TODO for the front-end UI, name with id
-        taskDefinition.setName(taskNode.getId() + "|" + taskNode.getName());
+        taskDefinition.setName(taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
         taskDefinition.setTaskParams(TaskType.of(taskNode.getType()) == TaskType.DEPENDENT ? taskNode.getDependence() : taskNode.getParams());
@@ -2298,6 +2298,7 @@ public class ProcessService {
                                                            String desc, String locations, String connects) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
+        processDefinitionLog.setUserId(operator.getId());
         processDefinitionLog.setCode(processDefinitionCode);
         processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version);
         processDefinitionLog.setName(processDefinitionName);
@@ -2339,7 +2340,7 @@ public class ProcessService {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
         Map<String, TaskDefinition> taskNameAndCode = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(projectCode, taskNode.getName());
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskNode.getCode());
             if (taskDefinition == null) {
                 try {
                     long code = SnowFlakeUtils.getInstance().nextId();
@@ -2447,7 +2448,8 @@ public class ProcessService {
      * @return dag graph
      */
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-        List<TaskNode> taskNodeList = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion());
+        Map<String, String> locationMap = locationToMap(processDefinition.getLocations());
+        List<TaskNode> taskNodeList = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion(), locationMap);
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, new ArrayList<>(processTaskRelations));
         // Generate concrete Dag to be executed
@@ -2458,7 +2460,8 @@ public class ProcessService {
      * generate ProcessData
      */
     public ProcessData genProcessData(ProcessDefinition processDefinition) {
-        List<TaskNode> taskNodes = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion());
+        Map<String, String> locationMap = locationToMap(processDefinition.getLocations());
+        List<TaskNode> taskNodes = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion(), locationMap);
         ProcessData processData = new ProcessData();
         processData.setTasks(taskNodes);
         processData.setGlobalParams(JSONUtils.toList(processDefinition.getGlobalParams(), Property.class));
@@ -2467,7 +2470,7 @@ public class ProcessService {
         return processData;
     }
 
-    public List<TaskNode> genTaskNodeList(Long processCode, int processVersion) {
+    public List<TaskNode> genTaskNodeList(Long processCode, int processVersion, Map<String, String> locationMap) {
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
@@ -2500,10 +2503,9 @@ public class ProcessService {
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream().collect(Collectors.toMap(TaskDefinitionLog::getCode, log -> log));
         taskNodeMap.forEach((k, v) -> {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
-            // TODO split from name
-            v.setId(StringUtils.substringBefore(taskDefinitionLog.getName(), "|"));
+            v.setId(locationMap.get(taskDefinitionLog.getName()));
             v.setCode(taskDefinitionLog.getCode());
-            v.setName(StringUtils.substringAfter(taskDefinitionLog.getName(), "|"));
+            v.setName(taskDefinitionLog.getName());
             v.setDesc(taskDefinitionLog.getDescription());
             v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
             v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
@@ -2516,7 +2518,6 @@ public class ProcessService {
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
                     taskDefinitionLog.getTimeoutNotifyStrategy(),
                     taskDefinitionLog.getTimeout())));
-            // TODO name will be remove
             v.getPreTaskNodeList().forEach(task -> task.setName(taskDefinitionLogMap.get(task.getCode()).getName()));
             v.setPreTasks(JSONUtils.toJsonString(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList())));
         });
@@ -2524,7 +2525,28 @@ public class ProcessService {
     }
 
     /**
+     * parse locations
+     *
+     * @param locations processDefinition locations
+     * @return key:taskName,value:taskId
+     */
+    public Map<String, String> locationToMap(String locations) {
+        Map<String, String> frontTaskIdAndNameMap = new HashMap<>();
+        if (StringUtils.isBlank(locations)) {
+            return frontTaskIdAndNameMap;
+        }
+        ObjectNode jsonNodes = JSONUtils.parseObject(locations);
+        Iterator<Entry<String, JsonNode>> fields = jsonNodes.fields();
+        while (fields.hasNext()) {
+            Entry<String, JsonNode> jsonNodeEntry = fields.next();
+            frontTaskIdAndNameMap.put(JSONUtils.findValue(jsonNodeEntry.getValue(), "name"), jsonNodeEntry.getKey());
+        }
+        return frontTaskIdAndNameMap;
+    }
+
+    /**
      * add authorized resources
+     *
      * @param ownResources own resources
      * @param userId userId
      */
