@@ -156,6 +156,11 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
 
     /**
+     * sudo enable
+     */
+    public static final String SUDO_ENABLE = "sudo.enable";
+
+    /**
      * string true
      */
     public static final String STRING_TRUE = "true";

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -84,7 +85,7 @@ public abstract class AbstractCommandExecutor {
      * log list
      */
     protected final List<String> logBuffer;
-    
+
     protected boolean logOutputIsScuccess = false;
 
     /**
@@ -134,9 +135,11 @@ public abstract class AbstractCommandExecutor {
         processBuilder.redirectErrorStream(true);
 
         // setting up user to run commands
-        command.add("sudo");
-        command.add("-u");
-        command.add(taskExecutionContext.getTenantCode());
+        if (CommonUtils.isSudoEnable()) {
+            command.add("sudo");
+            command.add("-u");
+            command.add(taskExecutionContext.getTenantCode());
+        }
         command.add(commandInterpreter());
         command.addAll(commandOptions());
         command.add(commandFile);
