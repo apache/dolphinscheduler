@@ -137,6 +137,7 @@
               size="mini"
               :loading="spinnerLoading"
               @click="_version"
+              :disabled="$route.params.id == null"
               icon="el-icon-info">
               {{spinnerLoading ? 'Loading...' : $t('Version Info')}}
             </el-button>
