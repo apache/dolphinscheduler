@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.exception.BaseException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -204,21 +205,13 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds is empty, single resourcemanager enabled
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
-        String appUrl = "";
-
-        if (StringUtils.isEmpty(rmHaIds)) {
-            //single resourcemanager enabled
-            appUrl = appAddress;
-            yarnEnabled = true;
-        } else {
-            //resourcemanager HA enabled
-            appUrl = getAppAddress(appAddress, rmHaIds);
-            yarnEnabled = true;
-            logger.info("application url : {}", appUrl);
-        }
-
+        yarnEnabled = true;
+        String appUrl = StringUtils.isEmpty(rmHaIds) ? appAddress : getAppAddress(appAddress, rmHaIds);
         if (StringUtils.isBlank(appUrl)) {
-            throw new Exception("application url is blank");
+            throw new BaseException("yarn application url generation failed");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         }
         return String.format(appUrl, applicationId);
     }
@@ -428,12 +421,7 @@ public class HadoopUtils implements Closeable {
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
-        String responseContent;
-        if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-            responseContent = KerberosHttpClient.get(applicationUrl);
-        } else {
-            responseContent = HttpUtils.get(applicationUrl);
-        }
+        String responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
             if (!jsonObject.has("app")) {
@@ -445,7 +433,8 @@ public class HadoopUtils implements Closeable {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
-            responseContent = HttpUtils.get(jobHistoryUrl);
+            responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
+
             if (null != responseContent) {
                 ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
                 if (!jsonObject.has("job")) {
@@ -601,6 +590,10 @@ public class HadoopUtils implements Closeable {
         //get active ResourceManager
         String activeRM = YarnHAAdminUtils.getAcitveRMName(rmHa);
 
+        if (StringUtils.isEmpty(activeRM)) {
+            return null;
+        }
+
         String[] split1 = appAddress.split(Constants.DOUBLE_SLASH);
 
         if (split1.length != 2) {
@@ -664,12 +657,7 @@ public class HadoopUtils implements Closeable {
                 }
 
             } catch (Exception e) {
-                for (int i = 1; i < rmIdArr.length; i++) {
-                    String  state = getRMState(String.format(yarnUrl, rmIdArr[i]));
-                    if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                        return rmIdArr[i];
-                    }
-                }
+                logger.error("yarn ha application url generation failed, message:{}", e.getMessage());
             }
             return null;
         }
@@ -682,7 +670,7 @@ public class HadoopUtils implements Closeable {
          */
         public static String getRMState(String url) {
 
-            String retStr = HttpUtils.get(url);
+            String retStr = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(url) : HttpUtils.get(url);
 
             if (StringUtils.isEmpty(retStr)) {
                 return null;

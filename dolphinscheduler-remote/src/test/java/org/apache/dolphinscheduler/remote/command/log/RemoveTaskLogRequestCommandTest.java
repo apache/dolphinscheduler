@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote;
+package org.apache.dolphinscheduler.remote.command.log;
 
-import junit.framework.Assert;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
+
 import org.junit.Test;
 
-public class RemoveTaskLogResponseCommandTest {
+import junit.framework.Assert;
+
+public class RemoveTaskLogRequestCommandTest {
 
     @Test
-    public void testConvert2Command(){
-        RemoveTaskLogRequestCommand removeTaskLogRequestCommand = new RemoveTaskLogRequestCommand();
-        removeTaskLogRequestCommand.setPath("/opt/zhangsan");
-        Command command = removeTaskLogRequestCommand.convert2Command();
+    public void testConvert2Command() {
+        RemoveTaskLogResponseCommand removeTaskLogResponseCommand = new RemoveTaskLogResponseCommand();
+        removeTaskLogResponseCommand.setStatus(true);
+        Command command = removeTaskLogResponseCommand.convert2Command(122);
         Assert.assertNotNull(command);
     }
 }

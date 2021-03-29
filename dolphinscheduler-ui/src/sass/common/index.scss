@@ -91,7 +91,7 @@ body{
         position: absolute;
         right: 8px;
         top: 13px;
-        .from-box {
+        .form-box {
           .list {
             float: right;
             margin-right: 4px;
@@ -365,6 +365,8 @@ body::-webkit-scrollbar-thumb {
 .el-dialog__body {
   padding: 10px;
 }
-
-
-
+.el-dialog__header {
+  .el-dialog__headerbtn {
+    right: 10px;
+  }
+}

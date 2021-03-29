@@ -181,6 +181,19 @@ public class UsersServiceTest {
     }
 
     @Test
+    public void testSelectByIds() {
+        List<Integer> ids = new ArrayList<>();
+        List<User> users = usersService.queryUser(ids);
+        Assert.assertTrue(users.isEmpty());
+        ids.add(1);
+        List<User> userList = new ArrayList<>();
+        userList.add(new User());
+        when(userMapper.selectByIds(ids)).thenReturn(userList);
+        List<User> userList1 = usersService.queryUser(ids);
+        Assert.assertFalse(userList1.isEmpty());
+    }
+
+    @Test
     public void testGetUserIdByName() {
         User user = new User();
         user.setId(1);
@@ -325,7 +338,6 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        when(resourceMapper.queryAuthorizedResourceList(1)).thenReturn(new ArrayList<Resource>());
         when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
         when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
         result = usersService.grantResources(loginUser, 1, resourceIds);

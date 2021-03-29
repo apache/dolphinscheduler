@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -41,14 +43,13 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-
-
-
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
-public class MasterServer {
+@EnableTransactionManagement
+public class MasterServer implements IStoppable {
 
     /**
      * logger of MasterServer
@@ -62,8 +63,8 @@ public class MasterServer {
     private MasterConfig masterConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -86,9 +87,8 @@ public class MasterServer {
     private MasterSchedulerService masterSchedulerService;
 
     /**
-     * master server startup
+     * master server startup, not use web service
      *
-     * master server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -100,9 +100,8 @@ public class MasterServer {
      * run master server
      */
     @PostConstruct
-    public void run(){
-
-        //init remoting server
+    public void run() {
+        // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -112,7 +111,7 @@ public class MasterServer {
         this.nettyRemotingServer.start();
 
         // self tolerant
-        this.zkMasterClient.start();
+        this.zkMasterClient.start(this);
 
         // scheduler start
         this.masterSchedulerService.start();
@@ -132,11 +131,10 @@ public class MasterServer {
         }
 
         /**
-         *  register hooks, which are called before the process exits
+         * register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
                 close("shutdownHook");
             }
         }));
@@ -145,13 +143,14 @@ public class MasterServer {
 
     /**
      * gracefully close
+     *
      * @param cause close cause
      */
     public void close(String cause) {
 
         try {
-            //execute only once
-            if(Stopper.isStopped()){
+            // execute only once
+            if (Stopper.isStopped()) {
                 return;
             }
 
@@ -161,26 +160,29 @@ public class MasterServer {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quietly stop
+                // thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
-            //
+            // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
             this.zkMasterClient.close();
-            //close quartz
-            try{
+            // close quartz
+            try {
                 QuartzExecutors.getInstance().shutdown();
                 logger.info("Quartz service stopped");
-            }catch (Exception e){
-                logger.warn("Quartz service stopped exception:{}",e.getMessage());
+            } catch (Exception e) {
+                logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
-            System.exit(-1);
         }
     }
-}
 
+    @Override
+    public void stop(String cause) {
+        close(cause);
+    }
+}

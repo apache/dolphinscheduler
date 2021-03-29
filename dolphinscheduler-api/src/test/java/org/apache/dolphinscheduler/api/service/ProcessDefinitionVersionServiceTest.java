@@ -63,6 +63,9 @@ public class ProcessDefinitionVersionServiceTest {
     @Mock
     private ProjectServiceImpl projectService;
 
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+
     @Test
     public void testAddProcessDefinitionVersion() {
         long expectedVersion = 5L;
@@ -181,6 +184,8 @@ public class ProcessDefinitionVersionServiceTest {
                 .thenReturn(1);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName))
                 .thenReturn(res);
+        Mockito.when(processDefinitionService.checkHasAssociatedProcessDefinition(processDefinitionId, version))
+                .thenReturn(false);
 
         Map<String, Object> resultMap2 = processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(
                 loginUser
@@ -190,6 +195,14 @@ public class ProcessDefinitionVersionServiceTest {
 
         Assert.assertEquals(Status.SUCCESS, resultMap2.get(Constants.STATUS));
 
+        Mockito.when(processDefinitionService.checkHasAssociatedProcessDefinition(processDefinitionId, version))
+                .thenReturn(true);
+        Map<String, Object> resultMap3 = processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(
+                loginUser
+                , projectName
+                , processDefinitionId
+                , version);
+        Assert.assertEquals(Status.PROCESS_DEFINITION_VERSION_IS_USED, resultMap3.get(Constants.STATUS));
     }
 
     /**
