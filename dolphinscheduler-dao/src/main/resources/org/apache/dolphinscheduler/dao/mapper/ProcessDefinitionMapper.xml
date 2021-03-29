@@ -49,7 +49,7 @@
         <include refid="baseSql"/>
         from t_ds_process_definition
         where 1 = 1
-        <if test="codes != null and codes.length != 0">
+        <if test="codes != null and codes.size() != 0">
             and code in
             <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
