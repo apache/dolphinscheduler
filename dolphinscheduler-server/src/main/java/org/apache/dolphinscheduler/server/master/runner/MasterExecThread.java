@@ -78,7 +78,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,8 +184,8 @@ public class MasterExecThread implements Runnable {
     /**
      * constructor of MasterExecThread
      *
-     * @param processInstance     processInstance
-     * @param processService      processService
+     * @param processInstance processInstance
+     * @param processService processService
      * @param nettyRemotingClient nettyRemotingClient
      */
     public MasterExecThread(ProcessInstance processInstance
@@ -388,7 +387,7 @@ public class MasterExecThread implements Runnable {
      */
     private void buildFlowDag() throws Exception {
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
-        List<TaskNode> taskNodeList = processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+        List<TaskNode> taskNodeList = processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion(), new HashMap<>());
         forbiddenTaskList.clear();
         taskNodeList.stream().forEach(taskNode -> {
             if (taskNode.isForbidden()) {
@@ -496,7 +495,7 @@ public class MasterExecThread implements Runnable {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param nodeName        node name
+     * @param nodeName node name
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
@@ -1274,10 +1273,10 @@ public class MasterExecThread implements Runnable {
     /**
      * generate flow dag
      *
-     * @param totalTaskNodeList     total task node list
-     * @param startNodeNameList     start node name list
-     * @param recoveryNodeNameList  recovery node name list
-     * @param depNodeType           depend node type
+     * @param totalTaskNodeList total task node list
+     * @param startNodeNameList start node name list
+     * @param recoveryNodeNameList recovery node name list
+     * @param depNodeType depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */
