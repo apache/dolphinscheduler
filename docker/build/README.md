@@ -122,6 +122,44 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script files if you don't understand
 
+## Support Matrix
+
+| Type                                                         | Support      | Notes                                 |
+| ------------------------------------------------------------ | ------------ | ------------------------------------- |
+| Shell                                                        | Yes          |                                       |
+| Python2                                                      | Yes          |                                       |
+| Python3                                                      | Indirect Yes | Refer to FAQ                          |
+| Hadoop2                                                      | Indirect Yes | Refer to FAQ                          |
+| Hadoop3                                                      | Not Sure     | Not tested                            |
+| Spark-Local(client)                                          | Indirect Yes | Refer to FAQ                          |
+| Spark-YARN(cluster)                                          | Indirect Yes | Refer to FAQ                          |
+| Spark-Mesos(cluster)                                         | Not Yet      |                                       |
+| Spark-Standalone(cluster)                                    | Not Yet      |                                       |
+| Spark-Kubernetes(cluster)                                    | Not Yet      |                                       |
+| Flink-Local(local>=1.11)                                     | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-YARN(yarn-cluster)                                     | Indirect Yes | Refer to FAQ                          |
+| Flink-YARN(yarn-session/yarn-per-job/yarn-application>=1.11) | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-Mesos(default)                                         | Not Yet      |                                       |
+| Flink-Mesos(remote>=1.11)                                    | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-Standalone(default)                                    | Not Yet      |                                       |
+| Flink-Standalone(remote>=1.11)                               | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-Kubernetes(default)                                    | Not Yet      |                                       |
+| Flink-Kubernetes(remote>=1.11)                               | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-NativeKubernetes(kubernetes-session/application>=1.11) | Not Yet      | Generic CLI mode is not yet supported |
+| MapReduce                                                    | Indirect Yes | Refer to FAQ                          |
+| Kerberos                                                     | Indirect Yes | Refer to FAQ                          |
+| HTTP                                                         | Yes          |                                       |
+| DataX                                                        | Indirect Yes | Refer to FAQ                          |
+| Sqoop                                                        | Indirect Yes | Refer to FAQ                          |
+| SQL-MySQL                                                    | Indirect Yes | Refer to FAQ                          |
+| SQL-PostgreSQL                                               | Yes          |                                       |
+| SQL-Hive                                                     | Indirect Yes | Refer to FAQ                          |
+| SQL-Spark                                                    | Indirect Yes | Refer to FAQ                          |
+| SQL-ClickHouse                                               | Indirect Yes | Refer to FAQ                          |
+| SQL-Oracle                                                   | Indirect Yes | Refer to FAQ                          |
+| SQL-SQLServer                                                | Indirect Yes | Refer to FAQ                          |
+| SQL-DB2                                                      | Indirect Yes | Refer to FAQ                          |
+
 ## Environment Variables
 
 The DolphinScheduler Docker container is configured through environment variables, and the default value will be used if an environment variable is not set.

@@ -122,6 +122,44 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。
 
+## 支持矩阵
+
+| Type                                                         | 支持     | 备注                  |
+| ------------------------------------------------------------ | ------- | --------------------- |
+| Shell                                                        | 是      |                       |
+| Python2                                                      | 是      |                       |
+| Python3                                                      | 间接支持 | 详见 FAQ               |
+| Hadoop2                                                      | 间接支持 | 详见 FAQ               |
+| Hadoop3                                                      | 尚未确定 | 尚未测试                |
+| Spark-Local(client)                                          | 间接支持 | 详见 FAQ               |
+| Spark-YARN(cluster)                                          | 间接支持 | 详见 FAQ               |
+| Spark-Mesos(cluster)                                         | 尚不    |                        |
+| Spark-Standalone(cluster)                                    | 尚不    |                        |
+| Spark-Kubernetes(cluster)                                    | 尚不    |                        |
+| Flink-Local(local>=1.11)                                     | 尚不    | Generic CLI 模式尚未支持 |
+| Flink-YARN(yarn-cluster)                                     | 间接支持 | 详见 FAQ               |
+| Flink-YARN(yarn-session/yarn-per-job/yarn-application>=1.11) | 尚不    | Generic CLI 模式尚未支持 |
+| Flink-Mesos(default)                                         | 尚不    |                        |
+| Flink-Mesos(remote>=1.11)                                    | 尚不    | Generic CLI 模式尚未支持 |
+| Flink-Standalone(default)                                    | 尚不    |                        |
+| Flink-Standalone(remote>=1.11)                               | 尚不    | Generic CLI 模式尚未支持 |
+| Flink-Kubernetes(default)                                    | 尚不    |                        |
+| Flink-Kubernetes(remote>=1.11)                               | 尚不    | Generic CLI 模式尚未支持 |
+| Flink-NativeKubernetes(kubernetes-session/application>=1.11) | 尚不    | Generic CLI 模式尚未支持 |
+| MapReduce                                                    | 间接支持 | 详见 FAQ               |
+| Kerberos                                                     | 间接支持 | 详见 FAQ               |
+| HTTP                                                         | 是      |                       |
+| DataX                                                        | 间接支持 | 详见 FAQ               |
+| Sqoop                                                        | 间接支持 | 详见 FAQ               |
+| SQL-MySQL                                                    | 间接支持 | 详见 FAQ               |
+| SQL-PostgreSQL                                               | 是      |                       |
+| SQL-Hive                                                     | 间接支持 | 详见 FAQ               |
+| SQL-Spark                                                    | 间接支持 | 详见 FAQ               |
+| SQL-ClickHouse                                               | 间接支持 | 详见 FAQ               |
+| SQL-Oracle                                                   | 间接支持 | 详见 FAQ               |
+| SQL-SQLServer                                                | 间接支持 | 详见 FAQ               |
+| SQL-DB2                                                      | 间接支持 | 详见 FAQ               |
+
 ## 环境变量
 
 DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会使用默认值
