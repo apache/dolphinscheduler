@@ -43,10 +43,12 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
 })
+@EnableTransactionManagement
 public class MasterServer implements IStoppable {
 
     /**
