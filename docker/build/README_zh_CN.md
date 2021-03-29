@@ -509,29 +509,26 @@ docker stack rm dolphinscheduler
 
 ### 如何用 MySQL 替代 PostgreSQL 作为 DolphinScheduler 的数据库？
 
-> 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包和客户端.
+> 由于商业许可证的原因，我们不能直接使用 MySQL 的驱动包.
 >
 > 如果你要使用 MySQL, 你可以基于官方镜像 `apache/dolphinscheduler` 进行构建.
 
 1. 下载 MySQL 驱动包 [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (要求 `>=5.1.47`)
 
-2. 创建一个新的 `Dockerfile`，用于添加 MySQL 的驱动包和客户端:
+2. 创建一个新的 `Dockerfile`，用于添加 MySQL 的驱动包:
 
 ```
 FROM apache/dolphinscheduler:latest
 COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends default-mysql-client && \
-    rm -rf /var/lib/apt/lists/*
 ```
 
-3. 构建一个包含 MySQL 的驱动包和客户端的新镜像:
+3. 构建一个包含 MySQL 驱动包的新镜像:
 
 ```
-docker build -t apache/dolphinscheduler:mysql .
+docker build -t apache/dolphinscheduler:mysql-driver .
 ```
 
-4. 修改 `docker-compose.yml` 文件中的所有 image 字段为 `apache/dolphinscheduler:mysql`
+4. 修改 `docker-compose.yml` 文件中的所有 image 字段为 `apache/dolphinscheduler:mysql-driver`
 
 > 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
 

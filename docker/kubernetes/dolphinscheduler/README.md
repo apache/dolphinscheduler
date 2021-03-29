@@ -316,31 +316,28 @@ The configuration file is `values.yaml`, and the following tables lists the conf
 
 ### How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?
 
-> Because of the commercial license, we cannot directly use the driver and client of MySQL.
+> Because of the commercial license, we cannot directly use the driver of MySQL.
 >
 > If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image as follows.
 
 1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
 
-2. Create a new `Dockerfile` to add MySQL driver and client:
+2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
 FROM apache/dolphinscheduler:latest
 COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends default-mysql-client && \
-    rm -rf /var/lib/apt/lists/*
 ```
 
-3. Build a new docker image including MySQL driver and client:
+3. Build a new docker image including MySQL driver:
 
 ```
-docker build -t apache/dolphinscheduler:mysql .
+docker build -t apache/dolphinscheduler:mysql-driver .
 ```
 
-4. Push the docker image `apache/dolphinscheduler:mysql` to a docker registry
+4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry
 
-5. Modify image `repository` and update `tag` to `mysql` in `values.yaml`
+5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`
 
 6. Modify postgresql `enabled` to `false`
 

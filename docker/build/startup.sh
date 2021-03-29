@@ -27,7 +27,7 @@ export LOGGER_START_ENABLED=false
 
 # wait database
 waitDatabase() {
-    echo "test ${DATABASE_TYPE} service"
+    echo "try to connect ${DATABASE_TYPE} ..."
     while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
         local counter=$((counter+1))
         if [ $counter == 30 ]; then
@@ -37,21 +37,7 @@ waitDatabase() {
         echo "Trying to connect to ${DATABASE_TYPE} at ${DATABASE_HOST}:${DATABASE_PORT}. Attempt $counter."
         sleep 5
     done
-
-    echo "connect ${DATABASE_TYPE} service"
-    if [ ${DATABASE_TYPE} = "mysql" ]; then
-        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "select 1" 2>&1)
-        if [ "$(echo ${v} | grep 'ERROR' | wc -l)" -eq 1 ]; then
-            echo "Error: Can't connect to database...${v}"
-            exit 1
-        fi
-    else
-        v=$(PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
-        if [ "$(echo ${v} | grep 'FATAL' | wc -l)" -eq 1 ]; then
-            echo "Error: Can't connect to database...${v}"
-            exit 1
-        fi
-    fi
+    echo "${DATABASE_TYPE} connection is ok"
 }
 
 # init database
@@ -60,38 +46,9 @@ initDatabase() {
     ${DOLPHINSCHEDULER_HOME}/script/create-dolphinscheduler.sh
 }
 
-# check ds version
-checkDSVersion() {
-    if [ ${DATABASE_TYPE} = "mysql" ]; then
-        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "SELECT * FROM t_ds_version" 2>/dev/null)
-    else
-        v=$(PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "SELECT * FROM public.t_ds_version" 2>/dev/null)
-    fi
-    if [ -n "$v" ]; then
-        echo "ds version: $v"
-        return 0
-    else
-        return 1
-    fi
-}
-
-# check init database
-checkInitDatabase() {
-    echo "check init database"
-    while ! checkDSVersion; do
-        local counter=$((counter+1))
-        if [ $counter == 30 ]; then
-            echo "Error: Couldn't check init database."
-            exit 1
-        fi
-        echo "Trying to check init database. Attempt $counter."
-        sleep 5
-    done
-}
-
 # wait zk
 waitZK() {
-    echo "connect remote zookeeper"
+    echo "try to connect zookeeper ..."
     echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
         while ! nc -z ${line%:*} ${line#*:}; do
             local counter=$((counter+1))
@@ -103,6 +60,7 @@ waitZK() {
             sleep 5
         done
     done
+    echo "zookeeper connection is ok"
 }
 
 # print usage
@@ -150,7 +108,6 @@ case "$1" in
     ;;
     (alert-server)
         waitDatabase
-        checkInitDatabase
         export ALERT_START_ENABLED=true
     ;;
     (help)
