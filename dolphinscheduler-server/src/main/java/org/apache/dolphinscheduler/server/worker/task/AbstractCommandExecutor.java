@@ -289,7 +289,7 @@ public abstract class AbstractCommandExecutor {
             }
         }
 
-        return process.isAlive();
+        return !process.isAlive();
     }
 
     /**
