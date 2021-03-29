@@ -46,7 +46,7 @@ export default {
   Minute: '分',
   'Delay execution time': '延时执行时间',
   'Delay execution': '延时执行',
-  'Forced success': '强制成功过',
+  'Forced success': '强制成功',
   Cancel: '取消',
   'Confirm add': '确认添加',
   'The newly created sub-Process has not yet been executed and cannot enter the sub-Process': '新创建子工作流还未执行，不能进入子工作流',

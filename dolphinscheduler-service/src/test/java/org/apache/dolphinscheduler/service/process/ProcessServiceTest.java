@@ -503,4 +503,19 @@ public class ProcessServiceTest {
         Assert.assertEquals(processDefinitionJson, json);
 
     }
+
+    @Test
+    public void locationToMap() {
+        String locations = "{\"tasks-64888\":{\"name\":\"test_a\",\"targetarr\":\"\",\"nodenumber\":\"1\",\"x\":134,\"y\":183},"
+                + "\"tasks-24501\":{\"name\":\"test_b\",\"targetarr\":\"tasks-64888\",\"nodenumber\":\"0\",\"x\":392,\"y\":184},"
+                + "\"tasks-81137\":{\"name\":\"test_c\",\"targetarr\":\"\",\"nodenumber\":\"1\",\"x\":122,\"y\":327},"
+                + "\"tasks-41367\":{\"name\":\"test_d\",\"targetarr\":\"tasks-81137\",\"nodenumber\":\"0\",\"x\":409,\"y\":324}}";
+        Map<String, String> frontTaskIdAndNameMap = new HashMap<>();
+        frontTaskIdAndNameMap.put("test_a", "tasks-64888");
+        frontTaskIdAndNameMap.put("test_b", "tasks-24501");
+        frontTaskIdAndNameMap.put("test_c", "tasks-81137");
+        frontTaskIdAndNameMap.put("test_d", "tasks-41367");
+        Map<String, String> locationToMap = processService.locationToMap(locations);
+        Assert.assertEquals(frontTaskIdAndNameMap, locationToMap);
+    }
 }
