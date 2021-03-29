@@ -574,7 +574,7 @@ COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
 docker build -t apache/dolphinscheduler:mysql-driver .
 ```
 
-4. 将 `docker-compose.yml` 文件中的所有 image 字段 修改为 `apache/dolphinscheduler:mysql-driver`
+4. 将 `docker-compose.yml` 文件中的所有 `image` 字段修改为 `apache/dolphinscheduler:mysql-driver`
 
 > 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
 
@@ -603,12 +603,132 @@ COPY ojdbc8-19.9.0.0.jar /opt/dolphinscheduler/lib
 docker build -t apache/dolphinscheduler:oracle-driver .
 ```
 
-4. 将 `docker-compose.yml` 文件中的所有 image 字段 修改为 `apache/dolphinscheduler:oracle-driver`
+4. 将 `docker-compose.yml` 文件中的所有 `image` 字段修改为 `apache/dolphinscheduler:oracle-driver`
 
 > 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
 
 5. 运行 dolphinscheduler (详见**如何使用docker镜像**)
 
 6. 在数据源中心添加一个 Oracle 数据源
+
+### 如何支持 Python 2 pip 以及自定义 requirements.txt?
+
+1. 创建一个新的 `Dockerfile`，用于安装 pip:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY requirements.txt /tmp
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python-pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+这个命令会安装默认的 **pip 18.1**. 如果你想升级 pip, 只需添加一行
+
+```
+    pip install --no-cache-dir -U pip && \
+```
+
+2. 构建一个包含 pip 的新镜像:
+
+```
+docker build -t apache/dolphinscheduler:pip .
+```
+
+3. 将 `docker-compose.yml` 文件中的所有 `image` 字段修改为 `apache/dolphinscheduler:pip`
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+4. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+5. 在一个新 Python 任务下验证 pip
+
+### 如何支持 Python 3？
+
+1. 创建一个新的 `Dockerfile`，用于安装 Python 3:
+
+```
+FROM apache/dolphinscheduler:latest
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+这个命令会安装默认的 **Python 3.7.3**. 如果你也想安装 **pip3**, 将 `python3` 替换为 `python3-pip` 即可
+
+```
+    apt-get install -y --no-install-recommends python3-pip && \
+```
+
+2. 构建一个包含 Python 3 的新镜像:
+
+```
+docker build -t apache/dolphinscheduler:python3 .
+```
+
+3. 将 `docker-compose.yml` 文件中的所有 `image` 字段修改为 `apache/dolphinscheduler:python3`
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+4. 修改 `config.env.sh` 文件中的 `PYTHON_HOME` 为 `/usr/bin/python3`
+
+5. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+6. 在一个新 Python 任务下验证 Python 3
+
+### 如何支持 Hadoop, Spark, Flink, Hive 或 DataX？
+
+以 Spark 2.4.7 为例:
+
+1. 下载 Spark 2.4.7 发布的二进制包 `spark-2.4.7-bin-hadoop2.7.tgz`
+
+2. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+3. 复制 Spark 2.4.7 二进制包到 Docker 容器中
+
+```bash
+docker cp spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker:/opt/soft
+```
+
+因为存储卷 `dolphinscheduler-shared-local` 被挂载到 `/opt/soft`, 因此 `/opt/soft` 中的所有文件都不会丢失
+
+4. 登录到容器并确保 `SPARK_HOME2` 存在
+
+```bash
+docker exec -it dolphinscheduler-worker bash
+cd /opt/soft
+tar zxf spark-2.4.7-bin-hadoop2.7.tgz
+rm -f spark-2.4.7-bin-hadoop2.7.tgz
+ln -s spark-2.4.7-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+如果一切执行正常，最后一条命令将会打印 Spark 版本信息
+
+5. 在一个 Shell 任务下验证 Spark
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.11-2.4.7.jar
+```
+
+检查任务日志是否包含输出 `Pi is roughly 3.146015`
+
+6. 在一个 Spark 任务下验证 Spark
+
+文件 `spark-examples_2.11-2.4.7.jar` 需要先被上传到资源中心，然后创建一个 Spark 任务并设置:
+
+- Spark版本: `SPARK2`
+- 主函数的Class: `org.apache.spark.examples.SparkPi`
+- 主程序包: `spark-examples_2.11-2.4.7.jar`
+- 部署方式: `local`
+
+同样地, 检查任务日志是否包含输出 `Pi is roughly 3.146015`
+
+7. 验证 Spark on YARN
+
+Spark on YARN (部署方式为 `cluster` 或 `client`) 需要 Hadoop 支持. 类似于 Spark 支持, 支持 Hadoop 的操作几乎和前面的步骤相同
+
+确保 `$HADOOP_HOME` 和 `$HADOOP_CONF_DIR` 存在
 
 更多信息请查看 [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) 文档.

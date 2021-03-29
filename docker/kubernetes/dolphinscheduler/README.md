@@ -415,4 +415,129 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 7. Add a Oracle datasource in `Datasource manage`
 
+### How to support Python 2 pip and custom requirements.txt?
+
+1. Create a new `Dockerfile` to install pip:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY requirements.txt /tmp
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python-pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+The command will install the default **pip 18.1**. If you upgrade the pip, just add one line
+
+```
+    pip install --no-cache-dir -U pip && \
+```
+
+2. Build a new docker image including pip:
+
+```
+docker build -t apache/dolphinscheduler:pip .
+```
+
+3. Push the docker image `apache/dolphinscheduler:pip` to a docker registry
+
+4. Modify image `repository` and update `tag` to `pip` in `values.yaml`
+
+5. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+6. Verify pip under a new Python task
+
+### How to support Python 3?
+
+1. Create a new `Dockerfile` to install Python 3:
+
+```
+FROM apache/dolphinscheduler:latest
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+The command will install the default **Python 3.7.3**. If you also want to install **pip3**, just replace `python3` with `python3-pip` like
+
+```
+    apt-get install -y --no-install-recommends python3-pip && \
+```
+
+2. Build a new docker image including Python 3:
+
+```
+docker build -t apache/dolphinscheduler:python3 .
+```
+
+3. Push the docker image `apache/dolphinscheduler:python3` to a docker registry
+
+4. Modify image `repository` and update `tag` to `python3` in `values.yaml`
+
+5. Modify `PYTHON_HOME` to `/usr/bin/python3` in `values.yaml`
+
+6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+7. Verify Python 3 under a new Python task
+
+### How to support Hadoop, Spark, Flink, Hive or DataX?
+
+Take Spark 2.4.7 as an example:
+
+1. Download the Spark 2.4.7 release binary `spark-2.4.7-bin-hadoop2.7.tgz`
+
+2. Ensure that `common.sharedStoragePersistence.enabled` is turned on
+
+3. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+4. Copy the Spark 2.4.7 release binary into Docker container
+
+```bash
+kubectl cp spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
+kubectl cp -n test spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
+```
+
+Because the volume `sharedStoragePersistence` is mounted on `/opt/soft`, all files in `/opt/soft` will not be lost
+
+5. Attach the container and ensure that `SPARK_HOME2` exists
+
+```bash
+kubectl exec -it dolphinscheduler-worker-0 bash
+kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
+cd /opt/soft
+tar zxf spark-2.4.7-bin-hadoop2.7.tgz
+rm -f spark-2.4.7-bin-hadoop2.7.tgz
+ln -s spark-2.4.7-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+The last command will print Spark version if everything goes well
+
+6. Verify Spark under a Shell task
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.11-2.4.7.jar
+```
+
+Check whether the task log contains the output like `Pi is roughly 3.146015`
+
+7. Verify Spark under a Spark task
+
+The file `spark-examples_2.11-2.4.7.jar` needs to be uploaded to the resources first, and then create a Spark task with:
+
+- Spark Version: `SPARK2`
+- Main Class: `org.apache.spark.examples.SparkPi`
+- Main Package: `spark-examples_2.11-2.4.7.jar`
+- Deploy Mode: `local`
+
+Similarly, check whether the task log contains the output like `Pi is roughly 3.146015`
+
+8. Verify Spark on YARN
+
+Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Similar to Spark support, the operation of supporting Hadoop is almost the same as the previous steps
+
+Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
+
 For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+
