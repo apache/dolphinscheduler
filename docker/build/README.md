@@ -292,7 +292,7 @@ This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/pyt
 
 **`JAVA_HOME`**
 
-This environment variable sets `JAVA_HOME`. The default value is `/usr/lib/jvm/java-1.8-openjdk`.
+This environment variable sets `JAVA_HOME`. The default value is `/usr/local/openjdk-8`.
 
 **`HIVE_HOME`**
 
@@ -520,7 +520,9 @@ docker stack rm dolphinscheduler
 ```
 FROM apache/dolphinscheduler:latest
 COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
-RUN apk add --update --no-cache mysql-client
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends default-mysql-client && \
+    rm -rf /var/lib/apt/lists/*
 ```
 
 3. Build a new docker image including MySQL driver and client:

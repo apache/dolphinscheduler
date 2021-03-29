@@ -147,7 +147,7 @@ The configuration file is `values.yaml`, and the following tables lists the conf
 | `common.configmap.SPARK_HOME1`                                                    | Set `SPARK_HOME1` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark1`                                    |
 | `common.configmap.SPARK_HOME2`                                                    | Set `SPARK_HOME2` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark2`                                    |
 | `common.configmap.PYTHON_HOME`                                                    | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                      | `/usr/bin/python`                                     |
-| `common.configmap.JAVA_HOME`                                                      | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                        | `/usr/lib/jvm/java-1.8-openjdk`                       |
+| `common.configmap.JAVA_HOME`                                                      | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                        | `/usr/local/openjdk-8`                                |
 | `common.configmap.HIVE_HOME`                                                      | Set `HIVE_HOME` for DolphinScheduler's task environment                                                                        | `/opt/soft/hive`                                      |
 | `common.configmap.FLINK_HOME`                                                     | Set `FLINK_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/flink`                                     |
 | `common.configmap.DATAX_HOME`                                                     | Set `DATAX_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/datax`                                     |
@@ -327,7 +327,9 @@ The configuration file is `values.yaml`, and the following tables lists the conf
 ```
 FROM apache/dolphinscheduler:latest
 COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
-RUN apk add --update --no-cache mysql-client
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends default-mysql-client && \
+    rm -rf /var/lib/apt/lists/*
 ```
 
 3. Build a new docker image including MySQL driver and client:

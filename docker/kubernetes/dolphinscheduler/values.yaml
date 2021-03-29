@@ -96,7 +96,7 @@ common:
     SPARK_HOME1: "/opt/soft/spark1"
     SPARK_HOME2: "/opt/soft/spark2"
     PYTHON_HOME: "/usr/bin/python"
-    JAVA_HOME: "/usr/lib/jvm/java-1.8-openjdk"
+    JAVA_HOME: "/usr/local/openjdk-8"
     HIVE_HOME: "/opt/soft/hive"
     FLINK_HOME: "/opt/soft/flink"
     DATAX_HOME: "/opt/soft/datax"

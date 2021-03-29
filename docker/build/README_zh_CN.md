@@ -292,7 +292,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`JAVA_HOME`**
 
-配置`dolphinscheduler`的`JAVA_HOME`，默认值 `/usr/lib/jvm/java-1。8-openjdk`。
+配置`dolphinscheduler`的`JAVA_HOME`，默认值 `/usr/local/openjdk-8`。
 
 **`HIVE_HOME`**
 
@@ -520,7 +520,9 @@ docker stack rm dolphinscheduler
 ```
 FROM apache/dolphinscheduler:latest
 COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
-RUN apk add --update --no-cache mysql-client
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends default-mysql-client && \
+    rm -rf /var/lib/apt/lists/*
 ```
 
 3. 构建一个包含 MySQL 的驱动包和客户端的新镜像:
