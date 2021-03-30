@@ -693,6 +693,7 @@
       }
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
+        this.code = o.code
         this.name = o.name
         this.taskInstancePriority = o.taskInstancePriority
         this.runFlag = o.runFlag || 'NORMAL'
@@ -766,6 +767,7 @@
         return {
           type: this.nodeData.taskType,
           id: this.nodeData.id,
+          code: this.code,
           name: this.name,
           desc: this.desc,
           runFlag: this.runFlag,
