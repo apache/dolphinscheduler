@@ -527,5 +527,14 @@ export default {
         reject(e)
       })
     })
+  },
+  getWorkerAddresses ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('worker-group/worker-address-list', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

@@ -317,4 +317,17 @@ public class WorkerGroupService extends BaseService {
         return result;
     }
 
+    /**
+     * query all worker address list
+     *
+     * @return all worker address list
+     */
+    public Map<String, Object> getWorkerAddressList() {
+        Map<String, Object> result = new HashMap<>();
+        List<String> serverNodeList = zookeeperMonitor.getServerNodeList(ZKNodeType.WORKER, true);
+        result.put(Constants.DATA_LIST, serverNodeList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
 }

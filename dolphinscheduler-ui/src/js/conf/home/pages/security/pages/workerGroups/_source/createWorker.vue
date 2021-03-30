@@ -36,15 +36,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Worker Addresses')}}</template>
           <template slot="content">
-            <x-input
-                    :autosize="{ minRows: 4, maxRows: 6 }"
-                    type="textarea"
-                    v-model.trim="addrList"
-                    :placeholder="$t('Please enter the worker addresses separated by commas')">
-            </x-input>
-            <div class="cwm-tip">
-              <span>{{$t('Note: Multiple worker addresses have been comma separated')}}</span>
-            </div>
+            <treeselect :options="this.workerAddressList" v-model="addrList" :multiple="true" :placeholder="$t('Please select the worker addresses')"></treeselect>
           </template>
         </m-list-box-f>
       </div>
@@ -56,6 +48,8 @@
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
   export default {
     name: 'create-warning',
@@ -64,11 +58,12 @@
         store,
         id: 0,
         name: '',
-        addrList: ''
+        addrList: []
       }
     },
     props: {
-      item: Object
+      item: Object,
+      workerAddressList: Object
     },
     methods: {
       _ok () {
@@ -77,26 +72,14 @@
           this._submit()
         }
       },
-      checkIpAndPorts (addrs) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):\d{1,5}$/
-        return addrs.split(',').every(item => reg.test(item))
-      },
-      checkFqdnAndPorts (addrs) {
-        let reg = /^([\w-]+\.)*[\w-]+:\d{1,5}$/i
-        return addrs.split(',').every(item => reg.test(item))
-      },
       _verification () {
         // group name
         if (!this.name) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (!this.addrList) {
+        if (!this.addrList.length) {
           this.$message.warning(`${i18n.$t('Worker addresses cannot be empty')}`)
-          return false
-        }
-        if (!this.checkIpAndPorts(this.addrList) && !this.checkFqdnAndPorts(this.addrList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct worker addresses')}`)
           return false
         }
         return true
@@ -105,7 +88,7 @@
         let param = {
           id: this.id,
           name: this.name,
-          addrList: this.addrList
+          addrList: this.addrList.join(',')
         }
         if (this.item) {
           param.id = this.item.id
@@ -128,20 +111,11 @@
       if (this.item) {
         this.id = this.item.id
         this.name = this.item.name
-        this.addrList = this.item.addrList
+        this.addrList = this.item.addrList.split(',')
       }
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopup, mListBoxF, Treeselect }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .create-worker-model {
-    .cwm-tip {
-      color: #999;
-      padding-top: 4px;
-      display: block;
-    }
-  }
-</style>
