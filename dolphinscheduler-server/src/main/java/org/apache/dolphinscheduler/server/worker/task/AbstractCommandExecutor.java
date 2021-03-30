@@ -358,9 +358,8 @@ public abstract class AbstractCommandExecutor {
             try {
                 inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
-                logBuffer.add("welcome to use bigdata scheduling system...");
                 while ((line = inReader.readLine()) != null) {
-                        logBuffer.add(line);
+                    logBuffer.add(line);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -379,7 +378,6 @@ public abstract class AbstractCommandExecutor {
                         lastFlushTime = flush(lastFlushTime);
                     } else {
                         Thread.sleep(Constants.DEFAULT_LOG_FLUSH_INTERVAL);
-
                     }
                 }
             } catch (Exception e) {
