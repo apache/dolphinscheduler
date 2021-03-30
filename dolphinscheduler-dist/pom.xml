@@ -204,7 +204,7 @@
                         <configuration>
                             <name>apache-dolphinscheduler</name>
                             <release>1</release>
-                            <distribution>apache dolphinscheduler incubating rpm</distribution>
+                            <distribution>apache dolphinscheduler rpm</distribution>
                             <group>apache</group>
                             <packager>dolphinscheduler</packager>
                             <!-- <version>${project.version}</version> -->
