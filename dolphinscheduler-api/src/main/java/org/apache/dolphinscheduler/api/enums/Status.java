@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
+
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  *  status enum
@@ -180,6 +180,11 @@ public enum Status {
     DATASOURCE_OTHER_PARAMS_ILLEGAL(10171, "datasource other params illegal", "数据源其他参数不合法"),
     DATASOURCE_NAME_ILLEGAL(10172, "datasource name illegal", "数据源名称不合法"),
     DATASOURCE_HOST_ILLEGAL(10173, "datasource host illegal", "数据源HOST不合法"),
+    DELETE_WORKER_GROUP_NOT_EXIST(10174, "delete worker group not exist ", "删除worker分组不存在"),
+    CREATE_WORKER_GROUP_FORBIDDEN_IN_DOCKER(10175, "create worker group forbidden in docker ", "创建worker分组在docker中禁止"),
+    DELETE_WORKER_GROUP_FORBIDDEN_IN_DOCKER(10176, "delete worker group forbidden in docker ", "删除worker分组在docker中禁止"),
+    WORKER_ADDRESS_INVALID(10177, "worker address {0} invalid", "worker地址[{0}]无效"),
+    QUERY_WORKER_ADDRESS_LIST_FAIL(10178, "query worker address list fail ", "查询worker地址列表失败"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),

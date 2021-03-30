@@ -760,8 +760,8 @@ public final class Constants {
     /**
      * master/worker server use for zk
      */
-    public static final String MASTER_PREFIX = "master";
-    public static final String WORKER_PREFIX = "worker";
+    public static final String MASTER_TYPE = "master";
+    public static final String WORKER_TYPE = "worker";
     public static final String DELETE_ZK_OP = "delete";
     public static final String ADD_ZK_OP = "add";
     public static final String ALIAS = "alias";

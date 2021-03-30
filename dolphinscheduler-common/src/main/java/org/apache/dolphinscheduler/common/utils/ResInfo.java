@@ -112,4 +112,17 @@ public class ResInfo {
         return masterServer;
     }
 
+    /**
+     * is valid heartbeat info for zk
+     * @param heartBeatInfo heartbeat info
+     * @return heartbeat info is valid
+     */
+    public static boolean isValidHeartbeatForZKInfo(String heartBeatInfo) {
+        if (StringUtils.isNotEmpty(heartBeatInfo)) {
+            String[] parts = heartBeatInfo.split(Constants.COMMA);
+            return parts.length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
+        }
+        return false;
+    }
+
 }

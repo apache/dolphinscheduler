@@ -14,17 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.dao.mapper;
+
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
- * zk node type
+ * worker group mapper interface
  */
-public enum ZKNodeType {
+public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
     /**
-     * 0 master node;
-     * 1 worker node;
-     * 2 dead_server node;
+     * query all worker group
+     * @return worker group list
      */
-    MASTER, WORKER, DEAD_SERVER;
+    List<WorkerGroup> queryAllWorkerGroup();
+
+    /**
+     * query worer grouop by name
+     * @param name name
+     * @return worker group list
+     */
+    List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
+
 }

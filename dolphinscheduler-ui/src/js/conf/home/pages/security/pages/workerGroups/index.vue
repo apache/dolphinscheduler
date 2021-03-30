@@ -17,7 +17,11 @@
 <template>
   <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
-      <m-conditions @on-conditions="_onConditions"></m-conditions>
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group" v-if="isADMIN">
+          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create worker group')}}</x-button>
+        </template>
+      </m-conditions>
     </template>
     <template slot="content">
       <template v-if="workerGroupList.length || total>0">
@@ -57,6 +61,7 @@
         total: null,
         isLoading: false,
         workerGroupList: [],
+        workerAddressList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
@@ -68,7 +73,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getWorkerGroups']),
+      ...mapActions('security', ['getWorkerGroups', 'getWorkerAddresses']),
       /**
        * Inquire
        */
@@ -108,7 +113,8 @@
                 }
               },
               props: {
-                item: item
+                item: item,
+                workerAddressList: self.workerAddressList
               }
             })
           }
@@ -128,6 +134,11 @@
         }).catch(e => {
           this.isLoading = false
         })
+      },
+      _getWorkerAddressList () {
+        this.getWorkerAddresses().then(res => {
+          this.workerAddressList = res.data.map(x => ({ id: x, label: x }))
+        })
       }
     },
     watch: {
@@ -137,7 +148,9 @@
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
-    created () {},
+    created () {
+      this._getWorkerAddressList()
+    },
     mounted () {
       this.$modal.destroy()
     },

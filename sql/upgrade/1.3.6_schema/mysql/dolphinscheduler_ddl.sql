@@ -15,28 +15,26 @@
  * limitations under the License.
 */
 
--- uc_dolphin_T_t_ds_worker_group_A_ip_list
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
+-- uc_dolphin_T_t_ds_worker_group_R_ip_list
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_worker_group_R_ip_list;
 delimiter d//
-CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_worker_group_A_ip_list() RETURNS void AS $$
+CREATE PROCEDURE uc_dolphin_T_t_ds_worker_group_R_ip_list()
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
         WHERE TABLE_NAME='t_ds_worker_group'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
         AND COLUMN_NAME ='ip_list')
     THEN
-        ALTER TABLE t_ds_worker_group RENAME ip_list TO addr_list;
-        ALTER TABLE t_ds_worker_group ALTER COLUMN addr_list type text;
-        ALTER TABLE t_ds_worker_group ALTER COLUMN name type varchar(256), ALTER COLUMN name SET NOT NULL;
-        ALTER TABLE t_ds_worker_group ADD CONSTRAINT name_unique UNIQUE (name);
+        ALTER TABLE t_ds_worker_group CHANGE COLUMN `ip_list` `addr_list` text;
+        ALTER TABLE t_ds_worker_group MODIFY COLUMN `name` varchar(256) NOT NULL;
+        ALTER TABLE t_ds_worker_group ADD UNIQUE KEY `name_unique` (`name`);
     END IF;
 END;
-$$ LANGUAGE plpgsql;
+
 d//
 
 delimiter ;
-SELECT uc_dolphin_T_t_ds_worker_group_A_ip_list();
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_worker_group_A_ip_list();
-delimiter ;
-
--- Add foreign key constraints for t_ds_task_instance --
-ALTER TABLE t_ds_task_instance ADD CONSTRAINT foreign_key_instance_id  FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE;
-
+CALL uc_dolphin_T_t_ds_worker_group_R_ip_list;
+DROP PROCEDURE uc_dolphin_T_t_ds_worker_group_R_ip_list;

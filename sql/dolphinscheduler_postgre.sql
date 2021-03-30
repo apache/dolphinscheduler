@@ -648,11 +648,12 @@ create index version_index on t_ds_version(version);
 DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
-  name varchar(256) DEFAULT NULL ,
-  ip_list varchar(256) DEFAULT NULL ,
+  name varchar(256) NOT NULL ,
+  addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id) ,
+  CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
 --

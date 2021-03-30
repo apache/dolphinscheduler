@@ -21,28 +21,25 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dolphinscheduler.server.registry.ServerNodeManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *  round robin host manager
+ *  common host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
-    private final Logger logger = LoggerFactory.getLogger(CommonHostManager.class);
-
     /**
-     * zookeeperNodeManager
+     * server node manager
      */
     @Autowired
-    protected ZookeeperNodeManager zookeeperNodeManager;
+    protected ServerNodeManager serverNodeManager;
 
     /**
      * select host
@@ -50,39 +47,37 @@ public abstract class CommonHostManager implements HostManager {
      * @return host
      */
     @Override
-    public Host select(ExecutionContext context){
-        Host host = new Host();
-        Collection<String> nodes = null;
-        /**
-         * executor type
-         */
+    public Host select(ExecutionContext context) {
+        List<Host> candidates = null;
+        String workerGroup = context.getWorkerGroup();
         ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
+        switch (executorType) {
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
+                candidates = getWorkerCandidates(workerGroup);
                 break;
             case CLIENT:
                 break;
             default:
                 throw new IllegalArgumentException("invalid executorType : " + executorType);
-
         }
-        if(CollectionUtils.isEmpty(nodes)){
-            return host;
-        }
-        List<Host> candidateHosts = new ArrayList<>(nodes.size());
-        nodes.stream().forEach(node -> candidateHosts.add(Host.of(node)));
 
-        return select(candidateHosts);
+        if (CollectionUtils.isEmpty(candidates)) {
+            return new Host();
+        }
+        return select(candidates);
     }
 
     protected abstract Host select(Collection<Host> nodes);
 
-    public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
-        this.zookeeperNodeManager = zookeeperNodeManager;
+    protected List<Host> getWorkerCandidates(String workerGroup) {
+        List<Host> hosts = new ArrayList<>();
+        Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            for (String node : nodes) {
+                hosts.add(Host.of(node));
+            }
+        }
+        return hosts;
     }
 
-    public ZookeeperNodeManager getZookeeperNodeManager() {
-        return zookeeperNodeManager;
-    }
 }
