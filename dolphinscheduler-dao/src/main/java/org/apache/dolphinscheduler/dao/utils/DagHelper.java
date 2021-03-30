@@ -439,8 +439,8 @@ public class DagHelper {
                                            List<ProcessTaskRelation> processTaskRelations) {
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
 
-        taskNodeList.stream().forEach(taskNode -> {
-            taskNodeMap.putIfAbsent(taskNode.getCode(), taskNode);
+        taskNodeList.forEach(taskNode -> {
+            taskNodeMap.putIfAbsent(Long.parseLong(taskNode.getCode()), taskNode);
         });
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
@@ -485,12 +485,9 @@ public class DagHelper {
     /**
      * is there have conditions after the parent node
      */
-    public static boolean haveConditionsAfterNode(String parentNodeName,
-                                                  List<TaskNode> taskNodes
-    ) {
-        boolean result = false;
+    public static boolean haveConditionsAfterNode(String parentNodeName, List<TaskNode> taskNodes) {
         if (CollectionUtils.isEmpty(taskNodes)) {
-            return result;
+            return false;
         }
         for (TaskNode taskNode : taskNodes) {
             List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
@@ -498,6 +495,6 @@ public class DagHelper {
                 return true;
             }
         }
-        return result;
+        return false;
     }
 }

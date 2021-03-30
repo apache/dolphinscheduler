@@ -2340,7 +2340,7 @@ public class ProcessService {
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
         Map<String, TaskDefinition> taskNameAndCode = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskNode.getCode());
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(Long.parseLong(taskNode.getCode()));
             if (taskDefinition == null) {
                 try {
                     long code = SnowFlakeUtils.getInstance().nextId();
@@ -2484,7 +2484,7 @@ public class ProcessService {
             taskNodeMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
                 if (v == null) {
                     v = new TaskNode();
-                    v.setCode(processTaskRelation.getPostTaskCode());
+                    v.setCode(processTaskRelation.getPostTaskCode() + "");
                     v.setVersion(processTaskRelation.getPostTaskVersion());
                     v.setConditionResult(processTaskRelation.getConditionParams());
                     List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
@@ -2504,7 +2504,7 @@ public class ProcessService {
         taskNodeMap.forEach((k, v) -> {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
             v.setId(locationMap.get(taskDefinitionLog.getName()));
-            v.setCode(taskDefinitionLog.getCode());
+            v.setCode(taskDefinitionLog.getCode() + "");
             v.setName(taskDefinitionLog.getName());
             v.setDesc(taskDefinitionLog.getDescription());
             v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
