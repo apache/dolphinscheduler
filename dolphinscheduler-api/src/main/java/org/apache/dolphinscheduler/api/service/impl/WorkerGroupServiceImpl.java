@@ -323,4 +323,18 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return result;
     }
 
+    /**
+     * query all worker address list
+     *
+     * @return all worker address list
+     */
+    @Override
+    public Map<String, Object> getWorkerAddressList() {
+        Map<String, Object> result = new HashMap<>();
+        List<String> serverNodeList = zookeeperMonitor.getServerNodeList(ZKNodeType.WORKER, true);
+        result.put(Constants.DATA_LIST, serverNodeList);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
 }
