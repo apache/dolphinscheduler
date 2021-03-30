@@ -202,7 +202,7 @@
                         </executions>
 
                         <configuration>
-                            <name>apache-dolphinscheduler-incubating</name>
+                            <name>apache-dolphinscheduler</name>
                             <release>1</release>
                             <distribution>apache dolphinscheduler incubating rpm</distribution>
                             <group>apache</group>
@@ -420,10 +420,10 @@
                                 <script>mkdir -p /opt/soft</script>
                             </preinstallScriptlet>
                             <postinstallScriptlet>
-                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-incubating-${project.version} /opt/soft/dolphinscheduler</script>
+                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-${project.version} /opt/soft/dolphinscheduler</script>
                             </postinstallScriptlet>
                             <postremoveScriptlet>
-                                <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
+                                <script>rm -rf /opt/soft/apache-dolphinscheduler-${project.version}</script>
                             </postremoveScriptlet>
                         </configuration>
                     </plugin>

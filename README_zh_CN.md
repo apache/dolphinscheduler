@@ -76,8 +76,8 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-d
 制品:
 
 ```
-dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-bin.tar.gz: DolphinScheduler 二进制包
-dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: DolphinScheduler 源代码包
+dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-dolphinscheduler-bin.tar.gz: DolphinScheduler 二进制包
+dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-src.zip: DolphinScheduler 源代码包
 ```
 
 ## 感谢
