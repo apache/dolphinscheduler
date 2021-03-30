@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.server.registry.DependencyConfig;
 import org.apache.dolphinscheduler.server.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
@@ -36,7 +37,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, TaskResponseService.class, ZookeeperRegistryCenter.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ServerNodeManager.class, TaskResponseService.class})
+        ZookeeperCachedOperator.class, ZookeeperConfig.class, ServerNodeManager.class, TaskResponseService.class,
+        SpringConnectionFactory.class})
 public class TaskResponseServiceTest {
 
     @Autowired

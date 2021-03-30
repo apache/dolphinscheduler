@@ -651,7 +651,7 @@ CREATE TABLE t_ds_worker_group (
   addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id),
+  PRIMARY KEY (id) ,
   CONSTRAINT name_unique UNIQUE (name)
 ) ;
 

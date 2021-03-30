@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -122,12 +121,6 @@ public class ServerNodeManager implements InitializingBean {
     private AlertDao alertDao;
 
     /**
-     * autowire capable bean factory
-     */
-    @Autowired
-    private AutowireCapableBeanFactory beanFactory;
-
-    /**
      * init listener
      * @throws Exception if error throws Exception
      */
@@ -175,7 +168,7 @@ public class ServerNodeManager implements InitializingBean {
      * zookeeper client
      */
     @Component
-    class ZKClient extends AbstractZKClient {}
+    static class ZKClient extends AbstractZKClient {}
 
     /**
      *  worker node info and worker group db sync task
@@ -230,8 +223,8 @@ public class ServerNodeManager implements InitializingBean {
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
                     }
-                } catch (IllegalArgumentException ignore) {
-                    logger.warn(ignore.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    logger.warn(ex.getMessage());
                 } catch (Exception ex) {
                     logger.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
@@ -239,7 +232,7 @@ public class ServerNodeManager implements InitializingBean {
         }
 
         private String parseGroup(String path) {
-            String[] parts = path.split("\\/");
+            String[] parts = path.split("/");
             if (parts.length < 6) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
@@ -330,12 +323,12 @@ public class ServerNodeManager implements InitializingBean {
     public Set<String> getWorkerGroupNodes(String workerGroup) {
         workerGroupLock.lock();
         try {
-            if(StringUtils.isEmpty(workerGroup)) {
+            if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
             workerGroup = workerGroup.toLowerCase();
             Set<String> nodes = workerGroupNodes.get(workerGroup);
-            if(CollectionUtils.isNotEmpty(nodes)) {
+            if (CollectionUtils.isNotEmpty(nodes)) {
                 return Collections.unmodifiableSet(nodes);
             }
             return nodes;
@@ -354,16 +347,13 @@ public class ServerNodeManager implements InitializingBean {
 
     /**
      * get worker node info
-     * @param workerGroup workerGroup
+     * @param workerNode worker node
      * @return worker node info
      */
-    public String getWorkerNodeInfo(String workerGroup) {
+    public String getWorkerNodeInfo(String workerNode) {
         workerNodeInfoLock.lock();
         try {
-            if (StringUtils.isEmpty(workerGroup)) {
-                workerGroup = Constants.DEFAULT_WORKER_GROUP;
-            }
-            return workerNodeInfo.get(workerGroup);
+            return workerNodeInfo.getOrDefault(workerNode, null);
         } finally {
             workerNodeInfoLock.unlock();
         }
@@ -384,19 +374,12 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     /**
-     *  close
-     */
-    public void close() {
-        registryCenter.close();
-    }
-
-    /**
      *  destroy
      */
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();
-        close();
+        registryCenter.close();
     }
 
 }

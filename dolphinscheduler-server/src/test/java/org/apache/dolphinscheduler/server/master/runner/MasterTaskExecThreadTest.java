@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.consumer.TaskPriorityQueueConsumer;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -44,7 +45,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ServerNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
+        ServerNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, SpringConnectionFactory.class})
 public class MasterTaskExecThreadTest {
 
 

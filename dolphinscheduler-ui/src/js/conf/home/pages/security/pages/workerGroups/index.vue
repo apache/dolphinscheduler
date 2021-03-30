@@ -135,7 +135,7 @@
           this.isLoading = false
         })
       },
-      _getWorkerAddressList() {
+      _getWorkerAddressList () {
         this.getWorkerAddresses().then(res => {
           this.workerAddressList = res.data.map(x => ({ id: x, label: x }))
         })
