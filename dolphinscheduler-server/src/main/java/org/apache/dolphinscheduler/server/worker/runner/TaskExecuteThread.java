@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -45,6 +46,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.commons.collections.MapUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -71,17 +73,17 @@ public class TaskExecuteThread implements Runnable, Delayed {
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteThread.class);
 
     /**
-     *  task instance
+     * task instance
      */
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     *  abstract task
+     * abstract task
      */
     private AbstractTask task;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private TaskCallbackService taskCallbackService;
 
@@ -180,9 +182,38 @@ public class TaskExecuteThread implements Runnable, Delayed {
             responseCommand.setAppIds(task.getAppIds());
         } finally {
             taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),responseCommand.convert2Command(),Event.RESULT);
+            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            clearTaskExecPath();
+        }
+    }
 
+    /**
+     * when task finish, clear execute path.
+     */
+    private void clearTaskExecPath() {
+        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
+
+        if (!CommonUtils.isDevelopMode()) {
+            // get exec dir
+            String execLocalPath = taskExecutionContext.getExecutePath();
+
+            if (StringUtils.isEmpty(execLocalPath)) {
+                logger.warn("task: {} exec local path is empty.", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            if ("/".equals(execLocalPath)) {
+                logger.warn("task: {} exec local path is '/', direct deletion is not allowed", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            try {
+                org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
+                logger.info("exec local path: {} cleared.", execLocalPath);
+            } catch (IOException e) {
+                logger.error("delete exec dir failed : {}", e.getMessage(), e);
+            }
         }
     }
 
@@ -191,7 +222,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * @return
      */
     private Map<String, String> getGlobalParamsMap() {
-        Map<String,String> globalParamsMap = new HashMap<>(16);
+        Map<String, String> globalParamsMap = new HashMap<>(16);
 
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
@@ -204,7 +235,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
 
     /**
-     *  kill task
+     * kill task
      */
     public void kill() {
         if (task != null) {
@@ -224,7 +255,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
      * @param logger
      */
     private void downloadResource(String execLocalPath,
-                                  Map<String,String> projectRes,
+                                  Map<String, String> projectRes,
                                   Logger logger) throws Exception {
         if (MapUtils.isEmpty(projectRes)) {
             return;

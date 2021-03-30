@@ -69,6 +69,13 @@ public class CommonUtils {
     }
 
     /**
+     * @return sudo enable
+     */
+    public static boolean isSudoEnable() {
+        return PropertyUtils.getBoolean(Constants.SUDO_ENABLE, true);
+    }
+
+    /**
      * if upload resource is HDFS and kerberos startup is true , else false
      *
      * @return true if upload resource is HDFS and kerberos startup

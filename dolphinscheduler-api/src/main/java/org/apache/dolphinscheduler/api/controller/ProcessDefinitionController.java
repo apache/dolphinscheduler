@@ -292,7 +292,8 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-
+        logger.info("login user {}, query process versions, project name: {}, pageNo: {}, pageSize: {}, processDefinitionId: {}",
+                loginUser.getUserName(), projectName, pageNo, pageSize, processDefinitionId);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionVersions(loginUser
             , projectName, pageNo, pageSize, processDefinitionId);
 
@@ -320,7 +321,8 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
-
+        logger.info("login user {}, switch process version, project name: {}, processDefinitionId: {}, version: {}",
+                loginUser.getUserName(), projectName, processDefinitionId, version);
         Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectName
             , processDefinitionId, version);
         return returnDataList(result);
@@ -347,7 +349,8 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
-
+        logger.info("login user {}, delete process definition, project name: {}, processDefinitionId: {}, version: {}",
+                loginUser.getUserName(), projectName, processDefinitionId, version);
         Map<String, Object> result = processDefinitionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectName, processDefinitionId, version);
         return returnDataList(result);
     }
