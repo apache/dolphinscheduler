@@ -34,17 +34,9 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>IP</template>
+          <template slot="name"><strong>*</strong>{{$t('Worker Addresses')}}</template>
           <template slot="content">
-            <x-input
-                    :autosize="{ minRows: 4, maxRows: 6 }"
-                    type="textarea"
-                    v-model="ipList"
-                    :placeholder="$t('Please enter the IP address separated by commas')">
-            </x-input>
-            <div class="ipt-tip">
-              <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
-            </div>
+            <treeselect :options="this.workerAddressList" v-model="addrList" :multiple="true" :placeholder="$t('Please select the worker addresses')"></treeselect>
           </template>
         </m-list-box-f>
       </div>
@@ -56,6 +48,8 @@
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
   export default {
     name: 'create-warning',
@@ -64,11 +58,12 @@
         store,
         id: 0,
         name: '',
-        ipList: ''
+        addrList: []
       }
     },
     props: {
-      item: Object
+      item: Object,
+      workerAddressList: Object
     },
     methods: {
       _ok () {
@@ -77,28 +72,14 @@
           this._submit()
         }
       },
-      checkIsIps(ips) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',');
-        for(let i=0;i<valdata.length;i++){
-            if(reg.test(valdata[i])== false){
-                return false;
-            }
-        }
-        return true
-      },
       _verification () {
         // group name
         if (!this.name) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
-          return false
-        }
-        if(!this.checkIsIps(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
+        if (!this.addrList.length) {
+          this.$message.warning(`${i18n.$t('Worker addresses cannot be empty')}`)
           return false
         }
         return true
@@ -107,7 +88,7 @@
         let param = {
           id: this.id,
           name: this.name,
-          ipList: this.ipList
+          addrList: this.addrList.join(',')
         }
         if (this.item) {
           param.id = this.item.id
@@ -130,20 +111,11 @@
       if (this.item) {
         this.id = this.item.id
         this.name = this.item.name
-        this.ipList = this.item.ipList
+        this.addrList = this.item.addrList.split(',')
       }
     },
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopup, mListBoxF, Treeselect }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .create-worker-model {
-    .ipt-tip {
-      color: #999;
-      padding-top: 4px;
-      display: block;
-    }
-  }
-</style>

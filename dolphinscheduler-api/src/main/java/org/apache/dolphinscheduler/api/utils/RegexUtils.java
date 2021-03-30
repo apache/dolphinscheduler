@@ -15,33 +15,42 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
+package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RandomSelector;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
-
-import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- *  random host manager
+ * This is Regex expression utils.
  */
-public class RandomHostManager extends CommonHostManager {
+public class RegexUtils {
 
     /**
-     * selector
+     * check number regex expression
      */
-    private final Selector<Host> selector;
+    private static final String CHECK_NUMBER = "^-?\\d+(\\.\\d+)?$";
+
+    private RegexUtils() {
+    }
 
     /**
-     * set round robin
+     * check if the input is number
+     *
+     * @param str input
+     * @return
      */
-    public RandomHostManager(){
-        this.selector = new RandomSelector<>();
+    public static boolean isNumeric(String str) {
+        Pattern pattern = Pattern.compile(CHECK_NUMBER);
+        Matcher isNum = pattern.matcher(str);
+        return isNum.matches();
     }
 
-    @Override
-    public Host select(Collection<Host> nodes) {
-        return selector.select(nodes);
+    public static String escapeNRT(String str) {
+        // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
+        if (str != null && !str.isEmpty()) {
+            return str.replaceAll("[\n|\r|\t]", "_");
+        }
+        return null;
     }
+
 }

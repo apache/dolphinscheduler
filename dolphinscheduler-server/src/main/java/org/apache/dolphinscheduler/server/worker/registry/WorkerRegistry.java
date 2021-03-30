@@ -98,7 +98,7 @@ public class WorkerRegistry {
      * registry
      */
     public void registry() {
-        String address = NetUtils.getHost();
+        String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
 
@@ -120,10 +120,10 @@ public class WorkerRegistry {
         }
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(this.startTime,
-                this.workerConfig.getWorkerReservedMemory(),
                 this.workerConfig.getWorkerMaxCpuloadAvg(),
+                this.workerConfig.getWorkerReservedMemory(),
                 workerZkPaths,
-                Constants.WORKER_PREFIX,
+                Constants.WORKER_TYPE,
                 this.zookeeperRegistryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);

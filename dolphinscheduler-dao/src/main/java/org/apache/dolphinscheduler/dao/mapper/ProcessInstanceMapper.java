@@ -16,16 +16,18 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * process instance mapper interface
@@ -59,12 +61,12 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     /**
      * query process instance by worker group and stateArray
-     * @param workerGroupId workerGroupId
+     * @param workerGroupName workerGroupName
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByWorkerGroupIdAndStatus(@Param("workerGroupId") int workerGroupId,
-                                                   @Param("states") int[] states);
+    List<ProcessInstance> queryByWorkerGroupNameAndStatus(@Param("workerGroupName") String workerGroupName,
+                                                          @Param("states") int[] states);
 
     /**
      * process instance page
@@ -130,12 +132,13 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                         @Param("destTenantId") int destTenantId);
 
     /**
-     * update process instance by worker groupId
-     * @param originWorkerGroupId originWorkerGroupId
-     * @param destWorkerGroupId destWorkerGroupId
+     * update process instance by worker group name
+     * @param originWorkerGroupName originWorkerGroupName
+     * @param destWorkerGroupName destWorkerGroupName
      * @return update result
      */
-    int updateProcessInstanceByWorkerGroupId(@Param("originWorkerGroupId") int originWorkerGroupId, @Param("destWorkerGroupId") int destWorkerGroupId);
+    int updateProcessInstanceByWorkerGroupName(@Param("originWorkerGroupName") String originWorkerGroupName,
+                                               @Param("destWorkerGroupName") String destWorkerGroupName);
 
     /**
      * count process instance state by user
