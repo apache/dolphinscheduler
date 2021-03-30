@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -141,13 +142,13 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
-        logger.info("task instance  local execute path : {} ", execLocalPath);
+        logger.info("task instance local execute path : {}", execLocalPath);
         taskExecutionContext.setExecutePath(execLocalPath);
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirIfAbsent(execLocalPath);
-            if (workerConfig.getWorkerTenantAutoCreate()) {
+            if (CommonUtils.isSudoEnable() && workerConfig.getWorkerTenantAutoCreate()) {
                 OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
             }
         } catch (Throwable ex) {

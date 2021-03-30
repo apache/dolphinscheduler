@@ -87,7 +87,7 @@ We would like to express our deep gratitude to all the open-source projects used
 ## Community
 
 You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
-1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-mzqu52gi-rCggPkSHQ0DZYkwbTxO1Gw).
+1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw).
 2. Follow the [Twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
 
 ## How to Contribute
