@@ -2549,11 +2549,10 @@ public class ProcessService {
 
         taskRelationList.forEach(relation -> taskCodeMap.putIfAbsent(relation.getPostTaskCode(), relation.getPostTaskVersion()));
 
-        taskNode.setCode(taskDefinition.getCode());
+        taskNode.setCode(String.valueOf(taskDefinition.getCode()));
         taskNode.setVersion(taskDefinition.getVersion());
         taskNode.setName(taskDefinition.getName());
         taskNode.setId("task-" + taskDefinition.getId());
-        taskNode.setCode(taskDefinition.getCode());
         taskNode.setName(taskDefinition.getName());
         taskNode.setDesc(taskDefinition.getDescription());
         taskNode.setType(taskDefinition.getTaskType().getDescp());
