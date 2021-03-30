@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import org.apache.commons.configuration.Configuration;
 
-import java.lang.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -406,13 +406,17 @@ public class OSUtils {
     }
 
     /**
-     *  get sudo command
+     * get sudo command
+     *
      * @param tenantCode tenantCode
      * @param command command
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
-        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
+        if (!CommonUtils.isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
+            return command;
+        }
+        return String.format("sudo -u %s %s", tenantCode, command);
     }
 
     /**
