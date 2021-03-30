@@ -34,8 +34,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,8 +56,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("/data-quality")
 public class DataQualityController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataQualityController.class);
 
     @Autowired
     private DqRuleService dqRuleService;
