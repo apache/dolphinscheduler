@@ -156,7 +156,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>./skywalking-agent</outputDirectory>
+			<outputDirectory>./ext/skywalking-agent</outputDirectory>
 		</fileSet>
 
 		<fileSet>

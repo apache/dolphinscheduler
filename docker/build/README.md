@@ -34,15 +34,15 @@ The default username is `admin` and the default password is `dolphinscheduler123
 
 > **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
 
-#### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
+#### Or via Environment Variables **`DATABASE_HOST`**, **`DATABASE_PORT`**, **`ZOOKEEPER_QUORUM`**
 
 You can specify **existing postgres and zookeeper service**. Example:
 
 ```
 $ docker run -d --name dolphinscheduler \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -p 12345:12345 \
 apache/dolphinscheduler:latest all
 ```
@@ -63,9 +63,9 @@ docker volume create dolphinscheduler-resource-local
 
 ```
 $ docker run -d --name dolphinscheduler-master \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 apache/dolphinscheduler:latest master-server
 ```
 
@@ -73,9 +73,9 @@ apache/dolphinscheduler:latest master-server
 
 ```
 $ docker run -d --name dolphinscheduler-worker \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 apache/dolphinscheduler:latest worker-server
 ```
@@ -84,9 +84,9 @@ apache/dolphinscheduler:latest worker-server
 
 ```
 $ docker run -d --name dolphinscheduler-api \
--e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
+-e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
 -v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
 apache/dolphinscheduler:latest api-server
@@ -101,7 +101,7 @@ $ docker run -d --name dolphinscheduler-alert \
 apache/dolphinscheduler:latest alert-server
 ```
 
-**Note**: You must be specify `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
+**Note**: You must be specify `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
 
 ## How to build a docker image
 
@@ -122,9 +122,49 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script files if you don't understand
 
+## Support Matrix
+
+| Type                                                         | Support      | Notes                                 |
+| ------------------------------------------------------------ | ------------ | ------------------------------------- |
+| Shell                                                        | Yes          |                                       |
+| Python2                                                      | Yes          |                                       |
+| Python3                                                      | Indirect Yes | Refer to FAQ                          |
+| Hadoop2                                                      | Indirect Yes | Refer to FAQ                          |
+| Hadoop3                                                      | Not Sure     | Not tested                            |
+| Spark-Local(client)                                          | Indirect Yes | Refer to FAQ                          |
+| Spark-YARN(cluster)                                          | Indirect Yes | Refer to FAQ                          |
+| Spark-Mesos(cluster)                                         | Not Yet      |                                       |
+| Spark-Standalone(cluster)                                    | Not Yet      |                                       |
+| Spark-Kubernetes(cluster)                                    | Not Yet      |                                       |
+| Flink-Local(local>=1.11)                                     | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-YARN(yarn-cluster)                                     | Indirect Yes | Refer to FAQ                          |
+| Flink-YARN(yarn-session/yarn-per-job/yarn-application>=1.11) | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-Mesos(default)                                         | Not Yet      |                                       |
+| Flink-Mesos(remote>=1.11)                                    | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-Standalone(default)                                    | Not Yet      |                                       |
+| Flink-Standalone(remote>=1.11)                               | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-Kubernetes(default)                                    | Not Yet      |                                       |
+| Flink-Kubernetes(remote>=1.11)                               | Not Yet      | Generic CLI mode is not yet supported |
+| Flink-NativeKubernetes(kubernetes-session/application>=1.11) | Not Yet      | Generic CLI mode is not yet supported |
+| MapReduce                                                    | Indirect Yes | Refer to FAQ                          |
+| Kerberos                                                     | Indirect Yes | Refer to FAQ                          |
+| HTTP                                                         | Yes          |                                       |
+| DataX                                                        | Indirect Yes | Refer to FAQ                          |
+| Sqoop                                                        | Indirect Yes | Refer to FAQ                          |
+| SQL-MySQL                                                    | Indirect Yes | Refer to FAQ                          |
+| SQL-PostgreSQL                                               | Yes          |                                       |
+| SQL-Hive                                                     | Indirect Yes | Refer to FAQ                          |
+| SQL-Spark                                                    | Indirect Yes | Refer to FAQ                          |
+| SQL-ClickHouse                                               | Indirect Yes | Refer to FAQ                          |
+| SQL-Oracle                                                   | Indirect Yes | Refer to FAQ                          |
+| SQL-SQLServer                                                | Indirect Yes | Refer to FAQ                          |
+| SQL-DB2                                                      | Indirect Yes | Refer to FAQ                          |
+
 ## Environment Variables
 
 The DolphinScheduler Docker container is configured through environment variables, and the default value will be used if an environment variable is not set.
+
+### Database
 
 **`DATABASE_TYPE`**
 
@@ -174,13 +214,23 @@ This environment variable sets the database for database. The default value is `
 
 **Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`, `alert-server`.
 
+### ZooKeeper
+
+**`ZOOKEEPER_QUORUM`**
+
+This environment variable sets zookeeper quorum. The default value is `127.0.0.1:2181`.
+
+**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`, `api-server`.
+
+**`ZOOKEEPER_ROOT`**
+
+This environment variable sets zookeeper root directory for dolphinscheduler. The default value is `/dolphinscheduler`.
+
+### Common
+
 **`DOLPHINSCHEDULER_OPTS`**
 
-This environment variable sets jvm options for `master-server`, `worker-server`, `api-server` or `alert-server`. The default value is empty.
-
-**`LOGGER_SERVER_OPTS`**
-
-This environment variable sets jvm options for `logger-server` (since `logger-server` is deployed with `worker-server`, it needs to be set separately). The default value is empty.
+This environment variable sets jvm options for dolphinscheduler, suitable for `master-server`, `worker-server`, `api-server`, `alert-server`, `logger-server`. The default value is empty.
 
 **`DATA_BASEDIR_PATH`**
 
@@ -210,6 +260,54 @@ This environment variable sets s3 access key for resource storage. The default v
 
 This environment variable sets s3 secret key for resource storage. The default value is `xxxxxxx`.
 
+**`HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE`**
+
+This environment variable sets whether to startup kerberos. The default value is `false`.
+
+**`JAVA_SECURITY_KRB5_CONF_PATH`**
+
+This environment variable sets java.security.krb5.conf path. The default value is `/opt/krb5.conf`.
+
+**`LOGIN_USER_KEYTAB_USERNAME`**
+
+This environment variable sets login user from keytab username. The default value is `hdfs@HADOOP.COM`.
+
+**`LOGIN_USER_KEYTAB_PATH`**
+
+This environment variable sets login user from keytab path. The default value is `/opt/hdfs.keytab`.
+
+**`KERBEROS_EXPIRE_TIME`**
+
+This environment variable sets kerberos expire time, the unit is hour. The default value is `2`.
+
+**`HDFS_ROOT_USER`**
+
+This environment variable sets hdfs root user when resource.storage.type=HDFS. The default value is `hdfs`.
+
+**`YARN_RESOURCEMANAGER_HA_RM_IDS`**
+
+This environment variable sets yarn resourcemanager ha rm ids. The default value is empty.
+
+**`YARN_APPLICATION_STATUS_ADDRESS`**
+
+This environment variable sets yarn application status address. The default value is `http://ds1:8088/ws/v1/cluster/apps/%s`.
+
+**`SKYWALKING_ENABLE`**
+
+This environment variable sets whether to enable skywalking. The default value is `false`.
+
+**`SW_AGENT_COLLECTOR_BACKEND_SERVICES`**
+
+This environment variable sets agent collector backend services for skywalking. The default value is `127.0.0.1:11800`.
+
+**`SW_GRPC_LOG_SERVER_HOST`**
+
+This environment variable sets grpc log server host for skywalking. The default value is `127.0.0.1`.
+
+**`SW_GRPC_LOG_SERVER_PORT`**
+
+This environment variable sets grpc log server port for skywalking. The default value is `11800`.
+
 **`HADOOP_HOME`**
 
 This environment variable sets `HADOOP_HOME`. The default value is `/opt/soft/hadoop`.
@@ -232,7 +330,7 @@ This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/pyt
 
 **`JAVA_HOME`**
 
-This environment variable sets `JAVA_HOME`. The default value is `/usr/lib/jvm/java-1.8-openjdk`.
+This environment variable sets `JAVA_HOME`. The default value is `/usr/local/openjdk-8`.
 
 **`HIVE_HOME`**
 
@@ -246,23 +344,27 @@ This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/fli
 
 This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax`.
 
-**`ZOOKEEPER_QUORUM`**
+### Master Server
 
-This environment variable sets zookeeper quorum for `master-server` and `worker-serverr`. The default value is `127.0.0.1:2181`.
+**`MASTER_SERVER_OPTS`**
 
-**Note**: You must be specify it when start a standalone dolphinscheduler server. Like `master-server`, `worker-server`.
-
-**`ZOOKEEPER_ROOT`**
-
-This environment variable sets zookeeper root directory for dolphinscheduler. The default value is `/dolphinscheduler`.
+This environment variable sets jvm options for `master-server`. The default value is `-Xms1g -Xmx1g -Xmn512m`.
 
 **`MASTER_EXEC_THREADS`**
 
-This environment variable sets exec thread num for `master-server`. The default value is `100`.
+This environment variable sets exec thread number for `master-server`. The default value is `100`.
 
 **`MASTER_EXEC_TASK_NUM`**
 
-This environment variable sets exec task num for `master-server`. The default value is `20`.
+This environment variable sets exec task number for `master-server`. The default value is `20`.
+
+**`MASTER_DISPATCH_TASK_NUM`**
+
+This environment variable sets dispatch task number for `master-server`. The default value is `3`.
+
+**`MASTER_HOST_SELECTOR`**
+
+This environment variable sets host selector for `master-server`. Optional values include `Random`, `RoundRobin` and `LowerWeight`. The default value is `LowerWeight`.
 
 **`MASTER_HEARTBEAT_INTERVAL`**
 
@@ -278,19 +380,21 @@ This environment variable sets task commit interval for `master-server`. The def
 
 **`MASTER_MAX_CPULOAD_AVG`**
 
-This environment variable sets max cpu load avg for `master-server`. The default value is `100`.
+This environment variable sets max cpu load avg for `master-server`. The default value is `-1`.
 
 **`MASTER_RESERVED_MEMORY`**
 
-This environment variable sets reserved memory for `master-server`. The default value is `0.1`.
+This environment variable sets reserved memory for `master-server`, the unit is G. The default value is `0.3`.
 
-**`MASTER_LISTEN_PORT`**
+### Worker Server
 
-This environment variable sets port for `master-server`. The default value is `5678`.
+**`WORKER_SERVER_OPTS`**
+
+This environment variable sets jvm options for `worker-server`. The default value is `-Xms1g -Xmx1g -Xmn512m`.
 
 **`WORKER_EXEC_THREADS`**
 
-This environment variable sets exec thread num for `worker-server`. The default value is `100`.
+This environment variable sets exec thread number for `worker-server`. The default value is `100`.
 
 **`WORKER_HEARTBEAT_INTERVAL`**
 
@@ -298,19 +402,21 @@ This environment variable sets heartbeat interval for `worker-server`. The defau
 
 **`WORKER_MAX_CPULOAD_AVG`**
 
-This environment variable sets max cpu load avg for `worker-server`. The default value is `100`.
+This environment variable sets max cpu load avg for `worker-server`. The default value is `-1`.
 
 **`WORKER_RESERVED_MEMORY`**
 
-This environment variable sets reserved memory for `worker-server`. The default value is `0.1`.
-
-**`WORKER_LISTEN_PORT`**
-
-This environment variable sets port for `worker-server`. The default value is `1234`.
+This environment variable sets reserved memory for `worker-server`, the unit is G. The default value is `0.3`.
 
 **`WORKER_GROUPS`**
 
 This environment variable sets groups for `worker-server`. The default value is `default`.
+
+### Alert Server
+
+**`ALERT_SERVER_OPTS`**
+
+This environment variable sets jvm options for `alert-server`. The default value is `-Xms512m -Xmx512m -Xmn256m`.
 
 **`XLS_FILE_PATH`**
 
@@ -368,19 +474,31 @@ This environment variable sets enterprise wechat agent id for `alert-server`. Th
 
 This environment variable sets enterprise wechat users for `alert-server`. The default value is empty.
 
+### Api Server
+
+**`API_SERVER_OPTS`**
+
+This environment variable sets jvm options for `api-server`. The default value is `-Xms512m -Xmx512m -Xmn256m`.
+
+### Logger Server
+
+**`LOGGER_SERVER_OPTS`**
+
+This environment variable sets jvm options for `logger-server`. The default value is `-Xms512m -Xmx512m -Xmn256m`.
+
 ## Initialization scripts
 
-If you would like to do additional initialization in an image derived from this one, add one or more environment variable under `/root/start-init-conf.sh`, and modify template files in `/opt/dolphinscheduler/conf/*.tpl`.
+If you would like to do additional initialization in an image derived from this one, add one or more environment variables under `/root/start-init-conf.sh`, and modify template files in `/opt/dolphinscheduler/conf/*.tpl`.
 
-For example, to add an environment variable `API_SERVER_PORT` in `/root/start-init-conf.sh`:
+For example, to add an environment variable `SECURITY_AUTHENTICATION_TYPE` in `/root/start-init-conf.sh`:
 
 ```
-export API_SERVER_PORT=5555
+export SECURITY_AUTHENTICATION_TYPE=PASSWORD
 ```
 
-and to modify `/opt/dolphinscheduler/conf/application-api.properties.tpl` template file, add server port:
+and to modify `application-api.properties.tpl` template file, add the `SECURITY_AUTHENTICATION_TYPE`:
 ```
-server.port=${API_SERVER_PORT}
+security.authentication.type=${SECURITY_AUTHENTICATION_TYPE}
 ```
 
 `/root/start-init-conf.sh` will dynamically generate config file:
@@ -429,27 +547,26 @@ docker stack rm dolphinscheduler
 
 ### How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?
 
-> Because of the commercial license, we cannot directly use the driver and client of MySQL.
+> Because of the commercial license, we cannot directly use the driver of MySQL.
 >
 > If you want to use MySQL, you can build a new image based on the `apache/dolphinscheduler` image as follows.
 
 1. Download the MySQL driver [mysql-connector-java-5.1.49.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar) (require `>=5.1.47`)
 
-2. Create a new `Dockerfile` to add MySQL driver and client:
+2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
 FROM apache/dolphinscheduler:latest
 COPY mysql-connector-java-5.1.49.jar /opt/dolphinscheduler/lib
-RUN apk add --update --no-cache mysql-client
 ```
 
-3. Build a new docker image including MySQL driver and client:
+3. Build a new docker image including MySQL driver:
 
 ```
-docker build -t apache/dolphinscheduler:mysql .
+docker build -t apache/dolphinscheduler:mysql-driver .
 ```
 
-4. Modify all `image` fields to `apache/dolphinscheduler:mysql` in `docker-compose.yml`
+4. Modify all `image` fields to `apache/dolphinscheduler:mysql-driver` in `docker-compose.yml`
 
 > If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
 
@@ -457,17 +574,17 @@ docker build -t apache/dolphinscheduler:mysql .
 
 6. Add `dolphinscheduler-mysql` service in `docker-compose.yml` (**Optional**, you can directly use a external MySQL database)
 
-7. Modify all DATABASE environments in `docker-compose.yml`
+7. Modify DATABASE environments in `config.env.sh`
 
 ```
-DATABASE_TYPE: mysql
-DATABASE_DRIVER: com.mysql.jdbc.Driver
-DATABASE_HOST: dolphinscheduler-mysql
-DATABASE_PORT: 3306
-DATABASE_USERNAME: root
-DATABASE_PASSWORD: root
-DATABASE_DATABASE: dolphinscheduler
-DATABASE_PARAMS: useUnicode=true&characterEncoding=UTF-8
+DATABASE_TYPE=mysql
+DATABASE_DRIVER=com.mysql.jdbc.Driver
+DATABASE_HOST=dolphinscheduler-mysql
+DATABASE_PORT=3306
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=root
+DATABASE_DATABASE=dolphinscheduler
+DATABASE_PARAMS=useUnicode=true&characterEncoding=UTF-8
 ```
 
 > If you have added `dolphinscheduler-mysql` service in `docker-compose.yml`, just set `DATABASE_HOST` to `dolphinscheduler-mysql`
@@ -531,5 +648,125 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 5. Run a dolphinscheduler (See **How to use this docker image**)
 
 6. Add a Oracle datasource in `Datasource manage`
+
+### How to support Python 2 pip and custom requirements.txt?
+
+1. Create a new `Dockerfile` to install pip:
+
+```
+FROM apache/dolphinscheduler:latest
+COPY requirements.txt /tmp
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python-pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+The command will install the default **pip 18.1**. If you upgrade the pip, just add one line
+
+```
+    pip install --no-cache-dir -U pip && \
+```
+
+2. Build a new docker image including pip:
+
+```
+docker build -t apache/dolphinscheduler:pip .
+```
+
+3. Modify all `image` fields to `apache/dolphinscheduler:pip` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+4. Run a dolphinscheduler (See **How to use this docker image**)
+
+5. Verify pip under a new Python task
+
+### How to support Python 3?
+
+1. Create a new `Dockerfile` to install Python 3:
+
+```
+FROM apache/dolphinscheduler:latest
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+The command will install the default **Python 3.7.3**. If you also want to install **pip3**, just replace `python3` with `python3-pip` like
+
+```
+    apt-get install -y --no-install-recommends python3-pip && \
+```
+
+2. Build a new docker image including Python 3:
+
+```
+docker build -t apache/dolphinscheduler:python3 .
+```
+
+3. Modify all `image` fields to `apache/dolphinscheduler:python3` in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+4. Modify `PYTHON_HOME` to `/usr/bin/python3` in `config.env.sh`
+
+5. Run a dolphinscheduler (See **How to use this docker image**)
+
+6. Verify Python 3 under a new Python task
+
+### How to support Hadoop, Spark, Flink, Hive or DataX?
+
+Take Spark 2.4.7 as an example:
+
+1. Download the Spark 2.4.7 release binary `spark-2.4.7-bin-hadoop2.7.tgz`
+
+2. Run a dolphinscheduler (See **How to use this docker image**)
+
+3. Copy the Spark 2.4.7 release binary into Docker container
+
+```bash
+docker cp spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker:/opt/soft
+```
+
+Because the volume `dolphinscheduler-shared-local` is mounted on `/opt/soft`, all files in `/opt/soft` will not be lost
+
+4. Attach the container and ensure that `SPARK_HOME2` exists
+
+```bash
+docker exec -it dolphinscheduler-worker bash
+cd /opt/soft
+tar zxf spark-2.4.7-bin-hadoop2.7.tgz
+rm -f spark-2.4.7-bin-hadoop2.7.tgz
+ln -s spark-2.4.7-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+The last command will print Spark version if everything goes well
+
+5. Verify Spark under a Shell task
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.11-2.4.7.jar
+```
+
+Check whether the task log contains the output like `Pi is roughly 3.146015`
+
+6. Verify Spark under a Spark task
+
+The file `spark-examples_2.11-2.4.7.jar` needs to be uploaded to the resources first, and then create a Spark task with:
+
+- Spark Version: `SPARK2`
+- Main Class: `org.apache.spark.examples.SparkPi`
+- Main Package: `spark-examples_2.11-2.4.7.jar`
+- Deploy Mode: `local`
+
+Similarly, check whether the task log contains the output like `Pi is roughly 3.146015`
+
+7. Verify Spark on YARN
+
+Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Similar to Spark support, the operation of supporting Hadoop is almost the same as the previous steps
+
+Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
 
 For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.

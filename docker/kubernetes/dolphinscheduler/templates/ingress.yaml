@@ -27,8 +27,7 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   rules:
   - host: {{ .Values.ingress.host }}

@@ -54,7 +54,7 @@ do
   echo "scp dirs to $host/$installPath starting"
 	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
 
-  for dsDir in bin conf lib script sql ui skywalking-agent install.sh
+  for dsDir in bin conf ext lib script sql ui install.sh
   do
     # if worker in workersGroupMap
     if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
