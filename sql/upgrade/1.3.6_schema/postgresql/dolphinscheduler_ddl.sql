@@ -15,7 +15,6 @@
  * limitations under the License.
 */
 
-
 -- uc_dolphin_T_t_ds_worker_group_A_ip_list
 delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_worker_group_A_ip_list() RETURNS void AS $$
@@ -24,8 +23,10 @@ BEGIN
         WHERE TABLE_NAME='t_ds_worker_group'
         AND COLUMN_NAME ='ip_list')
     THEN
-        ALTER TABLE t_ds_worker_group rename ip_list TO addr_list;
-        ALTER TABLE t_ds_worker_group ALTER column addr_list type text;
+        ALTER TABLE t_ds_worker_group RENAME ip_list TO addr_list;
+        ALTER TABLE t_ds_worker_group ALTER COLUMN addr_list type text;
+        ALTER TABLE t_ds_worker_group ALTER COLUMN name type varchar(256), ALTER COLUMN name SET NOT NULL;
+        ALTER TABLE t_ds_worker_group ADD CONSTRAINT name_unique UNIQUE (name);
     END IF;
 END;
 $$ LANGUAGE plpgsql;

@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.server.registry;
 
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -30,6 +27,10 @@ import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,16 +39,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * zookeeper node manager test
+ * server node manager test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,WorkerRegistry.class,
         ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, CuratorZookeeperClient.class})
-public class ZookeeperNodeManagerTest {
+        ZookeeperCachedOperator.class, ZookeeperConfig.class, ServerNodeManager.class, CuratorZookeeperClient.class})
+public class ServerNodeManagerTest {
 
     @Autowired
-    private ZookeeperNodeManager zookeeperNodeManager;
+    private ServerNodeManager serverNodeManager;
 
     @Autowired
     private MasterRegistry masterRegistry;
@@ -68,11 +69,11 @@ public class ZookeeperNodeManagerTest {
     public void testGetMasterNodes(){
         masterRegistry.registry();
         try {
-            //let the zookeeperNodeManager catch the registry event
+            //let the serverNodeManager catch the registry event
             Thread.sleep(2000);
         } catch (InterruptedException ignore) {
         }
-        Set<String> masterNodes = zookeeperNodeManager.getMasterNodes();
+        Set<String> masterNodes = serverNodeManager.getMasterNodes();
         Assert.assertTrue(CollectionUtils.isNotEmpty(masterNodes));
         Assert.assertEquals(1, masterNodes.size());
         Assert.assertEquals(NetUtils.getAddr(masterConfig.getListenPort()), masterNodes.iterator().next());
@@ -83,11 +84,11 @@ public class ZookeeperNodeManagerTest {
     public void testGetWorkerGroupNodes(){
         workerRegistry.registry();
         try {
-            //let the zookeeperNodeManager catch the registry event
+            //let the serverNodeManager catch the registry event
             Thread.sleep(2000);
         } catch (InterruptedException ignore) {
         }
-        Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
+        Map<String, Set<String>> workerGroupNodes = serverNodeManager.getWorkerGroupNodes();
         Assert.assertEquals(1, workerGroupNodes.size());
         Assert.assertEquals("default".trim(), workerGroupNodes.keySet().iterator().next());
         workerRegistry.unRegistry();
@@ -97,12 +98,11 @@ public class ZookeeperNodeManagerTest {
     public void testGetWorkerGroupNodesWithParam(){
         workerRegistry.registry();
         try {
-            //let the zookeeperNodeManager catch the registry event
+            //let the serverNodeManager catch the registry event
             Thread.sleep(3000);
         } catch (InterruptedException ignore) {
         }
-        Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
-        Set<String> workerNodes = zookeeperNodeManager.getWorkerGroupNodes("default");
+        Set<String> workerNodes = serverNodeManager.getWorkerGroupNodes("default");
         Assert.assertTrue(CollectionUtils.isNotEmpty(workerNodes));
         Assert.assertEquals(1, workerNodes.size());
         Assert.assertEquals(NetUtils.getAddr(workerConfig.getListenPort()), workerNodes.iterator().next());
