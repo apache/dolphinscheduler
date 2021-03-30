@@ -168,7 +168,7 @@ public class ServerNodeManager implements InitializingBean {
      * zookeeper client
      */
     @Component
-    class ZKClient extends AbstractZKClient {}
+    static class ZKClient extends AbstractZKClient {}
 
     /**
      *  worker node info and worker group db sync task
@@ -223,8 +223,8 @@ public class ServerNodeManager implements InitializingBean {
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
                     }
-                } catch (IllegalArgumentException ignore) {
-                    logger.warn(ignore.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    logger.warn(ex.getMessage());
                 } catch (Exception ex) {
                     logger.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
@@ -374,19 +374,12 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     /**
-     *  close
-     */
-    public void close() {
-        registryCenter.close();
-    }
-
-    /**
      *  destroy
      */
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();
-        close();
+        registryCenter.close();
     }
 
 }

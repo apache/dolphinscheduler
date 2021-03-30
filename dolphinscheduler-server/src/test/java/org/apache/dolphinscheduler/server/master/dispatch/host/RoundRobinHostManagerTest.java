@@ -56,7 +56,7 @@ public class RoundRobinHostManagerTest {
 
     @Test
     public void testSelectWithResult() {
-        Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22:100"));
+        Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22"));
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));
