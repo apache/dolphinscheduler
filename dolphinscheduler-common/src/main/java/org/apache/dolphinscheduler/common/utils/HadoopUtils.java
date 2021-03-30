@@ -205,6 +205,7 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds is empty, single resourcemanager enabled
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
+
         yarnEnabled = true;
         String appUrl = StringUtils.isEmpty(rmHaIds) ? appAddress : getAppAddress(appAddress, rmHaIds);
         if (StringUtils.isBlank(appUrl)) {
@@ -419,7 +420,9 @@ public class HadoopUtils implements Closeable {
 
         String result = Constants.FAILED;
         String applicationUrl = getApplicationUrl(applicationId);
-        logger.info("applicationUrl={}", applicationUrl);
+        if (logger.isDebugEnabled()) {
+            logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
+        }
 
         String responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
@@ -432,7 +435,9 @@ public class HadoopUtils implements Closeable {
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            logger.info("jobHistoryUrl={}", jobHistoryUrl);
+            if (logger.isDebugEnabled()) {
+                logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
+            }
             responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
 
             if (null != responseContent) {
