@@ -55,8 +55,8 @@
         <el-table-column prop="modifyBy" :label="$t('Modify User')"></el-table-column>
         <el-table-column :label="$t('Timing state')">
           <template slot-scope="scope">
-            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
-            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'" class="time_offline">{{$t('offline')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'" class="time_online">{{$t('online')}}</span>
             <span v-if="!scope.row.scheduleReleaseState">-</span>
           </template>
         </el-table-column>
@@ -522,3 +522,17 @@
     components: { mVersions, mStart, mTiming, mRelatedItems }
   }
 </script>
+
+<style lang="scss" rel="stylesheet/scss">
+
+  .time_online {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 3px;
+  }
+  .time_offline {
+    background-color: #ffc107;
+    color: #fff;
+    padding: 3px;
+  }
+</style>
