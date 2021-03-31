@@ -44,8 +44,8 @@ call mvn clean compile package -Prelease -DskipTests=true
 if "%errorlevel%"=="1" goto :mvnFailed
 
 :: move dolphinscheduler-bin.tar.gz file to docker/build directory
-echo "move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-incubating-%VERSION%-SNAPSHOT-dolphinscheduler-bin.tar.gz %cd%\docker\build\"
-move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-incubating-%VERSION%-dolphinscheduler-bin.tar.gz %cd%\docker\build\
+echo "move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-%VERSION%-SNAPSHOT-dolphinscheduler-bin.tar.gz %cd%\docker\build\"
+move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-%VERSION%-dolphinscheduler-bin.tar.gz %cd%\docker\build\
 
 :: docker build
 echo "docker build --build-arg VERSION=%VERSION% -t %DOCKER_REPO%:%VERSION% %cd%\docker\build\"
