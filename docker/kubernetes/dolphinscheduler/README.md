@@ -1,8 +1,30 @@
-# DolphinScheduler
+DolphinScheduler
+=================
+
+* [Introduction](#introduction)
+* [Prerequisites](#prerequisites)
+* [Installing the Chart](#installing-the-chart)
+* [Access DolphinScheduler UI](#access-dolphinscheduler-ui)
+* [Uninstalling the Chart](#uninstalling-the-chart)
+* [Support Matrix](#support-matrix)
+* [Configuration](#configuration)
+* [FAQ](#faq)
+  * [How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?](#how-to-use-mysql-as-the-dolphinschedulers-database-instead-of-postgresql)
+  * [How to support MySQL datasource in Datasource manage?](#how-to-support-mysql-datasource-in-datasource-manage)
+  * [How to support Oracle datasource in Datasource manage?](#how-to-support-oracle-datasource-in-datasource-manage)
+  * [How to support Python 2 pip and custom requirements\.txt?](#how-to-support-python-2-pip-and-custom-requirementstxt)
+  * [How to support Python 3?](#how-to-support-python-3)
+  * [How to support Hadoop, Spark, Flink, Hive or DataX?](#how-to-support-hadoop-spark-flink-hive-or-datax)
+  * [How to support Spark 3?](#how-to-support-spark-3)
+  * [How to support shared storage between Master, Worker and Api server?](#how-to-support-shared-storage-between-master-worker-and-api-server)
+  * [How to support local file resource storage instead of HDFS and S3?](#how-to-support-local-file-resource-storage-instead-of-hdfs-and-s3)
+  * [How to support S3 resource storage like MinIO?](#how-to-support-s3-resource-storage-like-minio)
+  * [How to configure SkyWalking?](#how-to-configure-skywalking)
+
+## Introduction
 
 [DolphinScheduler](https://dolphinscheduler.apache.org) is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
-## Introduction
 This chart bootstraps a [DolphinScheduler](https://dolphinscheduler.apache.org) distributed deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
@@ -377,11 +399,11 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 
 5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`
 
-6. Modify postgresql `enabled` to `false`
+6. Modify postgresql `enabled` to `false` in `values.yaml`
 
-7. Modify externalDatabase (especially modify `host`, `username` and `password`):
+7. Modify externalDatabase (especially modify `host`, `username` and `password`) in `values.yaml`:
 
-```
+```yaml
 externalDatabase:
   type: "mysql"
   driver: "com.mysql.jdbc.Driver"
@@ -577,5 +599,124 @@ Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Si
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
 
-For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+### How to support Spark 3?
 
+In fact, the way to submit applications with `spark-submit` is the same, regardless of Spark 1, 2 or 3. In other words, the semantics of `SPARK_HOME2` is the second `SPARK_HOME` instead of `SPARK2`'s `HOME`, so just set `SPARK_HOME2=/path/to/spark3`
+
+Take Spark 3.1.1 as an example:
+
+1. Download the Spark 3.1.1 release binary `spark-3.1.1-bin-hadoop2.7.tgz`
+
+2. Ensure that `common.sharedStoragePersistence.enabled` is turned on
+
+3. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+4. Copy the Spark 3.1.1 release binary into Docker container
+
+```bash
+kubectl cp spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
+kubectl cp -n test spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
+```
+
+5. Attach the container and ensure that `SPARK_HOME2` exists
+
+```bash
+kubectl exec -it dolphinscheduler-worker-0 bash
+kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
+cd /opt/soft
+tar zxf spark-3.1.1-bin-hadoop2.7.tgz
+rm -f spark-3.1.1-bin-hadoop2.7.tgz
+ln -s spark-3.1.1-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+The last command will print Spark version if everything goes well
+
+6. Verify Spark under a Shell task
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.12-3.1.1.jar
+```
+
+Check whether the task log contains the output like `Pi is roughly 3.146015`
+
+### How to support shared storage between Master, Worker and Api server?
+
+For example, Master, Worker and Api server may use Hadoop at the same time
+
+1. Modify the following configurations in `values.yaml`
+
+```yaml
+common:
+  sharedStoragePersistence:
+    enabled: false
+    mountPath: "/opt/soft"
+    accessModes:
+    - "ReadWriteMany"
+    storageClassName: "-"
+    storage: "20Gi"
+```
+
+`storageClassName` and `storage` need to be modified to actual values
+
+> **Note**: `storageClassName` must support the access mode: `ReadWriteMany`
+
+2. Put the Hadoop into the nfs
+
+3. Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` are correct
+
+### How to support local file resource storage instead of HDFS and S3?
+
+Modify the following configurations in `values.yaml`
+
+```yaml
+common:
+  configmap:
+    RESOURCE_STORAGE_TYPE: "HDFS"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "file:///"
+  fsFileResourcePersistence:
+    enabled: true
+    accessModes:
+    - "ReadWriteMany"
+    storageClassName: "-"
+    storage: "20Gi"
+```
+
+`storageClassName` and `storage` need to be modified to actual values
+
+> **Note**: `storageClassName` must support the access mode: `ReadWriteMany`
+
+### How to support S3 resource storage like MinIO?
+
+Take MinIO as an example: Modify the following configurations in `values.yaml`
+
+```yaml
+common:
+  configmap:
+    RESOURCE_STORAGE_TYPE: "S3"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "s3a://BUCKET_NAME"
+    FS_S3A_ENDPOINT: "http://MINIO_IP:9000"
+    FS_S3A_ACCESS_KEY: "MINIO_ACCESS_KEY"
+    FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
+```
+
+`BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` need to be modified to actual values
+
+> **Note**: `MINIO_IP` can only use IP instead of domain name, because DolphinScheduler currently doesn't support S3 path style access
+
+### How to configure SkyWalking?
+
+Modify SKYWALKING configurations in `values.yaml`:
+
+```yaml
+common:
+  configmap:
+    SKYWALKING_ENABLE: "true"
+    SW_AGENT_COLLECTOR_BACKEND_SERVICES: "127.0.0.1:11800"
+    SW_GRPC_LOG_SERVER_HOST: "127.0.0.1"
+    SW_GRPC_LOG_SERVER_PORT: "11800"
+```
+
+For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
