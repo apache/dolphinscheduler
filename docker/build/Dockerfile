@@ -40,8 +40,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
 # 2. add dolphinscheduler
-ADD ./apache-dolphinscheduler-${VERSION}-dolphinscheduler-bin.tar.gz /opt/
-RUN ln -s /opt/apache-dolphinscheduler-${VERSION}-dolphinscheduler-bin /opt/dolphinscheduler
+ADD ./apache-dolphinscheduler-${VERSION}-bin.tar.gz /opt/
+RUN ln -s /opt/apache-dolphinscheduler-${VERSION}-bin /opt/dolphinscheduler
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 # 3. add configuration and modify permissions and set soft links

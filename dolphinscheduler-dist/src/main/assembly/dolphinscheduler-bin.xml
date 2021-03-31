@@ -19,15 +19,14 @@
 		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>dolphinscheduler-bin</id>
+	<id>bin</id>
 	<formats>
 		<format>tar.gz</format>
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
-	<baseDirectory>${project.build.finalName}-dolphinscheduler-bin</baseDirectory>
+	<baseDirectory>${project.build.finalName}-bin</baseDirectory>
 
 	<fileSets>
-		<!--alert start-->
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-alert/src/main/resources</directory>
 			<includes>
@@ -36,20 +35,22 @@
 				<include>**/*.json</include>
 				<include>**/*.ftl</include>
 			</includes>
-			<outputDirectory>./conf</outputDirectory>
+			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<!--alert end-->
 
-		<!--api start-->
 		<fileSet>
-			<directory>src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-api/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
 				<include>**/*.json</include>
 			</includes>
+			<excludes>
+				<exclude>application.properties</exclude>
+			</excludes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
+
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
 			<includes>
@@ -59,6 +60,7 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
+
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-common/src/main/resources/bin</directory>
 			<includes>
@@ -67,6 +69,7 @@
 			<directoryMode>755</directoryMode>
 			<outputDirectory>bin</outputDirectory>
 		</fileSet>
+
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
 			<includes>
@@ -74,20 +77,12 @@
 				<include>**/*.xml</include>
 				<include>**/*.json</include>
 			</includes>
+			<excludes>
+				<exclude>org/apache/dolphinscheduler/dao/mapper/*.xml</exclude>
+			</excludes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-api/src/main/resources</directory>
-			<includes>
-				<include>**/*.properties</include>
-				<include>**/*.xml</include>
-				<include>**/*.json</include>
-			</includes>
-			<outputDirectory>conf</outputDirectory>
-		</fileSet>
-		<!--api end-->
 
-		<!--server start-->
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-server/src/main/resources</directory>
 			<includes>
@@ -99,21 +94,6 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 
-
-		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
-			<includes>
-				<include>**/*.properties</include>
-				<include>**/*.xml</include>
-				<include>**/*.json</include>
-				<include>**/*.yml</include>
-			</includes>
-			<outputDirectory>conf</outputDirectory>
-		</fileSet>
-		<!--server end-->
-
-
-		<!--service end-->
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
 			<includes>
@@ -124,8 +104,16 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<!--service end-->
 
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
 
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>

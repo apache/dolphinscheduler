@@ -21,10 +21,10 @@
 		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 	<id>src</id>
 	<formats>
-		<format>zip</format>
+		<format>tar.gz</format>
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
-	<baseDirectory>${project.build.finalName}-src-release</baseDirectory>
+	<baseDirectory>${project.build.finalName}-src</baseDirectory>
 
 	<fileSets>
 		<fileSet>
