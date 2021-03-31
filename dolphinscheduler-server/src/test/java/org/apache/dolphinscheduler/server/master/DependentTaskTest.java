@@ -385,6 +385,7 @@ public class DependentTaskTest {
         taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         taskInstance.setTaskType(taskNode.getType());
+        taskInstance.setDependency(JSONUtils.parseObject(taskNode.getDependence(), DependentParameters.class));
         taskInstance.setName(taskNode.getName());
     }
 
