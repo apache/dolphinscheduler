@@ -45,20 +45,22 @@
         u.user_name as user_name
         from t_ds_datasource d
         join t_ds_user u on d.user_id = u.id
-        where 1 =1
-        <if test="userId != 0">
-            and d.id in
-            (select datasource_id
-            from t_ds_relation_datasource_user
-            where user_id=#{userId}
-            union select id as datasource_id
-            from t_ds_datasource
-            where user_id=#{userId}
-            )
-        </if>
-        <if test="name != null and name != ''">
-            and name like concat ('%', #{name}, '%')
-        </if>
+        <where>
+            <if test="userId != 0">
+             d.id in
+                (select datasource_id
+                from t_ds_relation_datasource_user
+                where user_id=#{userId}
+                union select id as datasource_id
+                from t_ds_datasource
+                where user_id=#{userId}
+                )
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat ('%', #{name}, '%')
+            </if>
+        </where>
+
         order by update_time desc
     </select>
     <select id="queryDataSourceByName" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">

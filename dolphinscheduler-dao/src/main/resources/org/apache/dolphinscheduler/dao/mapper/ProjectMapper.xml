@@ -60,16 +60,17 @@
         inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count
         from t_ds_project p
         join t_ds_user u on u.id=p.user_id
-        where 1=1
-        <if test="userId != 0">
-            and p.id in
-            (select project_id from t_ds_relation_project_user where user_id=#{userId}
-            union select id as project_id from t_ds_project where user_id=#{userId}
-            )
-        </if>
-        <if test="searchName!=null and searchName != ''">
-            and p.name like concat('%', #{searchName}, '%')
-        </if>
+        <where>
+            <if test="userId != 0">
+                 p.id in
+                (select project_id from t_ds_relation_project_user where user_id=#{userId}
+                union select id as project_id from t_ds_project where user_id=#{userId}
+                )
+            </if>
+            <if test="searchName!=null and searchName != ''">
+                and p.name like concat('%', #{searchName}, '%')
+            </if>
+        </where>
         order by p.create_time desc
     </select>
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
