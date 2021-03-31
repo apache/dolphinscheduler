@@ -28,6 +28,7 @@ DolphinScheduler
   * [如何支持 Python 2 pip 以及自定义 requirements\.txt？](#如何支持-python-2-pip-以及自定义-requirementstxt)
   * [如何支持 Python 3？](#如何支持-python-3)
   * [如何支持 Hadoop, Spark, Flink, Hive 或 DataX？](#如何支持-hadoop-spark-flink-hive-或-datax)
+  * [如何支持 Spark 3？](#如何支持-spark-3)
   * [如何在 Master、Worker 和 Api 服务之间支持共享存储？](#如何在-masterworker-和-api-服务之间支持共享存储)
   * [如何支持本地文件存储而非 HDFS 和 S3？](#如何支持本地文件存储而非-hdfs-和-s3)
   * [如何支持 S3 资源存储，例如 MinIO？](#如何支持-s3-资源存储例如-minio)
@@ -797,6 +798,43 @@ $SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_H
 Spark on YARN (部署方式为 `cluster` 或 `client`) 需要 Hadoop 支持. 类似于 Spark 支持, 支持 Hadoop 的操作几乎和前面的步骤相同
 
 确保 `$HADOOP_HOME` 和 `$HADOOP_CONF_DIR` 存在
+
+### 如何支持 Spark 3？
+
+事实上，使用 `spark-submit` 提交应用的方式是相同的, 无论是 Spark 1, 2 或 3. 换句话说，`SPARK_HOME2` 的语义是第二个 `SPARK_HOME`, 而非 `SPARK2` 的 `HOME`, 因此只需设置 `SPARK_HOME2=/path/to/spark3` 即可
+
+以 Spark 3.1.1 为例:
+
+1. 下载 Spark 3.1.1 发布的二进制包 `spark-3.1.1-bin-hadoop2.7.tgz`
+
+2. 运行 dolphinscheduler (详见**如何使用docker镜像**)
+
+3. 复制 Spark 3.1.1 二进制包到 Docker 容器中
+
+```bash
+docker cp spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker:/opt/soft
+```
+
+4. 登录到容器并确保 `SPARK_HOME2` 存在
+
+```bash
+docker exec -it dolphinscheduler-worker bash
+cd /opt/soft
+tar zxf spark-3.1.1-bin-hadoop2.7.tgz
+rm -f spark-3.1.1-bin-hadoop2.7.tgz
+ln -s spark-3.1.1-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+如果一切执行正常，最后一条命令将会打印 Spark 版本信息
+
+5. 在一个 Shell 任务下验证 Spark
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.12-3.1.1.jar
+```
+
+检查任务日志是否包含输出 `Pi is roughly 3.146015`
 
 ### 如何在 Master、Worker 和 Api 服务之间支持共享存储？
 

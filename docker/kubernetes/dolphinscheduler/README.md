@@ -15,6 +15,7 @@ DolphinScheduler
   * [How to support Python 2 pip and custom requirements\.txt?](#how-to-support-python-2-pip-and-custom-requirementstxt)
   * [How to support Python 3?](#how-to-support-python-3)
   * [How to support Hadoop, Spark, Flink, Hive or DataX?](#how-to-support-hadoop-spark-flink-hive-or-datax)
+  * [How to support Spark 3?](#how-to-support-spark-3)
   * [How to support shared storage between Master, Worker and Api server?](#how-to-support-shared-storage-between-master-worker-and-api-server)
   * [How to support local file resource storage instead of HDFS and S3?](#how-to-support-local-file-resource-storage-instead-of-hdfs-and-s3)
   * [How to support S3 resource storage like MinIO?](#how-to-support-s3-resource-storage-like-minio)
@@ -597,6 +598,47 @@ Similarly, check whether the task log contains the output like `Pi is roughly 3.
 Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Similar to Spark support, the operation of supporting Hadoop is almost the same as the previous steps
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
+
+### How to support Spark 3?
+
+In fact, the way to submit applications with `spark-submit` is the same, regardless of Spark 1, 2 or 3. In other words, the semantics of `SPARK_HOME2` is the second `SPARK_HOME` instead of `SPARK2`'s `HOME`, so just set `SPARK_HOME2=/path/to/spark3`
+
+Take Spark 3.1.1 as an example:
+
+1. Download the Spark 3.1.1 release binary `spark-3.1.1-bin-hadoop2.7.tgz`
+
+2. Ensure that `common.sharedStoragePersistence.enabled` is turned on
+
+3. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
+
+4. Copy the Spark 3.1.1 release binary into Docker container
+
+```bash
+kubectl cp spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft
+kubectl cp -n test spark-3.1.1-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft # with test namespace
+```
+
+5. Attach the container and ensure that `SPARK_HOME2` exists
+
+```bash
+kubectl exec -it dolphinscheduler-worker-0 bash
+kubectl exec -n test -it dolphinscheduler-worker-0 bash # with test namespace
+cd /opt/soft
+tar zxf spark-3.1.1-bin-hadoop2.7.tgz
+rm -f spark-3.1.1-bin-hadoop2.7.tgz
+ln -s spark-3.1.1-bin-hadoop2.7 spark2 # or just mv
+$SPARK_HOME2/bin/spark-submit --version
+```
+
+The last command will print Spark version if everything goes well
+
+6. Verify Spark under a Shell task
+
+```
+$SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HOME2/examples/jars/spark-examples_2.12-3.1.1.jar
+```
+
+Check whether the task log contains the output like `Pi is roughly 3.146015`
 
 ### How to support shared storage between Master, Worker and Api server?
 
