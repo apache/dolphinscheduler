@@ -35,9 +35,10 @@ spring.servlet.multipart.max-request-size=1024MB
 server.compression.enabled=true
 server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
 
-# post content
-server.jetty.max-http-post-size=5000000
+# max http post size
+server.jetty.max-http-form-post-size=5000000
 
+# messages encoding
 spring.messages.encoding=UTF-8
 
 # i18n classpath folder, file prefix messages. if have many files, use "," seperator

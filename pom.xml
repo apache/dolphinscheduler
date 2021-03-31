@@ -58,8 +58,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
-        <spring.version>5.1.5.RELEASE</spring.version>
-        <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
+        <spring.version>5.1.19.RELEASE</spring.version>
+        <spring.boot.version>2.1.18.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
@@ -117,6 +117,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
+        <swagger-models.version>1.5.24</swagger-models.version>
         <skywalking.version>8.4.0</skywalking.version>
     </properties>
 
@@ -540,6 +541,12 @@
             </dependency>
 
             <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-models.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>swagger-bootstrap-ui</artifactId>
                 <version>${swagger.version}</version>
@@ -559,8 +566,6 @@
 
         <pluginManagement>
             <plugins>
-
-
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>rpm-maven-plugin</artifactId>
