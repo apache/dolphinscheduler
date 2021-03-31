@@ -18,16 +18,16 @@
 # worker listener port
 #worker.listen.port=1234
 
-# worker execute thread number
+# worker execute thread number to limit task instances
 worker.exec.threads=${WORKER_EXEC_THREADS}
 
-# worker heartbeat interval
+# worker heartbeat interval, the unit is second
 worker.heartbeat.interval=${WORKER_HEARTBEAT_INTERVAL}
 
-# only less than cpu avg load, worker server can work. default value -1: the number of cpu cores * 2
+# worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
 worker.max.cpuload.avg=${WORKER_MAX_CPULOAD_AVG}
 
-# only larger than reserved memory, worker server can work. default value 0.3, the unit is G
+# worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
 worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 
 # default worker groups separated by comma, like 'worker.groups=default,test'
