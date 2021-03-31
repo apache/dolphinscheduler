@@ -20,16 +20,18 @@ DolphinScheduler
   * [Logger Server](#logger-server)
 * [初始化脚本](#初始化脚本)
 * [FAQ](#faq)
-  * [如何通过 docker\-compose 停止 dolphinscheduler？](#如何通过-docker-compose-停止-dolphinscheduler)
-  * [如何在 Docker Swarm 上部署 dolphinscheduler？](#如何在-docker-swarm-上部署-dolphinscheduler)
+  * [如何通过 docker\-compose 停止 DolphinScheduler？](#如何通过-docker-compose-停止-dolphinscheduler)
+  * [如何在 Docker Swarm 上部署 DolphinScheduler？](#如何在-docker-swarm-上部署-dolphinscheduler)
   * [如何用 MySQL 替代 PostgreSQL 作为 DolphinScheduler 的数据库？](#如何用-mysql-替代-postgresql-作为-dolphinscheduler-的数据库)
   * [如何在数据源中心支持 MySQL 数据源？](#如何在数据源中心支持-mysql-数据源)
   * [如何在数据源中心支持 Oracle 数据源？](#如何在数据源中心支持-oracle-数据源)
-  * [如何支持 Python 2 pip 以及自定义 requirements\.txt?](#如何支持-python-2-pip-以及自定义-requirementstxt)
+  * [如何支持 Python 2 pip 以及自定义 requirements\.txt？](#如何支持-python-2-pip-以及自定义-requirementstxt)
   * [如何支持 Python 3？](#如何支持-python-3)
   * [如何支持 Hadoop, Spark, Flink, Hive 或 DataX？](#如何支持-hadoop-spark-flink-hive-或-datax)
-  * [如何支持 S3 资源存储，例如 MinIO?](#如何支持-s3-资源存储例如-minio)
-  * [如何配置 SkyWalking?](#如何配置-skywalking)
+  * [如何在 Master、Worker 和 Api 服务之间支持共享存储？](#如何在-masterworker-和-api-服务之间支持共享存储)
+  * [如何支持本地文件存储而非 HDFS 和 S3？](#如何支持本地文件存储而非-hdfs-和-s3)
+  * [如何支持 S3 资源存储，例如 MinIO？](#如何支持-s3-资源存储例如-minio)
+  * [如何配置 SkyWalking？](#如何配置-skywalking)
 
 ## DolphinScheduler 是什么?
 
@@ -86,12 +88,6 @@ apache/dolphinscheduler:latest all
 
 你能够运行 DolphinScheduler 中的部分服务。
 
-* 创建一个 **本地卷** 用于资源存储，如下:
-
-```
-docker volume create dolphinscheduler-resource-local
-```
-
 * 启动一个 **master server**, 如下:
 
 ```
@@ -109,7 +105,6 @@ $ docker run -d --name dolphinscheduler-worker \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
--v dolphinscheduler-resource-local:/dolphinscheduler \
 apache/dolphinscheduler:latest worker-server
 ```
 
@@ -120,7 +115,6 @@ $ docker run -d --name dolphinscheduler-api \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
--v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
 apache/dolphinscheduler:latest api-server
 ```
@@ -550,7 +544,7 @@ done
 
 ## FAQ
 
-### 如何通过 docker-compose 停止 dolphinscheduler？
+### 如何通过 docker-compose 停止 DolphinScheduler？
 
 停止所有容器:
 
@@ -564,7 +558,7 @@ docker-compose stop
 docker-compose down -v
 ```
 
-### 如何在 Docker Swarm 上部署 dolphinscheduler？
+### 如何在 Docker Swarm 上部署 DolphinScheduler？
 
 假设 Docker Swarm 集群已经部署（如果还没有创建 Docker Swarm 集群，请参考 [create-swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/)）
 
@@ -684,7 +678,7 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 6. 在数据源中心添加一个 Oracle 数据源
 
-### 如何支持 Python 2 pip 以及自定义 requirements.txt?
+### 如何支持 Python 2 pip 以及自定义 requirements.txt？
 
 1. 创建一个新的 `Dockerfile`，用于安装 pip:
 
@@ -804,7 +798,50 @@ Spark on YARN (部署方式为 `cluster` 或 `client`) 需要 Hadoop 支持. 类
 
 确保 `$HADOOP_HOME` 和 `$HADOOP_CONF_DIR` 存在
 
-### 如何支持 S3 资源存储，例如 MinIO?
+### 如何在 Master、Worker 和 Api 服务之间支持共享存储？
+
+例如, Master、Worker 和 Api 服务可能同时使用 Hadoop
+
+1. 修改 `docker-compose.yml` 文件中的 `dolphinscheduler-shared-local` 存储卷，以支持 nfs
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+```yaml
+volumes:
+  dolphinscheduler-shared-local:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.40.0.199,nolock,soft,rw"
+      device: ":/path/to/shared/dir"
+```
+
+2. 将 Hadoop 放到 nfs
+
+3. 确保 `$HADOOP_HOME` 和 `$HADOOP_CONF_DIR` 正确
+
+### 如何支持本地文件存储而非 HDFS 和 S3？
+
+1. 修改 `config.env.sh` 文件中下面的环境变量:
+
+```
+RESOURCE_STORAGE_TYPE=HDFS
+FS_DEFAULT_FS=file:///
+```
+
+2. 修改 `docker-compose.yml` 文件中的 `dolphinscheduler-shared-local` 存储卷，以支持 nfs
+
+> 如果你想在 Docker Swarm 上部署 dolphinscheduler，你需要修改 `docker-stack.yml`
+
+```yaml
+volumes:
+  dolphinscheduler-resource-local:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.40.0.199,nolock,soft,rw"
+      device: ":/path/to/resource/dir"
+```
+
+### 如何支持 S3 资源存储，例如 MinIO？
 
 以 MinIO 为例: 修改 `config.env.sh` 文件中下面的环境变量
 
@@ -821,7 +858,7 @@ FS_S3A_SECRET_KEY=MINIO_SECRET_KEY
 
 > **注意**: `MINIO_IP` 只能使用 IP 而非域名, 因为 DolphinScheduler 尚不支持 S3 路径风格访问 (S3 path style access)
 
-### 如何配置 SkyWalking?
+### 如何配置 SkyWalking？
 
 修改 `config.env.sh` 文件中的 SKYWALKING 环境变量
 

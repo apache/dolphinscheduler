@@ -20,14 +20,16 @@ DolphinScheduler
   * [Logger Server](#logger-server)
 * [Initialization scripts](#initialization-scripts)
 * [FAQ](#faq)
-  * [How to stop dolphinscheduler by docker\-compose?](#how-to-stop-dolphinscheduler-by-docker-compose)
-  * [How to deploy dolphinscheduler on Docker Swarm?](#how-to-deploy-dolphinscheduler-on-docker-swarm)
+  * [How to stop DolphinScheduler by docker\-compose?](#how-to-stop-dolphinscheduler-by-docker-compose)
+  * [How to deploy DolphinScheduler on Docker Swarm?](#how-to-deploy-dolphinscheduler-on-docker-swarm)
   * [How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?](#how-to-use-mysql-as-the-dolphinschedulers-database-instead-of-postgresql)
   * [How to support MySQL datasource in Datasource manage?](#how-to-support-mysql-datasource-in-datasource-manage)
   * [How to support Oracle datasource in Datasource manage?](#how-to-support-oracle-datasource-in-datasource-manage)
   * [How to support Python 2 pip and custom requirements\.txt?](#how-to-support-python-2-pip-and-custom-requirementstxt)
   * [How to support Python 3?](#how-to-support-python-3)
   * [How to support Hadoop, Spark, Flink, Hive or DataX?](#how-to-support-hadoop-spark-flink-hive-or-datax)
+  * [How to support shared storage between Master, Worker and Api server?](#how-to-support-shared-storage-between-master-worker-and-api-server)
+  * [How to support local file resource storage instead of HDFS and S3?](#how-to-support-local-file-resource-storage-instead-of-hdfs-and-s3)
   * [How to support S3 resource storage like MinIO?](#how-to-support-s3-resource-storage-like-minio)
   * [How to configure SkyWalking?](#how-to-configure-skywalking)
 
@@ -86,12 +88,6 @@ Access the Web UI：http://192.168.xx.xx:12345/dolphinscheduler
 
 You can start a standalone DolphinScheduler server.
 
-* Create a **local volume** for resource storage, For example:
-
-```
-docker volume create dolphinscheduler-resource-local
-```
-
 * Start a **master server**, For example:
 
 ```
@@ -109,7 +105,6 @@ $ docker run -d --name dolphinscheduler-worker \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
--v dolphinscheduler-resource-local:/dolphinscheduler \
 apache/dolphinscheduler:latest worker-server
 ```
 
@@ -120,7 +115,6 @@ $ docker run -d --name dolphinscheduler-api \
 -e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
 -e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -e ZOOKEEPER_QUORUM="192.168.x.x:2181" \
--v dolphinscheduler-resource-local:/dolphinscheduler \
 -p 12345:12345 \
 apache/dolphinscheduler:latest api-server
 ```
@@ -550,7 +544,7 @@ done
 
 ## FAQ
 
-### How to stop dolphinscheduler by docker-compose?
+### How to stop DolphinScheduler by docker-compose?
 
 Stop containers:
 
@@ -564,7 +558,7 @@ Stop containers and remove containers, networks and volumes:
 docker-compose down -v
 ```
 
-### How to deploy dolphinscheduler on Docker Swarm?
+### How to deploy DolphinScheduler on Docker Swarm?
 
 Assuming that the Docker Swarm cluster has been created (If there is no Docker Swarm cluster, please refer to [create-swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/))
 
@@ -804,9 +798,52 @@ Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Si
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
 
+### How to support shared storage between Master, Worker and Api server?
+
+For example, Master, Worker and Api server may use Hadoop at the same time
+
+1. Modify the volume `dolphinscheduler-shared-local` to support nfs in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+```yaml
+volumes:
+  dolphinscheduler-shared-local:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.40.0.199,nolock,soft,rw"
+      device: ":/path/to/shared/dir"
+```
+
+2. Put the Hadoop into the nfs
+
+3. Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` are correct
+
+### How to support local file resource storage instead of HDFS and S3?
+
+1. Modify the following environment variables in `config.env.sh`:
+
+```
+RESOURCE_STORAGE_TYPE=HDFS
+FS_DEFAULT_FS=file:///
+```
+
+2. Modify the volume `dolphinscheduler-resource-local` to support nfs in `docker-compose.yml`
+
+> If you want to deploy dolphinscheduler on Docker Swarm, you need modify `docker-stack.yml`
+
+```yaml
+volumes:
+  dolphinscheduler-resource-local:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.40.0.199,nolock,soft,rw"
+      device: ":/path/to/resource/dir"
+```
+
 ### How to support S3 resource storage like MinIO?
 
-Take MinIO as an example:  Modify the following environment variables in `config.env.sh`
+Take MinIO as an example: Modify the following environment variables in `config.env.sh`
 
 ```
 RESOURCE_STORAGE_TYPE=S3

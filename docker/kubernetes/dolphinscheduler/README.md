@@ -15,6 +15,8 @@ DolphinScheduler
   * [How to support Python 2 pip and custom requirements\.txt?](#how-to-support-python-2-pip-and-custom-requirementstxt)
   * [How to support Python 3?](#how-to-support-python-3)
   * [How to support Hadoop, Spark, Flink, Hive or DataX?](#how-to-support-hadoop-spark-flink-hive-or-datax)
+  * [How to support shared storage between Master, Worker and Api server?](#how-to-support-shared-storage-between-master-worker-and-api-server)
+  * [How to support local file resource storage instead of HDFS and S3?](#how-to-support-local-file-resource-storage-instead-of-hdfs-and-s3)
   * [How to support S3 resource storage like MinIO?](#how-to-support-s3-resource-storage-like-minio)
   * [How to configure SkyWalking?](#how-to-configure-skywalking)
 
@@ -396,11 +398,11 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 
 5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`
 
-6. Modify postgresql `enabled` to `false`
+6. Modify postgresql `enabled` to `false` in `values.yaml`
 
-7. Modify externalDatabase (especially modify `host`, `username` and `password`):
+7. Modify externalDatabase (especially modify `host`, `username` and `password`) in `values.yaml`:
 
-```
+```yaml
 externalDatabase:
   type: "mysql"
   driver: "com.mysql.jdbc.Driver"
@@ -596,17 +598,66 @@ Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Si
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
 
+### How to support shared storage between Master, Worker and Api server?
+
+For example, Master, Worker and Api server may use Hadoop at the same time
+
+1. Modify the following configurations in `values.yaml`
+
+```yaml
+common:
+  sharedStoragePersistence:
+    enabled: false
+    mountPath: "/opt/soft"
+    accessModes:
+    - "ReadWriteMany"
+    storageClassName: "-"
+    storage: "20Gi"
+```
+
+`storageClassName` and `storage` need to be modified to actual values
+
+> **Note**: `storageClassName` must support the access mode: `ReadWriteMany`
+
+2. Put the Hadoop into the nfs
+
+3. Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` are correct
+
+### How to support local file resource storage instead of HDFS and S3?
+
+Modify the following configurations in `values.yaml`
+
+```yaml
+common:
+  configmap:
+    RESOURCE_STORAGE_TYPE: "HDFS"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "file:///"
+  fsFileResourcePersistence:
+    enabled: true
+    accessModes:
+    - "ReadWriteMany"
+    storageClassName: "-"
+    storage: "20Gi"
+```
+
+`storageClassName` and `storage` need to be modified to actual values
+
+> **Note**: `storageClassName` must support the access mode: `ReadWriteMany`
+
 ### How to support S3 resource storage like MinIO?
 
-Take MinIO as an example:  Modify the following environment variables in `config.env.sh`
+Take MinIO as an example: Modify the following configurations in `values.yaml`
 
-```
-RESOURCE_STORAGE_TYPE=S3
-RESOURCE_UPLOAD_PATH=/dolphinscheduler
-FS_DEFAULT_FS=s3a://BUCKET_NAME
-FS_S3A_ENDPOINT=http://MINIO_IP:9000
-FS_S3A_ACCESS_KEY=MINIO_ACCESS_KEY
-FS_S3A_SECRET_KEY=MINIO_SECRET_KEY
+```yaml
+common:
+  configmap:
+    RESOURCE_STORAGE_TYPE: "S3"
+    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
+    FS_DEFAULT_FS: "s3a://BUCKET_NAME"
+    FS_S3A_ENDPOINT: "http://MINIO_IP:9000"
+    FS_S3A_ACCESS_KEY: "MINIO_ACCESS_KEY"
+    FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
 ```
 
 `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` need to be modified to actual values
@@ -615,13 +666,15 @@ FS_S3A_SECRET_KEY=MINIO_SECRET_KEY
 
 ### How to configure SkyWalking?
 
-Modify SKYWALKING environment variables in `config.env.sh`:
+Modify SKYWALKING configurations in `values.yaml`:
 
-```
-SKYWALKING_ENABLE=true
-SW_AGENT_COLLECTOR_BACKEND_SERVICES=127.0.0.1:11800
-SW_GRPC_LOG_SERVER_HOST=127.0.0.1
-SW_GRPC_LOG_SERVER_PORT=11800
+```yaml
+common:
+  configmap:
+    SKYWALKING_ENABLE: "true"
+    SW_AGENT_COLLECTOR_BACKEND_SERVICES: "127.0.0.1:11800"
+    SW_GRPC_LOG_SERVER_HOST: "127.0.0.1"
+    SW_GRPC_LOG_SERVER_PORT: "11800"
 ```
 
 For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
