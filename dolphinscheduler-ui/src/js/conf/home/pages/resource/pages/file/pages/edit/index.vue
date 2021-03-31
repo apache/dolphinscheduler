@@ -32,9 +32,8 @@
             </div>
           </template>
           <m-no-data :msg="msg" v-if="msg"></m-no-data>
-
         </template>
-        <template v-if="!isViewType">
+        <template v-else>
           <m-no-type></m-no-type>
         </template>
       </div>
