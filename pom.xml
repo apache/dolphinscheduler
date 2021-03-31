@@ -555,7 +555,7 @@
 
     <build>
 
-        <finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
 
         <pluginManagement>
             <plugins>
@@ -817,7 +817,7 @@
                         <include>**/server/master/ConditionsTaskTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include> -->
                         <include>**/server/master/ParamsTest.java</include>
-                        <include>**/server/register/ZookeeperNodeManagerTest.java</include>
+                        <include>**/server/register/ServerNodeManagerTest.java</include>
                         <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>

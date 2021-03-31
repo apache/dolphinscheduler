@@ -26,7 +26,7 @@
             <span>{{$t('Group')}}</span>
           </th>
           <th>
-            <span>IPList</span>
+            <span>{{$t('Addresses')}}</span>
           </th>
           <th>
             <span>{{$t('Create Time')}}</span>
@@ -34,18 +34,19 @@
           <th>
             <span>{{$t('Update Time')}}</span>
           </th>
+          <th scope="col" width="70">
+            <span>{{$t('Operation')}}</span>
+          </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">
           <td>
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span>
-              {{item.name}}
-            </span>
+            <span>{{item.name}}</span>
           </td>
           <td>
-            <span>{{item.ipList.join(',')}}</span>
+            <span style="display: inline-block; margin-left: 10px; margin-right: 10px">{{item.addrList}}</span>
           </td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
@@ -54,6 +55,24 @@
           <td>
             <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
             <span v-else>-</span>
+          </td>
+          <td>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-edit" :title="$t('Edit')" @click="_edit(item)" v-if="!item.systemDefault"></x-button>
+            <x-poptip
+                    :ref="'poptip-delete-' + $index"
+                    placement="bottom-end"
+                    width="90"
+                    v-if="!item.systemDefault">
+              <p>{{$t('Delete?')}}</p>
+              <div style="text-align: right; margin: 0;padding-top: 4px;">
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+              </div>
+              <template slot="reference">
+                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-trash" :title="$t('delete')">
+                </x-button>
+              </template>
+            </x-poptip>
           </td>
         </tr>
       </table>

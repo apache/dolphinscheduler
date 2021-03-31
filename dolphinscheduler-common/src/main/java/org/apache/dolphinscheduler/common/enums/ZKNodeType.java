@@ -25,7 +25,6 @@ public enum ZKNodeType {
      * 0 master node;
      * 1 worker node;
      * 2 dead_server node;
-     * 3 task_queue node;
      */
-    MASTER, WORKER, DEAD_SERVER, TASK_QUEUE;
+    MASTER, WORKER, DEAD_SERVER;
 }

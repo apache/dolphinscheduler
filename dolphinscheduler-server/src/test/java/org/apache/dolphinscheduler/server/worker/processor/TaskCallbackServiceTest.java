@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -31,7 +32,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
+import org.apache.dolphinscheduler.server.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -61,24 +62,11 @@ import io.netty.channel.Channel;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    TaskCallbackServiceTestConfig.class,
-    SpringZKServer.class,
-    SpringApplicationContext.class,
-    MasterRegistry.class,
-    WorkerRegistry.class,
-    ZookeeperRegistryCenter.class,
-    MasterConfig.class,
-    WorkerConfig.class,
-    RegisterOperator.class,
-    ZookeeperConfig.class,
-    ZookeeperNodeManager.class,
-    TaskCallbackService.class,
-    TaskResponseService.class,
-    TaskAckProcessor.class,
-    TaskResponseProcessor.class,
-    TaskExecuteProcessor.class,
-    CuratorZookeeperClient.class,
-    TaskExecutionContextCacheManagerImpl.class})
+        TaskCallbackServiceTestConfig.class, SpringZKServer.class, SpringApplicationContext.class,
+        SpringConnectionFactory.class, MasterRegistry.class, WorkerRegistry.class, ZookeeperRegistryCenter.class,
+        MasterConfig.class, WorkerConfig.class, RegisterOperator.class, ZookeeperConfig.class, ServerNodeManager.class,
+        TaskCallbackService.class, TaskResponseService.class, TaskAckProcessor.class, TaskResponseProcessor.class,
+        TaskExecuteProcessor.class, CuratorZookeeperClient.class, TaskExecutionContextCacheManagerImpl.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
