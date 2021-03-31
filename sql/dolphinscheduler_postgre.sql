@@ -569,7 +569,8 @@ CREATE TABLE t_ds_task_instance (
   task_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
   executor_id int DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
 
 --
