@@ -1,4 +1,37 @@
-## DolphinScheduler是什么?
+DolphinScheduler
+=================
+
+* [DolphinScheduler 是什么?](#dolphinscheduler-是什么)
+* [先决条件](#先决条件)
+* [如何使用 Docker 镜像](#如何使用-docker-镜像)
+    * [以 docker\-compose 的方式启动 DolphinScheduler (推荐)](#以-docker-compose-的方式启动-dolphinscheduler-推荐)
+    * [或者通过指定已存在的 PostgreSQL 和 ZooKeeper 服务](#或者通过指定已存在的-postgresql-和-zookeeper-服务)
+    * [或者运行 DolphinScheduler 中的部分服务](#或者运行-dolphinscheduler-中的部分服务)
+* [如何构建一个 Docker 镜像](#如何构建一个-docker-镜像)
+* [支持矩阵](#支持矩阵)
+* [环境变量](#环境变量)
+  * [数据库](#数据库)
+  * [ZooKeeper](#zookeeper)
+  * [通用](#通用)
+  * [Master Server](#master-server)
+  * [Worker Server](#worker-server)
+  * [Alert Server](#alert-server)
+  * [Api Server](#api-server)
+  * [Logger Server](#logger-server)
+* [初始化脚本](#初始化脚本)
+* [FAQ](#faq)
+  * [如何通过 docker\-compose 停止 dolphinscheduler？](#如何通过-docker-compose-停止-dolphinscheduler)
+  * [如何在 Docker Swarm 上部署 dolphinscheduler？](#如何在-docker-swarm-上部署-dolphinscheduler)
+  * [如何用 MySQL 替代 PostgreSQL 作为 DolphinScheduler 的数据库？](#如何用-mysql-替代-postgresql-作为-dolphinscheduler-的数据库)
+  * [如何在数据源中心支持 MySQL 数据源？](#如何在数据源中心支持-mysql-数据源)
+  * [如何在数据源中心支持 Oracle 数据源？](#如何在数据源中心支持-oracle-数据源)
+  * [如何支持 Python 2 pip 以及自定义 requirements\.txt?](#如何支持-python-2-pip-以及自定义-requirementstxt)
+  * [如何支持 Python 3？](#如何支持-python-3)
+  * [如何支持 Hadoop, Spark, Flink, Hive 或 DataX？](#如何支持-hadoop-spark-flink-hive-或-datax)
+  * [如何支持 S3 资源存储，例如 MinIO?](#如何支持-s3-资源存储例如-minio)
+  * [如何配置 SkyWalking?](#如何配置-skywalking)
+
+## DolphinScheduler 是什么?
 
 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 
@@ -16,17 +49,17 @@ Official Website: https://dolphinscheduler.apache.org
 - [Docker](https://docs.docker.com/engine/) 1.13.1+
 - [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
 
-## 如何使用docker镜像
+## 如何使用 Docker 镜像
 
-#### 以 docker-compose 的方式启动dolphinscheduler(推荐)
+#### 以 docker-compose 的方式启动 DolphinScheduler (推荐)
 
 ```
 $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 ```
 
-在`docker-compose.yml`文件中，默认的创建`Postgres`的用户、密码和数据库，默认值分别为：`root`、`root`、`dolphinscheduler`。
+在`docker-compose.yml`文件中，默认创建的**PostgreSQL**的用户、密码和数据库，默认值分别为：`root`、`root`、`dolphinscheduler`。
 
-同时，默认的`Zookeeper`也会在`docker-compose.yml`文件中被创建。
+同时，默认的**ZooKeeper**也会在`docker-compose.yml`文件中被创建。
 
 访问前端页面：http://192.168.xx.xx:12345/dolphinscheduler
 
@@ -34,9 +67,9 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 
 > **提示**: 为了在docker中快速开始，你可以创建一个名为`ds`的租户，并将这个租户`ds`关联到用户`admin`
 
-#### 或者通过环境变量 **`DATABASE_HOST`**, **`DATABASE_PORT`**, **`ZOOKEEPER_QUORUM`**
+#### 或者通过指定已存在的 PostgreSQL 和 ZooKeeper 服务
 
-你可以指定已经存在的 **`Postgres`** 和 **`Zookeeper`** 服务. 如下:
+你可以指定已存在的 **PostgreSQL** 和 **ZooKeeper** 服务. 如下:
 
 ```
 $ docker run -d --name dolphinscheduler \
@@ -49,9 +82,9 @@ apache/dolphinscheduler:latest all
 
 访问前端页面：http://192.168.xx.xx:12345/dolphinscheduler
 
-#### 或者运行dolphinscheduler中的部分服务
+#### 或者运行 DolphinScheduler 中的部分服务
 
-你能够运行dolphinscheduler中的部分服务。
+你能够运行 DolphinScheduler 中的部分服务。
 
 * 创建一个 **本地卷** 用于资源存储，如下:
 
@@ -103,7 +136,7 @@ apache/dolphinscheduler:latest alert-server
 
 **注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM`。
 
-## 如何构建一个docker镜像
+## 如何构建一个 Docker 镜像
 
 你能够在类Unix系统和Windows系统中构建一个docker镜像。
 
@@ -120,7 +153,7 @@ Windows系统, 如下:
 C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
-如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。
+如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容
 
 ## 支持矩阵
 
@@ -162,7 +195,9 @@ C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 ## 环境变量
 
-DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会使用默认值
+Docker 容器通过环境变量进行配置，缺省时将会使用默认值
+
+特别地，在 Docker Compose 和 Docker Swarm 中，可以通过环境变量配置文件 `config.env.sh` 进行配置
 
 ### 数据库
 
@@ -768,5 +803,33 @@ $SPARK_HOME2/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_H
 Spark on YARN (部署方式为 `cluster` 或 `client`) 需要 Hadoop 支持. 类似于 Spark 支持, 支持 Hadoop 的操作几乎和前面的步骤相同
 
 确保 `$HADOOP_HOME` 和 `$HADOOP_CONF_DIR` 存在
+
+### 如何支持 S3 资源存储，例如 MinIO?
+
+以 MinIO 为例: 修改 `config.env.sh` 文件中下面的环境变量
+
+```
+RESOURCE_STORAGE_TYPE=S3
+RESOURCE_UPLOAD_PATH=/dolphinscheduler
+FS_DEFAULT_FS=s3a://BUCKET_NAME
+FS_S3A_ENDPOINT=http://MINIO_IP:9000
+FS_S3A_ACCESS_KEY=MINIO_ACCESS_KEY
+FS_S3A_SECRET_KEY=MINIO_SECRET_KEY
+```
+
+`BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` 和 `MINIO_SECRET_KEY` 需要被修改为实际值
+
+> **注意**: `MINIO_IP` 只能使用 IP 而非域名, 因为 DolphinScheduler 尚不支持 S3 路径风格访问 (S3 path style access)
+
+### 如何配置 SkyWalking?
+
+修改 `config.env.sh` 文件中的 SKYWALKING 环境变量
+
+```
+SKYWALKING_ENABLE=true
+SW_AGENT_COLLECTOR_BACKEND_SERVICES=127.0.0.1:11800
+SW_GRPC_LOG_SERVER_HOST=127.0.0.1
+SW_GRPC_LOG_SERVER_PORT=11800
+```
 
 更多信息请查看 [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) 文档.

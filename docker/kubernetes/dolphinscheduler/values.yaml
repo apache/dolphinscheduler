@@ -67,7 +67,7 @@ externalZookeeper:
   zookeeperRoot: "/dolphinscheduler"
 
 common:
-  ## ConfigMap
+  ## Configmap
   configmap:
     DOLPHINSCHEDULER_OPTS: ""
     DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
@@ -146,7 +146,7 @@ master:
   #   requests:
   #     memory: "2Gi"
   #     cpu: "500m"
-  ## ConfigMap
+  ## Configmap
   configmap:
     MASTER_SERVER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
     MASTER_EXEC_THREADS: "100"
@@ -215,7 +215,7 @@ worker:
   #   requests:
   #     memory: "2Gi"
   #     cpu: "500m"
-  ## ConfigMap
+  ## Configmap
   configmap:
     LOGGER_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
     WORKER_SERVER_OPTS: "-Xms1g -Xmx1g -Xmn512m"
@@ -295,7 +295,7 @@ alert:
   #   requests:
   #     memory: "1Gi"
   #     cpu: "500m"
-  ## ConfigMap
+  ## Configmap
   configmap:
     ALERT_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
     XLS_FILE_PATH: "/tmp/xls"
@@ -371,7 +371,7 @@ api:
   #   requests:
   #     memory: "1Gi"
   #     cpu: "500m"
-  ## ConfigMap
+  ## Configmap
   configmap:
     API_SERVER_OPTS: "-Xms512m -Xmx512m -Xmn256m"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.

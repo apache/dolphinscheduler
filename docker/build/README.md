@@ -1,3 +1,36 @@
+DolphinScheduler
+=================
+
+* [What is DolphinScheduler?](#what-is-dolphinscheduler)
+* [Prerequisites](#prerequisites)
+* [How to use this Docker image](#how-to-use-this-docker-image)
+    * [You can start a DolphinScheduler by docker\-compose (recommended)](#you-can-start-a-dolphinscheduler-by-docker-compose-recommended)
+    * [Or via specifying the existing PostgreSQL and ZooKeeper service](#or-via-specifying-the-existing-postgresql-and-zookeeper-service)
+    * [Or start a standalone DolphinScheduler server](#or-start-a-standalone-dolphinscheduler-server)
+* [How to build a Docker image](#how-to-build-a-docker-image)
+* [Support Matrix](#support-matrix)
+* [Environment Variables](#environment-variables)
+  * [Database](#database)
+  * [ZooKeeper](#zookeeper)
+  * [Common](#common)
+  * [Master Server](#master-server)
+  * [Worker Server](#worker-server)
+  * [Alert Server](#alert-server)
+  * [Api Server](#api-server)
+  * [Logger Server](#logger-server)
+* [Initialization scripts](#initialization-scripts)
+* [FAQ](#faq)
+  * [How to stop dolphinscheduler by docker\-compose?](#how-to-stop-dolphinscheduler-by-docker-compose)
+  * [How to deploy dolphinscheduler on Docker Swarm?](#how-to-deploy-dolphinscheduler-on-docker-swarm)
+  * [How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?](#how-to-use-mysql-as-the-dolphinschedulers-database-instead-of-postgresql)
+  * [How to support MySQL datasource in Datasource manage?](#how-to-support-mysql-datasource-in-datasource-manage)
+  * [How to support Oracle datasource in Datasource manage?](#how-to-support-oracle-datasource-in-datasource-manage)
+  * [How to support Python 2 pip and custom requirements\.txt?](#how-to-support-python-2-pip-and-custom-requirementstxt)
+  * [How to support Python 3?](#how-to-support-python-3)
+  * [How to support Hadoop, Spark, Flink, Hive or DataX?](#how-to-support-hadoop-spark-flink-hive-or-datax)
+  * [How to support S3 resource storage like MinIO?](#how-to-support-s3-resource-storage-like-minio)
+  * [How to configure SkyWalking?](#how-to-configure-skywalking)
+
 ## What is DolphinScheduler?
 
 DolphinScheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
@@ -16,17 +49,17 @@ Official Website: https://dolphinscheduler.apache.org
 - [Docker](https://docs.docker.com/engine/) 1.13.1+
 - [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
 
-## How to use this docker image
+## How to use this Docker image
 
-#### You can start a dolphinscheduler by docker-compose (recommended)
+#### You can start a DolphinScheduler by docker-compose (recommended)
 
 ```
 $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 ```
 
-The default **postgres** user `root`, postgres password `root` and database `dolphinscheduler` are created in the `docker-compose.yml`.
+The default **PostgreSQL** username `root`, password `root` and database `dolphinscheduler` are created in the `docker-compose.yml`.
 
-The default **zookeeper** is created in the `docker-compose.yml`.
+The default **ZooKeeper** is created in the `docker-compose.yml`.
 
 Access the Web UI: http://192.168.xx.xx:12345/dolphinscheduler
 
@@ -34,9 +67,9 @@ The default username is `admin` and the default password is `dolphinscheduler123
 
 > **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
 
-#### Or via Environment Variables **`DATABASE_HOST`**, **`DATABASE_PORT`**, **`ZOOKEEPER_QUORUM`**
+#### Or via specifying the existing PostgreSQL and ZooKeeper service
 
-You can specify **existing postgres and zookeeper service**. Example:
+You can specify existing **PostgreSQL** and **ZooKeeper** service. Example:
 
 ```
 $ docker run -d --name dolphinscheduler \
@@ -49,9 +82,9 @@ apache/dolphinscheduler:latest all
 
 Access the Web UI：http://192.168.xx.xx:12345/dolphinscheduler
 
-#### Or start a standalone dolphinscheduler server
+#### Or start a standalone DolphinScheduler server
 
-You can start a standalone dolphinscheduler server.
+You can start a standalone DolphinScheduler server.
 
 * Create a **local volume** for resource storage, For example:
 
@@ -103,7 +136,7 @@ apache/dolphinscheduler:latest alert-server
 
 **Note**: You must be specify `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_DATABASE`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
 
-## How to build a docker image
+## How to build a Docker image
 
 You can build a docker image in A Unix-like operating system, You can also build it in Windows operating system.
 
@@ -162,7 +195,9 @@ Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script
 
 ## Environment Variables
 
-The DolphinScheduler Docker container is configured through environment variables, and the default value will be used if an environment variable is not set.
+The Docker container is configured through environment variables, and the default value will be used if an environment variable is not set
+
+Especially, it can be configured through the environment variable configuration file `config.env.sh` in Docker Compose and Docker Swarm
 
 ### Database
 
@@ -574,7 +609,7 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 
 6. Add `dolphinscheduler-mysql` service in `docker-compose.yml` (**Optional**, you can directly use a external MySQL database)
 
-7. Modify DATABASE environments in `config.env.sh`
+7. Modify DATABASE environment variables in `config.env.sh`
 
 ```
 DATABASE_TYPE=mysql
@@ -768,5 +803,33 @@ Similarly, check whether the task log contains the output like `Pi is roughly 3.
 Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Similar to Spark support, the operation of supporting Hadoop is almost the same as the previous steps
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
+
+### How to support S3 resource storage like MinIO?
+
+Take MinIO as an example:  Modify the following environment variables in `config.env.sh`
+
+```
+RESOURCE_STORAGE_TYPE=S3
+RESOURCE_UPLOAD_PATH=/dolphinscheduler
+FS_DEFAULT_FS=s3a://BUCKET_NAME
+FS_S3A_ENDPOINT=http://MINIO_IP:9000
+FS_S3A_ACCESS_KEY=MINIO_ACCESS_KEY
+FS_S3A_SECRET_KEY=MINIO_SECRET_KEY
+```
+
+`BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` need to be modified to actual values
+
+> **Note**: `MINIO_IP` can only use IP instead of domain name, because DolphinScheduler currently doesn't support S3 path style access
+
+### How to configure SkyWalking?
+
+Modify SKYWALKING environment variables in `config.env.sh`:
+
+```
+SKYWALKING_ENABLE=true
+SW_AGENT_COLLECTOR_BACKEND_SERVICES=127.0.0.1:11800
+SW_GRPC_LOG_SERVER_HOST=127.0.0.1
+SW_GRPC_LOG_SERVER_PORT=11800
+```
 
 For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.

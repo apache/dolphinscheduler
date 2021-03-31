@@ -1,8 +1,27 @@
-# DolphinScheduler
+DolphinScheduler
+=================
+
+* [Introduction](#introduction)
+* [Prerequisites](#prerequisites)
+* [Installing the Chart](#installing-the-chart)
+* [Access DolphinScheduler UI](#access-dolphinscheduler-ui)
+* [Uninstalling the Chart](#uninstalling-the-chart)
+* [Support Matrix](#support-matrix)
+* [Configuration](#configuration)
+* [FAQ](#faq)
+  * [How to use MySQL as the DolphinScheduler's database instead of PostgreSQL?](#how-to-use-mysql-as-the-dolphinschedulers-database-instead-of-postgresql)
+  * [How to support MySQL datasource in Datasource manage?](#how-to-support-mysql-datasource-in-datasource-manage)
+  * [How to support Oracle datasource in Datasource manage?](#how-to-support-oracle-datasource-in-datasource-manage)
+  * [How to support Python 2 pip and custom requirements\.txt?](#how-to-support-python-2-pip-and-custom-requirementstxt)
+  * [How to support Python 3?](#how-to-support-python-3)
+  * [How to support Hadoop, Spark, Flink, Hive or DataX?](#how-to-support-hadoop-spark-flink-hive-or-datax)
+  * [How to support S3 resource storage like MinIO?](#how-to-support-s3-resource-storage-like-minio)
+  * [How to configure SkyWalking?](#how-to-configure-skywalking)
+
+## Introduction
 
 [DolphinScheduler](https://dolphinscheduler.apache.org) is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
-## Introduction
 This chart bootstraps a [DolphinScheduler](https://dolphinscheduler.apache.org) distributed deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
@@ -577,5 +596,32 @@ Spark on YARN (Deploy Mode is `cluster` or `client`) requires Hadoop support. Si
 
 Ensure that `$HADOOP_HOME` and `$HADOOP_CONF_DIR` exists
 
-For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+### How to support S3 resource storage like MinIO?
 
+Take MinIO as an example:  Modify the following environment variables in `config.env.sh`
+
+```
+RESOURCE_STORAGE_TYPE=S3
+RESOURCE_UPLOAD_PATH=/dolphinscheduler
+FS_DEFAULT_FS=s3a://BUCKET_NAME
+FS_S3A_ENDPOINT=http://MINIO_IP:9000
+FS_S3A_ACCESS_KEY=MINIO_ACCESS_KEY
+FS_S3A_SECRET_KEY=MINIO_SECRET_KEY
+```
+
+`BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` need to be modified to actual values
+
+> **Note**: `MINIO_IP` can only use IP instead of domain name, because DolphinScheduler currently doesn't support S3 path style access
+
+### How to configure SkyWalking?
+
+Modify SKYWALKING environment variables in `config.env.sh`:
+
+```
+SKYWALKING_ENABLE=true
+SW_AGENT_COLLECTOR_BACKEND_SERVICES=127.0.0.1:11800
+SW_GRPC_LOG_SERVER_HOST=127.0.0.1
+SW_GRPC_LOG_SERVER_PORT=11800
+```
+
+For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
