@@ -23,8 +23,7 @@
     </sql>
     <delete id="deleteProjectRelation">
         delete from t_ds_relation_project_user
-        where 1=1
-        and user_id = #{userId}
+        where user_id = #{userId}
         <if test="projectId != 0 ">
             and project_id = #{projectId}
         </if>

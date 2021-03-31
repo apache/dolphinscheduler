@@ -42,17 +42,17 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -131,7 +131,11 @@ public class SqlTask extends AbstractTask {
             baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(sqlParameters.getType()),
                     sqlTaskExecutionContext.getConnectionParams());
 
-            // ready to execute SQL and parameter entity Map
+            // spilt and analysis sql
+            String sql = this.analysisSqlScript(sqlParameters.getSql())  ;
+            if (sql != null) {
+                sqlParameters.setSql(sql);
+            }
             SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
             List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())
                     .orElse(new ArrayList<>())
@@ -158,6 +162,43 @@ public class SqlTask extends AbstractTask {
             throw e;
         }
     }
+
+    /**
+     *  spilt and analysis sql
+     * @param sqlScript
+     * @return
+     */
+    private String analysisSqlScript(String sqlScript) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(sqlScript.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+            String line;
+            StringBuffer strBuf = new StringBuffer();
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().equals("") && !line.trim().startsWith("--")) {
+                    if (line.trim().endsWith(";")) {
+                        strBuf.append(line.trim() + "@_@" + "\r\n");
+                    } else {
+                        strBuf.append(line.trim() + " ");
+                    }
+                }
+            }
+            String s = strBuf.toString();
+            String[] split = s.split("@_@");
+            List<String> collect = Arrays.asList(split).stream().map(a -> {
+                String s1 = a.trim().replaceAll("\r\n", "")
+                        .replaceAll("\n", "")
+                        .replaceAll("\\s+", " ")
+                        .toLowerCase();
+                return s1;
+            }).filter(a -> StringUtils.isNotEmpty(a) || a.startsWith("commit"))
+                    .collect(Collectors.toList());
+            return collect.get(0);
+        } catch (Exception e) {
+            logger.error("analysis sql error", e);
+        }
+        return null;
+    }
+
 
     /**
      * ready to execute SQL and parameter entity Map

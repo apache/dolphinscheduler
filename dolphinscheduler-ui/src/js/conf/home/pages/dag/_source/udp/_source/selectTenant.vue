@@ -22,65 +22,85 @@
           size="small"
           style="width: 180px">
     <el-option
-            v-for="item in itemList"
-            :key="item.id"
-            :value="item.id"
-            :label="item.tenantCode">
+        v-for="item in itemList"
+        :key="item.id"
+        :disabled="item.disabled"
+        :label="item.tenantCode"
+        :value="item.id">
     </el-option>
   </el-select>
 </template>
 <script>
-  import disabledState from '@/module/mixin/disabledState'
-  export default {
-    name: 'form-tenant',
-    data () {
-      return {
-        selectedValue: this.value,
-        itemList: []
+import disabledState from '@/module/mixin/disabledState'
+export default {
+  name: 'form-tenant',
+  data() {
+    return {
+      selectedValue: this.value,
+      itemList: []
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    value: {
+      type: String,
+      default: 'default'
+    }
+  },
+  model: {
+    prop: 'value',
+    event: 'tenantSelectEvent'
+  },
+  mounted() {
+    let result = this.itemList.some(item => {
+      if (item.id === this.value) {
+        return true
       }
-    },
-    mixins: [disabledState],
-    props: {
-      value: {
-        type: String,
-        default: 'default'
-      }
-    },
-    model: {
-      prop: 'value',
-      event: 'tenantSelectEvent'
-    },
-    mounted () {
-      let result = this.itemList.some(item => {
-        if (item.id === this.value) {
-          return true
-        }
-      })
-      if (!result) {
-        this.selectedValue = 'default'
-      }
-    },
-    methods: {
-      _onChange (o) {
-        this.$emit('tenantSelectEvent', o)
-      }
-    },
-    watch: {
-      value (val) {
-        this.selectedValue = val
-      }
-    },
-    created () {
-      let stateTenantAllList = this.store.state.security.tenantAllList || []
-      if (stateTenantAllList.length) {
-        this.itemList = stateTenantAllList
+    })
+    if (!result) {
+      this.selectedValue = 'default'
+    }
+  },
+  methods: {
+    _onChange(o) {
+      this.$emit('tenantSelectEvent', o)
+    }
+  },
+  watch: {
+    value(val) {
+      this.selectedValue = val
+    }
+  },
+  created() {
+    let stateTenantAllList = this.store.state.security.tenantAllList || []
+    let currentUserInfo = this.store.state.user.userInfo || []
+    if (stateTenantAllList.length) {
+      this.itemList = stateTenantAllList
+      if (currentUserInfo && currentUserInfo.tenantId === 0) {
+        this.itemList.forEach(function (ele) {
+          ele.disabled = false
+        });
       } else {
-        this.store.dispatch('security/getTenantList').then(res => {
-          this.$nextTick(() => {
-            this.itemList = res
-          })
-        })
+        this.itemList.forEach(function (ele) {
+          ele.id === currentUserInfo.tenantId ? ele.disabled = false : ele.disabled = true
+        });
       }
+    } else {
+      this.store.dispatch('security/getTenantList').then(res => {
+        this.$nextTick(() => {
+          this.itemList = res
+          if (currentUserInfo && currentUserInfo.tenantId === 0) {
+            this.itemList.forEach(function (ele) {
+              ele.disabled = false
+            });
+          } else {
+            this.itemList.forEach(function (ele) {
+              ele.id === currentUserInfo.tenantId ? ele.disabled = false : ele.disabled = true
+            });
+          }
+        })
+      })
     }
   }
+}
 </script>

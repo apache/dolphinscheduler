@@ -74,16 +74,17 @@
         from t_ds_task_instance t
         left join t_ds_process_definition d on d.id=t.process_definition_id
         left join t_ds_project p on p.id=d.project_id
-        where 1=1
-        <if test="projectIds != null and projectIds.length != 0">
-            and d.project_id in
-            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
-        <if test="startTime != null and endTime != null">
-            and t.start_time > #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
-        </if>
+        <where>
+            <if test="projectIds != null and projectIds.length != 0">
+                d.project_id in
+                <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+                    #{i}
+                </foreach>
+            </if>
+            <if test="startTime != null and endTime != null">
+                and t.start_time > #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
         group by t.state
     </select>
     <select id="queryByInstanceIdAndName" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">

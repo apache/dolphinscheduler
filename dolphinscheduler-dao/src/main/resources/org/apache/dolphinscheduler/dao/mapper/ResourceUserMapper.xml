@@ -21,25 +21,27 @@
     <delete id="deleteResourceUser">
         delete
         from t_ds_relation_resources_user
-        where 1 = 1
-        <if test="userId != 0">
-            and user_id = #{userId}
-        </if>
-        <if test="resourceId != 0">
-            and resources_id = #{resourceId}
-        </if>
+        <where>
+            <if test="userId != 0">
+                 user_id = #{userId}
+            </if>
+            <if test="resourceId != 0">
+                and resources_id = #{resourceId}
+            </if>
+        </where>
     </delete>
 
     <delete id="deleteResourceUserArray" parameterType="java.lang.Integer">
         delete
         from t_ds_relation_resources_user
-        where 1 = 1
-        <if test="userId != 0">
-            and user_id = #{userId}
-        </if>
-        and resources_id in
-        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
-            #{i}
-        </foreach>
+        <where>
+            <if test="userId != 0">
+              user_id = #{userId}
+            </if>
+            and resources_id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </where>
     </delete>
 </mapper>

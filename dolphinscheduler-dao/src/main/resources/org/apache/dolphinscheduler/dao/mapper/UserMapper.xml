@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UserMapper">
     <sql id="baseSql">
-       id, user_name, user_password, user_type, email, phone, tenant_id, create_time, update_time, queue, state
+       id, user_name, user_password, user_type, email, phone, tenant_id, create_time, update_time, queue, `state`
     </sql>
     <sql id="baseSqlV2">
        ${alias}.id, ${alias}.user_name, ${alias}.user_password, ${alias}.user_type, ${alias}.email, ${alias}.phone, ${alias}.tenant_id,
@@ -50,10 +50,11 @@
         from t_ds_user u
         left join t_ds_tenant t on u.tenant_id=t.id
         left join t_ds_queue q on t.queue_id = q.id
-        where 1=1
-        <if test="userName!=null and userName != ''">
-            and u.user_name like concat ('%', #{userName}, '%')
-        </if>
+        <where>
+            <if test="userName!=null and userName != ''">
+                u.user_name like concat ('%', #{userName}, '%')
+            </if>
+        </where>
         order by u.update_time desc
     </select>
     <select id="queryDetailsById" resultType="org.apache.dolphinscheduler.dao.entity.User">
