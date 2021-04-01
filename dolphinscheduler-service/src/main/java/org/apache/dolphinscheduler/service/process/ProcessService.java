@@ -2181,7 +2181,7 @@ public class ProcessService {
      */
     public int processDefinitionToDB(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         if (null == processDefinition || null == processDefinitionLog) {
-            return Constants.EXIT_CODE_FAILURE;
+            return Constants.DEFINITION_FAILURE;
         }
 
         processDefinitionLog.setId(processDefinition.getId());
@@ -2202,7 +2202,7 @@ public class ProcessService {
      */
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog);
-        if (switchResult != Constants.EXIT_CODE_FAILURE) {
+        if (switchResult != Constants.DEFINITION_FAILURE) {
             switchProcessTaskRelationVersion(processDefinition);
         }
         return switchResult;
@@ -2227,7 +2227,7 @@ public class ProcessService {
         Date now = new Date();
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setUserId(operator.getId());
-        taskDefinition.setVersion(version == null || version == 0 ? 1 : version);
+        taskDefinition.setVersion(version == null || version == 0 ? 1 : version + 1);
         taskDefinition.setUpdateTime(now);
         setTaskFromTaskNode(taskNode, taskDefinition);
         int update = taskDefinitionMapper.updateById(taskDefinition);
@@ -2284,14 +2284,17 @@ public class ProcessService {
      */
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
                                      String connects, ProcessData processData, ProcessDefinition processDefinition) {
-        createTaskAndRelation(operator, project.getCode(), processDefinition, processData);
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
+        Map<String, TaskDefinition> taskDefinitionMap = handleTaskDefinition(operator, project.getCode(), processData.getTasks());
+        if (Constants.DEFINITION_FAILURE == handleTaskRelation(operator, project.getCode(), processDefinitionLog, processData.getTasks(), taskDefinitionMap)) {
+            return Constants.DEFINITION_FAILURE;
+        }
         return processDefinitionToDB(processDefinition, processDefinitionLog);
     }
 
     /**
-     *
+     * save processDefinition
      */
     public ProcessDefinitionLog insertProcessDefinitionLog(User operator, Long processDefinitionCode, String processDefinitionName,
                                                            ProcessData processData, Project project,
@@ -2300,7 +2303,7 @@ public class ProcessService {
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
         processDefinitionLog.setUserId(operator.getId());
         processDefinitionLog.setCode(processDefinitionCode);
-        processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version);
+        processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version + 1);
         processDefinitionLog.setName(processDefinitionName);
         processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionLog.setProjectCode(project.getCode());
@@ -2331,16 +2334,15 @@ public class ProcessService {
     }
 
     /**
-     * create task definition and task relations
+     * handle task definition
      */
-    public void createTaskAndRelation(User operator,
-                                      Long projectCode,
-                                      ProcessDefinition processDefinition,
-                                      ProcessData processData) {
-        List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-        Map<String, TaskDefinition> taskNameAndCode = new HashMap<>();
-        for (TaskNode taskNode : taskNodeList) {
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(Long.parseLong(taskNode.getCode()));
+    public Map<String, TaskDefinition> handleTaskDefinition(User operator, Long projectCode, List<TaskNode> taskNodes) {
+        if (taskNodes == null) {
+            return null;
+        }
+        Map<String, TaskDefinition> taskDefinitionMap = new HashMap<>();
+        for (TaskNode taskNode : taskNodes) {
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(StringUtils.strDigitToLong(taskNode.getCode(), -1L));
             if (taskDefinition == null) {
                 try {
                     long code = SnowFlakeUtils.getInstance().nextId();
@@ -2356,7 +2358,21 @@ public class ProcessService {
                 }
                 updateTaskDefinition(operator, projectCode, taskNode, taskDefinition);
             }
-            taskNameAndCode.put(taskNode.getName(), taskDefinition);
+            taskDefinitionMap.put(taskNode.getName(), taskDefinition);
+        }
+        return taskDefinitionMap;
+    }
+
+    /**
+     * handle task relations
+     */
+    public int handleTaskRelation(User operator,
+                                  Long projectCode,
+                                  ProcessDefinition processDefinition,
+                                  List<TaskNode> taskNodes,
+                                  Map<String, TaskDefinition> taskDefinitionMap) {
+        if (null == processDefinition || null == taskNodes || null == taskDefinitionMap) {
+            return Constants.DEFINITION_FAILURE;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
@@ -2364,7 +2380,7 @@ public class ProcessService {
         }
         List<ProcessTaskRelation> builderRelationList = new ArrayList<>();
         Date now = new Date();
-        for (TaskNode taskNode : taskNodeList) {
+        for (TaskNode taskNode : taskNodes) {
             List<String> depList = taskNode.getDepList();
             if (CollectionUtils.isNotEmpty(depList)) {
                 for (String preTaskName : depList) {
@@ -2372,10 +2388,10 @@ public class ProcessService {
                             processDefinition.getVersion(),
                             projectCode,
                             processDefinition.getCode(),
-                            taskNameAndCode.get(preTaskName).getCode(),
-                            taskNameAndCode.get(preTaskName).getVersion(),
-                            taskNameAndCode.get(taskNode.getName()).getCode(),
-                            taskNameAndCode.get(taskNode.getName()).getVersion(),
+                            taskDefinitionMap.get(preTaskName).getCode(),
+                            taskDefinitionMap.get(preTaskName).getVersion(),
+                            taskDefinitionMap.get(taskNode.getName()).getCode(),
+                            taskDefinitionMap.get(taskNode.getName()).getVersion(),
                             ConditionType.of("none"),
                             taskNode.getConditionResult(),
                             now,
@@ -2388,8 +2404,8 @@ public class ProcessService {
                         processDefinition.getCode(),
                         0L, // this isn't previous task node, set zero
                         0,
-                        taskNameAndCode.get(taskNode.getName()).getCode(),
-                        taskNameAndCode.get(taskNode.getName()).getVersion(),
+                        taskDefinitionMap.get(taskNode.getName()).getCode(),
+                        taskDefinitionMap.get(taskNode.getName()).getVersion(),
                         ConditionType.of("none"),
                         taskNode.getConditionResult(),
                         now,
@@ -2404,6 +2420,7 @@ public class ProcessService {
             processTaskRelationLog.setOperateTime(now);
             processTaskRelationLogMapper.insert(processTaskRelationLog);
         }
+        return 0;
     }
 
     public int saveTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
