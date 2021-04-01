@@ -110,8 +110,6 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
-import org.apache.commons.lang.math.NumberUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -2344,7 +2342,7 @@ public class ProcessService {
         }
         Map<String, TaskDefinition> taskDefinitionMap = new HashMap<>();
         for (TaskNode taskNode : taskNodes) {
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(NumberUtils.toLong(taskNode.getCode(), -1L));
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(StringUtils.strDigitToLong(taskNode.getCode(), -1L));
             if (taskDefinition == null) {
                 try {
                     long code = SnowFlakeUtils.getInstance().nextId();
