@@ -2378,7 +2378,7 @@ public class ProcessService {
                             taskNameAndCode.get(preTaskName).getVersion(),
                             taskNameAndCode.get(taskNode.getName()).getCode(),
                             taskNameAndCode.get(taskNode.getName()).getVersion(),
-                            ConditionType.of("none"),
+                            ConditionType.NONE,
                             taskNode.getConditionResult(),
                             now,
                             now));
@@ -2552,11 +2552,10 @@ public class ProcessService {
         taskNode.setCode(String.valueOf(taskDefinition.getCode()));
         taskNode.setVersion(taskDefinition.getVersion());
         taskNode.setName(taskDefinition.getName());
-        taskNode.setId("task-" + taskDefinition.getId());
         taskNode.setName(taskDefinition.getName());
         taskNode.setDesc(taskDefinition.getDescription());
         taskNode.setType(taskDefinition.getTaskType().getDescp());
-        taskNode.setRunFlag(taskDefinition.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : "NORMAL");
+        taskNode.setRunFlag(taskDefinition.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : Constants.FLOWNODE_RUN_FLAG_NORMAL);
         taskNode.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskNode.setRetryInterval(taskDefinition.getFailRetryInterval());
         taskNode.setParams(taskDefinition.getTaskParams());
