@@ -109,4 +109,8 @@
         join t_ds_user u on dp.user_id = u.id
         where di.id = #{processInstanceId};
     </select>
+
+    <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select * from t_ds_project
+    </select>
 </mapper>

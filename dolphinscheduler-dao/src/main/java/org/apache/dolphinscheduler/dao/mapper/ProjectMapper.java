@@ -92,4 +92,10 @@ public interface ProjectMapper extends BaseMapper<Project> {
      */
     ProjectUser queryProjectWithUserByProcessInstanceId(@Param("processInstanceId") int processInstanceId);
 
+    /**
+     * query all project
+     * @return projectList
+     */
+    List<Project> queryAllProject();
+
 }

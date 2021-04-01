@@ -322,8 +322,7 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAllProjectList() {
-        Mockito.when(processDefinitionMapper.listProjectIds()).thenReturn(getProjectIds());
-        Mockito.when(projectMapper.selectBatchIds(getProjectIds())).thenReturn(getList());
+        Mockito.when(projectMapper.queryAllProject()).thenReturn(getList());
 
         Map<String, Object> result = projectService.queryAllProjectList();
         logger.info(result.toString());
