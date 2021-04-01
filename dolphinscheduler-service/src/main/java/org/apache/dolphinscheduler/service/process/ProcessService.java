@@ -2183,7 +2183,7 @@ public class ProcessService {
      */
     public int processDefinitionToDB(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         if (null == processDefinition || null == processDefinitionLog) {
-            return Constants.EXIT_CODE_FAILURE;
+            return Constants.DEFINITION_FAILURE;
         }
 
         processDefinitionLog.setId(processDefinition.getId());
@@ -2204,7 +2204,7 @@ public class ProcessService {
      */
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog);
-        if (switchResult != Constants.EXIT_CODE_FAILURE) {
+        if (switchResult != Constants.DEFINITION_FAILURE) {
             switchProcessTaskRelationVersion(processDefinition);
         }
         return switchResult;
@@ -2289,8 +2289,8 @@ public class ProcessService {
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
         Map<String, TaskDefinition> taskDefinitionMap = handleTaskDefinition(operator, project.getCode(), processData.getTasks());
-        if (Constants.EXIT_CODE_FAILURE == handleTaskRelation(operator, project.getCode(), processDefinitionLog, processData.getTasks(), taskDefinitionMap)) {
-            return Constants.EXIT_CODE_FAILURE;
+        if (Constants.DEFINITION_FAILURE == handleTaskRelation(operator, project.getCode(), processDefinitionLog, processData.getTasks(), taskDefinitionMap)) {
+            return Constants.DEFINITION_FAILURE;
         }
         return processDefinitionToDB(processDefinition, processDefinitionLog);
     }
@@ -2369,12 +2369,12 @@ public class ProcessService {
      * handle task relations
      */
     public int handleTaskRelation(User operator,
-                                   Long projectCode,
-                                   ProcessDefinition processDefinition,
-                                   List<TaskNode> taskNodes,
-                                   Map<String, TaskDefinition> taskDefinitionMap) {
+                                  Long projectCode,
+                                  ProcessDefinition processDefinition,
+                                  List<TaskNode> taskNodes,
+                                  Map<String, TaskDefinition> taskDefinitionMap) {
         if (null == processDefinition || null == taskNodes || null == taskDefinitionMap) {
-            return Constants.EXIT_CODE_FAILURE;
+            return Constants.DEFINITION_FAILURE;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
