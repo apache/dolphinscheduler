@@ -101,7 +101,7 @@ spec:
             failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
           {{- end }}
           volumeMounts:
-            - mountPath: {{ .Values.common.configmap.DATA_BASEDIR_PATH | quote }}
+            - mountPath: {{ default "/tmp/dolphinscheduler" .Values.common.configmap.DATA_BASEDIR_PATH | quote }}
               name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs

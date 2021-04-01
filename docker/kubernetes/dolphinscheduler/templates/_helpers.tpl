@@ -184,7 +184,7 @@ Create a zookeeper environment variables.
 Create a common fs_s3a environment variables.
 */}}
 {{- define "dolphinscheduler.fs_s3a.env_vars" -}}
-{{- if eq .Values.common.configmap.RESOURCE_STORAGE_TYPE "S3" -}}
+{{- if eq (default "HDFS" .Values.common.configmap.RESOURCE_STORAGE_TYPE) "S3" -}}
 - name: FS_S3A_SECRET_KEY
   valueFrom:
     secretKeyRef:
@@ -230,7 +230,7 @@ Create a fsFileResourcePersistence volumeMount.
 */}}
 {{- define "dolphinscheduler.fsFileResource.volumeMount" -}}
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
-- mountPath: {{ .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
+- mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
   name: {{ include "dolphinscheduler.fullname" . }}-fs-file
 {{- end -}}
 {{- end -}}
