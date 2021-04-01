@@ -119,4 +119,16 @@ public class StringUtils {
         }
         return str.substring(pos + separator.length());
     }
+
+    public static long strDigitToLong(String str, long defaultValue) {
+        if (str == null) {
+            return defaultValue;
+        } else {
+            try {
+                return Long.parseLong(str);
+            } catch (NumberFormatException var4) {
+                return defaultValue;
+            }
+        }
+    }
 }
