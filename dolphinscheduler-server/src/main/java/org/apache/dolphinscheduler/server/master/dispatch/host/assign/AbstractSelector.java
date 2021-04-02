@@ -23,7 +23,7 @@ import java.util.Collection;
 /**
  *  AbstractSelector
  */
-public  abstract class AbstractSelector<T> implements Selector<T>{
+public  abstract class AbstractSelector<T> implements Selector<T> {
     @Override
     public T select(Collection<T> source) {
 
@@ -40,6 +40,6 @@ public  abstract class AbstractSelector<T> implements Selector<T>{
         return doSelect(source);
     }
 
-    protected abstract T  doSelect(Collection<T> source);
+    protected abstract T doSelect(Collection<T> source);
 
 }

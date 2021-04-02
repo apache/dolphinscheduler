@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,17 +67,30 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testreplaceNRTtoUnderline() {
-        String result1 = StringUtils.replaceNRTtoUnderline("abc\n");
-        Assert.assertEquals("abc_", result1);
+    public void testTrim() {
+        String trim = StringUtils.trim(null);
+        Assert.assertNull(trim);
 
-        String result2 = StringUtils.replaceNRTtoUnderline("abc\r");
-        Assert.assertEquals("abc_", result2);
+        trim = StringUtils.trim(" test ");
+        Assert.assertEquals("test", trim);
+    }
 
-        String result3 = StringUtils.replaceNRTtoUnderline("abc\t");
-        Assert.assertEquals("abc_", result3);
+    @Test
+    public void testDefaultIfBlank() {
+        String defaultStr = StringUtils.defaultIfBlank("", "defaultStr");
+        Assert.assertEquals("defaultStr", defaultStr);
 
-        String result4 = StringUtils.replaceNRTtoUnderline(null);
-        Assert.assertNull(result4);
+        defaultStr = StringUtils.defaultIfBlank("test", "defaultStr");
+        Assert.assertEquals("test", defaultStr);
+    }
+
+    @Test
+    public void testJoin() {
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("3");
+        list.add("4");
+        String join = StringUtils.join(list,  ",");
+        Assert.assertEquals("1,3,4", join);
     }
 }

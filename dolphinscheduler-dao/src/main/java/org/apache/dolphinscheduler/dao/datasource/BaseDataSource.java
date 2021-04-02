@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
+import static org.apache.dolphinscheduler.common.Constants.PASSWORD;
+import static org.apache.dolphinscheduler.common.Constants.USER;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +67,21 @@ public abstract class BaseDataSource {
      * principal
      */
     private String principal;
+
+    /**
+     * java.security.krb5.conf
+     */
+    private String javaSecurityKrb5Conf;
+
+    /**
+     * login.user.keytab.username
+     */
+    private String loginUserKeytabUsername;
+
+    /**
+     * login.user.keytab.path
+     */
+    private String loginUserKeytabPath;
 
     public String getPrincipal() {
         return principal;
@@ -142,6 +161,11 @@ public abstract class BaseDataSource {
                     separator = ":";
                     break;
                 case HIVE:
+                    if ("?".equals(otherParams.substring(0, 1))) {
+                        break;
+                    }
+                    separator = ";";
+                    break;
                 case SPARK:
                 case SQLSERVER:
                     separator = ";";
@@ -161,6 +185,19 @@ public abstract class BaseDataSource {
     public Connection getConnection() throws Exception {
         Class.forName(driverClassSelector());
         return DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+    }
+
+    /**
+     * the data source test connection
+     * @param info Properties
+     * @return Connection Connection
+     * @throws Exception Exception
+     */
+    public Connection getConnection(Properties info) throws Exception {
+        Class.forName(driverClassSelector());
+        info.setProperty(USER, getUser());
+        info.setProperty(PASSWORD, getPassword());
+        return DriverManager.getConnection(getJdbcUrl(), info);
     }
 
     protected String filterOther(String otherParams) {
@@ -211,4 +248,31 @@ public abstract class BaseDataSource {
         this.other = other;
     }
 
+    public void setConnParams(String connParams) {
+
+    }
+
+    public String getJavaSecurityKrb5Conf() {
+        return javaSecurityKrb5Conf;
+    }
+
+    public void setJavaSecurityKrb5Conf(String javaSecurityKrb5Conf) {
+        this.javaSecurityKrb5Conf = javaSecurityKrb5Conf;
+    }
+
+    public String getLoginUserKeytabUsername() {
+        return loginUserKeytabUsername;
+    }
+
+    public void setLoginUserKeytabUsername(String loginUserKeytabUsername) {
+        this.loginUserKeytabUsername = loginUserKeytabUsername;
+    }
+
+    public String getLoginUserKeytabPath() {
+        return loginUserKeytabPath;
+    }
+
+    public void setLoginUserKeytabPath(String loginUserKeytabPath) {
+        this.loginUserKeytabPath = loginUserKeytabPath;
+    }
 }

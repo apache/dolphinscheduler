@@ -21,6 +21,7 @@ import static java.util.Calendar.DAY_OF_MONTH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
@@ -34,6 +35,8 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,12 +44,12 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
 
 /**
  * shell task
@@ -102,6 +105,8 @@ public class ShellTask extends AbstractTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
+            setResult(shellCommandExecutor.getTaskResultString());
+            setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("shell task error", e);
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
@@ -182,5 +187,18 @@ public class ShellTask extends AbstractTask {
             paramsMap.put(Constants.PARAMETER_DATETIME, p);
         }
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+    }
+
+    public void setResult(String result) {
+        Map<String, Property> localParams = shellParameters.getLocalParametersMap();
+        List<Map<String, String>> outProperties = new ArrayList<>();
+        Map<String, String> p = new HashMap<>();
+        localParams.forEach((k,v) -> {
+            if (v.getDirect() == Direct.OUT) {
+                p.put(k, result);
+            }
+        });
+        outProperties.add(p);
+        resultString = JSONUtils.toJsonString(outProperties);
     }
 }

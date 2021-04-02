@@ -14,21 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+
+import java.nio.charset.StandardCharsets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-
+/**
+ * zookeeper cache operator
+ */
 @Component
 public class ZookeeperCachedOperator extends ZookeeperOperator {
 
@@ -36,6 +42,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
 
 
     private TreeCache treeCache;
+
     /**
      * register a unified listener of /${dsRoot},
      */
@@ -59,14 +66,16 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
             treeCache.start();
         } catch (Exception e) {
             logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
-            throw new RuntimeException(e);
+            throw new ServiceException(e);
         }
     }
 
     //for sub class
-    protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path){}
+    protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path) {
+        // Used by sub class
+    }
 
-    public String getFromCache(final String cachePath, final String key) {
+    public String getFromCache(final String key) {
         ChildData resultInCache = treeCache.getCurrentData(key);
         if (null != resultInCache) {
             return null == resultInCache.getData() ? null : new String(resultInCache.getData(), StandardCharsets.UTF_8);
@@ -74,11 +83,11 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
         return null;
     }
 
-    public TreeCache getTreeCache(final String cachePath) {
+    public TreeCache getTreeCache() {
         return treeCache;
     }
 
-    public void addListener(TreeCacheListener listener){
+    public void addListener(TreeCacheListener listener) {
         this.treeCache.getListenable().addListener(listener);
     }
 

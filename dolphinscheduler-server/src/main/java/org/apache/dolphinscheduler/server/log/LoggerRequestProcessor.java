@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.log;
 
 import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
@@ -30,19 +31,19 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.utils.Constants;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -61,10 +62,10 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
-    private final ThreadPoolExecutor executor;
+    private final ExecutorService executor;
 
     public LoggerRequestProcessor() {
-        this.executor = new ThreadPoolExecutor(4, 4, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(100));
+        this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
                         command.getBody(), ViewLogRequestCommand.class);
-                String msg = readWholeFileContent(viewLogRequest.getPath());
+                String msg = LoggerUtils.readWholeFileContent(viewLogRequest.getPath());
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
@@ -182,27 +183,4 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         return Collections.emptyList();
     }
 
-    /**
-     * read whole file content
-     *
-     * @param filePath file path
-     * @return whole file content
-     */
-    private String readWholeFileContent(String filePath) {
-        BufferedReader br = null;
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\r\n");
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            logger.error("read file error",e);
-        } finally {
-            IOUtils.closeQuietly(br);
-        }
-        return "";
-    }
 }

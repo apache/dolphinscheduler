@@ -81,15 +81,15 @@ public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
-    public static final String JVM_EVN = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+    public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
     /**
      * python process(datax only supports version 2.7 by default)
      */
     private static final String DATAX_PYTHON = "python2.7";
     /**
-     * datax home path
+     * datax path
      */
-    private static final String DATAX_HOME_EVN = "${DATAX_HOME}";
+    private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
     /**
      * datax channel count
      */
@@ -396,7 +396,7 @@ public class DataxTask extends AbstractTask {
         StringBuilder sbr = new StringBuilder();
         sbr.append(DATAX_PYTHON);
         sbr.append(" ");
-        sbr.append(DATAX_HOME_EVN);
+        sbr.append(DATAX_PATH);
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
         sbr.append(jobConfigFilePath);
@@ -424,7 +424,7 @@ public class DataxTask extends AbstractTask {
     public String loadJvmEnv(DataxParameters dataXParameters) {
         int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
         int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
-        return String.format(JVM_EVN, xms, xmx);
+        return String.format(JVM_PARAM, xms, xmx);
     }
 
     /**

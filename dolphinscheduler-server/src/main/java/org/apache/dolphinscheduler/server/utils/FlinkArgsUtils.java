@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,14 @@ import java.util.List;
  * flink args utils
  */
 public class FlinkArgsUtils {
+
     private static final String LOCAL_DEPLOY_MODE = "local";
+
     private static final String FLINK_VERSION_BEFORE_1_10 = "<1.10";
+
+    private FlinkArgsUtils() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * build args
@@ -53,7 +59,7 @@ public class FlinkArgsUtils {
             args.add(Constants.FLINK_YARN_CLUSTER);   //yarn-cluster
 
             int slot = param.getSlot();
-            if (slot != 0) {
+            if (slot > 0) {
                 args.add(Constants.FLINK_YARN_SLOT);
                 args.add(String.format("%d", slot));   //-ys
             }
@@ -64,11 +70,11 @@ public class FlinkArgsUtils {
                 args.add(ArgsUtils.escape(appName));
             }
 
-            // judge flink version,from flink1.10,the parameter -yn removed
+            // judge flink version, the parameter -yn has removed from flink 1.10
             String flinkVersion = param.getFlinkVersion();
-            if (FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
+            if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
                 int taskManager = param.getTaskManager();
-                if (taskManager != 0) {                        //-yn
+                if (taskManager > 0) {                        //-yn
                     args.add(Constants.FLINK_TASK_MANAGE);
                     args.add(String.format("%d", taskManager));
                 }
@@ -92,12 +98,19 @@ public class FlinkArgsUtils {
                     args.add(queue);
                 }
             }
-
-            args.add(Constants.FLINK_DETACH); //-d
-
         }
 
-        // -p -s -yqu -yat -sae -yD -D
+        int parallelism = param.getParallelism();
+        if (parallelism > 0) {
+            args.add(Constants.FLINK_PARALLELISM);
+            args.add(String.format("%d", parallelism));   // -p
+        }
+
+        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated abruptly
+        // The task status will be synchronized with the cluster job status
+        args.add(Constants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
+
+        // -s -yqu -yat -yD -D
         if (StringUtils.isNotEmpty(others)) {
             args.add(others);
         }
@@ -121,6 +134,5 @@ public class FlinkArgsUtils {
 
         return args;
     }
-
 
 }

@@ -230,7 +230,7 @@ public class UdfFunc {
             if (StringUtils.isBlank(key)) {
                 return null;
             }
-            return JSONUtils.parseObject(key);
+            return JSONUtils.parseObject(key, UdfFunc.class);
         }
     }
 }

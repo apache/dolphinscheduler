@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import static org.apache.dolphinscheduler.alert.utils.Constants.ALERT_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.common.Constants.ALERT_RPC_PORT;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.processor.AlertRequestProcessor;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
-import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -52,8 +52,6 @@ public class AlertServer {
      * Alert Dao
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-
-    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
     private AlertSender alertSender;
 
@@ -114,7 +112,7 @@ public class AlertServer {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(ALERT_RPC_PORT);
         this.server = new NettyRemotingServer(serverConfig);
-        this.server.registerProcessor(CommandType.ALERT_SEND_REQUEST, new AlertRequestProcessor(alertDao, alertPluginManager, pluginDao));
+        this.server.registerProcessor(CommandType.ALERT_SEND_REQUEST, new AlertRequestProcessor(alertDao, alertPluginManager));
         this.server.start();
     }
 
@@ -133,7 +131,7 @@ public class AlertServer {
                 logger.warn("No Alert Plugin . Can not send alert info. ");
             } else {
                 List<Alert> alerts = alertDao.listWaitExecutionAlert();
-                alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
+                alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
                 alertSender.run();
             }
         }
@@ -143,6 +141,7 @@ public class AlertServer {
      * start
      */
     public void start() {
+        PropertyUtils.loadPropertyFile(ALERT_PROPERTIES_PATH);
         initPlugin();
         initRemoteServer();
         logger.info("alert server ready start ");

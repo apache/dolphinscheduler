@@ -23,6 +23,9 @@ import static java.util.Objects.requireNonNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.plugin.AbstractDolphinPluginManager;
+import org.apache.dolphinscheduler.dao.DaoFactory;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
@@ -31,6 +34,7 @@ import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,21 +51,28 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
 
-    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
+    /**
+     * k->pluginDefineId v->pluginDefineName
+     */
+    private final Map<Integer, String> pluginDefineMap = new HashMap<>();
+
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+
+    private void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
 
         if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getName(), alertChannelFactory) != null) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is already registered", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '%s' is already registered", alertChannelFactory.getName()));
         }
 
         try {
             loadAlertChannel(alertChannelFactory.getName());
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load .", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '%s' is can not load .", alertChannelFactory.getName()));
         }
     }
 
-    protected void loadAlertChannel(String name) {
+    private void loadAlertChannel(String name) {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
@@ -75,12 +86,16 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
         logger.info("-- Loaded Alert Plugin {} --", name);
     }
 
-    public Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {
+    Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {
         return alertChannelFactoryMap;
     }
 
     public Map<String, AlertChannel> getAlertChannelMap() {
         return alertChannelMap;
+    }
+
+    public String getPluginNameById(int id) {
+        return pluginDefineMap.get(id);
     }
 
     @Override
@@ -93,7 +108,8 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
             PluginDefine pluginDefine = new PluginDefine(nameEn, PluginType.ALERT.getDesc(), paramsJson);
-            pluginDao.addOrUpdatePluginDefine(pluginDefine);
+            int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
+            pluginDefineMap.put(id, pluginDefine.getPluginName());
         }
     }
 }

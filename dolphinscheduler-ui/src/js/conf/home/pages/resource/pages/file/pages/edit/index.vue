@@ -21,7 +21,7 @@
         <h2>
           <span>{{name}}</span>
         </h2>
-        <template v-show="isNoType">
+        <template v-if="isViewType">
           <template v-if="!msg">
             <div class="code-mirror-model">
               <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
@@ -32,9 +32,8 @@
             </div>
           </template>
           <m-no-data :msg="msg" v-if="msg"></m-no-data>
-
         </template>
-        <template v-if="!isNoType">
+        <template v-else>
           <m-no-type></m-no-type>
         </template>
       </div>
@@ -64,7 +63,7 @@
     data () {
       return {
         name: '',
-        isNoType: true,
+        isViewType: true,
         isLoading: false,
         filtTypeArr: filtTypeArr,
         loadingIndex: 0,
@@ -165,10 +164,10 @@
       let a = fileName.substring(i, fileName.length)
       this.mode = handlerSuffix[a]
       this.size = bytesToSize(parseInt(fileSize))
-      this.isNoType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
+      this.isViewType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
     },
     mounted () {
-      if (this.isNoType) {
+      if (this.isViewType) {
         // get data
         this._getViewResources()
       }

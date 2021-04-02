@@ -33,9 +33,8 @@
         </el-select>
       </div>
     </m-list-box>
-
     <m-list-box v-if="programType !== 'PYTHON'">
-      <div slot="text">{{$t('Main class')}}</div>
+      <div slot="text">{{$t('Main Class')}}</div>
       <div slot="content">
         <el-input
           :disabled="isDetails"
@@ -47,7 +46,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Main jar package')}}</div>
+      <div slot="text">{{$t('Main Jar Package')}}</div>
       <div slot="content">
         <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
@@ -80,7 +79,7 @@
         </el-select>
       </div>
     </m-list-box>
-    <m-list-4-box v-if="deployMode === 'cluster'">
+    <m-list-box v-if="deployMode === 'cluster'">
       <div slot="text">{{$t('App Name')}}</div>
       <div slot="content">
         <el-input
@@ -91,7 +90,7 @@
           :placeholder="$t('Please enter app name(optional)')">
         </el-input>
       </div>
-    </m-list-4-box>
+    </m-list-box>
     <m-list-4-box v-if="deployMode === 'cluster'">
       <div slot="text">{{$t('JobManager Memory')}}</div>
       <div slot="content">
@@ -136,8 +135,20 @@
         </el-input>
       </div>
     </m-list-4-box>
+    <m-list-4-box>
+      <div slot="text">{{$t('Parallelism')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="parallelism"
+          :placeholder="$t('Please enter Parallelism')">
+        </el-input>
+      </div>
+    </m-list-4-box>
     <m-list-box>
-      <div slot="text">{{$t('Command-line parameters')}}</div>
+      <div slot="text">{{$t('Main Arguments')}}</div>
       <div slot="content">
         <el-input
                 :autosize="{minRows:2}"
@@ -145,12 +156,12 @@
                 type="textarea"
                 size="small"
                 v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')">
+                :placeholder="$t('Please enter main arguments')">
         </el-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Other parameters')}}</div>
+      <div slot="text">{{$t('Option Parameters')}}</div>
       <div slot="content">
         <el-input
                 :disabled="isDetails"
@@ -158,7 +169,7 @@
                 type="textarea"
                 size="small"
                 v-model="others"
-                :placeholder="$t('Please enter other parameters')">
+                :placeholder="$t('Please enter option parameters')">
         </el-input>
       </div>
     </m-list-box>
@@ -213,19 +224,21 @@
         cacheResourceList: [],
         // Custom function
         localParams: [],
-        // Driver Number of cores
+        // Slot number
         slot: 1,
-        // Driver Number of memory
+        // Parallelism
+        parallelism: 1,
+        // TaskManager mumber
         taskManager: '2',
-        // jobManager Memory
+        // JobManager memory
         jobManagerMemory: '1G',
-        // taskManager Memory
+        // TaskManager memory
         taskManagerMemory: '2G',
-        // Flink Job Name
+        // Flink app name
         appName: '',
-        // Command line argument
+        // Main arguments
         mainArgs: '',
-        // Other parameters
+        // Option parameters
         others: '',
         // Program type
         programType: 'SCALA',
@@ -310,8 +323,23 @@
           return false
         }
 
-        if (!_.isNumber(parseInt(this.taskManagerMemory))) {
+        if (!Number.isInteger(parseInt(this.taskManagerMemory))) {
           this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.slot))) {
+          this.$message.warning(`${i18n.$t('Please enter Slot number')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.parallelism))) {
+          this.$message.warning(`${i18n.$t('Please enter Parallelism')}`)
+          return false
+        }
+
+        if (this.flinkVersion === '<1.10' && !Number.isInteger(parseInt(this.taskManager))) {
+          this.$message.warning(`${i18n.$t('Please enter TaskManager number')}`)
           return false
         }
 
@@ -339,6 +367,7 @@
           localParams: this.localParams,
           flinkVersion: this.flinkVersion,
           slot: this.slot,
+          parallelism: this.parallelism,
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
@@ -475,6 +504,7 @@
           resourceList: this.resourceIdArr,
           localParams: this.localParams,
           slot: this.slot,
+          parallelism: this.parallelism,
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
@@ -506,6 +536,7 @@
         this.deployMode = o.params.deployMode || ''
         this.flinkVersion = o.params.flinkVersion || '<1.10'
         this.slot = o.params.slot || 1
+        this.parallelism = o.params.parallelism || 1
         this.taskManager = o.params.taskManager || '2'
         this.jobManagerMemory = o.params.jobManagerMemory || '1G'
         this.taskManagerMemory = o.params.taskManagerMemory || '2G'

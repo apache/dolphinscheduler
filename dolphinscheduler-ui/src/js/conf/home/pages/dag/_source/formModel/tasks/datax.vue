@@ -26,7 +26,7 @@
         </label>
       </div>
     </m-list-box>
-    <div v-if="!enable">
+    <template v-if="!enable">
       <m-list-box>
         <div slot="text">{{$t('Datasource')}}</div>
         <div slot="content">
@@ -41,7 +41,7 @@
       <m-list-box>
         <div slot="text">{{$t('SQL Statement')}}</div>
         <div slot="content">
-          <div class="from-mirror">
+          <div class="form-mirror">
             <textarea
               id="code-sql-mirror"
               name="code-sql-mirror"
@@ -115,12 +115,12 @@
           <span>({{$t('0 means unlimited by count')}})</span>
         </div>
       </m-list-box>
-    </div>
-    <div v-else>
+    </template>
+    <template v-else>
       <m-list-box>
         <div slot="text">json</div>
         <div slot="content">
-          <div class="from-mirror">
+          <div class="form-mirror">
             <textarea
               id="code-json-mirror"
               name="code-json-mirror"
@@ -140,12 +140,10 @@
           </m-local-params>
         </div>
       </m-list-box>
-    </div>
-    <div class="clearfix list">
-      <div class="text-box">
-        <span>{{$t('Running Memory')}}</span>
-      </div>
-      <div class="cont-box">
+    </template>
+    <m-list-box>
+      <div slot="text">{{$t('Running Memory')}}</div>
+      <div slot="content">
         <span >{{$t('Min Memory')}}</span>
         <m-select-input v-model="xms" :list="[1,2,3,4]">
         </m-select-input>
@@ -155,7 +153,7 @@
         </m-select-input>
         <span>&nbsp;&nbsp;&nbsp;G</span>
       </div>
-    </div>
+    </m-list-box>
     <el-dialog
       :visible.sync="scriptBoxDialog"
       append-to-body="true"

@@ -39,10 +39,11 @@ import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.Date;
@@ -70,7 +71,7 @@ import io.netty.channel.Channel;
     ZookeeperRegistryCenter.class,
     MasterConfig.class,
     WorkerConfig.class,
-    ZookeeperCachedOperator.class,
+    RegisterOperator.class,
     ZookeeperConfig.class,
     ZookeeperNodeManager.class,
     TaskCallbackService.class,
@@ -79,7 +80,8 @@ import io.netty.channel.Channel;
     TaskResponseProcessor.class,
     TaskExecuteProcessor.class,
     CuratorZookeeperClient.class,
-    TaskExecutionContextCacheManagerImpl.class})
+    TaskExecutionContextCacheManagerImpl.class,
+    WorkerManagerThread.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
@@ -118,6 +120,11 @@ public class TaskCallbackServiceTest {
         ackCommand.setTaskInstanceId(1);
         ackCommand.setStartTime(new Date());
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
+
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand();
+        String result = responseCommand.getResult();
+        responseCommand.setResult("return string");
+        taskCallbackService.sendResult(1, responseCommand.convert2Command());
 
         Stopper.stop();
 

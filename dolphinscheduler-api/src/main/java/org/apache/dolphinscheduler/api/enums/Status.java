@@ -22,7 +22,7 @@ import java.util.Locale;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * status enum
+ * status enum      // todo #4855 One category one interval
  */
 public enum Status {
 
@@ -133,7 +133,7 @@ public enum Status {
     QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error", "查询任务实例日志错误"),
     DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR(10104, "download task instance log file error", "下载任务日志文件错误"),
     CREATE_PROCESS_DEFINITION(10105, "create process definition", "创建工作流错误"),
-    VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR(10106, "verify process definition name unique error", "工作流定义名称已存在"),
+    VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR(10106, "verify process definition name unique error", "工作流定义名称验证错误"),
     UPDATE_PROCESS_DEFINITION_ERROR(10107, "update process definition error", "更新工作流定义错误"),
     RELEASE_PROCESS_DEFINITION_ERROR(10108, "release process definition error", "上线工作流错误"),
     QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR(10109, "query datail of process definition error", "查询工作流详细信息错误"),
@@ -194,11 +194,21 @@ public enum Status {
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR(10162, "query authorized and user created project error error", "查询授权的和用户创建的项目错误"),
-    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10163, "delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
     CHECK_OS_TENANT_CODE_ERROR(10164, "Please enter the English os tenant code", "请输入英文操作系统租户"),
     FORCE_TASK_SUCCESS_ERROR(10165, "force task success error", "强制成功任务实例错误"),
     TASK_INSTANCE_STATE_OPERATION_ERROR(10166, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
     DATASOURCE_TYPE_NOT_EXIST(10167, "data source type not exist", "数据源类型不存在"),
+    PROCESS_DEFINITION_NAME_EXIST(10168, "process definition name {0} already exists", "工作流定义名称[{0}]已存在"),
+    DATASOURCE_DB_TYPE_ILLEGAL(10169, "datasource type illegal", "数据源类型参数不合法"),
+    DATASOURCE_PORT_ILLEGAL(10170, "datasource port illegal", "数据源端口参数不合法"),
+    DATASOURCE_OTHER_PARAMS_ILLEGAL(10171, "datasource other params illegal", "数据源其他参数不合法"),
+    DATASOURCE_NAME_ILLEGAL(10172, "datasource name illegal", "数据源名称不合法"),
+    DATASOURCE_HOST_ILLEGAL(10173, "datasource host illegal", "数据源HOST不合法"),
+    DELETE_WORKER_GROUP_NOT_EXIST(10174, "delete worker group not exist ", "删除worker分组不存在"),
+    CREATE_WORKER_GROUP_FORBIDDEN_IN_DOCKER(10175, "create worker group forbidden in docker ", "创建worker分组在docker中禁止"),
+    DELETE_WORKER_GROUP_FORBIDDEN_IN_DOCKER(10176, "delete worker group forbidden in docker ", "删除worker分组在docker中禁止"),
+    WORKER_ADDRESS_INVALID(10177, "worker address {0} invalid", "worker地址[{0}]无效"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -250,7 +260,7 @@ public enum Status {
     BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026, "batch delete process definition by ids {0} error", "批量删除工作流定义[{0}]错误"),
     TENANT_NOT_SUITABLE(50027, "there is not any tenant suitable, please choose a tenant available.", "没有合适的租户，请选择可用的租户"),
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028, "export process definition by id error", "导出工作流定义错误"),
-    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028,"batch export process definition by ids error", "批量导出工作流定义错误"),
+    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028, "batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029, "import process definition error", "导入工作流定义错误"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
@@ -288,11 +298,12 @@ public enum Status {
     GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
     CREATE_ALERT_PLUGIN_INSTANCE_ERROR(110008, "create alert plugin instance error", "创建告警组和告警组插件实例错误"),
     QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
-    PLUGIN_INSTANCE_ALREADY_EXIT(110010,"plugin instance already exit","该告警插件实例已存在"),
-    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011,"query plugin instance page error","分页查询告警实例失败"),
-    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012,"failed to delete the alert instance, there is an alarm group associated with this alert instance","删除告警实例失败，存在与此告警实例关联的警报组")
+    PLUGIN_INSTANCE_ALREADY_EXIT(110010, "plugin instance already exit", "该告警插件实例已存在"),
+    LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
+    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012, "failed to delete the alert instance, there is an alarm group associated with this alert instance",
+            "删除告警实例失败，存在与此告警实例关联的警报组"),
+    PROCESS_DEFINITION_VERSION_IS_USED(110013,"this process definition version is used","此工作流定义版本被使用");
 
-    ;
 
     private final int code;
     private final String enMsg;

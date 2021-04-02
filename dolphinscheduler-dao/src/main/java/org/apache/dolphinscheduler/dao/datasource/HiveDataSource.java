@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
+import static org.apache.dolphinscheduler.common.Constants.SEMICOLON;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HiveConfUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.sql.Connection;
+import java.util.Map;
 
 /**
  * data source of hive
@@ -96,8 +100,21 @@ public class HiveDataSource extends BaseDataSource {
      */
     @Override
     public Connection getConnection() throws Exception {
-        CommonUtils.loadKerberosConf();
+        CommonUtils.loadKerberosConf(getJavaSecurityKrb5Conf(), getLoginUserKeytabUsername(), getLoginUserKeytabPath());
         return super.getConnection();
     }
 
+    @Override
+    public void setConnParams(String connParams) {
+        // Verification parameters
+        Map<String, String> connParamMap = CollectionUtils.stringToMap(connParams, SEMICOLON);
+        if (connParamMap.isEmpty()) {
+            return;
+        }
+
+        StringBuilder otherSb = new StringBuilder();
+        connParamMap.forEach((k, v) -> otherSb.append(String.format("%s=%s%s", k, v, SEMICOLON)));
+        StringBuilder otherAppend = StringUtils.isNotBlank(getOther()) ? otherSb.append(getOther()) : otherSb.deleteCharAt(otherSb.length() - 1);
+        super.setOther(otherAppend.toString());
+    }
 }

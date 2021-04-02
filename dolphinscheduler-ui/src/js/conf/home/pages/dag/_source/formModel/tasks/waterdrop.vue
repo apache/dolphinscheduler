@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 <template>
-  <div class="shell-model">
+  <div class="waterdrop-model">
     <!--deploy mode-->
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>

@@ -28,7 +28,7 @@
             &nbsp;&nbsp;
           </div>
         </h2>
-        <template v-if="isNoType">
+        <template v-if="isViewType">
 
           <div class="code-mirror-model" v-if="!msg">
             <textarea id="code-details-mirror" name="code-details-mirror"></textarea>
@@ -37,7 +37,7 @@
           <m-no-data :msg="msg" v-if="msg"></m-no-data>
 
         </template>
-        <template v-if="!isNoType">
+        <template v-if="!isViewType">
           <m-no-type></m-no-type>
         </template>
       </div>
@@ -67,7 +67,7 @@
     data () {
       return {
         name: '',
-        isNoType: true,
+        isViewType: true,
         isLoading: false,
         filtTypeArr: filtTypeArr,
         loadingIndex: 0,
@@ -87,7 +87,7 @@
         this.$router.go(-1)
       },
       _downloadFile () {
-        downloadFile('/resources/download', {
+        downloadFile('resources/download', {
           id: this.$route.params.id
         })
       },
@@ -197,10 +197,10 @@
       let a = fileName.substring(i, fileName.length)
       this.mode = handlerSuffix[a]
       this.size = bytesToSize(parseInt(fileSize))
-      this.isNoType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
+      this.isViewType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
     },
     mounted () {
-      if (this.isNoType) {
+      if (this.isViewType) {
         // get data
         this._getViewResources()
       }
