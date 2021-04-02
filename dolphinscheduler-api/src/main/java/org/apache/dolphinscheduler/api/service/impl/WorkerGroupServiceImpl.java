@@ -81,10 +81,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        if (Constants.DOCKER_MODE && !Constants.KUBERNETES_MODE) {
-            putMsg(result, Status.CREATE_WORKER_GROUP_FORBIDDEN_IN_DOCKER);
-            return result;
-        }
         if (StringUtils.isEmpty(name)) {
             putMsg(result, Status.NAME_NULL);
             return result;
@@ -301,10 +297,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
-        if (Constants.DOCKER_MODE && !Constants.KUBERNETES_MODE) {
-            putMsg(result, Status.DELETE_WORKER_GROUP_FORBIDDEN_IN_DOCKER);
             return result;
         }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);

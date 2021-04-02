@@ -19,7 +19,8 @@
           ref="popover"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           @ok="_ok"
-          @close="close">
+          @close="close"
+          style="width: 700px;">
     <template slot="content">
       <div class="create-worker-model">
         <m-list-box-f>
