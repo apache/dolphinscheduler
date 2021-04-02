@@ -44,6 +44,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *  worker server
@@ -57,6 +58,7 @@ import org.springframework.context.annotation.FilterType;
                 "org.apache.dolphinscheduler.server.registry.ServerNodeManager"
         })
 })
+@EnableTransactionManagement
 public class WorkerServer implements IStoppable {
 
     /**

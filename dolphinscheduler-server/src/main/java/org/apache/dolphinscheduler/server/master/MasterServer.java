@@ -42,6 +42,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *  master server
@@ -53,6 +54,7 @@ import org.springframework.context.annotation.FilterType;
                 "org.apache.dolphinscheduler.server.log.*"
         })
 })
+@EnableTransactionManagement
 public class MasterServer implements IStoppable {
 
     /**
