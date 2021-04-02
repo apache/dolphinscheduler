@@ -205,7 +205,6 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds is empty, single resourcemanager enabled
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
-
         yarnEnabled = true;
         String appUrl = StringUtils.isEmpty(rmHaIds) ? appAddress : getAppAddress(appAddress, rmHaIds);
         if (StringUtils.isBlank(appUrl)) {
@@ -420,9 +419,7 @@ public class HadoopUtils implements Closeable {
 
         String result = Constants.FAILED;
         String applicationUrl = getApplicationUrl(applicationId);
-        if (logger.isDebugEnabled()) {
-            logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
-        }
+        logger.info("applicationUrl={}", applicationUrl);
 
         String responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(applicationUrl) : HttpUtils.get(applicationUrl);
         if (responseContent != null) {
@@ -435,9 +432,7 @@ public class HadoopUtils implements Closeable {
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            if (logger.isDebugEnabled()) {
-                logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
-            }
+            logger.info("jobHistoryUrl={}", jobHistoryUrl);
             responseContent = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false) ? KerberosHttpClient.get(jobHistoryUrl) : HttpUtils.get(jobHistoryUrl);
 
             if (null != responseContent) {
@@ -612,7 +607,11 @@ public class HadoopUtils implements Closeable {
             return null;
         }
 
-        String end = Constants.COLON + split2[1];
+        String[]  split3 = split2[1].split(Constants.SINGLE_SLASH);
+
+        String activeResourceManagerPort = String.valueOf(PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088));
+        String rest =split2[1].substring(activeResourceManagerPort.length());
+        String end = Constants.COLON + activeResourceManagerPort+rest;
 
         return start + activeRM + end;
     }
