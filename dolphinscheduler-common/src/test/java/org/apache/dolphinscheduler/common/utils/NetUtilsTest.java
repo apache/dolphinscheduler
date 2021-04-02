@@ -51,7 +51,7 @@ public class NetUtilsTest {
         when(address.getHostAddress()).thenReturn("172.17.0.15");
         assertEquals("172.17.0.15", NetUtils.getHost(address));
         CommonTest.setFinalStatic(Constants.class.getDeclaredField("KUBERNETES_MODE"), true);
-        assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless.default.svc.cluster.local", NetUtils.getHost(address));
+        assertEquals("dolphinscheduler-worker-0.dolphinscheduler-worker-headless", NetUtils.getHost(address));
         address = mock(InetAddress.class);
         when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0");
         when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");

@@ -19,7 +19,8 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit worker group') : $t('Create worker group')"
-          @ok="_ok">
+          @ok="_ok"
+          style="width: 700px;">
     <template slot="content">
       <div class="create-worker-model">
         <m-list-box-f>

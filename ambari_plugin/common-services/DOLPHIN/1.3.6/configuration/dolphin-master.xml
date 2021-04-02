@@ -30,7 +30,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master execute thread number</description>
+		<description>master execute thread number to limit process instances</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
@@ -39,7 +39,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master execute task number in parallel</description>
+		<description>master execute task number in parallel per process instance</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
@@ -48,7 +48,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master dispatch task number</description>
+		<description>master dispatch task number per batch</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
@@ -63,7 +63,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master heartbeat interval</description>
+		<description>master heartbeat interval, the unit is second</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
@@ -81,7 +81,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master commit task interval</description>
+		<description>master commit task interval, the unit is millisecond</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
@@ -90,13 +90,13 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>only less than cpu avg load, master server can work. default value -1: the number of cpu cores * 2</description>
+		<description>master max cpuload avg, only higher than the system cpu load average, master server can schedule. default value -1: the number of cpu cores * 2</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
 		<name>master.reserved.memory</name>
 		<value>0.3</value>
-		<description>only larger than reserved memory, master server can work. default value 0.3, the unit is G</description>
+		<description>master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 </configuration>

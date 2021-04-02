@@ -55,7 +55,7 @@
           <th scope="col" style="min-width: 135px">
             <span>{{$t('Executor')}}</span>
           </th>
-          <th scope="col" style="max-width: 600px">
+          <th scope="col" style="min-width: 490px">
             <span>{{$t('host')}}</span>
           </th>
           <th scope="col" style="min-width: 230px">
@@ -93,7 +93,7 @@
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
           </td>
-          <td style="max-width: 600px"><span style="padding-right: 5px">{{item.host || '-'}}</span></td>
+          <td style="min-width: 490px"><span style="padding-right: 10px">{{item.host || '-'}}</span></td>
           <td style="z-index: inherit;">
             <div v-show="item.disabled">
               <x-button type="info"

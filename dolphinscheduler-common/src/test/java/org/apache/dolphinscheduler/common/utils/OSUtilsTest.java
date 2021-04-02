@@ -16,11 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -95,29 +90,6 @@ public class OSUtilsTest {
         Assert.assertTrue(resource);
         resource = OSUtils.checkResource(0,Double.MAX_VALUE);
         Assert.assertFalse(resource);
-
-        Configuration configuration = new PropertiesConfiguration();
-
-        configuration.setProperty(Constants.MASTER_MAX_CPULOAD_AVG,100);
-        configuration.setProperty(Constants.MASTER_RESERVED_MEMORY,0);
-        resource = OSUtils.checkResource(configuration,true);
-        Assert.assertTrue(resource);
-
-        configuration.setProperty(Constants.MASTER_MAX_CPULOAD_AVG,0);
-        configuration.setProperty(Constants.MASTER_RESERVED_MEMORY,Double.MAX_VALUE);
-        resource = OSUtils.checkResource(configuration,true);
-        Assert.assertFalse(resource);
-
-        configuration.setProperty(Constants.WORKER_MAX_CPULOAD_AVG,100);
-        configuration.setProperty(Constants.WORKER_RESERVED_MEMORY,0);
-        resource = OSUtils.checkResource(configuration,false);
-        Assert.assertTrue(resource);
-
-        configuration.setProperty(Constants.WORKER_MAX_CPULOAD_AVG,0);
-        configuration.setProperty(Constants.WORKER_RESERVED_MEMORY,Double.MAX_VALUE);
-        resource = OSUtils.checkResource(configuration,false);
-        Assert.assertFalse(resource);
-
     }
 
 }
