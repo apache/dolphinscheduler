@@ -100,7 +100,7 @@ case $startStop in
   (start)
     if [ "$DOCKER" = "true" ]; then
       echo start $command in docker
-      export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS -XX:+UseContainerSupport -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      export DOLPHINSCHEDULER_OPTS="$DOLPHINSCHEDULER_OPTS -XX:-UseContainerSupport"
       exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
       $JAVA_HOME/bin/java $exec_command
     else
