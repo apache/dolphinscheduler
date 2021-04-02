@@ -266,7 +266,7 @@ public abstract class AbstractCommandExecutor {
             // hard kill
             hardKill(processId);
 
-            // destory
+            // destroy
             process.destroy();
 
             process = null;
@@ -276,7 +276,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * soft kill
      * @param processId process id
-     * @return process is alive
+     * @return process is killed
      * @throws InterruptedException interrupted exception
      */
     private boolean softKill(int processId) {
@@ -294,7 +294,7 @@ public abstract class AbstractCommandExecutor {
             }
         }
 
-        return process.isAlive();
+        return !process.isAlive();
     }
 
     /**
