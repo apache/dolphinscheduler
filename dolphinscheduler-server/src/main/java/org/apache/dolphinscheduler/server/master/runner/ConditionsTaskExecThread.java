@@ -130,7 +130,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
         taskInstance.setStartTime(new Date());
         this.processService.saveTaskInstance(taskInstance);
 
-        this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(), DependentParameters.class);
+        this.dependentParameters = taskInstance.getDependency();
     }
 
     /**

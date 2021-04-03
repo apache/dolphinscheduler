@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.builder;
 
+import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.entity.*;
 
@@ -44,11 +46,20 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setStartTime(taskInstance.getStartTime());
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
-        taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setResources(taskInstance.getResources());
         taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
+        return this;
+    }
+
+    public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition) {
+        int timeoutSeconds = taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT;
+        if (timeoutSeconds >= Integer.MAX_VALUE) {
+            timeoutSeconds = Integer.MAX_VALUE;
+        }
+        taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy().getCode());
+        taskExecutionContext.setTaskTimeout(timeoutSeconds);
         return this;
     }
 
