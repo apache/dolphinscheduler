@@ -903,6 +903,7 @@
                         <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/utils/HostTest.java</include>
+                        <include>**/remote/utils/IPUtilsTest.java</include>
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/rpc/RpcTest.java</include>

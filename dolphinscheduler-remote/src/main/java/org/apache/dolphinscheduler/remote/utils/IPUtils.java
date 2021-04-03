@@ -38,16 +38,20 @@ public class IPUtils {
 
     private static String localHost = "unknown";
 
+    private static String localIp = "unknown";
+
     static {
         String host = System.getenv("HOSTNAME");
         if (isNotEmpty(host)) {
             localHost = host;
+            localIp = getIpByHostName(localHost);
         } else {
 
             try {
                 String hostName = InetAddress.getLocalHost().getHostName();
                 if (isNotEmpty(hostName)) {
                     localHost = hostName;
+                    localIp = getIpByHostName(localHost);
                 }
             } catch (UnknownHostException e) {
                 logger.error("get hostName error!", e);
@@ -57,6 +61,10 @@ public class IPUtils {
 
     public static String getLocalHost() {
         return localHost;
+    }
+
+    public static String getLocalIp() {
+        return localIp;
     }
 
 

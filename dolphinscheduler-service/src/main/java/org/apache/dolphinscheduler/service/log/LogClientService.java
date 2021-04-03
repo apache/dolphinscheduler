@@ -118,7 +118,7 @@ public class LogClientService {
         String result = "";
         final Host address = new Host(host, port);
         try {
-            if (IPUtils.getLocalHost().equals(host)) {
+            if (IPUtils.getLocalHost().equals(host) || IPUtils.getLocalIp().equals(host)) {
                 result = LoggerUtils.readWholeFileContent(request.getPath());
             } else {
                 Command command = request.convert2Command();
