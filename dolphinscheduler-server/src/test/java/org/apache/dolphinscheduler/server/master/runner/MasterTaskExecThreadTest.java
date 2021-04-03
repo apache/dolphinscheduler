@@ -114,7 +114,6 @@ public class MasterTaskExecThreadTest {
         taskInstance.setTaskType("SHELL");
         taskInstance.setId(252612);
         taskInstance.setName("C");
-        taskInstance.setTaskJson("{}");
         taskInstance.setProcessInstanceId(10111);
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;

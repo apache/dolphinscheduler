@@ -380,7 +380,8 @@ public class MasterExecThread implements Runnable {
      */
     private void buildFlowDag() throws Exception {
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
-        List<TaskNode> taskNodeList = processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion(), new HashMap<>());
+        List<TaskNode> taskNodeList =
+                processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion(), new HashMap<>());
         forbiddenTaskList.clear();
         taskNodeList.stream().forEach(taskNode -> {
             if (taskNode.isForbidden()) {
@@ -485,8 +486,6 @@ public class MasterExecThread implements Runnable {
             taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
-            // task instance node json
-            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert
@@ -556,9 +555,7 @@ public class MasterExecThread implements Runnable {
                 }
             }
             result.put(LOCAL_PARAMS, allParam);
-            taskNode.setParams(JSONUtils.toJsonString(result));
-            // task instance node json
-            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
+            taskInstance.setTaskParams(JSONUtils.toJsonString(result));
         }
     }
 
