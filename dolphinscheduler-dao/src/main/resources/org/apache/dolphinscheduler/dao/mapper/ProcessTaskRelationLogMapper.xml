@@ -29,4 +29,14 @@
         WHERE process_definition_code = #{processCode}
         and process_definition_version = #{processVersion}
     </select>
+    <select id="queryByTaskRelationList"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation_log
+        WHERE process_definition_code = #{processCode}
+        and process_definition_version = #{processVersion}
+        and post_task_code = #{taskCode}
+        and post_task_version = #{taskVersion}
+    </select>
 </mapper>

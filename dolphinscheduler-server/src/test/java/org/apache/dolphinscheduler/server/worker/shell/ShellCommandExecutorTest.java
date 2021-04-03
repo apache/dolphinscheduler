@@ -87,7 +87,6 @@ public class ShellCommandExecutorTest {
 
         TaskInstance taskInstance = processService.findTaskInstanceById(7657);
 
-        String taskJson = taskInstance.getTaskJson();
 //        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
 //        taskProps.setTaskParams(taskNode.getParams());
 

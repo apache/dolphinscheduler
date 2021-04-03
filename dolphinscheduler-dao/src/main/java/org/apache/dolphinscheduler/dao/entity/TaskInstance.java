@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -75,7 +76,7 @@ public class TaskInstance implements Serializable {
     private long taskCode;
 
     /**
-     *  process definition code
+     * process definition code
      */
     private long processDefinitionCode;
 
@@ -184,7 +185,7 @@ public class TaskInstance implements Serializable {
      * dependency
      */
     @TableField(exist = false)
-    private String dependency;
+    private DependentParameters dependency;
 
     /**
      * duration
@@ -235,7 +236,7 @@ public class TaskInstance implements Serializable {
      * varPool string
      */
     private String varPool;
-    
+
     /**
      * executor name
      */
@@ -251,6 +252,11 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
+    /**
+     * task params
+     */
+    private String taskParams;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -264,7 +270,7 @@ public class TaskInstance implements Serializable {
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
-    
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }
@@ -429,15 +435,14 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-    public String getDependency() {
-        if (this.dependency != null) {
-            return this.dependency;
+    public DependentParameters getDependency() {
+        if (this.dependency == null) {
+            this.dependency = JSONUtils.parseObject(this.getTaskParams(), DependentParameters.class);
         }
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        return taskNode == null ? null : taskNode.getDependence();
+        return this.dependency;
     }
 
-    public void setDependency(String dependency) {
+    public void setDependency(DependentParameters dependency) {
         this.dependency = dependency;
     }
 
@@ -643,5 +648,13 @@ public class TaskInstance implements Serializable {
 
     public void setTaskDefinitionVersion(int taskDefinitionVersion) {
         this.taskDefinitionVersion = taskDefinitionVersion;
+    }
+
+    public String getTaskParams() {
+        return taskParams;
+    }
+
+    public void setTaskParams(String taskParams) {
+        this.taskParams = taskParams;
     }
 }

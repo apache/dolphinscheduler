@@ -145,7 +145,6 @@ public class TaskPriorityQueueConsumer extends Thread {
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
-
             } catch (Exception e) {
                 logger.error("dispatcher task error", e);
             }
@@ -201,8 +200,6 @@ public class TaskPriorityQueueConsumer extends Thread {
         // task type
         TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
 
-        // task node
-        TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
         Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
@@ -221,7 +218,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        taskInstance.setResources(getResourceFullNames(taskNode));
+        taskInstance.setResources(getResourceFullNames(taskInstance));
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
@@ -230,21 +227,21 @@ public class TaskPriorityQueueConsumer extends Thread {
 
         // SQL task
         if (taskType == TaskType.SQL) {
-            setSQLTaskRelation(sqlTaskExecutionContext, taskNode);
+            setSQLTaskRelation(sqlTaskExecutionContext, taskInstance);
         }
 
         // DATAX task
         if (taskType == TaskType.DATAX) {
-            setDataxTaskRelation(dataxTaskExecutionContext, taskNode);
+            setDataxTaskRelation(dataxTaskExecutionContext, taskInstance);
         }
 
         // procedure task
         if (taskType == TaskType.PROCEDURE) {
-            setProcedureTaskRelation(procedureTaskExecutionContext, taskNode);
+            setProcedureTaskRelation(procedureTaskExecutionContext, taskInstance);
         }
 
         if (taskType == TaskType.SQOOP) {
-            setSqoopTaskRelation(sqoopTaskExecutionContext, taskNode);
+            setSqoopTaskRelation(sqoopTaskExecutionContext, taskInstance);
         }
 
         return TaskExecutionContextBuilder.get()
@@ -262,10 +259,10 @@ public class TaskPriorityQueueConsumer extends Thread {
      * set procedure task relation
      *
      * @param procedureTaskExecutionContext procedureTaskExecutionContext
-     * @param taskNode                      taskNode
+     * @param taskInstance                      taskInstance
      */
-    private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskNode taskNode) {
-        ProcedureParameters procedureParameters = JSONUtils.parseObject(taskNode.getParams(), ProcedureParameters.class);
+    private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskInstance taskInstance) {
+        ProcedureParameters procedureParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), ProcedureParameters.class);
         int datasourceId = procedureParameters.getDatasource();
         DataSource datasource = processService.findDataSourceById(datasourceId);
         procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
@@ -275,10 +272,10 @@ public class TaskPriorityQueueConsumer extends Thread {
      * set datax task relation
      *
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
-     * @param taskNode                  taskNode
+     * @param taskInstance                  taskInstance
      */
-    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
-        DataxParameters dataxParameters = JSONUtils.parseObject(taskNode.getParams(), DataxParameters.class);
+    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskInstance taskInstance) {
+        DataxParameters dataxParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), DataxParameters.class);
 
         DataSource dbSource = processService.findDataSourceById(dataxParameters.getDataSource());
         DataSource dbTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
@@ -300,10 +297,10 @@ public class TaskPriorityQueueConsumer extends Thread {
      * set sqoop task relation
      *
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
-     * @param taskNode                  taskNode
+     * @param taskInstance              taskInstance
      */
-    private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskNode taskNode) {
-        SqoopParameters sqoopParameters = JSONUtils.parseObject(taskNode.getParams(), SqoopParameters.class);
+    private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskInstance taskInstance) {
+        SqoopParameters sqoopParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqoopParameters.class);
 
         // sqoop job type is template set task relation
         if (sqoopParameters.getJobType().equals(SqoopJobType.TEMPLATE.getDescp())) {
@@ -331,10 +328,10 @@ public class TaskPriorityQueueConsumer extends Thread {
      * set SQL task relation
      *
      * @param sqlTaskExecutionContext sqlTaskExecutionContext
-     * @param taskNode                taskNode
+     * @param taskInstance                taskInstance
      */
-    private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskNode taskNode) {
-        SqlParameters sqlParameters = JSONUtils.parseObject(taskNode.getParams(), SqlParameters.class);
+    private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskInstance taskInstance) {
+        SqlParameters sqlParameters = JSONUtils.parseObject(taskInstance.getTaskParams(), SqlParameters.class);
         int datasourceId = sqlParameters.getDatasource();
         DataSource datasource = processService.findDataSourceById(datasourceId);
         sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
@@ -381,9 +378,9 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * get resource map key is full name and value is tenantCode
      */
-    protected Map<String, String> getResourceFullNames(TaskNode taskNode) {
+    protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
         Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
+        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
 
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();

@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -59,6 +60,10 @@ public class DependentTaskTest {
      * TaskNode.runFlag : task can be run normally
      */
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
+
+
+    public static final Long TASK_CODE = 1111L;
+    public static final int TASK_VERSION = 1;
 
     private ProcessService processService;
 
@@ -113,6 +118,9 @@ public class DependentTaskTest {
         Mockito.when(processService
                 .findTaskInstanceById(1000))
                 .thenAnswer(i -> taskInstance);
+
+        Mockito.when(processService.findTaskDefinition(TASK_CODE, TASK_VERSION))
+                .thenReturn(getTaskDefinition());
     }
 
     private void testBasicInit() {
@@ -359,14 +367,25 @@ public class DependentTaskTest {
         return taskNode;
     }
 
+    private TaskDefinition getTaskDefinition() {
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setCode(TASK_CODE);
+        taskDefinition.setVersion(TASK_VERSION);
+        taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
+        taskDefinition.setTimeout(0);
+        return taskDefinition;
+    }
+
     private void setupTaskInstance(TaskNode taskNode) {
         taskInstance = new TaskInstance();
         taskInstance.setId(1000);
+        taskInstance.setTaskCode(TASK_CODE);
+        taskInstance.setTaskDefinitionVersion(TASK_VERSION);
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-        taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
         taskInstance.setTaskType(taskNode.getType());
+        taskInstance.setDependency(JSONUtils.parseObject(taskNode.getDependence(), DependentParameters.class));
         taskInstance.setName(taskNode.getName());
     }
 
@@ -405,7 +424,6 @@ public class DependentTaskTest {
         taskInstance.setName(taskName);
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-        taskInstance.setTaskJson("{}");
         taskInstance.setState(state);
         return taskInstance;
     }
