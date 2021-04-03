@@ -59,11 +59,12 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("taskDefinitionCode") long taskDefinitionCode,
                                                       @Param("version") int version);
 
+
     /**
-     * query task definition log
      *
-     * @param taskDefinitions taskDefinition collection
-     * @return task definition log
+     * @param taskDefinitions
+     * @return
      */
     List<TaskDefinitionLog> queryByTaskDefinitions(@Param("taskDefinitions") Collection<TaskDefinition> taskDefinitions);
+
 }

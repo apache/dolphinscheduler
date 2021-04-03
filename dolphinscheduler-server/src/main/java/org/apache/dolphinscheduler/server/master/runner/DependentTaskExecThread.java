@@ -102,8 +102,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     private void initDependParameters() {
 
-        this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(),
-                DependentParameters.class);
+        this.dependentParameters = taskInstance.getDependency();
 
         for(DependentTaskModel taskModel : dependentParameters.getDependTaskList()){
             this.dependentTaskList.add(new DependentExecute(
