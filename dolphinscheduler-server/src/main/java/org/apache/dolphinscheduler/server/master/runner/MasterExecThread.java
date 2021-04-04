@@ -383,7 +383,7 @@ public class MasterExecThread implements Runnable {
         List<TaskNode> taskNodeList =
                 processService.genTaskNodeList(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion(), new HashMap<>());
         forbiddenTaskList.clear();
-        taskNodeList.stream().forEach(taskNode -> {
+        taskNodeList.forEach(taskNode -> {
             if (taskNode.isForbidden()) {
                 forbiddenTaskList.put(taskNode.getName(), taskNode);
             }
@@ -478,6 +478,8 @@ public class MasterExecThread implements Runnable {
         TaskInstance taskInstance = findTaskIfExists(nodeName);
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
+            taskInstance.setTaskCode(Long.parseLong(taskNode.getCode()));
+            taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
             // task name
             taskInstance.setName(nodeName);
             // process instance define id
@@ -934,7 +936,9 @@ public class MasterExecThread implements Runnable {
             // send warning email if process time out.
             if (!sendTimeWarning && checkProcessTimeOut(processInstance)) {
                 alertManager.sendProcessTimeoutAlert(processInstance,
-                        processService.findProcessDefineById(processInstance.getProcessDefinitionId()));
+                        processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                                processInstance.getProcessDefinitionVersion()));
+
                 sendTimeWarning = true;
             }
             for (Map.Entry<MasterBaseTaskExecThread, Future<Boolean>> entry : activeTaskNode.entrySet()) {
