@@ -28,9 +28,9 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
+import org.apache.dolphinscheduler.server.master.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
