@@ -204,7 +204,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        // TODO relationName have ?
         int saveResult = processService.saveProcessDefinition(loginUser, project, processDefinitionName, desc,
                 locations, connects, processData, processDefinition);
 
