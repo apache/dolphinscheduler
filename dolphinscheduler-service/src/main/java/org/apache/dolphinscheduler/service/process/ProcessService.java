@@ -390,7 +390,7 @@ public class ProcessService {
     }
 
     /**
-     * find process define by id.
+     * find process define by code and version.
      *
      * @param processDefinitionCode processDefinitionCode
      * @return process definition
@@ -593,6 +593,8 @@ public class ProcessService {
                                                        Command command,
                                                        Map<String, String> cmdParam) {
         ProcessInstance processInstance = new ProcessInstance(processDefinition);
+        processInstance.setProcessDefinitionCode(processDefinition.getCode());
+        processInstance.setProcessDefinitionVersion(processDefinition.getVersion());
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
@@ -718,7 +720,7 @@ public class ProcessService {
      */
     private ProcessInstance constructProcessInstance(Command command, String host) {
 
-        ProcessInstance processInstance = null;
+        ProcessInstance processInstance;
         CommandType commandType = command.getCommandType();
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
 
@@ -732,7 +734,7 @@ public class ProcessService {
         }
 
         if (cmdParam != null) {
-            Integer processInstanceId = 0;
+            int processInstanceId = 0;
             // recover from failure or pause tasks
             if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING)) {
                 String processId = cmdParam.get(Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING);
@@ -1226,7 +1228,8 @@ public class ProcessService {
      * @param childDefinitionId childDefinitionId
      */
     private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
-        ProcessDefinition fatherDefinition = this.findProcessDefineById(parentProcessInstance.getProcessDefinitionId());
+        ProcessDefinition fatherDefinition = this.findProcessDefinition(parentProcessInstance.getProcessDefinitionCode(),
+                parentProcessInstance.getProcessDefinitionVersion());
         ProcessDefinition childDefinition = this.findProcessDefineById(childDefinitionId);
         if (childDefinition != null && fatherDefinition != null) {
             childDefinition.setWarningGroupId(fatherDefinition.getWarningGroupId());

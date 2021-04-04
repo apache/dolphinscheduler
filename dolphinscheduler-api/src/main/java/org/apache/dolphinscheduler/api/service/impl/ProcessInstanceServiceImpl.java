@@ -202,7 +202,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
 
-        ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
         processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
         result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
