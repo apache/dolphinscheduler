@@ -52,7 +52,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -174,7 +179,7 @@ public class SqlTask extends AbstractTask {
             String line;
             StringBuffer strBuf = new StringBuffer();
             while ((line = br.readLine()) != null) {
-                if (!line.trim().equals("") && !line.trim().startsWith("--")) {
+                if (!("").equals(line.trim()) && !line.trim().startsWith("--")) {
                     if (line.trim().endsWith(";")) {
                         strBuf.append(line.trim() + "@_@" + "\r\n");
                     } else {
