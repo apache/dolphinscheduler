@@ -231,7 +231,7 @@
           processDefinition: {
             id: null,
             version: '',
-            state: ''
+            releaseState: ''
           },
           processDefinitionVersions: [],
           total: null,
@@ -806,7 +806,7 @@
           let pageNo = res.data.currentPage
           this.versionData.processDefinition.id = this.urlParam.id
           this.versionData.processDefinition.version = this.$store.state.dag.version
-          this.versionData.processDefinition.state = this.releaseState
+          this.versionData.processDefinition.releaseState = this.releaseState
           this.versionData.processDefinitionVersions = processDefinitionVersions
           this.versionData.total = total
           this.versionData.pageNo = pageNo

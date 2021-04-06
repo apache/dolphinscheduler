@@ -27,8 +27,8 @@
         <el-table-column prop="userName" :label="$t('Version')">
           <template slot-scope="scope">
             <span v-if="scope.row.version">
-              <span v-if="scope.row.version === versionData.processDefinition.version" style="color: green"><strong>{{scope.row.version}} {{$t('Current Version')}}</strong></span>
-              <span v-else>{{scope.row.version}}</span>
+              <span v-if="scope.row.version === versionData.processDefinition.version" style="color: green"><strong>V{{scope.row.version}} {{$t('Current Version')}}</strong></span>
+              <span v-else>V{{scope.row.version}}</span>
             </span>
             <span v-else>-</span>
           </template>
@@ -50,7 +50,7 @@
                 :title="$t('Confirm Switch To This Version?')"
                 @onConfirm="_mVersionSwitchProcessDefinitionVersion(scope.row)"
               >
-                <el-button :disabled="scope.row.version === versionData.processDefinition.version" type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
+                <el-button :disabled="versionData.processDefinition.releaseState === 'ONLINE' || scope.row.version === versionData.processDefinition.version" type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top">
