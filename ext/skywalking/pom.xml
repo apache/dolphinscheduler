@@ -30,8 +30,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dolphinscheduler.version>${parent.version}</dolphinscheduler.version>
-
         <agent.dir>${project.build.directory}/skywalking-agent/</agent.dir>
         <agent-plugins.dir>${agent.dir}/plugins/</agent-plugins.dir>
         <agent-activations.dir>${agent.dir}/activations/</agent-activations.dir>
@@ -44,13 +42,11 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-service</artifactId>
-            <version>${dolphinscheduler.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-server</artifactId>
-            <version>${dolphinscheduler.version}</version>
             <scope>provided</scope>
         </dependency>
 
