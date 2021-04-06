@@ -76,38 +76,38 @@ public abstract class AbstractZKClient extends RegisterOperator {
      * @param zkNodeType zookeeper node type
      * @return server list
      */
-    public List<Server> getServersList(ZKNodeType zkNodeType) {
-        Map<String, String> masterMap = getServerMaps(zkNodeType);
+    public List<Server> getServerList(ZKNodeType zkNodeType) {
+        Map<String, String> serverMaps = getServerMaps(zkNodeType);
         String parentPath = getZNodeParentPath(zkNodeType);
 
-        List<Server> masterServers = new ArrayList<>();
-        for (Map.Entry<String, String> entry : masterMap.entrySet()) {
-            Server masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
-            if (masterServer == null) {
+        List<Server> serverList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
+            Server server = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+            if (server == null) {
                 continue;
             }
             String key = entry.getKey();
-            masterServer.setZkDirectory(parentPath + "/" + key);
-            //set host and port
+            server.setZkDirectory(parentPath + "/" + key);
+            // set host and port
             String[] hostAndPort = key.split(COLON);
             String[] hosts = hostAndPort[0].split(DIVISION_STRING);
             // fetch the last one
-            masterServer.setHost(hosts[hosts.length - 1]);
-            masterServer.setPort(Integer.parseInt(hostAndPort[1]));
-            masterServers.add(masterServer);
+            server.setHost(hosts[hosts.length - 1]);
+            server.setPort(Integer.parseInt(hostAndPort[1]));
+            serverList.add(server);
         }
-        return masterServers;
+        return serverList;
     }
 
     /**
-     * get master server list map.
+     * get server list map.
      *
      * @param zkNodeType zookeeper node type
+     * @param hostOnly host only
      * @return result : {host : resource info}
      */
-    public Map<String, String> getServerMaps(ZKNodeType zkNodeType) {
-
-        Map<String, String> masterMap = new HashMap<>();
+    public Map<String, String> getServerMaps(ZKNodeType zkNodeType, boolean hostOnly) {
+        Map<String, String> serverMap = new HashMap<>();
         try {
             String path = getZNodeParentPath(zkNodeType);
             List<String> serverList = super.getChildrenKeys(path);
@@ -122,13 +122,27 @@ public abstract class AbstractZKClient extends RegisterOperator {
                 serverList = workerList;
             }
             for (String server : serverList) {
-                masterMap.putIfAbsent(server, super.get(path + Constants.SLASH + server));
+                String host = server;
+                if (zkNodeType == ZKNodeType.WORKER && hostOnly) {
+                    host = server.split(Constants.SLASH)[1];
+                }
+                serverMap.putIfAbsent(host, super.get(path + Constants.SLASH + server));
             }
         } catch (Exception e) {
             logger.error("get server list failed", e);
         }
 
-        return masterMap;
+        return serverMap;
+    }
+
+    /**
+     * get server list map.
+     *
+     * @param zkNodeType zookeeper node type
+     * @return result : {host : resource info}
+     */
+    public Map<String, String> getServerMaps(ZKNodeType zkNodeType) {
+        return getServerMaps(zkNodeType, false);
     }
 
     /**
@@ -145,7 +159,7 @@ public abstract class AbstractZKClient extends RegisterOperator {
                     host, zkNodeType);
             return false;
         }
-        Map<String, String> serverMaps = getServerMaps(zkNodeType);
+        Map<String, String> serverMaps = getServerMaps(zkNodeType, true);
         for (String hostKey : serverMaps.keySet()) {
             if (hostKey.contains(host)) {
                 return true;

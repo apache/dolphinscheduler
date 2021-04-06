@@ -20,11 +20,13 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -140,12 +142,15 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
-        logger.info("task instance  local execute path : {} ", execLocalPath);
+        logger.info("task instance local execute path : {}", execLocalPath);
         taskExecutionContext.setExecutePath(execLocalPath);
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirIfAbsent(execLocalPath);
+            if (CommonUtils.isSudoEnable() && workerConfig.getWorkerTenantAutoCreate()) {
+                OSUtils.createUserIfAbsent(taskExecutionContext.getTenantCode());
+            }
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.of(logger), errorLog, ex);

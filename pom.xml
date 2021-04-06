@@ -854,6 +854,7 @@
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/HttpParametersTest.java</include>
+                        <include>**/common/task/SqlParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
                         <include>**/common/threadutils/ThreadUtilsTest.java</include>
@@ -913,6 +914,7 @@
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
                         <include>**/server/log/TaskLogFilterTest.java</include>
                         <include>**/server/log/WorkerLogFilterTest.java</include>
+                        <include>**/server/master/config/MasterConfigTest.java</include>
                         <include>**/server/master/consumer/TaskPriorityQueueConsumerTest.java</include>
                         <include>**/server/master/runner/MasterTaskExecThreadTest.java</include>
                         <!--<include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>-->

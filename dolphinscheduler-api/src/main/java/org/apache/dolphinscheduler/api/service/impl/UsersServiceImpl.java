@@ -245,6 +245,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         return userMapper.selectById(id);
     }
 
+    @Override
+    public List<User> queryUser(List<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return userMapper.selectByIds(ids);
+    }
+
     /**
      * query user
      *
@@ -586,7 +594,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         //get the authorized resource id list by user id
-        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> oldAuthorizedRes = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
         //if resource type is UDF,need check whether it is bound by UDF function
         Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 

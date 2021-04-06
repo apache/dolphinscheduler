@@ -102,16 +102,12 @@ public class MasterExecThreadTest {
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        masterExecThread = PowerMockito.spy(new MasterExecThread(
-                processInstance
-                , processService
-                , null, null, config));
+        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, null, config));
         // prepareProcess init dag
         Field dag = MasterExecThread.class.getDeclaredField("dag");
         dag.setAccessible(true);
         dag.set(masterExecThread, new DAG());
         PowerMockito.doNothing().when(masterExecThread, "executeProcess");
-        PowerMockito.doNothing().when(masterExecThread, "postHandle");
         PowerMockito.doNothing().when(masterExecThread, "prepareProcess");
         PowerMockito.doNothing().when(masterExecThread, "runProcess");
         PowerMockito.doNothing().when(masterExecThread, "endProcess");
