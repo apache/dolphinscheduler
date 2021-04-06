@@ -166,7 +166,7 @@ public class SqlTaskTest {
     public void testIsQuerySqlInputNotnull() {
         SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
         parameters.setPreStatements(Arrays.asList("update xxaa1,aa2 from dual", "SELECT1 xy from dual"));
-        Assert.assertTrue(sqlTask.isQuerySql("select"));
+        Assert.assertTrue(sqlTask.isQuerySql("select x from dual"));
     }
 
     @Test
