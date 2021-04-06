@@ -389,7 +389,7 @@ public class ProcessUtils {
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
-        StringBuilder sb = new StringBuilder();
+        List<String> pidList = new ArrayList<>();
         Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
@@ -404,11 +404,13 @@ public class ProcessUtils {
 
         if (null != mat) {
             while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
+                pidList.add(mat.group(1));
             }
         }
-
-        return sb.toString().trim();
+        if (!pidList.isEmpty()) {
+            pidList = pidList.subList(1, pidList.size());
+        }
+        return String.join(" ", pidList).trim();
     }
 
     /**
