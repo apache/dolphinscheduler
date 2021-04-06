@@ -163,6 +163,35 @@ public class SqlTaskTest {
     }
 
     @Test
+    public void testIsQuerySqlInputNotnull() {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("update xxaa1,aa2 from dual", "SELECT1 xy from dual"));
+        Assert.assertTrue(sqlTask.isQuerySql("select"));
+    }
+
+    @Test
+    public void testIsQuerySqlInputNull() {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("update xxaa1,aa2 from dual", "SELECT1 xy from dual"));
+        Assert.assertTrue(!sqlTask.isQuerySql(""));
+    }
+
+    @Test
+    public void testIsQuerySqlSelect() {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("update xxaa1,aa2 from dual", "SELECT xy from dual"));
+        Assert.assertTrue(sqlTask.isQuerySql(parameters.getPreStatements().get(1)));
+    }
+
+    @Test
+    public void testIsQuerySqlNot() {
+        SqlParameters parameters = (SqlParameters) sqlTask.getParameters();
+        parameters.setPreStatements(Arrays.asList("update xxaa1,aa2 from dual", "SELECT1 xy from dual"));
+        Assert.assertTrue(!sqlTask.isQuerySql(parameters.getPreStatements().get(0)));
+        Assert.assertTrue(!sqlTask.isQuerySql(parameters.getPreStatements().get(1)));
+    }
+
+    @Test
     public void testIsQuerySqlOne() {
         Assert.assertTrue(sqlTask.isQuerySql("select a,bc,d from dual"));
     }
