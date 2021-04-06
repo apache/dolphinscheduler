@@ -102,7 +102,7 @@
               <span><el-button type="primary" size="mini" icon="el-icon-s-unfold" @click="_export(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Version Info')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button></span>
+              <span><el-button type="primary" size="mini" icon="el-icon-info" @click="_version(scope.row)" circle></el-button></span>
             </el-tooltip>
           </template>
         </el-table-column>
