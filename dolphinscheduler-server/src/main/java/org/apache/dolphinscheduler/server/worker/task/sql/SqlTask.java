@@ -165,7 +165,7 @@ public class SqlTask extends AbstractTask {
 
         } catch (Exception e) {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-            logger.error("sql task error", e);
+            logger.error("sql task error: {}", e.toString());
             throw e;
         }
     }
@@ -292,11 +292,14 @@ public class SqlTask extends AbstractTask {
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
-                                  List<String> createFuncs) {
+                                  List<String> createFuncs) throws Exception {
         Connection connection = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
         try {
+
+            baseDataSource.setConnParams(sqlParameters.getConnParams());
+
             // create connection
             connection = baseDataSource.getConnection();
             // create temp function
@@ -309,25 +312,43 @@ public class SqlTask extends AbstractTask {
 
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
 
+            String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
                 resultSet = stmt.executeQuery();
-                resultProcess(resultSet);
+                result = resultProcess(resultSet);
 
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                 // non query statement
-                stmt.executeUpdate();
+                String updateResult = String.valueOf(stmt.executeUpdate());
+                result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
 
             postSql(connection, postStatementsBinds);
+            this.setResultString(result);
 
         } catch (Exception e) {
-            logger.error("execute sql error", e);
-            throw new RuntimeException("execute sql error");
+            logger.error("execute sql error: {}", e.getMessage());
+            throw e;
         } finally {
             close(resultSet, stmt, connection);
         }
+    }
+
+    public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
+        String result = null;
+        for (Property info :properties) {
+            if (Direct.OUT == info.getDirect()) {
+                List<Map<String,String>> updateRL = new ArrayList<>();
+                Map<String,String> updateRM = new HashMap<>();
+                updateRM.put(info.getProp(),updateResult);
+                updateRL.add(updateRM);
+                result = JSONUtils.toJsonString(updateRL);
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -336,7 +357,7 @@ public class SqlTask extends AbstractTask {
      * @param resultSet resultSet
      * @throws Exception Exception
      */
-    private void resultProcess(ResultSet resultSet) throws Exception {
+    private String resultProcess(ResultSet resultSet) throws Exception {
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
@@ -352,10 +373,21 @@ public class SqlTask extends AbstractTask {
             rowCount++;
         }
         String result = JSONUtils.toJsonString(resultJSONArray);
-        logger.debug("execute sql : {}", result);
+        logger.debug("execute sql result : {}", result);
 
-        sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
-                JSONUtils.toJsonString(resultJSONArray));
+        int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
+        displayRows = Math.min(displayRows, resultJSONArray.size());
+        logger.info("display sql result {} rows as follows:", displayRows);
+        for (int i = 0; i < displayRows; i++) {
+            String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+            logger.info("row {} : {}", i + 1, row);
+        }
+
+        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
+            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
+                    JSONUtils.toJsonString(resultJSONArray));
+        }
+        return result;
     }
 
     /**

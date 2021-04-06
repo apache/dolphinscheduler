@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -32,9 +32,6 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +54,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 @Lazy
-public class AlertPluginInstanceServiceImpl extends BaseService implements AlertPluginInstanceService {
+public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements AlertPluginInstanceService {
 
     @Autowired
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
@@ -86,7 +83,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
 
         Map<String, Object> result = new HashMap<>();
 
-        if (CollectionUtils.isNotEmpty(alertPluginInstanceMapper.queryByInstanceName(alertPluginInstance.getInstanceName()))) {
+        if (BooleanUtils.isTrue(alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()))) {
             putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
             return result;
         }
@@ -187,7 +184,7 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
 
     @Override
     public boolean checkExistPluginInstanceName(String pluginInstanceName) {
-        return CollectionUtils.isNotEmpty(alertPluginInstanceMapper.queryByInstanceName(pluginInstanceName));
+        return BooleanUtils.isTrue(alertPluginInstanceMapper.existInstanceName(pluginInstanceName));
     }
 
     @Override
@@ -250,26 +247,15 @@ public class AlertPluginInstanceServiceImpl extends BaseService implements Alert
     }
 
     /**
-     * parseToPluginUiParams
+     * parse To Plugin Ui Params
      *
      * @param pluginParamsMapString k-v data
      * @param pluginUiParams Complete parameters(include ui)
      * @return Complete parameters list(include ui)
      */
     private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {
-        Map<String, String> paramsMap = JSONUtils.toMap(pluginParamsMapString);
-        if (MapUtils.isEmpty(paramsMap)) {
-            return null;
-        }
-        List<PluginParams> pluginParamsList = JSONUtils.toList(pluginUiParams, PluginParams.class);
-        List<PluginParams> newPluginParamsList = new ArrayList<>(pluginParamsList.size());
-        pluginParamsList.forEach(pluginParams -> {
-            pluginParams.setValue(paramsMap.get(pluginParams.getName()));
-            newPluginParamsList.add(pluginParams);
-
-        });
-
-        return JSONUtils.toJsonString(newPluginParamsList);
+        List<Map<String, Object>> pluginParamsList = PluginParamsTransfer.generatePluginParams(pluginParamsMapString, pluginUiParams);
+        return JSONUtils.toJsonString(pluginParamsList);
     }
 
     private boolean checkHasAssociatedAlertGroup(String id) {

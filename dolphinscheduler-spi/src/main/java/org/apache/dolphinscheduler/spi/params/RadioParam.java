@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_OPTIONS;
+
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -32,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class RadioParam extends PluginParams {
 
-    @JsonProperty("options")
+    @JsonProperty(STRING_PLUGIN_PARAM_OPTIONS)
     private List<ParamsOptions> paramsOptionsList;
 
     private RadioParam(Builder builder) {

@@ -17,14 +17,8 @@
 
 package org.apache.dolphinscheduler.service.zk;
 
-import static org.apache.dolphinscheduler.common.Constants.ADD_ZK_OP;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
-import static org.apache.dolphinscheduler.common.Constants.DELETE_ZK_OP;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
-import static org.apache.dolphinscheduler.common.Constants.MASTER_PREFIX;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-import static org.apache.dolphinscheduler.common.Constants.WORKER_PREFIX;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
@@ -47,56 +41,9 @@ import org.springframework.stereotype.Component;
  * abstract zookeeper client
  */
 @Component
-public abstract class AbstractZKClient extends ZookeeperCachedOperator {
+public abstract class AbstractZKClient extends RegisterOperator {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractZKClient.class);
-
-    /**
-     * remove dead server by host
-     *
-     * @param host host
-     * @param serverType serverType
-     */
-    public void removeDeadServerByHost(String host, String serverType) {
-        List<String> deadServers = super.getChildrenKeys(getDeadZNodeParentPath());
-        for (String serverPath : deadServers) {
-            if (serverPath.startsWith(serverType + UNDERLINE + host)) {
-                String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-                super.remove(server);
-                logger.info("{} server {} deleted from zk dead server path success", serverType, host);
-            }
-        }
-    }
-
-    /**
-     * opType(add): if find dead server , then add to zk deadServerPath
-     * opType(delete): delete path from zk
-     *
-     * @param zNode node path
-     * @param zkNodeType master or worker
-     * @param opType delete or add
-     */
-    public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) {
-        String host = getHostByEventDataPath(zNode);
-        String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
-
-        //check server restart, if restart , dead server path in zk should be delete
-        if (opType.equals(DELETE_ZK_OP)) {
-            removeDeadServerByHost(host, type);
-
-        } else if (opType.equals(ADD_ZK_OP)) {
-            String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
-            if (!super.isExisted(deadServerPath)) {
-                //add dead server info to zk dead server path : /dead-servers/
-
-                super.persist(deadServerPath, (type + UNDERLINE + host));
-
-                logger.info("{} server dead , and {} added to zk dead server path success",
-                        zkNodeType, zNode);
-            }
-        }
-
-    }
 
     /**
      * get active master num
@@ -129,38 +76,38 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
      * @param zkNodeType zookeeper node type
      * @return server list
      */
-    public List<Server> getServersList(ZKNodeType zkNodeType) {
-        Map<String, String> masterMap = getServerMaps(zkNodeType);
+    public List<Server> getServerList(ZKNodeType zkNodeType) {
+        Map<String, String> serverMaps = getServerMaps(zkNodeType);
         String parentPath = getZNodeParentPath(zkNodeType);
 
-        List<Server> masterServers = new ArrayList<>();
-        for (Map.Entry<String, String> entry : masterMap.entrySet()) {
-            Server masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
-            if (masterServer == null) {
+        List<Server> serverList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
+            Server server = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+            if (server == null) {
                 continue;
             }
             String key = entry.getKey();
-            masterServer.setZkDirectory(parentPath + "/" + key);
-            //set host and port
+            server.setZkDirectory(parentPath + "/" + key);
+            // set host and port
             String[] hostAndPort = key.split(COLON);
             String[] hosts = hostAndPort[0].split(DIVISION_STRING);
             // fetch the last one
-            masterServer.setHost(hosts[hosts.length - 1]);
-            masterServer.setPort(Integer.parseInt(hostAndPort[1]));
-            masterServers.add(masterServer);
+            server.setHost(hosts[hosts.length - 1]);
+            server.setPort(Integer.parseInt(hostAndPort[1]));
+            serverList.add(server);
         }
-        return masterServers;
+        return serverList;
     }
 
     /**
-     * get master server list map.
+     * get server list map.
      *
      * @param zkNodeType zookeeper node type
+     * @param hostOnly host only
      * @return result : {host : resource info}
      */
-    public Map<String, String> getServerMaps(ZKNodeType zkNodeType) {
-
-        Map<String, String> masterMap = new HashMap<>();
+    public Map<String, String> getServerMaps(ZKNodeType zkNodeType, boolean hostOnly) {
+        Map<String, String> serverMap = new HashMap<>();
         try {
             String path = getZNodeParentPath(zkNodeType);
             List<String> serverList = super.getChildrenKeys(path);
@@ -175,19 +122,33 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
                 serverList = workerList;
             }
             for (String server : serverList) {
-                masterMap.putIfAbsent(server, super.get(path + Constants.SLASH + server));
+                String host = server;
+                if (zkNodeType == ZKNodeType.WORKER && hostOnly) {
+                    host = server.split(Constants.SLASH)[1];
+                }
+                serverMap.putIfAbsent(host, super.get(path + Constants.SLASH + server));
             }
         } catch (Exception e) {
             logger.error("get server list failed", e);
         }
 
-        return masterMap;
+        return serverMap;
+    }
+
+    /**
+     * get server list map.
+     *
+     * @param zkNodeType zookeeper node type
+     * @return result : {host : resource info}
+     */
+    public Map<String, String> getServerMaps(ZKNodeType zkNodeType) {
+        return getServerMaps(zkNodeType, false);
     }
 
     /**
      * check the zookeeper node already exists
      *
-     * @param host host
+     * @param host       host
      * @param zkNodeType zookeeper node type
      * @return true if exists
      */
@@ -198,7 +159,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
                     host, zkNodeType);
             return false;
         }
-        Map<String, String> serverMaps = getServerMaps(zkNodeType);
+        Map<String, String> serverMaps = getServerMaps(zkNodeType, true);
         for (String hostKey : serverMaps.keySet()) {
             if (hostKey.contains(host)) {
                 return true;
@@ -247,12 +208,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
         return path;
     }
 
-    /**
-     * @return get dead server node parent path
-     */
-    protected String getDeadZNodeParentPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS;
-    }
 
     /**
      * @return get master start up lock path
@@ -308,26 +263,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
         } catch (Exception e) {
             logger.error("init system znode failed", e);
         }
-    }
-
-    /**
-     * get host ip, string format: masterParentPath/ip
-     *
-     * @param path path
-     * @return host ip, string format: masterParentPath/ip
-     */
-    protected String getHostByEventDataPath(String path) {
-        if (StringUtils.isEmpty(path)) {
-            logger.error("empty path!");
-            return "";
-        }
-        String[] pathArray = path.split(SINGLE_SLASH);
-        if (pathArray.length < 1) {
-            logger.error("parse ip error: {}", path);
-            return "";
-        }
-        return pathArray[pathArray.length - 1];
-
     }
 
     @Override

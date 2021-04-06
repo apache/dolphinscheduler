@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import static org.apache.dolphinscheduler.alert.utils.Constants.ALERT_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.common.Constants.ALERT_RPC_PORT;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.processor.AlertRequestProcessor;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -140,6 +141,7 @@ public class AlertServer {
      * start
      */
     public void start() {
+        PropertyUtils.loadPropertyFile(ALERT_PROPERTIES_PATH);
         initPlugin();
         initRemoteServer();
         logger.info("alert server ready start ");

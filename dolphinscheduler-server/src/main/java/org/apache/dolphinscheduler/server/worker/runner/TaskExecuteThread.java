@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -30,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -46,12 +46,15 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.commons.collections.MapUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Delayed;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -62,7 +65,7 @@ import com.github.rholder.retry.RetryException;
 /**
  *  task scheduler thread
  */
-public class TaskExecuteThread implements Runnable {
+public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * logger
@@ -70,17 +73,17 @@ public class TaskExecuteThread implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteThread.class);
 
     /**
-     *  task instance
+     * task instance
      */
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     *  abstract task
+     * abstract task
      */
     private AbstractTask task;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private TaskCallbackService taskCallbackService;
 
@@ -132,7 +135,6 @@ public class TaskExecuteThread implements Runnable {
             // task node
             TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
-            delayExecutionIfNeeded();
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
             }
@@ -174,6 +176,7 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
             responseCommand.setVarPool(task.getVarPool());
+            responseCommand.setResult(task.getResultString());
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
         } catch (Exception e) {
             logger.error("task scheduler failure", e);
@@ -184,9 +187,38 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setAppIds(task.getAppIds());
         } finally {
             taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),responseCommand.convert2Command(),Event.RESULT);
+            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            clearTaskExecPath();
+        }
+    }
 
+    /**
+     * when task finish, clear execute path.
+     */
+    private void clearTaskExecPath() {
+        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
+
+        if (!CommonUtils.isDevelopMode()) {
+            // get exec dir
+            String execLocalPath = taskExecutionContext.getExecutePath();
+
+            if (StringUtils.isEmpty(execLocalPath)) {
+                logger.warn("task: {} exec local path is empty.", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            if ("/".equals(execLocalPath)) {
+                logger.warn("task: {} exec local path is '/', direct deletion is not allowed", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            try {
+                org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
+                logger.info("exec local path: {} cleared.", execLocalPath);
+            } catch (IOException e) {
+                logger.error("delete exec dir failed : {}", e.getMessage(), e);
+            }
         }
     }
 
@@ -195,7 +227,7 @@ public class TaskExecuteThread implements Runnable {
      * @return
      */
     private Map<String, String> getGlobalParamsMap() {
-        Map<String,String> globalParamsMap = new HashMap<>(16);
+        Map<String, String> globalParamsMap = new HashMap<>(16);
 
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
@@ -240,7 +272,7 @@ public class TaskExecuteThread implements Runnable {
     }
 
     /**
-     *  kill task
+     * kill task
      */
     public void kill() {
         if (task != null) {
@@ -260,7 +292,7 @@ public class TaskExecuteThread implements Runnable {
      * @param logger
      */
     private void downloadResource(String execLocalPath,
-                                  Map<String,String> projectRes,
+                                  Map<String, String> projectRes,
                                   Logger logger) throws Exception {
         if (MapUtils.isEmpty(projectRes)) {
             return;
@@ -285,24 +317,6 @@ public class TaskExecuteThread implements Runnable {
                 }
             } else {
                 logger.info("file : {} exists ", resFile.getName());
-            }
-        }
-    }
-
-    /**
-     * delay execution if needed.
-     */
-    private void delayExecutionIfNeeded() {
-        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                taskExecutionContext.getDelayTime() * 60L);
-        logger.info("delay execution time: {} s", remainTime < 0 ? 0 : remainTime);
-        if (remainTime > 0) {
-            try {
-                Thread.sleep(remainTime * Constants.SLEEP_TIME_MILLIS);
-            } catch (Exception e) {
-                logger.error("delay task execution failure, the task will be executed directly. process instance id:{}, task instance id:{}",
-                            taskExecutionContext.getProcessInstanceId(),
-                            taskExecutionContext.getTaskInstanceId());
             }
         }
     }
@@ -342,5 +356,27 @@ public class TaskExecuteThread implements Runnable {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
         return ackCommand;
+    }
+
+    /**
+     * get current TaskExecutionContext
+     * @return TaskExecutionContext
+     */
+    public TaskExecutionContext getTaskExecutionContext() {
+        return this.taskExecutionContext;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+        return unit.convert(DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
+                taskExecutionContext.getDelayTime() * 60L), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public int compareTo(Delayed o) {
+        if (o == null) {
+            return 1;
+        }
+        return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
     }
 }

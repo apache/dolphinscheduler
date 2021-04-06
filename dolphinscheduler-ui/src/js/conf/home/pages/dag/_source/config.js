@@ -190,14 +190,14 @@ const tasksState = {
   },
   FAILURE: {
     id: 6,
-    desc: `${i18n.$t('failed')}`,
+    desc: `${i18n.$t('Failed')}`,
     color: '#000000',
     icoUnicode: 'el-icon-circle-close',
     isSpin: false
   },
   SUCCESS: {
     id: 7,
-    desc: `${i18n.$t('success')}`,
+    desc: `${i18n.$t('Success')}`,
     color: '#33cc00',
     icoUnicode: 'el-icon-circle-check',
     isSpin: false
@@ -211,7 +211,7 @@ const tasksState = {
   },
   KILL: {
     id: 9,
-    desc: `${i18n.$t('kill')}`,
+    desc: `${i18n.$t('Kill')}`,
     color: '#a70202',
     icoUnicode: 'el-icon-remove-outline',
     isSpin: false
