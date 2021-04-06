@@ -33,7 +33,7 @@ ENV DOCKER true
 #     echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free"; \
 # } > /etc/apt/sources.list
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends tzdata dos2unix python supervisor procps netcat sudo tini && \
+    apt-get install -y --no-install-recommends tzdata dos2unix python supervisor procps psmisc netcat sudo tini && \
     echo "Asia/Shanghai" > /etc/timezone && \
     rm -f /etc/localtime && \
     dpkg-reconfigure tzdata && \
