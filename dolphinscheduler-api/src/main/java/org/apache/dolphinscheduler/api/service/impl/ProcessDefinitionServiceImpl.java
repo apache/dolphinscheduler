@@ -1404,8 +1404,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             ProcessData processData = processService.genProcessData(processDefinition);
             List<TaskNode> taskNodeList = processData.getTasks();
+            String locations = processDefinition.getLocations();
+            ObjectNode locationsJN = JSONUtils.parseObject(locations);
+
             taskNodeList.forEach(taskNode -> {
-                taskNode.setName(taskNode.getName() + "_copy_" + DateUtils.getCurrentTimeStamp());
+                String suffix = "_copy_" + DateUtils.getCurrentTimeStamp();
+                String id = taskNode.getId();
+                String newName = locationsJN.path(id).path("name").asText() + suffix;
+                ((ObjectNode) locationsJN.get(id)).put("name", newName);
+
+                taskNode.setName(taskNode.getName() + suffix);
                 taskNode.setCode("0");
             });
             processData.setTasks(taskNodeList);
@@ -1416,7 +1424,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp(),
                     processDefinitionJson,
                     processDefinition.getDescription(),
-                    processDefinition.getLocations(),
+                    locationsJN.toString(),
                     processDefinition.getConnects());
 
         }
