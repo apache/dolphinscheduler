@@ -35,6 +35,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * task definition
@@ -250,10 +251,12 @@ public class TaskDefinition {
     }
 
     public List<Property> getTaskParamList() {
-        List<Property> propList = JSONUtils.toList(JSONUtils.parseObject(taskParams).findValue("localParams").toString(),
-                Property.class);
-        return taskParamList = propList;
+        JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
+        if (localParams != null) {
+            taskParamList = JSONUtils.toList(localParams.toString(), Property.class);
+        }
 
+        return taskParamList;
     }
 
     public void setTaskParamList(List<Property> taskParamList) {
@@ -266,9 +269,11 @@ public class TaskDefinition {
 
     public Map<String, String> getTaskParamMap() {
         if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
-            List<Property> propList = JSONUtils.toList(JSONUtils.parseObject(taskParams).findValue("localParams").toString(),
-                    Property.class);
-            taskParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
+            if (localParams != null) {
+                List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
+                taskParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            }
         }
         return taskParamMap;
     }

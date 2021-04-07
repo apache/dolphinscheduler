@@ -237,7 +237,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             return;
         }
-        if (!CheckUtils.checkTaskNodeParameters(taskNode.getParams(), taskNode.getName())) {
+        if (!CheckUtils.checkTaskNodeParameters(taskNode)) {
             logger.error("task node {} parameter invalid", taskNode.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskNode.getName());
         }
