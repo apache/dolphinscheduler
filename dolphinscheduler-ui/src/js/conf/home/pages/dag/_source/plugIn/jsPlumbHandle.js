@@ -616,7 +616,8 @@ JSP.prototype.saveStore = function () {
         }
 
         let tasksParam = _.assign(v, {
-          preTasks: preTasks
+          preTasks: preTasks,
+          depList: null
         })
 
         // Sub-workflow has no retries and interval
