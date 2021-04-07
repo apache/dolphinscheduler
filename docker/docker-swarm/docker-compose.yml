@@ -20,7 +20,6 @@ services:
 
   dolphinscheduler-postgresql:
     image: bitnami/postgresql:latest
-    container_name: dolphinscheduler-postgresql
     environment:
       TZ: Asia/Shanghai
       POSTGRESQL_USERNAME: root
@@ -28,14 +27,12 @@ services:
       POSTGRESQL_DATABASE: dolphinscheduler
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
-    - dolphinscheduler-postgresql-initdb:/docker-entrypoint-initdb.d
     restart: unless-stopped
     networks:
     - dolphinscheduler
 
   dolphinscheduler-zookeeper:
     image: bitnami/zookeeper:latest
-    container_name: dolphinscheduler-zookeeper
     environment:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"
@@ -48,7 +45,6 @@ services:
 
   dolphinscheduler-api:
     image: apache/dolphinscheduler:latest
-    container_name: dolphinscheduler-api
     command: api-server
     ports:
     - 12345:12345
@@ -73,7 +69,6 @@ services:
 
   dolphinscheduler-alert:
     image: apache/dolphinscheduler:latest
-    container_name: dolphinscheduler-alert
     command: alert-server
     environment:
       TZ: Asia/Shanghai
@@ -93,7 +88,6 @@ services:
 
   dolphinscheduler-master:
     image: apache/dolphinscheduler:latest
-    container_name: dolphinscheduler-master
     command: master-server
     environment:
       TZ: Asia/Shanghai
@@ -115,7 +109,6 @@ services:
 
   dolphinscheduler-worker:
     image: apache/dolphinscheduler:latest
-    container_name: dolphinscheduler-worker
     command: worker-server
     environment:
       TZ: Asia/Shanghai
@@ -143,7 +136,6 @@ networks:
 
 volumes:
   dolphinscheduler-postgresql:
-  dolphinscheduler-postgresql-initdb:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
   dolphinscheduler-logs:
