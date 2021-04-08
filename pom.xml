@@ -805,6 +805,7 @@
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LocaleChangeInterceptorTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
+                        <include>**/api/interceptor/RateLimitInterceptorTest.java</include>
                         <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigLDAPTest.java</include>
