@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -56,6 +55,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -266,7 +267,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> commandMap = JSONUtils.toMap(processInstance.getCommandParam(), String.class, Object.class);
         String startParams = null;
         if (MapUtils.isNotEmpty(commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
-            startParams = (commandMap.get(Constants.CMD_PARAM_START_PARAMS)).toString();
+            Object startParamsJson = commandMap.get(Constants.CMD_PARAM_START_PARAMS);
+            if (startParamsJson != null) {
+                startParams = startParamsJson.toString();
+            }
         }
 
         switch (executeType) {
