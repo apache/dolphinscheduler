@@ -284,13 +284,13 @@
                 }, true)
 
                 if (clearList !== undefined && clearList.length > 0) {
-                  clearList.forEach(item => {
-                    if (item !== id) {
-                      this.fApi.updateRule(item, {
+                  clearList.forEach(i => {
+                    if (i !== id) {
+                      this.fApi.updateRule(i, {
                         options: []
                       }, true)
                     }
-                    this.fApi.setValue(item, null)
+                    this.fApi.setValue(i, null)
                   })
                 }
               } else {
@@ -393,6 +393,50 @@
        * verification
        */
       _verification () {
+        this._checkSparkParam()
+
+        this.sparkParam = {
+          deployMode: this.deployMode,
+          driverCores: this.driverCores,
+          driverMemory: this.driverMemory,
+          numExecutors: this.numExecutors,
+          executorMemory: this.executorMemory,
+          executorCores: this.executorCores,
+          others: this.others
+        }
+
+        this.inputEntryValueMap = this.fApi.formData()
+
+        let fields = this.fApi.fields()
+        try {
+          fields.forEach(item => {
+            this.fApi.setValue(item, this.inputEntryValueMap[item])
+            if (item !== 'mapping_columns') {
+              this.fApi.validateField(item, (errMsg) => {
+                if (errMsg) {
+                  throw new Error(errMsg)
+                }
+              })
+            } else {
+              this.inputEntryValueMap.mapping_columns = JSON.stringify(this.inputEntryValueMap.mapping_columns)
+            }
+          })
+        } catch (error) {
+          this.$message.warning(error.message)
+          return false
+        }
+
+        // storage
+        this.$emit('on-params', {
+          ruleId: this.ruleId,
+          sparkParameters: this.sparkParam,
+          localParams: this.localParams,
+          ruleInputParameter: this.inputEntryValueMap
+        })
+        return true
+      },
+
+      _checkSparkParam () {
         if (!this.numExecutors) {
           this.$message.warning(`${i18n.$t('Please enter Executor number')}`)
           return false
@@ -400,11 +444,6 @@
 
         if (!Number.isInteger(parseInt(this.numExecutors))) {
           this.$message.warning(`${i18n.$t('The Executor Number should be a positive integer')}`)
-          return false
-        }
-
-        if (!this.executorMemory) {
-          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
           return false
         }
 
@@ -427,51 +466,26 @@
           this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
           return false
         }
+
+        if (!this.driverCores) {
+          this.$message.warning(`${i18n.$t('Please enter Driver cores')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.driverCores))) {
+          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
+          return false
+        }
+
+        if (!this.driverMemory) {
+          this.$message.warning(`${i18n.$t('Please enter Driver memory')}`)
+          return false
+        }
+
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
-
-        this.sparkParam = {
-          deployMode: this.deployMode,
-          driverCores: this.driverCores,
-          driverMemory: this.driverMemory,
-          numExecutors: this.numExecutors,
-          executorMemory: this.executorMemory,
-          executorCores: this.executorCores,
-          others: this.others
-        }
-
-        this.inputEntryValueMap = this.fApi.formData()
-
-        let fields = this.fApi.fields()
-        try {
-          fields.forEach(item => {
-            this.fApi.setValue(item, this.inputEntryValueMap[item])
-            if (item !== 'mapping_columns') {
-              this.fApi.validateField(item, (errMsg) => {
-                if (errMsg) {
-                  console.log(errMsg)
-                  throw new Error(errMsg)
-                }
-              })
-            } else {
-              this.inputEntryValueMap.mapping_columns = JSON.stringify(this.inputEntryValueMap.mapping_columns)
-            }
-          })
-        } catch (error) {
-          this.$message.warning(error.message)
-          return false
-        }
-
-        // storage
-        this.$emit('on-params', {
-          ruleId: this.ruleId,
-          sparkParameters: this.sparkParam,
-          localParams: this.localParams,
-          ruleInputParameter: this.inputEntryValueMap
-        })
-        return true
       },
 
       _isArrayFn (o) {
@@ -542,7 +556,10 @@
     margin-right: 25px;
   }
   .form-box .el-form-item{
-    // margin-top: -5px;
     margin-bottom: -1px
+  }
+
+  .form-box .form-create .el-form-item{
+    margin-bottom: 0px
   }
 </style>
