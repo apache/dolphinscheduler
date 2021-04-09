@@ -542,7 +542,10 @@
     margin-right: 25px;
   }
   .form-box .el-form-item{
-    // margin-top: -5px;
     margin-bottom: -1px
+  }
+
+  .form-box .form-create .el-form-item{
+    margin-bottom: 0px
   }
 </style>
