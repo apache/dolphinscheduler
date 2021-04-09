@@ -156,6 +156,11 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
 
     /**
+     * sudo enable
+     */
+    public static final String SUDO_ENABLE = "sudo.enable";
+
+    /**
      * string true
      */
     public static final String STRING_TRUE = "true";
@@ -332,6 +337,11 @@ public final class Constants {
     public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[_|\\-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
+     * default display rows
+     */
+    public static final int DEFAULT_DISPLAY_ROWS = 10;
+
+    /**
      * read permission
      */
     public static final int READ_PERMISSION = 2 * 1;
@@ -385,6 +395,10 @@ public final class Constants {
      */
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
+    /**
+     * worker host weight
+     */
+    public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
      * default log cache rows num,output when reach the number
@@ -465,6 +479,8 @@ public final class Constants {
 
     public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
+    public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
+
     /**
      * complement data start date
      */
@@ -542,7 +558,7 @@ public final class Constants {
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-
+    public static final int HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH = 11;
 
     /**
      * jar
@@ -774,8 +790,8 @@ public final class Constants {
     /**
      * master/worker server use for zk
      */
-    public static final String MASTER_PREFIX = "master";
-    public static final String WORKER_PREFIX = "worker";
+    public static final String MASTER_TYPE = "master";
+    public static final String WORKER_TYPE = "worker";
     public static final String DELETE_ZK_OP = "delete";
     public static final String ADD_ZK_OP = "add";
     public static final String ALIAS = "alias";

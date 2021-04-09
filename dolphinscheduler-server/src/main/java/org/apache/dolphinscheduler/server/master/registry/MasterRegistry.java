@@ -81,7 +81,7 @@ public class MasterRegistry {
      * registry
      */
     public void registry() {
-        String address = NetUtils.getHost();
+        String address = NetUtils.getAddr(masterConfig.getListenPort());
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
@@ -98,10 +98,10 @@ public class MasterRegistry {
             });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
-                masterConfig.getMasterReservedMemory(),
                 masterConfig.getMasterMaxCpuloadAvg(),
+                masterConfig.getMasterReservedMemory(),
                 Sets.newHashSet(getMasterPath()),
-                Constants.MASTER_PREFIX,
+                Constants.MASTER_TYPE,
                 zookeeperRegistryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
@@ -132,9 +132,7 @@ public class MasterRegistry {
      * get local address
      */
     private String getLocalAddress() {
-
         return NetUtils.getAddr(masterConfig.getListenPort());
-
     }
 
     /**

@@ -447,19 +447,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query all project list that have one or more process definitions.
+     * query all project list
      *
      * @return project list
      */
     @Override
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = new ArrayList<>();
-
-        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
-        if (CollectionUtils.isNotEmpty(projectIds)) {
-            projects = projectMapper.selectBatchIds(projectIds);
-        }
+        List<Project> projects = projectMapper.queryAllProject();
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);

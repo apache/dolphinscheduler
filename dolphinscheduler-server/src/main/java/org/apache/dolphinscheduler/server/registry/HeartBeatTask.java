@@ -38,8 +38,9 @@ public class HeartBeatTask implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
 
     private String startTime;
-    private double reservedMemory;
     private double maxCpuloadAvg;
+    private double reservedMemory;
+    private int hostWeight; // worker host weight
     private Set<String> heartBeatPaths;
     private String serverType;
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
@@ -48,23 +49,38 @@ public class HeartBeatTask implements Runnable {
     protected IStoppable stoppable = null;
 
     public HeartBeatTask(String startTime,
-                         double reservedMemory,
                          double maxCpuloadAvg,
+                         double reservedMemory,
                          Set<String> heartBeatPaths,
                          String serverType,
                          ZookeeperRegistryCenter zookeeperRegistryCenter) {
         this.startTime = startTime;
-        this.reservedMemory = reservedMemory;
         this.maxCpuloadAvg = maxCpuloadAvg;
+        this.reservedMemory = reservedMemory;
         this.heartBeatPaths = heartBeatPaths;
-        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
         this.serverType = serverType;
+        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
+    }
+
+    public HeartBeatTask(String startTime,
+                         double maxCpuloadAvg,
+                         double reservedMemory,
+                         int hostWeight,
+                         Set<String> heartBeatPaths,
+                         String serverType,
+                         ZookeeperRegistryCenter zookeeperRegistryCenter) {
+        this.startTime = startTime;
+        this.maxCpuloadAvg = maxCpuloadAvg;
+        this.reservedMemory = reservedMemory;
+        this.hostWeight = hostWeight;
+        this.heartBeatPaths = heartBeatPaths;
+        this.serverType = serverType;
+        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
     }
 
     @Override
     public void run() {
         try {
-
             // check dead or not in zookeeper
             for (String heartBeatPath : heartBeatPaths) {
                 if (zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)) {
@@ -94,8 +110,12 @@ public class HeartBeatTask implements Runnable {
             builder.append(startTime).append(Constants.COMMA);
             builder.append(DateUtils.dateToString(new Date())).append(Constants.COMMA);
             builder.append(status).append(COMMA);
-            //save process id
+            // save process id
             builder.append(OSUtils.getProcessID());
+            // worker host weight
+            if (Constants.WORKER_TYPE.equals(serverType)) {
+                builder.append(Constants.COMMA).append(hostWeight);
+            }
 
             for (String heartBeatPath : heartBeatPaths) {
                 zookeeperRegistryCenter.getRegisterOperator().update(heartBeatPath, builder.toString());

@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.service.zk;
 
 import static org.apache.dolphinscheduler.common.Constants.ADD_ZK_OP;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_ZK_OP;
-import static org.apache.dolphinscheduler.common.Constants.MASTER_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-import static org.apache.dolphinscheduler.common.Constants.WORKER_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
@@ -69,10 +69,10 @@ public class RegisterOperator extends ZookeeperCachedOperator {
     }
 
     /**
-     * get host ip, string format: masterParentPath/ip
+     * get host ip:port, string format: parentPath/ip:port
      *
      * @param path path
-     * @return host ip, string format: masterParentPath/ip
+     * @return host ip:port, string format: parentPath/ip:port
      */
     protected String getHostByEventDataPath(String path) {
         if (StringUtils.isEmpty(path)) {
@@ -99,7 +99,7 @@ public class RegisterOperator extends ZookeeperCachedOperator {
      */
     public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
         String host = getHostByEventDataPath(zNode);
-        String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
+        String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
 
         //check server restart, if restart , dead server path in zk should be delete
         if (opType.equals(DELETE_ZK_OP)) {
@@ -130,7 +130,7 @@ public class RegisterOperator extends ZookeeperCachedOperator {
      */
     public void handleDeadServer(Set<String> zNodeSet, ZKNodeType zkNodeType, String opType) throws Exception {
 
-        String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
+        String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
         for (String zNode : zNodeSet) {
             String host = getHostByEventDataPath(zNode);
             //check server restart, if restart , dead server path in zk should be delete

@@ -17,7 +17,18 @@
 <template>
   <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
-      <m-conditions @on-conditions="_onConditions"></m-conditions>
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group" v-if="isADMIN">
+          <el-button size="mini" @click="_create('')">{{$t('Create worker group')}}</el-button>
+          <el-dialog
+            :title="item ? $t('Edit worker group') : $t('Create worker group')"
+            v-if="createWorkerGroupDialog"
+            :visible.sync="createWorkerGroupDialog"
+            width="auto">
+            <m-create-worker :item="item" @onUpdate="onUpdate" @close="close"></m-create-worker>
+          </el-dialog>
+        </template>
+      </m-conditions>
     </template>
     <template slot="content">
       <template v-if="workerGroupList.length || total>0">
@@ -57,6 +68,7 @@
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import mCreateWorker from './_source/createWorker'
 
   export default {
     name: 'worker-groups-index',
@@ -70,7 +82,9 @@
           pageNo: 1,
           searchVal: ''
         },
-        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
+        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
+        createWorkerGroupDialog: false,
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
@@ -95,6 +109,17 @@
       },
       _onEdit (item) {
         this._create(item)
+      },
+      _create (item) {
+        this.createWorkerGroupDialog = true
+        this.item = item
+      },
+      onUpdate () {
+        this._debounceGET('false')
+        this.createWorkerGroupDialog = false
+      },
+      close () {
+        this.createWorkerGroupDialog = false
       },
       _getList (flag) {
         this.isLoading = !flag
@@ -122,6 +147,6 @@
     created () {},
     mounted () {
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWorker }
   }
 </script>

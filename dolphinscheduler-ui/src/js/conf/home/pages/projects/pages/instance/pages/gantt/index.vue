@@ -29,10 +29,10 @@
             </a>
           </div>
         </div>
-        <template v-show="!isNodata">
+        <template v-if="!isNodata">
           <div class="gantt"></div>
         </template>
-        <template v-if="isNodata">
+        <template v-else>
           <m-no-data></m-no-data>
         </template>
         <m-spin :is-spin="isLoading">
