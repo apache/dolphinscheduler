@@ -195,13 +195,11 @@ public class ProcessInstance {
     /**
      * task locations for web
      */
-    @TableField(exist = false)
     private String locations;
 
     /**
      * task connects for web
      */
-    @TableField(exist = false)
     private String connects;
 
     /**
