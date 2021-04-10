@@ -43,6 +43,7 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -304,6 +305,7 @@ public class DataxTaskTest {
      * Method: buildDataxJsonFile()
      */
     @Test
+    @Ignore
     public void testBuildDataxJsonFile()
             throws Exception {
 
@@ -322,6 +324,7 @@ public class DataxTaskTest {
      * Method: buildDataxJsonFile()
      */
     @Test
+    @Ignore
     public void testBuildDataxJsonFile0()
             throws Exception {
         try {
@@ -415,6 +418,7 @@ public class DataxTaskTest {
      * Method: buildShellCommandFile(String jobConfigFilePath)
      */
     @Test
+    @Ignore
     public void testBuildShellCommandFile()
             throws Exception {
         try {
