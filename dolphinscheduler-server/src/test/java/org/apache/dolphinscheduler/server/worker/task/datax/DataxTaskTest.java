@@ -305,7 +305,7 @@ public class DataxTaskTest {
      * Method: buildDataxJsonFile()
      */
     @Test
-    @Ignore
+    @Ignore("method not found")
     public void testBuildDataxJsonFile()
             throws Exception {
 
@@ -324,7 +324,7 @@ public class DataxTaskTest {
      * Method: buildDataxJsonFile()
      */
     @Test
-    @Ignore
+    @Ignore("method not found")
     public void testBuildDataxJsonFile0()
             throws Exception {
         try {
@@ -418,7 +418,7 @@ public class DataxTaskTest {
      * Method: buildShellCommandFile(String jobConfigFilePath)
      */
     @Test
-    @Ignore
+    @Ignore("method not found")
     public void testBuildShellCommandFile()
             throws Exception {
         try {
