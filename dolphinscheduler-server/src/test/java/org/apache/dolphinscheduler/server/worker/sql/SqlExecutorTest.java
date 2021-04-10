@@ -19,8 +19,10 @@ package org.apache.dolphinscheduler.server.worker.sql;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -112,13 +114,11 @@ public class SqlExecutorTest {
 
 
         // custom logger
-//        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-//                taskInstance.getProcessDefinitionId(),
-//                taskInstance.getProcessInstanceId(),
-//                taskInstance.getId()));
+        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
 
-
-//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+        //AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
         AbstractTask task = null;
 
         logger.info("task info : {}", task);
