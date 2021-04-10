@@ -39,7 +39,6 @@ public class LogUtilsTest {
     @Test
     public void testGetTaskLogPath() {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(100);
         taskInstance.setId(1000);
 

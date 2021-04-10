@@ -311,9 +311,7 @@ public class ProcessServiceTest {
     public void testFormatTaskAppId() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(333);
-        taskInstance.setProcessDefinitionId(111);
         taskInstance.setProcessInstanceId(222);
-        Mockito.when(processService.findProcessDefineById(taskInstance.getProcessDefinitionId())).thenReturn(null);
         Mockito.when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(null);
         Assert.assertEquals("", processService.formatTaskAppId(taskInstance));
 
@@ -321,7 +319,6 @@ public class ProcessServiceTest {
         processDefinition.setId(111);
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
-        Mockito.when(processService.findProcessDefineById(taskInstance.getProcessDefinitionId())).thenReturn(processDefinition);
         Mockito.when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
         Assert.assertEquals("111_222_333", processService.formatTaskAppId(taskInstance));
 

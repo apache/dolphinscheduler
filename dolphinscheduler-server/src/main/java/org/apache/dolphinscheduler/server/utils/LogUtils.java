@@ -41,7 +41,7 @@ public class LogUtils {
      * get task log path
      */
     @SuppressWarnings("unchecked")
-    private static String getTaskLogPath(int processDefinitionId, int processInstanceId, int taskInstanceId) {
+    private static String getTaskLogPath(int processInstanceId, int taskInstanceId) {
         // Optional.map will be skipped if null
         return Optional.of(LoggerFactory.getILoggerFactory())
                 .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
@@ -50,7 +50,6 @@ public class LogUtils {
                 .map(TaskLogDiscriminator::getLogBase)
                 .map(e -> Paths.get(e)
                         .toAbsolutePath()
-                        .resolve(String.valueOf(processDefinitionId))
                         .resolve(String.valueOf(processInstanceId))
                         .resolve(taskInstanceId + ".log"))
                 .map(Path::toString)
@@ -61,14 +60,14 @@ public class LogUtils {
      * get task log path by TaskInstance
      */
     public static String getTaskLogPath(TaskInstance taskInstance) {
-        return getTaskLogPath(taskInstance.getProcessDefinitionId(), taskInstance.getProcessInstanceId(), taskInstance.getId());
+        return getTaskLogPath(taskInstance.getProcessInstanceId(), taskInstance.getId());
     }
 
     /**
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(taskExecutionContext.getProcessDefineId(), taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+        return getTaskLogPath(taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
     }
 
 }

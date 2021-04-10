@@ -676,7 +676,6 @@ CREATE TABLE t_ds_task_instance (
   task_type varchar(64) DEFAULT NULL ,
   task_code bigint NOT NULL,
   task_definition_version int DEFAULT NULL ,
-  process_definition_code bigint DEFAULT NULL ,
   process_instance_id int DEFAULT NULL ,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
