@@ -42,7 +42,6 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor<Oracl
 
         Map<String, Object> parameterMap = new LinkedHashMap<>();
         parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, datasourceParam.getConnectType());
-        parameterMap.put(TYPE, datasourceParam.getConnectType());
         parameterMap.putAll(buildCommonParamMap(address, jdbcUrl, datasourceParam));
 
         String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);

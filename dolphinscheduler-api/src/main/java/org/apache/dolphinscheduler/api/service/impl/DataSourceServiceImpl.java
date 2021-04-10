@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,19 +26,15 @@ import org.apache.dolphinscheduler.api.utils.datasource.DatasourceParamUtil;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.datasource.MySQLDataSource;
 import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-
-import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -50,7 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,15 +73,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public static final String DATABASE = "database";
     public static final String USER_NAME = "userName";
     public static final String OTHER = "other";
-
-    private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
-
-    private static final Pattern IPV6_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\:\\[\\]]+$");
-
-    private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
-
-    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
-
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
@@ -559,12 +544,4 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return result;
     }
 
-    private static boolean isNumeric(String str) {
-        for (int i = str.length(); --i >= 0; ) {
-            if (!Character.isDigit(str.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

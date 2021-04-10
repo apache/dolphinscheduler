@@ -30,6 +30,9 @@ import org.slf4j.LoggerFactory;
 
 public class DatasourceParamUtil {
 
+    private DatasourceParamUtil() {
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(DatasourceParamUtil.class);
     private static final Map<Integer, DatasourceProcessor> checkProcessorMap = new HashMap<>();
 

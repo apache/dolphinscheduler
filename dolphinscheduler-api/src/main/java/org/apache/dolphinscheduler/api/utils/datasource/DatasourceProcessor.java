@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
-public interface DatasourceProcessor<T> {
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
+
+public interface DatasourceProcessor<T extends BaseDataSourceParamDTO> {
 
     /**
      * check datasource is valid
+     * @param datasourceParam
      */
     void checkDatasourceParam(T datasourceParam);
 

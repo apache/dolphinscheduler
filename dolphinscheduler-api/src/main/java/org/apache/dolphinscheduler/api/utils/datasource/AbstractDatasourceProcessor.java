@@ -44,14 +44,9 @@ public abstract class AbstractDatasourceProcessor<T extends BaseDataSourceParamD
 
     private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
 
-    protected static final String NAME = "name";
-    protected static final String NOTE = "note";
     protected static final String TYPE = "type";
     protected static final String HOST = "host";
     protected static final String PORT = "port";
-    protected static final String PRINCIPAL = "principal";
-    protected static final String DATABASE = "database";
-    protected static final String USER_NAME = "userName";
     protected static final String OTHER = "other";
 
     @Override
