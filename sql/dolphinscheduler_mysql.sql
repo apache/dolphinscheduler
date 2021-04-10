@@ -601,6 +601,8 @@ CREATE TABLE `t_ds_process_instance` (
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_sub_process` int(11) DEFAULT '0' COMMENT 'flag, whether the process is sub process',
   `executor_id` int(11) NOT NULL COMMENT 'executor id',
+  `locations` text COMMENT 'Node location information',
+  `connects` text COMMENT 'Node connection information',
   `history_cmd` text COMMENT 'history commands of process instance operation',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority. 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
