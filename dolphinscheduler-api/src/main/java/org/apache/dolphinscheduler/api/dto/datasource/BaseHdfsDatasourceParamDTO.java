@@ -41,14 +41,6 @@ public abstract class BaseHdfsDatasourceParamDTO extends BaseDataSourceParamDTO 
         this.principal = principal;
     }
 
-    public String getJavaSecurityKrb5Conf() {
-        return javaSecurityKrb5Conf;
-    }
-
-    public void setJavaSecurityKrb5Conf(String javaSecurityKrb5Conf) {
-        this.javaSecurityKrb5Conf = javaSecurityKrb5Conf;
-    }
-
     public String getLoginUserKeytabUsername() {
         return loginUserKeytabUsername;
     }
@@ -63,5 +55,13 @@ public abstract class BaseHdfsDatasourceParamDTO extends BaseDataSourceParamDTO 
 
     public void setLoginUserKeytabPath(String loginUserKeytabPath) {
         this.loginUserKeytabPath = loginUserKeytabPath;
+    }
+
+    public String getJavaSecurityKrb5Conf() {
+        return javaSecurityKrb5Conf;
+    }
+
+    public void setJavaSecurityKrb5Conf(String javaSecurityKrb5Conf) {
+        this.javaSecurityKrb5Conf = javaSecurityKrb5Conf;
     }
 }

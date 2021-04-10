@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.utils.datasource;
 
 import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.api.dto.datasource.BaseHdfsDatasourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.Constants;
@@ -124,7 +125,6 @@ public abstract class AbstractDatasourceProcessor<T extends BaseDataSourceParamD
      * @return otherStr
      */
     protected String transformOther(String other, DbType dbType, String separator) {
-        //todo: wrapper other
         Map<String, String> map;
         if (DbType.MYSQL.equals(dbType)) {
             map = MySQLDataSource.buildOtherParams(other);
@@ -142,6 +142,20 @@ public abstract class AbstractDatasourceProcessor<T extends BaseDataSourceParamD
             otherSb.deleteCharAt(otherSb.length() - 1);
         }
         return otherSb.toString();
+    }
+
+    /**
+     * inject the kerberos parameter to the parameterMap
+     * @param parameterMap parameterMap
+     * @param hdfsDatasourceParamDTO datasource param
+     */
+    protected void injectKerberos(Map<String, Object> parameterMap, BaseHdfsDatasourceParamDTO hdfsDatasourceParamDTO) {
+        if (CommonUtils.getKerberosStartupState()) {
+            parameterMap.put(Constants.PRINCIPAL, hdfsDatasourceParamDTO.getPrincipal());
+            parameterMap.put(Constants.KERBEROS_KRB5_CONF_PATH, hdfsDatasourceParamDTO.getJavaSecurityKrb5Conf());
+            parameterMap.put(Constants.KERBEROS_KEY_TAB_USERNAME, hdfsDatasourceParamDTO.getLoginUserKeytabUsername());
+            parameterMap.put(Constants.KERBEROS_KEY_TAB_PATH, hdfsDatasourceParamDTO.getLoginUserKeytabPath());
+        }
     }
 
 }

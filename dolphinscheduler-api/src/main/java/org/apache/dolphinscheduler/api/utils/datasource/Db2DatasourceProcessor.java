@@ -28,11 +28,11 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor<Db2Datas
     @Override
     public String buildConnectionParams(Db2DatasourceParamDTO datasourceParam) {
         String address = String.format("%s%s:%s", Constants.JDBC_DB2, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
-        String separator = ";";
+        String jdbcUrl = String.format("%s/%s", address, datasourceParam.getDatabase());
+
         Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
 
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), ";");
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

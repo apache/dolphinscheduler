@@ -27,27 +27,22 @@ import java.util.Map;
 public class SparkDatasourceProcessor extends AbstractDatasourceProcessor<SparkDatasourceParamDTO> {
 
     @Override
-    public String buildConnectionParams(SparkDatasourceParamDTO datasourceParam) {
+    public String buildConnectionParams(SparkDatasourceParamDTO sparkDatasourceParam) {
         StringBuilder address = new StringBuilder();
         address.append(Constants.JDBC_HIVE_2);
-        for (String zkHost : datasourceParam.getHost().split(",")) {
-            address.append(String.format("%s:%s,", zkHost, datasourceParam.getPort()));
+        for (String zkHost : sparkDatasourceParam.getHost().split(",")) {
+            address.append(String.format("%s:%s,", zkHost, sparkDatasourceParam.getPort()));
         }
         address.deleteCharAt(address.length() - 1);
 
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
+        String jdbcUrl = address + "/" + sparkDatasourceParam.getDatabase();
         if (CommonUtils.getKerberosStartupState()) {
-            jdbcUrl += ";principal=" + datasourceParam.getPrincipal();
+            jdbcUrl += ";principal=" + sparkDatasourceParam.getPrincipal();
         }
         String separator = ";";
-        Map<String, Object> parameterMap = buildCommonParamMap(address.toString(), jdbcUrl, datasourceParam);
-        if (CommonUtils.getKerberosStartupState()) {
-            parameterMap.put(Constants.PRINCIPAL, datasourceParam.getPrincipal());
-            parameterMap.put(Constants.KERBEROS_KRB5_CONF_PATH, datasourceParam.getJavaSecurityKrb5Conf());
-            parameterMap.put(Constants.KERBEROS_KEY_TAB_USERNAME, datasourceParam.getLoginUserKeytabUsername());
-            parameterMap.put(Constants.KERBEROS_KEY_TAB_PATH, datasourceParam.getLoginUserKeytabPath());
-        }
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        Map<String, Object> parameterMap = buildCommonParamMap(address.toString(), jdbcUrl, sparkDatasourceParam);
+        injectKerberos(parameterMap, sparkDatasourceParam);
+        String otherStr = transformOther(sparkDatasourceParam.getOther(), sparkDatasourceParam.getType(), separator);
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

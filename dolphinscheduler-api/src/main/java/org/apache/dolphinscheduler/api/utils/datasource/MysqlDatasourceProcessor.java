@@ -26,14 +26,13 @@ import java.util.Map;
 public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor<MysqlDatasourceParamDTO> {
 
     @Override
-    public String buildConnectionParams(MysqlDatasourceParamDTO datasourceParam) {
-        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
-        String separator = "&";
+    public String buildConnectionParams(MysqlDatasourceParamDTO mysqlDatasourceParam) {
+        String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
+        String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
 
-        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
+        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, mysqlDatasourceParam);
 
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        String otherStr = transformOther(mysqlDatasourceParam.getOther(), mysqlDatasourceParam.getType(), "&");
         if (otherStr != null) {
             parameterMap.put(Constants.OTHER, otherStr);
         }

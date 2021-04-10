@@ -25,12 +25,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class OracleDatasourceProcessor extends AbstractDatasourceProcessor<OracleDatasourceParamDTO> {
-
-    private static final Logger logger = LoggerFactory.getLogger(OracleDatasourceProcessor.class);
 
     @Override
     public String buildConnectionParams(OracleDatasourceParamDTO datasourceParam) {

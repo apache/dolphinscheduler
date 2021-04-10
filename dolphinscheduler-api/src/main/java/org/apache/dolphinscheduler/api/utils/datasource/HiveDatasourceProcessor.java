@@ -41,12 +41,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor<HiveDat
         String separator = ";";
 
         Map<String, Object> parameterMap = buildCommonParamMap(address.toString(), jdbcUrl, datasourceParam);
-        if (CommonUtils.getKerberosStartupState()) {
-            parameterMap.put(Constants.PRINCIPAL, datasourceParam.getPrincipal());
-            parameterMap.put(Constants.KERBEROS_KRB5_CONF_PATH, datasourceParam.getJavaSecurityKrb5Conf());
-            parameterMap.put(Constants.KERBEROS_KEY_TAB_USERNAME, datasourceParam.getLoginUserKeytabUsername());
-            parameterMap.put(Constants.KERBEROS_KEY_TAB_PATH, datasourceParam.getLoginUserKeytabPath());
-        }
+        injectKerberos(parameterMap, datasourceParam);
         String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);

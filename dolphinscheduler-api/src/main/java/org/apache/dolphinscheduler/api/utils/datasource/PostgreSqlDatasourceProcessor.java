@@ -28,10 +28,9 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor<P
     @Override
     public String buildConnectionParams(PostgreSqlDatasourceParamDTO datasourceParam) {
         String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
-        String separator = "&";
+        String jdbcUrl = String.format("%s/%s", address, datasourceParam.getDatabase());
         Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), "&");
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

@@ -29,10 +29,10 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor<Sq
     public String buildConnectionParams(SqlServerDatasourceParamDTO datasourceParam) {
         String address = String.format("%s%s:%s", Constants.JDBC_SQLSERVER, datasourceParam.getHost(), datasourceParam.getPort());
         String jdbcUrl = address + "/" + datasourceParam.getDatabase();
-        String separator = ";";
 
         Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+
+        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), ";");
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

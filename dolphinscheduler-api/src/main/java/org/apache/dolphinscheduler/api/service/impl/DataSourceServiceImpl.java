@@ -559,33 +559,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return result;
     }
 
-    @Deprecated
-    private void checkParams(DbType type, String port, String host, String database, String other) {
-        if (null == DbType.of(type.getCode())) {
-            throw new ServiceException(Status.DATASOURCE_DB_TYPE_ILLEGAL);
-        }
-        if (!isNumeric(port)) {
-            throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
-        }
-        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
-            throw new ServiceException(Status.DATASOURCE_HOST_ILLEGAL);
-        }
-        if (!DATABASE_PATTER.matcher(database).matches()) {
-            throw new ServiceException(Status.DATASOURCE_NAME_ILLEGAL);
-        }
-        if (StringUtils.isBlank(other)) {
-            return;
-        }
-        Map<String, String> map = JSONUtils.toMap(other);
-        if (MapUtils.isEmpty(map)) {
-            return;
-        }
-        boolean paramsCheck = map.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
-        if (!paramsCheck) {
-            throw new ServiceException(Status.DATASOURCE_OTHER_PARAMS_ILLEGAL);
-        }
-    }
-
     private static boolean isNumeric(String str) {
         for (int i = str.length(); --i >= 0; ) {
             if (!Character.isDigit(str.charAt(i))) {

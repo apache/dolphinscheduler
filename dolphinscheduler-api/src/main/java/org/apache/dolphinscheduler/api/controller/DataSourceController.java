@@ -90,7 +90,8 @@ public class DataSourceController extends BaseController {
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @ApiParam(name = "DATA_SOURCE_PARAM", required = true)
                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        logger.info("login user {} create datasource : {}", RegexUtils.escapeNRT(loginUser.getUserName()), dataSourceParam);
+        String userName = RegexUtils.escapeNRT(loginUser.getUserName());
+        logger.info("login user {} create datasource : {}", userName, dataSourceParam);
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
 
@@ -111,7 +112,8 @@ public class DataSourceController extends BaseController {
     @ApiException(UPDATE_DATASOURCE_ERROR)
     public Result updateDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        logger.info("login user {} updateProcessInstance datasource : {}", RegexUtils.escapeNRT(loginUser.getUserName()), dataSourceParam);
+        String userName = RegexUtils.escapeNRT(loginUser.getUserName());
+        logger.info("login user {} updateProcessInstance datasource : {}", userName, dataSourceParam);
         return dataSourceService.updateDataSource(dataSourceParam.getId(), loginUser, dataSourceParam);
     }
 
@@ -205,7 +207,8 @@ public class DataSourceController extends BaseController {
     @ApiException(CONNECT_DATASOURCE_FAILURE)
     public Result connectDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        logger.info("login user {}, connect datasource: {}", RegexUtils.escapeNRT(loginUser.getUserName()), dataSourceParam);
+        String userName = RegexUtils.escapeNRT(loginUser.getUserName());
+        logger.info("login user {}, connect datasource: {}", userName, dataSourceParam);
         DatasourceParamUtil.checkDatasourceParam(dataSourceParam);
         String connectionParams = DatasourceParamUtil.buildConnectionParams(dataSourceParam);
         return dataSourceService.checkConnection(dataSourceParam.getType(), connectionParams);
