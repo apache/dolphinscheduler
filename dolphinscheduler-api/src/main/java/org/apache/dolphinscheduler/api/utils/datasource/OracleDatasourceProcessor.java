@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.OracleDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
@@ -25,26 +26,27 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class OracleDatasourceProcessor extends AbstractDatasourceProcessor<OracleDatasourceParamDTO> {
+public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(OracleDatasourceParamDTO datasourceParam) {
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        OracleDatasourceParamDTO oracleParam = (OracleDatasourceParamDTO) datasourceParam;
         String address;
-        if (DbConnectType.ORACLE_SID.equals(datasourceParam.getConnectType())) {
+        if (DbConnectType.ORACLE_SID.equals(oracleParam.getConnectType())) {
             address = String.format("%s%s:%s",
-                    Constants.JDBC_ORACLE_SID, datasourceParam.getHost(), datasourceParam.getPort());
+                    Constants.JDBC_ORACLE_SID, oracleParam.getHost(), oracleParam.getPort());
         } else {
             address = String.format("%s%s:%s",
-                    Constants.JDBC_ORACLE_SERVICE_NAME, datasourceParam.getHost(), datasourceParam.getPort());
+                    Constants.JDBC_ORACLE_SERVICE_NAME, oracleParam.getHost(), oracleParam.getPort());
         }
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
+        String jdbcUrl = address + "/" + oracleParam.getDatabase();
         String separator = "&";
 
         Map<String, Object> parameterMap = new LinkedHashMap<>();
-        parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, datasourceParam.getConnectType());
-        parameterMap.putAll(buildCommonParamMap(address, jdbcUrl, datasourceParam));
+        parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, oracleParam.getConnectType());
+        parameterMap.putAll(buildCommonParamMap(address, jdbcUrl, oracleParam));
 
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        String otherStr = transformOther(oracleParam.getOther(), oracleParam.getType(), separator);
         if (otherStr != null) {
             parameterMap.put(Constants.OTHER, otherStr);
         }

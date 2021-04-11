@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.HiveDataSourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
@@ -24,25 +25,26 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class HiveDatasourceProcessor extends AbstractDatasourceProcessor<HiveDataSourceParamDTO> {
+public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(HiveDataSourceParamDTO datasourceParam) {
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        HiveDataSourceParamDTO hiveParam = (HiveDataSourceParamDTO) datasourceParam;
         StringBuilder address = new StringBuilder();
         address.append(Constants.JDBC_HIVE_2);
-        for (String zkHost : datasourceParam.getHost().split(",")) {
-            address.append(String.format("%s:%s,", zkHost, datasourceParam.getPort()));
+        for (String zkHost : hiveParam.getHost().split(",")) {
+            address.append(String.format("%s:%s,", zkHost, hiveParam.getPort()));
         }
         address.deleteCharAt(address.length() - 1);
-        String jdbcUrl = address.toString() + "/" + datasourceParam.getDatabase();
+        String jdbcUrl = address.toString() + "/" + hiveParam.getDatabase();
         if (CommonUtils.getKerberosStartupState()) {
-            jdbcUrl += ";principal=" + datasourceParam.getPrincipal();
+            jdbcUrl += ";principal=" + hiveParam.getPrincipal();
         }
         String separator = ";";
 
-        Map<String, Object> parameterMap = buildCommonParamMap(address.toString(), jdbcUrl, datasourceParam);
-        injectKerberos(parameterMap, datasourceParam);
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        Map<String, Object> parameterMap = buildCommonParamMap(address.toString(), jdbcUrl, hiveParam);
+        injectKerberos(parameterMap, hiveParam);
+        String otherStr = transformOther(hiveParam.getOther(), hiveParam.getType(), separator);
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

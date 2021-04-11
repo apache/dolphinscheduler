@@ -17,20 +17,22 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.PostgreSqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor<PostgreSqlDatasourceParamDTO> {
+public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(PostgreSqlDatasourceParamDTO datasourceParam) {
-        String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = String.format("%s/%s", address, datasourceParam.getDatabase());
-        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), "&");
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        PostgreSqlDatasourceParamDTO postgreSqlParam = (PostgreSqlDatasourceParamDTO) datasourceParam;
+        String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, postgreSqlParam.getHost(), postgreSqlParam.getPort());
+        String jdbcUrl = String.format("%s/%s", address, postgreSqlParam.getDatabase());
+        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, postgreSqlParam);
+        String otherStr = transformOther(postgreSqlParam.getOther(), postgreSqlParam.getType(), "&");
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

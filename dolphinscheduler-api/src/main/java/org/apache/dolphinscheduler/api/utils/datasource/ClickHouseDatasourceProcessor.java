@@ -17,22 +17,24 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.ClickHouseDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor<ClickHouseDatasourceParamDTO> {
+public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(ClickHouseDatasourceParamDTO datasourceParam) {
-        String address = String.format("%s%s:%s/", Constants.JDBC_CLICKHOUSE, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        ClickHouseDatasourceParamDTO clickHouseParam = (ClickHouseDatasourceParamDTO) datasourceParam;
+        String address = String.format("%s%s:%s/", Constants.JDBC_CLICKHOUSE, clickHouseParam.getHost(), clickHouseParam.getPort());
+        String jdbcUrl = address + "/" + clickHouseParam.getDatabase();
         String separator = "&";
 
-        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, clickHouseParam);
+        String otherStr = transformOther(clickHouseParam.getOther(), clickHouseParam.getType(), separator);
         if (otherStr != null) {
             parameterMap.put(Constants.OTHER, otherStr);
         }

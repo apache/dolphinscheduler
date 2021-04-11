@@ -17,22 +17,24 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.PrestoDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor<PrestoDatasourceParamDTO> {
+public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(PrestoDatasourceParamDTO datasourceParam) {
-        String address = String.format("%s%s:%s", Constants.JDBC_PRESTO, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        PrestoDatasourceParamDTO prestoParam = (PrestoDatasourceParamDTO) datasourceParam;
+        String address = String.format("%s%s:%s", Constants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
+        String jdbcUrl = address + "/" + prestoParam.getDatabase();
         String separator = "&";
 
-        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), separator);
+        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, prestoParam);
+        String otherStr = transformOther(prestoParam.getOther(), prestoParam.getType(), separator);
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

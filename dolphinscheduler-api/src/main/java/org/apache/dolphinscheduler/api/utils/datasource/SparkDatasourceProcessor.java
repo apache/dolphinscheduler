@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.SparkDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
@@ -24,10 +25,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class SparkDatasourceProcessor extends AbstractDatasourceProcessor<SparkDatasourceParamDTO> {
+public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(SparkDatasourceParamDTO sparkDatasourceParam) {
+    public String buildConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
+        SparkDatasourceParamDTO sparkDatasourceParam = (SparkDatasourceParamDTO) dataSourceParam;
         StringBuilder address = new StringBuilder();
         address.append(Constants.JDBC_HIVE_2);
         for (String zkHost : sparkDatasourceParam.getHost().split(",")) {

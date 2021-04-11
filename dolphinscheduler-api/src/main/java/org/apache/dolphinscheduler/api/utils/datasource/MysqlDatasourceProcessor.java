@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor<MysqlDatasourceParamDTO> {
+public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(MysqlDatasourceParamDTO mysqlDatasourceParam) {
+    public String buildConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
+        MysqlDatasourceParamDTO mysqlDatasourceParam = (MysqlDatasourceParamDTO) dataSourceParam;
         String address = String.format("%s%s:%s", Constants.JDBC_MYSQL, mysqlDatasourceParam.getHost(), mysqlDatasourceParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, mysqlDatasourceParam.getDatabase());
 

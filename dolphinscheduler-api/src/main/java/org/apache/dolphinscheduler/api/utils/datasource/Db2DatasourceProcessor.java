@@ -17,22 +17,24 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.Db2DatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class Db2DatasourceProcessor extends AbstractDatasourceProcessor<Db2DatasourceParamDTO> {
+public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(Db2DatasourceParamDTO datasourceParam) {
-        String address = String.format("%s%s:%s", Constants.JDBC_DB2, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = String.format("%s/%s", address, datasourceParam.getDatabase());
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        Db2DatasourceParamDTO db2Param = (Db2DatasourceParamDTO) datasourceParam;
+        String address = String.format("%s%s:%s", Constants.JDBC_DB2, db2Param.getHost(), db2Param.getPort());
+        String jdbcUrl = String.format("%s/%s", address, db2Param.getDatabase());
 
-        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
+        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, db2Param);
 
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), ";");
+        String otherStr = transformOther(db2Param.getOther(), db2Param.getType(), ";");
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

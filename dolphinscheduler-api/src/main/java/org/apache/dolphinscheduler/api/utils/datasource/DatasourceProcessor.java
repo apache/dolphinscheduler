@@ -19,18 +19,17 @@ package org.apache.dolphinscheduler.api.utils.datasource;
 
 import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 
-public interface DatasourceProcessor<T extends BaseDataSourceParamDTO> {
+public interface DatasourceProcessor {
 
     /**
      * check datasource is valid
-     * @param datasourceParam
      */
-    void checkDatasourceParam(T datasourceParam);
+    void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam);
 
     /**
      * build datasource connection parameter
      * <p>
      * see {@code org.apache.dolphinscheduler.dao.entity.DataSource.connectionParams}
      */
-    String buildConnectionParams(T datasourceParam);
+    String buildConnectionParams(BaseDataSourceParamDTO datasourceParam);
 }

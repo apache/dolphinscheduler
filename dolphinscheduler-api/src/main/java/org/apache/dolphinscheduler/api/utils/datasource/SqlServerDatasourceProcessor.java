@@ -17,22 +17,24 @@
 
 package org.apache.dolphinscheduler.api.utils.datasource;
 
+import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.dto.datasource.SqlServerDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor<SqlServerDatasourceParamDTO> {
+public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
 
     @Override
-    public String buildConnectionParams(SqlServerDatasourceParamDTO datasourceParam) {
-        String address = String.format("%s%s:%s", Constants.JDBC_SQLSERVER, datasourceParam.getHost(), datasourceParam.getPort());
-        String jdbcUrl = address + "/" + datasourceParam.getDatabase();
+    public String buildConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+        SqlServerDatasourceParamDTO sqlServerParam = (SqlServerDatasourceParamDTO) datasourceParam;
+        String address = String.format("%s%s:%s", Constants.JDBC_SQLSERVER, sqlServerParam.getHost(), sqlServerParam.getPort());
+        String jdbcUrl = address + "/" + sqlServerParam.getDatabase();
 
-        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, datasourceParam);
+        Map<String, Object> parameterMap = buildCommonParamMap(address, jdbcUrl, sqlServerParam);
 
-        String otherStr = transformOther(datasourceParam.getOther(), datasourceParam.getType(), ";");
+        String otherStr = transformOther(sqlServerParam.getOther(), sqlServerParam.getType(), ";");
         if (otherStr != null) {
             parameterMap.put(OTHER, otherStr);
         }

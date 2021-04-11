@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public abstract class AbstractDatasourceProcessor<T extends BaseDataSourceParamDTO> implements DatasourceProcessor<T> {
+public abstract class AbstractDatasourceProcessor implements DatasourceProcessor {
 
     private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
 
