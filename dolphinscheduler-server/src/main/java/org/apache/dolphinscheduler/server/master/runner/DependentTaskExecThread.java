@@ -82,7 +82,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             logger.info("dependent task start");
             this.taskInstance = submit();
             logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskInstance.getProcessDefinitionId(),
                     taskInstance.getProcessInstanceId(),
                     taskInstance.getId()));
             String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
@@ -183,7 +182,10 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
         taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());

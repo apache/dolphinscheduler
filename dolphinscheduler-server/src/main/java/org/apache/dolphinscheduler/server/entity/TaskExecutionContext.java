@@ -86,6 +86,16 @@ public class TaskExecutionContext implements Serializable {
     private int processId;
 
     /**
+     * processCode
+     */
+    private Long processDefineCode;
+
+    /**
+     * processVersion
+     */
+    private int processDefineVersion;
+
+    /**
      * appIds
      */
     private String appIds;
@@ -129,7 +139,6 @@ public class TaskExecutionContext implements Serializable {
      * task queue
      */
     private String queue;
-
 
     /**
      * process define id
@@ -294,6 +303,22 @@ public class TaskExecutionContext implements Serializable {
 
     public void setProcessId(int processId) {
         this.processId = processId;
+    }
+
+    public Long getProcessDefineCode() {
+        return processDefineCode;
+    }
+
+    public void setProcessDefineCode(Long processDefineCode) {
+        this.processDefineCode = processDefineCode;
+    }
+
+    public int getProcessDefineVersion() {
+        return processDefineVersion;
+    }
+
+    public void setProcessDefineVersion(int processDefineVersion) {
+        this.processDefineVersion = processDefineVersion;
     }
 
     public String getAppIds() {
@@ -505,22 +530,24 @@ public class TaskExecutionContext implements Serializable {
     @Override
     public String toString() {
         return "TaskExecutionContext{"
-            + "taskInstanceId=" + taskInstanceId
-            + ", taskName='" + taskName + '\''
-            + ", currentExecutionStatus=" + currentExecutionStatus
-            + ", firstSubmitTime=" + firstSubmitTime
-            + ", startTime=" + startTime
-            + ", taskType='" + taskType + '\''
-            + ", host='" + host + '\''
-            + ", executePath='" + executePath + '\''
-            + ", logPath='" + logPath + '\''
-            + ", taskJson='" + taskJson + '\''
-            + ", processId=" + processId
-            + ", appIds='" + appIds + '\''
-            + ", processInstanceId=" + processInstanceId
-            + ", scheduleTime=" + scheduleTime
-            + ", globalParams='" + globalParams + '\''
-            + ", executorId=" + executorId
+                + "taskInstanceId=" + taskInstanceId
+                + ", taskName='" + taskName + '\''
+                + ", currentExecutionStatus=" + currentExecutionStatus
+                + ", firstSubmitTime=" + firstSubmitTime
+                + ", startTime=" + startTime
+                + ", taskType='" + taskType + '\''
+                + ", host='" + host + '\''
+                + ", executePath='" + executePath + '\''
+                + ", logPath='" + logPath + '\''
+                + ", taskJson='" + taskJson + '\''
+                + ", processId=" + processId
+                + ", processDefineCode=" + processDefineCode
+                + ", processDefineVersion=" + processDefineVersion
+                + ", appIds='" + appIds + '\''
+                + ", processInstanceId=" + processInstanceId
+                + ", scheduleTime=" + scheduleTime
+                + ", globalParams='" + globalParams + '\''
+                + ", executorId=" + executorId
                 + ", cmdTypeIfComplement=" + cmdTypeIfComplement
                 + ", tenantCode='" + tenantCode + '\''
                 + ", queue='" + queue + '\''

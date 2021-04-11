@@ -382,7 +382,6 @@ public class DependentTaskTest {
         taskInstance.setTaskCode(TASK_CODE);
         taskInstance.setTaskDefinitionVersion(TASK_VERSION);
         taskInstance.setProcessInstanceId(processInstance.getId());
-        taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         taskInstance.setTaskType(taskNode.getType());
         taskInstance.setDependency(JSONUtils.parseObject(taskNode.getDependence(), DependentParameters.class));
@@ -423,7 +422,6 @@ public class DependentTaskTest {
         taskInstance.setId(taskInstanceId);
         taskInstance.setName(taskName);
         taskInstance.setProcessInstanceId(processInstance.getId());
-        taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         taskInstance.setState(state);
         return taskInstance;
     }

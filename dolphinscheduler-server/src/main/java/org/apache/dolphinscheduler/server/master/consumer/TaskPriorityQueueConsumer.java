@@ -201,7 +201,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
 
 
-        Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
+        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
 
         // verify tenant is null
@@ -396,7 +396,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                 }
 
                 // get the resource id in order to get the resource names in batch
-                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getId());
+                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
                 Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
 
                 if (CollectionUtils.isNotEmpty(resourceIdsSet)) {

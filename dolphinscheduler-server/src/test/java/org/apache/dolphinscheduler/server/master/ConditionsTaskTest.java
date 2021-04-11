@@ -174,7 +174,6 @@ public class ConditionsTaskTest {
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskType(taskNode.getType());
         taskInstance.setProcessInstanceId(processInstance.getId());
-        taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
         return taskInstance;
     }
 

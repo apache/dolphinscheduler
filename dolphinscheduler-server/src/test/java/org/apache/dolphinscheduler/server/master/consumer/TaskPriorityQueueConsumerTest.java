@@ -107,7 +107,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -139,7 +138,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SQL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -183,7 +181,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("DATAX");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -225,7 +222,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SQOOP");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -267,7 +263,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -285,7 +280,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -321,7 +315,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -356,7 +349,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -388,7 +380,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -416,7 +407,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
 
         ProcessInstance processInstance = new ProcessInstance();
@@ -461,7 +451,6 @@ public class TaskPriorityQueueConsumerTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);

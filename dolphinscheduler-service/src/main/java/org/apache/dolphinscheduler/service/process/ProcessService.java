@@ -1459,7 +1459,8 @@ public class ProcessService {
         // get process instance
         ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         // get process define
-        ProcessDefinition processDefine = findProcessDefineById(taskInstance.getProcessDefinitionId());
+        ProcessDefinition processDefine = findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
 
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setProcessDefine(processDefine);
@@ -2168,16 +2169,15 @@ public class ProcessService {
      * format task app id in task instance
      */
     public String formatTaskAppId(TaskInstance taskInstance) {
-        ProcessDefinition definition = this.findProcessDefineById(taskInstance.getProcessDefinitionId());
-        ProcessInstance processInstanceById = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
-
-        if (definition == null || processInstanceById == null) {
+        ProcessInstance processInstance = findProcessInstanceById(taskInstance.getProcessInstanceId());
+        if (processInstance == null) {
             return "";
         }
-        return String.format("%s_%s_%s",
-                definition.getId(),
-                processInstanceById.getId(),
-                taskInstance.getId());
+        ProcessDefinition definition = findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+        if (definition == null) {
+            return "";
+        }
+        return String.format("%s_%s_%s", definition.getId(), processInstance.getId(), taskInstance.getId());
     }
 
 
@@ -2563,7 +2563,7 @@ public class ProcessService {
             return null;
         }
         List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                taskInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion()
+                processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion()
         );
         Map<Long, Integer> taskCodeMap = new HashedMap();
 

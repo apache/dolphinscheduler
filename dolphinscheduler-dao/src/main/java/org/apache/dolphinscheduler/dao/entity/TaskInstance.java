@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -59,13 +58,6 @@ public class TaskInstance implements Serializable {
     private String taskType;
 
     /**
-     * process definition id
-     * TODO delete
-     */
-    @TableField(exist = false)
-    private int processDefinitionId;
-
-    /**
      * process instance id
      */
     private int processInstanceId;
@@ -74,11 +66,6 @@ public class TaskInstance implements Serializable {
      * task code
      */
     private long taskCode;
-
-    /**
-     * process definition code
-     */
-    private long processDefinitionCode;
 
     /**
      * task defintion version
@@ -90,13 +77,6 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private String processInstanceName;
-
-    /**
-     * task json
-     * TODO delete
-     */
-    @TableField(exist = false)
-    private String taskJson;
 
     /**
      * state
@@ -255,6 +235,7 @@ public class TaskInstance implements Serializable {
     /**
      * task params
      */
+    @TableField(exist = false)
     private String taskParams;
 
     public void init(String host, Date startTime, String executePath) {
@@ -311,28 +292,12 @@ public class TaskInstance implements Serializable {
         this.taskType = taskType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
     public int getProcessInstanceId() {
         return processInstanceId;
     }
 
     public void setProcessInstanceId(int processInstanceId) {
         this.processInstanceId = processInstanceId;
-    }
-
-    public String getTaskJson() {
-        return taskJson;
-    }
-
-    public void setTaskJson(String taskJson) {
-        this.taskJson = taskJson;
     }
 
     public ExecutionStatus getState() {
@@ -593,10 +558,8 @@ public class TaskInstance implements Serializable {
                 + "id=" + id
                 + ", name='" + name + '\''
                 + ", taskType='" + taskType + '\''
-                + ", processDefinitionId=" + processDefinitionId
                 + ", processInstanceId=" + processInstanceId
                 + ", processInstanceName='" + processInstanceName + '\''
-                + ", taskJson='" + taskJson + '\''
                 + ", state=" + state
                 + ", firstSubmitTime=" + firstSubmitTime
                 + ", submitTime=" + submitTime
@@ -632,14 +595,6 @@ public class TaskInstance implements Serializable {
 
     public void setTaskCode(long taskCode) {
         this.taskCode = taskCode;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
     }
 
     public int getTaskDefinitionVersion() {
