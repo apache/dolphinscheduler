@@ -84,7 +84,7 @@ public class TenantServiceTest {
 
             Result<Void> result = tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.VERIFY_OS_TENANT_CODE_ERROR.getCode(), (int) result.getCode());
+            Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR.getCode(), (int) result.getCode());
 
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
