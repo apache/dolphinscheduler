@@ -14,23 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import org.apache.dolphinscheduler.common.enums.DbType;
+
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import javax.sql.DataSource;
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertThat;
-
 public class UpgradeDaoTest {
-    PostgresqlUpgradeDao postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
+
+    UpgradeDao upgradeDao;
+
+    @Before
+    public void before() {
+        upgradeDao = PostgresqlUpgradeDao.getInstance();
+    }
 
     @Test
-    public void testQueryQueryAllOldWorkerGroup() throws Exception{
-        postgresqlUpgradeDao.updateProcessDefinitionJsonWorkerGroup();
+    public void testGetDbType() {
+        DbType dbType = UpgradeDao.getDbType();
+        Assert.assertEquals(DbType.POSTGRESQL, dbType);
+    }
+
+    @Test
+    public void testInitSchema() {
+        upgradeDao.initSchema();
     }
 
 }
