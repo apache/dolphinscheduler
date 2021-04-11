@@ -79,7 +79,6 @@ public class WorkerManagerThreadTest {
         // init task execution context, logger
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessId(12345);
-        taskExecutionContext.setProcessDefineId(1);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTenantCode("test");
