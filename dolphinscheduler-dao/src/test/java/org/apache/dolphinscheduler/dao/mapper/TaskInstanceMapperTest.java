@@ -109,8 +109,6 @@ public class TaskInstanceMapperTest {
         taskInstance.setEndTime(new Date());
         taskInstance.setProcessInstanceId(processInstanceId);
         taskInstance.setTaskType(taskType);
-        taskInstance.setProcessDefinitionCode(1L);
-//        taskInstance.setProcessDefinitionId(processDefinitionId);
         taskInstanceMapper.insert(taskInstance);
         return taskInstance;
     }
@@ -293,7 +291,7 @@ public class TaskInstanceMapperTest {
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
         processDefinitionMapper.insert(definition);
-        task.setProcessDefinitionId(definition.getId());
+        //task.setProcessDefinitionId(definition.getId());
         taskInstanceMapper.updateById(task);
 
         int countTask = taskInstanceMapper.countTask(
@@ -330,7 +328,7 @@ public class TaskInstanceMapperTest {
         definition.setCreateTime(new Date());
         definition.setUpdateTime(new Date());
         processDefinitionMapper.insert(definition);
-        task.setProcessDefinitionId(definition.getId());
+        //task.setProcessDefinitionId(definition.getId());
         taskInstanceMapper.updateById(task);
 
 
