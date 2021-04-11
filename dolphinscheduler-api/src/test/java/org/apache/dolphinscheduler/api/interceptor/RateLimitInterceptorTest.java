@@ -29,23 +29,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class RateLimitInterceptorTest {
-
-    @Autowired
-    private RateLimitInterceptor rateLimitInterceptor;
-
-    @Test
-    public void testPreHandleSuccess() {
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        Assert.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
-    }
 
     @Test
     public void testPreHandleFalse() throws InterruptedException {

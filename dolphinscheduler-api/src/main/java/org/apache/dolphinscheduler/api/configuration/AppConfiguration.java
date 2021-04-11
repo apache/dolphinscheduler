@@ -50,7 +50,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
 
-    @Value("${max.global.qps.rate:100}")
+    @Value("${max.global.qps.rate:-1}")
     private int globalLimitQps;
 
     @Bean
@@ -89,16 +89,13 @@ public class AppConfiguration implements WebMvcConfigurer {
         return new LocaleChangeInterceptor();
     }
 
-    @Bean
-    public RateLimitInterceptor rateLimitInterceptor() {
-        return new RateLimitInterceptor(globalLimitQps);
-    }
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // i18n
         registry.addInterceptor(localeChangeInterceptor());
-        registry.addInterceptor(rateLimitInterceptor());
+        if (globalLimitQps > 0) {
+            registry.addInterceptor(new RateLimitInterceptor(globalLimitQps));
+        }
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
