@@ -434,6 +434,35 @@ const router = new Router({
       ]
     },
     {
+      path: '/dataquality',
+      name: 'dataquality',
+      component: resolve => require(['../pages/dataquality/index'], resolve),
+      meta: {
+        title: `${i18n.$t('DataQuality')}`
+      },
+      redirect: {
+        name: 'data-quality-result'
+      },
+      children: [
+        {
+          path: '/dataquality/result',
+          name: 'data-quality-result',
+          component: resolve => require(['../pages/dataquality/pages/result/index'], resolve),
+          meta: {
+            title: `${i18n.$t('DataQuality Result')}`
+          }
+        },
+        {
+          path: '/dataquality/rule',
+          name: 'data-quality-rule',
+          component: resolve => require(['../pages/dataquality/pages/rule/index'], resolve),
+          meta: {
+            title: `${i18n.$t('DataQuality Rule')}`
+          }
+        }
+      ]
+    },
+    {
       path: '/user',
       name: 'user',
       component: resolve => require(['../pages/user/index'], resolve),

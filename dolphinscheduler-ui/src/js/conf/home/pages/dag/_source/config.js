@@ -308,6 +308,10 @@ const tasksType = {
   CONDITIONS: {
     desc: 'CONDITIONS',
     color: '#E46F13'
+  },
+  DATA_QUALITY: {
+    desc: 'DATA_QUALITY',
+    color: '#E46F13'
   }
 }
 

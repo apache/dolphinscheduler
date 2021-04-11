@@ -21,18 +21,19 @@
         <h2>
           <span>{{name}}</span>
         </h2>
-        <template v-show="isViewType">
-          <template v-if="!msg">
-            <div class="code-mirror-model">
-              <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
-            </div>
-            <div class="submit-c">
-              <el-button type="text" @click="close()" :disabled="disabled" size="small"> {{$t('Return')}} </el-button>
-              <el-button type="primary" :loading="spinnerLoading" @click="ok()" round size="small">{{spinnerLoading ? 'Loading...' : $t('Save')}} </el-button>
-            </div>
-          </template>
-          <m-no-data :msg="msg" v-if="msg"></m-no-data>
-
+        <template>
+          <div v-show="isViewType">
+            <template v-if="!msg">
+              <div class="code-mirror-model">
+                <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
+              </div>
+              <div class="submit-c">
+                <el-button type="text" @click="close()" :disabled="disabled" size="small"> {{$t('Return')}} </el-button>
+                <el-button type="primary" :loading="spinnerLoading" @click="ok()" round size="small">{{spinnerLoading ? 'Loading...' : $t('Save')}} </el-button>
+              </div>
+            </template>
+            <m-no-data :msg="msg" v-if="msg"></m-no-data>
+          </div>
         </template>
         <template v-if="!isViewType">
           <m-no-type></m-no-type>
