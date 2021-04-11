@@ -482,8 +482,6 @@ public class MasterExecThread implements Runnable {
             taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
             // task name
             taskInstance.setName(nodeName);
-            // process instance define id
-            taskInstance.setProcessDefinitionId(processInstance.getProcessDefinitionId());
             // task instance state
             taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
             // process instance id

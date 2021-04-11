@@ -67,20 +67,15 @@ public class LoggerUtils {
      * build job id
      *
      * @param affix Task Logger's prefix
-     * @param processDefId process define id
      * @param processInstId process instance id
      * @param taskId task id
      * @return task id format
      */
     public static String buildTaskId(String affix,
-                                     int processDefId,
                                      int processInstId,
                                      int taskId) {
         // - [taskAppId=TASK_79_4084_15210]
-        return String.format(" - %s%s-%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix,
-                processDefId,
-                processInstId,
-                taskId);
+        return String.format(" - %s%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix, processInstId, taskId);
     }
 
     /**

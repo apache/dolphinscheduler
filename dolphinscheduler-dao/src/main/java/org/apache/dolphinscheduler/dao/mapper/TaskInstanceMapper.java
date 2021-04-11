@@ -51,12 +51,10 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance queryByInstanceIdAndName(@Param("processInstanceId") int processInstanceId,
                                           @Param("name") String name);
 
-    Integer countTask(
-                      @Param("projectCodes") Long[] projectCodes,
+    Integer countTask(@Param("projectCodes") Long[] projectCodes,
                       @Param("taskIds") int[] taskIds);
 
-    List<ExecuteStatusCount> countTaskInstanceStateByUser(
-                                                          @Param("startTime") Date startTime,
+    List<ExecuteStatusCount> countTaskInstanceStateByUser(@Param("startTime") Date startTime,
                                                           @Param("endTime") Date endTime,
                                                           @Param("projectCodes") Long[] projectCodes);
 

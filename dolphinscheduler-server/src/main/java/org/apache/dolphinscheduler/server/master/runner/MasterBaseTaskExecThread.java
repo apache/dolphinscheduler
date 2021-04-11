@@ -267,10 +267,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * call
      *
      * @return boolean
-     * @throws Exception exception
      */
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call() {
         this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
     }

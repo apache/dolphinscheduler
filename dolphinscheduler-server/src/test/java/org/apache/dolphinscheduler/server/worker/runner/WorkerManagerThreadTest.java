@@ -95,7 +95,6 @@ public class WorkerManagerThreadTest {
 
         taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(
                 LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()
         ));
