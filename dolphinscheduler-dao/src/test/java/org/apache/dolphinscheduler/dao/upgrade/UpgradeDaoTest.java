@@ -22,7 +22,11 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UpgradeDaoTest {
 
     UpgradeDao upgradeDao;
@@ -40,6 +44,7 @@ public class UpgradeDaoTest {
 
     @Test
     public void testInitSchema() {
+        Mockito.when(System.getProperty("user.dir")).thenReturn(System.getProperty("user.dir") + "/..");
         upgradeDao.initSchema();
     }
 
