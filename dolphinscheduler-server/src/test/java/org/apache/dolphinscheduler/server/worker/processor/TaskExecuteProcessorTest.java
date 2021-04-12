@@ -136,8 +136,9 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(taskExecutionContext);
 
         PowerMockito.mockStatic(FileUtils.class);
-        PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
-                taskExecutionContext.getProcessDefineId(),
+        PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()))
                 .thenReturn(taskExecutionContext.getExecutePath());
@@ -168,7 +169,6 @@ public class TaskExecuteProcessorTest {
     public TaskExecutionContext getTaskExecutionContext() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessId(12345);
-        taskExecutionContext.setProcessDefineId(1);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskType("sql");

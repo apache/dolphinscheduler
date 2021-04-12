@@ -150,8 +150,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
             taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
-            taskExecutionContext.setTaskAppId(String.format("%s_%s_%s",
-                    taskExecutionContext.getProcessDefineId(),
+            taskExecutionContext.setTaskAppId(String.format("%s_%s",
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 

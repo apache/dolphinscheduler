@@ -284,7 +284,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         logger.warn("process id:{} process name:{} task id: {},name:{} execution time out",
                 processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
         // send warn mail
-        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        //ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(), processInstance.getName(),
                 taskInstance.getId(), taskInstance.getName());
         return true;
