@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.IPUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +118,7 @@ public class LogClientService {
         String result = "";
         final Host address = new Host(host, port);
         try {
-            if (IPUtils.getLocalHost().equals(host) || IPUtils.getLocalIp().equals(host)) {
+            if (NetUtils.getHost().equals(host)) {
                 result = LoggerUtils.readWholeFileContent(request.getPath());
             } else {
                 Command command = request.convert2Command();

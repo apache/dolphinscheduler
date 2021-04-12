@@ -864,7 +864,6 @@
                         <include>**/common/utils/DependentUtilsTest.java</include>
                         <include>**/common/utils/EncryptionUtilsTest.java</include>
                         <include>**/common/utils/FileUtilsTest.java</include>
-                        <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/NetUtilsTest.java</include>
@@ -903,7 +902,6 @@
                         <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/utils/HostTest.java</include>
-                        <include>**/remote/utils/IPUtilsTest.java</include>
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/rpc/RpcTest.java</include>
