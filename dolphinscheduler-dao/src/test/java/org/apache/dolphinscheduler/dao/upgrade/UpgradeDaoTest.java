@@ -40,7 +40,7 @@ public class UpgradeDaoTest {
 
     @Test
     public void testInitSchema() {
-        String initSqlPath = "../sql/create/release-1.2.0_schema/postgresql/";
+        String initSqlPath = "/../sql/create/release-1.2.0_schema/postgresql/";
         upgradeDao.initSchema(initSqlPath);
     }
 
