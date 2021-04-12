@@ -301,7 +301,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
         /**
@@ -353,7 +353,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -373,10 +373,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
