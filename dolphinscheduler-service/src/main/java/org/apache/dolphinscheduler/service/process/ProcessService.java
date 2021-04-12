@@ -86,6 +86,8 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -713,7 +715,6 @@ public class ProcessService {
                 }
 
                 // Recalculate global parameters after rerun.
-
                 processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                     processDefinition.getGlobalParamMap(),
                     processDefinition.getGlobalParamList(),
@@ -821,6 +822,16 @@ public class ProcessService {
                 processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime + 1);
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
+                break;
+            case START_RANDOM_TASK_PROCESS:
+                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                processInstance.setRunTimes(runTime + 1);
+                setGlobalParamIfCommanded(processDefinition, cmdParam);
+                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                        processDefinition.getGlobalParamMap(),
+                        processDefinition.getGlobalParamList(),
+                        CommandType.START_RANDOM_TASK_PROCESS,
+                        processInstance.getScheduleTime()));
                 break;
             case SCHEDULER:
                 break;
