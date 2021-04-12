@@ -145,7 +145,7 @@ public class DependentTaskTest {
     public void testBasicSuccess() throws Exception {
         testBasicInit();
         ProcessInstance dependentProcessInstance =
-                getProcessInstanceForFindLastRunningProcess(200, 2, ExecutionStatus.FAILURE);
+                getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.FAILURE);
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
@@ -168,7 +168,7 @@ public class DependentTaskTest {
     public void testBasicFailure() throws Exception {
         testBasicInit();
         ProcessInstance dependentProcessInstance =
-                getProcessInstanceForFindLastRunningProcess(200, 2, ExecutionStatus.SUCCESS);
+                getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.SUCCESS);
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
@@ -219,9 +219,9 @@ public class DependentTaskTest {
         setupTaskInstance(taskNode);
 
         ProcessInstance processInstance200 =
-                getProcessInstanceForFindLastRunningProcess(200, 2, ExecutionStatus.FAILURE);
+                getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.FAILURE);
         ProcessInstance processInstance300 =
-                getProcessInstanceForFindLastRunningProcess(300, 3, ExecutionStatus.SUCCESS);
+                getProcessInstanceForFindLastRunningProcess(300, ExecutionStatus.SUCCESS);
 
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
@@ -276,7 +276,7 @@ public class DependentTaskTest {
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
-                .thenReturn(getProcessInstanceForFindLastRunningProcess(200, 2, ExecutionStatus.SUCCESS));
+                .thenReturn(getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.SUCCESS));
 
         DependentTaskExecThread taskExecThread = new DependentTaskExecThread(taskInstance);
         taskExecThread.call();
@@ -289,7 +289,7 @@ public class DependentTaskTest {
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
-                .thenReturn(getProcessInstanceForFindLastRunningProcess(200, 2, ExecutionStatus.FAILURE));
+                .thenReturn(getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.FAILURE));
 
         DependentTaskExecThread dependentTask = new DependentTaskExecThread(taskInstance);
         dependentTask.call();
@@ -323,7 +323,7 @@ public class DependentTaskTest {
         setupTaskInstance(taskNode);
 
         ProcessInstance dependentProcessInstance =
-                getProcessInstanceForFindLastRunningProcess(200, 2, ExecutionStatus.RUNNING_EXECUTION);
+                getProcessInstanceForFindLastRunningProcess(200, ExecutionStatus.RUNNING_EXECUTION);
         // for DependentExecute.findLastProcessInterval
         Mockito.when(processService
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any()))
@@ -349,7 +349,6 @@ public class DependentTaskTest {
     private ProcessInstance getProcessInstance(int processInstanceId, int processDefinitionId) {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(processInstanceId);
-        processInstance.setProcessDefinitionId(processDefinitionId);
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         return processInstance;
     }
@@ -403,12 +402,9 @@ public class DependentTaskTest {
         return dependentItem;
     }
 
-    private ProcessInstance getProcessInstanceForFindLastRunningProcess(
-            int processInstanceId, int processDefinitionId, ExecutionStatus state
-    ) {
+    private ProcessInstance getProcessInstanceForFindLastRunningProcess(int processInstanceId, ExecutionStatus state) {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(processInstanceId);
-        processInstance.setProcessDefinitionId(processDefinitionId);
         processInstance.setState(state);
         return processInstance;
     }

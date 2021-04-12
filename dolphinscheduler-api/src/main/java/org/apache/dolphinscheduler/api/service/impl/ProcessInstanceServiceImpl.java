@@ -204,11 +204,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
-        processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
+            processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
             ProcessData processData = processService.genProcessData(processDefinition);
             processInstance.setProcessInstanceJson(JSONUtils.toJsonString(processData));
             result.put(DATA_LIST, processInstance);

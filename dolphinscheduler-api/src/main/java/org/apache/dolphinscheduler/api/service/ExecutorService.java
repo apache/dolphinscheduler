@@ -66,10 +66,10 @@ public interface ExecutorService {
      * check whether the process definition can be executed
      *
      * @param processDefinition process definition
-     * @param processDefineId process definition id
+     * @param processDefineCode process definition code
      * @return check result code
      */
-    Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId);
+    Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, long processDefineCode);
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
