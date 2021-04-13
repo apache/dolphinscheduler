@@ -258,7 +258,7 @@ public class MasterExecThread implements Runnable {
         processService.saveProcessInstance(processInstance);
 
         // get schedules
-        int processDefinitionId = processInstance.getProcessDefinitionId();
+        int processDefinitionId = processInstance.getProcessDefinition().getId();
         List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId);
         List<Date> listDate = Lists.newLinkedList();
         if (!CollectionUtils.isEmpty(schedules)) {
@@ -268,7 +268,7 @@ public class MasterExecThread implements Runnable {
         }
         // get first fire date
         Iterator<Date> iterator = null;
-        Date scheduleDate = null;
+        Date scheduleDate;
         if (!CollectionUtils.isEmpty(listDate)) {
             iterator = listDate.iterator();
             scheduleDate = iterator.next();
@@ -282,9 +282,7 @@ public class MasterExecThread implements Runnable {
         }
 
         while (Stopper.isRunning()) {
-
-            logger.info("process {} start to complement {} data",
-                    processInstance.getId(), DateUtils.dateToString(scheduleDate));
+            logger.info("process {} start to complement {} data", processInstance.getId(), DateUtils.dateToString(scheduleDate));
             // prepare dag and other info
             prepareProcess();
 
@@ -302,8 +300,7 @@ public class MasterExecThread implements Runnable {
             endProcess();
             // process instance failure ，no more complements
             if (!processInstance.getState().typeIsSuccess()) {
-                logger.info("process {} state {}, complement not completely!",
-                        processInstance.getId(), processInstance.getState());
+                logger.info("process {} state {}, complement not completely!", processInstance.getId(), processInstance.getState());
                 break;
             }
             //  current process instance success ,next execute
