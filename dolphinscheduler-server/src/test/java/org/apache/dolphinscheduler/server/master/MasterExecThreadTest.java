@@ -88,7 +88,6 @@ public class MasterExecThreadTest {
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processInstance = mock(ProcessInstance.class);
-        Mockito.when(processInstance.getProcessDefinitionId()).thenReturn(processDefinitionId);
         Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);
         Mockito.when(processInstance.getHistoryCmd()).thenReturn(CommandType.COMPLEMENT_DATA.toString());
         Mockito.when(processInstance.getIsSubProcess()).thenReturn(Flag.NO);

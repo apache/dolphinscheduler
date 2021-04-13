@@ -109,7 +109,6 @@ public class ProcessServiceTest {
     public void testCreateSubCommand() {
         ProcessService processService = new ProcessService();
         ProcessInstance parentInstance = new ProcessInstance();
-        parentInstance.setProcessDefinitionId(1);
         parentInstance.setWarningType(WarningType.SUCCESS);
         parentInstance.setWarningGroupId(0);
 
