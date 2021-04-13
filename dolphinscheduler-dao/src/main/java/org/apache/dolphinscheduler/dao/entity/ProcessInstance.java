@@ -49,13 +49,6 @@ public class ProcessInstance {
     private int id;
 
     /**
-     * process definition id
-     * TODO delete
-     */
-    @TableField(exist = false)
-    private int processDefinitionId;
-
-    /**
      * process definition code
      */
     private Long processDefinitionCode;
@@ -288,14 +281,6 @@ public class ProcessInstance {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
     }
 
     public ExecutionStatus getState() {
@@ -616,7 +601,6 @@ public class ProcessInstance {
     public String toString() {
         return "ProcessInstance{"
                 + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
                 + ", state=" + state
                 + ", recovery=" + recovery
                 + ", startTime=" + startTime

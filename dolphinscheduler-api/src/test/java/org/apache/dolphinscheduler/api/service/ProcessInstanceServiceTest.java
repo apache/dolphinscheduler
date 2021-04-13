@@ -241,14 +241,14 @@ public class ProcessInstanceServiceTest {
 
         //project auth success
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setProcessDefinitionId(46);
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);
         ProcessDefinition processDefinition = getProcessDefinition();
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
-        when(processService.findProcessDefineById(processInstance.getProcessDefinitionId())).thenReturn(processDefinition);
+        when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
         Map<String, Object> successRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
@@ -395,7 +395,6 @@ public class ProcessInstanceServiceTest {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         tenant.setTenantCode("test_tenant");
-        when(processService.findProcessDefineById(processInstance.getProcessDefinitionId())).thenReturn(processDefinition);
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
@@ -555,6 +554,8 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setName("test_process_instance");
+        processInstance.setProcessDefinitionCode(46L);
+        processInstance.setProcessDefinitionVersion(1);
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
         return processInstance;
@@ -568,6 +569,7 @@ public class ProcessInstanceServiceTest {
     private ProcessDefinition getProcessDefinition() {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(46L);
+        processDefinition.setVersion(1);
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectId(2);

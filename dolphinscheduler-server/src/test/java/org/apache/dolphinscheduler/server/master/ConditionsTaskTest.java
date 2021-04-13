@@ -162,7 +162,6 @@ public class ConditionsTaskTest {
     private ProcessInstance getProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1000);
-        processInstance.setProcessDefinitionId(1000);
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
 
         return processInstance;

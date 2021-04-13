@@ -236,7 +236,7 @@ public class ProcessService {
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
         this.setSubProcessParam(processInstance);
-        delCommandById(command.getId());
+        this.commandMapper.deleteById(command.getId());
         return processInstance;
     }
 
@@ -250,7 +250,7 @@ public class ProcessService {
     public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
-        delCommandById(command.getId());
+        this.commandMapper.deleteById(command.getId());
     }
 
     /**
@@ -538,7 +538,7 @@ public class ProcessService {
                     processInstance.getTaskDependType(),
                     processInstance.getFailureStrategy(),
                     processInstance.getExecutorId(),
-                    processInstance.getProcessDefinitionId(),
+                    processInstance.getProcessDefinition().getId(),
                     JSONUtils.toJsonString(cmdParam),
                     processInstance.getWarningType(),
                     processInstance.getWarningGroupId(),
@@ -600,7 +600,7 @@ public class ProcessService {
         processInstance.setStartTime(new Date());
         processInstance.setRunTimes(1);
         processInstance.setMaxTryTimes(0);
-        processInstance.setProcessDefinitionId(command.getProcessDefinitionId());
+        //processInstance.setProcessDefinitionId(command.getProcessDefinitionId());
         processInstance.setCommandParam(command.getCommandParam());
         processInstance.setCommandType(command.getCommandType());
         processInstance.setIsSubProcess(Flag.NO);
@@ -719,7 +719,6 @@ public class ProcessService {
      * @return process instance
      */
     private ProcessInstance constructProcessInstance(Command command, String host) {
-
         ProcessInstance processInstance;
         CommandType commandType = command.getCommandType();
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
@@ -764,16 +763,13 @@ public class ProcessService {
                 }
 
                 // Recalculate global parameters after rerun.
-
                 processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                         processDefinition.getGlobalParamMap(),
                         processDefinition.getGlobalParamList(),
                         commandTypeIfComplement,
                         processInstance.getScheduleTime()));
+                processInstance.setProcessDefinition(processDefinition);
             }
-            processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
-            processInstance.setProcessDefinition(processDefinition);
-
             //reset command parameter
             if (processInstance.getCommandParam() != null) {
                 Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());
@@ -1346,24 +1342,11 @@ public class ProcessService {
     }
 
     /**
-     * create a new process instance
-     *
-     * @param processInstance processInstance
-     */
-    public void createProcessInstance(ProcessInstance processInstance) {
-
-        if (processInstance != null) {
-            processInstanceMapper.insert(processInstance);
-        }
-    }
-
-    /**
      * insert or update work process instance to data base
      *
      * @param processInstance processInstance
      */
     public void saveProcessInstance(ProcessInstance processInstance) {
-
         if (processInstance == null) {
             logger.error("save error, process instance is null!");
             return;
@@ -1371,7 +1354,7 @@ public class ProcessService {
         if (processInstance.getId() != 0) {
             processInstanceMapper.updateById(processInstance);
         } else {
-            createProcessInstance(processInstance);
+            processInstanceMapper.insert(processInstance);
         }
     }
 
@@ -1423,15 +1406,6 @@ public class ProcessService {
     public boolean updateTaskInstance(TaskInstance taskInstance) {
         int count = taskInstanceMapper.updateById(taskInstance);
         return count > 0;
-    }
-
-    /**
-     * delete a command by id
-     *
-     * @param id id
-     */
-    public void delCommandById(int id) {
-        commandMapper.deleteById(id);
     }
 
     /**
@@ -1772,9 +1746,11 @@ public class ProcessService {
         processInstance.setHost(Constants.NULL);
         processInstanceMapper.updateById(processInstance);
 
+        ProcessDefinition processDefinition = findProcessDefinition(processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+
         //2 insert into recover command
         Command cmd = new Command();
-        cmd.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+        cmd.setProcessDefinitionId(processDefinition.getId());
         cmd.setCommandParam(String.format("{\"%s\":%d}", Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);

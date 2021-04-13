@@ -130,7 +130,6 @@ public class SubProcessTaskTest {
     private ProcessInstance getProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(100);
-        processInstance.setProcessDefinitionId(1);
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
 
         return processInstance;
@@ -139,7 +138,6 @@ public class SubProcessTaskTest {
     private ProcessInstance getSubProcessInstance(ExecutionStatus executionStatus) {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(102);
-        processInstance.setProcessDefinitionId(2);
         processInstance.setState(executionStatus);
 
         return processInstance;

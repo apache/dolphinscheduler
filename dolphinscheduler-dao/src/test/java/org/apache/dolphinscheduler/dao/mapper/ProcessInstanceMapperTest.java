@@ -275,7 +275,6 @@ public class ProcessInstanceMapperTest {
 
         processDefinitionMapper.insert(processDefinition);
         ProcessInstance processInstance = insertOne();
-        processInstance.setProcessDefinitionId(processDefinition.getId());
         int update = processInstanceMapper.updateById(processInstance);
 
         Long[] projectCodes = new Long[]{processDefinition.getProjectCode()};

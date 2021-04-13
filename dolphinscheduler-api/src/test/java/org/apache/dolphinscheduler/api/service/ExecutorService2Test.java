@@ -117,7 +117,6 @@ public class ExecutorService2Test {
 
         // processInstance
         processInstance.setId(processInstanceId);
-        processInstance.setProcessDefinitionId(processDefinitionId);
         processInstance.setState(ExecutionStatus.FAILURE);
         processInstance.setExecutorId(userId);
         processInstance.setTenantId(tenantId);
