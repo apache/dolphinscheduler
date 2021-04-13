@@ -488,7 +488,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             separator = ";";
         }
 
-        parameterMap.put(TYPE, connectType);
         parameterMap.put(Constants.ADDRESS, address);
         parameterMap.put(Constants.DATABASE, database);
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
