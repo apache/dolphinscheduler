@@ -45,7 +45,7 @@ public class TenantControllerTest extends AbstractControllerTest{
     @Test
     public void testCreateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode","tenantCode");
+        paramsMap.add("tenantCode","hayden");
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
@@ -124,7 +124,7 @@ public class TenantControllerTest extends AbstractControllerTest{
     @Test
     public void testVerifyTenantCodeExists() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode", "tenantCode");
+        paramsMap.add("tenantCode", "hayden");
 
         MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
                 .header(SESSION_ID, sessionId)

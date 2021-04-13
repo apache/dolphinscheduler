@@ -1093,9 +1093,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // Check whether the task node is normal
             List<TaskNode> taskNodes = processData.getTasks();
 
-            if (taskNodes == null) {
+            if (CollectionUtils.isEmpty(taskNodes)) {
                 logger.error("process node info is empty");
-                putMsg(result, Status.DATA_IS_NULL, processDefinitionJson);
+                putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
                 return result;
             }
 

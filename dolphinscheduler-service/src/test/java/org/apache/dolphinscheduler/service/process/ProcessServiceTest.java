@@ -514,4 +514,18 @@ public class ProcessServiceTest {
         Map<String, String> locationToMap = processService.locationToMap(locations);
         Assert.assertEquals(frontTaskIdAndNameMap, locationToMap);
     }
+
+    @Test
+    public void testCreateCommand() {
+        Command command = new Command();
+        command.setProcessDefinitionId(123);
+        command.setCommandParam("{\"ProcessInstanceId\":222}");
+        command.setCommandType(CommandType.START_PROCESS);
+        int mockResult = 1;
+        Mockito.when(commandMapper.insert(command)).thenReturn(mockResult);
+        int exeMethodResult = processService.createCommand(command);
+        Assert.assertEquals(mockResult, exeMethodResult);
+        Mockito.verify(commandMapper, Mockito.times(1)).insert(command);
+    }
+
 }

@@ -127,11 +127,9 @@
         this.deleteResource({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },

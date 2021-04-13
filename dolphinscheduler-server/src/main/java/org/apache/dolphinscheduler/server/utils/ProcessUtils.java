@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -385,11 +386,13 @@ public class ProcessUtils {
                 return;
             }
 
-            String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
-            logger.info("process id:{}, cmd:{}", processId, cmd);
-
-            OSUtils.exeCmd(cmd);
+            String pidsStr = getPidsStr(processId);
+            if (StringUtils.isNotEmpty(pidsStr)) {
+                String cmd = String.format("kill -9 %s", pidsStr);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+                logger.info("process id:{}, cmd:{}", processId, cmd);
+                OSUtils.exeCmd(cmd);
+            }
 
         } catch (Exception e) {
             logger.error("kill task failed", e);
@@ -406,7 +409,7 @@ public class ProcessUtils {
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
-        StringBuilder sb = new StringBuilder();
+        List<String> pidList = new ArrayList<>();
         Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
@@ -421,19 +424,22 @@ public class ProcessUtils {
 
         if (null != mat) {
             while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
+                pidList.add(mat.group(1));
             }
         }
 
-        return sb.toString().trim();
+        if (CommonUtils.isSudoEnable() && !pidList.isEmpty()) {
+            pidList = pidList.subList(1, pidList.size());
+        }
+        return String.join(" ", pidList).trim();
     }
 
     /**
      * find logs and kill yarn tasks.
-     *
      * @param taskExecutionContext taskExecutionContext
+     * @return yarn application ids
      */
-    public static void killYarnJob(TaskExecutionContext taskExecutionContext) {
+    public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             LogClientService logClient = null;
@@ -457,11 +463,13 @@ public class ProcessUtils {
                 }
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                    return appIds;
                 }
             }
 
         } catch (Exception e) {
             logger.error("kill yarn job failure", e);
         }
+        return Collections.emptyList();
     }
 }
