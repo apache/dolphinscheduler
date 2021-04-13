@@ -367,7 +367,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resource.setDescription(desc);
         resource.setUpdateTime(now);
         if (file != null) {
-            resource.setFileName(file.getOriginalFilename());
             resource.setSize(file.getSize());
         }
 
