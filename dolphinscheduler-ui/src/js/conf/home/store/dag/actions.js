@@ -508,6 +508,18 @@ export default {
     })
   },
   /**
+   * Instance startup interface
+   */
+  instanceStart ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/executors/start-process-instance-random-node`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * View log
    */
   getLog ({ state }, payload) {
