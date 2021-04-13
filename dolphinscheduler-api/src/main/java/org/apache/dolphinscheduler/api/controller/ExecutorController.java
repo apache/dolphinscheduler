@@ -192,12 +192,11 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams) {
-        logger.info("login user {}, start process instance, project name: {}, process instance id: {}, schedule time: {},  "
-                        + "failure policy: {}, node id: {}, node dep: {}, notify type: {}, "
-                        + "notify group id: {}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}, startParams: {} ",
-                loginUser.getUserName(), projectName, processInstanceId, scheduleTime,
-                failureStrategy, startNodeList, taskDependType, warningType, workerGroup, runMode, processInstancePriority,
-                workerGroup, timeout, startParams);
+        logger.info("login user {}, start process instance, project name: {}, process instance id: {},   "
+                        + "failure policy: {}, node id: {},  notify type: {}, "
+                        + "notify group id: {}, run mode: {},process instance priority:{}, startParams: {} ",
+                loginUser.getUserName(), projectName, processInstanceId,
+                failureStrategy, startNodeList, warningType, workerGroup, runMode, processInstancePriority, startParams);
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -211,8 +210,6 @@ public class ExecutorController extends BaseController {
                 warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
         return returnDataList(result);
     }
-
-
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop

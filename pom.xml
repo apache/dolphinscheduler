@@ -796,6 +796,7 @@
                 <configuration>
                     <includes>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
+                        <include>**/api/controller/ExecutorController2Test.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
@@ -906,6 +907,7 @@
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/rpc/RpcTest.java</include>
+                        <include>**/server/master/MasterExecThread2Test.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>

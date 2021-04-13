@@ -281,6 +281,14 @@ public class ProcessServiceTest {
         command5.setCommandType(CommandType.START_PROCESS);
         ProcessInstance processInstance1 = processService.handleCommand(logger, host, validThreadNum, command5);
         Assert.assertTrue(processInstance1.getGlobalParams().contains("\"testStartParam1\""));
+
+        Command command6 = new Command();
+        command6.setProcessDefinitionId(123);
+        HashMap<String, String> commandParams4Random = new HashMap<>();
+        commandParams4Random.put(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING, "1");
+        command6.setCommandParam(JSONUtils.toJsonString(commandParams4Random));
+        command6.setCommandType(CommandType.START_RANDOM_TASK_PROCESS);
+        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command6));
     }
 
     @Test
