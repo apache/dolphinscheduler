@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -52,7 +53,7 @@ public class DolphinSchedulerManagerTest {
         files[5] = new File(rootDir + "sql/upgrade/1.3.2_schema");
         files[6] = new File(rootDir + "sql/upgrade/1.3.4_schema");
         PowerMockito.when(FileUtils.getAllDir("sql/upgrade")).thenReturn(files);
-        PowerMockito.when(FileUtils.readFile2Str(new FileInputStream(new File("sql/soft_version")))).thenReturn("1.4.0");
+        PowerMockito.when(FileUtils.readFile2Str(Mockito.any())).thenReturn("1.4.0");
 
         DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
         dolphinSchedulerManager.upgradeDolphinScheduler();
