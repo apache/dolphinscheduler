@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.upgrade;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,6 +52,7 @@ public class DolphinSchedulerManagerTest {
         files[5] = new File(rootDir + "sql/upgrade/1.3.2_schema");
         files[6] = new File(rootDir + "sql/upgrade/1.3.4_schema");
         PowerMockito.when(FileUtils.getAllDir("sql/upgrade")).thenReturn(files);
+        PowerMockito.when(FileUtils.readFile2Str(new FileInputStream(new File("sql/soft_version")))).thenReturn("1.4.0");
 
         DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
         dolphinSchedulerManager.upgradeDolphinScheduler();
