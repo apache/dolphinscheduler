@@ -100,7 +100,7 @@ common:
     HIVE_HOME: "/opt/soft/hive"
     FLINK_HOME: "/opt/soft/flink"
     DATAX_HOME: "/opt/soft/datax"
-  ## Shared storage persistence mounted into master and worker, such as Hadoop, Spark, Flink and DataX binary package
+  ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     enabled: false
     mountPath: "/opt/soft"
