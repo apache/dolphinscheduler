@@ -39,7 +39,7 @@ public class DolphinSchedulerManagerTest {
     public void testUpgradeDolphinScheduler() throws Exception {
         String rootDir = System.getProperty("user.dir") + "/../";
         PowerMockito.mockStatic(FileUtils.class);
-        File[] files = new File[4];
+        File[] files = new File[7];
 
         files[0] = new File(rootDir + "sql/upgrade/1.0.1_schema");
         files[1] = new File(rootDir + "sql/upgrade/1.0.2_schema");
