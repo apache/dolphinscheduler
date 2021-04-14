@@ -29,8 +29,8 @@
             </a>
           </div>
         </div>
-        <template v-show="!isNodata">
-          <div class="gantt"></div>
+        <template >
+          <div v-show="!isNodata" class="gantt"></div>
         </template>
         <template v-if="isNodata">
           <m-no-data></m-no-data>

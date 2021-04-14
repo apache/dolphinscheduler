@@ -24,6 +24,7 @@ import security from './security'
 import datasource from './datasource'
 import user from './user'
 import monitor from './monitor'
+import dataquality from './dataquality'
 Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
@@ -34,6 +35,7 @@ export default new Vuex.Store({
     security,
     datasource,
     user,
-    monitor
+    monitor,
+    dataquality
   }
 })
