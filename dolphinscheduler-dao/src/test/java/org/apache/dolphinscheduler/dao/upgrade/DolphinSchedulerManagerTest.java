@@ -44,7 +44,7 @@ public class DolphinSchedulerManagerTest {
     public void testUpgradeDolphinScheduler() throws Exception {
         String rootDir = System.getProperty("user.dir") + "/../";
         PowerMockito.mockStatic(FileUtils.class);
-        File[] files = new File[7];
+        File[] files = new File[10];
 
         files[0] = new File(rootDir + "sql/upgrade/1.0.1_schema");
         files[1] = new File(rootDir + "sql/upgrade/1.0.2_schema");
@@ -52,7 +52,10 @@ public class DolphinSchedulerManagerTest {
         files[3] = new File(rootDir + "sql/upgrade/1.2.0_schema");
         files[4] = new File(rootDir + "sql/upgrade/1.3.0_schema");
         files[5] = new File(rootDir + "sql/upgrade/1.3.2_schema");
-        files[6] = new File(rootDir + "sql/upgrade/1.3.4_schema");
+        files[6] = new File(rootDir + "sql/upgrade/1.3.3_schema");
+        files[7] = new File(rootDir + "sql/upgrade/1.3.5_schema");
+        files[8] = new File(rootDir + "sql/upgrade/1.3.6_schema");
+        files[9] = new File(rootDir + "sql/upgrade/1.4.0_schema");
         PowerMockito.when(FileUtils.getAllDir("sql/upgrade")).thenReturn(files);
 
         PowerMockito.whenNew(File.class).withArguments("sql/soft_version").thenReturn(null);
@@ -60,6 +63,7 @@ public class DolphinSchedulerManagerTest {
         PowerMockito.when(FileUtils.readFile2Str(Mockito.any())).thenReturn("1.4.0");
 
         DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+        dolphinSchedulerManager.upgradeDao.updateVersion("1.3.6");
         dolphinSchedulerManager.upgradeDolphinScheduler();
         Assert.assertNotNull(dolphinSchedulerManager.upgradeDao);
     }
