@@ -945,7 +945,7 @@ CREATE TABLE `t_ds_dq_rule_input_entry` (
     `type` int(11) DEFAULT NULL COMMENT 'form type',
     `title` varchar(255) DEFAULT NULL COMMENT 'form title',
     `value` varchar(255) DEFAULT NULL COMMENT 'default value, can be null',
-    `options` varchar(255) DEFAULT NULL COMMENT 'default options, can be null, like [{label:"",value:""}]',
+    `options` text DEFAULT NULL COMMENT 'default options, can be null, like [{label:"",value:""}]',
     `placeholder` varchar(255) DEFAULT NULL COMMENT 'placeholder',
     `option_source_type` int(11) DEFAULT NULL COMMENT 'he source type of options, use default options or other',
     `value_type` int(11) DEFAULT NULL COMMENT 'input entry value type: string,array,number .etc',
