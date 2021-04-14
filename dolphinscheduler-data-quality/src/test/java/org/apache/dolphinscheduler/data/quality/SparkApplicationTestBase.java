@@ -33,6 +33,7 @@ public class SparkApplicationTestBase {
     public void before() {
         SparkConf conf = new SparkConf().setAppName("data quality test");
         conf.set("spark.sql.crossJoin.enabled", "true");
+        conf.set("spark.driver.bindAddress","127.0.0.1");
         sparkSession = SparkSession.builder()
                 .master("local[4]")
                 .config(conf)
