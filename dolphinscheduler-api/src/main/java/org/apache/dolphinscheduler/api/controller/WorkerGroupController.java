@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKER_GROUP_FAIL;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_ADDRESS_LIST_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
@@ -156,6 +157,22 @@ public class WorkerGroupController extends BaseController {
     ) {
         logger.info("delete worker group: login user {}, id:{} ", RegexUtils.escapeNRT(loginUser.getUserName()), id);
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
+        return returnDataList(result);
+    }
+
+    /**
+     * query worker address list
+     *
+     * @param loginUser login user
+     * @return all worker address list
+     */
+    @ApiOperation(value = "queryWorkerAddressList", notes = "QUERY_WORKER_ADDRESS_LIST_NOTES")
+    @GetMapping(value = "/worker-address-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKER_ADDRESS_LIST_FAIL)
+    public Result queryWorkerAddressList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        logger.info("query worker address list: login user {}", RegexUtils.escapeNRT(loginUser.getUserName()));
+        Map<String, Object> result = workerGroupService.getWorkerAddressList();
         return returnDataList(result);
     }
 

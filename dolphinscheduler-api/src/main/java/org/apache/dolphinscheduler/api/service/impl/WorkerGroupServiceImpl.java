@@ -81,10 +81,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        if (Constants.DOCKER_MODE && !Constants.KUBERNETES_MODE) {
-            putMsg(result, Status.CREATE_WORKER_GROUP_FORBIDDEN_IN_DOCKER);
-            return result;
-        }
         if (StringUtils.isEmpty(name)) {
             putMsg(result, Status.NAME_NULL);
             return result;
@@ -303,10 +299,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        if (Constants.DOCKER_MODE && !Constants.KUBERNETES_MODE) {
-            putMsg(result, Status.DELETE_WORKER_GROUP_FORBIDDEN_IN_DOCKER);
-            return result;
-        }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);
         if (workerGroup == null) {
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
@@ -319,6 +311,20 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         workerGroupMapper.deleteById(id);
         processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query all worker address list
+     *
+     * @return all worker address list
+     */
+    @Override
+    public Map<String, Object> getWorkerAddressList() {
+        Map<String, Object> result = new HashMap<>();
+        List<String> serverNodeList = zookeeperMonitor.getServerNodeList(ZKNodeType.WORKER, true);
+        result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;
     }

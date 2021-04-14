@@ -86,6 +86,9 @@ public class NetUtils {
                     if (STS_PATTERN.matcher(host).find()) {
                         return String.format("%s.%s", host, host.replaceFirst("\\d+$", "headless"));
                     }
+                } else if (canonicalHost.contains(".")) {
+                    String[] items = canonicalHost.split("\\.");
+                    return String.format("%s.%s", items[0], items[1]);
                 }
                 return canonicalHost;
             }

@@ -24,8 +24,8 @@
             :title="item ? $t('Edit worker group') : $t('Create worker group')"
             v-if="createWorkerGroupDialog"
             :visible.sync="createWorkerGroupDialog"
-            width="auto">
-            <m-create-worker :item="item" @onUpdate="onUpdate" @close="close"></m-create-worker>
+            width="50%">
+            <m-create-worker :item="item" :worker-address-list="workerAddressList" @onUpdate="onUpdate" @close="close"></m-create-worker>
           </el-dialog>
         </template>
       </m-conditions>
@@ -77,6 +77,7 @@
         total: null,
         isLoading: false,
         workerGroupList: [],
+        workerAddressList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
@@ -90,7 +91,7 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getWorkerGroups']),
+      ...mapActions('security', ['getWorkerGroups', 'getWorkerAddresses']),
       /**
        * Inquire
        */
@@ -135,6 +136,11 @@
         }).catch(e => {
           this.isLoading = false
         })
+      },
+      _getWorkerAddressList () {
+        this.getWorkerAddresses().then(res => {
+          this.workerAddressList = res.data.map(x => ({ id: x, label: x }))
+        })
       }
     },
     watch: {
@@ -144,7 +150,9 @@
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
-    created () {},
+    created () {
+      this._getWorkerAddressList()
+    },
     mounted () {
     },
     components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWorker }
