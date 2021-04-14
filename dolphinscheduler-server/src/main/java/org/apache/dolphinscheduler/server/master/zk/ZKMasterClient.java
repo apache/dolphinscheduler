@@ -139,7 +139,7 @@ public class ZKMasterClient extends AbstractZKClient {
      * @param failover   is failover
      */
     private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
-        logger.info("{} node deleted : {}", zkNodeType.toString(), path);
+        logger.info("{} node deleted : {}", zkNodeType, path);
         InterProcessMutex mutex = null;
         try {
             String failoverPath = getFailoverLockPath(zkNodeType);
@@ -162,7 +162,7 @@ public class ZKMasterClient extends AbstractZKClient {
                 failoverServerWhenDown(serverHost, zkNodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed.", zkNodeType.toString());
+            logger.error("{} server failover failed.", zkNodeType);
             logger.error("failover exception ", e);
         } finally {
             releaseMutex(mutex);
@@ -174,9 +174,8 @@ public class ZKMasterClient extends AbstractZKClient {
      *
      * @param serverHost server host
      * @param zkNodeType zookeeper node type
-     * @throws Exception exception
      */
-    private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
+    private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) {
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);
@@ -252,7 +251,7 @@ public class ZKMasterClient extends AbstractZKClient {
      * @param taskInstance task instance
      * @return true if task instance need fail over
      */
-    private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) throws Exception {
+    private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) {
 
         boolean taskNeedFailover = true;
 
@@ -304,9 +303,8 @@ public class ZKMasterClient extends AbstractZKClient {
      *
      * @param workerHost           worker host
      * @param needCheckWorkerAlive need check worker alive
-     * @throws Exception exception
      */
-    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
+    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) {
         logger.info("start worker[{}] failover ...", workerHost);
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
