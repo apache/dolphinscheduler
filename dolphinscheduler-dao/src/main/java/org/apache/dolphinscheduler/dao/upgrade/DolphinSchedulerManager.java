@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import static org.apache.dolphinscheduler.dao.utils.Constants.TABLE_VERSION_V1;
+import static org.apache.dolphinscheduler.dao.utils.Constants.TABLE_VERSION_V2;
+import static org.apache.dolphinscheduler.dao.utils.Constants.TABLE_QUEUE_V1;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 
@@ -64,9 +68,9 @@ public class DolphinSchedulerManager {
      */
     public void initDolphinScheduler() {
         // Determines whether the dolphinscheduler table structure has been init
-        if (upgradeDao.isExistsTable("t_escheduler_version")
-                || upgradeDao.isExistsTable("t_ds_version")
-                ||  upgradeDao.isExistsTable("t_escheduler_queue")) {
+        if (upgradeDao.isExistsTable(TABLE_VERSION_V1)
+                || upgradeDao.isExistsTable(TABLE_VERSION_V2)
+                ||  upgradeDao.isExistsTable(TABLE_QUEUE_V1)) {
             logger.info("The database has been initialized. Skip the initialization step");
             return;
         }
@@ -96,13 +100,13 @@ public class DolphinSchedulerManager {
 
             String version = "";
             // Gets the version of the current system
-            if (upgradeDao.isExistsTable("t_escheduler_version")) {
-                version = upgradeDao.getCurrentVersion("t_escheduler_version");
-            } else if (upgradeDao.isExistsTable("t_ds_version")) {
-                version = upgradeDao.getCurrentVersion("t_ds_version");
-            } else if (upgradeDao.isExistsColumn("t_escheduler_queue","create_time")) {
+            if (upgradeDao.isExistsTable(TABLE_VERSION_V1)) {
+                version = upgradeDao.getCurrentVersion(TABLE_VERSION_V1);
+            } else if (upgradeDao.isExistsTable(TABLE_VERSION_V2)) {
+                version = upgradeDao.getCurrentVersion(TABLE_VERSION_V2);
+            } else if (upgradeDao.isExistsColumn(TABLE_QUEUE_V1,"create_time")) {
                 version = "1.0.1";
-            } else if (upgradeDao.isExistsTable("t_escheduler_queue")) {
+            } else if (upgradeDao.isExistsTable(TABLE_QUEUE_V1)) {
                 version = "1.0.0";
             } else {
                 logger.error("Unable to determine current software version, so cannot upgrade");

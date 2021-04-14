@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import static org.apache.dolphinscheduler.dao.utils.Constants.TABLE_VERSION_V1;
+import static org.apache.dolphinscheduler.dao.utils.Constants.TABLE_VERSION_V2;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -54,8 +57,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public abstract class UpgradeDao extends AbstractBaseDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
-    private static final String T_VERSION_NAME = "t_escheduler_version";
-    private static final String T_NEW_VERSION_NAME = "t_ds_version";
     private static final String rootDir = System.getProperty("user.dir");
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
@@ -170,17 +171,29 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
         try (Connection conn = dataSource.getConnection();
              Reader initSqlReader = new FileReader(mysqlSQLFilePath)) {
-            try {
-                conn.setAutoCommit(autoCommit);
-                // Execute the DolphinScheduler sql script to import related data of DolphinScheduler
-                ScriptRunner initScriptRunner = new ScriptRunner(conn, autoCommit, stopOnError);
-                initScriptRunner.runScript(initSqlReader);
-            } catch (Exception e) {
-                ConnectionUtils.rollback(conn);
-                logger.error(e.getMessage(), e);
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            this.runSqlScript(initSqlReader, conn, autoCommit, stopOnError);
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * run sql script
+     *
+     * @param initSqlReader Reader
+     * @param conn Connection
+     * @param autoCommit autoCommit
+     * @param stopOnError stopOnError
+     */
+    private void runSqlScript(Reader initSqlReader, Connection conn, boolean autoCommit, boolean stopOnError) {
+        try {
+            conn.setAutoCommit(autoCommit);
+            // Execute the DolphinScheduler sql script to import related data of DolphinScheduler
+            ScriptRunner initScriptRunner = new ScriptRunner(conn, autoCommit, stopOnError);
+            initScriptRunner.runScript(initSqlReader);
+        } catch (Exception e) {
+            ConnectionUtils.rollback(conn);
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -385,9 +398,12 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 // Execute the upgraded dolphinscheduler dml
                 ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
                 scriptRunner.runScript(sqlReader);
-
-                String versionTable = isExistsTable(T_VERSION_NAME) ? T_VERSION_NAME : isExistsTable(T_NEW_VERSION_NAME) ? T_NEW_VERSION_NAME : StringUtils.EMPTY;
-                if (StringUtils.isEmpty(versionTable)) {
+                String versionTable;
+                if (isExistsTable(TABLE_VERSION_V1)) {
+                    versionTable = TABLE_VERSION_V1;
+                } else if (isExistsTable(TABLE_VERSION_V2)) {
+                    versionTable = TABLE_VERSION_V2;
+                } else {
                     return;
                 }
 
@@ -427,9 +443,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     public void updateVersion(String version) {
         // Change version in the version table to the new version
-        String versionName = T_VERSION_NAME;
+        String versionName = TABLE_VERSION_V1;
         if (!SchemaUtils.isAGreatVersion("1.2.0", version)) {
-            versionName = "t_ds_version";
+            versionName = TABLE_VERSION_V2;
         }
         String upgradeSQL = String.format("update %s set version = ?", versionName);
         PreparedStatement pstmt = null;
