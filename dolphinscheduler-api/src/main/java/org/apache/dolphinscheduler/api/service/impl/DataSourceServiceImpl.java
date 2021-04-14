@@ -17,20 +17,21 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.api.utils.datasource.DatasourceParamUtil;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.BaseHdfsConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.common.datasource.oracle.OracleConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -64,16 +65,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceImpl.class);
 
-    public static final String NAME = "name";
-    public static final String NOTE = "note";
-    public static final String TYPE = "type";
-    public static final String HOST = "host";
-    public static final String PORT = "port";
-    public static final String PRINCIPAL = "principal";
-    public static final String DATABASE = "database";
-    public static final String USER_NAME = "userName";
-    public static final String OTHER = "other";
-
     @Autowired
     private DataSourceMapper dataSourceMapper;
 
@@ -89,7 +80,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      */
     @Override
     public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
-        DatasourceParamUtil.checkDatasourceParam(datasourceParam);
+        DatasourceUtil.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
         // check name can use or not
         if (checkName(datasourceParam.getName())) {
@@ -97,8 +88,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         // check connect
-        String connectionParams = DatasourceParamUtil.buildConnectionParams(datasourceParam);
-        Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParams);
+        ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(datasourceParam);
+        Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParam);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
             return result;
@@ -113,7 +104,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setUserId(loginUser.getId());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(datasourceParam.getType());
-        dataSource.setConnectionParams(connectionParams);
+        dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
         dataSourceMapper.insert(dataSource);
@@ -136,7 +127,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      */
     @Override
     public Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam) {
-        DatasourceParamUtil.checkDatasourceParam(dataSourceParam);
+        DatasourceUtil.checkDatasourceParam(dataSourceParam);
         Result<Object> result = new Result<>();
         // determine whether the data source exists
         DataSource dataSource = dataSourceMapper.selectById(id);
@@ -156,18 +147,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         //check password，if the password is not updated, set to the old password.
-        String parameter = DatasourceParamUtil.buildConnectionParams(dataSourceParam);
-        ObjectNode paramObject = JSONUtils.parseObject(parameter);
-        String password = paramObject.path(Constants.PASSWORD).asText();
+        BaseConnectionParam connectionParam = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(dataSourceParam);
+        String password = connectionParam.getPassword();
         if (StringUtils.isBlank(password)) {
             String oldConnectionParams = dataSource.getConnectionParams();
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
-            paramObject.put(Constants.PASSWORD, oldParams.path(Constants.PASSWORD).asText());
+            connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
-        // connectionParams json
-        String connectionParams = paramObject.toString();
 
-        Result<Object> isConnection = checkConnection(dataSource.getType(), parameter);
+        Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
             return result;
         }
@@ -178,7 +166,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setNote(dataSource.getNote());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(dataSource.getType());
-        dataSource.setConnectionParams(connectionParams);
+        dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setUpdateTime(now);
         dataSourceMapper.updateById(dataSource);
         putMsg(result, Status.SUCCESS);
@@ -206,79 +194,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         // type
-        String dataSourceType = dataSource.getType().toString();
-        // name
-        String dataSourceName = dataSource.getName();
-        // desc
-        String desc = dataSource.getNote();
-        // parameter
-        String parameter = dataSource.getConnectionParams();
+        BaseDataSourceParamDTO baseDataSourceParamDTO = DatasourceUtil.buildDatasourceParamDTO(
+                dataSource.getType(), dataSource.getConnectionParams());
+        baseDataSourceParamDTO.setId(dataSource.getId());
+        baseDataSourceParamDTO.setName(dataSource.getName());
+        baseDataSourceParamDTO.setNote(dataSource.getNote());
 
-        BaseDataSource datasourceForm = DataSourceFactory.getDatasource(dataSource.getType(), parameter);
-        DbConnectType connectType = null;
-        String hostSeperator = Constants.DOUBLE_SLASH;
-        if (DbType.ORACLE.equals(dataSource.getType())) {
-            connectType = ((OracleDataSource) datasourceForm).getConnectType();
-            if (DbConnectType.ORACLE_SID.equals(connectType)) {
-                hostSeperator = Constants.AT_SIGN;
-            }
-        }
-        String database = datasourceForm.getDatabase();
-        // jdbc connection params
-        String other = datasourceForm.getOther();
-        String address = datasourceForm.getAddress();
-
-        String[] hostsPorts = getHostsAndPort(address, hostSeperator);
-        // ip host
-        String host = hostsPorts[0];
-        // prot
-        String port = hostsPorts[1];
-        String separator = "";
-
-        switch (dataSource.getType()) {
-            case HIVE:
-            case SQLSERVER:
-                separator = ";";
-                break;
-            case MYSQL:
-            case POSTGRESQL:
-            case CLICKHOUSE:
-            case ORACLE:
-            case PRESTO:
-                separator = "&";
-                break;
-            default:
-                separator = "&";
-                break;
-        }
-
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        if (other != null) {
-            String[] configs = other.split(separator);
-            for (String config : configs) {
-                otherMap.put(config.split("=")[0], config.split("=")[1]);
-            }
-
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        map.put(NAME, dataSourceName);
-        map.put(NOTE, desc);
-        map.put(TYPE, dataSourceType);
-        if (connectType != null) {
-            map.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
-        }
-
-        map.put(HOST, host);
-        map.put(PORT, port);
-        map.put(PRINCIPAL, datasourceForm.getPrincipal());
-        map.put(Constants.KERBEROS_KRB5_CONF_PATH, datasourceForm.getJavaSecurityKrb5Conf());
-        map.put(Constants.KERBEROS_KEY_TAB_USERNAME, datasourceForm.getLoginUserKeytabUsername());
-        map.put(Constants.KERBEROS_KEY_TAB_PATH, datasourceForm.getLoginUserKeytabPath());
-        map.put(DATABASE, database);
-        map.put(USER_NAME, datasourceForm.getUser());
-        map.put(OTHER, otherMap);
-        result.put(Constants.DATA_LIST, map);
+        result.put(Constants.DATA_LIST, baseDataSourceParamDTO);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -388,14 +310,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return true if connect successfully, otherwise false
      */
     @Override
-    public Result<Object> checkConnection(DbType type, String parameter) {
+    public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
-        BaseDataSource datasource = DataSourceFactory.getDatasource(type, parameter);
-        if (datasource == null) {
+        if (connectionParam == null) {
             putMsg(result, Status.DATASOURCE_TYPE_NOT_EXIST, type);
             return result;
         }
-        try (Connection connection = datasource.getConnection()) {
+        try (Connection connection = DatasourceUtil.getConnection(type, connectionParam)) {
             if (connection == null) {
                 putMsg(result, Status.CONNECTION_TEST_FAILURE);
                 return result;
@@ -403,7 +324,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.SUCCESS);
             return result;
         } catch (Exception e) {
-            logger.error("datasource test connection error, dbType:{}, jdbcUrl:{}, message:{}.", type, datasource.getJdbcUrl(), e.getMessage());
+            logger.error("datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type, connectionParam, e.getMessage());
             return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), e.getMessage());
         }
     }
@@ -422,7 +343,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
+        return checkConnection(dataSource.getType(), DatasourceUtil.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
     }
 
     /**
@@ -518,29 +439,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * get host and port by address
-     *
-     * @param address address
-     * @param separator separator
-     * @return sting array: [host,port]
-     */
-    private String[] getHostsAndPort(String address, String separator) {
-        String[] result = new String[2];
-        String[] tmpArray = address.split(separator);
-        String hostsAndPorts = tmpArray[tmpArray.length - 1];
-        StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = hostsAndPorts.split(Constants.COMMA);
-        String port = hostPortArray[0].split(Constants.COLON)[1];
-        for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
-        }
-        hosts.deleteCharAt(hosts.length() - 1);
-        result[0] = hosts.toString();
-        result[1] = port;
         return result;
     }
 

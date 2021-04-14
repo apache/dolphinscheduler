@@ -22,10 +22,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.dto.datasource.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -55,7 +57,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
         mysqlDatasourceParam.setDatabase("dolphinscheduler");
         mysqlDatasourceParam.setUserName("root");
         mysqlDatasourceParam.setPassword("root@123");
-        mysqlDatasourceParam.setOther("");
+        mysqlDatasourceParam.setOther(new HashMap<>());
         MvcResult mvcResult = mockMvc.perform(post("/datasources/create")
                 .header("sessionId", sessionId)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)

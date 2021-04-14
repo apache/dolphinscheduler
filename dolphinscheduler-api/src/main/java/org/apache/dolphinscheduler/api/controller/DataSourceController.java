@@ -28,14 +28,15 @@ import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOUR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
 
-import org.apache.dolphinscheduler.api.dto.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.api.utils.datasource.DatasourceParamUtil;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -209,8 +210,8 @@ public class DataSourceController extends BaseController {
                                     @RequestBody BaseDataSourceParamDTO dataSourceParam) {
         String userName = RegexUtils.escapeNRT(loginUser.getUserName());
         logger.info("login user {}, connect datasource: {}", userName, dataSourceParam);
-        DatasourceParamUtil.checkDatasourceParam(dataSourceParam);
-        String connectionParams = DatasourceParamUtil.buildConnectionParams(dataSourceParam);
+        DatasourceUtil.checkDatasourceParam(dataSourceParam);
+        ConnectionParam connectionParams = DatasourceUtil.buildConnectionParams(dataSourceParam);
         return dataSourceService.checkConnection(dataSourceParam.getType(), connectionParams);
     }
 
