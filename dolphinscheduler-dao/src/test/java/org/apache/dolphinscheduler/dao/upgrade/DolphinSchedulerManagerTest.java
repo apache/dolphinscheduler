@@ -17,42 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.enums.DbType;
-
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * upgrade dao test
+ * dolphinshceduler manager test
  */
-public class UpgradeDaoTest {
-
-    UpgradeDao upgradeDao;
-
-    @Before
-    public void before() {
-        upgradeDao = PostgresqlUpgradeDao.getInstance();
-    }
+public class DolphinSchedulerManagerTest {
 
     @Test
-    public void testGetDbType() {
-        DbType dbType = UpgradeDao.getDbType();
-        Assert.assertEquals(DbType.POSTGRESQL, dbType);
+    public void testUpgradeDolphinScheduler() throws Exception {
+        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+        dolphinSchedulerManager.upgradeDolphinScheduler();
+        Assert.assertNotNull(dolphinSchedulerManager.upgradeDao);
     }
-
-    @Ignore
-    @Test
-    public void testInitSchema() {
-        String initSqlPath = "/../sql/create/release-1.2.0_schema/postgresql/";
-        upgradeDao.initSchema(initSqlPath);
-    }
-
-    @Test
-    public void testGetCurrentVersion() {
-        String t_ds_version = upgradeDao.getCurrentVersion("t_ds_version");
-        Assert.assertNotNull(t_ds_version);
-    }
-
 }
