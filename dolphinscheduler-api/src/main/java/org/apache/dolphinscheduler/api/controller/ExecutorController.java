@@ -175,7 +175,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "start-process-instance-random-node")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
-    public Result startProcessInstanceRandomNode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Map<String, Object>> startProcessInstanceRandomNode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                        @RequestParam(value = "processInstanceId") int processInstanceId,
                                        @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
@@ -189,12 +189,6 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams) {
-        logger.info("login user {}, start process instance, project name: {}, process instance id: {},   "
-                        + "failure policy: {}, node id: {},  notify type: {}, "
-                        + "notify group id: {}, run mode: {},process instance priority:{}, startParams: {} ",
-                loginUser.getUserName(), projectName, processInstanceId,
-                failureStrategy, startNodeList, warningType, workerGroup, runMode, processInstancePriority, startParams);
-
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
