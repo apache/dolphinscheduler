@@ -310,8 +310,8 @@ public class DataxTask extends AbstractTask {
 
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();
-        content.put("reader", reader.toString());
-        content.put("writer", writer.toString());
+        content.set("reader", reader);
+        content.set("writer", writer);
         contentList.add(content);
 
         return contentList;
@@ -341,8 +341,8 @@ public class DataxTask extends AbstractTask {
         errorLimit.put("percentage", 0);
 
         ObjectNode setting = JSONUtils.createObjectNode();
-        setting.put("speed", speed.toString());
-        setting.put("errorLimit", errorLimit.toString());
+        setting.set("speed", speed);
+        setting.set("errorLimit", errorLimit);
 
         return setting;
     }
@@ -462,7 +462,10 @@ public class DataxTask extends AbstractTask {
 
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
-            notNull(parser, String.format("database driver [%s] is not support", dbType.toString()));
+            if (parser == null) {
+                logger.warn("database driver [{}] is not support grammatical analysis sql", dbType);
+                return new String[0];
+            }
 
             SQLStatement sqlStatement = parser.parseStatement();
             SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
@@ -511,7 +514,7 @@ public class DataxTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            return null;
+            return new String[0];
         }
 
         return columnNames;
