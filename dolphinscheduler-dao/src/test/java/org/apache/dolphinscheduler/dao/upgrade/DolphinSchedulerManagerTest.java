@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +36,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * dolphinshceduler manager test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ FileUtils.class })
+@PrepareForTest({ FileUtils.class, SchemaUtils.class })
 @PowerMockIgnore({"javax.management.*"})
 public class DolphinSchedulerManagerTest {
 
