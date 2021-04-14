@@ -51,8 +51,8 @@ public class UpgradeDaoTest {
 
     @Test
     public void testGetCurrentVersion() {
-        String t_ds_version = upgradeDao.getCurrentVersion("t_ds_version");
-        Assert.assertNotNull(t_ds_version);
+        String version = upgradeDao.getCurrentVersion("t_ds_version");
+        Assert.assertNotNull(version);
     }
 
 }
