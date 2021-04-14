@@ -54,6 +54,7 @@ public class DolphinSchedulerManagerTest {
         files[6] = new File(rootDir + "sql/upgrade/1.3.4_schema");
         PowerMockito.when(FileUtils.getAllDir("sql/upgrade")).thenReturn(files);
 
+        PowerMockito.whenNew(File.class).withArguments("sql/soft_version").thenReturn(null);
         PowerMockito.whenNew(FileInputStream.class).withAnyArguments().thenReturn(null);
         PowerMockito.when(FileUtils.readFile2Str(Mockito.any())).thenReturn("1.4.0");
 
