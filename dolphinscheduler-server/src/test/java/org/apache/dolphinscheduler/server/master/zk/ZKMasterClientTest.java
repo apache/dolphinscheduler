@@ -14,19 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.processor.queue;
 
+package org.apache.dolphinscheduler.server.master.zk;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.registry.DependencyConfig;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
-import java.util.Date;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,35 +40,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+/**
+ * zookeeper master client test
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, TaskResponseService.class, ZookeeperRegistryCenter.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ServerNodeManager.class, TaskResponseService.class,
-        SpringConnectionFactory.class})
-public class TaskResponseServiceTest {
+@ContextConfiguration(classes = {DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,
+        ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class, SpringConnectionFactory.class,
+        ZookeeperCachedOperator.class, ZookeeperConfig.class, ServerNodeManager.class,
+        ZKMasterClient.class, RegisterOperator.class})
+public class ZKMasterClientTest {
 
     @Autowired
-    private TaskResponseService taskResponseService;
+    private ZKMasterClient zkMasterClient;
+
+    @Autowired
+    private ServerNodeManager serverNodeManager;
+
+    @Autowired
+    private MasterConfig masterConfig;
 
     @Test
-    public void testAdd(){
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
-                "", "", "", 1,null);
-        taskResponseService.addResponse(taskResponseEvent);
-        Assert.assertTrue(taskResponseService.getEventQueue().size() == 1);
+    public void testZKMasterClient() {
+        zkMasterClient.start();
         try {
-            Thread.sleep(10);
+            //let the serverNodeManager catch the registry event
+            Thread.sleep(2000);
         } catch (InterruptedException ignore) {
+            //ignore
         }
-        //after sleep, inner worker will take the event
-        Assert.assertTrue(taskResponseService.getEventQueue().size() == 0);
+        Set<String> masterNodes = serverNodeManager.getMasterNodes();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(masterNodes));
+        Assert.assertEquals(1, masterNodes.size());
+        Assert.assertEquals(NetUtils.getAddr(masterConfig.getListenPort()), masterNodes.iterator().next());
+        zkMasterClient.close();
     }
 
-    @Test
-    public void testStop(){
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
-                "", "", "", 1,null);
-        taskResponseService.addResponse(taskResponseEvent);
-        taskResponseService.stop();
-        Assert.assertTrue(taskResponseService.getEventQueue().size() == 0);
-    }
 }

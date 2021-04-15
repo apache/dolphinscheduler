@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.server.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
