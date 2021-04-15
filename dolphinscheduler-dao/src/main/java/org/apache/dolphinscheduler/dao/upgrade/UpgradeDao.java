@@ -432,7 +432,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @param schemaDir schemaDir
      */
     private void upgradeDolphinSchedulerDDL(String schemaDir) {
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        String sqlFilePath = MessageFormat.format("/sql/upgrade/{0}/{1}/dolphinscheduler_ddl.sql", schemaDir, getDbType().name().toLowerCase());
         this.runSqlScript(sqlFilePath, true, true);
     }
 
