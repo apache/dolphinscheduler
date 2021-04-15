@@ -117,7 +117,8 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         // self tolerant
-        this.zkMasterClient.start(this);
+        this.zkMasterClient.start();
+        this.zkMasterClient.setStoppable(this);
 
         // scheduler start
         this.masterSchedulerService.start();

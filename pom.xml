@@ -817,6 +817,7 @@
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/registry/ServerNodeManagerTest.java</include>
+                        <include>**/server/master/zk/ZKMasterClientTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <!-- <include>**/server/master/DependentTaskTest.java</include>

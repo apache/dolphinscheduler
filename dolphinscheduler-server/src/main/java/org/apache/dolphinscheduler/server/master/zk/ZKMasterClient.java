@@ -73,7 +73,7 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private MasterRegistry masterRegistry;
 
-    public void start(IStoppable stoppable) {
+    public void start() {
         InterProcessMutex mutex = null;
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
@@ -83,7 +83,6 @@ public class ZKMasterClient extends AbstractZKClient {
 
             // master registry
             masterRegistry.registry();
-            masterRegistry.getZookeeperRegistryCenter().setStoppable(stoppable);
             String registryPath = this.masterRegistry.getMasterPath();
             masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
@@ -104,6 +103,10 @@ public class ZKMasterClient extends AbstractZKClient {
         } finally {
             releaseMutex(mutex);
         }
+    }
+
+    public void setStoppable(IStoppable stoppable) {
+        masterRegistry.getZookeeperRegistryCenter().setStoppable(stoppable);
     }
 
     @Override
@@ -194,7 +197,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @return fail over lock path
      */
     private String getFailoverLockPath(ZKNodeType zkNodeType) {
-
         switch (zkNodeType) {
             case MASTER:
                 return getMasterFailoverLockPath();
