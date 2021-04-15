@@ -172,10 +172,10 @@ public class ProcessService {
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
-     * @param logger logger
-     * @param host host
+     * @param logger         logger
+     * @param host           host
      * @param validThreadNum validThreadNum
-     * @param command found command
+     * @param command        found command
      * @return process instance
      */
     @Transactional(rollbackFor = Exception.class)
@@ -215,7 +215,7 @@ public class ProcessService {
     /**
      * set process waiting thread
      *
-     * @param command command
+     * @param command         command
      * @param processInstance processInstance
      * @return process instance
      */
@@ -233,7 +233,7 @@ public class ProcessService {
     /**
      * check thread num
      *
-     * @param command command
+     * @param command        command
      * @param validThreadNum validThreadNum
      * @return if thread is enough
      */
@@ -385,7 +385,7 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      */
     public void removeTaskLogFile(Integer processInstanceId) {
-        try(LogClientService logClient = new LogClientService()){
+        try (LogClientService logClient = new LogClientService()) {
             List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
 
             if (CollectionUtils.isEmpty(taskInstanceList)) {
@@ -407,7 +407,7 @@ public class ProcessService {
                 // remove task log from loggerserver
                 logClient.removeTaskLog(ip, port, taskLogPath);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
         }
     }
 
@@ -561,7 +561,7 @@ public class ProcessService {
         processInstance.setConnects(processDefinition.getConnects());
 
         // reset global params while there are start parameters
-        setGlobalParamIfCommanded(processDefinition,cmdParam);
+        setGlobalParamIfCommanded(processDefinition, cmdParam);
 
         // curing global params
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
@@ -707,10 +707,10 @@ public class ProcessService {
                 // Recalculate global parameters after rerun.
 
                 processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    commandTypeIfComplement,
-                    processInstance.getScheduleTime()));
+                        processDefinition.getGlobalParamMap(),
+                        processDefinition.getGlobalParamList(),
+                        commandTypeIfComplement,
+                        processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
@@ -1067,7 +1067,7 @@ public class ProcessService {
     /**
      * complement data needs transform parent parameter to child.
      */
-    private String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance,Map<String,String> fatherParams) {
+    private String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance, Map<String, String> fatherParams) {
         // set sub work process command
         String processMapStr = JSONUtils.toJsonString(instanceMap);
         Map<String, String> cmdParam = JSONUtils.toMap(processMapStr);
@@ -1111,13 +1111,13 @@ public class ProcessService {
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
         Map<String, String> globalMap = this.getGlobalParamMap(parentProcessInstance.getGlobalParams());
-        Map<String,String> fatherParams = new HashMap<>();
+        Map<String, String> fatherParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(allParam)) {
             for (Property info : allParam) {
                 fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
             }
         }
-        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance,fatherParams);
+        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);
 
         return new Command(
                 commandType,
@@ -2180,8 +2180,9 @@ public class ProcessService {
 
     /**
      * add authorized resources
+     *
      * @param ownResources own resources
-     * @param userId userId
+     * @param userId       userId
      */
     private void addAuthorizedResources(List<Resource> ownResources, int userId) {
         List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
