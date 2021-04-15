@@ -100,6 +100,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.hadoop.mapreduce.v2.app.client.ClientService;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -384,17 +385,12 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      */
     public void removeTaskLogFile(Integer processInstanceId) {
-
-        LogClientService logClient = null;
-
-        try {
-            logClient = new LogClientService();
+        try(LogClientService logClient = new LogClientService()){
             List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
 
             if (CollectionUtils.isEmpty(taskInstanceList)) {
                 return;
             }
-
             for (TaskInstance taskInstance : taskInstanceList) {
                 String taskLogPath = taskInstance.getLogPath();
                 if (StringUtils.isEmpty(taskInstance.getHost())) {
@@ -408,12 +404,10 @@ public class ProcessService {
                     // compatible old version
                     ip = taskInstance.getHost();
                 }
-
                 // remove task log from loggerserver
                 logClient.removeTaskLog(ip, port, taskLogPath);
             }
-        } finally {
-            logClient.close();
+        }catch(Exception e){
         }
     }
 
