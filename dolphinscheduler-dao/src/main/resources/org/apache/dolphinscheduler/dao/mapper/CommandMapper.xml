@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
     <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select cmd.id, cmd.command_type, cmd.process_definition_id, cmd.command_param, cmd.task_depend_type, cmd.failure_strategy,
-        cmd.warning_type, cmd.warning_group_id, cmd.schedule_time, cmd.start_time, cmd.executor_id, cmd.dependence, cmd.update_time,
+        cmd.warning_type, cmd.warning_group_id, cmd.schedule_time, cmd.start_time, cmd.executor_id, cmd.update_time,
         cmd.process_instance_priority, cmd.worker_group
         from t_ds_command cmd
         join t_ds_process_definition definition on cmd.process_definition_id = definition.id
