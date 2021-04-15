@@ -887,7 +887,7 @@ public class MasterExecThread implements Runnable {
         try {
             readyToSubmitTaskQueue.put(taskInstance);
         } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue error");
+            logger.error("add task instance to readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
         }
     }
 
@@ -901,7 +901,7 @@ public class MasterExecThread implements Runnable {
         try {
             readyToSubmitTaskQueue.remove(taskInstance);
         } catch (Exception e) {
-            logger.error("remove task instance from readyToSubmitTaskQueue error");
+            logger.error("remove task instance from readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
         }
     }
 

@@ -62,4 +62,11 @@ public interface WorkerGroupService {
      */
     Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id);
 
+    /**
+     * query all worker address list
+     *
+     * @return all worker address list
+     */
+    Map<String, Object> getWorkerAddressList();
+
 }

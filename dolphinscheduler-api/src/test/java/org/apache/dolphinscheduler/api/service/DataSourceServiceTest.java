@@ -281,7 +281,7 @@ public class DataSourceServiceTest {
     public void buildParameter() {
         String param = dataSourceService.buildParameter(DbType.ORACLE, "192.168.9.1", "1521", "im"
                 , "", "test", "test", DbConnectType.ORACLE_SERVICE_NAME, "", "", "", "");
-        String expected = "{\"connectType\":\"ORACLE_SERVICE_NAME\",\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\","
+        String expected = "{\"connectType\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\","
                 + "\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
         Assert.assertEquals(expected, param);
 
@@ -290,7 +290,7 @@ public class DataSourceServiceTest {
         PowerMockito.when(CommonUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         param = dataSourceService.buildParameter(DbType.HIVE, "192.168.9.1", "10000", "im"
                 , "hive/hdfs-mycluster@ESZ.COM", "test", "test", null, "", "/opt/krb5.conf", "test2/hdfs-mycluster@ESZ.COM", "/opt/hdfs.headless.keytab");
-        expected = "{\"type\":null,\"address\":\"jdbc:hive2://192.168.9.1:10000\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im;principal=hive/hdfs-mycluster@ESZ.COM\","
+        expected = "{\"address\":\"jdbc:hive2://192.168.9.1:10000\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:hive2://192.168.9.1:10000/im;principal=hive/hdfs-mycluster@ESZ.COM\","
                 + "\"user\":\"test\",\"password\":\"test\",\"principal\":\"hive/hdfs-mycluster@ESZ.COM\",\"javaSecurityKrb5Conf\":\"/opt/krb5.conf\","
                 + "\"loginUserKeytabUsername\":\"test2/hdfs-mycluster@ESZ.COM\",\"loginUserKeytabPath\":\"/opt/hdfs.headless.keytab\"}";
         Assert.assertEquals(expected, param);
@@ -303,14 +303,14 @@ public class DataSourceServiceTest {
         String other = "{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}";
         String param = dataSourceService.buildParameter(DbType.MYSQL, "192.168.9.1", "1521", "im"
                 , "", "test", "123456", null, other, "", "", "");
-        String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
+        String expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
                 + "\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\"}";
         Assert.assertEquals(expected, param);
 
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
         param = dataSourceService.buildParameter(DbType.MYSQL, "192.168.9.1", "1521", "im"
                 , "", "test", "123456", null, "", "", "", "");
-        expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
+        expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
                 + "\"user\":\"test\",\"password\":\"123456\"}";
         Assert.assertEquals(expected, param);
     }
