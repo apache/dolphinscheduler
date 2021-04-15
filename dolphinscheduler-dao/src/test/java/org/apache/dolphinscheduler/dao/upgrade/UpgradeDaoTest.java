@@ -42,17 +42,27 @@ public class UpgradeDaoTest {
         Assert.assertEquals(DbType.POSTGRESQL, dbType);
     }
 
+    /**
+     * init schema
+     */
     @Ignore
     @Test
     public void testInitSchema() {
         String initSqlPath = "/../sql/create/release-1.2.0_schema/postgresql/";
         upgradeDao.initSchema(initSqlPath);
+        Assert.assertNotNull(upgradeDao);
     }
 
     @Test
     public void testGetCurrentVersion() {
         String version = upgradeDao.getCurrentVersion("t_ds_version");
         Assert.assertNotNull(version);
+    }
+
+    @Test
+    public void testUpgradeDolphinScheduler() {
+        String schemaDir = "/../../../sql/upgrade/1.4.0_schema";
+        upgradeDao.upgradeDolphinScheduler(schemaDir);
     }
 
 }

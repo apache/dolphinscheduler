@@ -63,7 +63,6 @@ public class DolphinSchedulerManagerTest {
         PowerMockito.when(FileUtils.readFile2Str(Mockito.any())).thenReturn("1.4.0");
 
         DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-        dolphinSchedulerManager.upgradeDao.updateVersion("1.3.6");
         dolphinSchedulerManager.upgradeDolphinScheduler();
         Assert.assertNotNull(dolphinSchedulerManager.upgradeDao);
     }
