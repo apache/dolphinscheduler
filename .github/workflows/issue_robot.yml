@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           persist-credentials: false
-          submodules: recursive
+          submodules: true
 
       - name: "Translation into English in issue"
         uses: ./.github/actions/translation-on-issue
