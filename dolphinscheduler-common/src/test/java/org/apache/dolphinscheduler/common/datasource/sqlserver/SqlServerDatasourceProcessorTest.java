@@ -56,7 +56,8 @@ public class SqlServerDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
+        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\""
+                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
         SqlServerConnectionParam sqlServerConnectionParam = JSONUtils.parseObject(connectionJson, SqlServerConnectionParam.class);
         Assert.assertNotNull(sqlServerConnectionParam);
         Assert.assertEquals("root", sqlServerConnectionParam.getUser());

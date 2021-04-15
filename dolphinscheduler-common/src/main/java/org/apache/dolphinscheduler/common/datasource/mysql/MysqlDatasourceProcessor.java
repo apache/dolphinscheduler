@@ -82,7 +82,7 @@ public class MysqlDatasourceProcessor extends AbstractDatasourceProcessor {
         mysqlConnectionParam.setDatabase(mysqlDatasourceParam.getDatabase());
         mysqlConnectionParam.setAddress(address);
         mysqlConnectionParam.setUser(mysqlDatasourceParam.getUserName());
-        mysqlConnectionParam.setPassword(mysqlDatasourceParam.getPassword());
+        mysqlConnectionParam.setPassword(CommonUtils.encodePassword(mysqlDatasourceParam.getPassword()));
         mysqlConnectionParam.setOther(transformOther(mysqlDatasourceParam.getOther()));
 
         return mysqlConnectionParam;

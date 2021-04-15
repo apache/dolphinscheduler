@@ -54,7 +54,8 @@ public class ClickHouseDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
-        String connectionParamJson = "{\"address\":\"jdbc:clickhouse://localhost:8123\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:clickhouse://localhost:8123/default\",\"user\":\"default\",\"password\":\"123456\"}";
+        String connectionParamJson = "{\"address\":\"jdbc:clickhouse://localhost:8123\",\"database\":\"default\","
+                + "\"jdbcUrl\":\"jdbc:clickhouse://localhost:8123/default\",\"user\":\"default\",\"password\":\"123456\"}";
         ClickhouseConnectionParam clickhouseConnectionParam = (ClickhouseConnectionParam) clickHouseDatasourceProcessor
                 .createConnectionParams(connectionParamJson);
         Assert.assertNotNull(clickhouseConnectionParam);

@@ -892,14 +892,14 @@
                         <include>**/common/utils/RetryerUtilsTest.java</include>
                         <include>**/common/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/common/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/Db2DatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/HiveDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/MysqlDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/OracleDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/PostgreSqlDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/PrestoDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/SparkDatasourceProcessorTest.java</include>
-                        <include>**/common/datasource/clickhouse/SqlServerDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/db2/Db2DatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/hive/HiveDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/oracle/OracleDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/presto/PrestoDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/spark/SparkDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>

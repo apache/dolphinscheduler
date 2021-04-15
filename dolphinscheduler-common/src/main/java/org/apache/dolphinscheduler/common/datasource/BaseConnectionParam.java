@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
-import org.apache.dolphinscheduler.common.enums.DbType;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 

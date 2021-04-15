@@ -81,13 +81,13 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         hiveConnectionParam.setAddress(address.toString());
         hiveConnectionParam.setJdbcUrl(jdbcUrl);
         hiveConnectionParam.setUser(hiveParam.getUserName());
-        hiveConnectionParam.setPassword(hiveParam.getPassword());
+        hiveConnectionParam.setPassword(CommonUtils.encodePassword(hiveParam.getPassword()));
 
         if (CommonUtils.getKerberosStartupState()) {
             hiveConnectionParam.setPrincipal(hiveParam.getPrincipal());
-            hiveConnectionParam.setJavaSecurityKrb5Conf(hiveConnectionParam.getJavaSecurityKrb5Conf());
-            hiveConnectionParam.setLoginUserKeytabPath(hiveConnectionParam.getLoginUserKeytabPath());
-            hiveConnectionParam.setLoginUserKeytabUsername(hiveConnectionParam.getLoginUserKeytabUsername());
+            hiveConnectionParam.setJavaSecurityKrb5Conf(hiveParam.getJavaSecurityKrb5Conf());
+            hiveConnectionParam.setLoginUserKeytabPath(hiveParam.getLoginUserKeytabPath());
+            hiveConnectionParam.setLoginUserKeytabUsername(hiveParam.getLoginUserKeytabUsername());
         }
         hiveConnectionParam.setOther(transformOther(hiveParam.getOther()));
         return hiveConnectionParam;
@@ -136,7 +136,7 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
             return null;
         }
         StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s%s;", key, value)));
+        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s;", key, value)));
         return stringBuilder.toString();
     }
 

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.common.datasource.presto;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.datasource.db2.Db2ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
 
 import java.sql.DriverManager;
@@ -55,7 +54,8 @@ public class PrestoDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
+        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
+                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);

@@ -64,7 +64,7 @@ public class ClickHouseDatasourceProcessor extends AbstractDatasourceProcessor {
         clickhouseConnectionParam.setAddress(address);
         clickhouseConnectionParam.setJdbcUrl(jdbcUrl);
         clickhouseConnectionParam.setUser(clickHouseParam.getUserName());
-        clickhouseConnectionParam.setPassword(clickHouseParam.getPassword());
+        clickhouseConnectionParam.setPassword(CommonUtils.encodePassword(clickHouseParam.getPassword()));
         clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
         return clickhouseConnectionParam;
     }

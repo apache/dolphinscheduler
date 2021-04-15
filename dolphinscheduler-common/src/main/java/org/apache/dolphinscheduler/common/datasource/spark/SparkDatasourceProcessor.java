@@ -79,7 +79,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
         }
 
         SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
-        sparkConnectionParam.setPassword(sparkDatasourceParam.getPassword());
+        sparkConnectionParam.setPassword(CommonUtils.encodePassword(sparkDatasourceParam.getPassword()));
         sparkConnectionParam.setUser(sparkDatasourceParam.getUserName());
         sparkConnectionParam.setOther(transformOther(sparkDatasourceParam.getOther()));
         sparkConnectionParam.setDatabase(sparkDatasourceParam.getDatabase());

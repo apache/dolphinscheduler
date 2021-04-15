@@ -76,7 +76,7 @@ public class OracleDatasourceProcessor extends AbstractDatasourceProcessor {
 
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setUser(oracleParam.getUserName());
-        oracleConnectionParam.setPassword(oracleParam.getPassword());
+        oracleConnectionParam.setPassword(CommonUtils.encodePassword(oracleParam.getPassword()));
         oracleConnectionParam.setAddress(address);
         oracleConnectionParam.setJdbcUrl(jdbcUrl);
         oracleConnectionParam.setDatabase(oracleParam.getDatabase());

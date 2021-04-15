@@ -55,7 +55,8 @@ public class Db2DatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
-        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:db2://localhost:5142\",\"database\":\"default\",\"jdbcUrl\":\"jdbc:db2://localhost:5142/default\"}";
+        String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:db2://localhost:5142\""
+                + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:db2://localhost:5142/default\"}";
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionJson);

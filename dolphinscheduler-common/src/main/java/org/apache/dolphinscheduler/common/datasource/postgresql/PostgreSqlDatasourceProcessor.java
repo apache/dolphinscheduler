@@ -65,7 +65,7 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         postgreSqlConnectionParam.setAddress(address);
         postgreSqlConnectionParam.setDatabase(postgreSqlParam.getDatabase());
         postgreSqlConnectionParam.setUser(postgreSqlParam.getUserName());
-        postgreSqlConnectionParam.setPassword(postgreSqlParam.getPassword());
+        postgreSqlConnectionParam.setPassword(CommonUtils.encodePassword(postgreSqlParam.getPassword()));
         postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
 
         return postgreSqlConnectionParam;

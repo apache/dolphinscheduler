@@ -64,7 +64,7 @@ public class SqlServerDatasourceProcessor extends AbstractDatasourceProcessor {
         sqlServerConnectionParam.setJdbcUrl(jdbcUrl);
         sqlServerConnectionParam.setOther(transformOther(sqlServerParam.getOther()));
         sqlServerConnectionParam.setUser(sqlServerParam.getUserName());
-        sqlServerConnectionParam.setPassword(sqlServerParam.getPassword());
+        sqlServerConnectionParam.setPassword(CommonUtils.encodePassword(sqlServerParam.getPassword()));
         return sqlServerConnectionParam;
     }
 

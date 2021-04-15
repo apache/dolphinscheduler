@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
@@ -61,11 +62,13 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                 if (null != baseDataSource) {
 
                     mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
-                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getJdbcUrl()).append(Constants.DOUBLE_QUOTES)
-                        .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
-                        .append(Constants.SPACE).append(baseDataSource.getUser())
-                        .append(Constants.SPACE).append(SqoopConstants.DB_PWD)
-                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getPassword()).append(Constants.DOUBLE_QUOTES)
+                            .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES)
+                            .append(DatasourceUtil.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(Constants.DOUBLE_QUOTES)
+                            .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
+                            .append(Constants.SPACE).append(baseDataSource.getUser())
+                            .append(Constants.SPACE).append(SqoopConstants.DB_PWD)
+                            .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES)
+                            .append(CommonUtils.decodePassword(baseDataSource.getPassword())).append(Constants.DOUBLE_QUOTES)
                         .append(Constants.SPACE).append(SqoopConstants.TABLE)
                         .append(Constants.SPACE).append(targetMysqlParameter.getTargetTable());
 

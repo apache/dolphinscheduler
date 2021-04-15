@@ -53,7 +53,8 @@ public class HiveDatasourceProcessorTest {
 
     @Test
     public void testCreateConnectionParams() {
-        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:hive2://localhost1:5142,localhost2:5142\",\"jdbcUrl\":\"jdbc:hive2://localhost1:5142,localhost2:5142/default\"}";
+        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:hive2://localhost1:5142,localhost2:5142\""
+                + ",\"jdbcUrl\":\"jdbc:hive2://localhost1:5142,localhost2:5142/default\"}";
         HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
                 .createConnectionParams(connectionParam);
         Assert.assertNotNull(connectionParam);

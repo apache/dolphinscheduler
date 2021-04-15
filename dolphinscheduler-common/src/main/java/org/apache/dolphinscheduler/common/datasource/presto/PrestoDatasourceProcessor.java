@@ -64,7 +64,7 @@ public class PrestoDatasourceProcessor extends AbstractDatasourceProcessor {
 
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setUser(prestoParam.getUserName());
-        prestoConnectionParam.setPassword(prestoParam.getPassword());
+        prestoConnectionParam.setPassword(CommonUtils.encodePassword(prestoParam.getPassword()));
         prestoConnectionParam.setOther(transformOther(prestoParam.getOther()));
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);

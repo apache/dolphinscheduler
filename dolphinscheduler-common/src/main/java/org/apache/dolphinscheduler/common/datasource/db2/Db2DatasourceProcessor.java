@@ -65,7 +65,7 @@ public class Db2DatasourceProcessor extends AbstractDatasourceProcessor {
         db2ConnectionParam.setDatabase(db2Param.getDatabase());
         db2ConnectionParam.setJdbcUrl(jdbcUrl);
         db2ConnectionParam.setUser(db2Param.getUserName());
-        db2ConnectionParam.setPassword(db2Param.getPassword());
+        db2ConnectionParam.setPassword(CommonUtils.encodePassword(db2Param.getPassword()));
         db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
 
         return db2ConnectionParam;
