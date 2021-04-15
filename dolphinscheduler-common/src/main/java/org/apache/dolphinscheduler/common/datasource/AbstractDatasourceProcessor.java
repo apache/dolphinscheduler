@@ -32,11 +32,6 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
 
     private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
 
-    protected static final String TYPE = "type";
-    protected static final String HOST = "host";
-    protected static final String PORT = "port";
-    protected static final String OTHER = "other";
-
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         checkHost(baseDataSourceParamDTO.getHost());
@@ -51,7 +46,7 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
      */
     protected void checkHost(String host) {
         if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
-            throw new RuntimeException("datasource host illegal");
+            throw new IllegalArgumentException("datasource host illegal");
         }
     }
 
@@ -62,7 +57,7 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
      */
     protected void checkDatasourcePatter(String database) {
         if (!DATABASE_PATTER.matcher(database).matches()) {
-            throw new RuntimeException("datasource name illegal");
+            throw new IllegalArgumentException("datasource name illegal");
         }
     }
 
@@ -77,7 +72,7 @@ public abstract class AbstractDatasourceProcessor implements DatasourceProcessor
         }
         boolean paramsCheck = other.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
         if (!paramsCheck) {
-            throw new RuntimeException("datasource other params illegal");
+            throw new IllegalArgumentException("datasource other params illegal");
         }
     }
 

@@ -30,8 +30,10 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -108,16 +110,14 @@ public class HiveDatasourceProcessor extends AbstractDatasourceProcessor {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         String jdbcUrl = hiveConnectionParam.getJdbcUrl();
         String otherParams = filterOther(hiveConnectionParam.getOther());
-        if (StringUtils.isNotEmpty(otherParams)) {
-            if (!"?".equals(otherParams.substring(0, 1))) {
-                jdbcUrl += ";";
-            }
+        if (StringUtils.isNotEmpty(otherParams) && !"?".equals(otherParams.substring(0, 1))) {
+            jdbcUrl += ";";
         }
         return jdbcUrl + otherParams;
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws Exception {
+    public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         CommonUtils.loadKerberosConf(hiveConnectionParam.getJavaSecurityKrb5Conf(),
                 hiveConnectionParam.getLoginUserKeytabUsername(), hiveConnectionParam.getLoginUserKeytabPath());

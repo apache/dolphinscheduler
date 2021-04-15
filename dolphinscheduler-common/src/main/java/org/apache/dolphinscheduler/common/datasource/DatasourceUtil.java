@@ -93,7 +93,7 @@ public class DatasourceUtil {
         return getDatasourceProcessor(dbType).createDatasourceParamDTO(connectionParams);
     }
 
-    private static DatasourceProcessor getDatasourceProcessor(DbType dbType) {
+    public static DatasourceProcessor getDatasourceProcessor(DbType dbType) {
         switch (dbType) {
             case MYSQL:
                 return mysqlProcessor;

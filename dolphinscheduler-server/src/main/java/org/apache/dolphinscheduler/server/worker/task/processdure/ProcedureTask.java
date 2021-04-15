@@ -59,12 +59,6 @@ public class ProcedureTask extends AbstractTask {
     private ProcedureParameters procedureParameters;
 
     /**
-     * base datasource
-     */
-    private ConnectionParam baseDataSource;
-
-
-    /**
      * taskExecutionContext
      */
     private TaskExecutionContext taskExecutionContext;

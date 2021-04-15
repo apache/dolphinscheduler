@@ -900,6 +900,7 @@
                         <include>**/common/datasource/presto/PrestoDatasourceProcessorTest.java</include>
                         <include>**/common/datasource/spark/SparkDatasourceProcessorTest.java</include>
                         <include>**/common/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/DatasourceUtilTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>

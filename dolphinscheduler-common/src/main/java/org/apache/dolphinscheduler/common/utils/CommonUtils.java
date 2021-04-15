@@ -24,6 +24,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -105,7 +106,7 @@ public class CommonUtils {
      * @param loginUserKeytabPath loginUserKeytabPath
      * @throws Exception errors
      */
-    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws Exception {
+    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws IOException {
         if (CommonUtils.getKerberosStartupState()) {
             System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf, PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)));
             Configuration configuration = new Configuration();

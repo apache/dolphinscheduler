@@ -118,7 +118,8 @@ public class PostgreSqlDatasourceProcessor extends AbstractDatasourceProcessor {
         }
         Map<String, String> otherMap = new LinkedHashMap<>();
         for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
+            String[] split = config.split("=");
+            otherMap.put(split[0], split[1]);
         }
         return otherMap;
     }
