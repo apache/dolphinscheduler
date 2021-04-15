@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Map;

@@ -31,8 +31,6 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
