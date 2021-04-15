@@ -37,7 +37,7 @@ public class SparkDatasourceProcessorTest {
     private SparkDatasourceProcessor sparkDatasourceProcessor = new SparkDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         SparkDatasourceParamDTO sparkDatasourceParamDTO = new SparkDatasourceParamDTO();
         sparkDatasourceParamDTO.setUserName("root");
         sparkDatasourceParamDTO.setPassword("12345");
@@ -52,7 +52,7 @@ public class SparkDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"12345\",\"address\":\"jdbc:hive2://localhost1:1234,localhost2:1234\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:hive2://localhost1:1234,localhost2:1234/default\"}";
         SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
@@ -62,12 +62,12 @@ public class SparkDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, sparkDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
         sparkConnectionParam.setJdbcUrl("jdbc:hive2://localhost1:1234,localhost2:1234/default");
         sparkConnectionParam.setOther("other");
@@ -76,7 +76,7 @@ public class SparkDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws Exception {
+    public void testGetConnection() throws Exception {
         SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -86,7 +86,7 @@ public class SparkDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.SPARK, sparkDatasourceProcessor.getDbType());
     }
 }

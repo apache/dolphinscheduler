@@ -38,7 +38,7 @@ public class Db2DatasourceProcessorTest {
     private Db2DatasourceProcessor db2DatasourceProcessor = new Db2DatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         Db2DatasourceParamDTO db2DatasourceParamDTO = new Db2DatasourceParamDTO();
         db2DatasourceParamDTO.setUserName("root");
         db2DatasourceParamDTO.setPassword("123456");
@@ -54,7 +54,7 @@ public class Db2DatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:db2://localhost:5142\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:db2://localhost:5142/default\"}";
         Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
@@ -65,12 +65,12 @@ public class Db2DatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.COM_DB2_JDBC_DRIVER, db2DatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         Db2ConnectionParam db2ConnectionParam = new Db2ConnectionParam();
         db2ConnectionParam.setJdbcUrl("jdbc:db2://localhost:5142/default");
         db2ConnectionParam.setOther("other=other");
@@ -79,7 +79,7 @@ public class Db2DatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         Db2ConnectionParam db2ConnectionParam = new Db2ConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -89,7 +89,7 @@ public class Db2DatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.DB2, db2DatasourceProcessor.getDbType());
     }
 

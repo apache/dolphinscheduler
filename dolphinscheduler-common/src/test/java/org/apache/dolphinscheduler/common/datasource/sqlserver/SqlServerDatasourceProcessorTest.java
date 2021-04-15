@@ -39,7 +39,7 @@ public class SqlServerDatasourceProcessorTest {
     private SqlServerDatasourceProcessor sqlServerDatasourceProcessor = new SqlServerDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         SqlServerDatasourceParamDTO sqlServerDatasourceParamDTO = new SqlServerDatasourceParamDTO();
         sqlServerDatasourceParamDTO.setUserName("root");
         sqlServerDatasourceParamDTO.setPassword("123456");
@@ -55,7 +55,7 @@ public class SqlServerDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sqlserver://localhost:1234\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sqlserver://localhost:1234;databaseName=default\"}";
         SqlServerConnectionParam sqlServerConnectionParam = JSONUtils.parseObject(connectionJson, SqlServerConnectionParam.class);
@@ -64,12 +64,12 @@ public class SqlServerDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.COM_SQLSERVER_JDBC_DRIVER, sqlServerDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         SqlServerConnectionParam sqlServerConnectionParam = new SqlServerConnectionParam();
         sqlServerConnectionParam.setJdbcUrl("jdbc:sqlserver://localhost:1234;databaseName=default");
         sqlServerConnectionParam.setOther("other");
@@ -78,7 +78,7 @@ public class SqlServerDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         SqlServerConnectionParam sqlServerConnectionParam = new SqlServerConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -88,7 +88,7 @@ public class SqlServerDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.SQLSERVER, sqlServerDatasourceProcessor.getDbType());
     }
 }

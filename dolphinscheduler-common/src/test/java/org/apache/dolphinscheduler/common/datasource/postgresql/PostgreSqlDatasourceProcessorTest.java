@@ -38,7 +38,7 @@ public class PostgreSqlDatasourceProcessorTest {
     private PostgreSqlDatasourceProcessor postgreSqlDatasourceProcessor = new PostgreSqlDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         PostgreSqlDatasourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSqlDatasourceParamDTO();
         postgreSqlDatasourceParamDTO.setUserName("root");
         postgreSqlDatasourceParamDTO.setPassword("123456");
@@ -54,7 +54,7 @@ public class PostgreSqlDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:postgresql://localhost:3308\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:postgresql://localhost:3308/default\"}";
         PostgreSqlConnectionParam connectionParams = (PostgreSqlConnectionParam) postgreSqlDatasourceProcessor
@@ -64,12 +64,12 @@ public class PostgreSqlDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         PostgreSqlConnectionParam postgreSqlConnectionParam = new PostgreSqlConnectionParam();
         postgreSqlConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:3308/default");
         postgreSqlConnectionParam.setOther("other");
@@ -80,7 +80,7 @@ public class PostgreSqlDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         PostgreSqlConnectionParam postgreSqlConnectionParam = new PostgreSqlConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -90,7 +90,7 @@ public class PostgreSqlDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.POSTGRESQL, postgreSqlDatasourceProcessor.getDbType());
     }
 }

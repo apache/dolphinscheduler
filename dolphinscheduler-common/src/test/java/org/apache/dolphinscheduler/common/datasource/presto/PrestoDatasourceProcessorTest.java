@@ -38,7 +38,7 @@ public class PrestoDatasourceProcessorTest {
     private PrestoDatasourceProcessor prestoDatasourceProcessor = new PrestoDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         PrestoDatasourceParamDTO prestoDatasourceParamDTO = new PrestoDatasourceParamDTO();
         prestoDatasourceParamDTO.setHost("localhost");
         prestoDatasourceParamDTO.setPort(1234);
@@ -53,7 +53,7 @@ public class PrestoDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:presto://localhost:1234\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:presto://localhost:1234/default\"}";
         PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
@@ -63,12 +63,12 @@ public class PrestoDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
         prestoConnectionParam.setOther("other");
@@ -78,7 +78,7 @@ public class PrestoDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -88,7 +88,7 @@ public class PrestoDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
     }
 }

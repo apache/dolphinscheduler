@@ -38,7 +38,7 @@ public class HiveDatasourceProcessorTest {
     private HiveDatasourceProcessor hiveDatasourceProcessor = new HiveDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
         hiveDataSourceParamDTO.setHost("localhost1,localhost2");
         hiveDataSourceParamDTO.setPort(5142);
@@ -52,7 +52,7 @@ public class HiveDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:hive2://localhost1:5142,localhost2:5142\""
                 + ",\"jdbcUrl\":\"jdbc:hive2://localhost1:5142,localhost2:5142/default\"}";
         HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
@@ -62,12 +62,12 @@ public class HiveDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER, hiveDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         HiveConnectionParam connectionParam = new HiveConnectionParam();
         connectionParam.setJdbcUrl("jdbc:hive2://localhost1:5142,localhost2:5142/default");
         Assert.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142/default",
@@ -75,7 +75,7 @@ public class HiveDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws Exception {
+    public void testGetConnection() throws Exception {
         HiveConnectionParam hiveConnectionParam = new HiveConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -85,7 +85,7 @@ public class HiveDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.HIVE, hiveDatasourceProcessor.getDbType());
     }
 }

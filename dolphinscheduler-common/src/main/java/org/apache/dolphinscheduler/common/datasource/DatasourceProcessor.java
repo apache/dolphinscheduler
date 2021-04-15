@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.common.datasource;
 import org.apache.dolphinscheduler.common.enums.DbType;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 public interface DatasourceProcessor {
 

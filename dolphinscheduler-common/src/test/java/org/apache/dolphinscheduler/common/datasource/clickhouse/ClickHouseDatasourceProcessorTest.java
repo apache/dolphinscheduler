@@ -38,7 +38,7 @@ public class ClickHouseDatasourceProcessorTest {
     private ClickHouseDatasourceProcessor clickHouseDatasourceProcessor = new ClickHouseDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         ClickHouseDatasourceParamDTO clickhouseConnectionParam = new ClickHouseDatasourceParamDTO();
         clickhouseConnectionParam.setUserName("user");
         clickhouseConnectionParam.setPassword("password");
@@ -53,7 +53,7 @@ public class ClickHouseDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionParamJson = "{\"address\":\"jdbc:clickhouse://localhost:8123\",\"database\":\"default\","
                 + "\"jdbcUrl\":\"jdbc:clickhouse://localhost:8123/default\",\"user\":\"default\",\"password\":\"123456\"}";
         ClickhouseConnectionParam clickhouseConnectionParam = (ClickhouseConnectionParam) clickHouseDatasourceProcessor
@@ -64,13 +64,13 @@ public class ClickHouseDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertNotNull(clickHouseDatasourceProcessor.getDatasourceDriver());
         Assert.assertEquals(Constants.COM_CLICKHOUSE_JDBC_DRIVER, clickHouseDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         ClickhouseConnectionParam connectionParam = new ClickhouseConnectionParam();
         connectionParam.setUser("default");
         connectionParam.setJdbcUrl("jdbc:clickhouse://localhost:8123/default");
@@ -80,7 +80,7 @@ public class ClickHouseDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         ClickhouseConnectionParam clickhouseConnectionParam = new ClickhouseConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
@@ -90,7 +90,7 @@ public class ClickHouseDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.CLICKHOUSE, clickHouseDatasourceProcessor.getDbType());
     }
 }

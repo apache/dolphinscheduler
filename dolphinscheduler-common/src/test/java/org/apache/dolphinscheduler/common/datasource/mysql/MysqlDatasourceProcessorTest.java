@@ -39,7 +39,7 @@ public class MysqlDatasourceProcessorTest {
     private MysqlDatasourceProcessor mysqlDatasourceProcessor = new MysqlDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
         mysqlDatasourceParamDTO.setUserName("root");
         mysqlDatasourceParamDTO.setPassword("123456");
@@ -55,7 +55,7 @@ public class MysqlDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://localhost:3306\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/default\"}";
         MysqlConnectionParam connectionParams = (MysqlConnectionParam) mysqlDatasourceProcessor
@@ -65,12 +65,12 @@ public class MysqlDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
@@ -78,7 +78,7 @@ public class MysqlDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
         mysqlConnectionParam.setUser("root");
         mysqlConnectionParam.setPassword("123456");
@@ -90,7 +90,7 @@ public class MysqlDatasourceProcessorTest {
     }
 
     @Test
-    public void getDbType() {
+    public void testGetDbType() {
         Assert.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
     }
 }

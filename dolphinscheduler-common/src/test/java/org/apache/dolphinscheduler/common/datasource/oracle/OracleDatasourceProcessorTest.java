@@ -39,7 +39,7 @@ public class OracleDatasourceProcessorTest {
     private OracleDatasourceProcessor oracleDatasourceProcessor = new OracleDatasourceProcessor();
 
     @Test
-    public void createConnectionParams() {
+    public void testCreateConnectionParams() {
         OracleDatasourceParamDTO oracleDatasourceParamDTO = new OracleDatasourceParamDTO();
         oracleDatasourceParamDTO.setConnectType(DbConnectType.ORACLE_SID);
         oracleDatasourceParamDTO.setHost("localhost");
@@ -56,7 +56,7 @@ public class OracleDatasourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams() {
+    public void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:oracle:thin:@localhost:3308\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:oracle:thin:@localhost:3308/default\",\"connectType\":\"ORACLE_SID\"}";
         OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
@@ -66,12 +66,12 @@ public class OracleDatasourceProcessorTest {
     }
 
     @Test
-    public void getDatasourceDriver() {
+    public void testGetDatasourceDriver() {
         Assert.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void getJdbcUrl() {
+    public void testGetJdbcUrl() {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308/default");
         oracleConnectionParam.setOther("other=other");
@@ -80,7 +80,7 @@ public class OracleDatasourceProcessorTest {
     }
 
     @Test
-    public void getConnection() throws SQLException, ClassNotFoundException {
+    public void testGetConnection() throws SQLException, ClassNotFoundException {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         PowerMockito.mockStatic(Class.class);
         PowerMockito.mockStatic(DriverManager.class);
