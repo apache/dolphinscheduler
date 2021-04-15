@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
+import org.apache.dolphinscheduler.common.enums.DbType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * The base model of connection param
  * <p>
@@ -30,6 +36,7 @@ package org.apache.dolphinscheduler.common.datasource;
  * {@link org.apache.dolphinscheduler.common.datasource.spark.SparkConnectionParam}
  * {@link org.apache.dolphinscheduler.common.datasource.sqlserver.SqlServerConnectionParam}
  */
+@JsonInclude(Include.NON_NULL)
 public abstract class BaseConnectionParam implements ConnectionParam {
 
     protected String user;
