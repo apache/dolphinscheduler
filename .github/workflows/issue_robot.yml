@@ -22,24 +22,26 @@ on:
     types: [opened]
 
 jobs:
-  comment:
+  issueRobot:
     runs-on: ubuntu-latest
     steps:
-    - uses: ben-z/actions-comment-on-issue@1.0.2
-      with:
-        message: "Hi:\n* Thank you for your feedback, we have received your issue, Please wait patiently for a reply.\n* In order to let us know your request as soon as possible, please provide detailed information、version or pictures.\n* If you haven't received a reply for a long time, you can subscribe to the developer's email，Mail subscription steps reference https://dolphinscheduler.apache.org/zh-cn/community/development/subscribe.html ,then send questions to dev@dolphinscheduler.apache.org."
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Checkout ${{ github.ref }}"
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          submodules: recursive
 
-  autoTranslate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions-cool/translation-helper@v1.1.1
+      - name: "Translation into English in issue"
+        uses: ./.github/actions/translation-on-issue
 
-  automate-issues-labels:
-    runs-on: ubuntu-latest
-    steps:
-      - name: initial labeling
-        uses: andymckay/labeler@master
+      - name: "Comment in issue"
+        uses: ./.github/actions/comment-on-issue
+        with:
+          message: "Hi:\n* Thank you for your feedback, we have received your issue, Please wait patiently for a reply.\n* In order for us to understand your request as soon as possible, please provide detailed information、version or pictures.\n* If you haven't received a reply for a long time, you can subscribe to the developer's email，Mail subscription steps reference https://dolphinscheduler.apache.org/zh-cn/community/development/subscribe.html ,Then write the issue URL in the email content and send question to dev@dolphinscheduler.apache.org."
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Add lable in issue"
+        uses: ./.github/actions/lable-on-issue
         with:
           add-labels: "Waiting for reply"
           ignore-if-labeled: true
