@@ -81,15 +81,15 @@ public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
-    public static final String JVM_EVN = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+    public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
     /**
      * python process(datax only supports version 2.7 by default)
      */
     private static final String DATAX_PYTHON = "python2.7";
     /**
-     * datax home path
+     * datax path
      */
-    private static final String DATAX_HOME_EVN = "${DATAX_HOME}";
+    private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
     /**
      * datax channel count
      */
@@ -310,8 +310,8 @@ public class DataxTask extends AbstractTask {
 
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();
-        content.put("reader", reader.toString());
-        content.put("writer", writer.toString());
+        content.set("reader", reader);
+        content.set("writer", writer);
         contentList.add(content);
 
         return contentList;
@@ -341,8 +341,8 @@ public class DataxTask extends AbstractTask {
         errorLimit.put("percentage", 0);
 
         ObjectNode setting = JSONUtils.createObjectNode();
-        setting.put("speed", speed.toString());
-        setting.put("errorLimit", errorLimit.toString());
+        setting.set("speed", speed);
+        setting.set("errorLimit", errorLimit);
 
         return setting;
     }
@@ -396,7 +396,7 @@ public class DataxTask extends AbstractTask {
         StringBuilder sbr = new StringBuilder();
         sbr.append(DATAX_PYTHON);
         sbr.append(" ");
-        sbr.append(DATAX_HOME_EVN);
+        sbr.append(DATAX_PATH);
         sbr.append(" ");
         sbr.append(loadJvmEnv(dataXParameters));
         sbr.append(jobConfigFilePath);
@@ -424,7 +424,7 @@ public class DataxTask extends AbstractTask {
     public String loadJvmEnv(DataxParameters dataXParameters) {
         int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
         int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
-        return String.format(JVM_EVN, xms, xmx);
+        return String.format(JVM_PARAM, xms, xmx);
     }
 
     /**
@@ -462,7 +462,10 @@ public class DataxTask extends AbstractTask {
 
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
-            notNull(parser, String.format("database driver [%s] is not support", dbType.toString()));
+            if (parser == null) {
+                logger.warn("database driver [{}] is not support grammatical analysis sql", dbType);
+                return new String[0];
+            }
 
             SQLStatement sqlStatement = parser.parseStatement();
             SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
@@ -511,7 +514,7 @@ public class DataxTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            return null;
+            return new String[0];
         }
 
         return columnNames;

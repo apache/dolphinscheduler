@@ -72,13 +72,13 @@
         order by id asc
     </select>
 
-    <select id="queryByWorkerGroupIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
-        <if test="workerGroupId != -1">
-            and worker_group_id =#{workerGroupId}
+        <if test="workerGroupName != ''">
+            and worker_group =#{workerGroupName}
         </if>
         and state in
         <foreach collection="states" item="i" open="(" close=")" separator=",">
@@ -104,7 +104,7 @@
         <if test="startTime != null ">
             and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
-        <if test="states != null and states != ''">
+        <if test="states != null and states.length > 0">
             and instance.state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
                 #{i}
@@ -138,10 +138,10 @@
         where tenant_id = #{originTenantId}
     </update>
 
-    <update id="updateProcessInstanceByWorkerGroupId">
+    <update id="updateProcessInstanceByWorkerGroupName">
         update t_ds_process_instance
-        set worker_group_id = #{destWorkerGroupId}
-        where worker_group_id = #{originWorkerGroupId}
+        set worker_group = #{destWorkerGroupName}
+        where worker_group = #{originWorkerGroupName}
     </update>
 
     <select id="countInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
@@ -219,5 +219,9 @@
         </foreach>
         order by id asc
     </select>
-
+    <update id="updateGlobalParamsById">
+        update t_ds_process_instance
+        set global_params = #{globalParams}
+        where id = #{id}
+    </update>
 </mapper>

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao;
 
 import static java.util.Objects.requireNonNull;
 
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
@@ -64,7 +65,7 @@ public class PluginDao extends AbstractBaseDao {
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
         List<PluginDefine> pluginDefineList = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
-        if (pluginDefineList == null || pluginDefineList.size() == 0) {
+        if (CollectionUtils.isEmpty(pluginDefineList)) {
             return pluginDefineMapper.insert(pluginDefine);
         }
         PluginDefine currPluginDefine = pluginDefineList.get(0);

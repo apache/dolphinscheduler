@@ -19,11 +19,14 @@ package org.apache.dolphinscheduler.alert.plugin;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.util.Objects;
+
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,24 +36,23 @@ import com.google.common.collect.ImmutableList;
 /**
  * AlertPluginManager Tester.
  */
-@Ignore
 public class AlertPluginManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManagerTest.class);
 
     @Test
-    public void testLoadPlugins() throws Exception {
+    public void testLoadPlugins() {
         logger.info("begin test AlertPluginManagerTest");
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
-        String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
+        String path = Objects.requireNonNull(DolphinPluginLoader.class.getClassLoader().getResource("")).getPath();
         alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
-            alertPluginManagerConfig.setInstalledPluginsDir(org.apache.dolphinscheduler.alert.utils.PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
+            alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
-            alertPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY).trim());
+            alertPluginManagerConfig.setMavenLocalRepository(Objects.requireNonNull(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY)).trim());
         }
 
         DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
@@ -60,6 +62,6 @@ public class AlertPluginManagerTest {
             throw new RuntimeException("load Alert Plugin Failed !", e);
         }
 
-        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("email alert"));
+        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("Email"));
     }
 }

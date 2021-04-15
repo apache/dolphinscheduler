@@ -87,7 +87,7 @@
         this.$router.go(-1)
       },
       _downloadFile () {
-        downloadFile('/resources/download', {
+        downloadFile('resources/download', {
           id: this.$route.params.id
         })
       },

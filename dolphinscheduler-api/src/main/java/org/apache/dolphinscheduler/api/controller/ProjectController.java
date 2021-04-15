@@ -14,37 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_PROJECT;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * project controller
  */
-@Api(tags = "PROJECT_TAG", position = 1)
+@Api(tags = "PROJECT_TAG")
 @RestController
 @RequestMapping("projects")
 public class ProjectController extends BaseController {
@@ -143,8 +159,8 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "projectId", value = "PAGE_SIZE", dataType = "Int", example = "20"),
-            @ApiImplicitParam(name = "projectId", value = "PAGE_NO", dataType = "Int", example = "1")
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -239,8 +255,8 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}, query authorized and user created project by user id: {}.",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
+                RegexUtils.escapeNRT(loginUser.getUserName()),
+                RegexUtils.escapeNRT(String.valueOf(loginUser.getId())));
         Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return returnDataList(result);
     }

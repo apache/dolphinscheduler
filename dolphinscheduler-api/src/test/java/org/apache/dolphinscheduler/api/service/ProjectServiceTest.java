@@ -50,6 +50,9 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * project service test
+ **/
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
 
@@ -66,7 +69,6 @@ public class ProjectServiceTest {
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
-
 
     private String projectName = "ProjectServiceTest";
 
@@ -274,6 +276,10 @@ public class ProjectServiceTest {
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
 
+        loginUser.setUserType(UserType.GENERAL_USER);
+        result = projectService.queryAuthorizedProject(loginUser, loginUser.getId());
+        projects = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
     @Test
@@ -282,14 +288,10 @@ public class ProjectServiceTest {
         User loginUser = getLoginUser();
 
         Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(getList());
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         //success
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = projectService.queryProjectCreatedByUser(loginUser);
+        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
@@ -320,8 +322,7 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAllProjectList() {
-        Mockito.when(processDefinitionMapper.listProjectIds()).thenReturn(getProjectIds());
-        Mockito.when(projectMapper.selectBatchIds(getProjectIds())).thenReturn(getList());
+        Mockito.when(projectMapper.queryAllProject()).thenReturn(getList());
 
         Map<String, Object> result = projectService.queryAllProjectList();
         logger.info(result.toString());

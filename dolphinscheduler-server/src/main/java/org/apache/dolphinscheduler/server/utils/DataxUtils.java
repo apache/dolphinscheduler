@@ -36,6 +36,8 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_SQLSERVER = "sqlserverreader";
 
+    public static final String DATAX_READER_PLUGIN_CLICKHOUSE = "clickhousereader";
+
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
     public static final String DATAX_WRITER_PLUGIN_POSTGRESQL = "postgresqlwriter";
@@ -43,6 +45,8 @@ public class DataxUtils {
     public static final String DATAX_WRITER_PLUGIN_ORACLE = "oraclewriter";
 
     public static final String DATAX_WRITER_PLUGIN_SQLSERVER = "sqlserverwriter";
+
+    public static final String DATAX_WRITER_PLUGIN_CLICKHOUSE = "clickhousewriter";
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -54,6 +58,8 @@ public class DataxUtils {
                 return DATAX_READER_PLUGIN_ORACLE;
             case SQLSERVER:
                 return DATAX_READER_PLUGIN_SQLSERVER;
+            case CLICKHOUSE:
+                return DATAX_READER_PLUGIN_CLICKHOUSE;
             default:
                 return null;
         }
@@ -69,6 +75,8 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_ORACLE;
             case SQLSERVER:
                 return DATAX_WRITER_PLUGIN_SQLSERVER;
+            case CLICKHOUSE:
+                return DATAX_WRITER_PLUGIN_CLICKHOUSE;
             default:
                 return null;
         }

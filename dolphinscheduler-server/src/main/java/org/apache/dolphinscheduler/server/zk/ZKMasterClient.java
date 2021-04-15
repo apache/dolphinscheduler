@@ -14,37 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.zk;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+
+import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
-
 
 /**
  * zookeeper master client
@@ -65,14 +67,25 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private ProcessService processService;
 
-    public void start() {
+    /**
+     * master registry
+     */
+    @Autowired
+    private MasterRegistry masterRegistry;
 
+    public void start(IStoppable stoppable) {
         InterProcessMutex mutex = null;
         try {
-            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
+            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
             String znodeLock = getMasterStartUpLockPath();
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
+
+            // master registry
+            masterRegistry.registry();
+            masterRegistry.getZookeeperRegistryCenter().setStoppable(stoppable);
+            String registryPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();
@@ -96,6 +109,7 @@ public class ZKMasterClient extends AbstractZKClient {
 
     @Override
     public void close() {
+        masterRegistry.unRegistry();
         super.close();
     }
 
@@ -134,9 +148,9 @@ public class ZKMasterClient extends AbstractZKClient {
             mutex.acquire();
 
             String serverHost = null;
-            if(StringUtils.isNotEmpty(path)){
+            if (StringUtils.isNotEmpty(path)) {
                 serverHost = getHostByEventDataPath(path);
-                if(StringUtils.isEmpty(serverHost)){
+                if (StringUtils.isEmpty(serverHost)) {
                     logger.error("server down error: unknown path: {}", path);
                     return;
                 }
@@ -163,9 +177,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @throws Exception exception
      */
     private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if (StringUtils.isEmpty(serverHost)) {
-            return;
-        }
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);
@@ -271,7 +282,7 @@ public class ZKMasterClient extends AbstractZKClient {
             return false;
         }
         Date workerServerStartDate = null;
-        List<Server> workerServers = getServersList(ZKNodeType.WORKER);
+        List<Server> workerServers = getServerList(ZKNodeType.WORKER);
         for (Server workerServer : workerServers) {
             if (taskInstance.getHost().equals(workerServer.getHost() + Constants.COLON + workerServer.getPort())) {
                 workerServerStartDate = workerServer.getCreateTime();
@@ -286,15 +297,6 @@ public class ZKMasterClient extends AbstractZKClient {
 
     /**
      * failover worker tasks
-     *
-     * 1. kill yarn job if there are yarn jobs in tasks.
-     * 2. change task state from running to need failover.
-     * 3. failover all tasks when workerHost is null
-     * @param workerHost worker host
-     */
-
-    /**
-     * failover worker tasks
      * <p>
      * 1. kill yarn job if there are yarn jobs in tasks.
      * 2. change task state from running to need failover.
@@ -306,7 +308,6 @@ public class ZKMasterClient extends AbstractZKClient {
      */
     private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
         logger.info("start worker[{}] failover ...", workerHost);
-
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
             if (needCheckWorkerAlive) {

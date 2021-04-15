@@ -70,7 +70,7 @@
             <template slot="content">
               <div class="file-update-box">
                 <template v-if="progress === 0">
-                  <input name="file" id="file" type="file" class="file-update">
+                  <input ref="file" name="file" type="file" class="file-update" @change="_onChange">
                   <el-button size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
@@ -174,17 +174,19 @@
           formData.append('file', this.file)
           formData.append('type', this.type)
           formData.append('name', this.name)
-          formData.append('pid', this.pid)
+          formData.append('pid', this.id)
           formData.append('currentDir', this.currentDir)
           formData.append('description', this.description)
           io.post('resources/create', res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateResourceChildUpdate')
+            this.reset()
           }, e => {
             reject(e)
             self.$emit('close')
             this.$message.error(e.msg || '')
+            this.reset()
           }, {
             data: formData,
             emulateJSON: false,
@@ -206,6 +208,15 @@
         $('.update-file-modal').hide()
         this.$emit('onArchiveResourceChildUpdate')
       },
+      reset () {
+        this.name = ''
+        this.description = ''
+        this.progress = 0
+        this.file = ''
+        this.currentDir = localStore.getItem('currentDir')
+        this.pid = this.id
+        this.dragOver = false
+      },
       /**
        * Drag and drop upload
        */
@@ -215,16 +226,15 @@
         this.name = file.name
         this.dragOver = false
       },
+      _onChange () {
+        let file = this.$refs.file.files[0]
+        this.file = file
+        this.name = file.name
+        this.$refs.file.value = null
+      },
       close () {
         this.$emit('closeResourceChildUpdate')
       }
-    },
-    mounted () {
-      $('#file').change(() => {
-        let file = $('#file')[0].files[0]
-        this.file = file
-        this.name = file.name
-      })
     },
     components: { mPopup, mListBoxF, mProgressBar }
   }

@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -56,6 +56,7 @@
     </parent>
 
     <properties>
+        <revision>1.3.6-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
@@ -120,6 +121,9 @@
         <guava-retry.version>2.0.0</guava-retry.version>
         <dep.airlift.version>0.184</dep.airlift.version>
         <dep.packaging.version>${dep.airlift.version}</dep.packaging.version>
+        <protostuff.version>1.7.2</protostuff.version>
+        <reflections.version>0.9.12</reflections.version>
+        <byte-buddy.version>1.9.16</byte-buddy.version>
     </properties>
 
     <dependencyManagement>
@@ -312,6 +316,32 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <!--protostuff-->
+            <!-- https://mvnrepository.com/artifact/io.protostuff/protostuff-core -->
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-core</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/io.protostuff/protostuff-runtime -->
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-runtime</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
             </dependency>
 
             <dependency>
@@ -563,21 +593,18 @@
                 <groupId>org.sonatype.aether</groupId>
                 <artifactId>aether-api</artifactId>
                 <version>1.13.1</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>io.airlift.resolver</groupId>
                 <artifactId>resolver</artifactId>
                 <version>1.5</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>6.2.1</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -827,6 +854,7 @@
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/HttpParametersTest.java</include>
+                        <include>**/common/task/SqlParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
                         <include>**/common/threadutils/ThreadUtilsTest.java</include>
@@ -839,6 +867,7 @@
                         <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
+                        <include>**/common/utils/NetUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
                         <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
@@ -858,37 +887,41 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/common/plugin/FilePluginManagerTest</include>
-                        <include>**/common/plugin/PluginClassLoaderTest</include>
+                        <include>**/common/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/datasource/MySQLDataSourceTest.java</include>
                         <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/entity/UdfFuncTest.java</include>
-                        <include>**/remote/JsonSerializerTest.java</include>
-                        <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
-                        <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
-                        <include>**/remote/NettyRemotingClientTest.java</include>
-                        <include>**/remote/NettyUtilTest.java</include>
-                        <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/remote/command/alert/AlertSendRequestCommandTest.java</include>
                         <include>**/remote/command/alert/AlertSendResponseCommandTest.java</include>
+                        <include>**/remote/command/future/ResponseFutureTest.java</include>
+                        <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
+                        <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/utils/HostTest.java</include>
+                        <include>**/remote/utils/NettyUtilTest.java</include>
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/rpc/RpcTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
+                        <include>**/server/log/LoggerRequestProcessorTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
                         <include>**/server/log/TaskLogFilterTest.java</include>
                         <include>**/server/log/WorkerLogFilterTest.java</include>
+                        <include>**/server/master/config/MasterConfigTest.java</include>
                         <include>**/server/master/consumer/TaskPriorityQueueConsumerTest.java</include>
                         <include>**/server/master/runner/MasterTaskExecThreadTest.java</include>
                         <!--<include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>-->
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
@@ -901,37 +934,43 @@
                         <include>**/server/master/processor/TaskAckProcessorTest.java</include>
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
-                        <include>**/server/register/ZookeeperNodeManagerTest.java</include>
+                        <include>**/server/register/ServerNodeManagerTest.java</include>
+                        <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
-                        <include>**/server/utils/HostTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/LogUtilsTest.java</include>
+                        <include>**/server/utils/MapReduceArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <include>**/server/worker/processor/TaskCallbackServiceTest.java</include>
+                        <include>**/server/worker/processor/TaskExecuteProcessorTest.java</include>
                         <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/TaskManagerTest.java</include>
+                        <include>**/server/worker/task/AbstractCommandExecutorTest.java</include>
+                        <include>**/server/worker/task/ShellTaskReturnTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
+                        <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>
+                        <include>**/service/zk/RegisterOperatorTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
-
+                        <include>**/service/log/LogClientServiceTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
@@ -956,6 +995,7 @@
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/datasource/OracleDataSourceTest.java</include>
                         <include>**/dao/datasource/HiveDataSourceTest.java</include>
+                        <include>**/dao/datasource/BaseDataSourceTest.java</include>
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>
@@ -978,7 +1018,7 @@
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
-                        <!--<include>**/alert/plugin/EmailAlertPluginTest.java</include>-->
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>

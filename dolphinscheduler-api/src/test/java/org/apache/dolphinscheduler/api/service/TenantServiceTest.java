@@ -46,13 +46,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * tenant service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class TenantServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
 
     @InjectMocks
@@ -70,24 +73,24 @@ public class TenantServiceTest {
     @Mock
     private UserMapper userMapper;
 
-    private static final String tenantCode = "TenantServiceTest";
+    private static final String tenantCode = "hayden";
 
     @Test
     public void testCreateTenant() {
 
         User loginUser = getLoginUser();
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         try {
             //check tenantCode
             Map<String, Object> result =
                 tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.VERIFY_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.OS_TENANT_CODE_EXIST, result.get(Constants.STATUS));
 
             // success
             result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
@@ -183,7 +186,7 @@ public class TenantServiceTest {
     @Test
     public void testVerifyTenantCode() {
 
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         // tenantCode not exist
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         logger.info(result.toString());

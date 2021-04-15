@@ -139,4 +139,11 @@
         set version = #{version}
         where id = #{processDefinitionId}
     </update>
+
+    <select id="queryHasAssociatedDefinitionByIdAndVersion" resultType="java.lang.Integer">
+        select id
+        from t_ds_process_definition
+        where id = #{processDefinitionId}
+        and version = #{version} limit 1
+    </select>
 </mapper>

@@ -14,7 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
+
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.Constants.HTTP_HEADER_UNKNOWN;
+import static org.apache.dolphinscheduler.common.Constants.HTTP_X_FORWARDED_FOR;
+import static org.apache.dolphinscheduler.common.Constants.HTTP_X_REAL_IP;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -23,12 +29,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * base controller
@@ -43,7 +48,7 @@ public class BaseController {
      * @return check result code
      */
     public Map<String, Object> checkPageParams(int pageNo, int pageSize) {
-        Map<String, Object> result = new HashMap<>(2);
+        Map<String, Object> result = new HashMap<>(4);
         Status resultEnum = Status.SUCCESS;
         String msg = Status.SUCCESS.getMsg();
         if (pageNo <= 0) {
@@ -197,7 +202,7 @@ public class BaseController {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        Map<String, Object> map = new HashMap<>(4);
+        Map<String, Object> map = new HashMap<>(8);
         map.put(Constants.TOTAL_LIST, totalList);
         map.put(Constants.CURRENT_PAGE, currentPage);
         map.put(Constants.TOTAL_PAGE, totalPage);

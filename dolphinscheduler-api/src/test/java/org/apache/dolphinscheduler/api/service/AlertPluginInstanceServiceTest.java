@@ -43,6 +43,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+/**
+ * alert plugin instance service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class AlertPluginInstanceServiceTest {
 
@@ -154,7 +157,7 @@ public class AlertPluginInstanceServiceTest {
 
     @Test
     public void testCreate() {
-        Mockito.when(alertPluginInstanceMapper.queryByInstanceName("test")).thenReturn(alertPluginInstances);
+        Mockito.when(alertPluginInstanceMapper.existInstanceName("test")).thenReturn(true);
         Map<String, Object> result = alertPluginInstanceService.create(user, 1, "test", uiParams);
         Assert.assertEquals(Status.PLUGIN_INSTANCE_ALREADY_EXIT, result.get(Constants.STATUS));
         Mockito.when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);

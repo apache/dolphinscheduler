@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.service.log.LogClientService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,7 +61,7 @@ public class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
 
     private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
 
@@ -306,7 +308,7 @@ public class ProcessUtils {
                     if (!applicationStatus.typeIsFinished()) {
                         String commandFile = String
                                 .format("%s/%s.kill", executePath, appId);
-                        String cmd = "yarn application -kill " + appId;
+                        String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
                         execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
                     }
                 } catch (Exception e) {
@@ -314,6 +316,24 @@ public class ProcessUtils {
                 }
             }
         }
+    }
+
+    /**
+     * get kerberos init command
+     */
+    public static String getKerberosInitCommand() {
+        logger.info("get kerberos init command");
+        StringBuilder kerberosCommandBuilder = new StringBuilder();
+        boolean hadoopKerberosState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
+        if (hadoopKerberosState) {
+            kerberosCommandBuilder.append("export KRB5_CONFIG=")
+                    .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
+                    .append("\n\n")
+                    .append(String.format("kinit -k -t %s %s || true",PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
+                    .append("\n\n");
+            logger.info("kerberos init command: {}", kerberosCommandBuilder);
+        }
+        return kerberosCommandBuilder.toString();
     }
 
     /**
@@ -366,18 +386,19 @@ public class ProcessUtils {
                 return;
             }
 
-            String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
-            logger.info("process id:{}, cmd:{}", processId, cmd);
-
-            OSUtils.exeCmd(cmd);
-
-            // find log and kill yarn job
-            killYarnJob(taskExecutionContext);
+            String pidsStr = getPidsStr(processId);
+            if (StringUtils.isNotEmpty(pidsStr)) {
+                String cmd = String.format("kill -9 %s", pidsStr);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
+                logger.info("process id:{}, cmd:{}", processId, cmd);
+                OSUtils.exeCmd(cmd);
+            }
 
         } catch (Exception e) {
             logger.error("kill task failed", e);
         }
+        // find log and kill yarn job
+        killYarnJob(taskExecutionContext);
     }
 
     /**
@@ -388,7 +409,7 @@ public class ProcessUtils {
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
-        StringBuilder sb = new StringBuilder();
+        List<String> pidList = new ArrayList<>();
         Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
@@ -403,19 +424,22 @@ public class ProcessUtils {
 
         if (null != mat) {
             while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
+                pidList.add(mat.group(1));
             }
         }
 
-        return sb.toString().trim();
+        if (CommonUtils.isSudoEnable() && !pidList.isEmpty()) {
+            pidList = pidList.subList(1, pidList.size());
+        }
+        return String.join(" ", pidList).trim();
     }
 
     /**
      * find logs and kill yarn tasks.
-     *
      * @param taskExecutionContext taskExecutionContext
+     * @return yarn application ids
      */
-    public static void killYarnJob(TaskExecutionContext taskExecutionContext) {
+    public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             LogClientService logClient = null;
@@ -439,11 +463,13 @@ public class ProcessUtils {
                 }
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                    return appIds;
                 }
             }
 
         } catch (Exception e) {
             logger.error("kill yarn job failure", e);
         }
+        return Collections.emptyList();
     }
 }

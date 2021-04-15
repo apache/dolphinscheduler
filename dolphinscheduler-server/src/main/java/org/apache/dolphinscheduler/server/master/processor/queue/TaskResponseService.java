@@ -165,7 +165,8 @@ public class TaskResponseService {
                             taskResponseEvent.getProcessId(),
                             taskResponseEvent.getAppIds(),
                             taskResponseEvent.getTaskInstanceId(),
-                            taskResponseEvent.getVarPool()
+                            taskResponseEvent.getVarPool(),
+                                taskResponseEvent.getResult()
                         );
                     }
                     // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success

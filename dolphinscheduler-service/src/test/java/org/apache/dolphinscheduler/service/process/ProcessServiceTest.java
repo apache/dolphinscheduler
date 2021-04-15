@@ -442,4 +442,39 @@ public class ProcessServiceTest {
         Assert.assertEquals(expect, processService.changeJson(newProcessData,oldJson));
 
     }
+
+    @Test
+    public void testChangeOutParam() {
+        String result = "[{\"d\":\"20210203\"}]";
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setProcessInstanceId(62);
+        taskInstance.setTaskJson("{\"id\":\"tasks-86175\",\"name\":\"wew\",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,"
+                + "\"retryInterval\":1,\"params\":{\"rawScript\":\"echo 20210203\",\"localParams\":[{\"prop\":\"d\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],"
+                + "\"resourceList\":[]},\"preTasks\":[],\"extras\":null,\"depList\":[],\"dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"workerGroupId\":null,"
+                + "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0}");
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(62);
+        processInstance.setGlobalParams("[{\"prop\":\"sql2\",\"direct\":null,\"type\":null,\"value\":\"\"},{\"prop\":\"out\",\"direct\":null,\"type\":null,\"value\":\"\"},"
+                + "{\"prop\":\"d\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
+        String params4ProcessString = "[{\"prop\":\"sql2\",\"direct\":null,\"type\":null,\"value\":\"\"},{\"prop\":\"out\",\"direct\":null,\"type\":null,\"value\":\"\"},"
+                + "{\"prop\":\"d\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20210203\"}]";
+        Mockito.when(processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
+        Mockito.when(this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId())).thenReturn(1);
+        processService.changeOutParam(result,taskInstance);
+    }
+
+    @Test
+    public void testCreateCommand() {
+        Command command = new Command();
+        command.setProcessDefinitionId(123);
+        command.setCommandParam("{\"ProcessInstanceId\":222}");
+        command.setCommandType(CommandType.START_PROCESS);
+        int mockResult = 1;
+        Mockito.when(commandMapper.insert(command)).thenReturn(mockResult);
+        int exeMethodResult = processService.createCommand(command);
+        Assert.assertEquals(mockResult, exeMethodResult);
+        Mockito.verify(commandMapper, Mockito.times(1)).insert(command);
+    }
+
 }
