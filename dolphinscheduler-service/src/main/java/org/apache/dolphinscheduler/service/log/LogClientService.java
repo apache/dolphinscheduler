@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * log client
  */
-public class LogClientService implements AutoCloseable{
+public class LogClientService implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
 
