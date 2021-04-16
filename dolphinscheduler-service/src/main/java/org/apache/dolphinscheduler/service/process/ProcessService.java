@@ -385,7 +385,6 @@ public class ProcessService {
      */
     public void removeTaskLogFile(Integer processInstanceId) {
 
-
         try (LogClientService logClient = new LogClientService()) {
             List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
 
@@ -409,6 +408,7 @@ public class ProcessService {
                 logClient.removeTaskLog(ip, port, taskLogPath);
             }
         } catch (Exception e) {
+            logger.error("remove task log file failed",e);
         }
     }
 
