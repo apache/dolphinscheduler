@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.enums.TaskType;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,17 +31,17 @@ public class TaskParametersUtilsTest {
 
     @Test
     public void testGetParameters() {
-        Assert.assertNull(TaskParametersUtils.getParameters("xx", "ttt"));
-        Assert.assertNull(TaskParametersUtils.getParameters("SHELL", "ttt"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SHELL", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SQL", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SUB_PROCESS", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("PROCEDURE", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("MR", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SPARK", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("PYTHON", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("DEPENDENT", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("FLINK", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("HTTP", "{}"));
+        Assert.assertNull(TaskParametersUtils.getParameters(TaskType.of("xx"), "ttt"));
+        Assert.assertNull(TaskParametersUtils.getParameters(TaskType.of("SHELL"), "ttt"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SHELL"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SQL"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SUB_PROCESS"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("PROCEDURE"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("MR"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SPARK"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("PYTHON"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("DEPENDENT"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("FLINK"), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("HTTP"), "{}"));
     }
 }

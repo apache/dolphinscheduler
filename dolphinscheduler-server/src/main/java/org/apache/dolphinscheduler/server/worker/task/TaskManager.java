@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task;
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
@@ -35,7 +33,7 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.slf4j.Logger;
 
 /**
- * task manaster
+ * task manager
  */
 public class TaskManager {
 
@@ -47,12 +45,7 @@ public class TaskManager {
      * @throws IllegalArgumentException illegal argument exception
      */
     public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger, AlertClientService alertClientService) throws IllegalArgumentException {
-        TaskType anEnum = EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType());
-        if (anEnum == null) {
-            logger.error("not support task type: {}", taskExecutionContext.getTaskType());
-            throw new IllegalArgumentException("not support task type");
-        }
-        switch (anEnum) {
+        switch (taskExecutionContext.getTaskType()) {
             case SHELL:
             case WATERDROP:
                 return new ShellTask(taskExecutionContext, logger);

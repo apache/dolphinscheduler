@@ -129,9 +129,9 @@ public class CheckUtils {
         AbstractParameters abstractParameters;
 
         if (TaskType.of(taskNode.getType()) == TaskType.DEPENDENT) {
-            abstractParameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getDependence());
+            abstractParameters = TaskParametersUtils.getParameters(TaskType.of(taskNode.getType()), taskNode.getDependence());
         } else {
-            abstractParameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
+            abstractParameters = TaskParametersUtils.getParameters(TaskType.of(taskNode.getType()), taskNode.getParams());
         }
 
         if (abstractParameters != null) {

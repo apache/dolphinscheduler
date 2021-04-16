@@ -77,7 +77,7 @@ public class TaskInstanceMapperTest {
      */
     private TaskInstance insertTaskInstance(int processInstanceId) {
         //insertOne
-        return insertTaskInstance("us task", processInstanceId, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString());
+        return insertTaskInstance("us task", processInstanceId, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL);
     }
 
     /**
@@ -100,7 +100,7 @@ public class TaskInstanceMapperTest {
     /**
      * construct a task instance and then insert
      */
-    private TaskInstance insertTaskInstance(String taskName, int processInstanceId, ExecutionStatus state, String taskType) {
+    private TaskInstance insertTaskInstance(String taskName, int processInstanceId, ExecutionStatus state, TaskType taskType) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setFlag(Flag.YES);
         taskInstance.setName(taskName);

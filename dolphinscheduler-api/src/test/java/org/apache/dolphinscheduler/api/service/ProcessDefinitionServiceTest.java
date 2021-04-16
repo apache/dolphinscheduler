@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -795,7 +796,7 @@ public class ProcessDefinitionServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL);
         taskInstance.setId(1);
         taskInstance.setName("test_task_instance");
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
@@ -832,7 +833,7 @@ public class ProcessDefinitionServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
-        taskInstance.setTaskType("SUB_PROCESS");
+        taskInstance.setTaskType(TaskType.SUB_PROCESS);
         taskInstance.setId(1);
         taskInstance.setName("test_task_instance");
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);

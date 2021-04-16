@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
@@ -61,7 +62,7 @@ public class ShellTaskReturnTest {
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
-        taskExecutionContext.setTaskType("SHELL");
+        taskExecutionContext.setTaskType(TaskType.SHELL);
         taskExecutionContext.setHost("127.0.0.1:1234");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");

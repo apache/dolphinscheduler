@@ -242,9 +242,9 @@ public class ProcedureTask extends AbstractTask {
      * @throws SQLException
      */
     private void setTimeout(CallableStatement stmt) throws SQLException {
-        Boolean failed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED;
-        Boolean warnfailed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
-        if(failed || warnfailed){
+        Boolean failed = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED;
+        Boolean warnFailed = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
+        if(failed || warnFailed){
             stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
         }
     }

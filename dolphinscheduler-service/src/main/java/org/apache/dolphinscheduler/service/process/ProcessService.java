@@ -1428,16 +1428,20 @@ public class ProcessService {
         // get task instance
         TaskInstance taskInstance = findTaskInstanceById(taskInstId);
         if (taskInstance == null) {
-            return taskInstance;
+            return null;
         }
         // get process instance
         ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         // get process define
         ProcessDefinition processDefine = findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
-
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setProcessDefine(processDefine);
+        TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                taskInstance.getTaskCode(),
+                taskInstance.getTaskDefinitionVersion());
+        taskInstance.setTaskDefine(taskDefinition);
+//        taskInstance.setTaskParams(taskDefinition == null ? "" : taskDefinition.getTaskParams());
         return taskInstance;
     }
 
@@ -2244,8 +2248,7 @@ public class ProcessService {
      */
     public String getResourceIds(TaskDefinition taskDefinition) {
         Set<Integer> resourceIds = null;
-        // TODO modify taskDefinition.getTaskType()
-        AbstractParameters params = TaskParametersUtils.getParameters(taskDefinition.getTaskType().getDescp().toUpperCase(), taskDefinition.getTaskParams());
+        AbstractParameters params = TaskParametersUtils.getParameters(taskDefinition.getTaskType(), taskDefinition.getTaskParams());
 
         if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
             resourceIds = params.getResourceFilesList().

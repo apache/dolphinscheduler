@@ -54,13 +54,8 @@ public class TaskParametersUtils {
      * @param parameter parameter
      * @return task parameters
      */
-    public static AbstractParameters getParameters(String taskType, String parameter) {
-        TaskType anEnum = EnumUtils.getEnum(TaskType.class, taskType);
-        if (anEnum == null) {
-            logger.error("not support task type: {}", taskType);
-            return null;
-        }
-        switch (anEnum) {
+    public static AbstractParameters getParameters(TaskType taskType, String parameter) {
+        switch (taskType) {
             case SUB_PROCESS:
                 return JSONUtils.parseObject(parameter, SubProcessParameters.class);
             case SHELL:
@@ -89,6 +84,7 @@ public class TaskParametersUtils {
             case SQOOP:
                 return JSONUtils.parseObject(parameter, SqoopParameters.class);
             default:
+                logger.error("not support task type: {}", taskType);
                 return null;
         }
 

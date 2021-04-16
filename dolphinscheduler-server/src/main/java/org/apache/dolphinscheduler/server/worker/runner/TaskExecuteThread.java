@@ -124,13 +124,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // check if the OS user exists
-            if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
-                String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
-                taskLogger.error(errorLog);
-                responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
-                responseCommand.setEndTime(new Date());
-                return;
-            }
+//            if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
+//                String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
+//                taskLogger.error(errorLog);
+//                responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
+//                responseCommand.setEndTime(new Date());
+//                return;
+//            }
 
 
             if (taskExecutionContext.getStartTime() == null) {
@@ -146,7 +146,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getResources(),
                     logger);
 
-            taskExecutionContext.setTaskParams(taskExecutionContext.getTaskParams());
             taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
             taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
@@ -311,8 +310,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
         ackCommand.setLogPath(taskExecutionContext.getLogPath());
         ackCommand.setHost(taskExecutionContext.getHost());
-        if (taskExecutionContext.getTaskType().equals(TaskType.SQL.name())
-                || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())) {
+        if (taskExecutionContext.getTaskType() == TaskType.SQL || taskExecutionContext.getTaskType() == TaskType.PROCEDURE) {
             ackCommand.setExecutePath(null);
         } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());

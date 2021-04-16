@@ -55,7 +55,7 @@ public class TaskInstance implements Serializable {
     /**
      * task type
      */
-    private String taskType;
+    private TaskType taskType;
 
     /**
      * process instance id
@@ -68,7 +68,7 @@ public class TaskInstance implements Serializable {
     private long taskCode;
 
     /**
-     * task defintion version
+     * task definition version
      */
     private int taskDefinitionVersion;
 
@@ -145,6 +145,12 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private ProcessDefinition processDefine;
+
+    /**
+     * task definition
+     */
+    @TableField(exist = false)
+    private TaskDefinition taskDefine;
 
     /**
      * process id
@@ -268,6 +274,14 @@ public class TaskInstance implements Serializable {
         this.processDefine = processDefine;
     }
 
+    public TaskDefinition getTaskDefine() {
+        return taskDefine;
+    }
+
+    public void setTaskDefine(TaskDefinition taskDefine) {
+        this.taskDefine = taskDefine;
+    }
+
     public int getId() {
         return id;
     }
@@ -284,11 +298,11 @@ public class TaskInstance implements Serializable {
         this.name = name;
     }
 
-    public String getTaskType() {
+    public TaskType getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(String taskType) {
+    public void setTaskType(TaskType taskType) {
         this.taskType = taskType;
     }
 
@@ -484,15 +498,15 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isSubProcess() {
-        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+        return TaskType.SUB_PROCESS == this.taskType;
     }
 
     public boolean isDependTask() {
-        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+        return TaskType.DEPENDENT == this.taskType;
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
+        return TaskType.CONDITIONS == this.taskType;
     }
 
     /**

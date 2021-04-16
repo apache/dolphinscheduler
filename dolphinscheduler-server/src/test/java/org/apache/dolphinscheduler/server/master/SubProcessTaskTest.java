@@ -147,9 +147,9 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
         taskInstance.setName("S");
-        taskInstance.setTaskType(TaskType.SUB_PROCESS.toString());
+        taskInstance.setTaskType(TaskType.SUB_PROCESS);
         taskInstance.setName(taskNode.getName());
-        taskInstance.setTaskType(taskNode.getType());
+        taskInstance.setTaskType(TaskType.of(taskNode.getType()));
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;

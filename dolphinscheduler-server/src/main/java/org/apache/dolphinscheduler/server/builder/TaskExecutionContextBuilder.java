@@ -55,11 +55,12 @@ public class TaskExecutionContextBuilder {
 
     public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition) {
         int timeoutSeconds = taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT;
-        if (timeoutSeconds >= Integer.MAX_VALUE) {
+        if (timeoutSeconds == 0) {
             timeoutSeconds = Integer.MAX_VALUE;
         }
-        taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy().getCode());
+        taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
         taskExecutionContext.setTaskTimeout(timeoutSeconds);
+        taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
         return this;
     }
 

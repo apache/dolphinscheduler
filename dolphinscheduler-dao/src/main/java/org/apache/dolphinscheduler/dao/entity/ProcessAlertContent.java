@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -68,7 +69,7 @@ public class ProcessAlertContent implements Serializable {
     @JsonProperty("warnLevel")
     private AlertWarnLevel warnLevel;
     @JsonProperty("taskType")
-    private String taskType;
+    private TaskType taskType;
     @JsonProperty("retryTimes")
     private int retryTimes;
     @JsonProperty("taskState")
@@ -132,7 +133,7 @@ public class ProcessAlertContent implements Serializable {
         private String taskName;
         private AlertEvent event;
         private AlertWarnLevel warnLevel;
-        private String taskType;
+        private TaskType taskType;
         private int retryTimes;
         private ExecutionStatus taskState;
         private Date taskStartTime;
@@ -220,7 +221,7 @@ public class ProcessAlertContent implements Serializable {
             return this;
         }
 
-        public Builder taskType(String taskType) {
+        public Builder taskType(TaskType taskType) {
             this.taskType = taskType;
             return this;
         }

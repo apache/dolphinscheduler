@@ -65,8 +65,7 @@ public enum TaskType {
     private final int code;
     private final String descp;
 
-    public static boolean typeIsNormalTask(String typeName) {
-        TaskType taskType = TaskType.valueOf(typeName);
+    public static boolean typeIsNormalTask(TaskType taskType) {
         return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
     }
 
