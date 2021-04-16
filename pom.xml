@@ -43,7 +43,7 @@
     <mailingLists>
         <mailingList>
             <name>DolphinScheduler Developer List</name>
-            <post>dev-subscribe@dolphinscheduler.apache.org</post>
+            <post>dev@dolphinscheduler.apache.org</post>
             <subscribe>dev-subscribe@dolphinscheduler.apache.org</subscribe>
             <unsubscribe>dev-unsubscribe@dolphinscheduler.apache.org</unsubscribe>
         </mailingList>
