@@ -16,8 +16,8 @@ This chart bootstraps a [DolphinScheduler](https://dolphinscheduler.apache.org) 
 To install the chart with the release name `dolphinscheduler`:
 
 ```bash
-$ git clone https://github.com/apache/incubator-dolphinscheduler.git
-$ cd incubator-dolphinscheduler/docker/kubernetes/dolphinscheduler
+$ git clone https://github.com/apache/dolphinscheduler.git
+$ cd dolphinscheduler/docker/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
 $ helm install dolphinscheduler .
@@ -361,4 +361,4 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 7. Add a Oracle datasource in `Datasource manage`
 
-For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+For more information please refer to the [dolphinscheduler](https://github.com/apache/dolphinscheduler.git) documentation.
