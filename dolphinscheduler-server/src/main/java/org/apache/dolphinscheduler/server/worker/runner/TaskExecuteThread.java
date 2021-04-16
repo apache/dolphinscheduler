@@ -124,13 +124,13 @@ public class TaskExecuteThread implements Runnable, Delayed {
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // check if the OS user exists
-//            if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
-//                String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
-//                taskLogger.error(errorLog);
-//                responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
-//                responseCommand.setEndTime(new Date());
-//                return;
-//            }
+            if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
+                String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
+                taskLogger.error(errorLog);
+                responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
+                responseCommand.setEndTime(new Date());
+                return;
+            }
 
 
             if (taskExecutionContext.getStartTime() == null) {

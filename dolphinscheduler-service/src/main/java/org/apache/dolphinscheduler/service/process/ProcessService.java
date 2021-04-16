@@ -1441,7 +1441,6 @@ public class ProcessService {
                 taskInstance.getTaskCode(),
                 taskInstance.getTaskDefinitionVersion());
         taskInstance.setTaskDefine(taskDefinition);
-//        taskInstance.setTaskParams(taskDefinition == null ? "" : taskDefinition.getTaskParams());
         return taskInstance;
     }
 
