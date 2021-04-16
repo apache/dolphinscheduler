@@ -384,9 +384,7 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      */
     public void removeTaskLogFile(Integer processInstanceId) {
-
         List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
-
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
