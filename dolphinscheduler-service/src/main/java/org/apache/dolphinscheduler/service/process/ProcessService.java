@@ -407,8 +407,6 @@ public class ProcessService {
                 // remove task log from loggerserver
                 logClient.removeTaskLog(ip, port, taskLogPath);
             }
-        } catch (Exception e) {
-            logger.error("remove task log file failed",e);
         }
     }
 
