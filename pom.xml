@@ -624,7 +624,7 @@
 
     <build>
 
-        <finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
 
 
         <pluginManagement>
