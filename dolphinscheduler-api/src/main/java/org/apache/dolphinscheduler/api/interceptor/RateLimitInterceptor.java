@@ -60,9 +60,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 public RateLimiter load(String token) {
                     // use tenant customize rate limit
                     Map<String, Integer> customizeTenantQpsRate = trafficConfiguration.getCustomizeTenantQpsRate();
-                    int tenantQuota = trafficConfiguration.getDefaultTenantQpsLimit();
+                    int tenantQuota = trafficConfiguration.getDefaultTenantQpsRate();
                     if (MapUtils.isNotEmpty(customizeTenantQpsRate)) {
-                        tenantQuota = customizeTenantQpsRate.getOrDefault(token, trafficConfiguration.getDefaultTenantQpsLimit());
+                        tenantQuota = customizeTenantQpsRate.getOrDefault(token, trafficConfiguration.getDefaultTenantQpsRate());
                     }
                     // use tenant default rate limit
                     return RateLimiter.create(tenantQuota, 1, TimeUnit.SECONDS);
@@ -94,11 +94,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         return true;
     }
 
-
     public RateLimitInterceptor(TrafficConfiguration trafficConfiguration) {
         this.trafficConfiguration = trafficConfiguration;
         if (trafficConfiguration.isTrafficGlobalControlSwitch()) {
-            this.globalRateLimiter = RateLimiter.create(trafficConfiguration.getMaxGlobalQpsLimit(), 1, TimeUnit.SECONDS);
+            this.globalRateLimiter = RateLimiter.create(trafficConfiguration.getMaxGlobalQpsRate(), 1, TimeUnit.SECONDS);
         }
     }
 

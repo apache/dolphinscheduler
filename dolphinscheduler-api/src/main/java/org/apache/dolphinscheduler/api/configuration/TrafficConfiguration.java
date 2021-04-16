@@ -28,11 +28,11 @@ public class TrafficConfiguration {
     @Value("${traffic.control.global.switch:false}")
     private boolean trafficGlobalControlSwitch;
     @Value("${traffic.control.max.global.qps.rate:300}")
-    private Integer maxGlobalQpsLimit;
+    private Integer maxGlobalQpsRate;
     @Value("${traffic.control.tenant.switch:false}")
     private boolean trafficTenantControlSwitch;
     @Value("${traffic.control.default.tenant.qps.rate:10}")
-    private Integer defaultTenantQpsLimit;
+    private Integer defaultTenantQpsRate;
     @Value("#{'${traffic.control.customize.tenant.qps.rate:}'.empty?null:'${traffic.control.customize.tenant.qps.rate:}'}")
     private Map<String, Integer> customizeTenantQpsRate;
 
@@ -44,12 +44,12 @@ public class TrafficConfiguration {
         this.trafficGlobalControlSwitch = trafficGlobalControlSwitch;
     }
 
-    public Integer getMaxGlobalQpsLimit() {
-        return maxGlobalQpsLimit;
+    public Integer getMaxGlobalQpsRate() {
+        return maxGlobalQpsRate;
     }
 
-    public void setMaxGlobalQpsLimit(Integer maxGlobalQpsLimit) {
-        this.maxGlobalQpsLimit = maxGlobalQpsLimit;
+    public void setMaxGlobalQpsRate(Integer maxGlobalQpsRate) {
+        this.maxGlobalQpsRate = maxGlobalQpsRate;
     }
 
     public boolean isTrafficTenantControlSwitch() {
@@ -60,12 +60,12 @@ public class TrafficConfiguration {
         this.trafficTenantControlSwitch = trafficTenantControlSwitch;
     }
 
-    public Integer getDefaultTenantQpsLimit() {
-        return defaultTenantQpsLimit;
+    public Integer getDefaultTenantQpsRate() {
+        return defaultTenantQpsRate;
     }
 
-    public void setDefaultTenantQpsLimit(Integer defaultTenantQpsLimit) {
-        this.defaultTenantQpsLimit = defaultTenantQpsLimit;
+    public void setDefaultTenantQpsRate(Integer defaultTenantQpsRate) {
+        this.defaultTenantQpsRate = defaultTenantQpsRate;
     }
 
     public Map<String, Integer> getCustomizeTenantQpsRate() {

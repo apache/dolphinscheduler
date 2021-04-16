@@ -40,7 +40,7 @@ public class TrafficConfigurationTest {
 
     @Test
     public void getMaxGlobalQpsLimit() {
-        Assert.assertEquals(300, (int) trafficConfiguration.getMaxGlobalQpsLimit());
+        Assert.assertEquals(300, (int) trafficConfiguration.getMaxGlobalQpsRate());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class TrafficConfigurationTest {
 
     @Test
     public void getDefaultTenantQpsLimit() {
-        Assert.assertEquals(10, (int) trafficConfiguration.getDefaultTenantQpsLimit());
+        Assert.assertEquals(10, (int) trafficConfiguration.getDefaultTenantQpsRate());
     }
 
     @Test
