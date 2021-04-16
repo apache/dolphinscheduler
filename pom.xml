@@ -795,6 +795,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                        <include>**/api/configuration/TrafficConfigurationTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
@@ -805,6 +806,7 @@
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LocaleChangeInterceptorTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
+                        <include>**/api/interceptor/RateLimitInterceptorTest.java</include>
                         <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigLDAPTest.java</include>
