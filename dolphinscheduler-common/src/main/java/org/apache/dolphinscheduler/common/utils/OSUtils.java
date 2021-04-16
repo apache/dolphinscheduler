@@ -85,7 +85,7 @@ public class OSUtils {
      */
     public static double memoryUsage() {
         GlobalMemory memory = hal.getMemory();
-        double memoryUsage = (memory.getTotal() - memory.getAvailable() - memory.getSwapUsed()) * 0.1 / memory.getTotal() * 10;
+        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 1.0 / memory.getTotal();
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
@@ -101,12 +101,11 @@ public class OSUtils {
      */
     public static double availablePhysicalMemorySize() {
         GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = (memory.getAvailable() + memory.getSwapUsed()) / 1024.0 / 1024 / 1024;
+        double availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(availablePhysicalMemorySize));
-
     }
 
     /**
@@ -118,11 +117,11 @@ public class OSUtils {
      */
     public static double totalMemorySize() {
         GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
+        double totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(availablePhysicalMemorySize));
+        return Double.parseDouble(df.format(totalPhysicalMemorySize));
     }
 
     /**
