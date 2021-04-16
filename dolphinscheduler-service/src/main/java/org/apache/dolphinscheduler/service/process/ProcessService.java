@@ -385,12 +385,12 @@ public class ProcessService {
      */
     public void removeTaskLogFile(Integer processInstanceId) {
 
-        try (LogClientService logClient = new LogClientService()) {
-            List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
 
-            if (CollectionUtils.isEmpty(taskInstanceList)) {
-                return;
-            }
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+        try (LogClientService logClient = new LogClientService()) {
             for (TaskInstance taskInstance : taskInstanceList) {
                 String taskLogPath = taskInstance.getLogPath();
                 if (StringUtils.isEmpty(taskInstance.getHost())) {
