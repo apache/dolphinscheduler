@@ -482,8 +482,6 @@ CREATE TABLE t_ds_process_instance (
   update_time timestamp NULL ,
   is_sub_process int DEFAULT '0' ,
   executor_id int NOT NULL ,
-  locations text ,
-  connects text ,
   history_cmd text ,
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT NULL ,
