@@ -36,17 +36,17 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
-        <developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
-        <url>https://github.com/apache/incubator-dolphinscheduler</url>
+        <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
+        <url>https://github.com/apache/dolphinscheduler</url>
         <tag>HEAD</tag>
     </scm>
     <mailingLists>
         <mailingList>
             <name>DolphinScheduler Developer List</name>
-            <post>dev@dolphinscheduler.incubator.apache.org</post>
-            <subscribe>dev-subscribe@dolphinscheduler.incubator.apache.org</subscribe>
-            <unsubscribe>dev-unsubscribe@dolphinscheduler.incubator.apache.org</unsubscribe>
+            <post>dev@dolphinscheduler.apache.org</post>
+            <subscribe>dev-subscribe@dolphinscheduler.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@dolphinscheduler.apache.org</unsubscribe>
         </mailingList>
     </mailingLists>
     <parent>
