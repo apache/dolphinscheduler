@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-
-import org.apache.commons.configuration.Configuration;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -115,7 +112,7 @@ public class OSUtils {
      *
      * @return available Physical Memory Size, unit: G
      */
-    public static double totalMemorySize() {
+    public static double totalPhysicalMemorySize() {
         GlobalMemory memory = hal.getMemory();
         double totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
 
@@ -501,27 +498,6 @@ public class OSUtils {
         } else {
             return true;
         }
-    }
-
-    /**
-     * check memory and cpu usage
-     *
-     * @param conf conf
-     * @param isMaster is master
-     * @return check memory and cpu usage
-     */
-    public static Boolean checkResource(Configuration conf, Boolean isMaster) {
-        double systemCpuLoad;
-        double systemReservedMemory;
-
-        if (Boolean.TRUE.equals(isMaster)) {
-            systemCpuLoad = conf.getDouble(Constants.MASTER_MAX_CPULOAD_AVG, Constants.DEFAULT_MASTER_CPU_LOAD);
-            systemReservedMemory = conf.getDouble(Constants.MASTER_RESERVED_MEMORY, Constants.DEFAULT_MASTER_RESERVED_MEMORY);
-        } else {
-            systemCpuLoad = conf.getDouble(Constants.WORKER_MAX_CPULOAD_AVG, Constants.DEFAULT_WORKER_CPU_LOAD);
-            systemReservedMemory = conf.getDouble(Constants.WORKER_RESERVED_MEMORY, Constants.DEFAULT_WORKER_RESERVED_MEMORY);
-        }
-        return checkResource(systemCpuLoad, systemReservedMemory);
     }
 
 }
