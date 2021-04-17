@@ -47,7 +47,7 @@ public class TaskManager {
     public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger, AlertClientService alertClientService) throws IllegalArgumentException {
         switch (taskExecutionContext.getTaskType()) {
             case "SHELL":
-            case TaskType.WATERDROP.getDesc():
+            case "WATERDROP":
                 return new ShellTask(taskExecutionContext, logger);
             case "PROCEDURE":
                 return new ProcedureTask(taskExecutionContext, logger);
