@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 @PrepareForTest({SpringApplicationContext.class})
 public class TaskManagerTest {
 
-    private static Logger logger = LoggerFactory.getLogger(TaskManagerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskManagerTest.class);
 
     private TaskExecutionContext taskExecutionContext;
 
@@ -66,7 +66,7 @@ public class TaskManagerTest {
         taskExecutionContext.setProcessId(12345);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
-        taskExecutionContext.setTaskType(TaskType.SHELL);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");
@@ -92,23 +92,23 @@ public class TaskManagerTest {
     @Test
     public void testNewTask() {
 
-        taskExecutionContext.setTaskType(TaskType.SHELL);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.WATERDROP);
+        taskExecutionContext.setTaskType(TaskType.WATERDROP.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.HTTP);
+        taskExecutionContext.setTaskType(TaskType.HTTP.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.MR);
+        taskExecutionContext.setTaskType(TaskType.MR.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.SPARK);
+        taskExecutionContext.setTaskType(TaskType.SPARK.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.FLINK);
+        taskExecutionContext.setTaskType(TaskType.FLINK.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.PYTHON);
+        taskExecutionContext.setTaskType(TaskType.PYTHON.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.DATAX);
+        taskExecutionContext.setTaskType(TaskType.DATAX.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType(TaskType.SQOOP);
+        taskExecutionContext.setTaskType(TaskType.SQOOP.getDesc());
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
 
     }
@@ -121,7 +121,7 @@ public class TaskManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNotExists() {
-        taskExecutionContext.setTaskType(TaskType.SHELL);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
     }
 
@@ -129,7 +129,7 @@ public class TaskManagerTest {
     public void testShellTaskReturnString() {
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
-        taskExecutionContext.setTaskType(TaskType.SHELL);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setHost("127.0.0.1:1234");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");

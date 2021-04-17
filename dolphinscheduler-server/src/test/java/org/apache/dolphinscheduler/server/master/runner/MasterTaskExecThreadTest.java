@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -112,7 +111,7 @@ public class MasterTaskExecThreadTest {
 
     private TaskInstance getTaskInstance(){
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);

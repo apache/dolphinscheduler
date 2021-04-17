@@ -105,7 +105,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testSHELLTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -136,7 +136,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testSQLTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SQL);
+        taskInstance.setTaskType(TaskType.SQL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -179,7 +179,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testDataxTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.DATAX);
+        taskInstance.setTaskType(TaskType.DATAX.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -220,7 +220,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testSqoopTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SQOOP);
+        taskInstance.setTaskType(TaskType.SQOOP.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -261,7 +261,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testTaskInstanceIsFinalState() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -278,7 +278,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testNotFoundWorkerGroup() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -310,10 +310,10 @@ public class TaskPriorityQueueConsumerTest {
     }
 
     @Test
-    public void testDispatch() throws Exception {
+    public void testDispatch() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -347,7 +347,7 @@ public class TaskPriorityQueueConsumerTest {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -375,10 +375,10 @@ public class TaskPriorityQueueConsumerTest {
     }
 
     @Test
-    public void testGetResourceFullNames() throws Exception {
+    public void testGetResourceFullNames() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -400,12 +400,12 @@ public class TaskPriorityQueueConsumerTest {
     }
 
     @Test
-    public void testVerifyTenantIsNull() throws Exception {
+    public void testVerifyTenantIsNull() {
         Tenant tenant = null;
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
 
         ProcessInstance processInstance = new ProcessInstance();
@@ -449,7 +449,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testRun() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType(TaskType.SHELL);
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);

@@ -31,17 +31,17 @@ public class TaskParametersUtilsTest {
 
     @Test
     public void testGetParameters() {
-        Assert.assertNull(TaskParametersUtils.getParameters(TaskType.of("xx"), "ttt"));
-        Assert.assertNull(TaskParametersUtils.getParameters(TaskType.of("SHELL"), "ttt"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SHELL"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SQL"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SUB_PROCESS"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("PROCEDURE"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("MR"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("SPARK"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("PYTHON"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("DEPENDENT"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("FLINK"), "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.of("HTTP"), "{}"));
+        Assert.assertNull(TaskParametersUtils.getParameters("xx", "ttt"));
+        Assert.assertNull(TaskParametersUtils.getParameters(TaskType.SHELL.getDesc(), "ttt"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SHELL.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SQL.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SUB_PROCESS.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.PROCEDURE.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.MR.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SPARK.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.PYTHON.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.DEPENDENT.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.FLINK.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.HTTP.getDesc(), "{}"));
     }
 }

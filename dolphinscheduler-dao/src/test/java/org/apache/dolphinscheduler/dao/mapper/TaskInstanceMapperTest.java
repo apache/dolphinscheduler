@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -40,6 +37,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -77,7 +77,7 @@ public class TaskInstanceMapperTest {
      */
     private TaskInstance insertTaskInstance(int processInstanceId) {
         //insertOne
-        return insertTaskInstance("us task", processInstanceId, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL);
+        return insertTaskInstance(processInstanceId, TaskType.SHELL.getDesc());
     }
 
     /**
@@ -100,11 +100,11 @@ public class TaskInstanceMapperTest {
     /**
      * construct a task instance and then insert
      */
-    private TaskInstance insertTaskInstance(String taskName, int processInstanceId, ExecutionStatus state, TaskType taskType) {
+    private TaskInstance insertTaskInstance(int processInstanceId, String taskType) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setFlag(Flag.YES);
-        taskInstance.setName(taskName);
-        taskInstance.setState(state);
+        taskInstance.setName("us task");
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
         taskInstance.setProcessInstanceId(processInstanceId);

@@ -42,14 +42,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ConditionsTaskTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(DependentTaskTest.class);
 
     /**
      * TaskNode.runFlag : task can be run normally
@@ -120,7 +116,7 @@ public class ConditionsTaskTest {
     }
 
     @Test
-    public void testBasicFailure() throws Exception {
+    public void testBasicFailure() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
         ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
         taskExecThread.call();
@@ -131,7 +127,7 @@ public class ConditionsTaskTest {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-1000");
         taskNode.setName("C");
-        taskNode.setType(TaskType.CONDITIONS.toString());
+        taskNode.setType(TaskType.CONDITIONS.getDesc());
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
 
         DependentItem dependentItem = new DependentItem();
@@ -171,7 +167,7 @@ public class ConditionsTaskTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
         taskInstance.setName(taskNode.getName());
-        taskInstance.setTaskType(TaskType.of(taskNode.getType()));
+        taskInstance.setTaskType(taskNode.getType().toUpperCase());
         taskInstance.setProcessInstanceId(processInstance.getId());
         return taskInstance;
     }

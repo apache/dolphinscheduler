@@ -194,8 +194,7 @@ public abstract class AbstractTask {
     public void after() {
         if (getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
             // task recor flat : if true , start up qianfan
-            if (TaskRecordDao.getTaskRecordFlag()
-                    && TaskType.typeIsNormalTask(taskExecutionContext.getTaskType())) {
+            if (TaskRecordDao.getTaskRecordFlag() && typeIsNormalTask(taskExecutionContext.getTaskType())) {
                 AbstractParameters params = TaskParametersUtils.getParameters(taskExecutionContext.getTaskType(), taskExecutionContext.getTaskParams());
 
                 // replace placeholder
@@ -224,6 +223,9 @@ public abstract class AbstractTask {
         }
     }
 
+    private boolean typeIsNormalTask(String taskType) {
+        return !(TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(taskType) || TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType));
+    }
 
     /**
      * get exit status according to exitCode

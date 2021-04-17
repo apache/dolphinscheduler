@@ -200,7 +200,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if (taskExecutionContext.getTaskType() == TaskType.SQL || taskExecutionContext.getTaskType() == TaskType.PROCEDURE) {
+        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
             ackCommand.setExecutePath(null);
         } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());

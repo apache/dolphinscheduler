@@ -172,7 +172,7 @@ public class TaskExecuteProcessorTest {
         taskExecutionContext.setProcessId(12345);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
-        taskExecutionContext.setTaskType(TaskType.SQL);
+        taskExecutionContext.setTaskType(TaskType.SQL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");

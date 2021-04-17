@@ -221,21 +221,21 @@ public class TaskPriorityQueueConsumer extends Thread {
         SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
 
         // SQL task
-        if (taskInstance.getTaskType() == TaskType.SQL) {
+        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
             setSQLTaskRelation(sqlTaskExecutionContext, taskInstance);
         }
 
         // DATAX task
-        if (taskInstance.getTaskType() == TaskType.DATAX) {
+        if (TaskType.DATAX.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
             setDataxTaskRelation(dataxTaskExecutionContext, taskInstance);
         }
 
         // procedure task
-        if (taskInstance.getTaskType() == TaskType.PROCEDURE) {
+        if (TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
             setProcedureTaskRelation(procedureTaskExecutionContext, taskInstance);
         }
 
-        if (taskInstance.getTaskType() == TaskType.SQOOP) {
+        if (TaskType.SQOOP.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
             setSqoopTaskRelation(sqoopTaskExecutionContext, taskInstance);
         }
 

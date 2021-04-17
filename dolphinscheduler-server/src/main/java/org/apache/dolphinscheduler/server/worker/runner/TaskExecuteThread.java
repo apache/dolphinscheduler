@@ -20,9 +20,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -217,7 +215,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
 
     /**
      * get global paras map
-     * @return
+     * @return map
      */
     private Map<String, String> getGlobalParamsMap() {
         Map<String, String> globalParamsMap = new HashMap<>(16);
@@ -248,13 +246,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
     /**
      * download resource file
      *
-     * @param execLocalPath
-     * @param projectRes
-     * @param logger
+     * @param execLocalPath execLocalPath
+     * @param projectRes projectRes
+     * @param logger logger
      */
-    private void downloadResource(String execLocalPath,
-                                  Map<String, String> projectRes,
-                                  Logger logger) throws Exception {
+    private void downloadResource(String execLocalPath, Map<String, String> projectRes, Logger logger) {
         if (MapUtils.isEmpty(projectRes)) {
             return;
         }
@@ -310,7 +306,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
         ackCommand.setLogPath(taskExecutionContext.getLogPath());
         ackCommand.setHost(taskExecutionContext.getHost());
-        if (taskExecutionContext.getTaskType() == TaskType.SQL || taskExecutionContext.getTaskType() == TaskType.PROCEDURE) {
+        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
             ackCommand.setExecutePath(null);
         } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());

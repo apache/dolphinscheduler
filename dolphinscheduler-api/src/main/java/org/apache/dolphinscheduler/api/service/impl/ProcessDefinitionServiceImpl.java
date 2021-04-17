@@ -744,7 +744,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return if task has sub process return true else false
      */
     private boolean checkTaskHasSubProcess(String taskType) {
-        return taskType.equals(TaskType.SUB_PROCESS.name());
+        return taskType.equals(TaskType.SUB_PROCESS.getDesc());
     }
 
     /**
@@ -1317,7 +1317,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                             subProcessId = Integer.parseInt(JSONUtils.parseObject(
                                     taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
                         }
-                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType().getDescp(), taskInstance.getState().toString()
+                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
                                 , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
                     }
                 }

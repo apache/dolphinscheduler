@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -122,7 +121,7 @@ public class SubProcessTaskTest {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-10");
         taskNode.setName("S");
-        taskNode.setType(TaskType.SUB_PROCESS.toString());
+        taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
         return taskNode;
     }
@@ -147,9 +146,9 @@ public class SubProcessTaskTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
         taskInstance.setName("S");
-        taskInstance.setTaskType(TaskType.SUB_PROCESS);
+        taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
         taskInstance.setName(taskNode.getName());
-        taskInstance.setTaskType(TaskType.of(taskNode.getType()));
+        taskInstance.setTaskType(taskNode.getType().toUpperCase());
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;

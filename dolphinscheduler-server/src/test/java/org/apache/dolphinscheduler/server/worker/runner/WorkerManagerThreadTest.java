@@ -83,7 +83,7 @@ public class WorkerManagerThreadTest {
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTenantCode("test");
-        taskExecutionContext.setTaskType(TaskType.SHELL);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");

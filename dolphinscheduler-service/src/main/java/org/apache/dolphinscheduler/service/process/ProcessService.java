@@ -2226,8 +2226,8 @@ public class ProcessService {
     private void setTaskFromTaskNode(TaskNode taskNode, TaskDefinition taskDefinition) {
         taskDefinition.setName(taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
-        taskDefinition.setTaskType(TaskType.of(taskNode.getType()));
-        taskDefinition.setTaskParams(TaskType.of(taskNode.getType()) == TaskType.DEPENDENT ? taskNode.getDependence() : taskNode.getParams());
+        taskDefinition.setTaskType(taskNode.getType().toUpperCase());
+        taskDefinition.setTaskParams(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType()) ? taskNode.getDependence() : taskNode.getParams());
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
@@ -2507,12 +2507,12 @@ public class ProcessService {
             v.setCode(taskDefinitionLog.getCode() + "");
             v.setName(taskDefinitionLog.getName());
             v.setDesc(taskDefinitionLog.getDescription());
-            v.setType(taskDefinitionLog.getTaskType().getDescp().toUpperCase());
+            v.setType(taskDefinitionLog.getTaskType().toUpperCase());
             v.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
             v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
-            v.setParams(taskDefinitionLog.getTaskType() == TaskType.DEPENDENT ? null : taskDefinitionLog.getTaskParams());
-            v.setDependence(taskDefinitionLog.getTaskType() == TaskType.DEPENDENT ? taskDefinitionLog.getTaskParams() : null);
+            v.setParams(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskDefinitionLog.getTaskType()) ? null : taskDefinitionLog.getTaskParams());
+            v.setDependence(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskDefinitionLog.getTaskType()) ? taskDefinitionLog.getTaskParams() : null);
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
@@ -2552,7 +2552,7 @@ public class ProcessService {
         taskNode.setName(taskDefinition.getName());
         taskNode.setName(taskDefinition.getName());
         taskNode.setDesc(taskDefinition.getDescription());
-        taskNode.setType(taskDefinition.getTaskType().getDescp());
+        taskNode.setType(taskDefinition.getTaskType());
         taskNode.setRunFlag(taskDefinition.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : Constants.FLOWNODE_RUN_FLAG_NORMAL);
         taskNode.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
         taskNode.setRetryInterval(taskDefinition.getFailRetryInterval());

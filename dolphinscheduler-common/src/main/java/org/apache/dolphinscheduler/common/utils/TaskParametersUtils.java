@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
@@ -41,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskParametersUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(TaskParametersUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskParametersUtils.class);
 
     private TaskParametersUtils() {
         throw new UnsupportedOperationException("Construct TaskParametersUtils");
@@ -54,34 +53,34 @@ public class TaskParametersUtils {
      * @param parameter parameter
      * @return task parameters
      */
-    public static AbstractParameters getParameters(TaskType taskType, String parameter) {
+    public static AbstractParameters getParameters(String taskType, String parameter) {
         switch (taskType) {
-            case SUB_PROCESS:
+            case "SUB_PROCESS":
                 return JSONUtils.parseObject(parameter, SubProcessParameters.class);
-            case SHELL:
-            case WATERDROP:
+            case "SHELL":
+            case "WATERDROP":
                 return JSONUtils.parseObject(parameter, ShellParameters.class);
-            case PROCEDURE:
+            case "PROCEDURE":
                 return JSONUtils.parseObject(parameter, ProcedureParameters.class);
-            case SQL:
+            case "SQL":
                 return JSONUtils.parseObject(parameter, SqlParameters.class);
-            case MR:
+            case "MR":
                 return JSONUtils.parseObject(parameter, MapReduceParameters.class);
-            case SPARK:
+            case "SPARK":
                 return JSONUtils.parseObject(parameter, SparkParameters.class);
-            case PYTHON:
+            case "PYTHON":
                 return JSONUtils.parseObject(parameter, PythonParameters.class);
-            case DEPENDENT:
+            case "DEPENDENT":
                 return JSONUtils.parseObject(parameter, DependentParameters.class);
-            case FLINK:
+            case "FLINK":
                 return JSONUtils.parseObject(parameter, FlinkParameters.class);
-            case HTTP:
+            case "HTTP":
                 return JSONUtils.parseObject(parameter, HttpParameters.class);
-            case DATAX:
+            case "DATAX":
                 return JSONUtils.parseObject(parameter, DataxParameters.class);
-            case CONDITIONS:
+            case "CONDITIONS":
                 return JSONUtils.parseObject(parameter, ConditionsParameters.class);
-            case SQOOP:
+            case "SQOOP":
                 return JSONUtils.parseObject(parameter, SqoopParameters.class);
             default:
                 logger.error("not support task type: {}", taskType);

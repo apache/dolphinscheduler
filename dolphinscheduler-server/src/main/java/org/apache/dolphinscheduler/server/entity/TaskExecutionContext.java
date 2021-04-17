@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
@@ -60,7 +59,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * task type
      */
-    private TaskType taskType;
+    private String taskType;
 
     /**
      * host
@@ -254,11 +253,11 @@ public class TaskExecutionContext implements Serializable {
         this.startTime = startTime;
     }
 
-    public TaskType getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(TaskType taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

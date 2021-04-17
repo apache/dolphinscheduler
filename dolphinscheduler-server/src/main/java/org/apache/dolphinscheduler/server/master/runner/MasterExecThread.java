@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -485,7 +484,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance type
-            taskInstance.setTaskType(TaskType.of(taskNode.getType()));
+            taskInstance.setTaskType(taskNode.getType().toUpperCase());
             // task instance whether alert
             taskInstance.setAlertFlag(Flag.NO);
 

@@ -16,9 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
@@ -41,55 +38,35 @@ public enum TaskType {
      * 12 SQOOP
      * 13 WATERDROP
      */
-    SHELL(0, "shell"),
-    SQL(1, "sql"),
-    SUB_PROCESS(2, "sub_process"),
-    PROCEDURE(3, "procedure"),
-    MR(4, "mr"),
-    SPARK(5, "spark"),
-    PYTHON(6, "python"),
-    DEPENDENT(7, "dependent"),
-    FLINK(8, "flink"),
-    HTTP(9, "http"),
-    DATAX(10, "datax"),
-    CONDITIONS(11, "conditions"),
-    SQOOP(12, "sqoop"),
-    WATERDROP(13, "waterdrop");
+    SHELL(0, "SHELL"),
+    SQL(1, "SQL"),
+    SUB_PROCESS(2, "SUB_PROCESS"),
+    PROCEDURE(3, "PROCEDURE"),
+    MR(4, "MR"),
+    SPARK(5, "SPARK"),
+    PYTHON(6, "PYTHON"),
+    DEPENDENT(7, "DEPENDENT"),
+    FLINK(8, "FLINK"),
+    HTTP(9, "HTTP"),
+    DATAX(10, "DATAX"),
+    CONDITIONS(11, "CONDITIONS"),
+    SQOOP(12, "SQOOP"),
+    WATERDROP(13, "WATERDROP");
 
-    TaskType(int code, String descp) {
+    TaskType(int code, String desc) {
         this.code = code;
-        this.descp = descp;
+        this.desc = desc;
     }
 
     @EnumValue
     private final int code;
-    private final String descp;
-
-    public static boolean typeIsNormalTask(TaskType taskType) {
-        return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
-    }
+    private final String desc;
 
     public int getCode() {
         return code;
     }
 
-    public String getDescp() {
-        return descp;
-    }
-
-    private static final Map<String, TaskType> TASK_TYPE_MAP = new HashMap<>();
-
-    static {
-        for (TaskType taskType : TaskType.values()) {
-            TASK_TYPE_MAP.put(taskType.descp, taskType);
-        }
-    }
-
-    public static TaskType of(String descp) {
-        descp = descp.toLowerCase();
-        if (TASK_TYPE_MAP.containsKey(descp)) {
-            return TASK_TYPE_MAP.get(descp);
-        }
-        throw new IllegalArgumentException("invalid type : " + descp);
+    public String getDesc() {
+        return desc;
     }
 }

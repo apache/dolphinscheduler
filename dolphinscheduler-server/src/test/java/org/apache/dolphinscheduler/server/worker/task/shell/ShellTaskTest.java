@@ -28,11 +28,12 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,7 +66,7 @@ public class ShellTaskTest {
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
-        taskExecutionContext.setTaskType(TaskType.SHELL);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setHost("127.0.0.1:1234");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");

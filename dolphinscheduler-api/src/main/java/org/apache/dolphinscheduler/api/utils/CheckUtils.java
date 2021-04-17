@@ -16,11 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -29,6 +24,11 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -128,10 +128,10 @@ public class CheckUtils {
     public static boolean checkTaskNodeParameters(TaskNode taskNode) {
         AbstractParameters abstractParameters;
 
-        if (TaskType.of(taskNode.getType()) == TaskType.DEPENDENT) {
-            abstractParameters = TaskParametersUtils.getParameters(TaskType.of(taskNode.getType()), taskNode.getDependence());
+        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType())) {
+            abstractParameters = TaskParametersUtils.getParameters(taskNode.getType().toUpperCase(), taskNode.getDependence());
         } else {
-            abstractParameters = TaskParametersUtils.getParameters(TaskType.of(taskNode.getType()), taskNode.getParams());
+            abstractParameters = TaskParametersUtils.getParameters(taskNode.getType().toUpperCase(), taskNode.getParams());
         }
 
         if (abstractParameters != null) {

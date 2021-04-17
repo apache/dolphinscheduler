@@ -359,7 +359,7 @@ public class DependentTaskTest {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-10");
         taskNode.setName("D");
-        taskNode.setType(TaskType.DEPENDENT.toString());
+        taskNode.setType(TaskType.DEPENDENT.getDesc());
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
         return taskNode;
     }
@@ -380,7 +380,7 @@ public class DependentTaskTest {
         taskInstance.setTaskDefinitionVersion(TASK_VERSION);
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-        taskInstance.setTaskType(TaskType.of(taskNode.getType()));
+        taskInstance.setTaskType(taskNode.getType().toUpperCase());
         taskInstance.setDependency(JSONUtils.parseObject(taskNode.getDependence(), DependentParameters.class));
         taskInstance.setName(taskNode.getName());
     }
@@ -412,7 +412,7 @@ public class DependentTaskTest {
             String taskName, ProcessInstance processInstance
     ) {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType(TaskType.DEPENDENT);
+        taskInstance.setTaskType(TaskType.DEPENDENT.getDesc());
         taskInstance.setId(taskInstanceId);
         taskInstance.setName(taskName);
         taskInstance.setProcessInstanceId(processInstance.getId());

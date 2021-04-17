@@ -55,7 +55,7 @@ public class TaskInstance implements Serializable {
     /**
      * task type
      */
-    private TaskType taskType;
+    private String taskType;
 
     /**
      * process instance id
@@ -298,11 +298,11 @@ public class TaskInstance implements Serializable {
         this.name = name;
     }
 
-    public TaskType getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(TaskType taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 
@@ -498,15 +498,15 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isSubProcess() {
-        return TaskType.SUB_PROCESS == this.taskType;
+        return TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public boolean isDependTask() {
-        return TaskType.DEPENDENT == this.taskType;
+        return TaskType.DEPENDENT.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS == this.taskType;
+        return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**

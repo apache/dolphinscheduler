@@ -46,26 +46,26 @@ public class TaskManager {
      */
     public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger, AlertClientService alertClientService) throws IllegalArgumentException {
         switch (taskExecutionContext.getTaskType()) {
-            case SHELL:
-            case WATERDROP:
+            case "SHELL":
+            case TaskType.WATERDROP.getDesc():
                 return new ShellTask(taskExecutionContext, logger);
-            case PROCEDURE:
+            case "PROCEDURE":
                 return new ProcedureTask(taskExecutionContext, logger);
-            case SQL:
+            case "SQL":
                 return new SqlTask(taskExecutionContext, logger, alertClientService);
-            case MR:
+            case "MR":
                 return new MapReduceTask(taskExecutionContext, logger);
-            case SPARK:
+            case "SPARK":
                 return new SparkTask(taskExecutionContext, logger);
-            case FLINK:
+            case "FLINK":
                 return new FlinkTask(taskExecutionContext, logger);
-            case PYTHON:
+            case "PYTHON":
                 return new PythonTask(taskExecutionContext, logger);
-            case HTTP:
+            case "HTTP":
                 return new HttpTask(taskExecutionContext, logger);
-            case DATAX:
+            case "DATAX":
                 return new DataxTask(taskExecutionContext, logger);
-            case SQOOP:
+            case "SQOOP":
                 return new SqoopTask(taskExecutionContext, logger);
             default:
                 logger.error("not support task type: {}", taskExecutionContext.getTaskType());
