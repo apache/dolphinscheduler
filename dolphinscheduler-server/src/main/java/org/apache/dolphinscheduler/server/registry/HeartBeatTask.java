@@ -89,14 +89,12 @@ public class HeartBeatTask implements Runnable {
                 }
             }
 
-            double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
-
+            double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             int status = Constants.NORMAL_NODE_STATUS;
-
-            if (availablePhysicalMemorySize < reservedMemory
-                    || loadAverage > maxCpuloadAvg) {
-                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize, loadAverage);
+            if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+                logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+                        loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
                 status = Constants.ABNORMAL_NODE_STATUS;
             }
 
