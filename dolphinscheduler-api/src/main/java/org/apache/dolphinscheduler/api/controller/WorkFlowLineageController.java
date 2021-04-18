@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_LINEAGE_ERROR;
 import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -61,6 +62,7 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value = "/list-name")
     @ResponseStatus(HttpStatus.OK)
+    @AccessLogAnnotation
     public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                     @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
                                                                     @ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal) {
@@ -76,6 +78,7 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value = "/list-ids")
     @ResponseStatus(HttpStatus.OK)
+    @AccessLogAnnotation
     public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                  @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
                                                                  @ApiIgnore @RequestParam(value = "ids", required = false) String ids) {
