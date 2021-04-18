@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.server.builder;
 
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.entity.*;
 
@@ -54,12 +56,14 @@ public class TaskExecutionContextBuilder {
     }
 
     public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition) {
-        int timeoutSeconds = taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT;
-        if (timeoutSeconds == 0) {
-            timeoutSeconds = Integer.MAX_VALUE;
+        taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
+        if (taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN) {
+            taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
+            if(taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.FAILED
+                    || taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.WARNFAILED) {
+                taskExecutionContext.setTaskTimeout(Math.min(taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT, Integer.MAX_VALUE));
+            }
         }
-        taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
-        taskExecutionContext.setTaskTimeout(timeoutSeconds);
         taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
         return this;
     }

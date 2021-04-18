@@ -130,7 +130,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 return;
             }
 
-
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
             }
