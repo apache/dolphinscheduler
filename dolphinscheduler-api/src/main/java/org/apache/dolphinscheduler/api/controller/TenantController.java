@@ -117,8 +117,6 @@ public class TenantController extends BaseController {
                                         @RequestParam(value = "searchVal", required = false) String searchVal,
                                         @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam("pageSize") Integer pageSize) {
-//        logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
-//                loginUser.getUserName(), pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
