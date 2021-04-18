@@ -47,20 +47,23 @@ public class AccessLogAspect {
         long startTime = System.currentTimeMillis();
 
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            String userName = "NOT LOGIN";
+            User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
+            if (loginUser != null) {
+                userName = loginUser.getUserName();
+            }
 
-        String userName = "NOT LOGIN";
-        User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
-        if (loginUser != null) {
-            userName = loginUser.getUserName();
+            logger.info("REQUEST LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
+                    userName,
+                    request.getRequestURI(),
+                    request.getMethod(),
+                    proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
+                    Arrays.toString(proceedingJoinPoint.getArgs()));
+
         }
 
-        logger.info("REQUEST LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
-                userName,
-                request.getRequestURI(),
-                request.getMethod(),
-                proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
-                Arrays.toString(proceedingJoinPoint.getArgs()));
 
         Object ob = proceedingJoinPoint.proceed();
 
