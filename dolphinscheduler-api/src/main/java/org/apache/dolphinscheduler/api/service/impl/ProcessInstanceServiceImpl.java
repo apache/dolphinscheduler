@@ -329,7 +329,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
-            if (taskInstance.getTaskType().equalsIgnoreCase(TaskType.DEPENDENT.toString())) {
+            if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
                 Result<String> logResult = loggerService.queryLog(
                         taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {

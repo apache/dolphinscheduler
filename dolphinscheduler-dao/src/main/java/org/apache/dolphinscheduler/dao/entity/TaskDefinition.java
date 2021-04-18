@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -82,7 +81,7 @@ public class TaskDefinition {
     /**
      * task type
      */
-    private TaskType taskType;
+    private String taskType;
 
     /**
      * user defined parameters
@@ -318,11 +317,11 @@ public class TaskDefinition {
         this.projectCode = projectCode;
     }
 
-    public TaskType getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
-    public void setTaskType(TaskType taskType) {
+    public void setTaskType(String taskType) {
         this.taskType = taskType;
     }
 

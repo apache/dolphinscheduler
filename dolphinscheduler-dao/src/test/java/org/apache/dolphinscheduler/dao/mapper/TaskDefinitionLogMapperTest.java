@@ -63,7 +63,7 @@ public class TaskDefinitionLogMapperTest {
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");
         taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(userId);
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
@@ -120,7 +120,7 @@ public class TaskDefinitionLogMapperTest {
         taskDefinition.setCode(888888L);
         taskDefinition.setName("unit-test");
         taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(1);
         taskDefinition.setResourceIds("1");
         taskDefinition.setVersion(1);

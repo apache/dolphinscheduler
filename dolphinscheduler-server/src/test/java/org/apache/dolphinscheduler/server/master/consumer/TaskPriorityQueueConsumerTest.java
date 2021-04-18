@@ -22,9 +22,8 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -106,7 +105,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testSHELLTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -137,7 +136,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testSQLTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SQL");
+        taskInstance.setTaskType(TaskType.SQL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -180,7 +179,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testDataxTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("DATAX");
+        taskInstance.setTaskType(TaskType.DATAX.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -221,7 +220,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testSqoopTask() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SQOOP");
+        taskInstance.setTaskType(TaskType.SQOOP.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -262,7 +261,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testTaskInstanceIsFinalState() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -279,7 +278,7 @@ public class TaskPriorityQueueConsumerTest {
     public void testNotFoundWorkerGroup() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -311,10 +310,10 @@ public class TaskPriorityQueueConsumerTest {
     }
 
     @Test
-    public void testDispatch() throws Exception {
+    public void testDispatch() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -338,7 +337,7 @@ public class TaskPriorityQueueConsumerTest {
 
         TaskPriority taskPriority = new TaskPriority();
         taskPriority.setTaskId(1);
-        boolean res  = taskPriorityQueueConsumer.dispatch(taskPriority);
+        boolean res = taskPriorityQueueConsumer.dispatch(taskPriority);
 
         Assert.assertFalse(res);
     }
@@ -348,7 +347,7 @@ public class TaskPriorityQueueConsumerTest {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -370,16 +369,16 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        TaskExecutionContext taskExecutionContext  = taskPriorityQueueConsumer.getTaskExecutionContext(1);
+        TaskExecutionContext taskExecutionContext = taskPriorityQueueConsumer.getTaskExecutionContext(1);
 
         Assert.assertNotNull(taskExecutionContext);
     }
 
     @Test
-    public void testGetResourceFullNames() throws Exception {
+    public void testGetResourceFullNames() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -387,7 +386,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setExecutorId(2);
         // task node
 
-        Map<String, String>  map = taskPriorityQueueConsumer.getResourceFullNames(taskInstance);
+        Map<String, String> map = taskPriorityQueueConsumer.getResourceFullNames(taskInstance);
 
         List<Resource> resourcesList = new ArrayList<Resource>();
         Resource resource = new Resource();
@@ -401,19 +400,19 @@ public class TaskPriorityQueueConsumerTest {
     }
 
     @Test
-    public void testVerifyTenantIsNull() throws Exception {
+    public void testVerifyTenantIsNull() {
         Tenant tenant = null;
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         taskInstance.setProcessInstance(processInstance);
 
-        boolean res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant,taskInstance);
+        boolean res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant, taskInstance);
         Assert.assertTrue(res);
 
         tenant = new Tenant();
@@ -423,7 +422,7 @@ public class TaskPriorityQueueConsumerTest {
         tenant.setQueueId(1);
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
-        res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant,taskInstance);
+        res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant, taskInstance);
         Assert.assertFalse(res);
 
     }
@@ -442,15 +441,15 @@ public class TaskPriorityQueueConsumerTest {
 
         taskPriorityQueueConsumer.setDataxTaskRelation(dataxTaskExecutionContext, taskInstance);
 
-        Assert.assertEquals(1,dataxTaskExecutionContext.getDataSourceId());
-        Assert.assertEquals(1,dataxTaskExecutionContext.getDataTargetId());
+        Assert.assertEquals(1, dataxTaskExecutionContext.getDataSourceId());
+        Assert.assertEquals(1, dataxTaskExecutionContext.getDataTargetId());
     }
 
     @Test
     public void testRun() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setProcessInstanceId(1);
         taskInstance.setState(ExecutionStatus.KILL);
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
@@ -478,7 +477,7 @@ public class TaskPriorityQueueConsumerTest {
         taskPriorityQueueConsumer.run();
 
         TimeUnit.SECONDS.sleep(10);
-        Assert.assertNotEquals(-1,taskPriorityQueue.size());
+        Assert.assertNotEquals(-1, taskPriorityQueue.size());
 
     }
 

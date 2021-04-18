@@ -135,7 +135,7 @@ public abstract class AbstractCommandExecutor {
         processBuilder.redirectErrorStream(true);
 
         // setting up user to run commands
-        if (CommonUtils.isSudoEnable()) {
+        if (!OSUtils.isWindows() && CommonUtils.isSudoEnable()) {
             command.add("sudo");
             command.add("-u");
             command.add(taskExecutionContext.getTenantCode());
@@ -208,9 +208,7 @@ public abstract class AbstractCommandExecutor {
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-            taskExecutionContext.getExecutePath(),
-            processId
-            , result.getExitStatusCode());
+            taskExecutionContext.getExecutePath(), processId, result.getExitStatusCode());
 
         // if SHELL task exit
         if (status) {
