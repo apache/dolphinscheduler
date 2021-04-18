@@ -360,7 +360,7 @@ public class TaskNode {
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS.toString().equalsIgnoreCase(this.getType());
+        return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.getType());
     }
 
     public List<PreviousTaskNode> getPreTaskNodeList() {

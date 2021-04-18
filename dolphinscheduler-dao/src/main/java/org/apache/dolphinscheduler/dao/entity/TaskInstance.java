@@ -68,7 +68,7 @@ public class TaskInstance implements Serializable {
     private long taskCode;
 
     /**
-     * task defintion version
+     * task definition version
      */
     private int taskDefinitionVersion;
 
@@ -145,6 +145,12 @@ public class TaskInstance implements Serializable {
      */
     @TableField(exist = false)
     private ProcessDefinition processDefine;
+
+    /**
+     * task definition
+     */
+    @TableField(exist = false)
+    private TaskDefinition taskDefine;
 
     /**
      * process id
@@ -266,6 +272,14 @@ public class TaskInstance implements Serializable {
 
     public void setProcessDefine(ProcessDefinition processDefine) {
         this.processDefine = processDefine;
+    }
+
+    public TaskDefinition getTaskDefine() {
+        return taskDefine;
+    }
+
+    public void setTaskDefine(TaskDefinition taskDefine) {
+        this.taskDefine = taskDefine;
     }
 
     public int getId() {
@@ -484,15 +498,15 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isSubProcess() {
-        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+        return TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public boolean isDependTask() {
-        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+        return TaskType.DEPENDENT.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
+        return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**

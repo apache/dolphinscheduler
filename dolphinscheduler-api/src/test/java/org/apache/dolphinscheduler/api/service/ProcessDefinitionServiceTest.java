@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -30,13 +29,12 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -61,11 +59,8 @@ import org.apache.http.entity.ContentType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +77,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -696,7 +690,7 @@ public class ProcessDefinitionServiceTest {
         Assert.assertEquals(Status.PROCESS_NODE_HAS_CYCLE, taskCycleRes.get(Constants.STATUS));
 
         //json abnormal
-        String abnormalJson = processDefinitionJson.replaceAll("SHELL", "");
+        String abnormalJson = processDefinitionJson.replaceAll(TaskType.SHELL.getDesc(), "");
         processData = JSONUtils.parseObject(abnormalJson, ProcessData.class);
         Map<String, Object> abnormalTaskRes = processDefinitionService.checkProcessNodeList(processData, abnormalJson);
         Assert.assertEquals(Status.PROCESS_NODE_S_PARAMETER_INVALID, abnormalTaskRes.get(Constants.STATUS));
@@ -795,7 +789,7 @@ public class ProcessDefinitionServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setId(1);
         taskInstance.setName("test_task_instance");
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
@@ -832,7 +826,7 @@ public class ProcessDefinitionServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
-        taskInstance.setTaskType("SUB_PROCESS");
+        taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
         taskInstance.setId(1);
         taskInstance.setName("test_task_instance");
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
@@ -1128,7 +1122,6 @@ public class ProcessDefinitionServiceTest {
      * @return ProcessDefinition
      */
     private ProcessDefinition getProcessDefinition() {
-
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
@@ -1229,7 +1222,7 @@ public class ProcessDefinitionServiceTest {
 
     @Test
     public void testExportProcessMetaData() {
-        Integer processDefinitionId = 111;
+        int processDefinitionId = 111;
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(processDefinitionId);
         Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinition));
