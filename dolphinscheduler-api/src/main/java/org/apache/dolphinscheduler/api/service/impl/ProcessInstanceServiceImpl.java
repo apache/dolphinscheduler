@@ -209,6 +209,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
             processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
+            processInstance.setConnects(processDefinition.getConnects());
+            processInstance.setLocations(processDefinition.getLocations());
+
             ProcessData processData = processService.genProcessData(processDefinition);
             processInstance.setProcessInstanceJson(JSONUtils.toJsonString(processData));
             result.put(DATA_LIST, processInstance);
