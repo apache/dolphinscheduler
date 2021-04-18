@@ -61,9 +61,7 @@ public class AccessLogAspect {
                     request.getMethod(),
                     proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
                     Arrays.toString(proceedingJoinPoint.getArgs()));
-
         }
-
 
         Object ob = proceedingJoinPoint.proceed();
 
