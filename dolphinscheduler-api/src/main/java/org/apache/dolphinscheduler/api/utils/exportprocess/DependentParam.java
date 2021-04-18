@@ -109,6 +109,6 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
      */
     @Override
     public void afterPropertiesSet() {
-        TaskNodeParamFactory.register(TaskType.DEPENDENT.name(), this);
+        TaskNodeParamFactory.register(TaskType.DEPENDENT.getDesc(), this);
     }
 }

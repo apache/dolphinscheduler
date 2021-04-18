@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -39,19 +40,19 @@ public class TaskInstanceTest {
         TaskInstance taskInstance = new TaskInstance();
 
         //sub process
-        taskInstance.setTaskType("SUB_PROCESS");
+        taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
         Assert.assertTrue(taskInstance.isSubProcess());
 
         //not sub process
-        taskInstance.setTaskType("HTTP");
+        taskInstance.setTaskType(TaskType.HTTP.getDesc());
         Assert.assertFalse(taskInstance.isSubProcess());
 
         //sub process
-        taskInstance.setTaskType("CONDITIONS");
+        taskInstance.setTaskType(TaskType.CONDITIONS.getDesc());
         Assert.assertTrue(taskInstance.isConditionsTask());
 
         //sub process
-        taskInstance.setTaskType("DEPENDENT");
+        taskInstance.setTaskType(TaskType.DEPENDENT.getDesc());
         Assert.assertTrue(taskInstance.isDependTask());
     }
 

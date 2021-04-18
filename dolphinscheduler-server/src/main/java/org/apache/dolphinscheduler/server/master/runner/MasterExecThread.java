@@ -484,7 +484,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance type
-            taskInstance.setTaskType(taskNode.getType());
+            taskInstance.setTaskType(taskNode.getType().toUpperCase());
             // task instance whether alert
             taskInstance.setAlertFlag(Flag.NO);
 

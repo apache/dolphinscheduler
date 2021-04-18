@@ -411,7 +411,7 @@ public class ProcessServiceTest {
         taskDefinition.setCode(3L);
         taskDefinition.setName("1-test");
         taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(1);
         taskDefinition.setVersion(2);
         taskDefinition.setCreateTime(new Date());
@@ -421,7 +421,7 @@ public class ProcessServiceTest {
         td2.setCode(2L);
         td2.setName("unit-test");
         td2.setProjectCode(1L);
-        td2.setTaskType(TaskType.SHELL);
+        td2.setTaskType(TaskType.SHELL.getDesc());
         td2.setUserId(1);
         td2.setVersion(1);
         td2.setCreateTime(new Date());
@@ -472,7 +472,7 @@ public class ProcessServiceTest {
         taskDefinition.setCode(3L);
         taskDefinition.setName("1-test");
         taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL);
+        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
         taskDefinition.setUserId(1);
         taskDefinition.setVersion(2);
         taskDefinition.setCreateTime(new Date());
@@ -482,7 +482,7 @@ public class ProcessServiceTest {
         td2.setCode(2L);
         td2.setName("unit-test");
         td2.setProjectCode(1L);
-        td2.setTaskType(TaskType.SHELL);
+        td2.setTaskType(TaskType.SHELL.getDesc());
         td2.setUserId(1);
         td2.setVersion(1);
         td2.setCreateTime(new Date());

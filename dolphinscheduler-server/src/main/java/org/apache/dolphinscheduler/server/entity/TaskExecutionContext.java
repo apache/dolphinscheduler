@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
@@ -168,7 +169,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * task timeout strategy
      */
-    private int taskTimeoutStrategy;
+    private TaskTimeoutStrategy taskTimeoutStrategy;
 
     /**
      * task timeout
@@ -420,11 +421,11 @@ public class TaskExecutionContext implements Serializable {
         this.taskAppId = taskAppId;
     }
 
-    public int getTaskTimeoutStrategy() {
+    public TaskTimeoutStrategy getTaskTimeoutStrategy() {
         return taskTimeoutStrategy;
     }
 
-    public void setTaskTimeoutStrategy(int taskTimeoutStrategy) {
+    public void setTaskTimeoutStrategy(TaskTimeoutStrategy taskTimeoutStrategy) {
         this.taskTimeoutStrategy = taskTimeoutStrategy;
     }
 

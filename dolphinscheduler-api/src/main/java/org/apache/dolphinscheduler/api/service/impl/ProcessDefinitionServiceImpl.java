@@ -744,7 +744,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return if task has sub process return true else false
      */
     private boolean checkTaskHasSubProcess(String taskType) {
-        return taskType.equals(TaskType.SUB_PROCESS.name());
+        return taskType.equals(TaskType.SUB_PROCESS.getDesc());
     }
 
     /**
