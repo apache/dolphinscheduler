@@ -59,7 +59,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         if (taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN) {
             taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
-            if(taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.FAILED
+            if (taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.FAILED
                     || taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.WARNFAILED) {
                 taskExecutionContext.setTaskTimeout(Math.min(taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT, Integer.MAX_VALUE));
             }
