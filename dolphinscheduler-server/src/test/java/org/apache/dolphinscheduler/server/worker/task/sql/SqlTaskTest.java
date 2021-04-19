@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -39,6 +40,7 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,6 +114,16 @@ public class SqlTaskTest {
         PowerMockito.when(ParameterUtils.replaceScheduleTime(Mockito.any(), Mockito.any())).thenReturn("insert into tb_1 values('1','2')");
 
         sqlTask.handle();
-        Assert.assertEquals(Constants.EXIT_CODE_SUCCESS,sqlTask.getExitStatusCode());
+        Assert.assertEquals(Constants.EXIT_CODE_SUCCESS, sqlTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testResultProcess() throws Exception {
+        // test input null and will not throw a exception
+        AlertSendResponseCommand mockResponseCommand = PowerMockito.mock(AlertSendResponseCommand.class);
+        PowerMockito.when(mockResponseCommand.getResStatus()).thenReturn(true);
+        PowerMockito.when(alertClientService.sendAlert(0, "null query result sets", "[]")).thenReturn(mockResponseCommand);
+        String result = Whitebox.invokeMethod(sqlTask, "resultProcess", null);
+        Assert.assertNotNull(result);
     }
 }
