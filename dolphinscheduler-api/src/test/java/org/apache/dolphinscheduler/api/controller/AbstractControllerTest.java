@@ -38,7 +38,6 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * abstract controller test
  */
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class AbstractControllerTest {
@@ -64,7 +63,7 @@ public class AbstractControllerTest {
     }
 
     @After
-    public void after(){
+    public void after() throws Exception {
         sessionService.signOut("127.0.0.1", user);
     }
 
