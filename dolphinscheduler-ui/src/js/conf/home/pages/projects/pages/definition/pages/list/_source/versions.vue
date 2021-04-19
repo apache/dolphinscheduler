@@ -50,7 +50,7 @@
                 :title="$t('Confirm Switch To This Version?')"
                 @onConfirm="_mVersionSwitchProcessDefinitionVersion(scope.row)"
               >
-                <el-button :disabled="versionData.processDefinition.releaseState === 'ONLINE' || scope.row.version === versionData.processDefinition.version" type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
+                <el-button :disabled="versionData.processDefinition.releaseState === 'ONLINE' || scope.row.version === versionData.processDefinition.version || isInstance" type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
             <el-tooltip :content="$t('Delete')" placement="top">
@@ -62,7 +62,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row,scope.row.id)"
               >
-                <el-button :disabled="scope.row.version === versionData.processDefinition.version" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button :disabled="scope.row.version === versionData.processDefinition.version || isInstance" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
@@ -110,6 +110,7 @@
       }
     },
     props: {
+      isInstance: Boolean,
       versionData: Object
     },
     methods: {

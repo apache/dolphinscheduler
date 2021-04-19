@@ -276,17 +276,17 @@ public interface ProcessDefinitionService {
             , int processDefinitionId, long version);
 
     /**
-     * query the pagination versions info by one certain process definition id
+     * query the pagination versions info by one certain process definition code
      *
      * @param loginUser login user info to check auth
      * @param projectName process definition project name
      * @param pageNo page number
      * @param pageSize page size
-     * @param processDefinitionId process definition id
+     * @param processDefinitionCode process definition code
      * @return the pagination process definition versions info of the certain process definition
      */
     Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName,
-                                                       int pageNo, int pageSize, int processDefinitionId);
+                                                       int pageNo, int pageSize, long processDefinitionCode);
 
     /**
      * delete one certain process definition by version number and process definition id

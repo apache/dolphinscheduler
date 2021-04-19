@@ -153,7 +153,7 @@
         :visible.sync="drawer"
         size=""
         :with-header="false">
-        <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
+        <m-versions :versionData = versionData :isInstance="type === 'instance'" @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
       </el-drawer>
       <el-drawer
         :visible.sync="nodeDrawer"
@@ -798,7 +798,7 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
-          processDefinitionId: this.urlParam.id
+          processDefinitionCode: this.store.state.dag.code
         }).then(res => {
           let processDefinitionVersions = res.data.lists
           let total = res.data.totalCount

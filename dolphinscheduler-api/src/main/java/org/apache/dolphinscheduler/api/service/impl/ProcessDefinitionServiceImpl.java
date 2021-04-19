@@ -1726,17 +1726,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * query the pagination versions info by one certain process definition id
+     * query the pagination versions info by one certain process definition code
      *
      * @param loginUser login user info to check auth
      * @param projectName process definition project name
      * @param pageNo page number
      * @param pageSize page size
-     * @param processDefinitionId process definition id
+     * @param processDefinitionCode process definition code
      * @return the pagination process definition versions info of the certain process definition
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, int processDefinitionId) {
+    public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, long processDefinitionCode) {
 
         Map<String, Object> result = new HashMap<>();
 
@@ -1758,7 +1758,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefinitionId);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
 
         PageInfo<ProcessDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<ProcessDefinitionLog> page = new Page<>(pageNo, pageSize);
