@@ -2325,7 +2325,7 @@ public class ProcessService {
         }
         Map<String, TaskDefinition> taskDefinitionMap = new HashMap<>();
         for (TaskNode taskNode : taskNodes) {
-            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(StringUtils.strDigitToLong(taskNode.getCode(), -1L));
+            TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionCode(taskNode.getCode());
             if (taskDefinition == null) {
                 try {
                     long code = SnowFlakeUtils.getInstance().nextId();
@@ -2484,7 +2484,7 @@ public class ProcessService {
             taskNodeMap.compute(processTaskRelation.getPostTaskCode(), (k, v) -> {
                 if (v == null) {
                     v = new TaskNode();
-                    v.setCode(processTaskRelation.getPostTaskCode() + "");
+                    v.setCode(processTaskRelation.getPostTaskCode());
                     v.setVersion(processTaskRelation.getPostTaskVersion());
                     v.setConditionResult(processTaskRelation.getConditionParams());
                     List<PreviousTaskNode> preTaskNodeList = new ArrayList<>();
@@ -2504,7 +2504,7 @@ public class ProcessService {
         taskNodeMap.forEach((k, v) -> {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMap.get(k);
             v.setId(locationMap.get(taskDefinitionLog.getName()));
-            v.setCode(taskDefinitionLog.getCode() + "");
+            v.setCode(taskDefinitionLog.getCode());
             v.setName(taskDefinitionLog.getName());
             v.setDesc(taskDefinitionLog.getDescription());
             v.setType(taskDefinitionLog.getTaskType().toUpperCase());
@@ -2547,7 +2547,7 @@ public class ProcessService {
 
         taskRelationList.forEach(relation -> taskCodeMap.putIfAbsent(relation.getPostTaskCode(), relation.getPostTaskVersion()));
 
-        taskNode.setCode(String.valueOf(taskDefinition.getCode()));
+        taskNode.setCode(taskDefinition.getCode());
         taskNode.setVersion(taskDefinition.getVersion());
         taskNode.setName(taskDefinition.getName());
         taskNode.setName(taskDefinition.getName());

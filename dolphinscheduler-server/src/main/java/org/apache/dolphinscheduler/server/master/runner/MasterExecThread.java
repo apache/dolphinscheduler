@@ -475,7 +475,7 @@ public class MasterExecThread implements Runnable {
         TaskInstance taskInstance = findTaskIfExists(nodeName);
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
-            taskInstance.setTaskCode(Long.parseLong(taskNode.getCode()));
+            taskInstance.setTaskCode(taskNode.getCode());
             taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
             // task name
             taskInstance.setName(nodeName);
