@@ -91,26 +91,6 @@ public class ProcessDefinitionVersionServiceTest {
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> resultMap1 = processDefinitionVersionService.queryProcessDefinitionVersions(
-                loginUser
-                , projectName
-                , pageNo
-                , pageSize
-                , processDefinitionId);
-        Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR
-                , resultMap1.get(Constants.STATUS));
-
-        // pageSize <= 0
-        pageNo = 1;
-        pageSize = -1;
-        Map<String, Object> resultMap2 = processDefinitionVersionService.queryProcessDefinitionVersions(
-                loginUser
-                , projectName
-                , pageNo
-                , pageSize
-                , processDefinitionId);
-        Assert.assertEquals(Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR
-                , resultMap2.get(Constants.STATUS));
 
         Map<String, Object> res = new HashMap<>();
         putMsg(res, Status.PROJECT_NOT_FOUNT);
