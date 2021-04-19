@@ -456,7 +456,8 @@ public class ProcessDefinitionServiceTest {
                 , Mockito.anyString()
                 , Mockito.anyString()
                 , Mockito.any(ProcessData.class)
-                , Mockito.any(ProcessDefinition.class)))
+                , Mockito.any(ProcessDefinition.class)
+                ,true))
                 .thenReturn(1);
 
         Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(getProcessData());
