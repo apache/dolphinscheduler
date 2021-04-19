@@ -18,13 +18,11 @@ package org.apache.dolphinscheduler.common.os;
 
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import oshi.hardware.GlobalMemory;
-
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 
 
 /**
@@ -34,42 +32,34 @@ public class OSUtilsTest {
 
     private static Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
 
-
     @Test
     public void memoryUsage() {
-        logger.info("memoryUsage : {}", OSUtils.memoryUsage());// 0.3361799418926239
+        double memoryUsage = OSUtils.memoryUsage();
+        logger.info("memoryUsage : {}", memoryUsage);
+        Assert.assertTrue(memoryUsage >= 0.0);
     }
 
     @Test
-    public void availablePhysicalMemorySize() {
-        logger.info("availablePhysicalMemorySize : {}", OSUtils.availablePhysicalMemorySize());
-        logger.info("availablePhysicalMemorySize : {}", OSUtils.totalMemorySize() / 10);
+    public void physicalMemorySize() {
+        double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
+        double totalPhysicalMemorySize = OSUtils.totalPhysicalMemorySize();
+        logger.info("availablePhysicalMemorySize : {}", availablePhysicalMemorySize);
+        logger.info("totalPhysicalMemorySize : {}", totalPhysicalMemorySize);
+        Assert.assertTrue(availablePhysicalMemorySize >= 0.0);
+        Assert.assertTrue(totalPhysicalMemorySize >= 0.0);
     }
-
 
     @Test
     public void loadAverage() {
-        logger.info("memoryUsage : {}", OSUtils.loadAverage());
+        double loadAverage = OSUtils.loadAverage();
+        logger.info("loadAverage : {}", loadAverage);
+        Assert.assertTrue(loadAverage >= 0.0);
     }
-
-
-    private void printMemory(GlobalMemory memory) {
-        logger.info("memoryUsage : {} %" , (memory.getTotal() - memory.getAvailable()) * 100 / memory.getTotal() );
-    }
-
 
     @Test
-    public void cpuUsage() throws Exception {
-        logger.info("cpuUsage : {}", OSUtils.cpuUsage());
-        Thread.sleep(1000L);
-        logger.info("cpuUsage : {}", OSUtils.cpuUsage());
-
+    public void cpuUsage() {
         double cpuUsage = OSUtils.cpuUsage();
-
-        DecimalFormat df = new DecimalFormat("0.00");
-
-        df.setRoundingMode(RoundingMode.HALF_UP);
-
-        logger.info("cpuUsage1 : {}", df.format(cpuUsage));
+        logger.info("cpuUsage : {}", cpuUsage);
+        Assert.assertTrue(cpuUsage >= 0.0);
     }
 }
