@@ -1414,7 +1414,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 ((ObjectNode) locationsJN.get(id)).put("name", newName);
 
                 taskNode.setName(taskNode.getName() + suffix);
-                taskNode.setCode("0");
+                taskNode.setCode(0L);
             });
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);

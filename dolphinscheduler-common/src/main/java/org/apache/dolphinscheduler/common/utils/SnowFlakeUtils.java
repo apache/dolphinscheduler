@@ -17,36 +17,25 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Objects;
 
 public class SnowFlakeUtils {
     // start timestamp
-    private static final long START_TIMESTAMP = 1609430400000L; //2021-01-01
+    private static final long START_TIMESTAMP = 1609430400L; //2021-01-01
     // Number of digits
-    private static final long SEQUENCE_BIT = 12;
-    private static final long MACHINE_BIT = 5;
-    private static final long DATA_CENTER_BIT = 5;
-    // Maximum value
-    private static final long MAX_DATA_CENTER_NUM = ~(-1L << DATA_CENTER_BIT);
+    private static final long SEQUENCE_BIT = 13;
+    private static final long MACHINE_BIT = 2;
     private static final long MAX_SEQUENCE = ~(-1L << SEQUENCE_BIT);
     // The displacement to the left
     private static final long MACHINE_LEFT = SEQUENCE_BIT;
-    private static final long DATA_CENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT;
-    private static final long TIMESTAMP_LEFT = DATA_CENTER_LEFT + DATA_CENTER_BIT;
-    private final int dataCenterId;
+    private static final long TIMESTAMP_LEFT = SEQUENCE_BIT + MACHINE_BIT;
     private final int machineId;
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
     private SnowFlakeUtils() throws SnowFlakeException {
-        this.dataCenterId = PropertyUtils.getInt(Constants.SNOW_FLAKE_DATA_CENTER_ID, 1);
-        if (dataCenterId > MAX_DATA_CENTER_NUM || dataCenterId < 0) {
-            throw new IllegalArgumentException(String.format("dataCenterId can't be greater than %d or less than 0", MAX_DATA_CENTER_NUM));
-        }
         try {
             this.machineId = Math.abs(Objects.hash(InetAddress.getLocalHost().getHostName())) % 32;
         } catch (UnknownHostException e) {
@@ -78,7 +67,6 @@ public class SnowFlakeUtils {
         }
         lastTimestamp = currStmp;
         return (currStmp - START_TIMESTAMP) << TIMESTAMP_LEFT
-                | dataCenterId << DATA_CENTER_LEFT
                 | machineId << MACHINE_LEFT
                 | sequence;
     }
@@ -92,7 +80,7 @@ public class SnowFlakeUtils {
     }
 
     private long nowTimestamp() {
-        return System.currentTimeMillis();
+        return System.currentTimeMillis() / 1000;
     }
 
     public static class SnowFlakeException extends Exception {
