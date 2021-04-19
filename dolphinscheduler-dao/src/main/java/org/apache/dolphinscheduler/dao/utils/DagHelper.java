@@ -440,7 +440,7 @@ public class DagHelper {
         Map<Long, TaskNode> taskNodeMap = new HashMap<>();
 
         taskNodeList.forEach(taskNode -> {
-            taskNodeMap.putIfAbsent(Long.parseLong(taskNode.getCode()), taskNode);
+            taskNodeMap.putIfAbsent(taskNode.getCode(), taskNode);
         });
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
