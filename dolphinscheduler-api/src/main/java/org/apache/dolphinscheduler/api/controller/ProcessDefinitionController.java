@@ -275,14 +275,14 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectName         the process definition project name
      * @param pageNo              the process definition version list current page number
      * @param pageSize            the process definition version list page size
-     * @param processDefinitionId the process definition id
+     * @param processDefinitionCode the process definition code
      * @return the process definition version list
      */
     @ApiOperation(value = "queryProcessDefinitionVersions", notes = "QUERY_PROCESS_DEFINITION_VERSIONS_NOTES")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "1")
     })
     @GetMapping(value = "/versions")
     @ResponseStatus(HttpStatus.OK)
@@ -291,11 +291,11 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
-                                                 @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-        logger.info("login user {}, query process versions, project name: {}, pageNo: {}, pageSize: {}, processDefinitionId: {}",
-                loginUser.getUserName(), projectName, pageNo, pageSize, processDefinitionId);
+                                                 @RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
+        logger.info("login user {}, query process versions, project name: {}, pageNo: {}, pageSize: {}, processDefinitionCode: {}",
+                loginUser.getUserName(), projectName, pageNo, pageSize, processDefinitionCode);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionVersions(loginUser
-            , projectName, pageNo, pageSize, processDefinitionId);
+            , projectName, pageNo, pageSize, processDefinitionCode);
 
         return returnDataList(result);
     }
