@@ -700,14 +700,6 @@ public class ProcessService {
                 if (commandTypeIfComplement == CommandType.REPEAT_RUNNING) {
                     setGlobalParamIfCommanded(processDefinition, cmdParam);
                 }
-
-                // Recalculate global parameters after rerun.
-
-                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                        processDefinition.getGlobalParamMap(),
-                        processDefinition.getGlobalParamList(),
-                        commandTypeIfComplement,
-                        processInstance.getScheduleTime()));
             }
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
