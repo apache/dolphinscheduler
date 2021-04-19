@@ -59,7 +59,7 @@
         (SELECT COUNT(*) FROM t_ds_process_definition def, t_ds_process_instance inst WHERE def.id =
         inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count
         from t_ds_project p
-        join t_ds_user u on u.id=p.user_id
+        left join t_ds_user u on u.id=p.user_id
         where 1=1
         <if test="userId != 0">
             and p.id in
@@ -108,5 +108,9 @@
         join t_ds_project dp on dpd.project_id = dp.id
         join t_ds_user u on dp.user_id = u.id
         where di.id = #{processInstanceId};
+    </select>
+
+    <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select * from t_ds_project
     </select>
 </mapper>

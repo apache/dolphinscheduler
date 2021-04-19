@@ -301,7 +301,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
         /**
@@ -353,7 +353,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -373,10 +373,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
@@ -447,19 +443,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query all project list that have one or more process definitions.
+     * query all project list
      *
      * @return project list
      */
     @Override
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = new ArrayList<>();
-
-        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
-        if (CollectionUtils.isNotEmpty(projectIds)) {
-            projects = projectMapper.selectBatchIds(projectIds);
-        }
+        List<Project> projects = projectMapper.queryAllProject();
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);

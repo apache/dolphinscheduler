@@ -36,17 +36,17 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
-        <developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
-        <url>https://github.com/apache/incubator-dolphinscheduler</url>
+        <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
+        <url>https://github.com/apache/dolphinscheduler</url>
         <tag>HEAD</tag>
     </scm>
     <mailingLists>
         <mailingList>
             <name>DolphinScheduler Developer List</name>
-            <post>dev@dolphinscheduler.incubator.apache.org</post>
-            <subscribe>dev-subscribe@dolphinscheduler.incubator.apache.org</subscribe>
-            <unsubscribe>dev-unsubscribe@dolphinscheduler.incubator.apache.org</unsubscribe>
+            <post>dev@dolphinscheduler.apache.org</post>
+            <subscribe>dev-subscribe@dolphinscheduler.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@dolphinscheduler.apache.org</unsubscribe>
         </mailingList>
     </mailingLists>
     <parent>
@@ -624,7 +624,7 @@
 
     <build>
 
-        <finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
 
 
         <pluginManagement>
@@ -797,6 +797,7 @@
                     <includes>
                         <include>**/api/controller/ProjectControllerTest.java</include>
                         <include>**/api/controller/QueueControllerTest.java</include>
+                        <include>**/api/configuration/TrafficConfigurationTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
@@ -807,6 +808,7 @@
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LocaleChangeInterceptorTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
+                        <include>**/api/interceptor/RateLimitInterceptorTest.java</include>
                         <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigLDAPTest.java</include>
@@ -866,7 +868,6 @@
                         <include>**/common/utils/DependentUtilsTest.java</include>
                         <include>**/common/utils/EncryptionUtilsTest.java</include>
                         <include>**/common/utils/FileUtilsTest.java</include>
-                        <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/NetUtilsTest.java</include>
@@ -925,6 +926,7 @@
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/registry/ServerNodeManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
@@ -936,7 +938,7 @@
                         <include>**/server/master/processor/TaskAckProcessorTest.java</include>
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
-                        <include>**/server/register/ZookeeperNodeManagerTest.java</include>
+                        <include>**/server/master/zk/ZKMasterClientTest.java</include>
                         <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
@@ -954,7 +956,7 @@
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
