@@ -460,12 +460,16 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 processDefinition.getUserId());
         setProcessInstance(processInstance, tenant, scheduleTime, locations,
                 connects, processInstanceJson, processData);
-        int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
             updateDefine = syncDefinition(loginUser, project, locations, connects,
                     processInstance, processDefinition, processData);
+
+            processInstance.setProcessDefinitionVersion(processDefinitionLogMapper.
+                    queryMaxVersionForDefinition(processInstance.getProcessDefinitionCode()));
         }
+
+        int update = processService.updateProcessInstance(processInstance);
         if (update > 0 && updateDefine > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
