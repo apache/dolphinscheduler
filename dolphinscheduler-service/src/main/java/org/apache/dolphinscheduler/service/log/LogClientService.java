@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /**
  * log client
  */
-public class LogClientService {
+public class LogClientService implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
 
@@ -67,6 +67,7 @@ public class LogClientService {
     /**
      * close
      */
+    @Override
     public void close() {
         this.client.close();
         this.isRunning = false;
