@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_ADDRESS_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -117,8 +118,12 @@ public class WorkerGroupController extends BaseController {
     ) {
         logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
                 RegexUtils.escapeNRT(loginUser.getUserName()), pageNo, pageSize, searchVal);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
+        result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
         return returnDataListPaging(result);
     }
 
