@@ -52,7 +52,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -72,7 +71,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -425,12 +423,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param locations locations
      * @param connects connects
      * @return update result code
-     * @throws ParseException parse exception for json parse
      */
+    @Transactional
     @Override
     public Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
                                                      String processInstanceJson, String scheduleTime, Boolean syncDefine,
-                                                     Flag flag, String locations, String connects) throws ParseException {
+                                                     Flag flag, String locations, String connects) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
         //check project permission
@@ -461,10 +459,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
                 processDefinition.getUserId());
-        setProcessInstance(processInstance, tenant, scheduleTime, locations,
-                connects, processInstanceJson, processData);
+        setProcessInstance(processInstance, tenant, scheduleTime, processData);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
+            processDefinition.setId(processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode()).getId());
             updateDefine = syncDefinition(loginUser, project, locations, connects,
                     processInstance, processDefinition, processData);
 
@@ -495,37 +493,29 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         processDefinition.setTimeout(processInstance.getTimeout());
         processDefinition.setUpdateTime(new Date());
 
-        int updateDefine = processService.saveProcessDefinition(loginUser, project, processDefinition.getName(),
+        return processService.saveProcessDefinition(loginUser, project, processDefinition.getName(),
                 processDefinition.getDescription(), locations, connects,
-                processData, processDefinition);
-        return updateDefine;
+                processData, processDefinition, false);
     }
 
     /**
      * update process instance attributes
-     *
-     * @return false if check failed or
      */
-    private void setProcessInstance(ProcessInstance processInstance, Tenant tenant,
-                                    String scheduleTime, String locations, String connects, String processInstanceJson,
-                                    ProcessData processData) {
+    private void setProcessInstance(ProcessInstance processInstance, Tenant tenant, String scheduleTime, ProcessData processData) {
 
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
         }
         processInstance.setScheduleTime(schedule);
-        processInstance.setLocations(locations);
-        processInstance.setConnects(connects);
-        if (StringUtils.isNotEmpty(processInstanceJson)) {
-            return;
-        }
         List<Property> globalParamList = processData.getGlobalParams();
-        Map<String, String> globalParamMap = Optional.ofNullable(globalParamList).orElse(Collections.emptyList()).stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        Map<String, String> globalParamMap = Optional.ofNullable(globalParamList)
+                .orElse(Collections.emptyList())
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property::getValue));
         String globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
                 processInstance.getCmdTypeIfComplement(), schedule);
-        int timeout = processData.getTimeout();
-        processInstance.setTimeout(timeout);
+        processInstance.setTimeout(processData.getTimeout());
         if (tenant != null) {
             processInstance.setTenantCode(tenant.getTenantCode());
         }
@@ -706,13 +696,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new RuntimeException("workflow instance is null");
         }
 
-        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+        ProcessDefinition processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion()
         );
-        ProcessDefinition processDefinition = JSONUtils.parseObject(JSONUtils.toJsonString(processDefinitionLog),
-                ProcessDefinition.class);
-
         GanttDto ganttDto = new GanttDto();
         DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
         //topological sort
