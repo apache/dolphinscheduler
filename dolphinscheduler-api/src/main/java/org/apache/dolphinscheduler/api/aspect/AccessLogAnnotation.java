@@ -22,17 +22,14 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
-
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AccessLogAnnotation {
-   String[] ignoreRequestArgs() default {};
+    String[] ignoreRequestArgs() default {};
 
-   boolean ignoreRequest() default false;
+    boolean ignoreRequest() default false;
 
-   boolean ignoreResponse() default true;
-
+    boolean ignoreResponse() default true;
 }

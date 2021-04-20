@@ -420,7 +420,6 @@ public class ProcessDefinitionController extends BaseController {
                                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                                   @RequestParam("processDefinitionName") String processDefinitionName) {
 
-
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
         return returnDataList(result);
     }

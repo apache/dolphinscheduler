@@ -19,14 +19,11 @@ package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,9 +80,9 @@ public class AccessLogAspect {
                     String[] parameterNames = ((MethodSignature) proceedingJoinPoint.getSignature()).getParameterNames();
                     if (parameterNames.length > 0) {
                         List<String> ignoreList = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toList());
-                        HashMap<String, Object> argsMap = new HashMap();
+                        HashMap<String, Object> argsMap = new HashMap<String, Object>();
 
-                        for(int i = 0; i < parameterNames.length; i++) {
+                        for (int i = 0; i < parameterNames.length; i++) {
                             if (!ignoreList.contains(parameterNames[i])) {
                                 argsMap.put(parameterNames[i], args[i]);
                             }
