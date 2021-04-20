@@ -1396,7 +1396,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                       Project targetProject) throws JsonProcessingException {
 
         Map<String, Object> result = new HashMap<>();
-
+        String currentTimeStamp = DateUtils.getCurrentTimeStamp();
         ProcessDefinition processDefinition = processDefinitionMapper.selectById(processId);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
@@ -1407,21 +1407,27 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             String locations = processDefinition.getLocations();
             ObjectNode locationsJN = JSONUtils.parseObject(locations);
 
-            taskNodeList.forEach(taskNode -> {
-                String suffix = "_copy_" + DateUtils.getCurrentTimeStamp();
+            for (TaskNode taskNode : taskNodeList) {
+                String suffix = "_copy_" + currentTimeStamp;
                 String id = taskNode.getId();
                 String newName = locationsJN.path(id).path("name").asText() + suffix;
                 ((ObjectNode) locationsJN.get(id)).put("name", newName);
 
+                List<String> depList = taskNode.getDepList();
+                List<String> newDepList = depList.stream()
+                        .map(s -> s + suffix)
+                        .collect(Collectors.toList());
+
+                taskNode.setDepList(newDepList);
                 taskNode.setName(taskNode.getName() + suffix);
                 taskNode.setCode(0L);
-            });
+            }
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             return createProcessDefinition(
                     loginUser,
                     targetProject.getName(),
-                    processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp(),
+                    processDefinition.getName() + "_copy_" + currentTimeStamp,
                     processDefinitionJson,
                     processDefinition.getDescription(),
                     locationsJN.toString(),
