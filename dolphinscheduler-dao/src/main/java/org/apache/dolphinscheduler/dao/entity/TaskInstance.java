@@ -506,6 +506,10 @@ public class TaskInstance implements Serializable {
         return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
     }
 
+    public boolean isSwhichTask() {
+        return TaskType.SWHICH.equals(TaskType.valueOf(this.taskType));
+    }
+
     /**
      * determine if you can try again
      *

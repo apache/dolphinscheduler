@@ -23,17 +23,23 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
+import org.apache.dolphinscheduler.common.task.conditions.SwhichParameters;
+import org.apache.dolphinscheduler.common.task.conditions.SwhichResultVo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * dag tools
@@ -306,6 +312,9 @@ public class DagHelper {
         } else if (dag.getNode(preNodeName).isConditionsTask()) {
             List<String> conditionTaskList = parseConditionTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
             startVertexes.addAll(conditionTaskList);
+        } else if (dag.getNode(preNodeName).isSwhichTask()) {
+            List<String> conditionTaskList = parseSwhichTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
+            startVertexes.addAll(conditionTaskList);
         } else {
             startVertexes = dag.getSubsequentNodes(preNodeName);
         }
@@ -384,6 +393,50 @@ public class DagHelper {
             setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
         }
         return conditionTaskList;
+    }
+
+    /**
+     * parse condition task find the branch process
+     * set skip flag for another one.
+     *
+     * @param nodeName
+     * @return
+     */
+    public static List<String> parseSwhichTask(String nodeName,
+                                               Map<String, TaskNode> skipTaskNodeList,
+                                               DAG<String, TaskNode, TaskNodeRelation> dag,
+                                               Map<String, TaskInstance> completeTaskList) {
+        List<String> conditionTaskList = new ArrayList<>();
+        TaskNode taskNode = dag.getNode(nodeName);
+        if (!taskNode.isSwhichTask()) {
+            return conditionTaskList;
+        }
+        if (!completeTaskList.containsKey(nodeName)) {
+            return conditionTaskList;
+        }
+        TaskInstance taskInstance = completeTaskList.get(nodeName);
+        TaskNode taskNodeNew = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+        skipTaskNode4Condition(taskNodeNew, skipTaskNodeList, completeTaskList, dag);
+        return conditionTaskList;
+    }
+
+    private static List<String> skipTaskNode4Condition(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList, Map<String, TaskInstance> completeTaskList, DAG<String, TaskNode, TaskNodeRelation> dag) {
+        SwhichParameters swhichParameters =
+                JSONUtils.parseObject(taskNode.getDependence(), SwhichParameters.class);
+        int resultConditionLocation = swhichParameters.getResultConditionLocation();
+        List<SwhichResultVo> conditionResultVoList = swhichParameters.getDependTaskList();
+        List<String> swhichTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
+        if (CollectionUtils.isEmpty(swhichTaskList)) {
+            swhichTaskList = new ArrayList<>();
+        }
+        conditionResultVoList.remove(resultConditionLocation);
+        for (SwhichResultVo info : conditionResultVoList) {
+            if (CollectionUtils.isEmpty(info.getNextNode())) {
+                continue;
+            }
+            setTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList);
+        }
+        return swhichTaskList;
     }
 
     /**

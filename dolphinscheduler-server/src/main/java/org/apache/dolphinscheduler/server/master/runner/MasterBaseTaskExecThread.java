@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -32,8 +33,13 @@ import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +100,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     protected TaskTimeoutParameter taskTimeoutParameter;
 
+    protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
     /**
      * constructor of MasterBaseTaskExecThread
      *
@@ -319,5 +326,24 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         Date startTime = taskInstance.getStartTime();
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
         return timeoutSeconds - usedTime;
+    }
+
+    public String setTaskParams(String content, String rgex,ProcessInstance processInstance) {
+        Pattern pattern = Pattern.compile(rgex);
+        Matcher m = pattern.matcher(content);
+        while (m.find()) {
+            String paramName = m.group(1);
+            Property property = JSONUtils.toList(processInstance.getGlobalParams(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property)).get(paramName);
+            if (property == null) {
+                return "";
+            }
+            String value = property.getValue();
+            if (!NumberUtils.isNumber(value)) {
+                value = "\"" + value + "\"";
+            }
+            logger.info("paramName：{}，paramValue{}", paramName, value);
+            content = content.replace("${" + paramName + "}", value);
+        }
+        return content;
     }
 }

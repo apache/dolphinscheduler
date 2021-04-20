@@ -432,6 +432,8 @@ public class MasterExecThread implements Runnable {
             abstractExecThread = new DependentTaskExecThread(taskInstance);
         } else if (taskInstance.isConditionsTask()) {
             abstractExecThread = new ConditionsTaskExecThread(taskInstance);
+        } else if (taskInstance.isSwhichTask()) {
+            abstractExecThread = new ConditionsTaskExecThread(taskInstance);
         } else {
             abstractExecThread = new MasterTaskExecThread(taskInstance);
         }
