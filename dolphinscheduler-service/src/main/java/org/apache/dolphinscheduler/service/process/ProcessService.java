@@ -1587,32 +1587,6 @@ public class ProcessService {
     }
 
     /**
-     * update the process instance
-     *
-     * @param processInstanceId processInstanceId
-     * @param processJson processJson
-     * @param globalParams globalParams
-     * @param scheduleTime scheduleTime
-     * @param flag flag
-     * @param locations locations
-     * @param connects connects
-     * @return update process instance result
-     */
-    public int updateProcessInstance(Integer processInstanceId, String processJson,
-                                     String globalParams, Date scheduleTime, Flag flag,
-                                     String locations, String connects) {
-        ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
-        if (processInstance != null) {
-            processInstance.setGlobalParams(globalParams);
-            processInstance.setScheduleTime(scheduleTime);
-            processInstance.setLocations(locations);
-            processInstance.setConnects(connects);
-            return processInstanceMapper.updateById(processInstance);
-        }
-        return 0;
-    }
-
-    /**
      * change task state
      *
      * @param state state
@@ -2163,13 +2137,13 @@ public class ProcessService {
     /**
      * switch process definition version to process definition log version
      */
-    public int processDefinitionToDB(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
+    public int processDefinitionToDB(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog, Boolean isFromProcessDefine) {
         if (null == processDefinition || null == processDefinitionLog) {
             return Constants.DEFINITION_FAILURE;
         }
 
         processDefinitionLog.setId(processDefinition.getId());
-        processDefinitionLog.setReleaseState(ReleaseState.OFFLINE);
+        processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
         processDefinitionLog.setFlag(Flag.YES);
 
         int result;
@@ -2185,7 +2159,7 @@ public class ProcessService {
      * switch process definition version to process definition log version
      */
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
-        int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog);
+        int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog, true);
         if (switchResult != Constants.DEFINITION_FAILURE) {
             switchProcessTaskRelationVersion(processDefinition);
         }
@@ -2266,14 +2240,15 @@ public class ProcessService {
      * save processDefinition (including create or update processDefinition)
      */
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
-                                     String connects, ProcessData processData, ProcessDefinition processDefinition) {
+                                     String connects, ProcessData processData, ProcessDefinition processDefinition,
+                                     Boolean isFromProcessDefine) {
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
                 name, processData, project, desc, locations, connects);
-        Map<String, TaskDefinition> taskDefinitionMap = handleTaskDefinition(operator, project.getCode(), processData.getTasks());
+        Map<String, TaskDefinition> taskDefinitionMap = handleTaskDefinition(operator, project.getCode(), processData.getTasks(), isFromProcessDefine);
         if (Constants.DEFINITION_FAILURE == handleTaskRelation(operator, project.getCode(), processDefinitionLog, processData.getTasks(), taskDefinitionMap)) {
             return Constants.DEFINITION_FAILURE;
         }
-        return processDefinitionToDB(processDefinition, processDefinitionLog);
+        return processDefinitionToDB(processDefinition, processDefinitionLog, isFromProcessDefine);
     }
 
     /**
@@ -2319,7 +2294,7 @@ public class ProcessService {
     /**
      * handle task definition
      */
-    public Map<String, TaskDefinition> handleTaskDefinition(User operator, Long projectCode, List<TaskNode> taskNodes) {
+    public Map<String, TaskDefinition> handleTaskDefinition(User operator, Long projectCode, List<TaskNode> taskNodes, Boolean isFromProcessDefine) {
         if (taskNodes == null) {
             return null;
         }
@@ -2336,7 +2311,7 @@ public class ProcessService {
                 }
                 saveTaskDefinition(operator, projectCode, taskNode, taskDefinition);
             } else {
-                if (isTaskOnline(taskDefinition.getCode())) {
+                if (isFromProcessDefine && isTaskOnline(taskDefinition.getCode())) {
                     throw new ServiceException(String.format("The task %s is on line in process", taskNode.getName()));
                 }
                 updateTaskDefinition(operator, projectCode, taskNode, taskDefinition);

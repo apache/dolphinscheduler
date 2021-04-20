@@ -205,7 +205,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         int saveResult = processService.saveProcessDefinition(loginUser, project, processDefinitionName, desc,
-                locations, connects, processData, processDefinition);
+                locations, connects, processData, processDefinition, true);
 
         if (saveResult > 0) {
             putMsg(result, Status.SUCCESS);
@@ -414,7 +414,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessData newProcessData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
         int saveResult = processService.saveProcessDefinition(loginUser, project, name, desc,
-                locations, connects, newProcessData, processDefinition);
+                locations, connects, newProcessData, processDefinition, true);
 
         if (saveResult > 0) {
             putMsg(result, Status.SUCCESS);

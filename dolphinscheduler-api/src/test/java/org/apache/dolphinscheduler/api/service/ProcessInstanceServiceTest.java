@@ -409,7 +409,7 @@ public class ProcessInstanceServiceTest {
         when(processDefineMapper.updateById(processDefinition)).thenReturn(1);
         when(processService.saveProcessDefinition(Mockito.any(), Mockito.any(),
                 Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.any(), Mockito.any())).thenReturn(1);
+                Mockito.anyString(), Mockito.any(), Mockito.any(), true)).thenReturn(1);
         putMsg(result, Status.SUCCESS, projectName);
 
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,

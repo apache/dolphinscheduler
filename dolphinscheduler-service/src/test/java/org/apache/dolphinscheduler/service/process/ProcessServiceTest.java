@@ -361,7 +361,7 @@ public class ProcessServiceTest {
         Mockito.when(processDefineMapper.updateById(any())).thenReturn(1);
         Mockito.when(processDefineLogMapper.insert(any())).thenReturn(1);
 
-        int i = processService.saveProcessDefinition(user, project, "name", "desc", "locations", "connects", processData, processDefinition);
+        int i = processService.saveProcessDefinition(user, project, "name", "desc", "locations", "connects", processData, processDefinition, true);
         Assert.assertEquals(1, i);
 
     }
