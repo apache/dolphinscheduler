@@ -33,7 +33,7 @@
         ,
         u.user_name as user_name
         from t_ds_project p
-        join t_ds_user u on p.user_id = u.id
+        left join t_ds_user u on p.user_id = u.id
         where p.id = #{projectId}
     </select>
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.Project">
@@ -44,7 +44,7 @@
         ,
         u.user_name as user_name
         from t_ds_project p
-        join t_ds_user u on p.user_id = u.id
+        left join t_ds_user u on p.user_id = u.id
         where p.name = #{projectName}
         limit 1
     </select>
