@@ -328,11 +328,12 @@ public class SqlTask extends AbstractTask {
             }
         }
 
-        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
-            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
-                    JSONUtils.toJsonString(resultJSONArray));
-        }
         String result = JSONUtils.toJsonString(resultJSONArray);
+        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
+            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
+                            ? sqlParameters.getTitle()
+                            : taskExecutionContext.getTaskName() + " query result sets", result);
+        }
         logger.debug("execute sql result : {}", result);
         return result;
     }
