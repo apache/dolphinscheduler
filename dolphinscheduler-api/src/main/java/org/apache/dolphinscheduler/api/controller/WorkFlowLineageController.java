@@ -62,7 +62,7 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value = "/list-name")
     @ResponseStatus(HttpStatus.OK)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                     @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
                                                                     @ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal) {
@@ -78,7 +78,7 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value = "/list-ids")
     @ResponseStatus(HttpStatus.OK)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                  @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
                                                                  @ApiIgnore @RequestParam(value = "ids", required = false) String ids) {

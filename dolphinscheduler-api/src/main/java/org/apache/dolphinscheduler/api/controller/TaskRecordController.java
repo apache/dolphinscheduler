@@ -70,7 +70,7 @@ public class TaskRecordController extends BaseController {
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_RECORD_LIST_PAGING_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskRecordListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "taskName", required = false) String taskName,
                                             @RequestParam(value = "state", required = false) String state,
@@ -105,7 +105,7 @@ public class TaskRecordController extends BaseController {
     @GetMapping("/history-list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_RECORD_LIST_PAGING_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryHistoryTaskRecordListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @RequestParam(value = "taskName", required = false) String taskName,
                                                    @RequestParam(value = "state", required = false) String state,

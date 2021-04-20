@@ -66,7 +66,7 @@ public class MonitorController extends BaseController {
     @GetMapping(value = "/master/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listMaster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryMaster(loginUser);
         return returnDataList(result);
@@ -82,7 +82,7 @@ public class MonitorController extends BaseController {
     @GetMapping(value = "/worker/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_WORKERS_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listWorker(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryWorker(loginUser);
         return returnDataList(result);
@@ -98,7 +98,7 @@ public class MonitorController extends BaseController {
     @GetMapping(value = "/database")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATABASE_STATE_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
         return returnDataList(result);
@@ -114,7 +114,7 @@ public class MonitorController extends BaseController {
     @GetMapping(value = "/zookeeper/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryZookeeperState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = monitorService.queryZookeeperState(loginUser);
         return returnDataList(result);

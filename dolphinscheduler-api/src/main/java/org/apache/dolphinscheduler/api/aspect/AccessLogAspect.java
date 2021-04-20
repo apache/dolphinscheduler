@@ -19,8 +19,15 @@ package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,6 +35,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -46,26 +54,65 @@ public class AccessLogAspect {
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes != null) {
-            HttpServletRequest request = attributes.getRequest();
-            String userName = "NOT LOGIN";
-            User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
-            if (loginUser != null) {
-                userName = loginUser.getUserName();
-            }
-
-            logger.info("REQUEST LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
-                    userName,
-                    request.getRequestURI(),
-                    request.getMethod(),
-                    proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
-                    Arrays.toString(proceedingJoinPoint.getArgs()));
-        }
+        // fetch AccessLogAnnotation
+        MethodSignature sign =  (MethodSignature) proceedingJoinPoint.getSignature();
+        Method method = sign.getMethod();
+        AccessLogAnnotation annotation = method.getAnnotation(AccessLogAnnotation.class);
 
         Object ob = proceedingJoinPoint.proceed();
 
-        logger.info("RESPONSE:{}, REQUEST DURATION:{} milliseconds", ob, (System.currentTimeMillis() - startTime));
+        String logText = "";
+
+        // log request
+        if (!annotation.ignoreRequest()) {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+
+                // handle login info
+                String userName = "NOT LOGIN";
+                User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
+                if (loginUser != null) {
+                    userName = loginUser.getUserName();
+                }
+
+                // handle args
+                Object[] args = proceedingJoinPoint.getArgs();
+                String argsString = Arrays.toString(args);
+                if (annotation.ignoreRequestArgs().length > 0) {
+                    String[] parameterNames = ((MethodSignature) proceedingJoinPoint.getSignature()).getParameterNames();
+                    if (parameterNames.length > 0) {
+                        List<String> ignoreList = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toList());
+                        HashMap<String, Object> argsMap = new HashMap();
+
+                        for(int i = 0; i < parameterNames.length; i++) {
+                            if (!ignoreList.contains(parameterNames[i])) {
+                                argsMap.put(parameterNames[i], args[i]);
+                            }
+                        }
+                        argsString = argsMap.toString();
+                    }
+                }
+                logText = String.format("REQUEST LOGIN_USER:%s, URI:%s, METHOD:%s, HANDLER:%s, ARGS:%s",
+                        userName,
+                        request.getRequestURI(),
+                        request.getMethod(),
+                        proceedingJoinPoint.getSignature().getDeclaringTypeName() + "." + proceedingJoinPoint.getSignature().getName(),
+                        argsString);
+
+            }
+        }
+
+        // log response
+        if (!annotation.ignoreResponse()) {
+            logText += String.format("\nRESPONSE:%s, REQUEST DURATION:%s milliseconds",
+                    ob, (System.currentTimeMillis() - startTime));
+        }
+
+        if (logText.length() > 0) {
+            logger.info(logText);
+        }
+
         return ob;
     }
 

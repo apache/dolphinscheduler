@@ -80,7 +80,7 @@ public class WorkerGroupController extends BaseController {
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SAVE_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result saveWorkerGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
@@ -108,7 +108,7 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllWorkerGroupsPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("pageNo") Integer pageNo,
                                              @RequestParam("pageSize") Integer pageSize,
@@ -129,7 +129,7 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/all-groups")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = workerGroupService.queryAllGroup();
         return returnDataList(result);
@@ -149,7 +149,7 @@ public class WorkerGroupController extends BaseController {
     @PostMapping(value = "/delete-by-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam("id") Integer id
     ) {
@@ -167,7 +167,7 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/worker-address-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_ADDRESS_LIST_FAIL)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryWorkerAddressList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = workerGroupService.getWorkerAddressList();
         return returnDataList(result);
