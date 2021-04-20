@@ -203,6 +203,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result verifyProcessDefinitionName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam(value = "name", required = true) String name) {
+
         Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectName, name);
         return returnDataList(result);
     }
@@ -285,7 +286,11 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId) {
 
-        Map<String, Object> result = processDefinitionVersionService.queryProcessDefinitionVersions(loginUser
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
+        result = processDefinitionVersionService.queryProcessDefinitionVersions(loginUser
             , projectName, pageNo, pageSize, processDefinitionId);
         return returnDataList(result);
     }
@@ -312,7 +317,6 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
-
         Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectName
             , processDefinitionId, version);
         return returnDataList(result);
@@ -340,7 +344,6 @@ public class ProcessDefinitionController extends BaseController {
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
-
         Map<String, Object> result = processDefinitionVersionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectName, processDefinitionId, version);
         return returnDataList(result);
     }
@@ -374,7 +377,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by id
+     * query detail of process definition by id
      *
      * @param loginUser   login user
      * @param projectName project name
@@ -398,7 +401,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by name
+     * query detail of process definition by name
      *
      * @param loginUser login user
      * @param projectName project name
@@ -415,8 +418,9 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<ProcessDefinition> queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                                                  @RequestParam("processDefinitionName") String processDefinitionName
-    ) {
+                                                                  @RequestParam("processDefinitionName") String processDefinitionName) {
+
+
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
         return returnDataList(result);
     }
@@ -468,6 +472,7 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                    @RequestParam("pageSize") Integer pageSize) {
+
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -478,7 +483,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * encapsulation treeview structure
+     * encapsulation tree view structure
      *
      * @param loginUser   login user
      * @param projectName project name
@@ -499,6 +504,7 @@ public class ProcessDefinitionController extends BaseController {
                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                            @RequestParam("processId") Integer id,
                            @RequestParam("limit") Integer limit) throws Exception {
+
         Map<String, Object> result = processDefinitionService.viewTree(id, limit);
         return returnDataList(result);
     }
@@ -523,6 +529,7 @@ public class ProcessDefinitionController extends BaseController {
         @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
         @RequestParam("processDefinitionId") Integer processDefinitionId) throws Exception {
+
         Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionId(processDefinitionId);
         return returnDataList(result);
     }
@@ -572,6 +579,7 @@ public class ProcessDefinitionController extends BaseController {
                                               @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam("processDefinitionId") Integer processDefinitionId
     ) {
+
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
         return returnDataList(result);
     }
@@ -646,6 +654,7 @@ public class ProcessDefinitionController extends BaseController {
                                                   @RequestParam("processDefinitionIds") String processDefinitionIds,
                                                   HttpServletResponse response) {
         try {
+
             processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectName, processDefinitionIds, response);
         } catch (Exception e) {
             logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
@@ -666,6 +675,7 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionAllByProjectId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam("projectId") Integer projectId) {
+
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionAllByProjectId(projectId);
         return returnDataList(result);
     }
