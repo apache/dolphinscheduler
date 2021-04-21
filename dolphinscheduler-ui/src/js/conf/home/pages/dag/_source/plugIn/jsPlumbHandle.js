@@ -619,7 +619,6 @@ JSP.prototype.saveStore = function () {
             preTasks.push($(`#${v1}`).find('.name-p').text())
           })
         }
-
         let tasksParam = _.assign(v, {
           preTasks: preTasks
         })
@@ -731,11 +730,7 @@ JSP.prototype.handleEvent = function () {
       return false
     }
 
-    if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber') === 2) {
-      return false
-    } else {
-      $(`#${sourceId}`).attr('data-nodenumber', Number($(`#${sourceId}`).attr('data-nodenumber')) + 1)
-    }
+    $(`#${sourceId}`).attr('data-nodenumber', Number($(`#${sourceId}`).attr('data-nodenumber')) + 1)
 
     // Storage node dependency information
     saveTargetarr(sourceId, targetId)
