@@ -292,5 +292,14 @@ public interface ProcessDefinitionService {
      * @return task dependencies list
      */
     Map<String, Object> queryDownstreamTaskDependencies(Integer processId, String taskName);
+  
+    /**
+     * check has associated process definition
+     *
+     * @param processDefinitionId process definition id
+     * @param version version
+     * @return The query result has a specific process definition return true
+     */
+    boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version);
 }
 

@@ -80,6 +80,18 @@
         </el-radio-group>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('App Name')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="appName"
+          :placeholder="$t('Please enter app name(optional)')">
+        </el-input>
+      </div>
+    </m-list-box>
     <m-list-4-box>
       <div slot="text">{{$t('Driver Cores')}}</div>
       <div slot="content">
@@ -223,6 +235,8 @@
         executorMemory: '2G',
         // Executor cores
         executorCores: 2,
+        // Spark app name
+        appName: '',
         // Main arguments
         mainArgs: '',
         // Option parameters
@@ -448,6 +462,7 @@
           numExecutors: this.numExecutors,
           executorMemory: this.executorMemory,
           executorCores: this.executorCores,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType,
@@ -512,6 +527,7 @@
           numExecutors: this.numExecutors,
           executorMemory: this.executorMemory,
           executorCores: this.executorCores,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType,
@@ -544,6 +560,7 @@
         this.numExecutors = o.params.numExecutors || 2
         this.executorMemory = o.params.executorMemory || '2G'
         this.executorCores = o.params.executorCores || 2
+        this.appName = o.params.appName || ''
         this.mainArgs = o.params.mainArgs || ''
         this.others = o.params.others
         this.programType = o.params.programType || 'SCALA'

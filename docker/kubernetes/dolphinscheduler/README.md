@@ -16,8 +16,8 @@ This chart bootstraps a [DolphinScheduler](https://dolphinscheduler.apache.org) 
 To install the chart with the release name `dolphinscheduler`:
 
 ```bash
-$ git clone https://github.com/apache/incubator-dolphinscheduler.git
-$ cd incubator-dolphinscheduler/docker/kubernetes/dolphinscheduler
+$ git clone https://github.com/apache/dolphinscheduler.git
+$ cd dolphinscheduler/docker/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
 $ helm install dolphinscheduler .
@@ -54,6 +54,8 @@ And then access the web: http://192.168.xx.xx:12345/dolphinscheduler
 
 The default username is `admin` and the default password is `dolphinscheduler123`
 
+> **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `dolphinscheduler` deployment:
@@ -78,14 +80,12 @@ The Configuration file is `values.yaml`, and the following tables lists the conf
 
 | Parameter                                                                         | Description                                                                                                                    | Default                                               |
 | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| `nameOverride`                                                                    | String to partially override common.names.fullname                                                                             | `nil`                                                 |
-| `fullnameOverride`                                                                | String to fully override common.names.fullname                                                                                 | `nil`                                                 |
 | `timezone`                                                                        | World time and date for cities in all time zones                                                                               | `Asia/Shanghai`                                       |
-| `image.registry`                                                                  | Docker image registry for the DolphinScheduler                                                                                 | `docker.io`                                           |
+|                                                                                   |                                                                                                                                |                                                       |
 | `image.repository`                                                                | Docker image repository for the DolphinScheduler                                                                               | `apache/dolphinscheduler`                             |
 | `image.tag`                                                                       | Docker image version for the DolphinScheduler                                                                                  | `latest`                                              |
 | `image.pullPolicy`                                                                | Image pull policy. One of Always, Never, IfNotPresent                                                                          | `IfNotPresent`                                        |
-| `image.pullSecrets`                                                               | Image pull secrets. An optional list of references to secrets in the same namespace to use for pulling any of the images       | `[]`                                                  |
+| `image.pullSecret`                                                                | Image pull secret. An optional reference to secret in the same namespace to use for pulling any of the images                  | `nil`                                                 |
 |                                                                                   |                                                                                                                                |                                                       |
 | `postgresql.enabled`                                                              | If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL                             | `true`                                                |
 | `postgresql.postgresqlUsername`                                                   | The username for internal PostgreSQL                                                                                           | `root`                                                |
@@ -134,7 +134,7 @@ The Configuration file is `values.yaml`, and the following tables lists the conf
 | `master.tolerations`                                                              | If specified, the pod's tolerations                                                                                            | `{}`                                                  |
 | `master.resources`                                                                | The `resource` limit and request config for master server                                                                      | `{}`                                                  |
 | `master.configmap.DOLPHINSCHEDULER_OPTS`                                          | The java options for master server                                                                                             | `""`                                                  |
-| `master.configmap.MASTER_EXEC_THREADS`                                            | Master execute thread num                                                                                                      | `100`                                                 |
+| `master.configmap.MASTER_EXEC_THREADS`                                            | Master execute thread number                                                                                                   | `100`                                                 |
 | `master.configmap.MASTER_EXEC_TASK_NUM`                                           | Master execute task number in parallel                                                                                         | `20`                                                  |
 | `master.configmap.MASTER_HEARTBEAT_INTERVAL`                                      | Master heartbeat interval                                                                                                      | `10`                                                  |
 | `master.configmap.MASTER_TASK_COMMIT_RETRYTIMES`                                  | Master commit task retry times                                                                                                 | `5`                                                   |
@@ -167,13 +167,13 @@ The Configuration file is `values.yaml`, and the following tables lists the conf
 | `worker.tolerations`                                                              | If specified, the pod's tolerations                                                                                            | `{}`                                                  |
 | `worker.resources`                                                                | The `resource` limit and request config for worker server                                                                      | `{}`                                                  |
 | `worker.configmap.DOLPHINSCHEDULER_OPTS`                                          | The java options for worker server                                                                                             | `""`                                                  |
-| `worker.configmap.WORKER_EXEC_THREADS`                                            | Worker execute thread num                                                                                                      | `100`                                                 |
+| `worker.configmap.WORKER_EXEC_THREADS`                                            | Worker execute thread number                                                                                                   | `100`                                                 |
 | `worker.configmap.WORKER_HEARTBEAT_INTERVAL`                                      | Worker heartbeat interval                                                                                                      | `10`                                                  |
 | `worker.configmap.WORKER_MAX_CPULOAD_AVG`                                         | Only less than cpu avg load, worker server can work. default value : the number of cpu cores * 2                               | `100`                                                 |
 | `worker.configmap.WORKER_RESERVED_MEMORY`                                         | Only larger than reserved memory, worker server can work. default value : physical memory * 1/10, unit is G                    | `0.1`                                                 |
 | `worker.configmap.WORKER_LISTEN_PORT`                                             | Worker listen port                                                                                                             | `1234`                                                |
 | `worker.configmap.WORKER_GROUPS`                                                  | Worker groups                                                                                                                  | `default`                                             |
-| `worker.configmap.WORKER_WEIGHT`                                                  | Worker weight                                                                                                                  | `100`                                                 |
+| `worker.configmap.WORKER_HOST_WEIGHT`                                             | Worker host weight                                                                                                             | `100`                                                 |
 | `worker.livenessProbe.enabled`                                                    | Turn on and off liveness probe                                                                                                 | `true`                                                |
 | `worker.livenessProbe.initialDelaySeconds`                                        | Delay before liveness probe is initiated                                                                                       | `30`                                                  |
 | `worker.livenessProbe.periodSeconds`                                              | How often to perform the probe                                                                                                 | `30`                                                  |
@@ -283,7 +283,7 @@ docker build -t apache/dolphinscheduler:mysql .
 
 4. Push the docker image `apache/dolphinscheduler:mysql` to a docker registry
 
-5. Modify image `registry` and `repository`, and update `tag` to `mysql` in `values.yaml`
+5. Modify image `repository` and update `tag` to `mysql` in `values.yaml`
 
 6. Modify postgresql `enabled` to `false`
 
@@ -326,7 +326,7 @@ docker build -t apache/dolphinscheduler:mysql-driver .
 
 4. Push the docker image `apache/dolphinscheduler:mysql-driver` to a docker registry
 
-5. Modify image `registry` and `repository`, and update `tag` to `mysql-driver` in `values.yaml`
+5. Modify image `repository` and update `tag` to `mysql-driver` in `values.yaml`
 
 6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
 
@@ -355,10 +355,10 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 4. Push the docker image `apache/dolphinscheduler:oracle-driver` to a docker registry
 
-5. Modify image `registry` and `repository`, and update `tag` to `oracle-driver` in `values.yaml`
+5. Modify image `repository` and update `tag` to `oracle-driver` in `values.yaml`
 
 6. Run a DolphinScheduler release in Kubernetes (See **Installing the Chart**)
 
 7. Add a Oracle datasource in `Datasource manage`
 
-For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+For more information please refer to the [dolphinscheduler](https://github.com/apache/dolphinscheduler.git) documentation.

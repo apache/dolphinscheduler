@@ -769,7 +769,7 @@ public class ProcessDefinitionServiceTest {
         // task empty
         processData.setTasks(null);
         Map<String, Object> taskNotEmptyRes = processDefinitionService.checkProcessNodeList(processData, processDefinitionJson);
-        Assert.assertEquals(Status.DATA_IS_NULL, taskNotEmptyRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, taskNotEmptyRes.get(Constants.STATUS));
 
         // task cycle
         String processDefinitionJsonCycle = CYCLE_SHELL_JSON;

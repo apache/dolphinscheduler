@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -55,6 +56,9 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
 
     @Autowired
     private ProjectMapper projectMapper;
+
+    @Autowired
+    private ProcessDefinitionService processDefinitionService;
 
     /**
      * add the newest version of one process definition
@@ -115,17 +119,6 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
     @Override
     public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, int processDefinitionId) {
 
-        Map<String, Object> result = new HashMap<>();
-
-        // check the if pageNo or pageSize less than 1
-        if (pageNo <= 0 || pageSize <= 0) {
-            putMsg(result
-                    , Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR
-                    , pageNo
-                    , pageSize);
-            return result;
-        }
-
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
@@ -178,8 +171,19 @@ public class ProcessDefinitionVersionServiceImpl extends BaseServiceImpl impleme
         if (resultStatus != Status.SUCCESS) {
             return checkResult;
         }
+
+        // check has associated process definition
+        boolean hasAssociatedProcessDefinition = processDefinitionService.checkHasAssociatedProcessDefinition(processDefinitionId, version);
+        if (hasAssociatedProcessDefinition) {
+            putMsg(result, Status.PROCESS_DEFINITION_VERSION_IS_USED);
+            return result;
+        }
+
         processDefinitionVersionMapper.deleteByProcessDefinitionIdAndVersion(processDefinitionId, version);
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+
+
 }

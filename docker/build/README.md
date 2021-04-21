@@ -2,7 +2,7 @@
 
 DolphinScheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
-GitHub URL: https://github.com/apache/incubator-dolphinscheduler
+GitHub URL: https://github.com/apache/dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
@@ -10,6 +10,11 @@ Official Website: https://dolphinscheduler.apache.org
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
 
 ## How to use this docker image
 
@@ -26,6 +31,8 @@ The default **zookeeper** is created in the `docker-compose.yml`.
 Access the Web UI: http://192.168.xx.xx:12345/dolphinscheduler
 
 The default username is `admin` and the default password is `dolphinscheduler123`
+
+> **Tip**: For quick start in docker, you can create a tenant named `ds` and associate the user `admin` with the tenant `ds`
 
 #### Or via Environment Variables **`DATABASE_HOST`** **`DATABASE_PORT`** **`DATABASE_DATABASE`** **`ZOOKEEPER_QUORUM`**
 
@@ -104,14 +111,14 @@ You can build a docker image in A Unix-like operating system, You can also build
 In Unix-Like, Example:
 
 ```bash
-$ cd path/incubator-dolphinscheduler
+$ cd path/dolphinscheduler
 $ sh ./docker/build/hooks/build
 ```
 
 In Windows, Example:
 
 ```bat
-C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script files if you don't understand
@@ -186,7 +193,7 @@ This environment variable sets `SPARK_HOME2`. The default value is `/opt/soft/sp
 
 **`PYTHON_HOME`**
 
-This environment variable sets `PYTHON_HOME`. The default value is `/usr/bin/python`.
+This environment variable sets `PYTHON_HOME`. The default value is `/usr`.
 
 **`JAVA_HOME`**
 
@@ -202,7 +209,7 @@ This environment variable sets `FLINK_HOME`. The default value is `/opt/soft/fli
 
 **`DATAX_HOME`**
 
-This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax/bin/datax.py`.
+This environment variable sets `DATAX_HOME`. The default value is `/opt/soft/datax`.
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 
@@ -302,7 +309,7 @@ This environment variable sets port for `worker-server`. The default value is `1
 
 This environment variable sets groups for `worker-server`. The default value is `default`.
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 This environment variable sets weight for `worker-server`. The default value is `100`.
 
@@ -478,4 +485,4 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 6. Add a Oracle datasource in `Datasource manage`
 
-For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+For more information please refer to the [dolphinscheduler](https://github.com/apache/dolphinscheduler.git) documentation.

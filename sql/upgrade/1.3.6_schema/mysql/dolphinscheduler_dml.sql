@@ -13,32 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.remote;
-
-import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
-
-import org.apache.dolphinscheduler.remote.utils.NettyUtils;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import io.netty.channel.epoll.Epoll;
-
-/**
- * NettyUtilTest
- */
-public class NettyUtilTest {
-
-
-    @Test
-    public void testUserEpoll() {
-        if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
-            Assert.assertTrue(NettyUtils.useEpoll());
-        } else {
-            Assert.assertFalse(NettyUtils.useEpoll());
-        }
-    }
-
-}
+*/

@@ -2,7 +2,7 @@
 
 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 
-GitHub URL: https://github.com/apache/incubator-dolphinscheduler
+GitHub URL: https://github.com/apache/dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
@@ -10,6 +10,11 @@ Official Website: https://dolphinscheduler.apache.org
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
+
+## 先决条件
+
+- [Docker](https://docs.docker.com/engine/) 1.13.1+
+- [Docker Compose](https://docs.docker.com/compose/) 1.11.0+
 
 ## 如何使用docker镜像
 
@@ -26,6 +31,8 @@ $ docker-compose -f ./docker/docker-swarm/docker-compose.yml up -d
 访问前端页面：http://192.168.xx.xx:12345/dolphinscheduler
 
 默认的用户是`admin`，默认的密码是`dolphinscheduler123`
+
+> **提示**: 为了在docker中快速开始，你可以创建一个名为`ds`的租户，并将这个租户`ds`关联到用户`admin`
 
 #### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
@@ -104,14 +111,14 @@ apache/dolphinscheduler:latest alert-server
 类Unix系统, 如下:
 
 ```bash
-$ cd path/incubator-dolphinscheduler
+$ cd path/dolphinscheduler
 $ sh ./docker/build/hooks/build
 ```
 
 Windows系统, 如下:
 
 ```bat
-C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。
@@ -186,7 +193,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`PYTHON_HOME`**
 
-配置`dolphinscheduler`的`PYTHON_HOME`，默认值 `/usr/bin/python`。
+配置`dolphinscheduler`的`PYTHON_HOME`，默认值 `/usr`。
 
 **`JAVA_HOME`**
 
@@ -202,7 +209,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 **`DATAX_HOME`**
 
-配置`dolphinscheduler`的`DATAX_HOME`，默认值 `/opt/soft/datax/bin/datax。py`。
+配置`dolphinscheduler`的`DATAX_HOME`，默认值 `/opt/soft/datax`。
 
 **`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
 
@@ -302,7 +309,7 @@ DolphinScheduler Docker 容器通过环境变量进行配置，缺省时将会�
 
 配置`worker-server`的分组，默认值 `default`。
 
-**`WORKER_WEIGHT`**
+**`WORKER_HOST_WEIGHT`**
 
 配置`worker-server`的权重，默认之`100`。
 
@@ -478,4 +485,4 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 6. 在数据源中心添加一个 Oracle 数据源
 
-更多信息请查看 [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) 文档.
+更多信息请查看 [dolphinscheduler](https://github.com/apache/dolphinscheduler.git) 文档.

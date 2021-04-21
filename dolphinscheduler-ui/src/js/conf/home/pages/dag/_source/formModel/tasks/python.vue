@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 <template>
-  <div class="shell-model">
+  <div class="python-model">
     <m-list-box>
       <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
-        <div class="from-mirror">
+        <div class="form-mirror">
           <textarea id="code-python-mirror" name="code-python-mirror" style="opacity: 0;">
           </textarea>
           <a class="ans-modal-box-max">
@@ -36,7 +36,6 @@
         </treeselect>
       </div>
     </m-list-box>
-
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">

@@ -1171,9 +1171,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // Check whether the task node is normal
             List<TaskNode> taskNodes = processData.getTasks();
 
-            if (taskNodes == null) {
+            if (CollectionUtils.isEmpty(taskNodes)) {
                 logger.error("process node info is empty");
-                putMsg(result, Status.DATA_IS_NULL, processDefinitionJson);
+                putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
                 return result;
             }
 
@@ -1840,7 +1840,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        logger.info("DepList: {}", depList);
         result.put(Constants.DATA_LIST, depList);
         putMsg(result, Status.SUCCESS);
         depList.clear();
@@ -1885,12 +1884,24 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
             }
         }
-        logger.info("DepList: {}", depList);
         result.put(Constants.DATA_LIST, depList);
         depList.clear();
         putMsg(result, Status.SUCCESS);
 
         return result;
+    }
+      
+    /**
+     * check has associated process definition
+     *
+     * @param processDefinitionId process definition id
+     * @param version version
+     * @return The query result has a specific process definition return true
+     */
+    @Override
+    public boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version) {
+        Integer hasAssociatedDefinitionId = processDefineMapper.queryHasAssociatedDefinitionByIdAndVersion(processDefinitionId, version);
+        return Objects.nonNull(hasAssociatedDefinitionId);
     }
 
     private void upStreamOp(TaskNode taskNode) {

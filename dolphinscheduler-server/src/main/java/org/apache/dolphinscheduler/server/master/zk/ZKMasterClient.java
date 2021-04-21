@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.zk;
+package org.apache.dolphinscheduler.server.master.zk;
 
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -28,10 +29,8 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -74,19 +73,18 @@ public class ZKMasterClient extends AbstractZKClient {
     @Autowired
     private MasterRegistry masterRegistry;
 
-    public void start(MasterServer masterServer) {
+    public void start() {
         InterProcessMutex mutex = null;
         try {
-            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
+            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
             String znodeLock = getMasterStartUpLockPath();
             mutex = new InterProcessMutex(getZkClient(), znodeLock);
             mutex.acquire();
 
             // master registry
             masterRegistry.registry();
-            masterRegistry.getZookeeperRegistryCenter().setStoppable(masterServer);
-            String registPath = this.masterRegistry.getMasterPath();
-            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
+            String registryPath = this.masterRegistry.getMasterPath();
+            masterRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(registryPath, ZKNodeType.MASTER, Constants.DELETE_ZK_OP);
 
             // init system znode
             this.initSystemZNode();
@@ -108,10 +106,14 @@ public class ZKMasterClient extends AbstractZKClient {
         }
     }
 
+    public void setStoppable(IStoppable stoppable) {
+        masterRegistry.getZookeeperRegistryCenter().setStoppable(stoppable);
+    }
+
     @Override
     public void close() {
-        super.close();
         masterRegistry.unRegistry();
+        super.close();
     }
 
     /**
@@ -140,7 +142,7 @@ public class ZKMasterClient extends AbstractZKClient {
      * @param failover   is failover
      */
     private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
-        logger.info("{} node deleted : {}", zkNodeType.toString(), path);
+        logger.info("{} node deleted : {}", zkNodeType, path);
         InterProcessMutex mutex = null;
         try {
             String failoverPath = getFailoverLockPath(zkNodeType);
@@ -163,7 +165,7 @@ public class ZKMasterClient extends AbstractZKClient {
                 failoverServerWhenDown(serverHost, zkNodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed.", zkNodeType.toString());
+            logger.error("{} server failover failed.", zkNodeType);
             logger.error("failover exception ", e);
         } finally {
             releaseMutex(mutex);
@@ -175,12 +177,8 @@ public class ZKMasterClient extends AbstractZKClient {
      *
      * @param serverHost server host
      * @param zkNodeType zookeeper node type
-     * @throws Exception exception
      */
-    private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if (StringUtils.isEmpty(serverHost)) {
-            return;
-        }
+    private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) {
         switch (zkNodeType) {
             case MASTER:
                 failoverMaster(serverHost);
@@ -200,7 +198,6 @@ public class ZKMasterClient extends AbstractZKClient {
      * @return fail over lock path
      */
     private String getFailoverLockPath(ZKNodeType zkNodeType) {
-
         switch (zkNodeType) {
             case MASTER:
                 return getMasterFailoverLockPath();
@@ -256,7 +253,7 @@ public class ZKMasterClient extends AbstractZKClient {
      * @param taskInstance task instance
      * @return true if task instance need fail over
      */
-    private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) throws Exception {
+    private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) {
 
         boolean taskNeedFailover = true;
 
@@ -286,7 +283,7 @@ public class ZKMasterClient extends AbstractZKClient {
             return false;
         }
         Date workerServerStartDate = null;
-        List<Server> workerServers = getServersList(ZKNodeType.WORKER);
+        List<Server> workerServers = getServerList(ZKNodeType.WORKER);
         for (Server workerServer : workerServers) {
             if (taskInstance.getHost().equals(workerServer.getHost() + Constants.COLON + workerServer.getPort())) {
                 workerServerStartDate = workerServer.getCreateTime();
@@ -308,10 +305,8 @@ public class ZKMasterClient extends AbstractZKClient {
      *
      * @param workerHost           worker host
      * @param needCheckWorkerAlive need check worker alive
-     * @throws Exception exception
      */
-    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
-        workerHost = Host.of(workerHost).getAddress();
+    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) {
         logger.info("start worker[{}] failover ...", workerHost);
         List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {

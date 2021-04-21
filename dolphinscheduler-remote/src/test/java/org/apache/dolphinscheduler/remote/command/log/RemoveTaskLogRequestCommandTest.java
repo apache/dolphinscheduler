@@ -15,33 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.remote.command.log;
 
-import org.junit.Assert;
+import org.apache.dolphinscheduler.remote.command.Command;
+
 import org.junit.Test;
 
-/**
- * hive conf utils test
- */
-public class HiveConfUtilsTest {
+import junit.framework.Assert;
 
-    /**
-     * test is hive conf var
-     */
+public class RemoveTaskLogRequestCommandTest {
+
     @Test
-    public void testIsHiveConfVar() {
-
-        String conf = "hive.exec.script.wrapper=123";
-        boolean hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertTrue(hiveConfVar);
-
-        conf = "hive.test.v1=v1";
-        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertFalse(hiveConfVar);
-
-        conf = "tez.queue.name=tezQueue";
-        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertTrue(hiveConfVar);
-
+    public void testConvert2Command() {
+        RemoveTaskLogResponseCommand removeTaskLogResponseCommand = new RemoveTaskLogResponseCommand();
+        removeTaskLogResponseCommand.setStatus(true);
+        Command command = removeTaskLogResponseCommand.convert2Command(122);
+        Assert.assertNotNull(command);
     }
 }

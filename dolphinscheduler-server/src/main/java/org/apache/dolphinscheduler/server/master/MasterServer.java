@@ -28,8 +28,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
-import org.apache.dolphinscheduler.server.worker.WorkerServer;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.server.master.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
@@ -43,10 +42,19 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ *  master server
+ */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.server.worker.*",
+                "org.apache.dolphinscheduler.server.monitor.*",
+                "org.apache.dolphinscheduler.server.log.*"
+        })
 })
+@EnableTransactionManagement
 public class MasterServer implements IStoppable {
 
     /**
@@ -85,9 +93,7 @@ public class MasterServer implements IStoppable {
     private MasterSchedulerService masterSchedulerService;
 
     /**
-     * master server startup
-     * <p>
-     * master server not use web service
+     * master server startup, not use web service
      *
      * @param args arguments
      */
@@ -111,7 +117,8 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         // self tolerant
-        this.zkMasterClient.start(this);
+        this.zkMasterClient.start();
+        this.zkMasterClient.setStoppable(this);
 
         // scheduler start
         this.masterSchedulerService.start();
@@ -131,14 +138,11 @@ public class MasterServer implements IStoppable {
         }
 
         /**
-         *  register hooks, which are called before the process exits
+         * register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (Stopper.isRunning()) {
-                    close("shutdownHook");
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
+                close("shutdownHook");
             }
         }));
 
@@ -152,7 +156,7 @@ public class MasterServer implements IStoppable {
     public void close(String cause) {
 
         try {
-            //execute only once
+            // execute only once
             if (Stopper.isStopped()) {
                 return;
             }
@@ -163,27 +167,24 @@ public class MasterServer implements IStoppable {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quietly stop
+                // thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
             } catch (Exception e) {
                 logger.warn("thread sleep exception ", e);
             }
-            //close
+            // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
             this.zkMasterClient.close();
-            //close quartz
+            // close quartz
             try {
                 QuartzExecutors.getInstance().shutdown();
                 logger.info("Quartz service stopped");
             } catch (Exception e) {
                 logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
-
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
-        } finally {
-            System.exit(-1);
         }
     }
 
@@ -192,4 +193,3 @@ public class MasterServer implements IStoppable {
         close(cause);
     }
 }
-

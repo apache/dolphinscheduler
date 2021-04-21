@@ -15,33 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * hive conf utils test
- */
-public class HiveConfUtilsTest {
+public class HostWorkerTest {
 
-    /**
-     * test is hive conf var
-     */
     @Test
-    public void testIsHiveConfVar() {
-
-        String conf = "hive.exec.script.wrapper=123";
-        boolean hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertTrue(hiveConfVar);
-
-        conf = "hive.test.v1=v1";
-        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertFalse(hiveConfVar);
-
-        conf = "tez.queue.name=tezQueue";
-        hiveConfVar = HiveConfUtils.isHiveConfVar(conf);
-        Assert.assertTrue(hiveConfVar);
-
+    public void testHostWorker1() {
+        HostWorker hostWorker = new HostWorker("192.158.2.2", 11, 20, "default");
+        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assert.assertEquals(11, hostWorker.getPort());
+        Assert.assertEquals(20, hostWorker.getHostWeight());
+        Assert.assertEquals("default", hostWorker.getWorkerGroup());
     }
+
+    @Test
+    public void testHostWorker2() {
+        HostWorker hostWorker = HostWorker.of("192.158.2.2:22", 80, "default");
+        Assert.assertEquals("192.158.2.2", hostWorker.getIp());
+        Assert.assertEquals(22, hostWorker.getPort());
+        Assert.assertEquals(80, hostWorker.getHostWeight());
+        Assert.assertEquals("default", hostWorker.getWorkerGroup());
+    }
+
 }

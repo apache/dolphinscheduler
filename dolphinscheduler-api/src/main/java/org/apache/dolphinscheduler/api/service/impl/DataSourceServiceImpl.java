@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -29,11 +30,14 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
+import org.apache.dolphinscheduler.dao.datasource.MySQLDataSource;
 import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -44,6 +48,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +78,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public static final String USER_NAME = "userName";
     public static final String OTHER = "other";
 
+    private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
+
+    private static final Pattern IPV6_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\:\\[\\]]+$");
+
+    private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
+
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
+
+
     @Autowired
     private DataSourceMapper dataSourceMapper;
 
@@ -83,9 +97,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * create data source
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source type
      * @param parameter datasource parameters
      * @return create result code
      */
@@ -126,11 +140,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source type
      * @param parameter datasource parameters
-     * @param id        data source id
+     * @param id data source id
      * @return update result code
      */
     @Override
@@ -286,8 +300,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return data source list page
      */
     @Override
@@ -315,8 +329,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     /**
      * handle datasource connection password for safety
-     *
-     * @param dataSourceList
      */
     private void handlePasswd(List<DataSource> dataSourceList) {
         for (DataSource dataSource : dataSourceList) {
@@ -340,7 +352,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * query data resource list
      *
      * @param loginUser login user
-     * @param type      data source type
+     * @param type data source type
      * @return data source list page
      */
     @Override
@@ -364,7 +376,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * verify datasource exists
      *
-     * @param name      datasource name
+     * @param name datasource name
      * @return true if data datasource not exists, otherwise return false
      */
     @Override
@@ -383,7 +395,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type      data source type
+     * @param type data source type
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
@@ -404,7 +416,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         } catch (Exception e) {
             logger.error("datasource test connection error, dbType:{}, jdbcUrl:{}, message:{}.", type, datasource.getJdbcUrl(), e.getMessage());
-            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(),e.getMessage());
+            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), e.getMessage());
         }
     }
 
@@ -428,13 +440,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * build paramters
      *
-     * @param type      data source  type
-     * @param host      data source  host
-     * @param port      data source port
-     * @param database  data source database name
-     * @param userName  user name
-     * @param password  password
-     * @param other     other parameters
+     * @param type data source  type
+     * @param host data source  host
+     * @param port data source port
+     * @param database data source database name
+     * @param userName user name
+     * @param password password
+     * @param other other parameters
      * @param principal principal
      * @return datasource parameter
      */
@@ -443,7 +455,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                                  String port, String database, String principal, String userName,
                                  String password, DbConnectType connectType, String other,
                                  String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) {
-
+        checkParams(type, port, host, database, other);
         String address = buildAddress(type, host, port, connectType);
         Map<String, Object> parameterMap = new LinkedHashMap<>();
         String jdbcUrl;
@@ -476,7 +488,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             separator = ";";
         }
 
-        parameterMap.put(TYPE, connectType);
         parameterMap.put(Constants.ADDRESS, address);
         parameterMap.put(Constants.DATABASE, database);
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
@@ -491,9 +502,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Map<String, String> map = JSONUtils.toMap(other);
-        if (map != null) {
+        if (type == DbType.MYSQL) {
+            map = MySQLDataSource.buildOtherParams(other);
+        }
+
+        if (MapUtils.isNotEmpty(map)) {
             StringBuilder otherSb = new StringBuilder();
-            for (Map.Entry<String, String> entry: map.entrySet()) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
                 otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
             }
             if (!Constants.DB2.equals(type.name())) {
@@ -553,7 +568,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * delete datasource
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param datasourceId data source id
      * @return delete result code
      */
@@ -587,7 +602,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return unauthed data source result code
      */
     @Override
@@ -628,7 +643,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return authorized result code
      */
     @Override
@@ -649,7 +664,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * get host and port by address
      *
-     * @param address   address
+     * @param address address
      * @param separator separator
      * @return sting array: [host,port]
      */
@@ -667,5 +682,40 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         result[0] = hosts.toString();
         result[1] = port;
         return result;
+    }
+
+    private void checkParams(DbType type, String port, String host, String database, String other) {
+        if (null == DbType.of(type.getCode())) {
+            throw new ServiceException(Status.DATASOURCE_DB_TYPE_ILLEGAL);
+        }
+        if (!isNumeric(port)) {
+            throw new ServiceException(Status.DATASOURCE_PORT_ILLEGAL);
+        }
+        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+            throw new ServiceException(Status.DATASOURCE_HOST_ILLEGAL);
+        }
+        if (!DATABASE_PATTER.matcher(database).matches()) {
+            throw new ServiceException(Status.DATASOURCE_NAME_ILLEGAL);
+        }
+        if (StringUtils.isBlank(other)) {
+            return;
+        }
+        Map<String, String> map = JSONUtils.toMap(other);
+        if (MapUtils.isEmpty(map)) {
+            return;
+        }
+        boolean paramsCheck = map.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
+        if (!paramsCheck) {
+            throw new ServiceException(Status.DATASOURCE_OTHER_PARAMS_ILLEGAL);
+        }
+    }
+
+    private static boolean isNumeric(String str) {
+        for (int i = str.length(); --i >= 0; ) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }

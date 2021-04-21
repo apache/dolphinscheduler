@@ -15,20 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import junit.framework.Assert;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
-import org.junit.Test;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
-public class RemoveTaskLogResponseCommandTest {
+import org.apache.ibatis.annotations.Param;
 
-    @Test
-    public void testConvert2Command(){
-        RemoveTaskLogRequestCommand removeTaskLogRequestCommand = new RemoveTaskLogRequestCommand();
-        removeTaskLogRequestCommand.setPath("/opt/zhangsan");
-        Command command = removeTaskLogRequestCommand.convert2Command();
-        Assert.assertNotNull(command);
-    }
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * worker group mapper interface
+ */
+public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
+
+    /**
+     * query all worker group
+     * @return worker group list
+     */
+    List<WorkerGroup> queryAllWorkerGroup();
+
+    /**
+     * query worer grouop by name
+     * @param name name
+     * @return worker group list
+     */
+    List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
+
 }

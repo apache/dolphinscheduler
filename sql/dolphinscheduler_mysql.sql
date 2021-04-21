@@ -327,7 +327,6 @@ CREATE TABLE `t_ds_command` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'schedule time',
   `start_time` datetime DEFAULT NULL COMMENT 'start time',
   `executor_id` int(11) DEFAULT NULL COMMENT 'executor id',
-  `dependence` varchar(255) DEFAULT NULL COMMENT 'dependence',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
@@ -375,7 +374,6 @@ CREATE TABLE `t_ds_error_command` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'scheduler time',
   `start_time` datetime DEFAULT NULL COMMENT 'start time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `dependence` text COMMENT 'dependence',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
   `message` text COMMENT 'message',
@@ -789,6 +787,23 @@ CREATE TABLE `t_ds_user` (
 -- Records of t_ds_user
 -- ----------------------------
 
+-- ----------------------------
+-- Table structure for t_ds_worker_group
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_worker_group`;
+CREATE TABLE `t_ds_worker_group` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(256) NOT NULL COMMENT 'worker group name',
+  `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
+  `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_worker_group
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_version
