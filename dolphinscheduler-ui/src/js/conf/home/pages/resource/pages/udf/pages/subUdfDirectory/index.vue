@@ -121,6 +121,7 @@
           this.isLeft = true
         }
         this.isLoading = !flag
+        this.searchParams.id = this.$route.params.id
         this.getResourcesListP(this.searchParams).then(res => {
           if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1

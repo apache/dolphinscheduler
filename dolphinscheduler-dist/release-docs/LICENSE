@@ -425,7 +425,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jline 0.9.94: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
-    postgresql 42.1.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.1.4, BSD 2-clause
+    postgresql 42.2.5: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.2.5, BSD 2-clause
     protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
     threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.3.6,  BSD 3-clause
@@ -471,7 +471,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     aspectjweaver 1.9.2:https://mvnrepository.com/artifact/org.aspectj/aspectjweaver/1.9.2, EPL 1.0
     logback-classic 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic/1.2.3, EPL 1.0 and LGPL 2.1
     logback-core 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-core/1.2.3, EPL 1.0 and LGPL 2.1
-    oshi-core 3.5.0: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.5.0, EPL 1.0
+    oshi-core 3.9.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.9.1, EPL 1.0
     junit 4.12: https://mvnrepository.com/artifact/junit/junit/4.12, EPL 1.0
     h2-1.4.200 https://github.com/h2database/h2database/blob/master/LICENSE.txt, MPL 2.0 or EPL 1.0
 
