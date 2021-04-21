@@ -42,7 +42,6 @@ public class SwitchParameters extends AbstractParameters {
     private int resultConditionLocation;
     private List<SwitchResultVo> dependTaskList;
 
-
     public int getResultConditionLocation() {
         return resultConditionLocation;
     }
@@ -51,7 +50,6 @@ public class SwitchParameters extends AbstractParameters {
         this.resultConditionLocation = resultConditionLocation;
     }
 
-
     public List<SwitchResultVo> getDependTaskList() {
         return dependTaskList;
     }
@@ -59,7 +57,6 @@ public class SwitchParameters extends AbstractParameters {
     public void setDependTaskList(List<SwitchResultVo> dependTaskList) {
         this.dependTaskList = dependTaskList;
     }
-
 
     public DependentRelation getRelation() {
         return relation;

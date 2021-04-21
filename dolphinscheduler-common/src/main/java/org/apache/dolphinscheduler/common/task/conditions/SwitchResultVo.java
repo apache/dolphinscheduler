@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.task.conditions;
 
-import java.util.List;
-
 public class SwitchResultVo {
 
     private String condition;

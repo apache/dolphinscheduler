@@ -101,6 +101,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     protected TaskTimeoutParameter taskTimeoutParameter;
 
     protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+
     /**
      * constructor of MasterBaseTaskExecThread
      *
@@ -244,10 +245,10 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * buildTaskPriority
      *
      * @param processInstancePriority processInstancePriority
-     * @param processInstanceId processInstanceId
-     * @param taskInstancePriority taskInstancePriority
-     * @param taskInstanceId taskInstanceId
-     * @param workerGroup workerGroup
+     * @param processInstanceId       processInstanceId
+     * @param taskInstancePriority    taskInstancePriority
+     * @param taskInstanceId          taskInstanceId
+     * @param workerGroup             workerGroup
      * @return TaskPriority
      */
     private TaskPriority buildTaskPriority(int processInstancePriority,
@@ -329,7 +330,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         return timeoutSeconds - usedTime;
     }
 
-    public String setTaskParams(String content, String rgex,ProcessInstance processInstance) {
+    public String setTaskParams(String content, String rgex, ProcessInstance processInstance) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         while (m.find()) {

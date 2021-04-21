@@ -313,9 +313,9 @@ public class TaskNode {
     return TaskType.CONDITIONS.toString().equalsIgnoreCase(this.getType());
   }
 
-  public boolean isSwitchTask() {
-    return TaskType.SWITCH.toString().equalsIgnoreCase(this.getType());
-  }
+    public boolean isSwitchTask() {
+        return TaskType.SWITCH.toString().equalsIgnoreCase(this.getType());
+    }
 
   @Override
   public String toString() {
