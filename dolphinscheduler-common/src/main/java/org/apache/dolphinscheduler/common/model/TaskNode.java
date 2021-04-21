@@ -205,7 +205,6 @@ public class TaskNode {
 
   public void setDepList(List<String> depList) throws JsonProcessingException {
     this.depList = depList;
-    this.preTasks = JSONUtils.toJsonString(depList);
   }
 
   public String getLoc() {
