@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.commons.lang.math.NumberUtils;
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -340,7 +338,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 return "";
             }
             String value = property.getValue();
-            if (!NumberUtils.isNumber(value)) {
+            Pattern numPattern = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+            Matcher isNum = numPattern.matcher(value);
+            if (!isNum.matches()) {
                 value = "\"" + value + "\"";
             }
             logger.info("paramName：{}，paramValue{}", paramName, value);
