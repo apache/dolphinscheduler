@@ -73,7 +73,7 @@ public class AccessLogAspect {
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
-                logText = String.format("REQUEST LOGIN_USER:%s, URI:%s, METHOD:%s, HANDLER:%s, ARGS:%s",
+                logText = String.format("REQUEST LOGIN_USER:%s, URI:%s, METHOD:%s, HANDLER:%s, ARGS:%s%n",
                         userName,
                         request.getRequestURI(),
                         request.getMethod(),
@@ -85,7 +85,7 @@ public class AccessLogAspect {
 
         // log response
         if (!annotation.ignoreResponse()) {
-            logText += String.format("%nRESPONSE:%s, REQUEST DURATION:%s milliseconds",
+            logText += String.format("RESPONSE:%s, REQUEST DURATION:%s milliseconds%n",
                     ob, (System.currentTimeMillis() - startTime));
         }
 
