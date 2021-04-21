@@ -105,32 +105,30 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
 
         conditionResult = DependResult.SUCCESS;
         for (SwitchResultVo info : switchResultVos) {
-            logger.info("-------------switch第{}个分支-------------", (i + 1));
-            logger.info("判断语句-原始：{}", info.getCondition());
+            logger.info("switch number:{},start", (i + 1));
+            logger.info("switch condition:{}", info.getCondition());
             if (StringUtils.isEmpty(info.getCondition())) {
                 finalConditionLocation = i;
-                logger.info("-------------条件判断第{}个分支结束-------------", (i + 1));
                 break;
             }
             String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex, processInstance);
-            logger.info("判断语句-格式化：{}", content);
+            logger.info("format switch condition:{}", content);
             Boolean result = null;
             try {
                 result = SwitchTaskUtils.evaluate(content);
             } catch (Exception e) {
-                logger.info("输入错误 : {}", content);
+                logger.info("input error :{}", content);
                 e.printStackTrace();
                 conditionResult = DependResult.FAILED;
                 //result = false;
                 break;
             }
-            logger.info("执行结果 : {}", result);
+            logger.info("the result: {}", result);
             if (result) {
                 finalConditionLocation = i;
-                logger.info("-------------条件判断第{}个分支结束-------------", (i + 1));
                 break;
             }
-            logger.info("-------------条件判断第{}个分支结束-------------", (i + 1));
+            logger.info("switch number:{},end", (i + 1));
             i++;
         }
         conditionsParameters.setDependTaskList(switchResultVos);
