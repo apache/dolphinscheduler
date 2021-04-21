@@ -133,8 +133,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         setTaskCache(taskExecutionContext);
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-            taskExecutionContext.getProcessInstanceId(),
-            taskExecutionContext.getTaskInstanceId()));
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId()));
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));

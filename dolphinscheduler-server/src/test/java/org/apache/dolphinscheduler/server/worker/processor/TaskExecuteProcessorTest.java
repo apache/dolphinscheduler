@@ -113,6 +113,8 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(taskExecutionContextCacheManager);
 
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()));
 
@@ -172,6 +174,8 @@ public class TaskExecuteProcessorTest {
         taskExecutionContext.setProcessId(12345);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
         taskExecutionContext.setTaskType(TaskType.SQL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);

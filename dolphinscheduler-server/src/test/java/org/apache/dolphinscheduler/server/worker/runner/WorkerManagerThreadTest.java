@@ -82,6 +82,8 @@ public class WorkerManagerThreadTest {
         taskExecutionContext.setProcessId(12345);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
         taskExecutionContext.setTenantCode("test");
         taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
@@ -95,6 +97,8 @@ public class WorkerManagerThreadTest {
 
         taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(
                 LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()
         ));

@@ -114,6 +114,8 @@ public class SqlExecutorTest {
 
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                1L,
+                1,
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
 

@@ -68,6 +68,8 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
         try{
             this.taskInstance = submit();
             logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    processInstance.getProcessDefinitionCode(),
+                    processInstance.getProcessDefinitionVersion(),
                     taskInstance.getProcessInstanceId(),
                     taskInstance.getId()));
             String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
