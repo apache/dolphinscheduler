@@ -45,7 +45,9 @@ public class AccessLogAspect {
     private static final Logger logger = LoggerFactory.getLogger(AccessLogAspect.class);
 
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation)")
-    public void logPointCut(){}
+    public void logPointCut(){
+        // Do nothing because of it's a pointcut
+    }
 
     @Around("logPointCut()")
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
@@ -67,29 +69,10 @@ public class AccessLogAspect {
                 HttpServletRequest request = attributes.getRequest();
 
                 // handle login info
-                String userName = "NOT LOGIN";
-                User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
-                if (loginUser != null) {
-                    userName = loginUser.getUserName();
-                }
+                String userName = parseLoginInfo(request);
 
                 // handle args
-                Object[] args = proceedingJoinPoint.getArgs();
-                String argsString = Arrays.toString(args);
-                if (annotation.ignoreRequestArgs().length > 0) {
-                    String[] parameterNames = ((MethodSignature) proceedingJoinPoint.getSignature()).getParameterNames();
-                    if (parameterNames.length > 0) {
-                        List<String> ignoreList = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toList());
-                        HashMap<String, Object> argsMap = new HashMap<String, Object>();
-
-                        for (int i = 0; i < parameterNames.length; i++) {
-                            if (!ignoreList.contains(parameterNames[i])) {
-                                argsMap.put(parameterNames[i], args[i]);
-                            }
-                        }
-                        argsString = argsMap.toString();
-                    }
-                }
+                String argsString = parseArgs(proceedingJoinPoint, annotation);
                 logText = String.format("REQUEST LOGIN_USER:%s, URI:%s, METHOD:%s, HANDLER:%s, ARGS:%s",
                         userName,
                         request.getRequestURI(),
@@ -102,7 +85,7 @@ public class AccessLogAspect {
 
         // log response
         if (!annotation.ignoreResponse()) {
-            logText += String.format("\nRESPONSE:%s, REQUEST DURATION:%s milliseconds",
+            logText += String.format("%nRESPONSE:%s, REQUEST DURATION:%s milliseconds",
                     ob, (System.currentTimeMillis() - startTime));
         }
 
@@ -111,6 +94,35 @@ public class AccessLogAspect {
         }
 
         return ob;
+    }
+
+    private String parseArgs(ProceedingJoinPoint proceedingJoinPoint, AccessLogAnnotation annotation) {
+        Object[] args = proceedingJoinPoint.getArgs();
+        String argsString = Arrays.toString(args);
+        if (annotation.ignoreRequestArgs().length > 0) {
+            String[] parameterNames = ((MethodSignature) proceedingJoinPoint.getSignature()).getParameterNames();
+            if (parameterNames.length > 0) {
+                List<String> ignoreList = Arrays.stream(annotation.ignoreRequestArgs()).collect(Collectors.toList());
+                HashMap<String, Object> argsMap = new HashMap<>();
+
+                for (int i = 0; i < parameterNames.length; i++) {
+                    if (!ignoreList.contains(parameterNames[i])) {
+                        argsMap.put(parameterNames[i], args[i]);
+                    }
+                }
+                argsString = argsMap.toString();
+            }
+        }
+        return argsString;
+    }
+
+    private String parseLoginInfo(HttpServletRequest request) {
+        String userName = "NOT LOGIN";
+        User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
+        if (loginUser != null) {
+            userName = loginUser.getUserName();
+        }
+        return userName;
     }
 
 }

@@ -36,8 +36,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -171,9 +169,7 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
-        String userReplace = RegexUtils.escapeNRT(loginUser.getUserName());
-        String tenantCodeReplace = RegexUtils.escapeNRT(tenantCode);
-        String descReplace = RegexUtils.escapeNRT(description);
+
         Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
         return returnDataList(result);
     }
