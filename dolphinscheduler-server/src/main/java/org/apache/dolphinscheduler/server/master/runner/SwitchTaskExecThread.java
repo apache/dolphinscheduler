@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.task.conditions.SwhichParameters;
-import org.apache.dolphinscheduler.common.task.conditions.SwhichResultVo;
+import org.apache.dolphinscheduler.common.task.conditions.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.conditions.SwitchResultVo;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.server.utils.SwhichTaskUtils;
+import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.LoggerFactory;
 
-public class SwhichTaskExecThread extends MasterBaseTaskExecThread {
+public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * dependent parameters
@@ -61,7 +61,7 @@ public class SwhichTaskExecThread extends MasterBaseTaskExecThread {
      *
      * @param taskInstance task instance
      */
-    public SwhichTaskExecThread(TaskInstance taskInstance) {
+    public SwitchTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
         taskInstance.setStartTime(new Date());
     }
@@ -95,16 +95,17 @@ public class SwhichTaskExecThread extends MasterBaseTaskExecThread {
         }
 
         TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
-        SwhichParameters conditionsParameters = JSONUtils.parseObject(taskNode.getDependence(), SwhichParameters.class);
-        List<SwhichResultVo> swhichResultVos = conditionsParameters.getDependTaskList();
-        SwhichResultVo swhichResultVo = new SwhichResultVo();
-        swhichResultVo.setNextNode(conditionsParameters.getNextNode());
-        swhichResultVos.add(swhichResultVo);
-        int finalConditionLocation = swhichResultVos.size() - 1;
+        SwitchParameters conditionsParameters = JSONUtils.parseObject(taskNode.getDependence(), SwitchParameters.class);
+        List<SwitchResultVo> switchResultVos = conditionsParameters.getDependTaskList();
+        SwitchResultVo switchResultVo = new SwitchResultVo();
+        switchResultVo.setNextNode(conditionsParameters.getNextNode());
+        switchResultVos.add(switchResultVo);
+        int finalConditionLocation = switchResultVos.size() - 1;
         int i = 0;
+
         conditionResult = DependResult.SUCCESS;
-        for (SwhichResultVo info : swhichResultVos) {
-            logger.info("-------------条件判断第{}个分支-------------", (i + 1));
+        for (SwitchResultVo info : switchResultVos) {
+            logger.info("-------------switch第{}个分支-------------", (i + 1));
             logger.info("判断语句-原始：{}", info.getCondition());
             if (StringUtils.isEmpty(info.getCondition())) {
                 finalConditionLocation = i;
@@ -115,7 +116,7 @@ public class SwhichTaskExecThread extends MasterBaseTaskExecThread {
             logger.info("判断语句-格式化：{}", content);
             Boolean result = null;
             try {
-                result = SwhichTaskUtils.evaluate(content);
+                result = SwitchTaskUtils.evaluate(content);
             } catch (Exception e) {
                 logger.info("输入错误 : {}", content);
                 e.printStackTrace();
@@ -132,7 +133,7 @@ public class SwhichTaskExecThread extends MasterBaseTaskExecThread {
             logger.info("-------------条件判断第{}个分支结束-------------", (i + 1));
             i++;
         }
-        conditionsParameters.setDependTaskList(swhichResultVos);
+        conditionsParameters.setDependTaskList(switchResultVos);
         conditionsParameters.setResultConditionLocation(finalConditionLocation);
         taskNode.setDependence(JSONUtils.toJsonString(conditionsParameters));
         taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));

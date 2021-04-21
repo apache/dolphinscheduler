@@ -52,7 +52,7 @@ public enum TaskType {
     CONDITIONS(11, "conditions"),
     SQOOP(12, "sqoop"),
     WATERDROP(13, "waterdrop"),
-    SWHICH(14, "swhich"),
+    SWITCH(14, "switch"),
     ;
 
     TaskType(int code, String descp){

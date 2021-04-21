@@ -15,24 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.common.task.conditions;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import java.util.List;
 
-public class SwhichTaskUtils {
-    private static ScriptEngineManager manager;
-    private static ScriptEngine engine;
+public class SwitchResultVo {
 
-    static {
-        manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("js");
+    private String condition;
+    private String nextNode;
+
+    public String getCondition() {
+        return condition;
     }
 
-    public static boolean evaluate(String expression) throws ScriptException {
-        Object result = engine.eval(expression);
-        return (Boolean) result;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
+    public String getNextNode() {
+        return nextNode;
+    }
+
+    public void setNextNode(String nextNode) {
+        this.nextNode = nextNode;
+    }
 }

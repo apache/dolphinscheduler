@@ -23,12 +23,13 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
-import org.apache.dolphinscheduler.common.task.conditions.SwhichParameters;
-import org.apache.dolphinscheduler.common.task.conditions.SwhichResultVo;
+import org.apache.dolphinscheduler.common.task.conditions.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.conditions.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -312,8 +313,8 @@ public class DagHelper {
         } else if (dag.getNode(preNodeName).isConditionsTask()) {
             List<String> conditionTaskList = parseConditionTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
             startVertexes.addAll(conditionTaskList);
-        } else if (dag.getNode(preNodeName).isSwhichTask()) {
-            List<String> conditionTaskList = parseSwhichTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
+        } else if (dag.getNode(preNodeName).isSwitchTask()) {
+            List<String> conditionTaskList = parseSwitchTask(preNodeName, skipTaskNodeList, dag, completeTaskList);
             startVertexes.addAll(conditionTaskList);
         } else {
             startVertexes = dag.getSubsequentNodes(preNodeName);
@@ -402,13 +403,13 @@ public class DagHelper {
      * @param nodeName
      * @return
      */
-    public static List<String> parseSwhichTask(String nodeName,
+    public static List<String> parseSwitchTask(String nodeName,
                                                Map<String, TaskNode> skipTaskNodeList,
                                                DAG<String, TaskNode, TaskNodeRelation> dag,
                                                Map<String, TaskInstance> completeTaskList) {
         List<String> conditionTaskList = new ArrayList<>();
         TaskNode taskNode = dag.getNode(nodeName);
-        if (!taskNode.isSwhichTask()) {
+        if (!taskNode.isSwitchTask()) {
             return conditionTaskList;
         }
         if (!completeTaskList.containsKey(nodeName)) {
@@ -416,27 +417,26 @@ public class DagHelper {
         }
         TaskInstance taskInstance = completeTaskList.get(nodeName);
         TaskNode taskNodeNew = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
-        skipTaskNode4Condition(taskNodeNew, skipTaskNodeList, completeTaskList, dag);
+        String nextNde = skipTaskNode4Condition(taskNodeNew, skipTaskNodeList, completeTaskList, dag);
+        conditionTaskList.add(nextNde);
         return conditionTaskList;
     }
 
-    private static List<String> skipTaskNode4Condition(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList, Map<String, TaskInstance> completeTaskList, DAG<String, TaskNode, TaskNodeRelation> dag) {
-        SwhichParameters swhichParameters =
-                JSONUtils.parseObject(taskNode.getDependence(), SwhichParameters.class);
-        int resultConditionLocation = swhichParameters.getResultConditionLocation();
-        List<SwhichResultVo> conditionResultVoList = swhichParameters.getDependTaskList();
-        List<String> swhichTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
-        if (CollectionUtils.isEmpty(swhichTaskList)) {
-            swhichTaskList = new ArrayList<>();
-        }
+    private static String skipTaskNode4Condition(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList, Map<String, TaskInstance> completeTaskList, DAG<String, TaskNode, TaskNodeRelation> dag) {
+        SwitchParameters switchParameters =
+                JSONUtils.parseObject(taskNode.getDependence(), SwitchParameters.class);
+        int resultConditionLocation = switchParameters.getResultConditionLocation();
+        List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
+        String switchTask = conditionResultVoList.get(resultConditionLocation).getNextNode();
+
         conditionResultVoList.remove(resultConditionLocation);
-        for (SwhichResultVo info : conditionResultVoList) {
-            if (CollectionUtils.isEmpty(info.getNextNode())) {
+        for (SwitchResultVo info : conditionResultVoList) {
+            if (StringUtils.isEmpty(info.getNextNode())) {
                 continue;
             }
-            setTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList);
+            setTaskNodeSkip(info.getNextNode(), dag, completeTaskList, skipTaskNodeList);
         }
-        return swhichTaskList;
+        return switchTask;
     }
 
     /**

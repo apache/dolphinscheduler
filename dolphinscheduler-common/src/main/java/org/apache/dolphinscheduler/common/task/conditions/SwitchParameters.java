@@ -24,11 +24,10 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwhichParameters extends AbstractParameters {
+public class SwitchParameters extends AbstractParameters {
 
-    private DependentRelation dependRelation;
-    private String relation;
-    private List<String> nextNode;
+    private DependentRelation relation;
+    private String nextNode;
 
     @Override
     public boolean checkParameters() {
@@ -41,15 +40,8 @@ public class SwhichParameters extends AbstractParameters {
     }
 
     private int resultConditionLocation;
-    private List<SwhichResultVo> dependTaskList;
+    private List<SwitchResultVo> dependTaskList;
 
-    public DependentRelation getDependRelation() {
-        return dependRelation;
-    }
-
-    public void setDependRelation(DependentRelation dependRelation) {
-        this.dependRelation = dependRelation;
-    }
 
     public int getResultConditionLocation() {
         return resultConditionLocation;
@@ -59,27 +51,29 @@ public class SwhichParameters extends AbstractParameters {
         this.resultConditionLocation = resultConditionLocation;
     }
 
-    public String getRelation() {
-        return relation;
-    }
 
-    public void setRelation(String relation) {
-        this.relation = relation;
-    }
-
-    public List<SwhichResultVo> getDependTaskList() {
+    public List<SwitchResultVo> getDependTaskList() {
         return dependTaskList;
     }
 
-    public void setDependTaskList(List<SwhichResultVo> dependTaskList) {
+    public void setDependTaskList(List<SwitchResultVo> dependTaskList) {
         this.dependTaskList = dependTaskList;
     }
 
-    public List<String> getNextNode() {
+
+    public DependentRelation getRelation() {
+        return relation;
+    }
+
+    public void setRelation(DependentRelation relation) {
+        this.relation = relation;
+    }
+
+    public String getNextNode() {
         return nextNode;
     }
 
-    public void setNextNode(List<String> nextNode) {
+    public void setNextNode(String nextNode) {
         this.nextNode = nextNode;
     }
 }
