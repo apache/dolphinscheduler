@@ -72,10 +72,12 @@ public class LoggerUtils {
      * @return task id format
      */
     public static String buildTaskId(String affix,
+                                     Long processDefineCode,
+                                     int processDefineVersion,
                                      int processInstId,
                                      int taskId) {
-        // - [taskAppId=TASK_79_4084_15210]
-        return String.format(" - %s%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix, processInstId, taskId);
+        // - [taskAppId=TASK-798_1-4084-15210]
+        return String.format(" - %s%s-%s_%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix, processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
     /**
