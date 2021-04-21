@@ -57,19 +57,12 @@ public class PropertyUtils {
      */
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
-            InputStream fis = null;
-            try {
-                fis = PropertyUtils.class.getResourceAsStream(fileName);
+            try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
                 properties.load(fis);
 
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
-                if (fis != null) {
-                    IOUtils.closeQuietly(fis);
-                }
                 System.exit(1);
-            } finally {
-                IOUtils.closeQuietly(fis);
             }
         }
     }
