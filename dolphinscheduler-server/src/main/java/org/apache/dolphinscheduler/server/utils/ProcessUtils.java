@@ -409,7 +409,7 @@ public class ProcessUtils {
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
-        StringBuilder sb = new StringBuilder();
+        List<String> pidList = new ArrayList<>();
         Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
@@ -424,11 +424,14 @@ public class ProcessUtils {
 
         if (null != mat) {
             while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
+                pidList.add(mat.group(1));
             }
         }
 
-        return sb.toString().trim();
+        if (CommonUtils.isSudoEnable() && !pidList.isEmpty()) {
+            pidList = pidList.subList(1, pidList.size());
+        }
+        return String.join(" ", pidList).trim();
     }
 
     /**
@@ -439,17 +442,11 @@ public class ProcessUtils {
     public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            LogClientService logClient = null;
             String log;
-            try {
-                logClient = new LogClientService();
+            try (LogClientService logClient = new LogClientService()) {
                 log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
                         Constants.RPC_PORT,
                         taskExecutionContext.getLogPath());
-            } finally {
-                if (logClient != null) {
-                    logClient.close();
-                }
             }
             if (StringUtils.isNotEmpty(log)) {
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);
