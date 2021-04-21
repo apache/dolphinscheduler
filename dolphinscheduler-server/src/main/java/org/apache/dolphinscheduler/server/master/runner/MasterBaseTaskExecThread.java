@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -32,8 +34,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
-
-import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
