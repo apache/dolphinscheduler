@@ -1264,7 +1264,8 @@ public class ProcessService {
         List<TaskInstance> taskInstances = this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
 
         for (TaskInstance task : taskInstances) {
-            if (task.getState() == ExecutionStatus.FAILURE) {
+            if (task.getState() == ExecutionStatus.FAILURE
+                    && task.getRetryTimes() >= task.getMaxRetryTimes()) {
                 return false;
             }
         }
