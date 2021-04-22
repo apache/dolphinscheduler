@@ -114,7 +114,7 @@ alter table QRTZ_PAUSED_TRIGGER_GRPS add primary key(SCHED_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_FIRED_TRIGGERS (
 SCHED_NAME character varying(120) NOT NULL,
-ENTRY_ID character varying(95) NOT NULL,
+ENTRY_ID character varying(200) NOT NULL,
 TRIGGER_NAME character varying(200) NOT NULL,
 TRIGGER_GROUP character varying(200) NOT NULL,
 INSTANCE_NAME character varying(200) NOT NULL,
