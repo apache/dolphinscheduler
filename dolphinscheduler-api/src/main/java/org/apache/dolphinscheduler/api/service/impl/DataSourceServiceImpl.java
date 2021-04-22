@@ -235,6 +235,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         switch (dataSource.getType()) {
             case HIVE:
+           //edit datasource select spark, data parameters lost
+            case SPARK:
             case SQLSERVER:
                 separator = ";";
                 break;
