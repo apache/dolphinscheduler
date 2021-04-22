@@ -35,7 +35,7 @@
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <treeselect  v-model="resourceList" :multiple="true" maxHeight="200" :options="options" :normalizer="normalizer" :disabled="isDetails" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}  &nbsp; <span  class="copy-path" @mousedown="_copyPath($event, node)" ><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> </span> &nbsp; </div>
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }} <span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
         </treeselect>
       </div>
     </m-list-box>
