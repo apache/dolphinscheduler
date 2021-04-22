@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.dao.upgrade;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -63,7 +65,7 @@ public class DolphinSchedulerManager {
     /**
      * init DolphinScheduler
      */
-    public void initDolphinScheduler() {
+    public void initDolphinScheduler() throws SQLException, IOException {
         // Determines whether the dolphinscheduler table structure has been init
         if (upgradeDao.isExistsTable("t_escheduler_version") ||
                 upgradeDao.isExistsTable("t_ds_version") ||
@@ -77,14 +79,10 @@ public class DolphinSchedulerManager {
     /**
      * init DolphinScheduler Schema
      */
-    public void initDolphinSchedulerSchema() {
+    public void initDolphinSchedulerSchema() throws SQLException, IOException {
 
         logger.info("Start initializing the DolphinScheduler manager table structure");
-        try {
-            upgradeDao.initSchema();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        upgradeDao.initSchema();
     }
 
 

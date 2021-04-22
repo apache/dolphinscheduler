@@ -19,29 +19,22 @@ package org.apache.dolphinscheduler.dao.upgrade.shell;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-/**
- * init DolphinScheduler
- */
-public class InitDolphinScheduler {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({DolphinSchedulerManager.class, InitDolphinScheduler.class})
+public class InitDolphinSchedulerTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
-
-	/**
-	 * init dolphin scheduler db
-	 * @param args args
-	 */
-    public static void main(String[] args) {
-        Thread.currentThread().setName("manager-InitDolphinScheduler");
-        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-        try {
-            dolphinSchedulerManager.initDolphinScheduler();
-            logger.info("init DolphinScheduler finished");
-        } catch (Exception ex) {
-            logger.error("init DolphinScheduler error", ex);
-        }
-
+    @Test
+    public void main() throws Exception {
+        DolphinSchedulerManager mockManager = PowerMockito.mock(DolphinSchedulerManager.class);
+        PowerMockito.whenNew(DolphinSchedulerManager.class).withNoArguments().thenReturn(mockManager);
+        InitDolphinScheduler.main(null);
+        Assert.assertTrue(true);
     }
 }
