@@ -32,7 +32,7 @@
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <treeselect v-model="resourceList" :multiple="true" maxHeight="200" :options="resourceOptions" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}<span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}<span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
         </treeselect>
       </div>
     </m-list-box>
@@ -105,12 +105,12 @@
             return node.raw.fullName
           }
         })
-        clipboard.on('success', e => {
+        clipboard.on('success', handler => {
           this.$message.success(`${i18n.$t('Copy success')}`)
           // Free memory
           clipboard.destroy()
         })
-        clipboard.on('error', e => {
+        clipboard.on('error', handler => {
           // Copy is not supported
           this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
           // Free memory
