@@ -964,6 +964,7 @@
                         <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/task/AbstractCommandExecutorTest.java</include>
                         <include>**/server/worker/task/ShellTaskReturnTest.java</include>
+                        <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
