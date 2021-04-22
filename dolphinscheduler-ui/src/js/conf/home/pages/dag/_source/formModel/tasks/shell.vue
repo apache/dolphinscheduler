@@ -68,7 +68,7 @@
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
-
+  import Clipboard from 'clipboard'
   let editor
 
   export default {
@@ -102,10 +102,10 @@
       backfillItem: Object
     },
     methods: {
-      _copyPath(e, node) {
-        e.stopPropagation();
-        let clipboard = new Clipboard(`.copy-path`,{
-          text:function () {
+      _copyPath (e, node) {
+        e.stopPropagation()
+        let clipboard = new Clipboard('.copy-path', {
+          text: function () {
             return node.raw.fullName
           }
         })

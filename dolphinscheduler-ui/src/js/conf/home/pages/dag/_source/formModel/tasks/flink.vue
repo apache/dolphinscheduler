@@ -203,6 +203,7 @@
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
+  import Clipboard from 'clipboard'
 
   export default {
     name: 'flink',
@@ -263,10 +264,10 @@
     },
     mixins: [disabledState],
     methods: {
-      _copyPath(e, node) {
-        e.stopPropagation();
-        let clipboard = new Clipboard(`.copy-path`,{
-          text:function () {
+      _copyPath (e, node) {
+        e.stopPropagation()
+        let clipboard = new Clipboard('.copy-path', {
+          text: function () {
             return node.raw.fullName
           }
         })
