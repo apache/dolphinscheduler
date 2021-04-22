@@ -304,34 +304,37 @@ public class SqlTask extends AbstractTask {
      */
     private String resultProcess(ResultSet resultSet) throws Exception {
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
-        ResultSetMetaData md = resultSet.getMetaData();
-        int num = md.getColumnCount();
+        if (resultSet != null) {
+            ResultSetMetaData md = resultSet.getMetaData();
+            int num = md.getColumnCount();
 
-        int rowCount = 0;
+            int rowCount = 0;
 
-        while (rowCount < LIMIT && resultSet.next()) {
-            ObjectNode mapOfColValues = JSONUtils.createObjectNode();
-            for (int i = 1; i <= num; i++) {
-                mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
+            while (rowCount < LIMIT && resultSet.next()) {
+                ObjectNode mapOfColValues = JSONUtils.createObjectNode();
+                for (int i = 1; i <= num; i++) {
+                    mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
+                }
+                resultJSONArray.add(mapOfColValues);
+                rowCount++;
             }
-            resultJSONArray.add(mapOfColValues);
-            rowCount++;
+
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
+            displayRows = Math.min(displayRows, resultJSONArray.size());
+            logger.info("display sql result {} rows as follows:", displayRows);
+            for (int i = 0; i < displayRows; i++) {
+                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
+                logger.info("row {} : {}", i + 1, row);
+            }
         }
+
         String result = JSONUtils.toJsonString(resultJSONArray);
-        logger.debug("execute sql result : {}", result);
-
-        int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
-        displayRows = Math.min(displayRows, resultJSONArray.size());
-        logger.info("display sql result {} rows as follows:", displayRows);
-        for (int i = 0; i < displayRows; i++) {
-            String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-            logger.info("row {} : {}", i + 1, row);
-        }
-
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
-            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle()) ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
-                    JSONUtils.toJsonString(resultJSONArray));
+            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
+                            ? sqlParameters.getTitle()
+                            : taskExecutionContext.getTaskName() + " query result sets", result);
         }
+        logger.debug("execute sql result : {}", result);
         return result;
     }
 
