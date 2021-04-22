@@ -241,7 +241,6 @@ public class TaskInstance implements Serializable {
     /**
      * task params
      */
-    @TableField(exist = false)
     private String taskParams;
 
     public void init(String host, Date startTime, String executePath) {
