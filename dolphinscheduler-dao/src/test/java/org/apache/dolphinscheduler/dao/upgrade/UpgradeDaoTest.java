@@ -14,23 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.junit.Test;
+import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+
+import java.io.FileReader;
+import java.sql.Connection;
 
 import javax.sql.DataSource;
-import java.util.Map;
 
-import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertThat;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({MysqlUpgradeDao.class, ConnectionFactory.class})
 public class UpgradeDaoTest {
-    PostgresqlUpgradeDao postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
 
     @Test
-    public void testQueryQueryAllOldWorkerGroup() throws Exception{
-        postgresqlUpgradeDao.updateProcessDefinitionJsonWorkerGroup();
-    }
+    public void testInitMysqlSchema() throws Exception {
 
+        PowerMockito.mockStatic(ConnectionFactory.class);
+        ConnectionFactory mockConnectionFactory = PowerMockito.mock(ConnectionFactory.class);
+        PowerMockito.when(ConnectionFactory.getInstance()).thenReturn(mockConnectionFactory);
+
+        DataSource mockDatasource = PowerMockito.mock(DataSource.class);
+        PowerMockito.when(mockConnectionFactory.getDataSource()).thenReturn(mockDatasource);
+        Connection mockConnection = PowerMockito.mock(Connection.class);
+        PowerMockito.when(mockDatasource.getConnection()).thenReturn(mockConnection);
+        ScriptRunner mockScript = PowerMockito.mock(ScriptRunner.class);
+        FileReader mockFileReader = PowerMockito.mock(FileReader.class);
+        PowerMockito.whenNew(ScriptRunner.class).withAnyArguments().thenReturn(mockScript);
+        PowerMockito.whenNew(FileReader.class).withAnyArguments().thenReturn(mockFileReader);
+
+        UpgradeDao upgradeDao = MysqlUpgradeDao.getInstance();
+        upgradeDao.initSchema();
+        Assert.assertTrue(true);
+
+    }
 }

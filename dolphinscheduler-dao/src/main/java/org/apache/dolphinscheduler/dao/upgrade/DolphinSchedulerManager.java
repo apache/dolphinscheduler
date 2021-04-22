@@ -14,14 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 
 /**
  * upgrade manager
@@ -77,7 +80,11 @@ public class DolphinSchedulerManager {
     public void initDolphinSchedulerSchema() {
 
         logger.info("Start initializing the DolphinScheduler manager table structure");
-        upgradeDao.initSchema();
+        try {
+            upgradeDao.initSchema();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 
