@@ -38,3 +38,23 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_worker_group_R_ip_list;
 DROP PROCEDURE uc_dolphin_T_t_ds_worker_group_R_ip_list;
+
+-- uc_dolphin_T_qrtz_fired_triggers_R_entry_id
+drop PROCEDURE if EXISTS uc_dolphin_T_qrtz_fired_triggers_R_entry_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_qrtz_fired_triggers_R_entry_id()
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+        WHERE TABLE_NAME='QRTZ_FIRED_TRIGGERS'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME ='entry_id')
+    THEN
+        ALTER TABLE QRTZ_FIRED_TRIGGERS MODIFY COLUMN `entry_id` varchar(200);
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_qrtz_fired_triggers_R_entry_id;
+DROP PROCEDURE uc_dolphin_T_qrtz_fired_triggers_R_entry_id;
