@@ -21,18 +21,15 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, PostgreSqlDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class PostgreSqlDatasourceProcessorTest {
 
     private PostgreSqlDatasourceProcessor postgreSqlDatasourceProcessor = new PostgreSqlDatasourceProcessor();
@@ -77,16 +74,6 @@ public class PostgreSqlDatasourceProcessorTest {
         String jdbcUrl = postgreSqlDatasourceProcessor.getJdbcUrl(postgreSqlConnectionParam);
         Assert.assertEquals("jdbc:postgresql://localhost:3308/default?other", jdbcUrl);
 
-    }
-
-    @Test
-    public void testGetConnection() throws SQLException, ClassNotFoundException {
-        PostgreSqlConnectionParam postgreSqlConnectionParam = new PostgreSqlConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        postgreSqlDatasourceProcessor.getConnection(postgreSqlConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

@@ -25,13 +25,11 @@ import java.sql.DriverManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, SparkDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class SparkDatasourceProcessorTest {
 
     private SparkDatasourceProcessor sparkDatasourceProcessor = new SparkDatasourceProcessor();
@@ -73,16 +71,6 @@ public class SparkDatasourceProcessorTest {
         sparkConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default;other",
                 sparkDatasourceProcessor.getJdbcUrl(sparkConnectionParam));
-    }
-
-    @Test
-    public void testGetConnection() throws Exception {
-        SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        sparkDatasourceProcessor.getConnection(sparkConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

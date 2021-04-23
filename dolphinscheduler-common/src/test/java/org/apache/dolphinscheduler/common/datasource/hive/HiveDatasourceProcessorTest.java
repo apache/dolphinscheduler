@@ -26,13 +26,11 @@ import java.sql.DriverManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, HiveDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class HiveDatasourceProcessorTest {
 
     private HiveDatasourceProcessor hiveDatasourceProcessor = new HiveDatasourceProcessor();
@@ -72,16 +70,6 @@ public class HiveDatasourceProcessorTest {
         connectionParam.setJdbcUrl("jdbc:hive2://localhost1:5142,localhost2:5142/default");
         Assert.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142/default",
                 hiveDatasourceProcessor.getJdbcUrl(connectionParam));
-    }
-
-    @Test
-    public void testGetConnection() throws Exception {
-        HiveConnectionParam hiveConnectionParam = new HiveConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        hiveDatasourceProcessor.getConnection(hiveConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

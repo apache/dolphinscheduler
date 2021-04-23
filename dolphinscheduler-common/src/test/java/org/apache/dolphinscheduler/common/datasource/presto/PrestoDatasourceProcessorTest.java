@@ -21,18 +21,15 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, PrestoDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class PrestoDatasourceProcessorTest {
 
     private PrestoDatasourceProcessor prestoDatasourceProcessor = new PrestoDatasourceProcessor();
@@ -75,16 +72,6 @@ public class PrestoDatasourceProcessorTest {
         Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
                 prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
-    }
-
-    @Test
-    public void testGetConnection() throws SQLException, ClassNotFoundException {
-        PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        prestoDatasourceProcessor.getConnection(prestoConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

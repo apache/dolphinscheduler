@@ -22,18 +22,15 @@ import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, OracleDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class OracleDatasourceProcessorTest {
 
     private OracleDatasourceProcessor oracleDatasourceProcessor = new OracleDatasourceProcessor();
@@ -77,17 +74,6 @@ public class OracleDatasourceProcessorTest {
         oracleConnectionParam.setOther("other=other");
         Assert.assertEquals("jdbc:oracle:thin:@localhost:3308/default?other=other",
                 oracleDatasourceProcessor.getJdbcUrl(oracleConnectionParam));
-    }
-
-    @Test
-    public void testGetConnection() throws SQLException, ClassNotFoundException {
-        OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        oracleDatasourceProcessor.getConnection(oracleConnectionParam);
-        Assert.assertTrue(true);
-
     }
 
     @Test

@@ -29,8 +29,10 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -115,7 +117,7 @@ public class SparkDatasourceProcessor extends AbstractDatasourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws Exception {
+    public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
         SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
         CommonUtils.loadKerberosConf(sparkConnectionParam.getJavaSecurityKrb5Conf(),
                 sparkConnectionParam.getLoginUserKeytabUsername(), sparkConnectionParam.getLoginUserKeytabPath());

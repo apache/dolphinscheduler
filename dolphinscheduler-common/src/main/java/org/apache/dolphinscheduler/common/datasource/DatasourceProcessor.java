@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.common.datasource;
 
 import org.apache.dolphinscheduler.common.enums.DbType;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public interface DatasourceProcessor {
 
@@ -70,7 +72,7 @@ public interface DatasourceProcessor {
      * @param connectionParam connectionParam
      * @return {@link Connection}
      */
-    Connection getConnection(ConnectionParam connectionParam) throws Exception;
+    Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException;
 
     /**
      * @return {@link DbType}

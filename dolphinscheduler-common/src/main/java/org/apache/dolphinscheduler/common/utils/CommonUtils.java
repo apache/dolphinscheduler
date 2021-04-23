@@ -104,7 +104,7 @@ public class CommonUtils {
      * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
      * @param loginUserKeytabUsername loginUserKeytabUsername
      * @param loginUserKeytabPath loginUserKeytabPath
-     * @throws Exception errors
+     * @throws IOException errors
      */
     public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws IOException {
         if (CommonUtils.getKerberosStartupState()) {

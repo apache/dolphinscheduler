@@ -114,7 +114,7 @@ public class DatasourceUtil {
             case PRESTO:
                 return prestoPROCESSOR;
             default:
-                throw new RuntimeException("datasource type illegal");
+                throw new IllegalArgumentException("datasource type illegal:" + dbType);
         }
     }
 

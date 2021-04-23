@@ -22,18 +22,15 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, SqlServerDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class SqlServerDatasourceProcessorTest {
 
     private SqlServerDatasourceProcessor sqlServerDatasourceProcessor = new SqlServerDatasourceProcessor();
@@ -75,16 +72,6 @@ public class SqlServerDatasourceProcessorTest {
         sqlServerConnectionParam.setOther("other");
         Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default;other",
                 sqlServerDatasourceProcessor.getJdbcUrl(sqlServerConnectionParam));
-    }
-
-    @Test
-    public void testGetConnection() throws SQLException, ClassNotFoundException {
-        SqlServerConnectionParam sqlServerConnectionParam = new SqlServerConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        sqlServerDatasourceProcessor.getConnection(sqlServerConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

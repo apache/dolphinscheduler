@@ -21,18 +21,15 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, ClickHouseDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class ClickHouseDatasourceProcessorTest {
 
     private ClickHouseDatasourceProcessor clickHouseDatasourceProcessor = new ClickHouseDatasourceProcessor();
@@ -77,16 +74,6 @@ public class ClickHouseDatasourceProcessorTest {
         connectionParam.setOther("other=other1");
         String jdbcUrl = clickHouseDatasourceProcessor.getJdbcUrl(connectionParam);
         Assert.assertEquals("jdbc:clickhouse://localhost:8123/default?other=other1", jdbcUrl);
-    }
-
-    @Test
-    public void testGetConnection() throws SQLException, ClassNotFoundException {
-        ClickhouseConnectionParam clickhouseConnectionParam = new ClickhouseConnectionParam();
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        clickHouseDatasourceProcessor.getConnection(clickhouseConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

@@ -22,18 +22,15 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class})
 public class MysqlDatasourceProcessorTest {
 
     private MysqlDatasourceProcessor mysqlDatasourceProcessor = new MysqlDatasourceProcessor();
@@ -75,18 +72,6 @@ public class MysqlDatasourceProcessorTest {
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         Assert.assertEquals("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
-    }
-
-    @Test
-    public void testGetConnection() throws SQLException, ClassNotFoundException {
-        MysqlConnectionParam mysqlConnectionParam = new MysqlConnectionParam();
-        mysqlConnectionParam.setUser("root");
-        mysqlConnectionParam.setPassword("123456");
-        PowerMockito.mockStatic(Class.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
-        mysqlDatasourceProcessor.getConnection(mysqlConnectionParam);
-        Assert.assertTrue(true);
     }
 
     @Test

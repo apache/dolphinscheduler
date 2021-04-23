@@ -36,7 +36,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DatasourceUtil.class, Class.class, DriverManager.class, MysqlDatasourceProcessor.class})
+@PrepareForTest({Class.class, DriverManager.class, MysqlDatasourceProcessor.class})
 public class DatasourceUtilTest {
 
     @Test
