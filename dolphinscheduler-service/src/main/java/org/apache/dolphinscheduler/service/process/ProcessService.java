@@ -1247,7 +1247,6 @@ public class ProcessService {
             if (taskInstance.isSubProcess()) {
                 taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
             } else {
-
                 if (processInstanceState != ExecutionStatus.READY_STOP
                         && processInstanceState != ExecutionStatus.READY_PAUSE) {
                     // failure task set invalid
