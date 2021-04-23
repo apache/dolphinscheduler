@@ -87,7 +87,7 @@ public class DependentExecute {
      */
     private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
-        return calculateResultForTasks(dependentItem, dateIntervals );
+        return calculateResultForTasks(dependentItem, dateIntervals);
     }
 
     /**
@@ -257,9 +257,7 @@ public class DependentExecute {
             }
             dependResultList.add(dependResult);
         }
-        modelDependResult = DependentUtils.getDependResultForRelation(
-                this.relation, dependResultList
-        );
+        modelDependResult = DependentUtils.getDependResultForRelation(this.relation, dependResultList);
         return modelDependResult;
     }
 
