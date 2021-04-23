@@ -24,11 +24,13 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -58,9 +60,7 @@ public class AccessLogAspect {
         Method method = sign.getMethod();
         AccessLogAnnotation annotation = method.getAnnotation(AccessLogAnnotation.class);
 
-        Object ob = proceedingJoinPoint.proceed();
-
-        String logText = "";
+        String tranceId = UUID.randomUUID().toString();
 
         // log request
         if (!annotation.ignoreRequest()) {
@@ -73,7 +73,8 @@ public class AccessLogAspect {
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
-                logText = String.format("REQUEST LOGIN_USER:%s, URI:%s, METHOD:%s, HANDLER:%s, ARGS:%s%n",
+                logger.info("REQUEST TRANCE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
+                        tranceId,
                         userName,
                         request.getRequestURI(),
                         request.getMethod(),
@@ -83,14 +84,11 @@ public class AccessLogAspect {
             }
         }
 
+        Object ob = proceedingJoinPoint.proceed();
+
         // log response
         if (!annotation.ignoreResponse()) {
-            logText += String.format("RESPONSE:%s, REQUEST DURATION:%s milliseconds%n",
-                    ob, (System.currentTimeMillis() - startTime));
-        }
-
-        if (logText.length() > 0) {
-            logger.info(logText);
+            logger.info("RESPONSE TRANCE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", tranceId, ob, (System.currentTimeMillis() - startTime));
         }
 
         return ob;
