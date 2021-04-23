@@ -76,12 +76,12 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
                     taskInstance.getId()));
             String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
             Thread.currentThread().setName(threadLoggerInfoName);
+            logger.info("switch task start");
             initTaskParameters();
-            logger.info("dependent task start");
             waitTaskQuit();
             updateTaskState();
         } catch (Exception e) {
-            logger.error("conditions task run exception", e);
+            logger.error("switch task run exception", e);
         }
         return true;
     }
@@ -147,7 +147,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
         if (this.cancel) {
             status = ExecutionStatus.KILL;
         } else {
-            status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
+            status = (conditionResult != DependResult.SUCCESS) ? ExecutionStatus.FAILURE : ExecutionStatus.SUCCESS;
         }
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
@@ -155,8 +155,8 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void initTaskParameters() {
-        this.taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
         this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+        this.taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         this.processService.saveTaskInstance(taskInstance);
