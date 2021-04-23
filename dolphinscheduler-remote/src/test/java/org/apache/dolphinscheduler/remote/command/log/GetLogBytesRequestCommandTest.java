@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import junit.framework.Assert;
-
 import org.apache.dolphinscheduler.remote.command.Command;
 
 import org.junit.Test;
 
+import junit.framework.Assert;
 
 public class GetLogBytesRequestCommandTest {
 
