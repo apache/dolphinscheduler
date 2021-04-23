@@ -14,35 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade.shell;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * create DolphinScheduler
- *
  */
 public class CreateDolphinScheduler {
 
-	private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
 
-	/**
+    /**
 	 * create dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		try {
-			dolphinSchedulerManager.initDolphinScheduler();
-			logger.info("init DolphinScheduler finished");
-			dolphinSchedulerManager.upgradeDolphinScheduler();
-			logger.info("upgrade DolphinScheduler finished");
-			logger.info("create DolphinScheduler success");
-		} catch (Exception e) {
-			logger.error("create DolphinScheduler failed",e);
-		}
+     *
+     * @param args args
+    */
+    public static void main(String[] args) {
+        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+        try {
+            logger.info("create DolphinScheduler begin");
+            dolphinSchedulerManager.initDolphinScheduler();
+            logger.info("create DolphinScheduler success");
+        } catch (Exception e) {
+            logger.error("create DolphinScheduler failed", e);
+        }
 
-	}
+    }
 }
