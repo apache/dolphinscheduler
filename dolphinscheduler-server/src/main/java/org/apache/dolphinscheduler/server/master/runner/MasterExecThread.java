@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -448,13 +449,14 @@ public class MasterExecThread implements Runnable {
      * find task instance in db.
      * in case submit more than one same name task in the same time.
      *
-     * @param taskName task name
+     * @param taskCode task code
+     * @param taskVersion task version
      * @return TaskInstance
      */
-    private TaskInstance findTaskIfExists(String taskName) {
+    private TaskInstance findTaskIfExists(Long taskCode, int taskVersion) {
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(this.processInstance.getId());
         for (TaskInstance taskInstance : taskInstanceList) {
-            if (taskInstance.getName().equals(taskName)) {
+            if (taskInstance.getTaskCode() == taskCode && taskInstance.getTaskDefinitionVersion() == taskVersion) {
                 return taskInstance;
             }
         }
@@ -465,20 +467,19 @@ public class MasterExecThread implements Runnable {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param nodeName node name
+     * @param taskNode taskNode
      * @return TaskInstance
      */
-    private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
-                                            TaskNode taskNode) {
+    private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
         //update processInstance for update the globalParams
         this.processInstance = this.processService.findProcessInstanceById(this.processInstance.getId());
-        TaskInstance taskInstance = findTaskIfExists(nodeName);
+        TaskInstance taskInstance = findTaskIfExists(taskNode.getCode(), taskNode.getVersion());
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
             taskInstance.setTaskCode(taskNode.getCode());
             taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
             // task name
-            taskInstance.setName(nodeName);
+            taskInstance.setName(taskNode.getName());
             // task instance state
             taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
             // process instance id
@@ -518,27 +519,28 @@ public class MasterExecThread implements Runnable {
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
-            //get process global
-            setProcessGlobal(taskNode, taskInstance);
+            if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType())) {
+                taskInstance.setTaskParams(taskNode.getDependence());
+            } else {
+                taskInstance.setTaskParams(globalParamToTaskParams(taskNode.getParams()));
+            }
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
         return taskInstance;
     }
 
-    private void setProcessGlobal(TaskNode taskNode, TaskInstance taskInstance) {
+    private String globalParamToTaskParams(String params) {
         String globalParams = this.processInstance.getGlobalParams();
-        if (StringUtils.isNotEmpty(globalParams)) {
-            Map<String, String> globalMap = processService.getGlobalParamMap(globalParams);
-            if (globalMap != null && globalMap.size() != 0) {
-                setGlobalMapToTask(taskNode, taskInstance, globalMap);
-            }
+        if (StringUtils.isBlank(globalParams)) {
+            return params;
         }
-    }
-
-    private void setGlobalMapToTask(TaskNode taskNode, TaskInstance taskInstance, Map<String, String> globalMap) {
-        // the param save in localParams
-        Map<String, Object> result = JSONUtils.toMap(taskNode.getParams(), String.class, Object.class);
+        Map<String, String> globalMap = processService.getGlobalParamMap(globalParams);
+        if (globalMap == null || globalMap.size() == 0) {
+            return params;
+        }
+        // the process global param save in localParams
+        Map<String, Object> result = JSONUtils.toMap(params, String.class, Object.class);
         Object localParams = result.get(LOCAL_PARAMS);
         if (localParams != null) {
             List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
@@ -552,8 +554,8 @@ public class MasterExecThread implements Runnable {
                 }
             }
             result.put(LOCAL_PARAMS, allParam);
-            taskInstance.setTaskParams(JSONUtils.toJsonString(result));
         }
+        return JSONUtils.toJsonString(result);
     }
 
     private void submitPostNode(String parentNodeName) {
@@ -567,9 +569,10 @@ public class MasterExecThread implements Runnable {
                 throw new RuntimeException();
             }
             TaskNode taskNodeObject = dag.getNode(taskNode);
-            VarPoolUtils.setTaskNodeLocalParams(taskNodeObject, propToValue);
-            taskInstances.add(createTaskInstance(processInstance, taskNode,
-                    taskNodeObject));
+            if (!TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNodeObject.getType())) {
+                VarPoolUtils.setTaskNodeLocalParams(taskNodeObject, propToValue);
+            }
+            taskInstances.add(createTaskInstance(processInstance, taskNodeObject));
         }
 
         // if previous node success , post node submit
