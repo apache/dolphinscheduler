@@ -90,7 +90,7 @@ public class AlertGroupMapperTest {
 
         Integer count = 1;
 
-        Integer offset = 2;
+        Integer offset = 0;
         Integer size = 1;
 
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count, groupName);
