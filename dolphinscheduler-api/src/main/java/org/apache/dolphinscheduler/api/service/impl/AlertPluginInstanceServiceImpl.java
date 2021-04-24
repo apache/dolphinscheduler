@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -32,6 +33,8 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -254,7 +257,14 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * @return Complete parameters list(include ui)
      */
     private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {
+        // todo: serialize to PluginParams list
         List<Map<String, Object>> pluginParamsList = PluginParamsTransfer.generatePluginParams(pluginParamsMapString, pluginUiParams);
+        pluginParamsList.forEach(pluginParamMap -> {
+            Map<String, String> props = (Map<String, String>) pluginParamMap.get("props");
+            if (MapUtils.isNotEmpty(props) && "password".equals(props.get("type"))) {
+                pluginParamMap.put("value", EncryptionUtils.getMd5((String) pluginParamMap.get("value")));
+            }
+        });
         return JSONUtils.toJsonString(pluginParamsList);
     }
 
