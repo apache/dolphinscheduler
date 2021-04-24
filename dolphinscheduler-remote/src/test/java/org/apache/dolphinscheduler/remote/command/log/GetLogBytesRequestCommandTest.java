@@ -28,7 +28,7 @@ public class GetLogBytesRequestCommandTest {
     @Test
     public void testConvert2Command() {
         GetLogBytesRequestCommand getLogBytesRequestCommand = new GetLogBytesRequestCommand();
-        getLogBytesRequestCommand.setPath("/opt/zhangsan");
+        getLogBytesRequestCommand.setPath("/opt/test");
         Command command = getLogBytesRequestCommand.convert2Command();
         Assert.assertNotNull(command);
     }
