@@ -88,10 +88,10 @@ public class AlertGroupMapperTest {
 
         String groupName = "testGroup";
 
-        Integer count = 4;
+        Integer count = 1;
 
         Integer offset = 2;
-        Integer size = 2;
+        Integer size = 1;
 
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count, groupName);
 
@@ -152,7 +152,7 @@ public class AlertGroupMapperTest {
      */
     @Test
     public void testQueryByGroupName() {
-        Integer count = 4;
+        Integer count = 1;
         String groupName = "testGroup";
 
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count, groupName);
@@ -175,7 +175,7 @@ public class AlertGroupMapperTest {
      */
     @Test
     public void testQueryAllGroupList() {
-        Integer count = 4;
+        Integer count = 1;
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count);
 
         List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();
