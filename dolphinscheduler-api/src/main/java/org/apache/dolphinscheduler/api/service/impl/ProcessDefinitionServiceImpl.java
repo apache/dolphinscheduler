@@ -55,6 +55,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -155,6 +156,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
 
+    @Autowired
     private SchedulerService schedulerService;
 
     /**
@@ -563,7 +565,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 // To check resources whether they are already cancel authorized or deleted
                 String resourceIds = processDefinition.getResourceIds();
                 if (StringUtils.isNotBlank(resourceIds)) {
-                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(Constants.COMMA)).map(Integer::parseInt).toArray(Integer[]::new);
                     PermissionCheck<Integer> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE_ID, processService, resourceIdArray, loginUser.getId(), logger);
                     try {
                         permissionCheck.checkPermission();
@@ -1463,8 +1465,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        // TODO:
-        //  Project targetProject = projectMapper.queryDetailByCode(targetProjectCode);
         Project targetProject = projectMapper.queryDetailById(targetProjectId);
         if (targetProject == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);
@@ -1501,7 +1501,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                           int targetProjectId) {
         Map<String, Object> result = new HashMap<>();
         List<String> failedProcessList = new ArrayList<>();
-
         //check src project auth
         Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
         if (checkResult != null) {
@@ -1513,8 +1512,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        // TODO :
-        //  Project targetProject = projectMapper.queryDetailByCode(targetProjectCode);
         Project targetProject = projectMapper.queryDetailById(targetProjectId);
         if (targetProject == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);
@@ -1528,12 +1525,61 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
-        doBatchMoveProcessDefinition(targetProject, failedProcessList, processDefinitionIdList);
+        Integer[] definitionIds = Arrays.stream(processDefinitionIds.split(Constants.COMMA)).map(Integer::parseInt).toArray(Integer[]::new);
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(definitionIds);
+        for (ProcessDefinition processDefinition : processDefinitionList) {
+            ProcessDefinitionLog processDefinitionLog = moveProcessDefinition(loginUser, targetProject.getCode(), processDefinition, result, failedProcessList);
+            if (processDefinitionLog != null) {
+                moveTaskRelation(loginUser, processDefinition.getProjectCode(), processDefinitionLog);
+            }
+        }
 
         checkBatchOperateResult(projectName, targetProject.getName(), result, failedProcessList, false);
-
         return result;
+    }
+
+    private ProcessDefinitionLog moveProcessDefinition(User loginUser, Long targetProjectCode, ProcessDefinition processDefinition,
+                                                       Map<String, Object> result, List<String> failedProcessList) {
+        try {
+            Integer version = processDefinitionLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
+            ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+            processDefinitionLog.setVersion(version == null || version == 0 ? 1 : version + 1);
+            processDefinitionLog.setProjectCode(targetProjectCode);
+            processDefinitionLog.setOperator(loginUser.getId());
+            Date now = new Date();
+            processDefinitionLog.setOperateTime(now);
+            processDefinitionLog.setUpdateTime(now);
+            processDefinitionLog.setCreateTime(now);
+            int update = processDefinitionMapper.updateById(processDefinitionLog);
+            int insertLog = processDefinitionLogMapper.insert(processDefinitionLog);
+            if ((insertLog & update) > 0) {
+                putMsg(result, Status.SUCCESS);
+            } else {
+                failedProcessList.add(processDefinition.getId() + "[" + processDefinition.getName() + "]");
+                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            }
+            return processDefinitionLog;
+        } catch (Exception e) {
+            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            failedProcessList.add(processDefinition.getId() + "[" + processDefinition.getName() + "]");
+            logger.error("move processDefinition error: {}", e.getMessage(), e);
+        }
+        return null;
+    }
+
+    private void moveTaskRelation(User loginUser, Long projectCode, ProcessDefinitionLog processDefinition) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
+        if (!processTaskRelationList.isEmpty()) {
+            processTaskRelationMapper.deleteByCode(projectCode, processDefinition.getCode());
+        }
+        Date now = new Date();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
+            processTaskRelation.setProjectCode(processDefinition.getProjectCode());
+            processTaskRelation.setProcessDefinitionVersion(processDefinition.getVersion());
+            processTaskRelation.setCreateTime(now);
+            processTaskRelation.setUpdateTime(now);
+            processService.saveTaskRelation(loginUser, processTaskRelation);
+        }
     }
 
     /**
@@ -1583,30 +1629,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
         }
         return result;
-    }
-
-    /**
-     * do batch move process definition
-     *
-     * @param targetProject targetProject
-     * @param failedProcessList failedProcessList
-     * @param processDefinitionIdList processDefinitionIdList
-     */
-    private void doBatchMoveProcessDefinition(Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
-        for (String processDefinitionId : processDefinitionIdList) {
-            try {
-                Map<String, Object> moveProcessDefinitionResult =
-                        moveProcessDefinition(Integer.valueOf(processDefinitionId), targetProject);
-                if (!Status.SUCCESS.equals(moveProcessDefinitionResult.get(Constants.STATUS))) {
-                    setFailedProcessList(failedProcessList, processDefinitionId);
-                    logger.error((String) moveProcessDefinitionResult.get(Constants.MSG));
-                }
-            } catch (Exception e) {
-                setFailedProcessList(failedProcessList, processDefinitionId);
-                logger.error("move processDefinition error: {}", e.getMessage(), e);
-
-            }
-        }
     }
 
     /**
@@ -1666,34 +1688,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
         return null;
-    }
-
-    /**
-     * move process definition
-     *
-     * @param processId processId
-     * @param targetProject targetProject
-     * @return move result code
-     */
-    private Map<String, Object> moveProcessDefinition(Integer processId,
-                                                      Project targetProject) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processId);
-        if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
-            return result;
-        }
-
-        processDefinition.setProjectId(targetProject.getId());
-        processDefinition.setUpdateTime(new Date());
-        if (processDefinitionMapper.updateById(processDefinition) > 0) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
-        }
-        return result;
     }
 
     /**

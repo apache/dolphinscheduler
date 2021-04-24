@@ -2370,14 +2370,18 @@ public class ProcessService {
             }
         }
         for (ProcessTaskRelation processTaskRelation : builderRelationList) {
-            processTaskRelationMapper.insert(processTaskRelation);
-            // save process task relation log
-            ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
-            processTaskRelationLog.setOperator(operator.getId());
-            processTaskRelationLog.setOperateTime(now);
-            processTaskRelationLogMapper.insert(processTaskRelationLog);
+            saveTaskRelation(operator, processTaskRelation);
         }
         return 0;
+    }
+
+    public void saveTaskRelation(User operator, ProcessTaskRelation processTaskRelation) {
+        processTaskRelationMapper.insert(processTaskRelation);
+        // save process task relation log
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+        processTaskRelationLog.setOperator(operator.getId());
+        processTaskRelationLog.setOperateTime(new Date());
+        processTaskRelationLogMapper.insert(processTaskRelationLog);
     }
 
     public int saveTaskDefinition(User operator, Long projectCode, TaskNode taskNode, TaskDefinition taskDefinition) {
@@ -2496,44 +2500,6 @@ public class ProcessService {
             v.setPreTasks(JSONUtils.toJsonString(v.getPreTaskNodeList().stream().map(PreviousTaskNode::getName).collect(Collectors.toList())));
         });
         return new ArrayList<>(taskNodeMap.values());
-    }
-
-    /**
-     * getTaskNodeFromTaskInstance
-     * return null if task definition do not exists
-     *
-     * @param taskInstance
-     * @return
-     */
-    public TaskNode getTaskNodeFromTaskInstance(TaskInstance taskInstance) {
-        TaskNode taskNode = new TaskNode();
-        ProcessInstance processInstance = processInstanceMapper.selectById(taskInstance.getProcessInstanceId());
-        TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                taskInstance.getTaskCode(),
-                taskInstance.getTaskDefinitionVersion());
-        if (taskDefinition == null) {
-            return null;
-        }
-        List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
-                processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion()
-        );
-        Map<Long, Integer> taskCodeMap = new HashedMap();
-
-        taskRelationList.forEach(relation -> taskCodeMap.putIfAbsent(relation.getPostTaskCode(), relation.getPostTaskVersion()));
-
-        taskNode.setCode(taskDefinition.getCode());
-        taskNode.setVersion(taskDefinition.getVersion());
-        taskNode.setName(taskDefinition.getName());
-        taskNode.setName(taskDefinition.getName());
-        taskNode.setDesc(taskDefinition.getDescription());
-        taskNode.setType(taskDefinition.getTaskType());
-        taskNode.setRunFlag(taskDefinition.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_FORBIDDEN : Constants.FLOWNODE_RUN_FLAG_NORMAL);
-        taskNode.setMaxRetryTimes(taskDefinition.getFailRetryTimes());
-        taskNode.setRetryInterval(taskDefinition.getFailRetryInterval());
-        taskNode.setParams(taskDefinition.getTaskParams());
-        taskNode.setTaskInstancePriority(taskDefinition.getTaskPriority());
-        taskNode.setWorkerGroup(taskDefinition.getWorkerGroup());
-        return taskNode;
     }
 
     /**
