@@ -73,8 +73,8 @@ Please referer the official website document: [QuickStart in Kubernetes](https:/
 Artifact:
 
 ```
-dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-dolphinscheduler-bin.tar.gz: Binary package of DolphinScheduler
-dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-src.zip: Source code package of DolphinScheduler
+dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-bin.tar.gz: Binary package of DolphinScheduler
+dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-src.tar.gz: Source code package of DolphinScheduler
 ```
 
 ## Thanks
