@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -262,7 +261,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         pluginParamsList.forEach(pluginParamMap -> {
             Map<String, String> props = (Map<String, String>) pluginParamMap.get("props");
             if (MapUtils.isNotEmpty(props) && "password".equals(props.get("type"))) {
-                pluginParamMap.put("value", EncryptionUtils.getMd5((String) pluginParamMap.get("value")));
+                // hide the password
+                pluginParamMap.remove("value");
             }
         });
         return JSONUtils.toJsonString(pluginParamsList);
