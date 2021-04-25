@@ -63,7 +63,7 @@ public class SlackSender {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             Map<String, String> paramMap = new HashMap<>();
             paramMap.put(SlackParamsConstants.SLACK_BOT, botName);
-            paramMap.put(SlackParamsConstants.text, title + "\n" + content);
+            paramMap.put(SlackParamsConstants.TEXT, title + "\n" + content);
 
             HttpPost httpPost = new HttpPost(webHookUrl);
             httpPost.setEntity(new StringEntity(JSONUtils.toJsonString(paramMap), "UTF-8"));
