@@ -132,6 +132,7 @@
         this.$emit('mVersionDeleteProcessDefinitionVersion', {
           version: item.version,
           processDefinitionId: this.versionData.processDefinition.id,
+          processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
       },
@@ -143,7 +144,7 @@
         this.$emit('mVersionGetProcessDefinitionVersionsPage', {
           pageNo: val,
           pageSize: this.pageSize,
-          processDefinitionId: this.versionData.processDefinition.id,
+          processDefinitionCode: this.versionData.processDefinition.code,
           fromThis: this
         })
       },

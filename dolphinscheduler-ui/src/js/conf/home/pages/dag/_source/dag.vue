@@ -753,11 +753,11 @@
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionCode, fromThis }) {
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
-          processDefinitionId: processDefinitionId
+          processDefinitionCode: processDefinitionCode
         }).then(res => {
           this.versionData.processDefinitionVersions = res.data.lists
           this.versionData.total = res.data.totalCount
@@ -775,7 +775,7 @@
        * @param processDefinitionId the process definition id user want to delete
        * @param fromThis fromThis
        */
-      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, processDefinitionCode, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
@@ -784,7 +784,7 @@
           this.mVersionGetProcessDefinitionVersionsPage({
             pageNo: 1,
             pageSize: 10,
-            processDefinitionId: processDefinitionId,
+            processDefinitionCode: processDefinitionCode,
             fromThis: fromThis
           })
         }).catch(e => {
@@ -805,6 +805,7 @@
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
           this.versionData.processDefinition.id = this.urlParam.id
+          this.versionData.processDefinition.code = this.store.state.dag.code
           this.versionData.processDefinition.version = this.$store.state.dag.version
           this.versionData.processDefinition.releaseState = this.releaseState
           this.versionData.processDefinitionVersions = processDefinitionVersions
