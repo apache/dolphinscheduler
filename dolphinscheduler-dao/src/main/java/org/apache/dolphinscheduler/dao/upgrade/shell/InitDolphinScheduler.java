@@ -14,34 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.dao.upgrade.shell;
 
 import org.apache.dolphinscheduler.dao.upgrade.DolphinSchedulerManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * init DolphinScheduler
+ *
  */
 public class InitDolphinScheduler {
 
-    private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
+	private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
 
 	/**
 	 * init dolphin scheduler db
 	 * @param args args
 	 */
-    public static void main(String[] args) {
-        Thread.currentThread().setName("manager-InitDolphinScheduler");
-        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-        try {
-            dolphinSchedulerManager.initDolphinScheduler();
-            logger.info("init DolphinScheduler finished");
-        } catch (Exception ex) {
-            logger.error("init DolphinScheduler error", ex);
-        }
-
-    }
+	public static void main(String[] args) {
+		Thread.currentThread().setName("manager-InitDolphinScheduler");
+		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+		dolphinSchedulerManager.initDolphinScheduler();
+		logger.info("init DolphinScheduler finished");
+		
+	}
 }
