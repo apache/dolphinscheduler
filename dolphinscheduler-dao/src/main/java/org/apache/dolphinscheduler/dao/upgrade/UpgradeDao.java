@@ -14,25 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.SchemaUtils;
-import org.apache.dolphinscheduler.common.utils.ScriptRunner;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import javax.sql.DataSource;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,14 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 public abstract class UpgradeDao extends AbstractBaseDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
@@ -59,9 +46,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static final String rootDir = System.getProperty("user.dir");
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
-
-    private static final String MYSQL_CREATE_SCRIPT = rootDir + "/sql/dolphinscheduler_mysql.sql";
-    private static final String POSTGRE_CREATE_SCRIPT = rootDir + "/sql/dolphinscheduler_postgre.sql";
 
 
     @Override
@@ -106,40 +90,119 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     /**
      * init schema
      */
-    public void initSchema() throws SQLException, IOException {
+    public void initSchema() {
         DbType dbType = getDbType();
         String initSqlPath = "";
         if (dbType != null) {
             switch (dbType) {
                 case MYSQL:
-                    initSqlPath = MYSQL_CREATE_SCRIPT;
+                    initSqlPath = "/sql/create/release-1.0.0_schema/mysql/";
+                    initSchema(initSqlPath);
                     break;
                 case POSTGRESQL:
-                    initSqlPath = POSTGRE_CREATE_SCRIPT;
+                    initSqlPath = "/sql/create/release-1.2.0_schema/postgresql/";
+                    initSchema(initSqlPath);
                     break;
                 default:
                     logger.error("not support sql type: {},can't upgrade", dbType);
                     throw new IllegalArgumentException("not support sql type,can't upgrade");
             }
         }
+    }
+
+
+    /**
+     * init scheam
+     *
+     * @param initSqlPath initSqlPath
+     */
+    public void initSchema(String initSqlPath) {
+
+        // Execute the dolphinscheduler DDL, it cannot be rolled back
+        runInitDDL(initSqlPath);
+
+        // Execute the dolphinscheduler DML, it can be rolled back
+        runInitDML(initSqlPath);
+
+
+    }
+
+    /**
+     * run DML
+     *
+     * @param initSqlPath initSqlPath
+     */
+    private void runInitDML(String initSqlPath) {
+        Connection conn = null;
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        logger.info("Init sql filePath: {}", initSqlPath);
-        try (Connection conn = dataSource.getConnection()) {
+        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
+            ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
+            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
+            initScriptRunner.runScript(initSqlReader);
+
+            conn.commit();
+        } catch (IOException e) {
             try {
-                conn.setAutoCommit(false);
-                ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
-                Reader initSqlReader = new FileReader(initSqlPath);
-                initScriptRunner.runScript(initSqlReader);
-                conn.commit();
-            } catch (IOException | SQLException e) {
                 conn.rollback();
-                logger.error("execute init script error.", e);
-                throw e;
+            } catch (SQLException e1) {
+                logger.error(e1.getMessage(), e1);
             }
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (Exception e) {
+            try {
+                if (null != conn) {
+                    conn.rollback();
+                }
+            } catch (SQLException e1) {
+                logger.error(e1.getMessage(), e1);
+            }
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
-            // ignore
+            ConnectionUtils.releaseResource(conn);
+
+        }
+
+    }
+
+    /**
+     * run DDL
+     *
+     * @param initSqlPath initSqlPath
+     */
+    private void runInitDDL(String initSqlPath) {
+        Connection conn = null;
+        if (StringUtils.isEmpty(rootDir)) {
+            throw new RuntimeException("Environment variable user.dir not found");
+        }
+        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
+        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
+        try {
+            conn = dataSource.getConnection();
+            // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
+            ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
+            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
+            initScriptRunner.runScript(initSqlReader);
+
+        } catch (IOException e) {
+
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (Exception e) {
+
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            ConnectionUtils.releaseResource(conn);
+
         }
 
     }
