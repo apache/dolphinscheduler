@@ -515,53 +515,53 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * get tasks list by process definition id
+     * get tasks list by process definition code
      *
-     * @param loginUser           login user
-     * @param projectName         project name
-     * @param processDefinitionId process definition id
+     * @param loginUser             login user
+     * @param projectName           project name
+     * @param processDefinitionCode process definition code
      * @return task list
      */
-    @ApiOperation(value = "getNodeListByDefinitionId", notes = "GET_NODE_LIST_BY_DEFINITION_ID_NOTES")
+    @ApiOperation(value = "getNodeListByDefinitionCode", notes = "GET_NODE_LIST_BY_DEFINITION_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100")
     })
     @GetMapping(value = "gen-task-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
-    public Result getNodeListByDefinitionId(
+    public Result getNodeListByDefinitionCode(
         @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-        @RequestParam("processDefinitionId") Integer processDefinitionId) throws Exception {
-        logger.info("query task node name list by definitionId, login user:{}, project name:{}, id : {}",
-            loginUser.getUserName(), projectName, processDefinitionId);
-        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionId(processDefinitionId);
+        @RequestParam("processDefinitionCode") Long processDefinitionCode) throws Exception {
+        logger.info("query task node name list by definitionCode, login user:{}, project name:{}, code : {}",
+            loginUser.getUserName(), projectName, processDefinitionCode);
+        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCode(processDefinitionCode);
         return returnDataList(result);
     }
 
     /**
-     * get tasks list by process definition id
+     * get tasks list by process definition code list
      *
      * @param loginUser               login user
      * @param projectName             project name
-     * @param processDefinitionIdList process definition id list
+     * @param processDefinitionCodeList process definition code list
      * @return node list data
      */
-    @ApiOperation(value = "getNodeListByDefinitionIdList", notes = "GET_NODE_LIST_BY_DEFINITION_ID_NOTES")
+    @ApiOperation(value = "getNodeListByDefinitionCodeList", notes = "GET_NODE_LIST_BY_DEFINITION_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionIdList", value = "PROCESS_DEFINITION_ID_LIST", required = true, type = "String")
+        @ApiImplicitParam(name = "processDefinitionCodeList", value = "PROCESS_DEFINITION_CODE_LIST", required = true, type = "String")
     })
     @GetMapping(value = "get-task-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
-    public Result getNodeListByDefinitionIdList(
+    public Result getNodeListByDefinitionCodeList(
         @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-        @RequestParam("processDefinitionIdList") String processDefinitionIdList) {
+        @RequestParam("processDefinitionCodeList") String processDefinitionCodeList) {
 
-        logger.info("query task node name list by definitionId list, login user:{}, project name:{}, id list: {}",
-            loginUser.getUserName(), projectName, processDefinitionIdList);
-        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionIdList(processDefinitionIdList);
+        logger.info("query task node name list by definitionId list, login user:{}, project name:{}, code list: {}",
+            loginUser.getUserName(), projectName, processDefinitionCodeList);
+        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCodeList(processDefinitionCodeList);
         return returnDataList(result);
     }
 

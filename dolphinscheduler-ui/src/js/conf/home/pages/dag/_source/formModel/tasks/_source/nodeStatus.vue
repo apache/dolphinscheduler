@@ -112,7 +112,7 @@
           this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
             this.definitionList = _.map(_.cloneDeep(res), v => {
               return {
-                value: v.id,
+                value: v.code,
                 label: v.name
               }
             })
@@ -123,10 +123,10 @@
       /**
        * get dependItemList
        */
-      _getDependItemList (ids, is = true) {
+      _getDependItemList (codes, is = true) {
         return new Promise((resolve, reject) => {
           if (is) {
-            this.store.dispatch('dag/getProcessTasksList', { processDefinitionId: ids }).then(res => {
+            this.store.dispatch('dag/getProcessTasksList', { processDefinitionCodeList: codes }).then(res => {
               resolve(['ALL'].concat(_.map(res, v => v.name)))
             })
           }
@@ -163,13 +163,13 @@
         if (!this.dependItemList.length) {
           this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
         } else {
-          // get definitionId ids
-          let ids = _.map(this.dependItemList, v => v.definitionId).join(',')
+          // get definitionCode codes
+          let codes = _.map(this.dependItemList, v => v.definitionCode).join(',')
           // get item list
-          this._getDependItemList(ids, false).then(res => {
+          this._getDependItemList(codes, false).then(res => {
             _.map(this.dependItemList, (v, i) => {
               this._getProcessByProjectId(v.projectId).then(definitionList => {
-                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
+                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode, ['ALL'].concat(_.map(res[v.definitionCode] || [], v => v.name)), v))
               })
             })
           })

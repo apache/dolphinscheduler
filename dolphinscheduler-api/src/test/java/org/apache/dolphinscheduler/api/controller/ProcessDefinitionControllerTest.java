@@ -301,13 +301,13 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testGetNodeListByDefinitionId() throws Exception {
         String projectName = "test";
-        int id = 1;
+        Long code = 1L;
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionId(id)).thenReturn(result);
-        Result response = processDefinitionController.getNodeListByDefinitionId(user, projectName, id);
+        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionCode(code)).thenReturn(result);
+        Result response = processDefinitionController.getNodeListByDefinitionCode(user, projectName, code);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
@@ -315,13 +315,13 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testGetNodeListByDefinitionIdList() throws Exception {
         String projectName = "test";
-        String idList = "1,2,3";
+        String codeList = "1,2,3";
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionIdList(idList)).thenReturn(result);
-        Result response = processDefinitionController.getNodeListByDefinitionIdList(user, projectName, idList);
+        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionCodeList(codeList)).thenReturn(result);
+        Result response = processDefinitionController.getNodeListByDefinitionCodeList(user, projectName, codeList);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
