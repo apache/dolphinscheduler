@@ -60,8 +60,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
-        <spring.version>5.1.18.RELEASE</spring.version>
-        <spring.boot.version>2.1.17.RELEASE</spring.boot.version>
+        <spring.version>5.1.19.RELEASE</spring.version>
+        <spring.boot.version>2.1.18.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
