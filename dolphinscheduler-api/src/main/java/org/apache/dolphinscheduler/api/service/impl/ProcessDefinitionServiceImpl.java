@@ -1128,17 +1128,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * get task node details based on process definition
      *
-     * @param defineId define id
+     * @param defineCode define code
      * @return task node list
      */
-    @Override
-    public Map<String, Object> getTaskNodeListByDefinitionId(Integer defineId) {
+    public Map<String, Object> getTaskNodeListByDefinitionCode(Long defineCode) {
         Map<String, Object> result = new HashMap<>();
 
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(defineId);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(defineCode);
         if (processDefinition == null) {
             logger.info("process define not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineCode);
             return result;
         }
         ProcessData processData = processService.genProcessData(processDefinition);
@@ -1162,24 +1161,23 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * get task node details based on process definition
      *
-     * @param defineIdList define id list
+     * @param defineCodeList define code list
      * @return task node list
      */
     @Override
-    public Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList) {
+    public Map<String, Object> getTaskNodeListByDefinitionCodeList(String defineCodeList) {
         Map<String, Object> result = new HashMap<>();
 
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
-        String[] idList = defineIdList.split(",");
-        List<Integer> idIntList = new ArrayList<>();
-        for (String definitionId : idList) {
-            idIntList.add(Integer.parseInt(definitionId));
+        String[] codeList = defineCodeList.split(",");
+        List<Long> codeLongList = new ArrayList<>();
+        for (String definitionCode : codeList) {
+            codeLongList.add(Long.parseLong(definitionCode));
         }
-        Integer[] idArray = idIntList.toArray(new Integer[0]);
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codeLongList);
         if (CollectionUtils.isEmpty(processDefinitionList)) {
             logger.info("process definition not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineCodeList);
             return result;
         }
 

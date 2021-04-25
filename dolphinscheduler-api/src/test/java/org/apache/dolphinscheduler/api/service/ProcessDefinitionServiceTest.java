@@ -61,6 +61,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -700,41 +701,42 @@ public class ProcessDefinitionServiceTest {
     @Test
     public void testGetTaskNodeListByDefinitionId() {
         //process definition not exist
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(null);
-        Map<String, Object> processDefinitionNullRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(null);
+        Map<String, Object> processDefinitionNullRes = processDefinitionService.getTaskNodeListByDefinitionCode(46L);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
         //process data null
         ProcessDefinition processDefinition = getProcessDefinition();
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
-        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionCode(46L);
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, successRes.get(Constants.STATUS));
 
         //success
         Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(new ProcessData());
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
-        Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionCode(46L);
         Assert.assertEquals(Status.SUCCESS, dataNotValidRes.get(Constants.STATUS));
     }
 
     @Test
     public void testGetTaskNodeListByDefinitionIdList() {
         //process definition not exist
-        String defineIdList = "46";
-        Integer[] idArray = {46};
-        Mockito.when(processDefineMapper.queryDefinitionListByIdList(idArray)).thenReturn(null);
-        Map<String, Object> processNotExistRes = processDefinitionService.getTaskNodeListByDefinitionIdList(defineIdList);
+        String defineCodeList = "46";
+        Long[] codeArray = {46L};
+        List<Long> codeList = Arrays.asList(codeArray);
+        Mockito.when(processDefineMapper.queryByCodes(codeList)).thenReturn(null);
+        Map<String, Object> processNotExistRes = processDefinitionService.getTaskNodeListByDefinitionCodeList(defineCodeList);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processNotExistRes.get(Constants.STATUS));
 
         //process definition exist
         ProcessDefinition processDefinition = getProcessDefinition();
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
-        Mockito.when(processDefineMapper.queryDefinitionListByIdList(idArray)).thenReturn(processDefinitionList);
+        Mockito.when(processDefineMapper.queryByCodes(codeList)).thenReturn(processDefinitionList);
         ProcessData processData = getProcessData();
         Mockito.when(processService.genProcessData(processDefinition)).thenReturn(processData);
 
-        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionIdList(defineIdList);
+        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionCodeList(defineCodeList);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
