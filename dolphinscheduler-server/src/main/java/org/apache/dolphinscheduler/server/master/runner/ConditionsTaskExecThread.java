@@ -56,7 +56,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * constructor of MasterBaseTaskExecThread
      *
-     * @param taskInstance    task instance
+     * @param taskInstance task instance
      */
     public ConditionsTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
@@ -65,7 +65,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
     @Override
     public Boolean submitWaitComplete() {
-        try{
+        try {
             this.taskInstance = submit();
             logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                     processInstance.getProcessDefinitionCode(),
@@ -78,33 +78,28 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
             logger.info("dependent task start");
             waitTaskQuit();
             updateTaskState();
-        }catch (Exception e){
-            logger.error("conditions task run exception" , e);
+        } catch (Exception e) {
+            logger.error("conditions task run exception", e);
         }
         return true;
     }
 
     private void waitTaskQuit() {
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId()
-        );
-        for(TaskInstance task : taskInstances){
+        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+        for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());
         }
 
         List<DependResult> modelResultList = new ArrayList<>();
-        for(DependentTaskModel dependentTaskModel : dependentParameters.getDependTaskList()){
-
+        for (DependentTaskModel dependentTaskModel : dependentParameters.getDependTaskList()) {
             List<DependResult> itemDependResult = new ArrayList<>();
-            for(DependentItem item : dependentTaskModel.getDependItemList()){
+            for (DependentItem item : dependentTaskModel.getDependItemList()) {
                 itemDependResult.add(getDependResultForItem(item));
             }
             DependResult modelResult = DependentUtils.getDependResultForRelation(dependentTaskModel.getRelation(), itemDependResult);
             modelResultList.add(modelResult);
         }
-        conditionResult = DependentUtils.getDependResultForRelation(
-                dependentParameters.getRelation(), modelResultList
-        );
+        conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), modelResultList);
         logger.info("the conditions task depend result : {}", conditionResult);
     }
 
@@ -113,9 +108,9 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      */
     private void updateTaskState() {
         ExecutionStatus status;
-        if(this.cancel){
+        if (this.cancel) {
             status = ExecutionStatus.KILL;
-        }else{
+        } else {
             status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         }
         taskInstance.setState(status);
@@ -137,20 +132,18 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * depend result for depend item
-     * @param item
-     * @return
      */
-    private DependResult getDependResultForItem(DependentItem item){
+    private DependResult getDependResultForItem(DependentItem item) {
 
         DependResult dependResult = DependResult.SUCCESS;
-        if(!completeTaskList.containsKey(item.getDepTasks())){
+        if (!completeTaskList.containsKey(item.getDepTasks())) {
             logger.info("depend item: {} have not completed yet.", item.getDepTasks());
             dependResult = DependResult.FAILED;
             return dependResult;
         }
         ExecutionStatus executionStatus = completeTaskList.get(item.getDepTasks());
-        if(executionStatus != item.getStatus()){
-            logger.info("depend item : {} expect status: {}, actual status: {}" ,item.getDepTasks(), item.getStatus(), executionStatus);
+        if (executionStatus != item.getStatus()) {
+            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTasks(), item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
         logger.info("dependent item complete {} {},{}",
