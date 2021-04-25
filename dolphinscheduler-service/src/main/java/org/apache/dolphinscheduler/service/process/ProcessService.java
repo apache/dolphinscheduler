@@ -2200,7 +2200,9 @@ public class ProcessService {
         taskDefinition.setName(taskNode.getName());
         taskDefinition.setDescription(taskNode.getDesc());
         taskDefinition.setTaskType(taskNode.getType().toUpperCase());
-        taskDefinition.setTaskParams(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType()) ? taskNode.getDependence() : taskNode.getParams());
+        taskDefinition.setTaskParams(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType()) ||
+                TaskType.CONDITIONS.getDesc().equalsIgnoreCase(taskNode.getType()) ?
+                taskNode.getDependence() : taskNode.getParams());
         taskDefinition.setFlag(taskNode.isForbidden() ? Flag.NO : Flag.YES);
         taskDefinition.setTaskPriority(taskNode.getTaskInstancePriority());
         taskDefinition.setWorkerGroup(taskNode.getWorkerGroup());
@@ -2490,7 +2492,9 @@ public class ProcessService {
             v.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
             v.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
             v.setParams(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskDefinitionLog.getTaskType()) ? null : taskDefinitionLog.getTaskParams());
-            v.setDependence(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskDefinitionLog.getTaskType()) ? taskDefinitionLog.getTaskParams() : null);
+            v.setDependence(TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskDefinitionLog.getTaskType()) ||
+                    TaskType.CONDITIONS.getDesc().equalsIgnoreCase(taskDefinitionLog.getTaskType())
+                    ? taskDefinitionLog.getTaskParams() : null);
             v.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
             v.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
             v.setTimeout(JSONUtils.toJsonString(new TaskTimeoutParameter(taskDefinitionLog.getTimeoutFlag() == TimeoutFlag.OPEN,
