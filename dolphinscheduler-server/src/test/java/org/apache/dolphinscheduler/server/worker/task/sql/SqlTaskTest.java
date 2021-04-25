@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -51,8 +50,8 @@ import org.slf4j.LoggerFactory;
  *  sql task test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {SqlTask.class, DriverManager.class, SpringApplicationContext.class,
-        ParameterUtils.class, AlertSendResponseCommand.class, BaseDataSource.class})
+@PrepareForTest(value = {SqlTask.class, DatasourceUtil.class, SpringApplicationContext.class,
+        ParameterUtils.class, AlertSendResponseCommand.class})
 public class SqlTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlTaskTest.class);
@@ -110,12 +109,12 @@ public class SqlTaskTest {
     @Test
     public void testHandle() throws Exception {
         Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(connection);
         PreparedStatement preparedStatement = PowerMockito.mock(PreparedStatement.class);
         PowerMockito.when(connection.prepareStatement(Mockito.any())).thenReturn(preparedStatement);
         PowerMockito.mockStatic(ParameterUtils.class);
         PowerMockito.when(ParameterUtils.replaceScheduleTime(Mockito.any(), Mockito.any())).thenReturn("insert into tb_1 values('1','2')");
+        PowerMockito.mockStatic(DatasourceUtil.class);
+        PowerMockito.when(DatasourceUtil.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
         sqlTask.handle();
         Assert.assertEquals(Constants.EXIT_CODE_SUCCESS, sqlTask.getExitStatusCode());
