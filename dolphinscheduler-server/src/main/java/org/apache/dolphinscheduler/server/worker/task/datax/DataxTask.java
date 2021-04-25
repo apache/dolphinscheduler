@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -25,11 +27,10 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
@@ -49,7 +50,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -235,10 +235,12 @@ public class DataxTask extends AbstractTask {
 
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
-        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+        BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                DbType.of(dataxTaskExecutionContext.getSourcetype()),
                 dataxTaskExecutionContext.getSourceConnectionParams());
 
-        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
+        BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
@@ -250,15 +252,13 @@ public class DataxTask extends AbstractTask {
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        for (String url : new String[]{dataSourceCfg.getJdbcUrl()}) {
-            urlArr.add(url);
-        }
+        urlArr.add(DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataSourceCfg));
 
         readerConnArr.add(readerConn);
 
         ObjectNode readerParam = JSONUtils.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
-        readerParam.put("password", dataSourceCfg.getPassword());
+        readerParam.put("password", CommonUtils.decodePassword(dataSourceCfg.getPassword()));
         readerParam.putArray("connection").addAll(readerConnArr);
 
         ObjectNode reader = JSONUtils.createObjectNode();
@@ -268,16 +268,14 @@ public class DataxTask extends AbstractTask {
         List<ObjectNode> writerConnArr = new ArrayList<>();
         ObjectNode writerConn = JSONUtils.createObjectNode();
         ArrayNode tableArr = writerConn.putArray("table");
-        for (String table : new String[]{dataXParameters.getTargetTable()}) {
-            tableArr.add(table);
-        }
+        tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
+        writerConn.put("jdbcUrl", DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
-        writerParam.put("password", dataTargetCfg.getPassword());
+        writerParam.put("password", CommonUtils.decodePassword(dataTargetCfg.getPassword()));
 
         String[] columns = parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
                 DbType.of(dataxTaskExecutionContext.getTargetType()),
@@ -436,7 +434,7 @@ public class DataxTask extends AbstractTask {
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseDataSource dataSourceCfg, String sql) {
+    private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseConnectionParam dataSourceCfg, String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
@@ -527,14 +525,13 @@ public class DataxTask extends AbstractTask {
      * @param sql sql for data synchronization
      * @return column name array
      */
-    public String[] tryExecuteSqlResolveColumnNames(BaseDataSource baseDataSource, String sql) {
+    public String[] tryExecuteSqlResolveColumnNames(BaseConnectionParam baseDataSource, String sql) {
         String[] columnNames;
         sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(), baseDataSource.getUser(),
-                        baseDataSource.getPassword());
+                Connection connection = DatasourceUtil.getConnection(DbType.valueOf(dataXParameters.getDtType()), baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 
