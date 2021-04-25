@@ -1171,12 +1171,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> result = new HashMap<>();
 
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
-        String[] codeList = defineCodeList.split(",");
-        List<Long> codeLongList = new ArrayList<>();
-        for (String definitionCode : codeList) {
-            codeLongList.add(Long.parseLong(definitionCode));
+        String[] codeArr = defineCodeList.split(",");
+        List<Long> codeList = new ArrayList<>();
+        for (String definitionCode : codeArr) {
+            codeList.add(Long.parseLong(definitionCode));
         }
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codeLongList);
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codeList);
         if (CollectionUtils.isEmpty(processDefinitionList)) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineCodeList);
