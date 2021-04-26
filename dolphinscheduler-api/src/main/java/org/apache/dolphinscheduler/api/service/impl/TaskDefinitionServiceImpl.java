@@ -230,7 +230,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return result;
     }
 
-
     public void checkTaskNode(Map<String, Object> result, TaskNode taskNode, String taskDefinitionJson) {
         if (taskNode == null) {
             logger.error("taskDefinitionJson is not valid json");

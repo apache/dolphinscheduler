@@ -2119,7 +2119,6 @@ public class ProcessService {
         return String.format("%s_%s_%s", definition.getId(), processInstance.getId(), taskInstance.getId());
     }
 
-
     /**
      * switch process definition version to process definition log version
      */

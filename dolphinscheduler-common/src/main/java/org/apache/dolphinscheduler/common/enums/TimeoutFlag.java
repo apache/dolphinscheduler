@@ -29,8 +29,7 @@ public enum TimeoutFlag {
     CLOSE(0, "close"),
     OPEN(1, "open");
 
-
-    TimeoutFlag(int code, String desc){
+    TimeoutFlag(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
