@@ -28,4 +28,7 @@ public class SlackParamsConstants {
     public static final String SLACK_BOT = "Username";
     public static final String SLACK_BOT_NAME = "username";
     public static final String TEXT = "text";
+    public static final String ATTACHMENT = "attachments";
+
+    public static final Integer MAX_SHOW_NUMBER = 100;
 }
