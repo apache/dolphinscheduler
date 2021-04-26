@@ -1171,5 +1171,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-register</module>
     </modules>
 </project>
