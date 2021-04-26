@@ -14,21 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.api.persistentVolumeClaim.enabled }}
+{{- if .Values.common.sharedStoragePersistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-api
+  name: {{ include "dolphinscheduler.fullname" . }}-shared
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-shared
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
 spec:
   accessModes:
-  {{- range .Values.api.persistentVolumeClaim.accessModes }}
+  {{- range .Values.common.sharedStoragePersistence.accessModes }}
     - {{ . | quote }}
   {{- end }}
-  storageClassName: {{ .Values.api.persistentVolumeClaim.storageClassName | quote }}
+  storageClassName: {{ .Values.common.sharedStoragePersistence.storageClassName | quote }}
   resources:
     requests:
-      storage: {{ .Values.api.persistentVolumeClaim.storage | quote }}
+      storage: {{ .Values.common.sharedStoragePersistence.storage | quote }}
 {{- end }}
