@@ -114,7 +114,7 @@ alter table QRTZ_PAUSED_TRIGGER_GRPS add primary key(SCHED_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_FIRED_TRIGGERS (
 SCHED_NAME character varying(120) NOT NULL,
-ENTRY_ID character varying(95) NOT NULL,
+ENTRY_ID character varying(200) NOT NULL,
 TRIGGER_NAME character varying(200) NOT NULL,
 TRIGGER_GROUP character varying(200) NOT NULL,
 INSTANCE_NAME character varying(200) NOT NULL,
@@ -228,7 +228,6 @@ CREATE TABLE t_ds_command (
   schedule_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   executor_id int DEFAULT NULL ,
-  dependence varchar(255) DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
@@ -270,7 +269,6 @@ CREATE TABLE t_ds_error_command (
   schedule_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  dependence text ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
   message text ,
@@ -753,11 +751,12 @@ create index version_index on t_ds_version(version);
 DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
-  name varchar(256) DEFAULT NULL ,
+  name varchar(256) NOT NULL ,
   addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id) ,
+  CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
 --

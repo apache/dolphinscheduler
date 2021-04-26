@@ -18,8 +18,10 @@
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -27,8 +29,9 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -39,6 +42,7 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +50,8 @@ import org.slf4j.LoggerFactory;
  *  sql task test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = {SqlTask.class, DriverManager.class, SpringApplicationContext.class, ParameterUtils.class})
+@PrepareForTest(value = {SqlTask.class, DatasourceUtil.class, SpringApplicationContext.class,
+        ParameterUtils.class, AlertSendResponseCommand.class})
 public class SqlTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlTaskTest.class);
@@ -104,14 +109,43 @@ public class SqlTaskTest {
     @Test
     public void testHandle() throws Exception {
         Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.mockStatic(DriverManager.class);
-        PowerMockito.when(DriverManager.getConnection(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(connection);
         PreparedStatement preparedStatement = PowerMockito.mock(PreparedStatement.class);
         PowerMockito.when(connection.prepareStatement(Mockito.any())).thenReturn(preparedStatement);
         PowerMockito.mockStatic(ParameterUtils.class);
         PowerMockito.when(ParameterUtils.replaceScheduleTime(Mockito.any(), Mockito.any())).thenReturn("insert into tb_1 values('1','2')");
+        PowerMockito.mockStatic(DatasourceUtil.class);
+        PowerMockito.when(DatasourceUtil.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
         sqlTask.handle();
-        Assert.assertEquals(Constants.EXIT_CODE_SUCCESS,sqlTask.getExitStatusCode());
+        Assert.assertEquals(Constants.EXIT_CODE_SUCCESS, sqlTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testResultProcess() throws Exception {
+        // test input null and will not throw a exception
+        AlertSendResponseCommand mockResponseCommand = PowerMockito.mock(AlertSendResponseCommand.class);
+        PowerMockito.when(mockResponseCommand.getResStatus()).thenReturn(true);
+        PowerMockito.when(alertClientService.sendAlert(0, "null query result sets", "[]")).thenReturn(mockResponseCommand);
+        String result = Whitebox.invokeMethod(sqlTask, "resultProcess", null);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void testResultProcess02() throws Exception {
+        // test input not null
+        ResultSet resultSet = PowerMockito.mock(ResultSet.class);
+        ResultSetMetaData mockResultMetaData = PowerMockito.mock(ResultSetMetaData.class);
+        PowerMockito.when(resultSet.getMetaData()).thenReturn(mockResultMetaData);
+        PowerMockito.when(mockResultMetaData.getColumnCount()).thenReturn(2);
+        PowerMockito.when(resultSet.next()).thenReturn(true);
+        PowerMockito.when(resultSet.getObject(Mockito.anyInt())).thenReturn(1);
+        PowerMockito.when(mockResultMetaData.getColumnLabel(Mockito.anyInt())).thenReturn("a");
+
+        AlertSendResponseCommand mockResponseCommand = PowerMockito.mock(AlertSendResponseCommand.class);
+        PowerMockito.when(mockResponseCommand.getResStatus()).thenReturn(true);
+        PowerMockito.when(alertClientService.sendAlert(Mockito.anyInt(), Mockito.anyString(), Mockito.anyString())).thenReturn(mockResponseCommand);
+
+        String result = Whitebox.invokeMethod(sqlTask, "resultProcess", resultSet);
+        Assert.assertNotNull(result);
     }
 }

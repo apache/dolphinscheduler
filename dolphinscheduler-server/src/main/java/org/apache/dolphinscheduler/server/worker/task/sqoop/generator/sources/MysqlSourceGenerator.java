@@ -18,15 +18,16 @@
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.SqoopQueryType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
@@ -54,17 +55,20 @@ public class MysqlSourceGenerator implements ISourceGenerator {
             SqoopTaskExecutionContext sqoopTaskExecutionContext = taskExecutionContext.getSqoopTaskExecutionContext();
 
             if (null != sourceMysqlParameter) {
-                BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.of(sqoopTaskExecutionContext.getSourcetype()),
+                BaseConnectionParam baseDataSource = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                        DbType.of(sqoopTaskExecutionContext.getSourcetype()),
                     sqoopTaskExecutionContext.getSourceConnectionParams());
 
                 if (null != baseDataSource) {
 
                     mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
-                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getJdbcUrl()).append(Constants.DOUBLE_QUOTES)
+                            .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES)
+                            .append(DatasourceUtil.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(Constants.DOUBLE_QUOTES)
                         .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
                         .append(Constants.SPACE).append(baseDataSource.getUser())
                         .append(Constants.SPACE).append(SqoopConstants.DB_PWD)
-                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getPassword()).append(Constants.DOUBLE_QUOTES);
+                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES)
+                            .append(CommonUtils.decodePassword(baseDataSource.getPassword())).append(Constants.DOUBLE_QUOTES);
 
                     //sqoop table & sql query
                     if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {

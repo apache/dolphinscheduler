@@ -32,7 +32,7 @@ public class PeerTaskInstancePriorityQueueTest {
     public void put() throws TaskPriorityQueueException {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
         TaskInstance taskInstanceHigPriority = createTaskInstance("high", Priority.HIGH);
-        TaskInstance taskInstanceMediumPriority = createTaskInstance("high", Priority.MEDIUM);
+        TaskInstance taskInstanceMediumPriority = createTaskInstance("medium", Priority.MEDIUM);
         queue.put(taskInstanceHigPriority);
         queue.put(taskInstanceMediumPriority);
         Assert.assertEquals(2, queue.size());

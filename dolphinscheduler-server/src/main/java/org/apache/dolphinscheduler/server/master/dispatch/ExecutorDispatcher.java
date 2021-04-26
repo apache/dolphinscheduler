@@ -26,11 +26,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.server.master.dispatch.executor.ExecutorManager;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
+
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * executor dispatcher
@@ -84,8 +85,8 @@ public class ExecutorDispatcher implements InitializingBean {
 
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
-            throw new ExecuteException(String.format("fail to execute : %s due to no suitable worker , " +
-                            "current task need to %s worker group execute",
+            throw new ExecuteException(String.format("fail to execute : %s due to no suitable worker, "
+                            + "current task needs worker group %s to execute",
                     context.getCommand(),context.getWorkerGroup()));
         }
         context.setHost(host);

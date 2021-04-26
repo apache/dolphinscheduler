@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -27,19 +25,21 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * dag helper test
@@ -51,7 +51,7 @@ public class DagHelperTest {
      * @throws JsonProcessingException if error throws JsonProcessingException
      */
     @Test
-    public void testTaskNodeCanSubmit() throws JsonProcessingException {
+    public void testTaskNodeCanSubmit() throws IOException {
         //1->2->3->5->7
         //4->3->6
         DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
@@ -90,7 +90,7 @@ public class DagHelperTest {
      * test parse post node list
      */
     @Test
-    public void testParsePostNodeList() throws JsonProcessingException {
+    public void testParsePostNodeList() throws IOException {
         DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
         Map<String, TaskInstance> completeTaskList = new HashMap<>();
         Map<String, TaskNode> skipNodeList = new HashMap<>();
@@ -157,7 +157,7 @@ public class DagHelperTest {
      * @throws JsonProcessingException
      */
     @Test
-    public void testForbiddenPostNode() throws JsonProcessingException {
+    public void testForbiddenPostNode() throws IOException {
         DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
         Map<String, TaskInstance> completeTaskList = new HashMap<>();
         Map<String, TaskNode> skipNodeList = new HashMap<>();
@@ -195,7 +195,7 @@ public class DagHelperTest {
      * @throws JsonProcessingException
      */
     @Test
-    public void testConditionPostNode() throws JsonProcessingException {
+    public void testConditionPostNode() throws IOException {
         DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
         Map<String, TaskInstance> completeTaskList = new HashMap<>();
         Map<String, TaskNode> skipNodeList = new HashMap<>();
@@ -269,7 +269,7 @@ public class DagHelperTest {
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
      */
-    private DAG<String, TaskNode, TaskNodeRelation> generateDag() throws JsonProcessingException {
+    private DAG<String, TaskNode, TaskNodeRelation> generateDag() throws IOException {
         List<TaskNode> taskNodeList = new ArrayList<>();
         TaskNode node1 = new TaskNode();
         node1.setId("1");
@@ -283,7 +283,7 @@ public class DagHelperTest {
         node2.setType(TaskType.SHELL.getDesc());
         List<String> dep2 = new ArrayList<>();
         dep2.add("1");
-        node2.setDepList(dep2);
+        node2.setPreTasks(JSONUtils.toJsonString(dep2));
         taskNodeList.add(node2);
 
 
@@ -300,7 +300,7 @@ public class DagHelperTest {
         List<String> dep3 = new ArrayList<>();
         dep3.add("2");
         dep3.add("4");
-        node3.setDepList(dep3);
+        node3.setPreTasks(JSONUtils.toJsonString(dep3));
         taskNodeList.add(node3);
 
         TaskNode node5 = new TaskNode();
@@ -310,7 +310,7 @@ public class DagHelperTest {
         List<String> dep5 = new ArrayList<>();
         dep5.add("3");
         dep5.add("8");
-        node5.setDepList(dep5);
+        node5.setPreTasks(JSONUtils.toJsonString(dep5));
         taskNodeList.add(node5);
 
         TaskNode node6 = new TaskNode();
@@ -319,7 +319,7 @@ public class DagHelperTest {
         node6.setType(TaskType.SHELL.getDesc());
         List<String> dep6 = new ArrayList<>();
         dep6.add("3");
-        node6.setDepList(dep6);
+        node6.setPreTasks(JSONUtils.toJsonString(dep6));
         taskNodeList.add(node6);
 
         TaskNode node7 = new TaskNode();
@@ -328,7 +328,7 @@ public class DagHelperTest {
         node7.setType(TaskType.SHELL.getDesc());
         List<String> dep7 = new ArrayList<>();
         dep7.add("5");
-        node7.setDepList(dep7);
+        node7.setPreTasks(JSONUtils.toJsonString(dep7));
         taskNodeList.add(node7);
 
         TaskNode node8 = new TaskNode();
@@ -337,7 +337,7 @@ public class DagHelperTest {
         node8.setType(TaskType.SHELL.getDesc());
         List<String> dep8 = new ArrayList<>();
         dep8.add("2");
-        node8.setDepList(dep8);
+        node8.setPreTasks(JSONUtils.toJsonString(dep8));
         taskNodeList.add(node8);
 
         List<String> startNodes = new ArrayList<>();

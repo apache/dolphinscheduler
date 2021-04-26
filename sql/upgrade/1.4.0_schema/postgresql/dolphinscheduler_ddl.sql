@@ -281,3 +281,7 @@ DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_alertgroup_A_create_user_id();
 -- ALTER TABLE t_ds_process_definition_version DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
 -- DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
+
+-- ALTER TABLE t_ds_command DROP COLUMN "dependence";
+
+-- ALTER TABLE t_ds_error_command DROP COLUMN "dependence";

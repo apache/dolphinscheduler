@@ -126,8 +126,12 @@ public class ProcessInstanceController extends BaseController {
                         "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
                 loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName, stateType, host,
                 startTime, endTime, pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        Map<String, Object> result = processInstanceService.queryProcessInstanceList(
+        result = processInstanceService.queryProcessInstanceList(
                 loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }

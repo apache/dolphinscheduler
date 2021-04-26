@@ -2,7 +2,7 @@
 
 DolphinScheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 
-GitHub URL: https://github.com/apache/incubator-dolphinscheduler
+GitHub URL: https://github.com/apache/dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
@@ -111,14 +111,14 @@ You can build a docker image in A Unix-like operating system, You can also build
 In Unix-Like, Example:
 
 ```bash
-$ cd path/incubator-dolphinscheduler
+$ cd path/dolphinscheduler
 $ sh ./docker/build/hooks/build
 ```
 
 In Windows, Example:
 
 ```bat
-C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script files if you don't understand
@@ -485,4 +485,4 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 6. Add a Oracle datasource in `Datasource manage`
 
-For more information please refer to the [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) documentation.
+For more information please refer to the [dolphinscheduler](https://github.com/apache/dolphinscheduler.git) documentation.

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
 import static org.apache.dolphinscheduler.common.enums.DataType.BOOLEAN;
@@ -27,6 +28,8 @@ import static org.apache.dolphinscheduler.common.enums.DataType.TIMESTAMP;
 import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
@@ -39,15 +42,12 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -67,12 +67,6 @@ public class ProcedureTask extends AbstractTask {
      * procedure parameters
      */
     private ProcedureParameters procedureParameters;
-
-    /**
-     * base datasource
-     */
-    private BaseDataSource baseDataSource;
-
 
     /**
      * taskExecutionContext
@@ -117,17 +111,13 @@ public class ProcedureTask extends AbstractTask {
         CallableStatement stmt = null;
         try {
             // load class
-            DataSourceFactory.loadClass(DbType.valueOf(procedureParameters.getType()));
-
+            DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
-            baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
+            ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
-
             // get jdbc connection
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    baseDataSource.getUser(),
-                    baseDataSource.getPassword());
+            connection = DatasourceUtil.getConnection(dbType, connectionParam);
 
 
             // combining local and global parameters
@@ -136,7 +126,6 @@ public class ProcedureTask extends AbstractTask {
                     procedureParameters.getLocalParametersMap(),
                     CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                     taskExecutionContext.getScheduleTime());
-
 
             Collection<Property> userDefParamsList = null;
 
@@ -156,7 +145,6 @@ public class ProcedureTask extends AbstractTask {
 
             // outParameterMap
             Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, paramsMap, userDefParamsList);
-
 
             stmt.executeUpdate();
 
@@ -269,7 +257,8 @@ public class ProcedureTask extends AbstractTask {
     /**
      * close jdbc resource
      */
-    private void close(PreparedStatement stmt, Connection connection) {
+    private void close(PreparedStatement stmt,
+                       Connection connection) {
         if (stmt != null) {
             try {
                 stmt.close();

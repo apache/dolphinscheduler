@@ -2,7 +2,7 @@
 
 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 
-GitHub URL: https://github.com/apache/incubator-dolphinscheduler
+GitHub URL: https://github.com/apache/dolphinscheduler
 
 Official Website: https://dolphinscheduler.apache.org
 
@@ -111,14 +111,14 @@ apache/dolphinscheduler:latest alert-server
 类Unix系统, 如下:
 
 ```bash
-$ cd path/incubator-dolphinscheduler
+$ cd path/dolphinscheduler
 $ sh ./docker/build/hooks/build
 ```
 
 Windows系统, 如下:
 
 ```bat
-C:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
+C:\dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
 如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。
@@ -485,4 +485,4 @@ docker build -t apache/dolphinscheduler:oracle-driver .
 
 6. 在数据源中心添加一个 Oracle 数据源
 
-更多信息请查看 [incubator-dolphinscheduler](https://github.com/apache/incubator-dolphinscheduler.git) 文档.
+更多信息请查看 [dolphinscheduler](https://github.com/apache/dolphinscheduler.git) 文档.

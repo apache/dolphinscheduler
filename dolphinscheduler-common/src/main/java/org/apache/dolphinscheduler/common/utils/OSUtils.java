@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-
-import org.apache.commons.configuration.Configuration;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -85,7 +82,7 @@ public class OSUtils {
      */
     public static double memoryUsage() {
         GlobalMemory memory = hal.getMemory();
-        double memoryUsage = (memory.getTotal() - memory.getAvailable() - memory.getSwapUsed()) * 0.1 / memory.getTotal() * 10;
+        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 1.0 / memory.getTotal();
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
@@ -101,12 +98,11 @@ public class OSUtils {
      */
     public static double availablePhysicalMemorySize() {
         GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = (memory.getAvailable() + memory.getSwapUsed()) / 1024.0 / 1024 / 1024;
+        double availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(availablePhysicalMemorySize));
-
     }
 
     /**
@@ -116,13 +112,13 @@ public class OSUtils {
      *
      * @return available Physical Memory Size, unit: G
      */
-    public static double totalMemorySize() {
+    public static double totalPhysicalMemorySize() {
         GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
+        double totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(availablePhysicalMemorySize));
+        return Double.parseDouble(df.format(totalPhysicalMemorySize));
     }
 
     /**
@@ -486,43 +482,22 @@ public class OSUtils {
     /**
      * check memory and cpu usage
      *
-     * @param systemCpuLoad systemCpuLoad
-     * @param systemReservedMemory systemReservedMemory
+     * @param maxCpuloadAvg maxCpuloadAvg
+     * @param reservedMemory reservedMemory
      * @return check memory and cpu usage
      */
-    public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory) {
+    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
         // system load average
         double loadAverage = loadAverage();
         // system available physical memory
         double availablePhysicalMemorySize = availablePhysicalMemorySize();
-
-        if (loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory) {
-            logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize, loadAverage);
+        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
             return false;
         } else {
             return true;
         }
-    }
-
-    /**
-     * check memory and cpu usage
-     *
-     * @param conf conf
-     * @param isMaster is master
-     * @return check memory and cpu usage
-     */
-    public static Boolean checkResource(Configuration conf, Boolean isMaster) {
-        double systemCpuLoad;
-        double systemReservedMemory;
-
-        if (Boolean.TRUE.equals(isMaster)) {
-            systemCpuLoad = conf.getDouble(Constants.MASTER_MAX_CPULOAD_AVG, Constants.DEFAULT_MASTER_CPU_LOAD);
-            systemReservedMemory = conf.getDouble(Constants.MASTER_RESERVED_MEMORY, Constants.DEFAULT_MASTER_RESERVED_MEMORY);
-        } else {
-            systemCpuLoad = conf.getDouble(Constants.WORKER_MAX_CPULOAD_AVG, Constants.DEFAULT_WORKER_CPU_LOAD);
-            systemReservedMemory = conf.getDouble(Constants.WORKER_RESERVED_MEMORY, Constants.DEFAULT_WORKER_RESERVED_MEMORY);
-        }
-        return checkResource(systemCpuLoad, systemReservedMemory);
     }
 
 }

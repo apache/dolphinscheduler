@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
@@ -26,7 +27,6 @@ import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseComma
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.IPUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -40,7 +40,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LogClientService.class, IPUtils.class, LoggerUtils.class, NettyRemotingClient.class})
+@PrepareForTest({LogClientService.class, NetUtils.class, LoggerUtils.class, NettyRemotingClient.class})
 public class LogClientServiceTest {
 
     @Test
@@ -49,8 +49,8 @@ public class LogClientServiceTest {
         int port = 1234;
         String path = "/tmp/log";
 
-        PowerMockito.mockStatic(IPUtils.class);
-        PowerMockito.when(IPUtils.getLocalHost()).thenReturn(localMachine);
+        PowerMockito.mockStatic(NetUtils.class);
+        PowerMockito.when(NetUtils.getHost()).thenReturn(localMachine);
         PowerMockito.mockStatic(LoggerUtils.class);
         PowerMockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("application_xx_11");
 
@@ -61,12 +61,12 @@ public class LogClientServiceTest {
 
     @Test
     public void testViewLogFromRemote() throws Exception {
-        String localMachine = "LOCAL_MACHINE";
+        String localMachine = "127.0.0.1";
         int port = 1234;
         String path = "/tmp/log";
 
-        PowerMockito.mockStatic(IPUtils.class);
-        PowerMockito.when(IPUtils.getLocalHost()).thenReturn(localMachine + "1");
+        PowerMockito.mockStatic(NetUtils.class);
+        PowerMockito.when(NetUtils.getHost()).thenReturn(localMachine + "1");
 
         NettyRemotingClient remotingClient = PowerMockito.mock(NettyRemotingClient.class);
         PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(remotingClient);

@@ -383,6 +383,13 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testQueryProcessDefinitionVersions() {
         String projectName = "test";
+
+        Result result = processDefinitionController.queryProcessDefinitionVersions(user, projectName, 1, -10, 1);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
+
+        result = processDefinitionController.queryProcessDefinitionVersions(user, projectName, -1, 10, 1);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
+
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
         resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionLog>(1, 10));
@@ -393,7 +400,7 @@ public class ProcessDefinitionControllerTest {
                 , 10
                 , 1))
                 .thenReturn(resultMap);
-        Result result = processDefinitionController.queryProcessDefinitionVersions(
+        result = processDefinitionController.queryProcessDefinitionVersions(
                 user
                 , projectName
                 , 1
@@ -408,17 +415,8 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
-        Mockito.when(processDefinitionService.switchProcessDefinitionVersion(
-                user
-                , projectName
-                , 1
-                , 10))
-                .thenReturn(resultMap);
-        Result result = processDefinitionController.switchProcessDefinitionVersion(
-                user
-                , projectName
-                , 1
-                , 10);
+        Mockito.when(processDefinitionService.switchProcessDefinitionVersion(user, projectName, 1, 10)).thenReturn(resultMap);
+        Result result = processDefinitionController.switchProcessDefinitionVersion(user, projectName, 1, 10);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
@@ -439,7 +437,6 @@ public class ProcessDefinitionControllerTest {
                 , projectName
                 , 1
                 , 10);
-
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 
