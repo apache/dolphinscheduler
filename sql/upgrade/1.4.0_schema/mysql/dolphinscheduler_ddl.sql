@@ -290,3 +290,7 @@ DROP PROCEDURE uc_dolphin_T_t_ds_alertgroup_A_create_user_id;
 -- ALTER TABLE t_ds_process_definition_version DROP `receivers`, DROP `receivers_cc`;
 
 -- DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
+
+-- ALTER TABLE t_ds_command DROP `dependence`;
+
+-- ALTER TABLE t_ds_error_command DROP `dependence`;
