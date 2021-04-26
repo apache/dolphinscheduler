@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.server.worker.task.datax;
 
 import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
 
+import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
@@ -253,10 +253,11 @@ public class DataxTaskTest {
     public void testParsingSqlColumnNames()
             throws Exception {
         try {
-            BaseDataSource dataSource = DataSourceFactory.getDatasource(getDataSource().getType(),
+            BaseConnectionParam dataSource = (BaseConnectionParam) DatasourceUtil.buildConnectionParams(
+                    getDataSource().getType(),
                     getDataSource().getConnectionParams());
 
-            Method method = DataxTask.class.getDeclaredMethod("parsingSqlColumnNames", DbType.class, DbType.class, BaseDataSource.class, String.class);
+            Method method = DataxTask.class.getDeclaredMethod("parsingSqlColumnNames", DbType.class, DbType.class, BaseConnectionParam.class, String.class);
             method.setAccessible(true);
             String[] columns = (String[]) method.invoke(dataxTask, DbType.MYSQL, DbType.MYSQL, dataSource, "select 1 as a, 2 as `table` from dual");
 
