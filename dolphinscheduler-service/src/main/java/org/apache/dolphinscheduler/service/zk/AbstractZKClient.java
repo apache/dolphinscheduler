@@ -29,9 +29,12 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +103,28 @@ public abstract class AbstractZKClient extends RegisterOperator {
     }
 
     /**
+     * get server zk nodes.
+     *
+     * @param zkNodeType zookeeper node type
+     * @return result : list<zknode>
+     */
+    public List<String> getServerZkNodes(ZKNodeType zkNodeType) {
+        String path = getZNodeParentPath(zkNodeType);
+        List<String> serverList = super.getChildrenKeys(path);
+        if (zkNodeType == ZKNodeType.WORKER) {
+            List<String> workerList = new ArrayList<>();
+            for (String group : serverList) {
+                List<String> groupServers = super.getChildrenKeys(path + Constants.SLASH + group);
+                for (String groupServer : groupServers) {
+                    workerList.add(group + Constants.SLASH + groupServer);
+                }
+            }
+            serverList = workerList;
+        }
+        return serverList;
+    }
+
+    /**
      * get server list map.
      *
      * @param zkNodeType zookeeper node type
@@ -110,17 +135,7 @@ public abstract class AbstractZKClient extends RegisterOperator {
         Map<String, String> serverMap = new HashMap<>();
         try {
             String path = getZNodeParentPath(zkNodeType);
-            List<String> serverList = super.getChildrenKeys(path);
-            if (zkNodeType == ZKNodeType.WORKER) {
-                List<String> workerList = new ArrayList<>();
-                for (String group : serverList) {
-                    List<String> groupServers = super.getChildrenKeys(path + Constants.SLASH + group);
-                    for (String groupServer : groupServers) {
-                        workerList.add(group + Constants.SLASH + groupServer);
-                    }
-                }
-                serverList = workerList;
-            }
+            List<String> serverList = getServerZkNodes(zkNodeType);
             for (String server : serverList) {
                 String host = server;
                 if (zkNodeType == ZKNodeType.WORKER && hostOnly) {
@@ -146,9 +161,47 @@ public abstract class AbstractZKClient extends RegisterOperator {
     }
 
     /**
+     * get server node set.
+     *
+     * @param zkNodeType zookeeper node type
+     * @param hostOnly host only
+     * @return result : set<host>
+     */
+    public Set<String> getServerNodeSet(ZKNodeType zkNodeType, boolean hostOnly) {
+        Set<String> serverSet = new HashSet<>();
+        try {
+            List<String> serverList = getServerZkNodes(zkNodeType);
+            for (String server : serverList) {
+                String host = server;
+                if (zkNodeType == ZKNodeType.WORKER && hostOnly) {
+                    host = server.split(Constants.SLASH)[1];
+                }
+                serverSet.add(host);
+            }
+        } catch (Exception e) {
+            logger.error("get server node set failed", e);
+        }
+        return serverSet;
+    }
+
+    /**
+     * get server node list.
+     *
+     * @param zkNodeType zookeeper node type
+     * @param hostOnly host only
+     * @return result : list<host>
+     */
+    public List<String> getServerNodeList(ZKNodeType zkNodeType, boolean hostOnly) {
+        Set<String> serverSet = getServerNodeSet(zkNodeType, hostOnly);
+        List<String> serverList = new ArrayList<>(serverSet);
+        Collections.sort(serverList);
+        return serverList;
+    }
+
+    /**
      * check the zookeeper node already exists
      *
-     * @param host       host
+     * @param host host
      * @param zkNodeType zookeeper node type
      * @return true if exists
      */
