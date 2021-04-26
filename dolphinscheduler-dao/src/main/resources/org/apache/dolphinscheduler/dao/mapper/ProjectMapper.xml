@@ -79,7 +79,7 @@
         inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
         AND inst.state=1 ) as inst_running_count
         from t_ds_project p
-        join t_ds_user u on u.id=p.user_id
+        left join t_ds_user u on u.id=p.user_id
         where 1=1
         <if test="userId != 0">
             and p.id in

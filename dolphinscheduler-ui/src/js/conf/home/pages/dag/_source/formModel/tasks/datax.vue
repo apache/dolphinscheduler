@@ -33,7 +33,7 @@
           <m-datasource
             ref="refDs"
             @on-dsData="_onDsData"
-            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
+            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER', 'CLICKHOUSE']"
             :data="{ type:dsType,datasource:datasource }">
           </m-datasource>
         </div>

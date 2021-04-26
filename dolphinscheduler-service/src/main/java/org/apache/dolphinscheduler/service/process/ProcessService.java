@@ -436,17 +436,11 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      */
     public void removeTaskLogFile(Integer processInstanceId) {
-
-        LogClientService logClient = null;
-
-        try {
-            logClient = new LogClientService();
-            List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
-
-            if (CollectionUtils.isEmpty(taskInstanceList)) {
-                return;
-            }
-
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+        try (LogClientService logClient = new LogClientService()) {
             for (TaskInstance taskInstance : taskInstanceList) {
                 String taskLogPath = taskInstance.getLogPath();
                 if (StringUtils.isEmpty(taskInstance.getHost())) {
@@ -460,13 +454,8 @@ public class ProcessService {
                     // compatible old version
                     ip = taskInstance.getHost();
                 }
-
                 // remove task log from loggerserver
                 logClient.removeTaskLog(ip, port, taskLogPath);
-            }
-        } finally {
-            if (logClient != null) {
-                logClient.close();
             }
         }
     }
@@ -1330,7 +1319,8 @@ public class ProcessService {
         List<TaskInstance> taskInstances = this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
 
         for (TaskInstance task : taskInstances) {
-            if (task.getState() == ExecutionStatus.FAILURE) {
+            if (task.getState() == ExecutionStatus.FAILURE
+                    && task.getRetryTimes() >= task.getMaxRetryTimes()) {
                 return false;
             }
         }

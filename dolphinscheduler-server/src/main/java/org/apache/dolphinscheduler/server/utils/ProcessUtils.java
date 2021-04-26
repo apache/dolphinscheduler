@@ -442,17 +442,11 @@ public class ProcessUtils {
     public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            LogClientService logClient = null;
             String log;
-            try {
-                logClient = new LogClientService();
+            try (LogClientService logClient = new LogClientService()) {
                 log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
                         Constants.RPC_PORT,
                         taskExecutionContext.getLogPath());
-            } finally {
-                if (logClient != null) {
-                    logClient.close();
-                }
             }
             if (StringUtils.isNotEmpty(log)) {
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);
