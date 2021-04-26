@@ -53,109 +53,109 @@ public class VarPoolUtilsTest {
                 + "print(\"${{setValue({},{})}}\".format(\"p2\",4));");
         logger.info(rawScript);
     }
-
-    @Test
-    public void testSetTaskNodeLocalParams() throws Exception {
-        String taskJson = "{\"id\":\"tasks-66199\",\"name\":\"file-shell\",\"desc\":null,\"type\":\"SHELL\","
-                + "\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":1,\""
-                + "params\":{\"rawScript\":\"sh n-1/n-1-1/run.sh\",\""
-                + "localParams\":[{\"prop\":\"k1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v1\"},{\"prop\":\"k2\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v2\"},"
-                + "{\"prop\":\"k3\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v3\"}],\""
-                + "resourceList\":[{\"id\":\"dolphinschedule-code\",\"res\":\"n-1/n-1-1/dolphinscheduler-api-server.log\"},"
-                + "{\"id\":\"mr-code\",\"res\":\"n-1/n-1-1/hadoop-mapreduce-examples-2.7.4.jar\"},"
-                + "{\"id\":\"run\",\"res\":\"n-1/n-1-1/run.sh\"}]},\"preTasks\":[],\"extras\":null,\"depList\":[],\""
-                + "dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\""
-                + "workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0}";
-
-        String changeTaskJson = "{"
-                + "    \"id\":\"tasks-66199\","
-                + "    \"code\":null,"
-                + "    \"version\":0,"
-                + "    \"name\":\"file-shell\","
-                + "    \"desc\":null,"
-                + "    \"type\":\"SHELL\","
-                + "    \"runFlag\":\"NORMAL\","
-                + "    \"loc\":null,"
-                + "    \"maxRetryTimes\":0,"
-                + "    \"retryInterval\":1,"
-                + "    \"params\":{"
-                + "        \"rawScript\":\"sh n-1/n-1-1/run.sh\","
-                + "        \"localParams\":["
-                + "            {"
-                + "                \"prop\":\"k1\","
-                + "                \"direct\":\"IN\","
-                + "                \"type\":\"VARCHAR\","
-                + "                \"value\":\"k1-value-change\""
-                + "            },"
-                + "            {"
-                + "                \"prop\":\"k2\","
-                + "                \"direct\":\"IN\","
-                + "                \"type\":\"VARCHAR\","
-                + "                \"value\":\"k2-value-change\""
-                + "            },"
-                + "            {"
-                + "                \"prop\":\"k3\","
-                + "                \"direct\":\"IN\","
-                + "                \"type\":\"VARCHAR\","
-                + "                \"value\":\"v3\""
-                + "            }"
-                + "        ],"
-                + "        \"resourceList\":["
-                + "            {"
-                + "                \"id\":\"dolphinschedule-code\","
-                + "                \"res\":\"n-1/n-1-1/dolphinscheduler-api-server.log\""
-                + "            },"
-                + "            {"
-                + "                \"id\":\"mr-code\","
-                + "                \"res\":\"n-1/n-1-1/hadoop-mapreduce-examples-2.7.4.jar\""
-                + "            },"
-                + "            {"
-                + "                \"id\":\"run\","
-                + "                \"res\":\"n-1/n-1-1/run.sh\""
-                + "            }"
-                + "        ]"
-                + "    },"
-                + "    \"preTasks\":["
-                + ""
-                + "    ],"
-                + "    \"preTaskNodeList\":null,"
-                + "    \"extras\":null,"
-                + "    \"depList\":["
-                + ""
-                + "    ],"
-                + "    \"dependence\":{"
-                + ""
-                + "    },"
-                + "    \"conditionResult\":{"
-                + "        \"successNode\":["
-                + "            \"\""
-                + "        ],"
-                + "        \"failedNode\":["
-                + "            \"\""
-                + "        ]"
-                + "    },"
-                + "    \"taskInstancePriority\":\"MEDIUM\","
-                + "    \"workerGroup\":\"default\","
-                + "    \"workerGroupId\":null,"
-                + "    \"timeout\":{"
-                + "        \"strategy\":\"\","
-                + "        \"interval\":null,"
-                + "        \"enable\":false"
-                + "    },"
-                + "    \"delayTime\":0"
-                + "}";
-
-        ObjectNode jsonNodes = JSONUtils.parseObject(changeTaskJson);
-        Map<String, Object> propToValue = new HashMap<String, Object>();
-        propToValue.put("k1", "k1-value-change");
-        propToValue.put("k2", "k2-value-change");
-
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-
-        VarPoolUtils.setTaskNodeLocalParams(taskNode, propToValue);
-
-        Assert.assertEquals(JSONUtils.toJsonString(jsonNodes), JSONUtils.toJsonString(taskNode).trim());
-
-    }
+//
+//    @Test
+//    public void testSetTaskNodeLocalParams() throws Exception {
+//        String taskJson = "{\"id\":\"tasks-66199\",\"name\":\"file-shell\",\"desc\":null,\"type\":\"SHELL\","
+//                + "\"runFlag\":\"NORMAL\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":1,\""
+//                + "params\":{\"rawScript\":\"sh n-1/n-1-1/run.sh\",\""
+//                + "localParams\":[{\"prop\":\"k1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v1\"},{\"prop\":\"k2\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v2\"},"
+//                + "{\"prop\":\"k3\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v3\"}],\""
+//                + "resourceList\":[{\"id\":\"dolphinschedule-code\",\"res\":\"n-1/n-1-1/dolphinscheduler-api-server.log\"},"
+//                + "{\"id\":\"mr-code\",\"res\":\"n-1/n-1-1/hadoop-mapreduce-examples-2.7.4.jar\"},"
+//                + "{\"id\":\"run\",\"res\":\"n-1/n-1-1/run.sh\"}]},\"preTasks\":[],\"extras\":null,\"depList\":[],\""
+//                + "dependence\":{},\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"taskInstancePriority\":\"MEDIUM\",\""
+//                + "workerGroup\":\"default\",\"workerGroupId\":null,\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"delayTime\":0}";
+//
+//        String changeTaskJson = "{"
+//                + "    \"id\":\"tasks-66199\","
+//                + "    \"code\":null,"
+//                + "    \"version\":0,"
+//                + "    \"name\":\"file-shell\","
+//                + "    \"desc\":null,"
+//                + "    \"type\":\"SHELL\","
+//                + "    \"runFlag\":\"NORMAL\","
+//                + "    \"loc\":null,"
+//                + "    \"maxRetryTimes\":0,"
+//                + "    \"retryInterval\":1,"
+//                + "    \"params\":{"
+//                + "        \"rawScript\":\"sh n-1/n-1-1/run.sh\","
+//                + "        \"localParams\":["
+//                + "            {"
+//                + "                \"prop\":\"k1\","
+//                + "                \"direct\":\"IN\","
+//                + "                \"type\":\"VARCHAR\","
+//                + "                \"value\":\"k1-value-change\""
+//                + "            },"
+//                + "            {"
+//                + "                \"prop\":\"k2\","
+//                + "                \"direct\":\"IN\","
+//                + "                \"type\":\"VARCHAR\","
+//                + "                \"value\":\"k2-value-change\""
+//                + "            },"
+//                + "            {"
+//                + "                \"prop\":\"k3\","
+//                + "                \"direct\":\"IN\","
+//                + "                \"type\":\"VARCHAR\","
+//                + "                \"value\":\"v3\""
+//                + "            }"
+//                + "        ],"
+//                + "        \"resourceList\":["
+//                + "            {"
+//                + "                \"id\":\"dolphinschedule-code\","
+//                + "                \"res\":\"n-1/n-1-1/dolphinscheduler-api-server.log\""
+//                + "            },"
+//                + "            {"
+//                + "                \"id\":\"mr-code\","
+//                + "                \"res\":\"n-1/n-1-1/hadoop-mapreduce-examples-2.7.4.jar\""
+//                + "            },"
+//                + "            {"
+//                + "                \"id\":\"run\","
+//                + "                \"res\":\"n-1/n-1-1/run.sh\""
+//                + "            }"
+//                + "        ]"
+//                + "    },"
+//                + "    \"preTasks\":["
+//                + ""
+//                + "    ],"
+//                + "    \"preTaskNodeList\":null,"
+//                + "    \"extras\":null,"
+//                + "    \"depList\":["
+//                + ""
+//                + "    ],"
+//                + "    \"dependence\":{"
+//                + ""
+//                + "    },"
+//                + "    \"conditionResult\":{"
+//                + "        \"successNode\":["
+//                + "            \"\""
+//                + "        ],"
+//                + "        \"failedNode\":["
+//                + "            \"\""
+//                + "        ]"
+//                + "    },"
+//                + "    \"taskInstancePriority\":\"MEDIUM\","
+//                + "    \"workerGroup\":\"default\","
+//                + "    \"workerGroupId\":null,"
+//                + "    \"timeout\":{"
+//                + "        \"strategy\":\"\","
+//                + "        \"interval\":null,"
+//                + "        \"enable\":false"
+//                + "    },"
+//                + "    \"delayTime\":0"
+//                + "}";
+//
+//        ObjectNode jsonNodes = JSONUtils.parseObject(changeTaskJson);
+//        Map<String, Object> propToValue = new HashMap<String, Object>();
+//        propToValue.put("k1", "k1-value-change");
+//        propToValue.put("k2", "k2-value-change");
+//
+//        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+//
+//        VarPoolUtils.setTaskNodeLocalParams(taskNode, propToValue);
+//
+//        Assert.assertEquals(JSONUtils.toJsonString(jsonNodes), JSONUtils.toJsonString(taskNode).trim());
+//
+//    }
 
 }
