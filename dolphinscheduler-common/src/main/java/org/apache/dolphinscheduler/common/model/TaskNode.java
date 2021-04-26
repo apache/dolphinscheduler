@@ -25,7 +25,9 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -369,6 +371,24 @@ public class TaskNode {
 
     public void setPreTaskNodeList(List<PreviousTaskNode> preTaskNodeList) {
         this.preTaskNodeList = preTaskNodeList;
+    }
+
+    public String getTaskParams() {
+        Map<String, Object> taskParams = JSONUtils.toMap(this.params, String.class, Object.class);
+        if (taskParams == null) {
+            taskParams = new HashMap<>();
+        }
+        taskParams.put(Constants.CONDITION_RESULT, this.conditionResult);
+        taskParams.put(Constants.DEPENDENCE, this.dependence);
+        return JSONUtils.toJsonString(taskParams);
+    }
+
+    public Map<String, Object> taskParamsToJsonObj(String taskParams) {
+        Map<String, Object> taskParamsMap = JSONUtils.toMap(taskParams, String.class, Object.class);
+        if (taskParamsMap == null) {
+            taskParamsMap = new HashMap<>();
+        }
+        return taskParamsMap;
     }
 
     @Override

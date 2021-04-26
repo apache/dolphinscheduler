@@ -153,6 +153,11 @@ public class TaskDefinition {
     private int timeout;
 
     /**
+     * delay execution time.
+     */
+    private int delayTime;
+
+    /**
      * resource ids
      */
     private String resourceIds;
@@ -381,6 +386,14 @@ public class TaskDefinition {
         this.resourceIds = resourceIds;
     }
 
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
+
     @Override
     public String toString() {
         return "TaskDefinition{"
@@ -405,6 +418,7 @@ public class TaskDefinition {
                 + ", timeoutFlag=" + timeoutFlag
                 + ", timeoutNotifyStrategy=" + timeoutNotifyStrategy
                 + ", timeout=" + timeout
+                + ", delayTime=" + delayTime
                 + ", resourceIds='" + resourceIds + '\''
                 + ", createTime=" + createTime
                 + ", updateTime=" + updateTime

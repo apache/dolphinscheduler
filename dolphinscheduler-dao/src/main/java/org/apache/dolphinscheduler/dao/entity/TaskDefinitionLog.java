@@ -63,6 +63,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setTimeoutNotifyStrategy(taskDefinition.getTimeoutNotifyStrategy());
         this.setTaskType(taskDefinition.getTaskType());
         this.setTimeout(taskDefinition.getTimeout());
+        this.setDelayTime(taskDefinition.getDelayTime());
         this.setTimeoutFlag(taskDefinition.getTimeoutFlag());
         this.setUpdateTime(taskDefinition.getUpdateTime());
         this.setCreateTime(taskDefinition.getCreateTime());
