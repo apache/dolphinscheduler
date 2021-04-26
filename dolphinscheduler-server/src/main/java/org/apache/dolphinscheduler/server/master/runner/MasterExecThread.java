@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -61,10 +60,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -234,8 +229,6 @@ public class MasterExecThread implements Runnable {
             processService.updateProcessInstance(processInstance);
         } finally {
             taskExecService.shutdown();
-            // post handle
-            postHandle();
         }
     }
 
@@ -421,27 +414,6 @@ public class MasterExecThread implements Runnable {
             }
             if (task.getState().typeIsFailure() && !task.taskCanRetry()) {
                 errorTaskList.put(task.getName(), task);
-            }
-        }
-    }
-
-    /**
-     * process post handle
-     */
-    private void postHandle() {
-        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
-
-        if (!CommonUtils.isDevelopMode()) {
-            // get exec dir
-            String execLocalPath = org.apache.dolphinscheduler.common.utils.FileUtils
-                    .getProcessExecDir(processInstance.getProcessDefinition().getProjectId(),
-                            processInstance.getProcessDefinitionId(),
-                            processInstance.getId());
-
-            try {
-                FileUtils.deleteDirectory(new File(execLocalPath));
-            } catch (IOException e) {
-                logger.error("delete exec dir failed ", e);
             }
         }
     }
@@ -645,7 +617,7 @@ public class MasterExecThread implements Runnable {
             }
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
             if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
-                return DependResult.WAITING;
+                return DependResult.NON_EXEC;
             }
             // ignore task state if current task is condition
             if (taskNode.isConditionsTask()) {
@@ -915,7 +887,7 @@ public class MasterExecThread implements Runnable {
         try {
             readyToSubmitTaskQueue.put(taskInstance);
         } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue error");
+            logger.error("add task instance to readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
         }
     }
 
@@ -929,7 +901,7 @@ public class MasterExecThread implements Runnable {
         try {
             readyToSubmitTaskQueue.remove(taskInstance);
         } catch (Exception e) {
-            logger.error("remove task instance from readyToSubmitTaskQueue error");
+            logger.error("remove task instance from readyToSubmitTaskQueue error, taskName: {}", taskInstance.getName(), e);
         }
     }
 
@@ -1176,6 +1148,10 @@ public class MasterExecThread implements Runnable {
                     dependFailedTask.put(task.getName(), task);
                     removeTaskFromStandbyList(task);
                     logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
+                } else if (DependResult.NON_EXEC == dependResult) {
+                    // for some reasons(depend task pause/stop) this task would not be submit
+                    removeTaskFromStandbyList(task);
+                    logger.info("remove task {},id:{} , because depend result : {}", task.getName(), task.getId(), dependResult);
                 }
             }
         } catch (Exception e) {

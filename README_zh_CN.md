@@ -3,12 +3,12 @@ Dolphin Scheduler Official Website
 ============
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
-[![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
+[![Total Lines](https://tokei.rs/b1/github/apache/dolphinscheduler?category=lines)](https://github.com/apache/dolphinscheduler)
+[![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/dolphinscheduler/branch/dev)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 
 
-[![Stargazers over time](https://starchart.cc/apache/incubator-dolphinscheduler.svg)](https://starchart.cc/apache/incubator-dolphinscheduler)
+[![Stargazers over time](https://starchart.cc/apache/dolphinscheduler.svg)](https://starchart.cc/apache/dolphinscheduler)
 
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
@@ -52,7 +52,7 @@ Dolphin Scheduler Official Website
 
 ## 近期研发计划
 
-DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-dolphinscheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是正在研发的功能，TODO卡片是待做事项(包括 feature ideas)
+DolphinScheduler的工作计划：<a href="https://github.com/apache/dolphinscheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是正在研发的功能，TODO卡片是待做事项(包括 feature ideas)
 
 ## 参与贡献
 
@@ -76,8 +76,8 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-d
 制品:
 
 ```
-dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-bin.tar.gz: DolphinScheduler 二进制包
-dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: DolphinScheduler 源代码包
+dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-bin.tar.gz: DolphinScheduler 二进制包
+dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-src.tar.gz: DolphinScheduler 源代码包
 ```
 
 ## 感谢
@@ -92,9 +92,9 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 
 ## 社区
 
-1. 通过[该申请链接](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-mzqu52gi-rCggPkSHQ0DZYkwbTxO1Gw)加入slack channel
+1. 通过[该申请链接](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)加入slack channel
 2. 关注[Apache Dolphin Scheduler的Twitter账号](https://twitter.com/dolphinschedule)获取实时动态
 
 ## 版权
 
-请参考 [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) 文件.
+请参考 [LICENSE](https://github.com/apache/dolphinscheduler/blob/dev/LICENSE) 文件.

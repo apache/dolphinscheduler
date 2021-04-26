@@ -18,55 +18,32 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *  round robin host manager
+ *  common host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
     /**
-     * zookeeper registry center
+     * server node manager
      */
     @Autowired
-    protected ZookeeperRegistryCenter registryCenter;
-
-    /**
-     * zookeeper node manager
-     */
-    @Autowired
-    protected ZookeeperNodeManager zookeeperNodeManager;
-
-    /**
-     * zk master client
-     */
-    @Autowired
-    protected ZKMasterClient zkMasterClient;
-
-    /**
-     * worker group mapper
-     */
-    @Autowired
-    protected WorkerGroupMapper workerGroupMapper;
+    protected ServerNodeManager serverNodeManager;
 
     /**
      * select host
@@ -80,10 +57,7 @@ public abstract class CommonHostManager implements HostManager {
         ExecutorType executorType = context.getExecutorType();
         switch (executorType) {
             case WORKER:
-                candidates = getHostWorkersFromDatabase(workerGroup);
-                if (candidates.isEmpty()) {
-                    candidates = getHostWorkersFromZookeeper(workerGroup);
-                }
+                candidates = getWorkerCandidates(workerGroup);
                 break;
             case CLIENT:
                 break;
@@ -99,31 +73,12 @@ public abstract class CommonHostManager implements HostManager {
 
     protected abstract HostWorker select(Collection<HostWorker> nodes);
 
-    protected List<HostWorker> getHostWorkersFromDatabase(String workerGroup) {
+    protected List<HostWorker> getWorkerCandidates(String workerGroup) {
         List<HostWorker> hostWorkers = new ArrayList<>();
-        List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(workerGroup);
-        if (CollectionUtils.isNotEmpty(workerGroups)) {
-            Map<String, String> serverMaps = zkMasterClient.getServerMaps(ZKNodeType.WORKER, true);
-            for (WorkerGroup wg : workerGroups) {
-                for (String addr : wg.getAddrList().split(Constants.COMMA)) {
-                    if (serverMaps.containsKey(addr)) {
-                        String heartbeat = serverMaps.get(addr);
-                        int hostWeight = getWorkerHostWeightFromHeartbeat(heartbeat);
-                        hostWorkers.add(HostWorker.of(addr, hostWeight, workerGroup));
-                    }
-                }
-            }
-        }
-        return hostWorkers;
-    }
-
-    protected List<HostWorker> getHostWorkersFromZookeeper(String workerGroup) {
-        List<HostWorker> hostWorkers = new ArrayList<>();
-        Collection<String> nodes = zookeeperNodeManager.getWorkerGroupNodes(workerGroup);
+        Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
         if (CollectionUtils.isNotEmpty(nodes)) {
             for (String node : nodes) {
-                String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
-                String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
+                String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
                 int hostWeight = getWorkerHostWeightFromHeartbeat(heartbeat);
                 hostWorkers.add(HostWorker.of(node, hostWeight, workerGroup));
             }
@@ -140,14 +95,6 @@ public abstract class CommonHostManager implements HostManager {
             }
         }
         return hostWeight;
-    }
-
-    public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
-        this.zookeeperNodeManager = zookeeperNodeManager;
-    }
-
-    public ZookeeperNodeManager getZookeeperNodeManager() {
-        return zookeeperNodeManager;
     }
 
 }

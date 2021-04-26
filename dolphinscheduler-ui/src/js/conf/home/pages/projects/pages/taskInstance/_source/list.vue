@@ -59,7 +59,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="retryTimes" :label="$t('Retry Count')"></el-table-column>
-        <el-table-column :label="$t('host')" min-width="190">
+        <el-table-column :label="$t('host')" min-width="210">
           <template slot-scope="scope">
             <span>{{scope.row.host | filterNull}}</span>
           </template>
