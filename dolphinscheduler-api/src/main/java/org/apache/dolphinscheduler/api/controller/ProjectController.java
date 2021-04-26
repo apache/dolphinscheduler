@@ -112,7 +112,8 @@ public class ProjectController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", dataType = "String"),
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -120,9 +121,11 @@ public class ProjectController extends BaseController {
     public Result updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectId") Integer projectId,
                                 @RequestParam("projectName") String projectName,
-                                @RequestParam(value = "description", required = false) String description) {
-        logger.info("login user {} , updateProcessInstance project name: {}, desc: {}", loginUser.getUserName(), projectName, description);
-        Map<String, Object> result = projectService.update(loginUser, projectId, projectName, description);
+                                @RequestParam(value = "description", required = false) String description,
+                                @RequestParam(value = "userName") String userName) {
+        logger.info("login user {} , updateProcessInstance project name: {}, desc: {}, ownerUser: {}",
+                loginUser.getUserName(), projectName, description, userName);
+        Map<String, Object> result = projectService.update(loginUser, projectId, projectName, description, userName);
         return returnDataList(result);
     }
 

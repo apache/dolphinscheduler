@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +61,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * create project
@@ -255,10 +259,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param projectId project id
      * @param projectName project name
      * @param desc description
+     * @param userName project owner
      * @return update result code
      */
     @Override
-    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
+    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
 
         Map<String, Object> descCheck = checkDesc(desc);
@@ -276,10 +281,15 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
+        User user = userMapper.queryByUserNameAccurately(userName);
+        if (user == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userName);
+            return result;
+        }
         project.setName(projectName);
         project.setDescription(desc);
         project.setUpdateTime(new Date());
-
+        project.setUserId(user.getId());
         int update = projectMapper.updateById(project);
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
