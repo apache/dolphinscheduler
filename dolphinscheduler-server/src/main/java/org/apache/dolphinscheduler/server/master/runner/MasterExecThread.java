@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -175,7 +174,7 @@ public class MasterExecThread implements Runnable {
      *
      * @param parentNodeName parent node name
      */
-    private Map<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
+    private Map<String, Object> propToValue = new ConcurrentHashMap<>();
 
     /**
      * constructor of MasterExecThread
@@ -519,11 +518,7 @@ public class MasterExecThread implements Runnable {
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
-            if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType())) {
-                taskInstance.setTaskParams(taskNode.getDependence());
-            } else {
-                taskInstance.setTaskParams(globalParamToTaskParams(taskNode.getParams()));
-            }
+            taskInstance.setTaskParams(globalParamToTaskParams(taskNode.getTaskParams()));
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
@@ -545,8 +540,11 @@ public class MasterExecThread implements Runnable {
         if (localParams != null) {
             List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
             for (Property info : allParam) {
+                String paramName = info.getProp();
+                if (StringUtils.isNotEmpty(paramName) && propToValue.containsKey(paramName)) {
+                    info.setValue((String) propToValue.get(paramName));
+                }
                 if (info.getDirect().equals(Direct.IN)) {
-                    String paramName = info.getProp();
                     String value = globalMap.get(paramName);
                     if (StringUtils.isNotEmpty(value)) {
                         info.setValue(value);
@@ -569,9 +567,6 @@ public class MasterExecThread implements Runnable {
                 throw new RuntimeException();
             }
             TaskNode taskNodeObject = dag.getNode(taskNode);
-            if (!TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNodeObject.getType())) {
-                VarPoolUtils.setTaskNodeLocalParams(taskNodeObject, propToValue);
-            }
             taskInstances.add(createTaskInstance(processInstance, taskNodeObject));
         }
 

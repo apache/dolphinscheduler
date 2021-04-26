@@ -330,8 +330,7 @@ CREATE TABLE t_ds_process_definition_log (
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id),
-  CONSTRAINT process_definition_unique UNIQUE (name, project_id)
+  PRIMARY KEY (id)
 ) ;
 
 DROP TABLE IF EXISTS t_ds_task_definition;
@@ -353,6 +352,7 @@ CREATE TABLE t_ds_task_definition (
   timeout_flag int DEFAULT NULL ,
   timeout_notify_strategy int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
+  delay_time int DEFAULT '0' ,
   resource_ids varchar(255) DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -381,13 +381,13 @@ CREATE TABLE t_ds_task_definition_log (
   timeout_flag int DEFAULT NULL ,
   timeout_notify_strategy int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
+  delay_time int DEFAULT '0' ,
   resource_ids varchar(255) DEFAULT NULL ,
   operator int DEFAULT NULL ,
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id),
-  CONSTRAINT task_definition_unique UNIQUE (name, project_id)
+  PRIMARY KEY (id)
 ) ;
 
 DROP TABLE IF EXISTS t_ds_process_task_relation;
