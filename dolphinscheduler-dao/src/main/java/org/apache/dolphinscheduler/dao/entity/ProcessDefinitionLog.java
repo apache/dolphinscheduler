@@ -70,7 +70,6 @@ public class ProcessDefinitionLog extends ProcessDefinition {
         this.setWarningGroupId(processDefinition.getWarningGroupId());
     }
 
-
     public int getOperator() {
         return operator;
     }

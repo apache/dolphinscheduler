@@ -60,7 +60,6 @@ public class ProcessTaskRelationLog extends ProcessTaskRelation {
         this.setUpdateTime(processTaskRelation.getUpdateTime());
     }
 
-
     public int getOperator() {
         return operator;
     }
