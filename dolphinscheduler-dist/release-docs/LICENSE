@@ -355,7 +355,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     netty-all 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
     parquet-hadoop-bundle 1.8.1: https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop-bundle/1.8.1, Apache 2.0
-    poi 3.17: https://mvnrepository.com/artifact/org.apache.poi/poi/3.17, Apache 2.0
+    poi 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi/4.1.2, Apache 2.0
+    poi-ooxml 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml/4.1.2, Apache 2.0
     plexus-cipher 1.7.0: https://mvnrepository.com/artifact/org.sonatype.plexus/plexus-cipher/1.7.0, Apache 2.0
     plexus-classworlds 2.4: https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-classworlds/2.4, Apache 2.0
     plexus-component-annotations 1.5.5: https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-component-annotations/1.5.5, Apache 2.0
