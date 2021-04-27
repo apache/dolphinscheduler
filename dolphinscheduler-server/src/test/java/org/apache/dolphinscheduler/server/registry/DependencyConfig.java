@@ -23,6 +23,10 @@ import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
+import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -178,6 +182,26 @@ public class DependencyConfig {
     @Bean
     public PluginDefineMapper pluginDefineMapper() {
         return Mockito.mock(PluginDefineMapper.class);
+    }
+
+    @Bean
+    public DqExecuteResultMapper dqExecuteResultMapper() {
+        return Mockito.mock(DqExecuteResultMapper.class);
+    }
+
+    @Bean
+    public DqRuleMapper dqRuleMapper() {
+        return Mockito.mock(DqRuleMapper.class);
+    }
+
+    @Bean
+    public DqRuleInputEntryMapper dqRuleInputEntryMapper() {
+        return Mockito.mock(DqRuleInputEntryMapper.class);
+    }
+
+    @Bean
+    public DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper() {
+        return Mockito.mock(DqRuleExecuteSqlMapper.class);
     }
 
 }

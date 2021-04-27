@@ -18,15 +18,18 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.dq.ConnectorType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.task.dq.DataQualityParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
@@ -40,11 +43,14 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.entity.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
@@ -229,6 +235,7 @@ public class TaskPriorityQueueConsumer extends Thread {
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
         SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
 
         // SQL task
         if (taskType == TaskType.SQL) {
@@ -249,6 +256,10 @@ public class TaskPriorityQueueConsumer extends Thread {
             setSqoopTaskRelation(sqoopTaskExecutionContext, taskNode);
         }
 
+        if (taskType == TaskType.DATA_QUALITY) {
+            setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskNode);
+        }
+
         return TaskExecutionContextBuilder.get()
             .buildTaskInstanceRelatedInfo(taskInstance)
             .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
@@ -257,6 +268,7 @@ public class TaskPriorityQueueConsumer extends Thread {
             .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
             .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
             .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
+            .buildDataQualityTaskRelatedInfo(dataQualityTaskExecutionContext)
             .create();
     }
 
@@ -325,6 +337,86 @@ public class TaskPriorityQueueConsumer extends Thread {
                 sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
                 sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
                 sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            }
+        }
+    }
+
+    /**
+     * set data quality task relation
+     *
+     * @param dataQualityTaskExecutionContext dataQualityTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setDataQualityTaskRelation(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, TaskNode taskNode) {
+        DataQualityParameters dataQualityParameters = JSONUtils.parseObject(taskNode.getParams(), DataQualityParameters.class);
+
+        if (dataQualityParameters == null) {
+            return;
+        }
+
+        Map<String,String> config = dataQualityParameters.getRuleInputParameter();
+
+        int ruleId = dataQualityParameters.getRuleId();
+        DqRule dqRule = processService.getDqRule(ruleId);
+
+        if (dqRule == null) {
+            logger.error("can not get DqRule by id {}",ruleId);
+            return;
+        }
+
+        dataQualityTaskExecutionContext.setRuleType(dqRule.getType());
+        dataQualityTaskExecutionContext.setRuleName(dqRule.getName());
+
+        List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
+        if (CollectionUtils.isEmpty(ruleInputEntryList)) {
+            logger.error("{} rule input entry list is empty ",ruleId);
+            return;
+        }
+
+        dataQualityTaskExecutionContext.setRuleInputEntryList(ruleInputEntryList);
+        dataQualityTaskExecutionContext.setExecuteSqlList(processService.getDqExecuteSql(ruleId));
+
+        setSourceConfig(dataQualityTaskExecutionContext, config);
+        setTargetConfig(dataQualityTaskExecutionContext, config);
+        setWriterConfig(dataQualityTaskExecutionContext, config);
+    }
+
+    private void setWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(Constants.WRITER_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.WRITER_DATASOURCE_ID)));
+            if (dataSource != null) {
+                ConnectorType writerConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.WRITER_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setWriterConnectorType(writerConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setWriterType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setWriterConnectionParams(dataSource.getConnectionParams());
+                dataQualityTaskExecutionContext.setWriterTable("t_ds_dq_execute_result");
+            }
+        }
+    }
+
+    private void setTargetConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(Constants.TARGET_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.TARGET_DATASOURCE_ID)));
+            if (dataSource != null) {
+                ConnectorType targetConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.TARGET_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setTargetConnectorType(targetConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setTargetType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setTargetConnectionParams(dataSource.getConnectionParams());
+            }
+        }
+    }
+
+    private void setSourceConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext, Map<String, String> config) {
+        if (StringUtils.isNotEmpty(config.get(Constants.SRC_DATASOURCE_ID))) {
+            DataSource dataSource = processService.findDataSourceById(Integer.parseInt(config.get(Constants.SRC_DATASOURCE_ID)));
+            if (dataSource != null) {
+                ConnectorType srcConnectorType = ConnectorType.of(
+                        DbType.of(Integer.parseInt(config.get(Constants.SRC_CONNECTOR_TYPE))).isHive() ? 1 : 0);
+                dataQualityTaskExecutionContext.setSourceConnectorType(srcConnectorType.getDescription());
+                dataQualityTaskExecutionContext.setSourceType(dataSource.getType().getCode());
+                dataQualityTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
             }
         }
     }
