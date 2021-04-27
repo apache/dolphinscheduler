@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.register.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,22 +15,7 @@ package org.apache.dolphinscheduler.plugin.register.api;/*
  * limitations under the License.
  */
 
-public interface RegisterCenter {
+package org.apache.dolphinscheduler.plugin.register.api;
 
-    void register();
-
-    void upRegister();
-
-    String get(String key);
-
-    void remove(String key);
-
-    void persist(String key, String value);
-
-    void update(String key, String value);
-
-
-    void remove();
-
-
+public class RegisterListener {
 }
