@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.command.log;
 
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import org.junit.Test;
 
@@ -30,6 +31,6 @@ public class GetLogBytesRequestCommandTest {
         GetLogBytesRequestCommand getLogBytesRequestCommand = new GetLogBytesRequestCommand();
         getLogBytesRequestCommand.setPath("/opt/test");
         Command command = getLogBytesRequestCommand.convert2Command();
-        Assert.assertNotNull(command);
+        Assert.assertEquals(CommandType.GET_LOG_BYTES_REQUEST, command.getType());
     }
 }
