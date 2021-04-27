@@ -18,7 +18,7 @@
 # worker listener port
 #worker.listen.port=1234
 
-# worker execute thread number to limit task instances
+# worker execute thread number to limit task instances in parallel
 worker.exec.threads=${WORKER_EXEC_THREADS}
 
 # worker heartbeat interval, the unit is second
