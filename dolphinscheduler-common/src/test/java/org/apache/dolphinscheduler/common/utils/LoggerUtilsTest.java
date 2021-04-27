@@ -44,7 +44,7 @@ public class LoggerUtilsTest {
 
         String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX, 798L,1,4084, 15210);
 
-        Assert.assertEquals(" - [taskAppId=TASK-79-4084-15210]", taskId);
+        Assert.assertEquals(" - [taskAppId=TASK-798_1-4084-15210]", taskId);
     }
 
     @Test
