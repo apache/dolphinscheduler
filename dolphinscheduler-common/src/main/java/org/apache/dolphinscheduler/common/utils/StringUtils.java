@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import java.util.Iterator;
-
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * java.lang.String utils class
