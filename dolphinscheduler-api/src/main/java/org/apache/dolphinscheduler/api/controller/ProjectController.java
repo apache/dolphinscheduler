@@ -123,12 +123,6 @@ public class ProjectController extends BaseController {
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "userName") String userName) {
-        String logUser = ParameterUtils.handleEscapes(loginUser.getUserName());
-        String logProjectName = ParameterUtils.handleEscapes(projectName);
-        String logDescription = ParameterUtils.handleEscapes(description);
-        String logUserName = ParameterUtils.handleEscapes(userName);
-        logger.info("login user {} , updateProcessInstance project name: {}, desc: {}, ownerUser: {}",
-                logUser, logProjectName, logDescription, logUserName);
         Map<String, Object> result = projectService.update(loginUser, projectId, projectName, description, userName);
         return returnDataList(result);
     }
