@@ -28,6 +28,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface PluginDefineMapper extends BaseMapper<PluginDefine> {
 
     /**
+     * check table exist
+     *
+     * @return boolean
+     */
+    int checkTableExist();
+
+    /**
      * query all plugin define
      *
      * @return PluginDefine list
