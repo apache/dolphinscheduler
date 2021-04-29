@@ -45,6 +45,15 @@ public class PluginDao extends AbstractBaseDao {
     }
 
     /**
+     * check plugin define table exist
+     *
+     * @return boolean
+     */
+    public boolean checkPluginDefineTableExist() {
+        return pluginDefineMapper.checkTableExist() > 0;
+    }
+
+    /**
      * add pluginDefine
      *
      * @param pluginDefine plugin define entiy
