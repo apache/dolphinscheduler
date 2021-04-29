@@ -646,7 +646,7 @@ public class ProcessDefinitionController extends BaseController {
     })
     @GetMapping(value = "/export")
     @ResponseBody
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "response"})
     public void batchExportProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("processDefinitionIds") String processDefinitionIds,

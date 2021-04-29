@@ -83,7 +83,7 @@ public class LoginController extends BaseController {
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = {"userPassword", "request", "response"})
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
@@ -127,7 +127,7 @@ public class LoginController extends BaseController {
     @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
     @ApiException(SIGN_OUT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "request"})
     public Result signOut(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
