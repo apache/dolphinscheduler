@@ -23,6 +23,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ Asia/Shanghai
 ENV LANG C.UTF-8
 ENV DOCKER true
+ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 # 1. install command/library/software
 # If install slowly, you can replcae debian's mirror with new mirror, Example:
@@ -41,9 +42,8 @@ RUN apt-get update && \
 
 # 2. add dolphinscheduler
 ADD ./apache-dolphinscheduler-${VERSION}-bin.tar.gz /opt/
-RUN ln -s /opt/apache-dolphinscheduler-${VERSION}-bin /opt/dolphinscheduler
-ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
-WORKDIR ${DOLPHINSCHEDULER_HOME}
+RUN ln -s -r /opt/apache-dolphinscheduler-${VERSION}-bin /opt/dolphinscheduler
+WORKDIR /opt/apache-dolphinscheduler-${VERSION}-bin
 
 # 3. add configuration and modify permissions and set soft links
 COPY ./checkpoint.sh /root/checkpoint.sh
@@ -59,9 +59,10 @@ RUN sed -i 's/*.conf$/*.ini/' /etc/supervisor/supervisord.conf && \
     dos2unix /root/startup.sh && \
     dos2unix /opt/dolphinscheduler/script/*.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
-    rm -rf /bin/sh && \
+    rm -f /bin/sh && \
     ln -s /bin/bash /bin/sh && \
     mkdir -p /tmp/xls && \
+    echo PS1=\'\\w \\$ \' >> ~/.bashrc && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
 # 4. expose port
