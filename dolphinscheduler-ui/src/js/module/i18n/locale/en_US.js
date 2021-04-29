@@ -366,6 +366,7 @@ export default {
   Start: 'Start',
   Copy: 'Copy',
   'Copy name': 'Copy name',
+  'Copy path': 'Copy path',
   'Please enter keyword': 'Please enter keyword',
   'File Upload': 'File Upload',
   'Drag the file into the current upload window': 'Drag the file into the current upload window',

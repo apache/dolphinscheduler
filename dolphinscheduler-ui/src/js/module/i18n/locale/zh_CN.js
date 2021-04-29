@@ -366,6 +366,7 @@ export default {
   Start: '运行',
   Copy: '复制节点',
   'Copy name': '复制名称',
+  'Copy path': '复制路径',
   'Please enter keyword': '请输入关键词',
   'File Upload': '文件上传',
   'Drag the file into the current upload window': '请将文件拖拽到当前上传窗口内！',
