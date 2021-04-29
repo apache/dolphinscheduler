@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="spark-model">
+  <div class="mr-model">
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
@@ -50,6 +50,18 @@
       </div>
     </m-list-box>
     <m-list-box>
+      <div slot="text">{{$t('App Name')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="appName"
+          :placeholder="$t('Please enter app name(optional)')">
+        </el-input>
+      </div>
+    </m-list-box>
+    <m-list-box>
       <div slot="text">{{$t('Main Arguments')}}</div>
       <div slot="content">
         <el-input
@@ -79,7 +91,7 @@
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <treeselect  v-model="resourceList" :multiple="true" maxHeight="200" :options="mainJarList" :normalizer="normalizer" :disabled="isDetails" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}<span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
         </treeselect>
       </div>
     </m-list-box>
@@ -104,6 +116,8 @@
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
+  import Clipboard from 'clipboard'
+
   export default {
     name: 'mr',
     data () {
@@ -122,6 +136,8 @@
         cacheResourceList: [],
         // Custom parameter
         localParams: [],
+        // MR app name
+        appName: '',
         // Main arguments
         mainArgs: '',
         // Option parameters
@@ -144,6 +160,25 @@
     },
     mixins: [disabledState],
     methods: {
+      _copyPath (e, node) {
+        e.stopPropagation()
+        let clipboard = new Clipboard('.copy-path', {
+          text: function () {
+            return node.raw.fullName
+          }
+        })
+        clipboard.on('success', handler => {
+          this.$message.success(`${i18n.$t('Copy success')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+        clipboard.on('error', handler => {
+          // Copy is not supported
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+      },
       /**
        * getResourceId
        */
@@ -282,6 +317,7 @@
             return { id: v }
           }),
           localParams: this.localParams,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -342,6 +378,7 @@
           },
           resourceList: this.resourceIdArr,
           localParams: this.localParams,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -367,6 +404,7 @@
         } else {
           this.mainJar = o.params.mainJar.id || ''
         }
+        this.appName = o.params.appName || ''
         this.mainArgs = o.params.mainArgs || ''
         this.others = o.params.others
         this.programType = o.params.programType || 'JAVA'

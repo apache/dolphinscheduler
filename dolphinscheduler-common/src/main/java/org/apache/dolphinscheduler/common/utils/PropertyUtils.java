@@ -22,8 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PAT
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -51,21 +49,20 @@ public class PropertyUtils {
     }
 
     static {
-        String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
+        loadPropertyFile(COMMON_PROPERTIES_PATH);
+    }
+
+    /**
+     * init properties
+     */
+    public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
-            InputStream fis = null;
-            try {
-                fis = PropertyUtils.class.getResourceAsStream(fileName);
+            try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
                 properties.load(fis);
 
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
-                if (fis != null) {
-                    IOUtils.closeQuietly(fis);
-                }
                 System.exit(1);
-            } finally {
-                IOUtils.closeQuietly(fis);
             }
         }
     }
@@ -196,7 +193,7 @@ public class PropertyUtils {
      * @param defaultVal default value
      * @return property value
      */
-    public double getDouble(String key, double defaultVal) {
+    public static double getDouble(String key, double defaultVal) {
         String val = getString(key);
         return val == null ? defaultVal : Double.parseDouble(val);
     }
@@ -229,8 +226,8 @@ public class PropertyUtils {
      * @param <T> T
      * @return get enum value
      */
-    public <T extends Enum<T>> T getEnum(String key, Class<T> type,
-                                         T defaultValue) {
+    public static <T extends Enum<T>> T getEnum(String key, Class<T> type,
+                                                T defaultValue) {
         String val = getString(key);
         return val == null ? defaultValue : Enum.valueOf(type, val);
     }

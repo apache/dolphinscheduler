@@ -53,9 +53,17 @@
             <span>{{scope.row.endTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
-        <el-table-column prop="duration" :label="$t('Duration')"></el-table-column>
+        <el-table-column :label="$t('Duration')">
+          <template slot-scope="scope">
+            <span>{{scope.row.duration | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="retryTimes" :label="$t('Retry Count')"></el-table-column>
+        <el-table-column :label="$t('host')" min-width="210">
+          <template slot-scope="scope">
+            <span>{{scope.row.host | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Operation')" width="80" fixed="right">
           <template slot-scope="scope">
             <div>

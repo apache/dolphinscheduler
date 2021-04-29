@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -85,6 +86,8 @@ public abstract class AbstractCommandExecutor {
      */
     protected final List<String> logBuffer;
 
+    protected boolean logOutputIsScuccess = false;
+
     /**
      * SHELL result string
      */
@@ -132,9 +135,11 @@ public abstract class AbstractCommandExecutor {
         processBuilder.redirectErrorStream(true);
 
         // setting up user to run commands
-        command.add("sudo");
-        command.add("-u");
-        command.add(taskExecutionContext.getTenantCode());
+        if (CommonUtils.isSudoEnable()) {
+            command.add("sudo");
+            command.add("-u");
+            command.add(taskExecutionContext.getTenantCode());
+        }
         command.add(commandInterpreter());
         command.addAll(commandOptions());
         command.add(commandFile);
@@ -287,7 +292,7 @@ public abstract class AbstractCommandExecutor {
             }
         }
 
-        return process.isAlive();
+        return !process.isAlive();
     }
 
     /**
@@ -348,34 +353,46 @@ public abstract class AbstractCommandExecutor {
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
-        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader inReader = null;
-
-                try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
-
-                    long lastFlushTime = System.currentTimeMillis();
-
-                    while ((line = inReader.readLine()) != null) {
-                        if (line.startsWith("${setValue(")) {
-                            varPool.append(line.substring("${setValue(".length(), line.length() - 2));
-                            varPool.append("$VarPool$");
-                        } else {
-                            logBuffer.add(line);
-                            taskResultString = line;
-                            lastFlushTime = flush(lastFlushTime);
-                        }
+        ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
+        getOutputLogService.submit(() -> {
+            BufferedReader inReader = null;
+            try {
+                inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                logBuffer.add("welcome to use bigdata scheduling system...");
+                while ((line = inReader.readLine()) != null) {
+                    if (line.startsWith("${setValue(")) {
+                        varPool.append(line.substring("${setValue(".length(), line.length() - 2));
+                        varPool.append("$VarPool$");
+                    } else {
+                        logBuffer.add(line);
+                        taskResultString = line;
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    clear();
-                    close(inReader);
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                logOutputIsScuccess = true;
+                close(inReader);
+            }
+        });
+        getOutputLogService.shutdown();
+
+        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        parseProcessOutputExecutorService.submit(() -> {
+            try {
+                long lastFlushTime = System.currentTimeMillis();
+                while (logBuffer.size() > 0 || !logOutputIsScuccess) {
+                    if (logBuffer.size() > 0) {
+                        lastFlushTime = flush(lastFlushTime);
+                    } else {
+                        Thread.sleep(Constants.DEFAULT_LOG_FLUSH_INTERVAL);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                clear();
             }
         });
         parseProcessOutputExecutorService.shutdown();
@@ -391,9 +408,12 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
+                logger.info("check yarn application status, appId:{}", appId);
                 while (Stopper.isRunning()) {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                    logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("check yarn application status, appId:{}, final state:{}", appId, applicationStatus.name());
+                    }
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
                         || applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
@@ -406,7 +426,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()), e);
+            logger.error("yarn applications: {} , query status failed, exception:{}", StringUtils.join(appIds, ","), e);
             result = false;
         }
         return result;

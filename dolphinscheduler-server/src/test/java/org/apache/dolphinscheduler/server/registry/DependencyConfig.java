@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.RandomHostManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
@@ -78,6 +80,11 @@ public class DependencyConfig {
     @Bean
     public MasterConfig masterConfig() {
         return Mockito.mock(MasterConfig.class);
+    }
+
+    @Bean
+    public WorkerConfig workerConfig() {
+        return Mockito.mock(WorkerConfig.class);
     }
 
     @Bean
@@ -128,6 +135,11 @@ public class DependencyConfig {
     @Bean
     public ResourceMapper resourceMapper() {
         return Mockito.mock(ResourceMapper.class);
+    }
+
+    @Bean
+    public ResourceUserMapper resourceUserMapper() {
+        return Mockito.mock(ResourceUserMapper.class);
     }
 
     @Bean

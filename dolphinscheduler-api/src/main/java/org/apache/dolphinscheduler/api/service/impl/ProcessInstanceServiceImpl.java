@@ -236,19 +236,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             statusArray = new int[]{stateType.ordinal()};
         }
 
-        Date start = null;
-        Date end = null;
-        try {
-            if (StringUtils.isNotEmpty(startDate)) {
-                start = DateUtils.getScheduleDate(startDate);
-            }
-            if (StringUtils.isNotEmpty(endDate)) {
-                end = DateUtils.getScheduleDate(endDate);
-            }
-        } catch (Exception e) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-            return result;
+        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
+        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
+            return checkAndParseDateResult;
         }
+        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
+        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
 
         Page<ProcessInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -259,10 +252,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                         project.getId(), processDefineId, searchVal, executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
+        List<Integer> userIds = CollectionUtils.transformToList(processInstances, ProcessInstance::getExecutorId);
+        Map<Integer, User> idToUserMap = CollectionUtils.collectionToMap(usersService.queryUser(userIds), User::getId);
 
         for (ProcessInstance processInstance : processInstances) {
             processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
-            User executor = usersService.queryUser(processInstance.getExecutorId());
+            User executor = idToUserMap.get(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
             }

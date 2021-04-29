@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -56,6 +56,7 @@ public class AlertServerTest {
 
         PluginDao pluginDao = PowerMockito.mock(PluginDao.class);
         PowerMockito.when(DaoFactory.getDaoInstance(PluginDao.class)).thenReturn(pluginDao);
+        PowerMockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
 
         AlertChannel alertChannelMock = PowerMockito.mock(AlertChannel.class);
 
@@ -80,15 +81,11 @@ public class AlertServerTest {
         AlertServer alertServer = AlertServer.getInstance();
         Assert.assertNotNull(alertServer);
 
-        new Thread(() -> {
-            alertServer.start();
-        })
-                .start();
+        new Thread(() -> alertServer.start()).start();
 
         Thread.sleep(5 * Constants.ALERT_SCAN_INTERVAL);
 
         alertServer.stop();
-
     }
 
 }

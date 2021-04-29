@@ -74,7 +74,7 @@ CREATE TABLE `QRTZ_CRON_TRIGGERS` (
 DROP TABLE IF EXISTS `QRTZ_FIRED_TRIGGERS`;
 CREATE TABLE `QRTZ_FIRED_TRIGGERS` (
   `SCHED_NAME` varchar(120) NOT NULL,
-  `ENTRY_ID` varchar(95) NOT NULL,
+  `ENTRY_ID` varchar(200) NOT NULL,
   `TRIGGER_NAME` varchar(200) NOT NULL,
   `TRIGGER_GROUP` varchar(200) NOT NULL,
   `INSTANCE_NAME` varchar(200) NOT NULL,
@@ -297,14 +297,14 @@ CREATE TABLE `t_ds_alert` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup`(
-                                  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-                                  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
-                                  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
-                                  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
-                                  `description`    varchar(255) DEFAULT NULL,
-                                  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
-                                  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
-                                  PRIMARY KEY (`id`)
+  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `alert_instance_ids` varchar (255) DEFAULT NULL COMMENT 'alert instance ids',
+  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
+  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
+  `description`    varchar(255) DEFAULT NULL,
+  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
+  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -327,7 +327,6 @@ CREATE TABLE `t_ds_command` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'schedule time',
   `start_time` datetime DEFAULT NULL COMMENT 'start time',
   `executor_id` int(11) DEFAULT NULL COMMENT 'executor id',
-  `dependence` varchar(255) DEFAULT NULL COMMENT 'dependence',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
@@ -375,7 +374,6 @@ CREATE TABLE `t_ds_error_command` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'scheduler time',
   `start_time` datetime DEFAULT NULL COMMENT 'start time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `dependence` text COMMENT 'dependence',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64)  COMMENT 'worker group',
   `message` text COMMENT 'message',
@@ -789,6 +787,23 @@ CREATE TABLE `t_ds_user` (
 -- Records of t_ds_user
 -- ----------------------------
 
+-- ----------------------------
+-- Table structure for t_ds_worker_group
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_worker_group`;
+CREATE TABLE `t_ds_worker_group` (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(256) NOT NULL COMMENT 'worker group name',
+  `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
+  `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_worker_group
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_version
@@ -804,29 +819,25 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT INTO `t_ds_version`
-VALUES ('1', '1.3.0');
+INSERT INTO `t_ds_version` VALUES ('1', '1.4.0');
 
 
 -- ----------------------------
 -- Records of t_ds_alertgroup
 -- ----------------------------
 INSERT INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
-        '2018-11-29 10:20:39');
+VALUES ("1,2", 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
 INSERT INTO `t_ds_user`
-VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50',
-        '2018-10-24 17:40:22', null, 1);
+VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
 
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-SET
-sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,

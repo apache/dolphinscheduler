@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.task.procedure;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
@@ -30,8 +32,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -98,13 +98,14 @@ public class ProcedureTask extends AbstractTask {
         Connection connection = null;
         CallableStatement stmt = null;
         try {
-
+            // load class
+            DbType dbType = DbType.valueOf(procedureParameters.getType());
             // get datasource
-            BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
+            ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
-            // create jdbc connection
-            connection = baseDataSource.getConnection();
+            // get jdbc connection
+            connection = DatasourceUtil.getConnection(dbType, connectionParam);
 
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
@@ -130,9 +131,9 @@ public class ProcedureTask extends AbstractTask {
             setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
         } catch (Exception e) {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-            logger.error("procedure task error",e);
+            logger.error("procedure task error", e);
             throw e;
-        }  finally {
+        } finally {
             close(stmt,connection);
         }
     }
@@ -168,7 +169,6 @@ public class ProcedureTask extends AbstractTask {
      */
     private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<String, Property> paramsMap) throws Exception {
         Map<Integer,Property> outParameterMap = new HashMap<>();
-
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;
         }
@@ -214,11 +214,11 @@ public class ProcedureTask extends AbstractTask {
     }
 
     /**
-     * close jdbc resource
-     *
-     * @param stmt stmt
-     * @param connection connection
-     */
+    * close jdbc resource
+    *
+    * @param stmt stmt
+    * @param connection connection
+    */
     private void close(PreparedStatement stmt, Connection connection) {
         if (stmt != null) {
             try {
@@ -247,13 +247,13 @@ public class ProcedureTask extends AbstractTask {
     private void getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
         switch (dataType) {
             case VARCHAR:
-                logger.info("out prameter varchar key : {} , value : {}",prop,stmt.getString(index));
+                logger.info("out prameter varchar key : {} , value : {}", prop, stmt.getString(index));
                 break;
             case INTEGER:
                 logger.info("out prameter integer key : {} , value : {}", prop, stmt.getInt(index));
                 break;
             case LONG:
-                logger.info("out prameter long key : {} , value : {}",prop,stmt.getLong(index));
+                logger.info("out prameter long key : {} , value : {}", prop, stmt.getLong(index));
                 break;
             case FLOAT:
                 logger.info("out prameter float key : {} , value : {}",prop,stmt.getFloat(index));
@@ -285,10 +285,11 @@ public class ProcedureTask extends AbstractTask {
 
     /**
      * set out parameter
-     * @param index     index
-     * @param stmt      stmt
-     * @param dataType  dataType
-     * @param value     value
+     *
+     * @param index index
+     * @param stmt stmt
+     * @param dataType dataType
+     * @param value value
      * @throws Exception exception
      */
     private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception {

@@ -27,14 +27,14 @@
       </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
-          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
-          <em class="iconfont el-icon-timer" :class="'icon-' + el.state" v-if="el.state === 'RUNNING_EXECUTION'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
-          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILURE'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
+          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('Success')"></em>
+          <em class="iconfont el-icon-timer" :class="'icon-' + el.state" v-if="el.state === 'RUNNING_EXECUTION'" data-toggle="tooltip" data-container="body" :title="$t('Waiting')"></em>
+          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILURE'" data-toggle="tooltip" data-container="body" :title="$t('Failed')"></em>
         </span>
       </template>
       <span class="operation">
         <a href="javascript:" class="delete" @click="!isDetails && _remove($index)">
-          <em class="iconfont el-icon-delete" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" ></em>
+          <em class="iconfont el-icon-delete" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Delete')" ></em>
         </a>
         <a href="javascript:" class="add" @click="!isDetails && _add()" v-if="$index === (dependItemList.length - 1)">
           <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')"></em>
@@ -87,6 +87,8 @@
        * remove task
        */
       _remove (i) {
+        // eslint-disable-next-line
+        this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {

@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -124,12 +125,11 @@ public class TaskPriorityQueueConsumer extends Thread {
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
                 failedDispatchTasks.clear();
                 for (int i = 0; i < fetchTaskNum; i++) {
-                    if (taskPriorityQueue.size() <= 0) {
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    TaskPriority taskPriority = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+                    if (Objects.isNull(taskPriority)) {
                         continue;
                     }
-                    // if not task , blocking here
-                    TaskPriority taskPriority = taskPriorityQueue.take();
+
                     boolean dispatchResult = dispatch(taskPriority);
                     if (!dispatchResult) {
                         failedDispatchTasks.add(taskPriority);
@@ -172,7 +172,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                 result = dispatcher.dispatch(executionContext);
             }
         } catch (ExecuteException e) {
-            logger.error("dispatch error", e);
+            logger.error("dispatch error: {}", e.getMessage());
         }
         return result;
     }

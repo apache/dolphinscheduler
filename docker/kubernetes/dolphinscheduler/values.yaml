@@ -19,19 +19,15 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-nameOverride: ""
-fullnameOverride: ""
-
 timezone: "Asia/Shanghai"
 
 image:
-  registry: "apache"
-  repository: "dolphinscheduler"
+  repository: "apache/dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
-  pullSecrets: []
+  pullSecret: ""
 
-# If not exists external database, by default, Dolphinscheduler's database will use it.
+## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
   enabled: true
   postgresqlUsername: "root"
@@ -42,8 +38,8 @@ postgresql:
     size: "20Gi"
     storageClass: "-"
 
-# If exists external database, and set postgresql.enable value to false.
-# external database will be used, otherwise Dolphinscheduler's database will be used.
+## If exists external database, and set postgresql.enable value to false.
+## external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
   type: "postgresql"
   driver: "org.postgresql.Driver"
@@ -52,13 +48,12 @@ externalDatabase:
   username: "root"
   password: "root"
   database: "dolphinscheduler"
-  # multi params should join with & char
   params: "characterEncoding=utf8"
 
-# If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
+## If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
-  fourlwCommandsWhitelist: srvr,ruok,wchs,cons
+  fourlwCommandsWhitelist: "srvr,ruok,wchs,cons"
   service:
     port: "2181"
   persistence:
@@ -67,8 +62,8 @@ zookeeper:
     storageClass: "-"
   zookeeperRoot: "/dolphinscheduler"
 
-# If exists external zookeeper, and set zookeeper.enable value to false.
-# If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
+## If exists external zookeeper, and set zookeeper.enable value to false.
+## If zookeeper.enable is false, Dolphinscheduler's zookeeper will use it.
 externalZookeeper:
   zookeeperQuorum: "127.0.0.1:2181"
   zookeeperRoot: "/dolphinscheduler"
@@ -81,12 +76,12 @@ common:
     - "export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop"
     - "export SPARK_HOME1=/opt/soft/spark1"
     - "export SPARK_HOME2=/opt/soft/spark2"
-    - "export PYTHON_HOME=/usr/bin/python"
+    #- "export PYTHON_HOME=/opt/soft/python"
     - "export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk"
     - "export HIVE_HOME=/opt/soft/hive"
     - "export FLINK_HOME=/opt/soft/flink"
-    - "export DATAX_HOME=/opt/soft/datax/bin/datax.py"
-    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$PATH"
+    - "export DATAX_HOME=/opt/soft/datax"
+    - "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH"
     DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
     RESOURCE_STORAGE_TYPE: "HDFS"
     RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
@@ -207,8 +202,8 @@ worker:
     WORKER_MAX_CPULOAD_AVG: "100"
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
-    WORKER_GROUP: "default"
-    WORKER_WEIGHT: "100"
+    WORKER_GROUPS: "default"
+    WORKER_HOST_WEIGHT: "100"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -283,21 +278,7 @@ alert:
   ## ConfigMap
   configmap:
     DOLPHINSCHEDULER_OPTS: ""
-    ALERT_PLUGIN_DIR: "/opt/dolphinscheduler/alert/plugin"
-    XLS_FILE_PATH: "/tmp/xls"
-    MAIL_SERVER_HOST: ""
-    MAIL_SERVER_PORT: ""
-    MAIL_SENDER: ""
-    MAIL_USER: ""
-    MAIL_PASSWD: ""
-    MAIL_SMTP_STARTTLS_ENABLE: false
-    MAIL_SMTP_SSL_ENABLE: false
-    MAIL_SMTP_SSL_TRUST: ""
-    ENTERPRISE_WECHAT_ENABLE: false
-    ENTERPRISE_WECHAT_CORP_ID: ""
-    ENTERPRISE_WECHAT_SECRET: ""
-    ENTERPRISE_WECHAT_AGENT_ID: ""
-    ENTERPRISE_WECHAT_USERS: ""
+    ALERT_PLUGIN_DIR: "lib/plugin/alert"
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -390,9 +371,7 @@ api:
 ingress:
   enabled: false
   host: "dolphinscheduler.org"
-  path: "/"
+  path: "/dolphinscheduler"
   tls:
     enabled: false
-    hosts:
-      - "dolphinscheduler.org"
     secretName: "dolphinscheduler-tls"

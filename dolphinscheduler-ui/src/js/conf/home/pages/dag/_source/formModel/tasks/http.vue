@@ -88,8 +88,7 @@
         </el-input>
       </div>
     </m-list-box>
-
-    <m-list-box  >
+    <m-list-box>
       <div slot="text">{{$t('Timeout Settings')}}</div>
       <div slot="content">
         <label class="label-box">
@@ -99,24 +98,20 @@
         </label>
       </div>
     </m-list-box>
-
-    <div class="clearfix list" v-if = "timeoutSettings" >
-      <div class="text-box">
-        <span>{{$t('Connect Timeout')}}</span>
-      </div>
-      <div class="cont-box">
-        <span  class="label-box"  style="width: 193px;display: inline-block;" >
+    <m-list-box v-if="timeoutSettings">
+      <div slot="text">{{$t('Connect Timeout')}}</div>
+      <div slot="content">
+        <span  class="label-box" style="width: 193px;display: inline-block;">
           <el-input size="small" v-model='connectTimeout' maxlength="7"></el-input>
         </span>
         <span>{{$t('ms')}}</span>
         <span class="text-b">{{$t('Socket Timeout')}}</span>
-        <span  class="label-box" style="width: 193px;display: inline-block;" >
+        <span  class="label-box" style="width: 193px;display: inline-block;">
           <el-input size="small" v-model='socketTimeout' maxlength="7"></el-input>
         </span>
         <span>{{$t('ms')}}</span>
       </div>
-    </div>
-
+    </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">

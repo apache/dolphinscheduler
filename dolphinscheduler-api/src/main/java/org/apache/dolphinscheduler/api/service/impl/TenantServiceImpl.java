@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -89,23 +90,18 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
-        if (RegexUtils.isNumeric(tenantCode)) {
+        if (!RegexUtils.isValidLinuxUserName(tenantCode)) {
             putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
             return result;
         }
 
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
+            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
             return result;
         }
 
         Tenant tenant = new Tenant();
         Date now = new Date();
-
-        if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")) {
-            putMsg(result, Status.VERIFY_OS_TENANT_CODE_ERROR);
-            return result;
-        }
         tenant.setTenantCode(tenantCode);
         tenant.setQueueId(queueId);
         tenant.setDescription(desc);
@@ -344,7 +340,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return ture if the tenant code exists, otherwise return false
      */
     private boolean checkTenantExists(String tenantCode) {
-        List<Tenant> tenants = tenantMapper.queryByTenantCode(tenantCode);
-        return CollectionUtils.isNotEmpty(tenants);
+        Boolean existTenant = tenantMapper.existTenant(tenantCode);
+        return BooleanUtils.isTrue(existTenant);
     }
 }

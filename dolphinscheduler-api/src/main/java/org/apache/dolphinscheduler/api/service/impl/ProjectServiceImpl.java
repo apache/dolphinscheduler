@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
@@ -23,7 +24,6 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +63,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    private Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     /**
      * create project
@@ -97,8 +105,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .build();
 
         if (projectMapper.insert(project) > 0) {
-            Project insertedProject = projectMapper.queryByName(name);
-            result.put(Constants.DATA_LIST, insertedProject);
+            result.put(Constants.DATA_LIST, project.getId());
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
@@ -256,10 +263,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param projectId project id
      * @param projectName project name
      * @param desc description
+     * @param userName project owner
      * @return update result code
      */
     @Override
-    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
+    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
 
         Map<String, Object> descCheck = checkDesc(desc);
@@ -277,10 +285,15 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
+        User user = userMapper.queryByUserNameAccurately(userName);
+        if (user == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userName);
+            return result;
+        }
         project.setName(projectName);
         project.setDescription(desc);
         project.setUpdateTime(new Date());
-
+        project.setUserId(user.getId());
         int update = projectMapper.updateById(project);
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
@@ -301,7 +314,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
         /**
@@ -353,7 +366,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -373,10 +386,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
@@ -447,19 +456,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query all project list that have one or more process definitions.
+     * query all project list
      *
      * @return project list
      */
     @Override
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = new ArrayList<>();
-
-        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
-        if (CollectionUtils.isNotEmpty(projectIds)) {
-            projects = projectMapper.selectBatchIds(projectIds);
-        }
+        List<Project> projects = projectMapper.queryAllProject();
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);

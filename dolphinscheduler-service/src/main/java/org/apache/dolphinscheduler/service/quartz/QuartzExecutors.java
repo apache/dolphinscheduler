@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.quartz;
 
+import static org.apache.dolphinscheduler.common.Constants.DATASOURCE_PROPERTIES;
 import static org.apache.dolphinscheduler.common.Constants.ORG_POSTGRESQL_DRIVER;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS;
 import static org.apache.dolphinscheduler.common.Constants.ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK;
@@ -60,6 +61,7 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
@@ -147,10 +149,11 @@ public class QuartzExecutors {
      */
     private void init() {
         try {
+            PropertyUtils.loadPropertyFile(DATASOURCE_PROPERTIES);
             StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
             Properties properties = new Properties();
 
-            String dataSourceDriverClass = org.apache.dolphinscheduler.dao.utils.PropertyUtils.getString(SPRING_DATASOURCE_DRIVER_CLASS_NAME);
+            String dataSourceDriverClass = PropertyUtils.getString(SPRING_DATASOURCE_DRIVER_CLASS_NAME);
             if (dataSourceDriverClass.equals(ORG_POSTGRESQL_DRIVER)) {
                 properties.setProperty(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS, conf.getString(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS, PostgreSQLDelegate.class.getName()));
             } else {
@@ -370,7 +373,7 @@ public class QuartzExecutors {
      * @return data map
      */
     public static Map<String, Object> buildDataMap(int projectId, int scheduleId, Schedule schedule) {
-        Map<String, Object> dataMap = new HashMap<>(3);
+        Map<String, Object> dataMap = new HashMap<>(8);
         dataMap.put(PROJECT_ID, projectId);
         dataMap.put(SCHEDULE_ID, scheduleId);
         dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));

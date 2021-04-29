@@ -50,10 +50,10 @@
                 :title="$t('Confirm Switch To This Version?')"
                 @onConfirm="_mVersionSwitchProcessDefinitionVersion(scope.row)"
               >
-                <el-button type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
+                <el-button :disabled="scope.row.version === versionData.processDefinition.version" type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top">
+            <el-tooltip :content="$t('Delete')" placement="top">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -62,7 +62,7 @@
                 :title="$t('Delete?')"
                 @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row,scope.row.id)"
               >
-                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+                <el-button :disabled="scope.row.version === versionData.processDefinition.version" type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
               </el-popconfirm>
             </el-tooltip>
           </template>
