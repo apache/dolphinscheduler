@@ -299,7 +299,7 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/select-sub-process")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result querySubProcessInstanceByTaskId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("taskId") Integer taskId) {
