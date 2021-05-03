@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
@@ -47,9 +47,6 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     private WorkFlowLineageMapper workFlowLineageMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-
-    @Autowired
     private ProjectMapper projectMapper;
 
     @Override
@@ -66,48 +63,41 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                              Set<WorkFlowRelation> workFlowRelations,
                              ProcessLineage processLineage) {
         List<ProcessLineage> relations = workFlowLineageMapper.queryCodeRelation(
-                processLineage.getPostTaskCode(), processLineage.getPostTaskVersion()
-                , processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
-
-        for (ProcessLineage relation : relations) {
-            if (relation.getProcessDefinitionCode() != null) {
-
-                relation.setPreTaskCode(processLineage.getPostTaskCode());
-                relation.setPreTaskVersion(processLineage.getPostTaskVersion());
-
-                WorkFlowLineage pre = workFlowLineageMapper
-                        .queryWorkFlowLineageByCode(processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
-                // sourceWorkFlowId = ""
-                if (!workFlowLineageMap.containsKey(pre.getWorkFlowId())) {
-                    workFlowLineageMap.put(pre.getWorkFlowId(), pre);
-                }
-
-                WorkFlowLineage post = workFlowLineageMapper
-                        .queryWorkFlowLineageByCode(relation.getProcessDefinitionCode(), relation.getProjectCode());
-
-                if (workFlowLineageMap.containsKey(post.getWorkFlowId())) {
-                    WorkFlowLineage workFlowLineage = workFlowLineageMap.get(post.getWorkFlowId());
-                    String sourceWorkFlowId = workFlowLineage.getSourceWorkFlowId();
-                    if (sourceWorkFlowId.equals("")) {
-                        workFlowLineage.setSourceWorkFlowId(String.valueOf(pre.getWorkFlowId()));
-                    } else {
-                        workFlowLineage.setSourceWorkFlowId(sourceWorkFlowId + "," + pre.getWorkFlowId());
-
-                    }
-
+                processLineage.getPostTaskCode(), processLineage.getPostTaskVersion(),
+                processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
+        if (!relations.isEmpty()) {
+            Set<Integer> preWorkFlowIds = new HashSet<>();
+            List<ProcessLineage> preRelations = workFlowLineageMapper.queryCodeRelation(
+                    processLineage.getPreTaskCode(), processLineage.getPreTaskVersion(),
+                    processLineage.getProcessDefinitionCode(), processLineage.getProjectCode());
+            for (ProcessLineage preRelation : preRelations) {
+                WorkFlowLineage pre = workFlowLineageMapper.queryWorkFlowLineageByCode(
+                        preRelation.getProcessDefinitionCode(), preRelation.getProjectCode());
+                preWorkFlowIds.add(pre.getWorkFlowId());
+            }
+            ProcessLineage postRelation = relations.get(0);
+            WorkFlowLineage post = workFlowLineageMapper.queryWorkFlowLineageByCode(
+                    postRelation.getProcessDefinitionCode(), postRelation.getProjectCode());
+            if (!workFlowLineageMap.containsKey(post.getWorkFlowId())) {
+                post.setSourceWorkFlowId(StringUtils.join(preWorkFlowIds, ","));
+                workFlowLineageMap.put(post.getWorkFlowId(), post);
+            } else {
+                WorkFlowLineage workFlowLineage = workFlowLineageMap.get(post.getWorkFlowId());
+                String sourceWorkFlowId = workFlowLineage.getSourceWorkFlowId();
+                if (sourceWorkFlowId.equals("")) {
+                    workFlowLineage.setSourceWorkFlowId(StringUtils.join(preWorkFlowIds, ","));
                 } else {
-                    post.setSourceWorkFlowId(String.valueOf(pre.getWorkFlowId()));
-                    workFlowLineageMap.put(post.getWorkFlowId(), post);
+                    if (!preWorkFlowIds.isEmpty()) {
+                        workFlowLineage.setSourceWorkFlowId(sourceWorkFlowId + "," + StringUtils.join(preWorkFlowIds, ","));
+                    }
                 }
-
-                WorkFlowRelation workFlowRelation = new WorkFlowRelation();
-                workFlowRelation.setSourceWorkFlowId(pre.getWorkFlowId());
-                workFlowRelation.setTargetWorkFlowId(post.getWorkFlowId());
-                if (workFlowRelations.contains(workFlowRelation)) {
-                    continue;
+            }
+            if (preWorkFlowIds.isEmpty()) {
+                workFlowRelations.add(new WorkFlowRelation(0, post.getWorkFlowId()));
+            } else {
+                for (Integer workFlowId : preWorkFlowIds) {
+                    workFlowRelations.add(new WorkFlowRelation(workFlowId, post.getWorkFlowId()));
                 }
-                workFlowRelations.add(workFlowRelation);
-                getRelation(workFlowLineageMap, workFlowRelations, relation);
             }
         }
     }
