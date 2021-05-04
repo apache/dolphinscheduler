@@ -27,10 +27,10 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_P
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
 import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
-import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -42,8 +42,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,7 +68,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/projects/{projectName}/schedule")
 public class SchedulerController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
     public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
@@ -107,6 +104,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                  @RequestParam(value = "processDefinitionId") Integer processDefinitionId,
@@ -116,10 +114,6 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
-        logger.info("login user {},project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {},"
-                        + "failure policy: {},processInstancePriority : {}, workGroupId:{}",
-                RegexUtils.escapeNRT(loginUser.getUserName()), RegexUtils.escapeNRT(projectName), processDefinitionId, schedule, warningType, warningGroupId,
-                failureStrategy, processInstancePriority, workerGroup);
         Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
                 warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
 
@@ -152,6 +146,7 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/update")
     @ApiException(UPDATE_SCHEDULE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                  @RequestParam(value = "id") Integer id,
@@ -161,10 +156,6 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
-        logger.info("login user {},project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, "
-                        + "failure policy: {},processInstancePriority : {},workerGroupId:{}",
-                RegexUtils.escapeNRT(loginUser.getUserName()), RegexUtils.escapeNRT(projectName), id, schedule, warningType, warningGroupId, failureStrategy,
-                processInstancePriority, workerGroup);
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
                 warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
@@ -185,11 +176,10 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                          @RequestParam("id") Integer id) {
-        logger.info("login user {}, schedule setScheduleState, project name: {}, id: {}",
-                loginUser.getUserName(), projectName, id);
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.ONLINE);
         return returnDataList(result);
     }
@@ -208,11 +198,10 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("id") Integer id) {
-        logger.info("login user {}, schedule offline, project name: {}, process definition id: {}",
-                loginUser.getUserName(), projectName, id);
 
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.OFFLINE);
         return returnDataList(result);
@@ -239,14 +228,14 @@ public class SchedulerController extends BaseController {
     })
     @GetMapping("/list-paging")
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleListPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam Integer processDefinitionId,
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize) {
-        logger.info("login user {}, query schedule, project name: {}, process definition id: {}",
-                loginUser.getUserName(), projectName, processDefinitionId);
+
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -271,12 +260,11 @@ public class SchedulerController extends BaseController {
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_CRON_BY_ID_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
                                      @PathVariable String projectName,
                                      @RequestParam("scheduleId") Integer scheduleId
     ) {
-        logger.info("delete schedule by id, login user:{}, project name:{}, schedule id:{}",
-                loginUser.getUserName(), projectName, scheduleId);
         Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
         return returnDataList(result);
     }
@@ -291,10 +279,9 @@ public class SchedulerController extends BaseController {
     @ApiOperation(value = "queryScheduleList", notes = "QUERY_SCHEDULE_LIST_NOTES")
     @PostMapping("/list")
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleList(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                     @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName) {
-        logger.info("login user {}, query schedule list, project name: {}",
-                loginUser.getUserName(), projectName);
         Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectName);
         return returnDataList(result);
     }
@@ -314,12 +301,11 @@ public class SchedulerController extends BaseController {
     @PostMapping("/preview")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(PREVIEW_SCHEDULE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result previewSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                   @RequestParam(value = "schedule") String schedule
     ) {
-        logger.info("login user {}, project name: {}, preview schedule: {}",
-                loginUser.getUserName(), projectName, schedule);
         Map<String, Object> result = schedulerService.previewSchedule(loginUser, projectName, schedule);
         return returnDataList(result);
     }
