@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_RECORD_LIST_PAGING_ERROR;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskRecordService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,8 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,10 +46,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RestController
 @RequestMapping("/projects/task-record")
 public class TaskRecordController extends BaseController {
-
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskRecordController.class);
-
 
     @Autowired
     TaskRecordService taskRecordService;
@@ -73,6 +68,7 @@ public class TaskRecordController extends BaseController {
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_RECORD_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskRecordListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "taskName", required = false) String taskName,
                                             @RequestParam(value = "state", required = false) String state,
@@ -85,8 +81,6 @@ public class TaskRecordController extends BaseController {
                                             @RequestParam("pageSize") Integer pageSize
     ) {
 
-        logger.info("query task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
-                taskName, state, taskDate, startTime, endTime);
         Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(false, taskName, startTime, taskDate, sourceTable, destTable, endTime, state, pageNo, pageSize);
         return returnDataListPaging(result);
     }
@@ -109,6 +103,7 @@ public class TaskRecordController extends BaseController {
     @GetMapping("/history-list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_RECORD_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryHistoryTaskRecordListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @RequestParam(value = "taskName", required = false) String taskName,
                                                    @RequestParam(value = "state", required = false) String state,
@@ -121,8 +116,6 @@ public class TaskRecordController extends BaseController {
                                                    @RequestParam("pageSize") Integer pageSize
     ) {
 
-        logger.info("query hisotry task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
-                taskName, state, taskDate, startTime, endTime);
         Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(true, taskName, startTime, taskDate, sourceTable, destTable, endTime, state, pageNo, pageSize);
         return returnDataListPaging(result);
     }
