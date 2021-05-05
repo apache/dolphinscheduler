@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.api.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class AuthUtil {
     public static User user() {
