@@ -70,7 +70,7 @@ public class QueueController extends BaseController {
     @ApiException(QUERY_QUEUE_LIST_ERROR)
     @AccessLogAnnotation()
     public Result queryList() {
-        Map<String, Object> result = queueService.queryList(AuthUtil.User());
+        Map<String, Object> result = queueService.queryList(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -101,7 +101,7 @@ public class QueueController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = queueService.queryList(AuthUtil.User(), searchVal, pageNo, pageSize);
+        result = queueService.queryList(AuthUtil.user(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -123,7 +123,7 @@ public class QueueController extends BaseController {
     @AccessLogAnnotation()
     public Result createQueue(@RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
-        Map<String, Object> result = queueService.createQueue(AuthUtil.User(), queue, queueName);
+        Map<String, Object> result = queueService.createQueue(AuthUtil.user(), queue, queueName);
         return returnDataList(result);
     }
 
@@ -148,7 +148,7 @@ public class QueueController extends BaseController {
     public Result updateQueue(@RequestParam(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
-        Map<String, Object> result = queueService.updateQueue(AuthUtil.User(), id, queue, queueName);
+        Map<String, Object> result = queueService.updateQueue(AuthUtil.user(), id, queue, queueName);
         return returnDataList(result);
     }
 

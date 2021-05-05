@@ -85,7 +85,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result createDataSource(@ApiParam(name = "DATA_SOURCE_PARAM", required = true)
                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        return dataSourceService.createDataSource(AuthUtil.User(), dataSourceParam);
+        return dataSourceService.createDataSource(AuthUtil.user(), dataSourceParam);
     }
 
 
@@ -104,7 +104,7 @@ public class DataSourceController extends BaseController {
     @ApiException(UPDATE_DATASOURCE_ERROR)
     @AccessLogAnnotation()
     public Result updateDataSource(@RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        return dataSourceService.updateDataSource(dataSourceParam.getId(), AuthUtil.User(), dataSourceParam);
+        return dataSourceService.updateDataSource(dataSourceParam.getId(), AuthUtil.user(), dataSourceParam);
     }
 
     /**
@@ -143,7 +143,7 @@ public class DataSourceController extends BaseController {
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation()
     public Result queryDataSourceList(@RequestParam("type") DbType type) {
-        Map<String, Object> result = dataSourceService.queryDataSourceList(AuthUtil.User(), type.ordinal());
+        Map<String, Object> result = dataSourceService.queryDataSourceList(AuthUtil.user(), type.ordinal());
         return returnDataList(result);
     }
 
@@ -173,7 +173,7 @@ public class DataSourceController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = dataSourceService.queryDataSourceListPaging(AuthUtil.User(), searchVal, pageNo, pageSize);
+        result = dataSourceService.queryDataSourceListPaging(AuthUtil.user(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -231,7 +231,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result delete(@ApiIgnore
                          @RequestParam("id") int id) {
-        return dataSourceService.delete(AuthUtil.User(), id);
+        return dataSourceService.delete(AuthUtil.user(), id);
     }
 
     /**
@@ -270,7 +270,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result unauthDatasource(@RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = dataSourceService.unauthDatasource(AuthUtil.User(), userId);
+        Map<String, Object> result = dataSourceService.unauthDatasource(AuthUtil.user(), userId);
         return returnDataList(result);
     }
 
@@ -291,7 +291,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result authedDatasource(@RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = dataSourceService.authedDatasource(AuthUtil.User(), userId);
+        Map<String, Object> result = dataSourceService.authedDatasource(AuthUtil.user(), userId);
         return returnDataList(result);
     }
 

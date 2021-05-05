@@ -124,7 +124,7 @@ public class ExecutorController extends BaseController {
         if (startParams != null) {
             startParamMap = JSONUtils.toMap(startParams);
         }
-        Map<String, Object> result = execService.execProcessInstance(AuthUtil.User(), projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
+        Map<String, Object> result = execService.execProcessInstance(AuthUtil.user(), projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
                 warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
         return returnDataList(result);
@@ -153,7 +153,7 @@ public class ExecutorController extends BaseController {
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType
     ) {
-        Map<String, Object> result = execService.execute(AuthUtil.User(), projectName, processInstanceId, executeType);
+        Map<String, Object> result = execService.execute(AuthUtil.user(), projectName, processInstanceId, executeType);
         return returnDataList(result);
     }
 

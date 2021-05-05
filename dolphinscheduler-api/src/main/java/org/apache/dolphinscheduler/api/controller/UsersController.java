@@ -106,7 +106,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
-        Map<String, Object> result = usersService.createUser(AuthUtil.User(), userName, userPassword, email, tenantId, phone, queue, state);
+        Map<String, Object> result = usersService.createUser(AuthUtil.user(), userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
     }
 
@@ -136,7 +136,7 @@ public class UsersController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = usersService.queryUserList(AuthUtil.User(), searchVal, pageNo, pageSize);
+        result = usersService.queryUserList(AuthUtil.user(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -176,7 +176,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "tenantId") int tenantId,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
-        Map<String, Object> result = usersService.updateUser(AuthUtil.User(), id, userName, userPassword, email, tenantId, phone, queue, state);
+        Map<String, Object> result = usersService.updateUser(AuthUtil.user(), id, userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
     }
 
@@ -195,7 +195,7 @@ public class UsersController extends BaseController {
     @ApiException(DELETE_USER_BY_ID_ERROR)
     @AccessLogAnnotation
     public Result delUserById(@RequestParam(value = "id") int id) throws Exception {
-        Map<String, Object> result = usersService.deleteUserById(AuthUtil.User(), id);
+        Map<String, Object> result = usersService.deleteUserById(AuthUtil.user(), id);
         return returnDataList(result);
     }
 
@@ -217,7 +217,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result grantProject(@RequestParam(value = "userId") int userId,
                                @RequestParam(value = "projectIds") String projectIds) {
-        Map<String, Object> result = usersService.grantProject(AuthUtil.User(), userId, projectIds);
+        Map<String, Object> result = usersService.grantProject(AuthUtil.user(), userId, projectIds);
         return returnDataList(result);
     }
 
@@ -239,7 +239,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result grantResource(@RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "resourceIds") String resourceIds) {
-        Map<String, Object> result = usersService.grantResources(AuthUtil.User(), userId, resourceIds);
+        Map<String, Object> result = usersService.grantResources(AuthUtil.user(), userId, resourceIds);
         return returnDataList(result);
     }
 
@@ -262,7 +262,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result grantUDFFunc(@RequestParam(value = "userId") int userId,
                                @RequestParam(value = "udfIds") String udfIds) {
-        Map<String, Object> result = usersService.grantUDFFunction(AuthUtil.User(), userId, udfIds);
+        Map<String, Object> result = usersService.grantUDFFunction(AuthUtil.user(), userId, udfIds);
         return returnDataList(result);
     }
 
@@ -285,7 +285,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result grantDataSource(@RequestParam(value = "userId") int userId,
                                   @RequestParam(value = "datasourceIds") String datasourceIds) {
-        Map<String, Object> result = usersService.grantDataSource(AuthUtil.User(), userId, datasourceIds);
+        Map<String, Object> result = usersService.grantDataSource(AuthUtil.user(), userId, datasourceIds);
         return returnDataList(result);
     }
 
@@ -301,7 +301,7 @@ public class UsersController extends BaseController {
     @ApiException(GET_USER_INFO_ERROR)
     @AccessLogAnnotation
     public Result getUserInfo() {
-        Map<String, Object> result = usersService.getUserInfo(AuthUtil.User());
+        Map<String, Object> result = usersService.getUserInfo(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -316,7 +316,7 @@ public class UsersController extends BaseController {
     @ApiException(USER_LIST_ERROR)
     @AccessLogAnnotation
     public Result listUser() {
-        Map<String, Object> result = usersService.queryAllGeneralUsers(AuthUtil.User());
+        Map<String, Object> result = usersService.queryAllGeneralUsers(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -331,7 +331,7 @@ public class UsersController extends BaseController {
     @ApiException(USER_LIST_ERROR)
     @AccessLogAnnotation
     public Result listAll() {
-        Map<String, Object> result = usersService.queryUserList(AuthUtil.User());
+        Map<String, Object> result = usersService.queryUserList(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -371,7 +371,7 @@ public class UsersController extends BaseController {
     @ApiException(UNAUTHORIZED_USER_ERROR)
     @AccessLogAnnotation
     public Result unauthorizedUser(@RequestParam("alertgroupId") Integer alertgroupId) {
-        Map<String, Object> result = usersService.unauthorizedUser(AuthUtil.User(), alertgroupId);
+        Map<String, Object> result = usersService.unauthorizedUser(AuthUtil.user(), alertgroupId);
         return returnDataList(result);
     }
 
@@ -392,7 +392,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result authorizedUser(@RequestParam("alertgroupId") Integer alertgroupId) {
         try {
-            Map<String, Object> result = usersService.authorizedUser(AuthUtil.User(), alertgroupId);
+            Map<String, Object> result = usersService.authorizedUser(AuthUtil.user(), alertgroupId);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(Status.AUTHORIZED_USER_ERROR.getMsg(), e);
@@ -446,7 +446,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result<Object> activateUser(@RequestParam(value = "userName") String userName) {
         userName = ParameterUtils.handleEscapes(userName);
-        Map<String, Object> result = usersService.activateUser(AuthUtil.User(), userName);
+        Map<String, Object> result = usersService.activateUser(AuthUtil.user(), userName);
         return returnDataList(result);
     }
 
@@ -465,7 +465,7 @@ public class UsersController extends BaseController {
     @AccessLogAnnotation
     public Result<Object> batchActivateUser(@RequestBody List<String> userNames) {
         List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
-        Map<String, Object> result = usersService.batchActivateUser(AuthUtil.User(), formatUserNames);
+        Map<String, Object> result = usersService.batchActivateUser(AuthUtil.user(), formatUserNames);
         return returnDataList(result);
     }
 }

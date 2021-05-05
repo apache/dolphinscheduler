@@ -127,7 +127,7 @@ public class ProcessInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(
-                AuthUtil.User(), projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
+                AuthUtil.user(), projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -149,7 +149,7 @@ public class ProcessInstanceController extends BaseController {
     public Result queryTaskListByProcessId(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam("processInstanceId") Integer processInstanceId
     ) throws IOException {
-        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(AuthUtil.User(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(AuthUtil.user(), projectName, processInstanceId);
         return returnDataList(result);
     }
 
@@ -189,7 +189,7 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "connects", required = false) String connects,
                                         @RequestParam(value = "flag", required = false) Flag flag
     ) throws ParseException {
-        Map<String, Object> result = processInstanceService.updateProcessInstance(AuthUtil.User(), projectName,
+        Map<String, Object> result = processInstanceService.updateProcessInstance(AuthUtil.user(), projectName,
                 processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
         return returnDataList(result);
     }
@@ -212,7 +212,7 @@ public class ProcessInstanceController extends BaseController {
     public Result queryProcessInstanceById(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam("processInstanceId") Integer processInstanceId
     ) {
-        Map<String, Object> result = processInstanceService.queryProcessInstanceById(AuthUtil.User(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.queryProcessInstanceById(AuthUtil.user(), projectName, processInstanceId);
         return returnDataList(result);
     }
 
@@ -242,7 +242,7 @@ public class ProcessInstanceController extends BaseController {
 
     ) {
         projectName = ParameterUtils.handleEscapes(projectName);
-        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(AuthUtil.User(), projectName, size, startTime, endTime);
+        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(AuthUtil.user(), projectName, size, startTime, endTime);
         return returnDataList(result);
     }
 
@@ -266,7 +266,7 @@ public class ProcessInstanceController extends BaseController {
                                                              @RequestParam("processInstanceId") Integer processInstanceId
     ) {
         // task queue
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(AuthUtil.User(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(AuthUtil.user(), projectName, processInstanceId);
         return returnDataList(result);
     }
 
@@ -287,7 +287,7 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation()
     public Result querySubProcessInstanceByTaskId(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("taskId") Integer taskId) {
-        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(AuthUtil.User(), projectName, taskId);
+        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(AuthUtil.user(), projectName, taskId);
         return returnDataList(result);
     }
 
@@ -308,7 +308,7 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation
     public Result queryParentInstanceBySubId(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                              @RequestParam("subId") Integer subId) {
-        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(AuthUtil.User(), projectName, subId);
+        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(AuthUtil.user(), projectName, subId);
         return returnDataList(result);
     }
 
@@ -377,7 +377,7 @@ public class ProcessInstanceController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(AuthUtil.User(), projectName, processInstanceId);
+                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(AuthUtil.user(), projectName, processInstanceId);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                         deleteFailedIdList.add(strProcessInstanceId);
                         logger.error((String) deleteResult.get(Constants.MSG));

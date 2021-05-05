@@ -40,7 +40,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * process definition controller test
  */
-public class ProcessDefinitionControllerTest extends AbstractControllerTest{
+public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCreateProcessDefinition() throws Exception {
@@ -139,7 +139,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processId", id);
         paramsMap.add("releaseState", ReleaseState.OFFLINE.toString());
-
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/process/release", projectName)
                 .header(SESSION_ID, sessionId)

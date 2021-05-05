@@ -87,7 +87,7 @@ public class ProjectController extends BaseController {
     public Result createProject(@RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
 
-        Map<String, Object> result = projectService.createProject(AuthUtil.User(), projectName, description);
+        Map<String, Object> result = projectService.createProject(AuthUtil.user(), projectName, description);
         return returnDataList(result);
     }
 
@@ -114,7 +114,7 @@ public class ProjectController extends BaseController {
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "userName") String userName) {
-        Map<String, Object> result = projectService.update(AuthUtil.User(), projectId, projectName, description, userName);
+        Map<String, Object> result = projectService.update(AuthUtil.user(), projectId, projectName, description, userName);
         return returnDataList(result);
     }
 
@@ -166,7 +166,7 @@ public class ProjectController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectListPaging(AuthUtil.User(), pageSize, pageNo, searchVal);
+        result = projectService.queryProjectListPaging(AuthUtil.user(), pageSize, pageNo, searchVal);
         return returnDataListPaging(result);
     }
 
@@ -187,7 +187,7 @@ public class ProjectController extends BaseController {
     public Result deleteProject(@RequestParam("projectId") Integer projectId
     ) {
 
-        Map<String, Object> result = projectService.deleteProject(AuthUtil.User(), projectId);
+        Map<String, Object> result = projectService.deleteProject(AuthUtil.user(), projectId);
         return returnDataList(result);
     }
 
@@ -206,7 +206,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation()
     public Result queryUnauthorizedProject(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryUnauthorizedProject(AuthUtil.User(), userId);
+        Map<String, Object> result = projectService.queryUnauthorizedProject(AuthUtil.user(), userId);
         return returnDataList(result);
     }
 
@@ -226,7 +226,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation()
     public Result queryAuthorizedProject(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryAuthorizedProject(AuthUtil.User(), userId);
+        Map<String, Object> result = projectService.queryAuthorizedProject(AuthUtil.user(), userId);
         return returnDataList(result);
     }
 
@@ -241,7 +241,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation()
     public Result queryProjectCreatedAndAuthorizedByUser() {
-        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(AuthUtil.User());
+        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -262,7 +262,7 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = {"file"})
     public Result importProcessDefinition(@RequestParam("file") MultipartFile file,
                                           @RequestParam("projectName") String projectName) {
-        Map<String, Object> result = processDefinitionService.importProcessDefinition(AuthUtil.User(), file, projectName);
+        Map<String, Object> result = processDefinitionService.importProcessDefinition(AuthUtil.user(), file, projectName);
         return returnDataList(result);
     }
 

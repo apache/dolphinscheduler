@@ -83,7 +83,7 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.createTenant(AuthUtil.User(), tenantCode, queueId, description);
+        Map<String, Object> result = tenantService.createTenant(AuthUtil.user(), tenantCode, queueId, description);
         return returnDataList(result);
     }
 
@@ -113,7 +113,7 @@ public class TenantController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = tenantService.queryTenantList(AuthUtil.User(), searchVal, pageNo, pageSize);
+        result = tenantService.queryTenantList(AuthUtil.user(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -129,7 +129,7 @@ public class TenantController extends BaseController {
     @ApiException(QUERY_TENANT_LIST_ERROR)
     @AccessLogAnnotation()
     public Result queryTenantlist() {
-        Map<String, Object> result = tenantService.queryTenantList(AuthUtil.User());
+        Map<String, Object> result = tenantService.queryTenantList(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -160,7 +160,7 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.updateTenant(AuthUtil.User(), id, tenantCode, queueId, description);
+        Map<String, Object> result = tenantService.updateTenant(AuthUtil.user(), id, tenantCode, queueId, description);
         return returnDataList(result);
     }
 
@@ -180,7 +180,7 @@ public class TenantController extends BaseController {
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
     @AccessLogAnnotation()
     public Result deleteTenantById(@RequestParam(value = "id") int id) throws Exception {
-        Map<String, Object> result = tenantService.deleteTenantById(AuthUtil.User(), id);
+        Map<String, Object> result = tenantService.deleteTenantById(AuthUtil.user(), id);
         return returnDataList(result);
     }
 

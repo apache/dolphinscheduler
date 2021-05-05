@@ -80,7 +80,7 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "name") String name,
                                   @RequestParam(value = "addrList") String addrList
     ) {
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(AuthUtil.User(), id, name, addrList);
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(AuthUtil.user(), id, name, addrList);
         return returnDataList(result);
     }
 
@@ -111,7 +111,7 @@ public class WorkerGroupController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = workerGroupService.queryAllGroupPaging(AuthUtil.User(), pageNo, pageSize, searchVal);
+        result = workerGroupService.queryAllGroupPaging(AuthUtil.user(), pageNo, pageSize, searchVal);
         return returnDataListPaging(result);
     }
 
@@ -146,7 +146,7 @@ public class WorkerGroupController extends BaseController {
     @AccessLogAnnotation()
     public Result deleteById(@RequestParam("id") Integer id
     ) {
-        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(AuthUtil.User(), id);
+        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(AuthUtil.user(), id);
         return returnDataList(result);
     }
 

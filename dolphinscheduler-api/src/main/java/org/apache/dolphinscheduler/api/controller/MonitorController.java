@@ -63,7 +63,7 @@ public class MonitorController extends BaseController {
     @ApiException(LIST_MASTERS_ERROR)
     @AccessLogAnnotation()
     public Result listMaster() {
-        Map<String, Object> result = monitorService.queryMaster(AuthUtil.User());
+        Map<String, Object> result = monitorService.queryMaster(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -79,7 +79,7 @@ public class MonitorController extends BaseController {
     @ApiException(LIST_WORKERS_ERROR)
     @AccessLogAnnotation()
     public Result listWorker() {
-        Map<String, Object> result = monitorService.queryWorker(AuthUtil.User());
+        Map<String, Object> result = monitorService.queryWorker(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -95,7 +95,7 @@ public class MonitorController extends BaseController {
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     @AccessLogAnnotation()
     public Result queryDatabaseState() {
-        Map<String, Object> result = monitorService.queryDatabaseState(AuthUtil.User());
+        Map<String, Object> result = monitorService.queryDatabaseState(AuthUtil.user());
         return returnDataList(result);
     }
 
@@ -111,7 +111,7 @@ public class MonitorController extends BaseController {
     @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
     @AccessLogAnnotation()
     public Result queryZookeeperState() {
-        Map<String, Object> result = monitorService.queryZookeeperState(AuthUtil.User());
+        Map<String, Object> result = monitorService.queryZookeeperState(AuthUtil.user());
         return returnDataList(result);
     }
 

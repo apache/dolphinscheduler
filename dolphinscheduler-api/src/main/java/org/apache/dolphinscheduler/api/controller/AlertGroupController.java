@@ -84,7 +84,7 @@ public class AlertGroupController extends BaseController {
     public Result createAlertGroup(@RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        Map<String, Object> result = alertGroupService.createAlertgroup(AuthUtil.User(), groupName, description, alertInstanceIds);
+        Map<String, Object> result = alertGroupService.createAlertgroup(AuthUtil.user(), groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -132,7 +132,7 @@ public class AlertGroupController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = alertGroupService.listPaging(AuthUtil.User(), searchVal, pageNo, pageSize);
+        result = alertGroupService.listPaging(AuthUtil.user(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -160,7 +160,7 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
 
-        Map<String, Object> result = alertGroupService.updateAlertgroup(AuthUtil.User(), id, groupName, description, alertInstanceIds);
+        Map<String, Object> result = alertGroupService.updateAlertgroup(AuthUtil.user(), id, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -180,7 +180,7 @@ public class AlertGroupController extends BaseController {
     @ApiException(DELETE_ALERT_GROUP_ERROR)
     @AccessLogAnnotation()
     public Result delAlertGroupById(@RequestParam(value = "id") int id) {
-        Map<String, Object> result = alertGroupService.delAlertgroupById(AuthUtil.User(), id);
+        Map<String, Object> result = alertGroupService.delAlertgroupById(AuthUtil.user(), id);
         return returnDataList(result);
     }
 

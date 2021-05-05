@@ -77,7 +77,7 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token") String token) {
 
-        Map<String, Object> result = accessTokenService.createToken(AuthUtil.User(), userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.createToken(AuthUtil.user(), userId, expireTime, token);
         return returnDataList(result);
     }
 
@@ -95,7 +95,7 @@ public class AccessTokenController extends BaseController {
     @AccessLogAnnotation()
     public Result generateToken(@RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "expireTime") String expireTime) {
-        Map<String, Object> result = accessTokenService.generateToken(AuthUtil.User(), userId, expireTime);
+        Map<String, Object> result = accessTokenService.generateToken(AuthUtil.user(), userId, expireTime);
         return returnDataList(result);
     }
 
@@ -126,7 +126,7 @@ public class AccessTokenController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = accessTokenService.queryAccessTokenList(AuthUtil.User(), searchVal, pageNo, pageSize);
+        result = accessTokenService.queryAccessTokenList(AuthUtil.user(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -142,7 +142,7 @@ public class AccessTokenController extends BaseController {
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation()
     public Result delAccessTokenById(@RequestParam(value = "id") int id) {
-        Map<String, Object> result = accessTokenService.delAccessTokenById(AuthUtil.User(), id);
+        Map<String, Object> result = accessTokenService.delAccessTokenById(AuthUtil.user(), id);
         return returnDataList(result);
     }
 
@@ -166,7 +166,7 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token") String token) {
 
-        Map<String, Object> result = accessTokenService.updateToken(AuthUtil.User(), id, userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.updateToken(AuthUtil.user(), id, userId, expireTime, token);
         return returnDataList(result);
     }
 
