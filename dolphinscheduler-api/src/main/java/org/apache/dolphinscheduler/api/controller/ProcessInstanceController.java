@@ -322,7 +322,7 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/select-parent-process")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser"})
     public Result queryParentInstanceBySubId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                              @RequestParam("subId") Integer subId) {
@@ -344,7 +344,7 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/view-variables")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser"})
     public Result viewVariables(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("processInstanceId") Integer processInstanceId) throws Exception {
         Map<String, Object> result = processInstanceService.viewVariables(processInstanceId);
@@ -366,7 +366,7 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/view-gantt")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser"})
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                            @RequestParam("processInstanceId") Integer processInstanceId) throws Exception {
@@ -386,7 +386,7 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
-    @AccessLogAnnotation
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser"})
     public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @PathVariable String projectName,
                                                   @RequestParam("processInstanceIds") String processInstanceIds
