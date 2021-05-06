@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.register.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,11 +15,20 @@ package org.apache.dolphinscheduler.plugin.register.api;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.plugin.register.api;
+
+import java.util.List;
+import java.util.Map;
+
 public interface RegisterCenter {
 
-    void register();
+    void register(Map<String, Object> registerData) throws Exception;
 
     void upRegister();
+
+    void subscribe(String key, SubscribeListener subscribeListener);
+
+    void unsubscribe(String key, SubscribeListener subscribeListener);
 
     String get(String key);
 
@@ -31,6 +40,10 @@ public interface RegisterCenter {
 
 
     void remove();
+
+    List<String> getChildren(String path);
+
+    String getData(String key);
 
 
 }

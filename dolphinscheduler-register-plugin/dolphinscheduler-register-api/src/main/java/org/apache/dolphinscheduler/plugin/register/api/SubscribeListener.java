@@ -17,5 +17,5 @@
 
 package org.apache.dolphinscheduler.plugin.register.api;
 
-public class RegisterListener {
+public class SubscribeListener {
 }
