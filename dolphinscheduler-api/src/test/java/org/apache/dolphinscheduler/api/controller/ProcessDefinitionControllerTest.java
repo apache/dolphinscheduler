@@ -245,7 +245,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void stage_testBatchMoveProcessDefinition() throws Exception {
+    public void stage3_testBatchMoveProcessDefinition() throws Exception {
 
         String targetProjectId = projectId;
         String id = definitionId;
