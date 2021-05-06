@@ -27,6 +27,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class AuthUtil {
+
+    /**
+     * get LoginUser info from request
+     * @return User
+     */
     public static User user() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (ObjectUtils.isEmpty(attributes)) {
