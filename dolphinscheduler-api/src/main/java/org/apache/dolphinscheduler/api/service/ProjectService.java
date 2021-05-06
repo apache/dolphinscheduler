@@ -84,9 +84,10 @@ public interface ProjectService {
      * @param projectId project id
      * @param projectName project name
      * @param desc description
+     * @param userName project owner
      * @return update result code
      */
-    Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc);
+    Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc, String userName);
 
     /**
      * query unauthorized project

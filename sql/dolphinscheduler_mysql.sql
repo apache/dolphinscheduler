@@ -304,7 +304,8 @@ CREATE TABLE `t_ds_alertgroup`(
   `description`    varchar(255) DEFAULT NULL,
   `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
   `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_alertgroup_name_UN` (`group_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -350,7 +351,8 @@ CREATE TABLE `t_ds_datasource` (
   `connection_params` text NOT NULL COMMENT 'json connection params',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_datasource_name_UN` ('name', 'type')
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
