@@ -421,6 +421,7 @@ export default {
   'Create Resource': '创建资源',
   'User Center': '用户中心',
   'Please enter method': '请输入方法',
+  AllStatus: '全部状态',
   none: '无',
   name: '名称',
   'Process priority': '流程优先级',
