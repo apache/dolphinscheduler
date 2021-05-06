@@ -34,6 +34,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINI
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -112,6 +113,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_DEFINITION)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam(value = "name", required = true) String name,
@@ -120,9 +122,6 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "connects", required = true) String connects,
                                           @RequestParam(value = "description", required = false) String description) throws JsonProcessingException {
 
-        logger.info("login user {}, create  process definition, project name: {}, process definition name: {}, "
-                        + "process_definition_json: {}, desc: {} locations:{}, connects:{}",
-                loginUser.getUserName(), projectName, name, json, description, locations, connects);
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
                 description, locations, connects);
         return returnDataList(result);
@@ -145,16 +144,11 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/copy")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_COPY_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                         @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                         @RequestParam(value = "targetProjectId", required = true) int targetProjectId) {
-        logger.info("batch copy process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-                RegexUtils.escapeNRT(loginUser.getUserName()),
-                RegexUtils.escapeNRT(projectName),
-                RegexUtils.escapeNRT(processDefinitionIds),
-                RegexUtils.escapeNRT(String.valueOf(targetProjectId)));
-
         return returnDataList(
                 processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
     }
@@ -176,16 +170,11 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/move")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_MOVE_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result moveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                         @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                         @RequestParam(value = "targetProjectId", required = true) int targetProjectId) {
-        logger.info("batch move process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-                RegexUtils.escapeNRT(loginUser.getUserName()),
-                RegexUtils.escapeNRT(projectName),
-                RegexUtils.escapeNRT(processDefinitionIds),
-                RegexUtils.escapeNRT(String.valueOf(targetProjectId)));
-
         return returnDataList(
                 processDefinitionService.batchMoveProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
     }
@@ -205,11 +194,10 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyProcessDefinitionName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam(value = "name", required = true) String name) {
-        logger.info("verify process definition name unique, user:{}, project name:{}, process definition name:{}",
-                loginUser.getUserName(), projectName, name);
         Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectName, name);
         return returnDataList(result);
     }
@@ -241,6 +229,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam(value = "name", required = true) String name,
@@ -251,9 +240,6 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "description", required = false) String description,
                                           @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
-        logger.info("login user {}, update process define, project name: {}, process define name: {}, "
-                        + "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
-                loginUser.getUserName(), projectName, name, processDefinitionJson, description, locations, connects);
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
                 processDefinitionJson, description, locations, connects);
         //  If the update fails, the result will be returned directly
@@ -287,13 +273,12 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_VERSIONS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionVersions(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "pageNo") int pageNo,
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
-        logger.info("login user {}, query process versions, project name: {}, pageNo: {}, pageSize: {}, processDefinitionCode: {}",
-                loginUser.getUserName(), projectName, pageNo, pageSize, processDefinitionCode);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionVersions(loginUser
                 , projectName, pageNo, pageSize, processDefinitionCode);
 
@@ -317,12 +302,11 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/version/switch")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_PROCESS_DEFINITION_VERSION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result switchProcessDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
-        logger.info("login user {}, switch process version, project name: {}, processDefinitionId: {}, version: {}",
-                loginUser.getUserName(), projectName, processDefinitionId, version);
         Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectName
                 , processDefinitionId, version);
         return returnDataList(result);
@@ -345,12 +329,11 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/version/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINITION_VERSION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                                  @RequestParam(value = "version") long version) {
-        logger.info("login user {}, delete process definition, project name: {}, processDefinitionId: {}, version: {}",
-                loginUser.getUserName(), projectName, processDefinitionId, version);
         Map<String, Object> result = processDefinitionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectName, processDefinitionId, version);
         return returnDataList(result);
     }
@@ -373,13 +356,12 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/release")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result releaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam(value = "processId", required = true) int processId,
                                            @RequestParam(value = "releaseState", required = true) ReleaseState releaseState) {
 
-        logger.info("login user {}, release process definition, project name: {}, release state: {}",
-                loginUser.getUserName(), projectName, releaseState);
         Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, processId, releaseState);
         return returnDataList(result);
     }
@@ -399,12 +381,11 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/select-by-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                              @RequestParam("processId") Integer processId
     ) {
-        logger.info("query detail of process definition, login user:{}, project name:{}, process definition id:{}",
-                loginUser.getUserName(), projectName, processId);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionById(loginUser, projectName, processId);
         return returnDataList(result);
     }
@@ -424,6 +405,7 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/select-by-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<ProcessDefinition> queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                                   @RequestParam("processDefinitionName") String processDefinitionName
@@ -443,11 +425,10 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName
     ) {
-        logger.info("query process definition list, login user:{}, project name:{}",
-                loginUser.getUserName(), projectName);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionList(loginUser, projectName);
         return returnDataList(result);
     }
@@ -473,13 +454,13 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                    @RequestParam("pageNo") Integer pageNo,
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                    @RequestParam("pageSize") Integer pageSize) {
-        logger.info("query process definition list paging, login user:{}, project name:{}", loginUser.getUserName(), projectName);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -506,6 +487,7 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/view-tree")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                            @RequestParam("processId") Integer id,
@@ -558,9 +540,6 @@ public class ProcessDefinitionController extends BaseController {
             @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam("processDefinitionCodeList") String processDefinitionCodeList) {
-
-        logger.info("query task node name list by definitionId list, login user:{}, project name:{}, code list: {}",
-                loginUser.getUserName(), projectName, processDefinitionCodeList);
         Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCodeList(processDefinitionCodeList);
         return returnDataList(result);
     }
@@ -580,12 +559,11 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_ID_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam("processDefinitionId") Integer processDefinitionId
     ) {
-        logger.info("delete process definition by id, login user:{}, project name:{}, process definition id:{}",
-                loginUser.getUserName(), projectName, processDefinitionId);
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
         return returnDataList(result);
     }
@@ -605,13 +583,11 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchDeleteProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                     @RequestParam("processDefinitionIds") String processDefinitionIds
     ) {
-        logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
-                loginUser.getUserName(), projectName, processDefinitionIds);
-
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (StringUtils.isNotEmpty(processDefinitionIds)) {
@@ -654,13 +630,12 @@ public class ProcessDefinitionController extends BaseController {
     })
     @GetMapping(value = "/export")
     @ResponseBody
+    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "response"})
     public void batchExportProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("processDefinitionIds") String processDefinitionIds,
                                                   HttpServletResponse response) {
         try {
-            logger.info("batch export process definition by ids, login user:{}, project name:{}, process definition ids:{}",
-                    loginUser.getUserName(), projectName, processDefinitionIds);
             processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectName, processDefinitionIds, response);
         } catch (Exception e) {
             logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
@@ -678,10 +653,9 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/queryProcessDefinitionAllByProjectId")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionAllByProjectId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam("projectId") Integer projectId) {
-        logger.info("query process definition list, login user:{}, project id:{}",
-                loginUser.getUserName(), projectId);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionAllByProjectId(projectId);
         return returnDataList(result);
     }

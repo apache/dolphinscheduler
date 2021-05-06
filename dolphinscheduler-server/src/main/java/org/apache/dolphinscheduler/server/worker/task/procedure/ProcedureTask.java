@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.processdure;
+package org.apache.dolphinscheduler.server.worker.task.procedure;
 
 import static org.apache.dolphinscheduler.common.enums.DataType.BOOLEAN;
 import static org.apache.dolphinscheduler.common.enums.DataType.DATE;
@@ -59,7 +59,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
- * procedure task
+ *  procedure task
  */
 public class ProcedureTask extends AbstractTask {
 
@@ -87,7 +87,6 @@ public class ProcedureTask extends AbstractTask {
         logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
 
         this.procedureParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
-
 
         // check parameters
         if (!procedureParameters.checkParameters()) {
@@ -127,30 +126,18 @@ public class ProcedureTask extends AbstractTask {
                     CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                     taskExecutionContext.getScheduleTime());
 
-            Collection<Property> userDefParamsList = null;
-
-            if (procedureParameters.getLocalParametersMap() != null) {
-                userDefParamsList = procedureParameters.getLocalParametersMap().values();
-            }
-
-            String method = getCallMethod(userDefParamsList);
-
-            logger.info("call method : {}", method);
-
             // call method
-            stmt = connection.prepareCall(method);
+            stmt = connection.prepareCall(procedureParameters.getMethod());
 
             // set timeout
             setTimeout(stmt);
 
             // outParameterMap
-            Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, paramsMap, userDefParamsList);
+            Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, paramsMap);
 
             stmt.executeUpdate();
 
-            /**
-             *  print the output parameters to the log
-             */
+            // print the output parameters to the log
             printOutParameter(stmt, outParameterMap);
 
             setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
@@ -159,31 +146,8 @@ public class ProcedureTask extends AbstractTask {
             logger.error("procedure task error", e);
             throw e;
         } finally {
-            close(stmt, connection);
+            close(stmt,connection);
         }
-    }
-
-    /**
-     * get call method
-     *
-     * @param userDefParamsList userDefParamsList
-     * @return method
-     */
-    private String getCallMethod(Collection<Property> userDefParamsList) {
-        String method;// no parameters
-        if (CollectionUtils.isEmpty(userDefParamsList)) {
-            method = "{call " + procedureParameters.getMethod() + "}";
-        } else { // exists parameters
-            int size = userDefParamsList.size();
-            StringBuilder parameter = new StringBuilder();
-            parameter.append("(");
-            for (int i = 0; i < size - 1; i++) {
-                parameter.append("?,");
-            }
-            parameter.append("?)");
-            method = "{call " + procedureParameters.getMethod() + parameter.toString() + "}";
-        }
-        return method;
     }
 
     /**
@@ -191,6 +155,7 @@ public class ProcedureTask extends AbstractTask {
      *
      * @param stmt CallableStatement
      * @param outParameterMap outParameterMap
+     * @throws SQLException SQLException
      */
     private void printOutParameter(CallableStatement stmt,
                                    Map<Integer, Property> outParameterMap) throws SQLException {
@@ -212,32 +177,39 @@ public class ProcedureTask extends AbstractTask {
      *
      * @param stmt CallableStatement
      * @param paramsMap paramsMap
-     * @param userDefParamsList userDefParamsList
      * @return outParameterMap
+     * @throws Exception Exception
      */
-    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt,
-                                                      Map<String, Property> paramsMap,
-                                                      Collection<Property> userDefParamsList) throws Exception {
-        Map<Integer, Property> outParameterMap = new HashMap<>();
-        if (userDefParamsList != null && userDefParamsList.size() > 0) {
-            int index = 1;
-            for (Property property : userDefParamsList) {
-                logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
-                        , property.getProp(),
-                        property.getDirect(),
-                        property.getType(),
-                        property.getValue());
-                // set parameters
-                if (property.getDirect().equals(Direct.IN)) {
-                    ParameterUtils.setInParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
-                } else if (property.getDirect().equals(Direct.OUT)) {
-                    setOutParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
-                    property.setValue(paramsMap.get(property.getProp()).getValue());
-                    outParameterMap.put(index, property);
-                }
-                index++;
-            }
+    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<String, Property> paramsMap) throws Exception {
+        Map<Integer,Property> outParameterMap = new HashMap<>();
+        if (procedureParameters.getLocalParametersMap() == null) {
+            return outParameterMap;
         }
+
+        Collection<Property> userDefParamsList = procedureParameters.getLocalParametersMap().values();
+
+        if (CollectionUtils.isEmpty(userDefParamsList)) {
+            return outParameterMap;
+        }
+
+        int index = 1;
+        for (Property property : userDefParamsList) {
+            logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
+                    ,property.getProp(),
+                    property.getDirect(),
+                    property.getType(),
+                    property.getValue());
+            // set parameters
+            if (property.getDirect().equals(Direct.IN)) {
+                ParameterUtils.setInParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
+            } else if (property.getDirect().equals(Direct.OUT)) {
+                setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
+                property.setValue(paramsMap.get(property.getProp()).getValue());
+                outParameterMap.put(index,property);
+            }
+            index++;
+        }
+
         return outParameterMap;
     }
 
@@ -255,28 +227,35 @@ public class ProcedureTask extends AbstractTask {
     }
 
     /**
-     * close jdbc resource
-     */
-    private void close(PreparedStatement stmt,
-                       Connection connection) {
+    * close jdbc resource
+    *
+    * @param stmt stmt
+    * @param connection connection
+    */
+    private void close(PreparedStatement stmt, Connection connection) {
         if (stmt != null) {
             try {
                 stmt.close();
             } catch (SQLException e) {
-
+                logger.error("close prepared statement error : {}",e.getMessage(),e);
             }
         }
         if (connection != null) {
             try {
                 connection.close();
             } catch (SQLException e) {
-
+                logger.error("close connection error : {}",e.getMessage(),e);
             }
         }
     }
 
     /**
      * get output parameter
+     * @param stmt stmt
+     * @param index index
+     * @param prop prop
+     * @param dataType dataType
+     * @throws SQLException SQLException
      */
     private void getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
         switch (dataType) {
@@ -326,20 +305,43 @@ public class ProcedureTask extends AbstractTask {
      * @param value value
      * @throws Exception exception
      */
-    private void setOutParameter(int index, CallableStatement stmt, DataType dataType, String value) throws Exception {
-        if (dataType.equals(VARCHAR)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.VARCHAR);
-            } else {
-                stmt.registerOutParameter(index, Types.VARCHAR, value);
-            }
+    private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception {
+        int sqlType;
+        switch (dataType) {
+            case VARCHAR:
+                sqlType = Types.VARCHAR;
+                break;
+            case INTEGER:
+            case LONG:
+                sqlType = Types.INTEGER;
+                break;
+            case FLOAT:
+                sqlType = Types.FLOAT;
+                break;
+            case DOUBLE:
+                sqlType = Types.DOUBLE;
+                break;
+            case DATE:
+                sqlType = Types.DATE;
+                break;
+            case TIME:
+                sqlType = Types.TIME;
+                break;
+            case TIMESTAMP:
+                sqlType = Types.TIMESTAMP;
+                break;
+            case BOOLEAN:
+                sqlType = Types.BOOLEAN;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + dataType);
+        }
 
-        } else if (dataType.equals(INTEGER)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.INTEGER);
-            } else {
-                stmt.registerOutParameter(index, Types.INTEGER, value);
-            }
+        if (StringUtils.isEmpty(value)) {
+            stmt.registerOutParameter(index, sqlType);
+        } else {
+            stmt.registerOutParameter(index, sqlType, value);
+        }
 
         } else if (dataType.equals(LONG)) {
             if (StringUtils.isEmpty(value)) {
