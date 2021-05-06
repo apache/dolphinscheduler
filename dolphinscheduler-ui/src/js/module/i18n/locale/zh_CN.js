@@ -440,6 +440,7 @@ export default {
   'Process instance details': '流程实例详情',
   'Create Resource': '创建资源',
   'User Center': '用户中心',
+  AllStatus: '全部状态',
   None: '无',
   Name: '名称',
   'Process priority': '流程优先级',

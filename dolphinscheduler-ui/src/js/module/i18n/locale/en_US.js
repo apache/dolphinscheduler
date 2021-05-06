@@ -440,6 +440,7 @@ export default {
   'Process instance details': 'Process instance details',
   'Create Resource': 'Create Resource',
   'User Center': 'User Center',
+  AllStatus: 'All',
   None: 'None',
   Name: 'Name',
   'Process priority': 'Process priority',
