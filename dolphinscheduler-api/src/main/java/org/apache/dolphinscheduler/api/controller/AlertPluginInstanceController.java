@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 
@@ -86,7 +86,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result createAlertPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        Map<String, Object> result = alertPluginInstanceService.create(AuthUtil.user(), pluginDefineId, instanceName, pluginInstanceParams);
+        Map<String, Object> result = alertPluginInstanceService.create(AuthUtils.getAuthUser(), pluginDefineId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -111,7 +111,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result updateAlertPluginInstance(@RequestParam(value = "alertPluginInstanceId") int alertPluginInstanceId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        Map<String, Object> result = alertPluginInstanceService.update(AuthUtil.user(), alertPluginInstanceId, instanceName, pluginInstanceParams);
+        Map<String, Object> result = alertPluginInstanceService.update(AuthUtils.getAuthUser(), alertPluginInstanceId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -131,7 +131,7 @@ public class AlertPluginInstanceController extends BaseController {
     @AccessLogAnnotation()
     public Result deleteAlertPluginInstance(@RequestParam(value = "id") int id) {
 
-        Map<String, Object> result = alertPluginInstanceService.delete(AuthUtil.user(), id);
+        Map<String, Object> result = alertPluginInstanceService.delete(AuthUtils.getAuthUser(), id);
         return returnDataList(result);
     }
 
@@ -147,7 +147,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ApiException(GET_ALERT_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation()
     public Result getAlertPluginInstance(@RequestParam(value = "id") int id) {
-        Map<String, Object> result = alertPluginInstanceService.get(AuthUtil.user(), id);
+        Map<String, Object> result = alertPluginInstanceService.get(AuthUtils.getAuthUser(), id);
         return returnDataList(result);
     }
 

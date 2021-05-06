@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -112,7 +112,7 @@ public class TaskInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = taskInstanceService.queryTaskListPaging(
-                AuthUtil.user(), projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+                AuthUtils.getAuthUser(), projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -133,7 +133,7 @@ public class TaskInstanceController extends BaseController {
     @AccessLogAnnotation()
     public Result<Object> forceTaskSuccess(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
-        Map<String, Object> result = taskInstanceService.forceTaskSuccess(AuthUtil.user(), projectName, taskInstanceId);
+        Map<String, Object> result = taskInstanceService.forceTaskSuccess(AuthUtils.getAuthUser(), projectName, taskInstanceId);
         return returnDataList(result);
     }
 

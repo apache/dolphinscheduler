@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -80,7 +80,7 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "name") String name,
                                   @RequestParam(value = "addrList") String addrList
     ) {
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(AuthUtil.user(), id, name, addrList);
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(AuthUtils.getAuthUser(), id, name, addrList);
         return returnDataList(result);
     }
 
@@ -111,7 +111,7 @@ public class WorkerGroupController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = workerGroupService.queryAllGroupPaging(AuthUtil.user(), pageNo, pageSize, searchVal);
+        result = workerGroupService.queryAllGroupPaging(AuthUtils.getAuthUser(), pageNo, pageSize, searchVal);
         return returnDataListPaging(result);
     }
 
@@ -146,7 +146,7 @@ public class WorkerGroupController extends BaseController {
     @AccessLogAnnotation()
     public Result deleteById(@RequestParam("id") Integer id
     ) {
-        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(AuthUtil.user(), id);
+        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(AuthUtils.getAuthUser(), id);
         return returnDataList(result);
     }
 

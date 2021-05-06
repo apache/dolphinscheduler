@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -84,7 +84,7 @@ public class AlertGroupController extends BaseController {
     public Result createAlertGroup(@RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        Map<String, Object> result = alertGroupService.createAlertgroup(AuthUtil.user(), groupName, description, alertInstanceIds);
+        Map<String, Object> result = alertGroupService.createAlertgroup(AuthUtils.getAuthUser(), groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -132,7 +132,7 @@ public class AlertGroupController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = alertGroupService.listPaging(AuthUtil.user(), searchVal, pageNo, pageSize);
+        result = alertGroupService.listPaging(AuthUtils.getAuthUser(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -160,7 +160,7 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "description", required = false) String description,
                                    @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
 
-        Map<String, Object> result = alertGroupService.updateAlertgroup(AuthUtil.user(), id, groupName, description, alertInstanceIds);
+        Map<String, Object> result = alertGroupService.updateAlertgroup(AuthUtils.getAuthUser(), id, groupName, description, alertInstanceIds);
         return returnDataList(result);
     }
 
@@ -180,7 +180,7 @@ public class AlertGroupController extends BaseController {
     @ApiException(DELETE_ALERT_GROUP_ERROR)
     @AccessLogAnnotation()
     public Result delAlertGroupById(@RequestParam(value = "id") int id) {
-        Map<String, Object> result = alertGroupService.delAlertgroupById(AuthUtil.user(), id);
+        Map<String, Object> result = alertGroupService.delAlertgroupById(AuthUtils.getAuthUser(), id);
         return returnDataList(result);
     }
 

@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -124,7 +124,7 @@ public class ExecutorController extends BaseController {
         if (startParams != null) {
             startParamMap = JSONUtils.toMap(startParams);
         }
-        Map<String, Object> result = execService.execProcessInstance(AuthUtil.user(), projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
+        Map<String, Object> result = execService.execProcessInstance(AuthUtils.getAuthUser(), projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
                 warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
         return returnDataList(result);
@@ -153,7 +153,7 @@ public class ExecutorController extends BaseController {
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType
     ) {
-        Map<String, Object> result = execService.execute(AuthUtil.user(), projectName, processInstanceId, executeType);
+        Map<String, Object> result = execService.execute(AuthUtils.getAuthUser(), projectName, processInstanceId, executeType);
         return returnDataList(result);
     }
 

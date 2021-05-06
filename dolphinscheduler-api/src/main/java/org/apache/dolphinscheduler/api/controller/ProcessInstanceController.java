@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -127,7 +127,7 @@ public class ProcessInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(
-                AuthUtil.user(), projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
+                AuthUtils.getAuthUser(), projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -149,7 +149,7 @@ public class ProcessInstanceController extends BaseController {
     public Result queryTaskListByProcessId(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam("processInstanceId") Integer processInstanceId
     ) throws IOException {
-        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(AuthUtil.user(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(AuthUtils.getAuthUser(), projectName, processInstanceId);
         return returnDataList(result);
     }
 
@@ -189,7 +189,7 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "connects", required = false) String connects,
                                         @RequestParam(value = "flag", required = false) Flag flag
     ) throws ParseException {
-        Map<String, Object> result = processInstanceService.updateProcessInstance(AuthUtil.user(), projectName,
+        Map<String, Object> result = processInstanceService.updateProcessInstance(AuthUtils.getAuthUser(), projectName,
                 processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
         return returnDataList(result);
     }
@@ -212,7 +212,7 @@ public class ProcessInstanceController extends BaseController {
     public Result queryProcessInstanceById(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam("processInstanceId") Integer processInstanceId
     ) {
-        Map<String, Object> result = processInstanceService.queryProcessInstanceById(AuthUtil.user(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.queryProcessInstanceById(AuthUtils.getAuthUser(), projectName, processInstanceId);
         return returnDataList(result);
     }
 
@@ -242,7 +242,7 @@ public class ProcessInstanceController extends BaseController {
 
     ) {
         projectName = ParameterUtils.handleEscapes(projectName);
-        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(AuthUtil.user(), projectName, size, startTime, endTime);
+        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(AuthUtils.getAuthUser(), projectName, size, startTime, endTime);
         return returnDataList(result);
     }
 
@@ -266,7 +266,7 @@ public class ProcessInstanceController extends BaseController {
                                                              @RequestParam("processInstanceId") Integer processInstanceId
     ) {
         // task queue
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(AuthUtil.user(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(AuthUtils.getAuthUser(), projectName, processInstanceId);
         return returnDataList(result);
     }
 
@@ -287,7 +287,7 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation()
     public Result querySubProcessInstanceByTaskId(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("taskId") Integer taskId) {
-        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(AuthUtil.user(), projectName, taskId);
+        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(AuthUtils.getAuthUser(), projectName, taskId);
         return returnDataList(result);
     }
 
@@ -308,7 +308,7 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation
     public Result queryParentInstanceBySubId(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                              @RequestParam("subId") Integer subId) {
-        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(AuthUtil.user(), projectName, subId);
+        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(AuthUtils.getAuthUser(), projectName, subId);
         return returnDataList(result);
     }
 
@@ -377,7 +377,7 @@ public class ProcessInstanceController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(AuthUtil.user(), projectName, processInstanceId);
+                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(AuthUtils.getAuthUser(), projectName, processInstanceId);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                         deleteFailedIdList.add(strProcessInstanceId);
                         logger.error((String) deleteResult.get(Constants.MSG));

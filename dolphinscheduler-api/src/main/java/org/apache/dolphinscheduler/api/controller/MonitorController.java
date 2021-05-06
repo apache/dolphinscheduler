@@ -25,7 +25,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ZOOKEEPER_STATE
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 
 import java.util.Map;
@@ -63,7 +63,7 @@ public class MonitorController extends BaseController {
     @ApiException(LIST_MASTERS_ERROR)
     @AccessLogAnnotation()
     public Result listMaster() {
-        Map<String, Object> result = monitorService.queryMaster(AuthUtil.user());
+        Map<String, Object> result = monitorService.queryMaster(AuthUtils.getAuthUser());
         return returnDataList(result);
     }
 
@@ -79,7 +79,7 @@ public class MonitorController extends BaseController {
     @ApiException(LIST_WORKERS_ERROR)
     @AccessLogAnnotation()
     public Result listWorker() {
-        Map<String, Object> result = monitorService.queryWorker(AuthUtil.user());
+        Map<String, Object> result = monitorService.queryWorker(AuthUtils.getAuthUser());
         return returnDataList(result);
     }
 
@@ -95,7 +95,7 @@ public class MonitorController extends BaseController {
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     @AccessLogAnnotation()
     public Result queryDatabaseState() {
-        Map<String, Object> result = monitorService.queryDatabaseState(AuthUtil.user());
+        Map<String, Object> result = monitorService.queryDatabaseState(AuthUtils.getAuthUser());
         return returnDataList(result);
     }
 
@@ -111,7 +111,7 @@ public class MonitorController extends BaseController {
     @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
     @AccessLogAnnotation()
     public Result queryZookeeperState() {
-        Map<String, Object> result = monitorService.queryZookeeperState(AuthUtil.user());
+        Map<String, Object> result = monitorService.queryZookeeperState(AuthUtils.getAuthUser());
         return returnDataList(result);
     }
 

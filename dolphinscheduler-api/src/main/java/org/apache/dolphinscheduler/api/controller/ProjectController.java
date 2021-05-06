@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -87,7 +87,7 @@ public class ProjectController extends BaseController {
     public Result createProject(@RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
 
-        Map<String, Object> result = projectService.createProject(AuthUtil.user(), projectName, description);
+        Map<String, Object> result = projectService.createProject(AuthUtils.getAuthUser(), projectName, description);
         return returnDataList(result);
     }
 
@@ -114,7 +114,7 @@ public class ProjectController extends BaseController {
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "userName") String userName) {
-        Map<String, Object> result = projectService.update(AuthUtil.user(), projectId, projectName, description, userName);
+        Map<String, Object> result = projectService.update(AuthUtils.getAuthUser(), projectId, projectName, description, userName);
         return returnDataList(result);
     }
 
@@ -166,7 +166,7 @@ public class ProjectController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectListPaging(AuthUtil.user(), pageSize, pageNo, searchVal);
+        result = projectService.queryProjectListPaging(AuthUtils.getAuthUser(), pageSize, pageNo, searchVal);
         return returnDataListPaging(result);
     }
 
@@ -187,7 +187,7 @@ public class ProjectController extends BaseController {
     public Result deleteProject(@RequestParam("projectId") Integer projectId
     ) {
 
-        Map<String, Object> result = projectService.deleteProject(AuthUtil.user(), projectId);
+        Map<String, Object> result = projectService.deleteProject(AuthUtils.getAuthUser(), projectId);
         return returnDataList(result);
     }
 
@@ -206,7 +206,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     @AccessLogAnnotation()
     public Result queryUnauthorizedProject(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryUnauthorizedProject(AuthUtil.user(), userId);
+        Map<String, Object> result = projectService.queryUnauthorizedProject(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 
@@ -226,7 +226,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     @AccessLogAnnotation()
     public Result queryAuthorizedProject(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = projectService.queryAuthorizedProject(AuthUtil.user(), userId);
+        Map<String, Object> result = projectService.queryAuthorizedProject(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 
@@ -241,7 +241,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     @AccessLogAnnotation()
     public Result queryProjectCreatedAndAuthorizedByUser() {
-        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(AuthUtil.user());
+        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(AuthUtils.getAuthUser());
         return returnDataList(result);
     }
 
@@ -262,7 +262,7 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = {"file"})
     public Result importProcessDefinition(@RequestParam("file") MultipartFile file,
                                           @RequestParam("projectName") String projectName) {
-        Map<String, Object> result = processDefinitionService.importProcessDefinition(AuthUtil.user(), file, projectName);
+        Map<String, Object> result = processDefinitionService.importProcessDefinition(AuthUtils.getAuthUser(), file, projectName);
         return returnDataList(result);
     }
 

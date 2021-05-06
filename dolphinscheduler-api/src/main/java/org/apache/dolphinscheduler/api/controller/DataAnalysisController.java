@@ -26,7 +26,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.TASK_INSTANCE_STATE_C
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 
 import java.util.Map;
@@ -77,7 +77,7 @@ public class DataAnalysisController extends BaseController {
                                  @RequestParam(value = "endDate", required = false) String endDate,
                                  @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countTaskStateByProject(AuthUtil.user(), projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countTaskStateByProject(AuthUtils.getAuthUser(), projectId, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -103,7 +103,7 @@ public class DataAnalysisController extends BaseController {
                                             @RequestParam(value = "endDate", required = false) String endDate,
                                             @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(AuthUtil.user(), projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(AuthUtils.getAuthUser(), projectId, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -123,7 +123,7 @@ public class DataAnalysisController extends BaseController {
     @AccessLogAnnotation()
     public Result countDefinitionByUser(@RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(AuthUtil.user(), projectId);
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(AuthUtils.getAuthUser(), projectId);
         return returnDataList(result);
     }
 
@@ -149,7 +149,7 @@ public class DataAnalysisController extends BaseController {
                                     @RequestParam(value = "endDate", required = false) String endDate,
                                     @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countCommandState(AuthUtil.user(), projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countCommandState(AuthUtils.getAuthUser(), projectId, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -164,7 +164,7 @@ public class DataAnalysisController extends BaseController {
     @ApiException(QUEUE_COUNT_ERROR)
     @AccessLogAnnotation()
     public Result countQueueState(@RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
-        Map<String, Object> result = dataAnalysisService.countQueueState(AuthUtil.user(), projectId);
+        Map<String, Object> result = dataAnalysisService.countQueueState(AuthUtils.getAuthUser(), projectId);
         return returnDataList(result);
     }
 

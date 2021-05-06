@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -127,7 +127,7 @@ public class LoginController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = {"request"})
     public Result signOut(HttpServletRequest request) {
         String ip = getClientIpAddress(request);
-        sessionService.signOut(ip, AuthUtil.user());
+        sessionService.signOut(ip, AuthUtils.getAuthUser());
         //clear session
         request.removeAttribute(Constants.SESSION_USER);
         return success();

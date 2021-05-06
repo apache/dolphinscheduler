@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -77,7 +77,7 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token") String token) {
 
-        Map<String, Object> result = accessTokenService.createToken(AuthUtil.user(), userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.createToken(AuthUtils.getAuthUser(), userId, expireTime, token);
         return returnDataList(result);
     }
 
@@ -95,7 +95,7 @@ public class AccessTokenController extends BaseController {
     @AccessLogAnnotation()
     public Result generateToken(@RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "expireTime") String expireTime) {
-        Map<String, Object> result = accessTokenService.generateToken(AuthUtil.user(), userId, expireTime);
+        Map<String, Object> result = accessTokenService.generateToken(AuthUtils.getAuthUser(), userId, expireTime);
         return returnDataList(result);
     }
 
@@ -126,7 +126,7 @@ public class AccessTokenController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = accessTokenService.queryAccessTokenList(AuthUtil.user(), searchVal, pageNo, pageSize);
+        result = accessTokenService.queryAccessTokenList(AuthUtils.getAuthUser(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -142,7 +142,7 @@ public class AccessTokenController extends BaseController {
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
     @AccessLogAnnotation()
     public Result delAccessTokenById(@RequestParam(value = "id") int id) {
-        Map<String, Object> result = accessTokenService.delAccessTokenById(AuthUtil.user(), id);
+        Map<String, Object> result = accessTokenService.delAccessTokenById(AuthUtils.getAuthUser(), id);
         return returnDataList(result);
     }
 
@@ -166,7 +166,7 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token") String token) {
 
-        Map<String, Object> result = accessTokenService.updateToken(AuthUtil.user(), id, userId, expireTime, token);
+        Map<String, Object> result = accessTokenService.updateToken(AuthUtils.getAuthUser(), id, userId, expireTime, token);
         return returnDataList(result);
     }
 

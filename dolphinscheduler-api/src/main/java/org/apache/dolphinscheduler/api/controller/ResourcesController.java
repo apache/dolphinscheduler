@@ -46,7 +46,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
@@ -117,7 +117,7 @@ public class ResourcesController extends BaseController {
                                   @RequestParam(value = "description", required = false) String description,
                                   @RequestParam(value = "pid") int pid,
                                   @RequestParam(value = "currentDir") String currentDir) {
-        return resourceService.createDirectory(AuthUtil.user(), alias, description, type, pid, currentDir);
+        return resourceService.createDirectory(AuthUtils.getAuthUser(), alias, description, type, pid, currentDir);
     }
 
     /**
@@ -143,7 +143,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam("file") MultipartFile file,
                                  @RequestParam(value = "pid") int pid,
                                  @RequestParam(value = "currentDir") String currentDir) {
-        return resourceService.createResource(AuthUtil.user(), alias, description, type, file, pid, currentDir);
+        return resourceService.createResource(AuthUtils.getAuthUser(), alias, description, type, file, pid, currentDir);
     }
 
     /**
@@ -172,7 +172,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
                                  @RequestParam(value = "file", required = false) MultipartFile file) {
-        return resourceService.updateResource(AuthUtil.user(), resourceId, alias, description, type, file);
+        return resourceService.updateResource(AuthUtils.getAuthUser(), resourceId, alias, description, type, file);
     }
 
     /**
@@ -191,7 +191,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation()
     public Result queryResourceList(@RequestParam(value = "type") ResourceType type
     ) {
-        Map<String, Object> result = resourceService.queryResourceList(AuthUtil.user(), type);
+        Map<String, Object> result = resourceService.queryResourceList(AuthUtils.getAuthUser(), type);
         return returnDataList(result);
     }
 
@@ -228,7 +228,7 @@ public class ResourcesController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = resourceService.queryResourceListPaging(AuthUtil.user(), id, type, searchVal, pageNo, pageSize);
+        result = resourceService.queryResourceListPaging(AuthUtils.getAuthUser(), id, type, searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -249,7 +249,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation()
     public Result deleteResource(@RequestParam(value = "id") int resourceId
     ) throws Exception {
-        return resourceService.delete(AuthUtil.user(), resourceId);
+        return resourceService.delete(AuthUtils.getAuthUser(), resourceId);
     }
 
 
@@ -272,7 +272,7 @@ public class ResourcesController extends BaseController {
     public Result verifyResourceName(@RequestParam(value = "fullName") String fullName,
                                      @RequestParam(value = "type") ResourceType type
     ) {
-        return resourceService.verifyResourceName(fullName, type, AuthUtil.user());
+        return resourceService.verifyResourceName(fullName, type, AuthUtils.getAuthUser());
     }
 
     /**
@@ -292,7 +292,7 @@ public class ResourcesController extends BaseController {
     public Result queryResourceJarList(@RequestParam(value = "type") ResourceType type,
                                        @RequestParam(value = "programType", required = false) ProgramType programType
     ) {
-        Map<String, Object> result = resourceService.queryResourceByProgramType(AuthUtil.user(), type, programType);
+        Map<String, Object> result = resourceService.queryResourceByProgramType(AuthUtils.getAuthUser(), type, programType);
         return returnDataList(result);
     }
 
@@ -376,7 +376,7 @@ public class ResourcesController extends BaseController {
             logger.error("resource file contents are not allowed to be empty");
             return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
-        return resourceService.onlineCreateResource(AuthUtil.user(), type, fileName, fileSuffix, description, content, pid, currentDir);
+        return resourceService.onlineCreateResource(AuthUtils.getAuthUser(), type, fileName, fileSuffix, description, content, pid, currentDir);
     }
 
     /**
@@ -464,7 +464,7 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "database", required = false) String database,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "resourceId") int resourceId) {
-        return udfFuncService.createUdfFunction(AuthUtil.user(), funcName, className, argTypes, database, description, type, resourceId);
+        return udfFuncService.createUdfFunction(AuthUtils.getAuthUser(), funcName, className, argTypes, database, description, type, resourceId);
     }
 
     /**
@@ -554,7 +554,7 @@ public class ResourcesController extends BaseController {
             return returnDataListPaging(result);
         }
 
-        result = udfFuncService.queryUdfFuncListPaging(AuthUtil.user(), searchVal, pageNo, pageSize);
+        result = udfFuncService.queryUdfFuncListPaging(AuthUtils.getAuthUser(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -573,7 +573,7 @@ public class ResourcesController extends BaseController {
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
     @AccessLogAnnotation()
     public Result<Object> queryUdfFuncList(@RequestParam("type") UdfType type) {
-        Map<String, Object> result = udfFuncService.queryUdfFuncList(AuthUtil.user(), type.ordinal());
+        Map<String, Object> result = udfFuncService.queryUdfFuncList(AuthUtils.getAuthUser(), type.ordinal());
         return returnDataList(result);
     }
 
@@ -631,7 +631,7 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
     @AccessLogAnnotation
     public Result authorizedFile(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = resourceService.authorizedFile(AuthUtil.user(), userId);
+        Map<String, Object> result = resourceService.authorizedFile(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 
@@ -651,7 +651,7 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZE_RESOURCE_TREE)
     @AccessLogAnnotation
     public Result authorizeResourceTree(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = resourceService.authorizeResourceTree(AuthUtil.user(), userId);
+        Map<String, Object> result = resourceService.authorizeResourceTree(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 
@@ -672,7 +672,7 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation
     public Result unauthUDFFunc(@RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = resourceService.unauthorizedUDFFunction(AuthUtil.user(), userId);
+        Map<String, Object> result = resourceService.unauthorizedUDFFunction(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 
@@ -692,7 +692,7 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZED_UDF_FUNCTION_ERROR)
     @AccessLogAnnotation
     public Result authorizedUDFFunction(@RequestParam("userId") Integer userId) {
-        Map<String, Object> result = resourceService.authorizedUDFFunction(AuthUtil.user(), userId);
+        Map<String, Object> result = resourceService.authorizedUDFFunction(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 }

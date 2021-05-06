@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
@@ -85,7 +85,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result createDataSource(@ApiParam(name = "DATA_SOURCE_PARAM", required = true)
                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        return dataSourceService.createDataSource(AuthUtil.user(), dataSourceParam);
+        return dataSourceService.createDataSource(AuthUtils.getAuthUser(), dataSourceParam);
     }
 
 
@@ -104,7 +104,7 @@ public class DataSourceController extends BaseController {
     @ApiException(UPDATE_DATASOURCE_ERROR)
     @AccessLogAnnotation()
     public Result updateDataSource(@RequestBody BaseDataSourceParamDTO dataSourceParam) {
-        return dataSourceService.updateDataSource(dataSourceParam.getId(), AuthUtil.user(), dataSourceParam);
+        return dataSourceService.updateDataSource(dataSourceParam.getId(), AuthUtils.getAuthUser(), dataSourceParam);
     }
 
     /**
@@ -143,7 +143,7 @@ public class DataSourceController extends BaseController {
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation()
     public Result queryDataSourceList(@RequestParam("type") DbType type) {
-        Map<String, Object> result = dataSourceService.queryDataSourceList(AuthUtil.user(), type.ordinal());
+        Map<String, Object> result = dataSourceService.queryDataSourceList(AuthUtils.getAuthUser(), type.ordinal());
         return returnDataList(result);
     }
 
@@ -173,7 +173,7 @@ public class DataSourceController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = dataSourceService.queryDataSourceListPaging(AuthUtil.user(), searchVal, pageNo, pageSize);
+        result = dataSourceService.queryDataSourceListPaging(AuthUtils.getAuthUser(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -231,7 +231,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result delete(@ApiIgnore
                          @RequestParam("id") int id) {
-        return dataSourceService.delete(AuthUtil.user(), id);
+        return dataSourceService.delete(AuthUtils.getAuthUser(), id);
     }
 
     /**
@@ -270,7 +270,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result unauthDatasource(@RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = dataSourceService.unauthDatasource(AuthUtil.user(), userId);
+        Map<String, Object> result = dataSourceService.unauthDatasource(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 
@@ -291,7 +291,7 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation()
     public Result authedDatasource(@RequestParam("userId") Integer userId) {
 
-        Map<String, Object> result = dataSourceService.authedDatasource(AuthUtil.user(), userId);
+        Map<String, Object> result = dataSourceService.authedDatasource(AuthUtils.getAuthUser(), userId);
         return returnDataList(result);
     }
 

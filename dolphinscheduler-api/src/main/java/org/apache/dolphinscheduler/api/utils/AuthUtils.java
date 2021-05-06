@@ -26,9 +26,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-public class AuthUtil {
-    
-    private AuthUtil() {
+public class AuthUtils {
+
+    private AuthUtils() {
         throw new IllegalStateException("AuthUtil class");
     }
 
@@ -36,7 +36,7 @@ public class AuthUtil {
      * get LoginUser info from request
      * @return User
      */
-    public static User user() {
+    public static User getAuthUser() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (ObjectUtils.isEmpty(attributes)) {
             return null;

@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
-import org.apache.dolphinscheduler.api.utils.AuthUtil;
+import org.apache.dolphinscheduler.api.utils.AuthUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -70,7 +70,7 @@ public class QueueController extends BaseController {
     @ApiException(QUERY_QUEUE_LIST_ERROR)
     @AccessLogAnnotation()
     public Result queryList() {
-        Map<String, Object> result = queueService.queryList(AuthUtil.user());
+        Map<String, Object> result = queueService.queryList(AuthUtils.getAuthUser());
         return returnDataList(result);
     }
 
@@ -101,7 +101,7 @@ public class QueueController extends BaseController {
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = queueService.queryList(AuthUtil.user(), searchVal, pageNo, pageSize);
+        result = queueService.queryList(AuthUtils.getAuthUser(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -123,7 +123,7 @@ public class QueueController extends BaseController {
     @AccessLogAnnotation()
     public Result createQueue(@RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
-        Map<String, Object> result = queueService.createQueue(AuthUtil.user(), queue, queueName);
+        Map<String, Object> result = queueService.createQueue(AuthUtils.getAuthUser(), queue, queueName);
         return returnDataList(result);
     }
 
@@ -148,7 +148,7 @@ public class QueueController extends BaseController {
     public Result updateQueue(@RequestParam(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
-        Map<String, Object> result = queueService.updateQueue(AuthUtil.user(), id, queue, queueName);
+        Map<String, Object> result = queueService.updateQueue(AuthUtils.getAuthUser(), id, queue, queueName);
         return returnDataList(result);
     }
 
