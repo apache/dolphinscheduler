@@ -56,7 +56,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ProcessDefinitionControllerTest extends AbstractControllerTest {
-    private static Logger logger = LoggerFactory.getLogger(ProjectControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
 
     public static String projectName;
     public static String projectId;
@@ -84,8 +84,8 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), new TypeReference<Result<String>>() {
         });
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        Assert.assertNotNull(result.getData());
         logger.info("create project return result:{}", mvcResult.getResponse().getContentAsString());
 
         projectId = (String) result.getData();
@@ -268,7 +268,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void stage2_testQueryProcessDefinitionList() throws Exception {
-
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/list", projectName)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -497,6 +496,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("delete project return result:{}", mvcResult.getResponse().getContentAsString());
     }
