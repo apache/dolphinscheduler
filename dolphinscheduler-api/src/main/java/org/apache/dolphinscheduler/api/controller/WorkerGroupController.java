@@ -22,10 +22,10 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_ADDRESS_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
-import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -33,8 +33,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,8 +57,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/worker-group")
 public class WorkerGroupController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupController.class);
-
     @Autowired
     WorkerGroupService workerGroupService;
 
@@ -82,13 +78,12 @@ public class WorkerGroupController extends BaseController {
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SAVE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result saveWorkerGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
                                   @RequestParam(value = "addrList") String addrList
     ) {
-        logger.info("save worker group: login user {}, id:{}, name: {}, addrList: {} ",
-                RegexUtils.escapeNRT(loginUser.getUserName()), id, RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(addrList));
         Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, addrList);
         return returnDataList(result);
     }
@@ -111,13 +106,12 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllWorkerGroupsPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("pageNo") Integer pageNo,
                                              @RequestParam("pageSize") Integer pageSize,
                                              @RequestParam(value = "searchVal", required = false) String searchVal
     ) {
-        logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
-                RegexUtils.escapeNRT(loginUser.getUserName()), pageNo, pageSize, searchVal);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -137,8 +131,8 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/all-groups")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("query all worker group: login user {}", RegexUtils.escapeNRT(loginUser.getUserName()));
         Map<String, Object> result = workerGroupService.queryAllGroup();
         return returnDataList(result);
     }
@@ -157,10 +151,10 @@ public class WorkerGroupController extends BaseController {
     @PostMapping(value = "/delete-by-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam("id") Integer id
     ) {
-        logger.info("delete worker group: login user {}, id:{} ", RegexUtils.escapeNRT(loginUser.getUserName()), id);
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
         return returnDataList(result);
     }
@@ -175,8 +169,8 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/worker-address-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_ADDRESS_LIST_FAIL)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryWorkerAddressList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("query worker address list: login user {}", RegexUtils.escapeNRT(loginUser.getUserName()));
         Map<String, Object> result = workerGroupService.getWorkerAddressList();
         return returnDataList(result);
     }
