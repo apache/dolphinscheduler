@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PLUGINS_ERROR;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -28,8 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,8 +55,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("ui-plugins")
 public class UiPluginController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UiPluginController.class);
-
     @Autowired
     UiPluginService uiPluginService;
 
@@ -68,10 +65,10 @@ public class UiPluginController extends BaseController {
     @PostMapping(value = "/queryUiPluginsByType")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUiPluginsByType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "pluginType") PluginType pluginType) {
 
-        logger.info("query plugins by type , pluginType: {}", pluginType);
         Map<String, Object> result = uiPluginService.queryUiPluginsByType(pluginType);
         return returnDataList(result);
     }
@@ -83,10 +80,10 @@ public class UiPluginController extends BaseController {
     @PostMapping(value = "/queryUiPluginDetailById")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUiPluginDetailById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("pluginId") Integer pluginId) {
 
-        logger.info("query plugin detail by id , pluginId: {}", pluginId);
         Map<String, Object> result = uiPluginService.queryUiPluginDetailById(pluginId);
         return returnDataList(result);
     }

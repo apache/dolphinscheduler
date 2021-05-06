@@ -208,7 +208,8 @@ CREATE TABLE t_ds_alertgroup(
   description    varchar(255) DEFAULT NULL,
   create_time    timestamp    DEFAULT NULL,
   update_time    timestamp    DEFAULT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_alertgroup_name_UN UNIQUE (group_name)
 ) ;
 
 --
@@ -248,7 +249,8 @@ CREATE TABLE t_ds_datasource (
   connection_params text NOT NULL ,
   create_time timestamp NOT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_datasource_name_UN UNIQUE (name, type)
 ) ;
 
 --

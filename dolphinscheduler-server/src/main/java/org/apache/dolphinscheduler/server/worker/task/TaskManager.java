@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
 import org.apache.dolphinscheduler.server.worker.task.mr.MapReduceTask;
-import org.apache.dolphinscheduler.server.worker.task.processdure.ProcedureTask;
+import org.apache.dolphinscheduler.server.worker.task.procedure.ProcedureTask;
 import org.apache.dolphinscheduler.server.worker.task.python.PythonTask;
 import org.apache.dolphinscheduler.server.worker.task.shell.ShellTask;
 import org.apache.dolphinscheduler.server.worker.task.spark.SparkTask;

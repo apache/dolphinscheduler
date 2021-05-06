@@ -87,6 +87,7 @@ public class ProjectControllerTest extends AbstractControllerTest {
         paramsMap.add("projectId", projectId);
         paramsMap.add("projectName","project_test_update");
         paramsMap.add("desc","the test project update");
+        paramsMap.add("userName", "the project owner");
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/update")
                 .header(SESSION_ID, sessionId)
@@ -96,7 +97,7 @@ public class ProjectControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.USER_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info("update project return result:{}", mvcResult.getResponse().getContentAsString());
 
     }

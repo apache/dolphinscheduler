@@ -14,17 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static java.util.stream.Collectors.toList;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,12 +48,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  *  datasource mapper test
@@ -69,7 +79,7 @@ public class DataSourceMapperTest {
      * test insert
      */
     @Test
-    public void testInsert(){
+    public void testInsert() {
         DataSource dataSource = createDataSource();
         assertThat(dataSource.getId(), greaterThan(0));
     }
@@ -111,7 +121,7 @@ public class DataSourceMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         DataSource expectedDataSource = createDataSource();
 
         dataSourceMapper.deleteById(expectedDataSource.getId());
@@ -137,9 +147,9 @@ public class DataSourceMapperTest {
 
         assertThat(actualDataSources.size(), greaterThanOrEqualTo(2));
 
-        for (DataSource actualDataSource : actualDataSources){
+        for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = datasourceMap.get(actualDataSource.getId());
-            if (expectedDataSource != null){
+            if (expectedDataSource != null) {
                 assertEquals(expectedDataSource,actualDataSource);
             }
         }
@@ -161,9 +171,9 @@ public class DataSourceMapperTest {
         IPage<DataSource> dataSourceIPage = dataSourceMapper.selectPaging(page, userId, name);
         List<DataSource> actualDataSources = dataSourceIPage.getRecords();
 
-        for (DataSource actualDataSource : actualDataSources){
+        for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
-            if (expectedDataSource != null){
+            if (expectedDataSource != null) {
                 assertEquals(expectedDataSource,actualDataSource);
             }
         }
@@ -180,8 +190,8 @@ public class DataSourceMapperTest {
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByName(name);
 
-        for (DataSource actualDataSource : actualDataSources){
-            if (expectedDataSource.getId() == actualDataSource.getId()){
+        for (DataSource actualDataSource : actualDataSources) {
+            if (expectedDataSource.getId() == actualDataSource.getId()) {
                 assertEquals(expectedDataSource,actualDataSource);
             }
         }
@@ -200,9 +210,9 @@ public class DataSourceMapperTest {
 
         List<DataSource> actualDataSources = dataSourceMapper.queryAuthedDatasource(userId);
 
-        for (DataSource actualDataSource : actualDataSources){
+        for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
-            if (expectedDataSource != null){
+            if (expectedDataSource != null) {
                 assertEquals(expectedDataSource,actualDataSource);
             }
         }
@@ -221,9 +231,9 @@ public class DataSourceMapperTest {
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDatasourceExceptUserId(userId);
 
-        for (DataSource actualDataSource : actualDataSources){
+        for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
-            if (expectedDataSource != null){
+            if (expectedDataSource != null) {
                 assertEquals(expectedDataSource,actualDataSource);
             }
         }
@@ -234,7 +244,7 @@ public class DataSourceMapperTest {
      */
     @Test
     public void testListAllDataSourceByType() {
-        Integer count = 10;
+        Integer count = 1;
 
         Map<Integer, DataSource> expectedDataSourceMap = createDataSourceMap(count);
 
@@ -242,16 +252,16 @@ public class DataSourceMapperTest {
 
         assertThat(actualDataSources.size(), greaterThanOrEqualTo(count));
 
-        for (DataSource actualDataSource : actualDataSources){
+        for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
-            if (expectedDataSource != null){
+            if (expectedDataSource != null) {
                 assertEquals(expectedDataSource,actualDataSource);
             }
         }
     }
 
     @Test
-    public void testListAuthorizedDataSource(){
+    public void testListAuthorizedDataSource() {
         //create general user
         User generalUser1 = createGeneralUser("user1");
         User generalUser2 = createGeneralUser("user2");
@@ -260,14 +270,13 @@ public class DataSourceMapperTest {
         DataSource dataSource = createDataSource(generalUser1.getId(), "ds-1");
         DataSource unauthorizdDataSource = createDataSource(generalUser2.getId(), "ds-2");
 
-
         //data source ids
-        Integer[] dataSourceIds = new Integer[]{dataSource.getId(),unauthorizdDataSource.getId()};
+        Integer[] dataSourceIds = new Integer[]{dataSource.getId(), unauthorizdDataSource.getId()};
 
         List<DataSource> authorizedDataSource = dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
 
-        Assert.assertEquals(generalUser1.getId(),dataSource.getUserId());
-        Assert.assertNotEquals(generalUser1.getId(),unauthorizdDataSource.getUserId());
+        assertEquals(generalUser1.getId(), dataSource.getUserId());
+        Assert.assertNotEquals(generalUser1.getId(), unauthorizdDataSource.getUserId());
         Assert.assertFalse(authorizedDataSource.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(dataSourceIds)));
 
         //authorize object unauthorizdDataSource to generalUser1
@@ -281,7 +290,7 @@ public class DataSourceMapperTest {
      * create datasource relation
      * @param userId
      */
-    private Map<Integer,DataSource> createDataSourceMap(Integer userId,String name){
+    private Map<Integer,DataSource> createDataSourceMap(Integer userId,String name) {
 
         Map<Integer,DataSource> dataSourceMap = new HashMap<>();
 
@@ -289,7 +298,7 @@ public class DataSourceMapperTest {
 
         dataSourceMap.put(dataSource.getId(),dataSource);
 
-        DataSource otherDataSource = createDataSource(userId + 1,name);
+        DataSource otherDataSource = createDataSource(userId + 1, name + "1");
 
         DatasourceUser datasourceUser = new DatasourceUser();
 
@@ -311,10 +320,10 @@ public class DataSourceMapperTest {
      * @param count datasource count
      * @return datasource map
      */
-    private Map<Integer,DataSource> createDataSourceMap(Integer count){
+    private Map<Integer,DataSource> createDataSourceMap(Integer count) {
         Map<Integer,DataSource> dataSourceMap = new HashMap<>();
 
-        for (int i = 0 ; i < count ;i++){
+        for (int i = 0; i < count; i++) {
             DataSource dataSource = createDataSource("test");
             dataSourceMap.put(dataSource.getId(),dataSource);
         }
@@ -326,17 +335,16 @@ public class DataSourceMapperTest {
      * create datasource
      * @return datasource
      */
-    private DataSource createDataSource(){
+    private DataSource createDataSource() {
         return createDataSource(1,"test");
     }
-
 
     /**
      * create datasource
      * @param name name
      * @return datasource
      */
-    private DataSource createDataSource(String name){
+    private DataSource createDataSource(String name) {
         return createDataSource(1,name);
     }
 
@@ -346,7 +354,7 @@ public class DataSourceMapperTest {
      * @param name name
      * @return datasource
      */
-    private DataSource createDataSource(Integer userId,String name){
+    private DataSource createDataSource(Integer userId,String name) {
         Random random = new Random();
         DataSource dataSource = new DataSource();
         dataSource.setUserId(userId);
@@ -366,7 +374,7 @@ public class DataSourceMapperTest {
      * create general user
      * @return User
      */
-    private User createGeneralUser(String userName){
+    private User createGeneralUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("1");
@@ -381,11 +389,12 @@ public class DataSourceMapperTest {
 
     /**
      * create the relation of user and data source
-     * @param user          user
-     * @param dataSource    data source
+     *
+     * @param user user
+     * @param dataSource data source
      * @return DatasourceUser
      */
-    private DatasourceUser createUserDataSource(User user,DataSource dataSource){
+    private DatasourceUser createUserDataSource(User user, DataSource dataSource) {
         DatasourceUser datasourceUser = new DatasourceUser();
 
         datasourceUser.setDatasourceId(dataSource.getId());
@@ -397,6 +406,5 @@ public class DataSourceMapperTest {
         dataSourceUserMapper.insert(datasourceUser);
         return datasourceUser;
     }
-
 
 }

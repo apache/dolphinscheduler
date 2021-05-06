@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,6 +70,9 @@ public class ProjectServiceTest {
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
+    private UserMapper userMapper;
 
     private String projectName = "ProjectServiceTest";
 
@@ -240,19 +244,24 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
         Mockito.when(projectMapper.selectById(1)).thenReturn(getProject());
         // PROJECT_NOT_FOUNT
-        Map<String, Object> result = projectService.update(loginUser, 12, projectName, "desc");
+        Map<String, Object> result = projectService.update(loginUser, 12, projectName, "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
 
         //PROJECT_ALREADY_EXISTS
-        result = projectService.update(loginUser, 1, projectName, "desc");
+        result = projectService.update(loginUser, 1, projectName, "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS, result.get(Constants.STATUS));
 
+        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
+        result = projectService.update(loginUser, 1, "test", "desc", "testuser");
+        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
         //success
+        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
         project.setUserId(1);
         Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
-        result = projectService.update(loginUser, 1, "test", "desc");
+        result = projectService.update(loginUser, 1, "test", "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 

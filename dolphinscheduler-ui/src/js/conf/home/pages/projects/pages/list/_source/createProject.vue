@@ -31,6 +31,18 @@
             </el-input>
           </template>
         </m-list-box-f>
+        <m-list-box-f v-if="item">
+          <template slot="name"><strong>*</strong>{{ $t('Owned Users') }}</template>
+          <template slot="content">
+            <el-input
+              v-model="userName"
+              :placeholder="$t('Please enter user name')"
+              maxlength="60"
+              size="small"
+              type="input">
+            </el-input>
+          </template>
+        </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{ $t('Description') }}</template>
           <template slot="content">
@@ -59,7 +71,8 @@
       return {
         store,
         description: '',
-        projectName: ''
+        projectName: '',
+        userName: ''
       }
     },
     props: {
@@ -73,7 +86,8 @@
 
         let param = {
           projectName: _.trim(this.projectName),
-          description: _.trim(this.description)
+          description: _.trim(this.description),
+          userName: _.trim(this.userName)
         }
 
         // edit
@@ -104,6 +118,10 @@
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
+        if (this.item && !this.userName) {
+          this.$message.warning(`${i18n.$t('Please enter user name')}`)
+          return false
+        }
         return true
       }
     },
@@ -112,6 +130,7 @@
       if (this.item) {
         this.projectName = this.item.name
         this.description = this.item.description
+        this.userName = this.item.userName
       }
     },
     mounted () {

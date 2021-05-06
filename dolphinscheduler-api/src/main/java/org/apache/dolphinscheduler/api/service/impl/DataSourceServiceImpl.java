@@ -46,6 +46,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,9 +104,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
-        dataSourceMapper.insert(dataSource);
-
-        putMsg(result, Status.SUCCESS);
+        try {
+            dataSourceMapper.insert(dataSource);
+            putMsg(result, Status.SUCCESS);
+        } catch (DuplicateKeyException ex) {
+            logger.error("Create datasource error.", ex);
+            putMsg(result, Status.DATASOURCE_EXIST);
+        }
 
         return result;
     }
@@ -164,8 +169,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setUpdateTime(now);
-        dataSourceMapper.updateById(dataSource);
-        putMsg(result, Status.SUCCESS);
+        try {
+            dataSourceMapper.updateById(dataSource);
+            putMsg(result, Status.SUCCESS);
+        } catch (DuplicateKeyException ex) {
+            logger.error("Update datasource error.", ex);
+            putMsg(result, Status.DATASOURCE_EXIST);
+        }
         return result;
     }
 
