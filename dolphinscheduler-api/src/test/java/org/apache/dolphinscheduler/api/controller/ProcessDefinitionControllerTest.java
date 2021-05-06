@@ -54,14 +54,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 /**
  * process definition controller test
  */
-@FixMethodOrder(MethodSorters.JVM)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     private static Logger logger = LoggerFactory.getLogger(ProjectControllerTest.class);
 
     public static String projectName;
     public static String projectId;
     public static String definitionId;
-    public static String definitionVersionId;
 
     @Autowired
     private ProcessDefinitionVersionMapper processDefinitionVersionMapper;
@@ -70,7 +69,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Test
-    public void createProject() throws Exception {
+    public void stage1_createProject() throws Exception {
         projectName = "project_test1";
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectName", projectName);
@@ -94,7 +93,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
 
     @Test
-    public void testCreateProcessDefinition() throws Exception {
+    public void stage2_testCreateProcessDefinition() throws Exception {
         String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\""
                 + ":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\"
                 + "necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\""
@@ -129,7 +128,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testVerifyProcessDefinitionName() throws Exception {
+    public void stage2_testVerifyProcessDefinitionName() throws Exception {
         String name = "dag_test_1";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -149,7 +148,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void updateProcessDefinition() throws Exception {
+    public void stage2_updateProcessDefinition() throws Exception {
 
         String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\""
                 + ",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"}"
@@ -184,7 +183,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testReleaseProcessDefinition() throws Exception {
+    public void stage2_testReleaseProcessDefinition() throws Exception {
         String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -204,7 +203,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionById() throws Exception {
+    public void stage2_testQueryProcessDefinitionById() throws Exception {
         String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -224,7 +223,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testBatchCopyProcessDefinition() throws Exception {
+    public void stage3_testBatchCopyProcessDefinition() throws Exception {
 
         String targetProjectId = projectId;
         String id = definitionId;
@@ -246,7 +245,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testBatchMoveProcessDefinition() throws Exception {
+    public void stage3_testBatchMoveProcessDefinition() throws Exception {
 
         String targetProjectId = projectId;
         String id = definitionId;
@@ -268,7 +267,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionList() throws Exception {
+    public void stage2_testQueryProcessDefinitionList() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/list", projectName)
                 .header(SESSION_ID, sessionId))
@@ -283,7 +282,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
 
     @Test
-    public void testGetNodeListByDefinitionId() throws Exception {
+    public void stage2_testGetNodeListByDefinitionId() throws Exception {
         String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -302,7 +301,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGetNodeListByDefinitionIdList() throws Exception {
+    public void stage2_testGetNodeListByDefinitionIdList() throws Exception {
         String idList = definitionId + "";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -321,7 +320,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionAllByProjectId() throws Exception {
+    public void stage2_testQueryProcessDefinitionAllByProjectId() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId", projectId);
 
@@ -338,7 +337,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testViewTree() throws Exception {
+    public void stage2_testViewTree() throws Exception {
         String processId = definitionId;
         String limit = "2";
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -358,7 +357,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionListPaging() throws Exception {
+    public void stage3_testQueryProcessDefinitionListPaging() throws Exception {
         String pageNo = "1";
         String pageSize = "10";
         String searchVal = "";
@@ -383,7 +382,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testBatchExportProcessDefinitionByIds() throws Exception {
+    public void stage3_testBatchExportProcessDefinitionByIds() throws Exception {
         String processDefinitionIds = "" + definitionId;
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefinitionIds", processDefinitionIds);
@@ -398,7 +397,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionVersions() throws Exception {
+    public void stage2_testQueryProcessDefinitionVersions() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefinitionId", definitionId);
         paramsMap.set("pageNo", "1");
@@ -416,7 +415,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testSwitchProcessDefinitionVersion() throws Exception {
+    public void stage3_testSwitchProcessDefinitionVersion() throws Exception {
         // query definition version
         Page<ProcessDefinitionVersion> page = new Page<>(1, 10);
         IPage<ProcessDefinitionVersion> processDefinitionVersionsPaging = processDefinitionVersionMapper.queryProcessDefinitionVersionsPaging(page, Integer.parseInt(definitionId));
@@ -440,7 +439,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testDeleteProcessDefinitionVersion() throws Exception {
+    public void stage4_testDeleteProcessDefinitionVersion() throws Exception {
         // query definition version
         Page<ProcessDefinitionVersion> page = new Page<>(1, 10);
         IPage<ProcessDefinitionVersion> processDefinitionVersionsPaging = processDefinitionVersionMapper.queryProcessDefinitionVersionsPaging(page, Integer.parseInt(definitionId));
@@ -448,7 +447,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
         for (ProcessDefinitionVersion record : records) {
             MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-            paramsMap.add("processDefinitionId", projectId);
+            paramsMap.add("processDefinitionId", definitionId);
             paramsMap.add("version", String.valueOf(record.getVersion()));
 
             MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process//version/delete", projectName)
@@ -465,7 +464,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testDeleteProcessDefinitionById() throws Exception {
+    public void stage4_testDeleteProcessDefinitionById() throws Exception {
         String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -484,7 +483,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void deleteProject() throws Exception {
+    public void stage5_deleteProject() throws Exception {
         // delete all definition
         processDefinitionMapper.delete(new QueryWrapper<ProcessDefinition>().eq("project_id", Integer.parseInt(projectId)));
 
