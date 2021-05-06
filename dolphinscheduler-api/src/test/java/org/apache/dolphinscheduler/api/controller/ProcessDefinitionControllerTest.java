@@ -245,7 +245,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void stage3_testBatchMoveProcessDefinition() throws Exception {
+    public void stage_testBatchMoveProcessDefinition() throws Exception {
 
         String targetProjectId = projectId;
         String id = definitionId;
@@ -279,7 +279,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
-
 
     @Test
     public void stage2_testGetNodeListByDefinitionId() throws Exception {
