@@ -342,53 +342,5 @@ public class ProcedureTask extends AbstractTask {
         } else {
             stmt.registerOutParameter(index, sqlType, value);
         }
-
-        } else if (dataType.equals(LONG)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.INTEGER);
-            } else {
-                stmt.registerOutParameter(index, Types.INTEGER, value);
-            }
-        } else if (dataType.equals(FLOAT)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.FLOAT);
-            } else {
-                stmt.registerOutParameter(index, Types.FLOAT, value);
-            }
-        } else if (dataType.equals(DOUBLE)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.DOUBLE);
-            } else {
-                stmt.registerOutParameter(index, Types.DOUBLE, value);
-            }
-
-        } else if (dataType.equals(DATE)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.DATE);
-            } else {
-                stmt.registerOutParameter(index, Types.DATE, value);
-            }
-
-        } else if (dataType.equals(TIME)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.TIME);
-            } else {
-                stmt.registerOutParameter(index, Types.TIME, value);
-            }
-
-        } else if (dataType.equals(TIMESTAMP)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.TIMESTAMP);
-            } else {
-                stmt.registerOutParameter(index, Types.TIMESTAMP, value);
-            }
-
-        } else if (dataType.equals(BOOLEAN)) {
-            if (StringUtils.isEmpty(value)) {
-                stmt.registerOutParameter(index, Types.BOOLEAN);
-            } else {
-                stmt.registerOutParameter(index, Types.BOOLEAN, value);
-            }
-        }
     }
 }
