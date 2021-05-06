@@ -26,21 +26,72 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionVersionMapper;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+
 /**
  * process definition controller test
  */
+@FixMethodOrder(MethodSorters.JVM)
 public class ProcessDefinitionControllerTest extends AbstractControllerTest {
+    private static Logger logger = LoggerFactory.getLogger(ProjectControllerTest.class);
+
+    public static String projectName;
+    public static String projectId;
+    public static String definitionId;
+    public static String definitionVersionId;
+
+    @Autowired
+    private ProcessDefinitionVersionMapper processDefinitionVersionMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Test
+    public void createProject() throws Exception {
+        projectName = "project_test1";
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectName", projectName);
+        paramsMap.add("description", "the test project");
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/create")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), new TypeReference<Result<String>>() {
+        });
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertNotNull(result.getData());
+        logger.info("create project return result:{}", mvcResult.getResponse().getContentAsString());
+
+        projectId = (String) result.getData();
+    }
+
 
     @Test
     public void testCreateProcessDefinition() throws Exception {
@@ -50,7 +101,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
                 + ",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
                 + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
-        String projectName = "test";
         String name = "dag_test";
         String description = "desc test";
         String connects = "[]";
@@ -65,19 +115,22 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/process/save", projectName)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+
+        definitionId = result.getData().toString();
+
+
     }
 
     @Test
     public void testVerifyProcessDefinitionName() throws Exception {
-        String projectName = "test";
-        String name = "dag_test";
+        String name = "dag_test_1";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name", name);
@@ -104,11 +157,10 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
                 + ":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\""
                 + ":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
-        String projectName = "test";
         String name = "dag_test";
         String description = "desc test";
         String connects = "[]";
-        String id = "1";
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", id);
@@ -133,8 +185,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testReleaseProcessDefinition() throws Exception {
-        String projectName = "test";
-        String id = "1";
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processId", id);
@@ -154,9 +205,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryProcessDefinitionById() throws Exception {
-
-        String projectName = "test";
-        String id = "1";
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processId", id);
@@ -177,9 +226,8 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     @Test
     public void testBatchCopyProcessDefinition() throws Exception {
 
-        String projectName = "test";
-        String targetProjectId = "2";
-        String id = "1";
+        String targetProjectId = projectId;
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("targetProjectId", targetProjectId);
@@ -200,9 +248,8 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     @Test
     public void testBatchMoveProcessDefinition() throws Exception {
 
-        String projectName = "test";
-        String targetProjectId = "2";
-        String id = "1";
+        String targetProjectId = projectId;
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("targetProjectId", targetProjectId);
@@ -223,8 +270,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryProcessDefinitionList() throws Exception {
 
-        String projectName = "test";
-
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/list", projectName)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -236,30 +281,10 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
-    @Test
-    public void testDeleteProcessDefinitionById() throws Exception {
-        String projectName = "test";
-        String id = "1";
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", id);
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/delete", projectName)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-    }
 
     @Test
     public void testGetNodeListByDefinitionId() throws Exception {
-        String projectName = "test";
-        String id = "1";
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefinitionId", id);
@@ -278,13 +303,12 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testGetNodeListByDefinitionIdList() throws Exception {
-        String projectName = "test";
-        String idList = "1,2,3";
+        String idList = definitionId + "";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefinitionIdList", idList);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/gen-task-list", projectName)
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/get-task-list", projectName)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -298,9 +322,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryProcessDefinitionAllByProjectId() throws Exception {
-        String projectName = "test";
-        String projectId = "1";
-
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId", projectId);
 
@@ -318,8 +339,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testViewTree() throws Exception {
-        String projectName = "test";
-        String processId = "1";
+        String processId = definitionId;
         String limit = "2";
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processId", processId);
@@ -339,7 +359,6 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryProcessDefinitionListPaging() throws Exception {
-        String projectName = "test";
         String pageNo = "1";
         String pageSize = "10";
         String searchVal = "";
@@ -365,74 +384,48 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testBatchExportProcessDefinitionByIds() throws Exception {
-
-        String processDefinitionIds = "1,2";
-        String projectName = "test";
-        HttpServletResponse response = new MockHttpServletResponse();
+        String processDefinitionIds = "" + definitionId;
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processDefinitionIds", processDefinitionIds);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/export", projectName)
+        mockMvc.perform(get("/projects/{projectName}/process/export", projectName)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
-        Assert.assertNull(mvcResult);
     }
 
     @Test
     public void testQueryProcessDefinitionVersions() throws Exception {
-        String projectName = "test";
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo", "1");
-        paramsMap.add("pageSize", "-10");
-        paramsMap.add("processDefinitionId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/versions", projectName)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-
-        paramsMap.set("pageNo", "-1");
-        paramsMap.set("pageSize", "10");
-        mvcResult = mockMvc.perform(get("/projects/{projectName}/process/versions", projectName)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-
+        paramsMap.add("processDefinitionId", definitionId);
         paramsMap.set("pageNo", "1");
         paramsMap.set("pageSize", "10");
-        mvcResult = mockMvc.perform(get("/projects/{projectName}/process/versions", projectName)
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/versions", projectName)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }
 
     @Test
     public void testSwitchProcessDefinitionVersion() throws Exception {
-        String projectName = "test";
+        // query definition version
+        Page<ProcessDefinitionVersion> page = new Page<>(1, 10);
+        IPage<ProcessDefinitionVersion> processDefinitionVersionsPaging = processDefinitionVersionMapper.queryProcessDefinitionVersionsPaging(page, Integer.parseInt(definitionId));
+        List<ProcessDefinitionVersion> records = processDefinitionVersionsPaging.getRecords();
+        ProcessDefinitionVersion processDefinitionVersion = records.get(0);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", "1");
-        paramsMap.add("version", "10");
+        paramsMap.add("processDefinitionId", definitionId);
+        paramsMap.add("version", String.valueOf(processDefinitionVersion.getVersion()));
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/version/switch", projectName)
                 .header(SESSION_ID, sessionId)
@@ -448,13 +441,37 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDeleteProcessDefinitionVersion() throws Exception {
-        String projectName = "test";
+        // query definition version
+        Page<ProcessDefinitionVersion> page = new Page<>(1, 10);
+        IPage<ProcessDefinitionVersion> processDefinitionVersionsPaging = processDefinitionVersionMapper.queryProcessDefinitionVersionsPaging(page, Integer.parseInt(definitionId));
+        List<ProcessDefinitionVersion> records = processDefinitionVersionsPaging.getRecords();
+
+        for (ProcessDefinitionVersion record : records) {
+            MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+            paramsMap.add("processDefinitionId", projectId);
+            paramsMap.add("version", String.valueOf(record.getVersion()));
+
+            MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process//version/delete", projectName)
+                    .header(SESSION_ID, sessionId)
+                    .params(paramsMap))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andReturn();
+
+            Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+            Assert.assertNotNull(result);
+            Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        }
+    }
+
+    @Test
+    public void testDeleteProcessDefinitionById() throws Exception {
+        String id = definitionId;
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", "1");
-        paramsMap.add("version", "10");
+        paramsMap.add("processDefinitionId", id);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process//version/delete", projectName)
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/delete", projectName)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -464,6 +481,26 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void deleteProject() throws Exception {
+        // delete all definition
+        processDefinitionMapper.delete(new QueryWrapper<ProcessDefinition>().eq("project_id", Integer.parseInt(projectId)));
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectId", projectId);
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/delete")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info("delete project return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
 }
