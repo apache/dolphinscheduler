@@ -59,7 +59,7 @@ public interface WorkFlowLineageMapper {
     /**
      * queryWorkFlowLineageByCode
      *
-     * @param processDefinitionCode processDefinitioncode
+     * @param processDefinitionCode processDefinitionCode
      * @param projectCode projectCode
      * @return WorkFlowLineage
      */

@@ -38,6 +38,14 @@ public class WorkFlowRelation {
         this.targetWorkFlowId = targetWorkFlowId;
     }
 
+    public WorkFlowRelation() {
+    }
+
+    public WorkFlowRelation(int sourceWorkFlowId, int targetWorkFlowId) {
+        this.sourceWorkFlowId = sourceWorkFlowId;
+        this.targetWorkFlowId = targetWorkFlowId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof WorkFlowRelation
