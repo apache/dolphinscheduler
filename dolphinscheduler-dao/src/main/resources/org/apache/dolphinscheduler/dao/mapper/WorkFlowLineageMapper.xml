@@ -50,19 +50,18 @@
     </select>
 
     <select id="queryCodeRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
-        select project_code
+        select project_code,
                post_task_code,
                post_task_version,
                pre_task_code,
                pre_task_version,
                process_definition_code,
                process_definition_version
-         from t_ds_process_task_relation ptr
-         where ptr.pre_task_code=#{taskCode}
-                and ptr.pre_task_version=#{taskVersion}
-                and ptr.process_definition_code!=#{processDefinitionCode}
-                and ptr.project_code =#{projectCode}
-
+         from t_ds_process_task_relation
+         where post_task_code = #{taskCode}
+                and post_task_version = #{taskVersion}
+                and process_definition_code = #{processDefinitionCode}
+                and project_code = #{projectCode}
     </select>
 
     <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage"
