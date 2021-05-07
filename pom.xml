@@ -915,6 +915,9 @@
                         <include>**/remote/command/future/ResponseFutureTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesRequestCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesResponseCommandTest.java</include>
+                        <include>**/remote/command/log/ViewLogRequestCommandTest.java</include>
                         <include>**/remote/utils/HostTest.java</include>
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
