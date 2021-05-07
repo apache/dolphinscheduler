@@ -83,7 +83,7 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.createTenant(AuthUtils.getAuthUser(), tenantCode, queueId, description);
+        Map<String, Object> result = tenantService.createTenant(AuthUtils.getLoginUser(), tenantCode, queueId, description);
         return returnDataList(result);
     }
 
@@ -113,7 +113,7 @@ public class TenantController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = tenantService.queryTenantList(AuthUtils.getAuthUser(), searchVal, pageNo, pageSize);
+        result = tenantService.queryTenantList(AuthUtils.getLoginUser(), searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -129,7 +129,7 @@ public class TenantController extends BaseController {
     @ApiException(QUERY_TENANT_LIST_ERROR)
     @AccessLogAnnotation()
     public Result queryTenantlist() {
-        Map<String, Object> result = tenantService.queryTenantList(AuthUtils.getAuthUser());
+        Map<String, Object> result = tenantService.queryTenantList(AuthUtils.getLoginUser());
         return returnDataList(result);
     }
 
@@ -160,7 +160,7 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.updateTenant(AuthUtils.getAuthUser(), id, tenantCode, queueId, description);
+        Map<String, Object> result = tenantService.updateTenant(AuthUtils.getLoginUser(), id, tenantCode, queueId, description);
         return returnDataList(result);
     }
 
@@ -180,7 +180,7 @@ public class TenantController extends BaseController {
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
     @AccessLogAnnotation()
     public Result deleteTenantById(@RequestParam(value = "id") int id) throws Exception {
-        Map<String, Object> result = tenantService.deleteTenantById(AuthUtils.getAuthUser(), id);
+        Map<String, Object> result = tenantService.deleteTenantById(AuthUtils.getLoginUser(), id);
         return returnDataList(result);
     }
 

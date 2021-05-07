@@ -109,7 +109,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
-        Map<String, Object> result = schedulerService.insertSchedule(AuthUtils.getAuthUser(), projectName, processDefinitionId, schedule,
+        Map<String, Object> result = schedulerService.insertSchedule(AuthUtils.getLoginUser(), projectName, processDefinitionId, schedule,
                 warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
 
         return returnDataList(result);
@@ -150,7 +150,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
 
-        Map<String, Object> result = schedulerService.updateSchedule(AuthUtils.getAuthUser(), projectName, id, schedule,
+        Map<String, Object> result = schedulerService.updateSchedule(AuthUtils.getLoginUser(), projectName, id, schedule,
                 warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
         return returnDataList(result);
     }
@@ -171,7 +171,7 @@ public class SchedulerController extends BaseController {
     @AccessLogAnnotation()
     public Result online(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                          @RequestParam("id") Integer id) {
-        Map<String, Object> result = schedulerService.setScheduleState(AuthUtils.getAuthUser(), projectName, id, ReleaseState.ONLINE);
+        Map<String, Object> result = schedulerService.setScheduleState(AuthUtils.getLoginUser(), projectName, id, ReleaseState.ONLINE);
         return returnDataList(result);
     }
 
@@ -192,7 +192,7 @@ public class SchedulerController extends BaseController {
     public Result offline(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("id") Integer id) {
 
-        Map<String, Object> result = schedulerService.setScheduleState(AuthUtils.getAuthUser(), projectName, id, ReleaseState.OFFLINE);
+        Map<String, Object> result = schedulerService.setScheduleState(AuthUtils.getLoginUser(), projectName, id, ReleaseState.OFFLINE);
         return returnDataList(result);
     }
 
@@ -228,7 +228,7 @@ public class SchedulerController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = schedulerService.querySchedule(AuthUtils.getAuthUser(), projectName, processDefinitionId, searchVal, pageNo, pageSize);
+        result = schedulerService.querySchedule(AuthUtils.getLoginUser(), projectName, processDefinitionId, searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -250,7 +250,7 @@ public class SchedulerController extends BaseController {
     public Result deleteScheduleById(@PathVariable String projectName,
                                      @RequestParam("scheduleId") Integer scheduleId
     ) {
-        Map<String, Object> result = schedulerService.deleteScheduleById(AuthUtils.getAuthUser(), projectName, scheduleId);
+        Map<String, Object> result = schedulerService.deleteScheduleById(AuthUtils.getLoginUser(), projectName, scheduleId);
         return returnDataList(result);
     }
 
@@ -265,7 +265,7 @@ public class SchedulerController extends BaseController {
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     @AccessLogAnnotation()
     public Result queryScheduleList(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName) {
-        Map<String, Object> result = schedulerService.queryScheduleList(AuthUtils.getAuthUser(), projectName);
+        Map<String, Object> result = schedulerService.queryScheduleList(AuthUtils.getLoginUser(), projectName);
         return returnDataList(result);
     }
 
@@ -287,7 +287,7 @@ public class SchedulerController extends BaseController {
     public Result previewSchedule(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                   @RequestParam(value = "schedule") String schedule
     ) {
-        Map<String, Object> result = schedulerService.previewSchedule(AuthUtils.getAuthUser(), projectName, schedule);
+        Map<String, Object> result = schedulerService.previewSchedule(AuthUtils.getLoginUser(), projectName, schedule);
         return returnDataList(result);
     }
 }

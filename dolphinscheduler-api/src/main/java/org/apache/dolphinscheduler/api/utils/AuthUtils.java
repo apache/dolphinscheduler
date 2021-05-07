@@ -36,7 +36,7 @@ public class AuthUtils {
      * get LoginUser info from request
      * @return User
      */
-    public static User getAuthUser() {
+    public static User getLoginUser() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (ObjectUtils.isEmpty(attributes)) {
             return null;

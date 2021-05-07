@@ -127,7 +127,7 @@ public class LoginController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = {"request"})
     public Result signOut(HttpServletRequest request) {
         String ip = getClientIpAddress(request);
-        sessionService.signOut(ip, AuthUtils.getAuthUser());
+        sessionService.signOut(ip, AuthUtils.getLoginUser());
         //clear session
         request.removeAttribute(Constants.SESSION_USER);
         return success();

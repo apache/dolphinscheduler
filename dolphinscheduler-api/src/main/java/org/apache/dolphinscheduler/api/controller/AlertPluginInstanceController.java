@@ -49,7 +49,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * alert plugin instance controller
@@ -86,7 +85,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result createAlertPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        Map<String, Object> result = alertPluginInstanceService.create(AuthUtils.getAuthUser(), pluginDefineId, instanceName, pluginInstanceParams);
+        Map<String, Object> result = alertPluginInstanceService.create(AuthUtils.getLoginUser(), pluginDefineId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -111,7 +110,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result updateAlertPluginInstance(@RequestParam(value = "alertPluginInstanceId") int alertPluginInstanceId,
                                             @RequestParam(value = "instanceName") String instanceName,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        Map<String, Object> result = alertPluginInstanceService.update(AuthUtils.getAuthUser(), alertPluginInstanceId, instanceName, pluginInstanceParams);
+        Map<String, Object> result = alertPluginInstanceService.update(AuthUtils.getLoginUser(), alertPluginInstanceId, instanceName, pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -131,7 +130,7 @@ public class AlertPluginInstanceController extends BaseController {
     @AccessLogAnnotation()
     public Result deleteAlertPluginInstance(@RequestParam(value = "id") int id) {
 
-        Map<String, Object> result = alertPluginInstanceService.delete(AuthUtils.getAuthUser(), id);
+        Map<String, Object> result = alertPluginInstanceService.delete(AuthUtils.getLoginUser(), id);
         return returnDataList(result);
     }
 
@@ -147,7 +146,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ApiException(GET_ALERT_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation()
     public Result getAlertPluginInstance(@RequestParam(value = "id") int id) {
-        Map<String, Object> result = alertPluginInstanceService.get(AuthUtils.getAuthUser(), id);
+        Map<String, Object> result = alertPluginInstanceService.get(AuthUtils.getLoginUser(), id);
         return returnDataList(result);
     }
 
@@ -210,8 +209,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation()
-    public Result listPaging(@ApiIgnore
-                             @RequestParam("pageNo") Integer pageNo,
+    public Result listPaging(@RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {

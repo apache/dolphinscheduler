@@ -52,7 +52,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * executor controller
@@ -124,7 +123,7 @@ public class ExecutorController extends BaseController {
         if (startParams != null) {
             startParamMap = JSONUtils.toMap(startParams);
         }
-        Map<String, Object> result = execService.execProcessInstance(AuthUtils.getAuthUser(), projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
+        Map<String, Object> result = execService.execProcessInstance(AuthUtils.getLoginUser(), projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType,
                 warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
         return returnDataList(result);
@@ -148,12 +147,11 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
     @AccessLogAnnotation()
-    public Result execute(@ApiIgnore
-                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+    public Result execute(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType
     ) {
-        Map<String, Object> result = execService.execute(AuthUtils.getAuthUser(), projectName, processInstanceId, executeType);
+        Map<String, Object> result = execService.execute(AuthUtils.getLoginUser(), projectName, processInstanceId, executeType);
         return returnDataList(result);
     }
 

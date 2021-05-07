@@ -77,7 +77,7 @@ public class DataAnalysisController extends BaseController {
                                  @RequestParam(value = "endDate", required = false) String endDate,
                                  @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countTaskStateByProject(AuthUtils.getAuthUser(), projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countTaskStateByProject(AuthUtils.getLoginUser(), projectId, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -103,7 +103,7 @@ public class DataAnalysisController extends BaseController {
                                             @RequestParam(value = "endDate", required = false) String endDate,
                                             @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(AuthUtils.getAuthUser(), projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(AuthUtils.getLoginUser(), projectId, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -123,7 +123,7 @@ public class DataAnalysisController extends BaseController {
     @AccessLogAnnotation()
     public Result countDefinitionByUser(@RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(AuthUtils.getAuthUser(), projectId);
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(AuthUtils.getLoginUser(), projectId);
         return returnDataList(result);
     }
 
@@ -149,7 +149,7 @@ public class DataAnalysisController extends BaseController {
                                     @RequestParam(value = "endDate", required = false) String endDate,
                                     @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
 
-        Map<String, Object> result = dataAnalysisService.countCommandState(AuthUtils.getAuthUser(), projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countCommandState(AuthUtils.getLoginUser(), projectId, startDate, endDate);
         return returnDataList(result);
     }
 
@@ -159,12 +159,16 @@ public class DataAnalysisController extends BaseController {
      * @param projectId project id
      * @return queue state count
      */
+    @ApiOperation(value = "countQueueState", notes = "COUNT_QUEUE_STATE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100")
+    })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/queue-count")
     @ApiException(QUEUE_COUNT_ERROR)
     @AccessLogAnnotation()
     public Result countQueueState(@RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
-        Map<String, Object> result = dataAnalysisService.countQueueState(AuthUtils.getAuthUser(), projectId);
+        Map<String, Object> result = dataAnalysisService.countQueueState(AuthUtils.getLoginUser(), projectId);
         return returnDataList(result);
     }
 

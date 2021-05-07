@@ -112,7 +112,7 @@ public class TaskInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = taskInstanceService.queryTaskListPaging(
-                AuthUtils.getAuthUser(), projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+                AuthUtils.getLoginUser(), projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -133,7 +133,7 @@ public class TaskInstanceController extends BaseController {
     @AccessLogAnnotation()
     public Result<Object> forceTaskSuccess(@ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
-        Map<String, Object> result = taskInstanceService.forceTaskSuccess(AuthUtils.getAuthUser(), projectName, taskInstanceId);
+        Map<String, Object> result = taskInstanceService.forceTaskSuccess(AuthUtils.getLoginUser(), projectName, taskInstanceId);
         return returnDataList(result);
     }
 
