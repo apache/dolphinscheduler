@@ -31,8 +31,6 @@ public class TaskParametersUtilsTest {
 
     @Test
     public void testGetParameters() {
-        Assert.assertNull(TaskParametersUtils.getParameters("xx", "ttt"));
-        Assert.assertNull(TaskParametersUtils.getParameters(TaskType.SHELL.getDesc(), "ttt"));
         Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SHELL.getDesc(), "{}"));
         Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SQL.getDesc(), "{}"));
         Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SUB_PROCESS.getDesc(), "{}"));
