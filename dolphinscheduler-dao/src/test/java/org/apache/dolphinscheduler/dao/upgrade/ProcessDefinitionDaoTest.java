@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-
 import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
 
 import java.util.HashMap;
@@ -33,33 +32,24 @@ public class ProcessDefinitionDaoTest {
 
     @Test
     public void testQueryAllProcessDefinition() throws Exception{
-
         //Map<Integer, String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
-
         //assertThat(processDefinitionJsonMap.size(),greaterThanOrEqualTo(0));
     }
 
     @Test
     public void testUpdateProcessDefinitionJson() throws Exception{
-
         Map<Integer,String> processDefinitionJsonMap = new HashMap<>();
         processDefinitionJsonMap.put(1,"test");
-
         //processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),processDefinitionJsonMap);
-
     }
 
     @Test(expected = Exception.class)
     public void testQueryAllProcessDefinitionException() throws Exception{
         //processDefinitionDao.queryAllProcessDefinition(null);
-
     }
 
     @Test(expected = Exception.class)
     public void testUpdateProcessDefinitionJsonException() throws Exception{
         processDefinitionDao.updateProcessDefinitionJson(null,null);
-
     }
-
-
 }
