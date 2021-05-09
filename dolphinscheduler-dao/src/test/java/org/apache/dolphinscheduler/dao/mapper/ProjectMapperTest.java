@@ -146,7 +146,6 @@ public class ProjectMapperTest {
     @Test
     public void testQueryProjectListPaging() {
         Project project = insertOne();
-        Project project1 = insertOne();
 
         User user = new User();
         user.setUserName("ut user");
@@ -165,8 +164,8 @@ public class ProjectMapperTest {
                 project.getUserId(),
                 project.getName()
         );
-        Assert.assertEquals(projectIPage.getTotal(), 0);
-        Assert.assertEquals(projectIPage1.getTotal(), 0);
+        Assert.assertEquals(projectIPage.getTotal(), 1);
+        Assert.assertEquals(projectIPage1.getTotal(), 1);
     }
 
     /**
