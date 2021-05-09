@@ -101,7 +101,7 @@
         where task.task_code=define.code
         and task.task_definition_version=define.version
         <if test="projectCodes != null and projectCodes.length != 0">
-            and process.project_code in
+            and define.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>

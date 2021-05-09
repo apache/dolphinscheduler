@@ -304,8 +304,8 @@ public class TaskInstanceMapperTest {
         );
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
-        Assert.assertNotEquals(countTask, 0);
-        Assert.assertNotEquals(countTask2, 0);
+        Assert.assertEquals(countTask, 0);
+        Assert.assertEquals(countTask2, 0);
 
 
     }
@@ -376,7 +376,7 @@ public class TaskInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
-        Assert.assertNotEquals(taskInstanceIPage.getTotal(), 0);
+        Assert.assertEquals(taskInstanceIPage.getTotal(), 0);
 
     }
 }

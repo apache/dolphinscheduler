@@ -394,9 +394,11 @@ public class ProcessService {
      */
     public ProcessDefinition findProcessDefinition(Long processDefinitionCode, int version) {
         ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
-        if (processDefinition.getVersion() != version) {
+        if (processDefinition == null || processDefinition.getVersion() != version) {
             processDefinition = processDefineLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, version);
-            processDefinition.setId(0);
+            if (processDefinition != null) {
+                processDefinition.setId(0);
+            }
         }
         return processDefinition;
     }
