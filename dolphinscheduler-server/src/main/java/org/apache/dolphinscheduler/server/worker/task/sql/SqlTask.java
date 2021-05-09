@@ -456,8 +456,9 @@ public class SqlTask extends AbstractTask {
      */
     public void sendAttachment(int groupId, String title, String content) {
         AlertSendResponseCommand alertSendResponseCommand = alertClientService.sendAlert(groupId, title, content);
-        if (!alertSendResponseCommand.getResStatus()) {
-            throw new RuntimeException("send mail failed!");
+
+        if (alertSendResponseCommand == null || !alertSendResponseCommand.getResStatus()) {
+            logger.warn("sql task sendAttachment error! response: {}", alertSendResponseCommand);
         }
     }
 

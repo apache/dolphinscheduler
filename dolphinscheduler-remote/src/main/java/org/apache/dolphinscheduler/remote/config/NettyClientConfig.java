@@ -54,51 +54,99 @@ public class NettyClientConfig {
      */
     private int connectTimeoutMillis = 3000;
 
+    /**
+     * see {@link io.netty.handler.timeout.IdleStateHandler}
+     */
+    private long readerIdleTime = 1000 * 6;
+
+    /**
+     * see {@link io.netty.handler.timeout.IdleStateHandler}
+     */
+    private long writerIdleTime = 0;
+
+    /**
+     * see {@link io.netty.handler.timeout.IdleStateHandler}
+     */
+    private long allIdleTime = 0;
+
     public int getWorkerThreads() {
         return workerThreads;
     }
 
-    public void setWorkerThreads(int workerThreads) {
+    public NettyClientConfig setWorkerThreads(int workerThreads) {
         this.workerThreads = workerThreads;
+        return this;
     }
 
     public boolean isTcpNoDelay() {
         return tcpNoDelay;
     }
 
-    public void setTcpNoDelay(boolean tcpNoDelay) {
+    public NettyClientConfig setTcpNoDelay(boolean tcpNoDelay) {
         this.tcpNoDelay = tcpNoDelay;
+        return this;
     }
 
     public boolean isSoKeepalive() {
         return soKeepalive;
     }
 
-    public void setSoKeepalive(boolean soKeepalive) {
+    public NettyClientConfig setSoKeepalive(boolean soKeepalive) {
         this.soKeepalive = soKeepalive;
+        return this;
     }
 
     public int getSendBufferSize() {
         return sendBufferSize;
     }
 
-    public void setSendBufferSize(int sendBufferSize) {
+    public NettyClientConfig setSendBufferSize(int sendBufferSize) {
         this.sendBufferSize = sendBufferSize;
+        return this;
     }
 
     public int getReceiveBufferSize() {
         return receiveBufferSize;
     }
 
-    public void setReceiveBufferSize(int receiveBufferSize) {
+    public NettyClientConfig setReceiveBufferSize(int receiveBufferSize) {
         this.receiveBufferSize = receiveBufferSize;
+        return this;
     }
 
     public int getConnectTimeoutMillis() {
         return connectTimeoutMillis;
     }
 
-    public void setConnectTimeoutMillis(int connectTimeoutMillis) {
+    public NettyClientConfig setConnectTimeoutMillis(int connectTimeoutMillis) {
         this.connectTimeoutMillis = connectTimeoutMillis;
+        return this;
+    }
+
+    public long getReaderIdleTime() {
+        return readerIdleTime;
+    }
+
+    public NettyClientConfig setReaderIdleTime(long readerIdleTime) {
+        this.readerIdleTime = readerIdleTime;
+        return this;
+    }
+
+    public long getWriterIdleTime() {
+        return writerIdleTime;
+    }
+
+    public NettyClientConfig setWriterIdleTime(long writerIdleTime) {
+        this.writerIdleTime = writerIdleTime;
+        return this;
+    }
+
+    public long getAllIdleTime() {
+        return allIdleTime;
+    }
+
+    public NettyClientConfig setAllIdleTime(long allIdleTime) {
+        this.allIdleTime = allIdleTime;
+        return this;
     }
 }

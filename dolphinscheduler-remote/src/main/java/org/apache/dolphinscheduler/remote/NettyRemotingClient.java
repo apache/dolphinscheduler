@@ -173,7 +173,12 @@ public class NettyRemotingClient {
                     @Override
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline()
-                                .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
+                                .addLast("client-idle-handler", new IdleStateHandler(
+                                        clientConfig.getReaderIdleTime(),
+                                        clientConfig.getWriterIdleTime(),
+                                        clientConfig.getAllIdleTime(),
+                                        TimeUnit.MILLISECONDS)
+                                )
                                 .addLast(new NettyDecoder(), clientHandler, encoder);
                     }
                 });

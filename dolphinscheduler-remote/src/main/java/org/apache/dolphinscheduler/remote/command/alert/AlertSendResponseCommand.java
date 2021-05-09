@@ -72,4 +72,12 @@ public class AlertSendResponseCommand implements Serializable {
         command.setBody(body);
         return command;
     }
+
+    @Override
+    public String toString() {
+        return "AlertSendResponseCommand{"
+                + "resStatus=" + resStatus
+                + ", resResults=" + resResults
+                + '}';
+    }
 }

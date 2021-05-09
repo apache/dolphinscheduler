@@ -49,4 +49,12 @@ public class AlertSendResponseResult implements Serializable {
         this.status = status;
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "AlertSendResponseResult{"
+                + "status=" + status
+                + ", message='" + message + '\''
+                + '}';
+    }
 }

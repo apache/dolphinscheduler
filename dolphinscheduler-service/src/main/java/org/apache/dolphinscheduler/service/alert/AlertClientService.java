@@ -51,7 +51,7 @@ public class AlertClientService {
      * alert client
      */
     public AlertClientService() {
-        this.clientConfig = new NettyClientConfig();
+        this.clientConfig = new NettyClientConfig().setReaderIdleTime(ALERT_REQUEST_TIMEOUT);
         this.client = new NettyRemotingClient(clientConfig);
         this.isRunning = true;
     }
@@ -60,9 +60,7 @@ public class AlertClientService {
      * alert client
      */
     public AlertClientService(String host, int port) {
-        this.clientConfig = new NettyClientConfig();
-        this.client = new NettyRemotingClient(clientConfig);
-        this.isRunning = true;
+        this();
         this.host = host;
         this.port = port;
     }
@@ -78,10 +76,11 @@ public class AlertClientService {
 
     /**
      * alert sync send data
-     * @param groupId
-     * @param title
-     * @param content
-     * @return
+     *
+     * @param groupId groupId
+     * @param title title
+     * @param content content
+     * @return if exceptions encountered will return null
      */
     public AlertSendResponseCommand sendAlert(int groupId, String title,  String content) {
         return this.sendAlert(this.host,this.port,groupId,title,content);
@@ -94,7 +93,7 @@ public class AlertClientService {
      * @param groupId groupId
      * @param title title
      * @param content content
-     * @return AlertSendResponseCommand
+     * @return AlertSendResponseCommand, if exceptions encountered will return null
      */
     public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title,  String content) {
         logger.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} ", host, port, groupId, title);
@@ -106,8 +105,9 @@ public class AlertClientService {
             if (response != null) {
                 return JsonSerializer.deserialize(response.getBody(), AlertSendResponseCommand.class);
             }
+            logger.info("sync alert send , host : {}, port : {}, groupId : {}, title : {} ", host, port, groupId, title);
         } catch (Exception e) {
-            logger.error("sync alert send error", e);
+            logger.error("sync alert send error, host: {}, port: {}, groupId: {} title: {}", host, port, groupId, title, e);
         } finally {
             this.client.closeChannel(address);
         }
