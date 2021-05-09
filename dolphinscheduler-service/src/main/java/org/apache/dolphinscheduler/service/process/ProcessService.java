@@ -2158,7 +2158,7 @@ public class ProcessService {
         int result = 0;
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogList) {
-            result =+ processTaskRelationMapper.insert(processTaskRelationLog);
+            result += processTaskRelationMapper.insert(processTaskRelationLog);
         }
         return result;
     }
