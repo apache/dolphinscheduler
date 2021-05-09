@@ -1148,11 +1148,8 @@ public class ProcessService {
                                            ProcessInstanceMap instanceMap,
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
-        TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                task.getTaskCode(), task.getTaskDefinitionVersion()
-        );
-        Map<String, String> subProcessParam = JSONUtils.toMap(taskDefinition.getTaskParams());
-        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
+        Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
+        int childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
@@ -2148,20 +2145,22 @@ public class ProcessService {
     public int switchVersion(ProcessDefinition processDefinition, ProcessDefinitionLog processDefinitionLog) {
         int switchResult = processDefinitionToDB(processDefinition, processDefinitionLog, true);
         if (switchResult != Constants.DEFINITION_FAILURE) {
-            switchProcessTaskRelationVersion(processDefinition);
+            switchResult = switchProcessTaskRelationVersion(processDefinition);
         }
         return switchResult;
     }
 
-    public void switchProcessTaskRelationVersion(ProcessDefinition processDefinition) {
+    public int switchProcessTaskRelationVersion(ProcessDefinition processDefinition) {
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         }
+        int result = 0;
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogList) {
-            processTaskRelationMapper.insert(processTaskRelationLog);
+            result =+ processTaskRelationMapper.insert(processTaskRelationLog);
         }
+        return result;
     }
 
     /**

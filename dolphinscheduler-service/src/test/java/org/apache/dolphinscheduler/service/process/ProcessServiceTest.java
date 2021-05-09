@@ -107,7 +107,6 @@ public class ProcessServiceTest {
 
     @Test
     public void testCreateSubCommand() {
-        ProcessService processService = new ProcessService();
         ProcessInstance parentInstance = new ProcessInstance();
         parentInstance.setWarningType(WarningType.SUCCESS);
         parentInstance.setWarningGroupId(0);
@@ -115,35 +114,31 @@ public class ProcessServiceTest {
         TaskInstance task = new TaskInstance();
         task.setTaskParams("{\"processDefinitionId\":100}}");
         task.setId(10);
+        task.setTaskCode(1L);
+        task.setTaskDefinitionVersion(1);
 
         ProcessInstance childInstance = null;
         ProcessInstanceMap instanceMap = new ProcessInstanceMap();
         instanceMap.setParentProcessInstanceId(1);
         instanceMap.setParentTaskInstanceId(10);
-        Command command = null;
+        Command command;
 
         //father history: start; child null == command type: start
         parentInstance.setHistoryCmd("START_PROCESS");
         parentInstance.setCommandType(CommandType.START_PROCESS);
-        command = processService.createSubProcessCommand(
-                parentInstance, childInstance, instanceMap, task
-        );
+        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
         //father history: start,start failure; child null == command type: start
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
-        command = processService.createSubProcessCommand(
-                parentInstance, childInstance, instanceMap, task
-        );
+        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
         //father history: scheduler,start failure; child null == command type: scheduler
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("SCHEDULER,START_FAILURE_TASK_PROCESS");
-        command = processService.createSubProcessCommand(
-                parentInstance, childInstance, instanceMap, task
-        );
+        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.SCHEDULER, command.getCommandType());
 
         //father history: complement,start failure; child null == command type: complement
@@ -156,9 +151,7 @@ public class ProcessServiceTest {
         complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE, startString);
         complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE, endString);
         parentInstance.setCommandParam(JSONUtils.toJsonString(complementMap));
-        command = processService.createSubProcessCommand(
-                parentInstance, childInstance, instanceMap, task
-        );
+        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
 
         JsonNode complementDate = JSONUtils.parseObject(command.getCommandParam());
@@ -171,9 +164,7 @@ public class ProcessServiceTest {
         childInstance = new ProcessInstance();
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("START_PROCESS,START_FAILURE_TASK_PROCESS");
-        command = processService.createSubProcessCommand(
-                parentInstance, childInstance, instanceMap, task
-        );
+        command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
     }
 
@@ -322,7 +313,6 @@ public class ProcessServiceTest {
         processInstance.setProcessDefinitionCode(1L);
         Mockito.when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
         Assert.assertEquals("", processService.formatTaskAppId(taskInstance));
-
     }
 
     @Test
@@ -352,6 +342,7 @@ public class ProcessServiceTest {
         project.setCode(1L);
 
         ProcessData processData = new ProcessData();
+        processData.setTasks(new ArrayList<>());
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
@@ -359,13 +350,9 @@ public class ProcessServiceTest {
         processDefinition.setName("test");
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
-
-        Mockito.when(processDefineMapper.updateById(any())).thenReturn(1);
-        Mockito.when(processDefineLogMapper.insert(any())).thenReturn(1);
-
-        int i = processService.saveProcessDefinition(user, project, "name", "desc", "locations", "connects", processData, processDefinition, true);
-        Assert.assertEquals(1, i);
-
+        Assert.assertEquals(-1, processService.saveProcessDefinition(user, project, "name",
+                "desc", "locations", "connects", processData,
+                processDefinition, true));
     }
 
     @Test
@@ -375,17 +362,11 @@ public class ProcessServiceTest {
         processDefinition.setId(123);
         processDefinition.setName("test");
         processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
 
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         processDefinitionLog.setCode(1L);
-
-        Mockito.when(processDefineMapper.updateById(any())).thenReturn(1);
-
-        int i = processService.switchVersion(processDefinition, processDefinitionLog);
-
-        Assert.assertEquals(1, i);
-
+        processDefinitionLog.setVersion(2);
+        Assert.assertEquals(0, processService.switchVersion(processDefinition, processDefinitionLog));
     }
 
     @Test
@@ -443,13 +424,12 @@ public class ProcessServiceTest {
 
     @Test
     public void testGenProcessData() {
-        String processDefinitionJson = "{\"tasks\":[{\"id\":\"task-0\",\"code\":3,\"version\":0,\"name\":\"1-test\""
-                + ",\"desc\":null,\"type\":\"SHELL\",\"runFlag\":\"FORBIDDEN\",\"loc\":null,\"maxRetryTimes\":0"
-                + ",\"retryInterval\":0,\"params\":null,\"preTasks\":[\"unit-test\"],\"preTaskNodeList\":[{\"code\":2"
-                + ",\"name\":\"unit-test\",\"version\":0}],\"extras\":null,\"depList\":[\"unit-test\"],\"dependence\":null"
-                + ",\"conditionResult\":null,\"taskInstancePriority\":null,\"workerGroup\":null,\"workerGroupId\":null"
-                + ",\"timeout\":{\"enable\":false,\"strategy\":null,\"interval\":0},\"delayTime\":0}]"
-                + ",\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
+        String processDefinitionJson = "{\"tasks\":[{\"id\":null,\"code\":3,\"version\":0,\"name\":\"1-test\",\"desc\":null,"
+                + "\"type\":\"SHELL\",\"runFlag\":\"FORBIDDEN\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":0,"
+                + "\"params\":{},\"preTasks\":[\"unit-test\"],\"preTaskNodeList\":[{\"code\":2,\"name\":\"unit-test\","
+                + "\"version\":0}],\"extras\":null,\"depList\":[\"unit-test\"],\"dependence\":null,\"conditionResult\":null,"
+                + "\"taskInstancePriority\":null,\"workerGroup\":null,\"timeout\":{\"enable\":false,\"strategy\":null,"
+                + "\"interval\":0},\"delayTime\":0}],\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
@@ -499,7 +479,6 @@ public class ProcessServiceTest {
         String json = JSONUtils.toJsonString(processService.genProcessData(processDefinition));
 
         Assert.assertEquals(processDefinitionJson, json);
-
     }
 
     @Test
