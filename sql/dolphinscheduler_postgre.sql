@@ -297,17 +297,17 @@ CREATE TABLE t_ds_process_definition (
   global_params text ,
   locations text ,
   connects text ,
-  warning_group_id int4 DEFAULT NULL ,
+  warning_group_id int DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
-  tenant_id int NOT NULL DEFAULT '-1' ,
+  tenant_id int DEFAULT '-1' ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id),
-  CONSTRAINT process_definition_unique UNIQUE (name, project_id)
+  PRIMARY KEY (id) ,
+  CONSTRAINT process_definition_unique UNIQUE (name, project_code)
 ) ;
 
-create index process_definition_index on t_ds_process_definition (project_code,id);
+create index process_definition_index on t_ds_process_definition (code,id);
 
 DROP TABLE IF EXISTS t_ds_process_definition_log;
 CREATE TABLE t_ds_process_definition_log (
@@ -322,10 +322,10 @@ CREATE TABLE t_ds_process_definition_log (
   global_params text ,
   locations text ,
   connects text ,
-  warning_group_id int4 DEFAULT NULL ,
+  warning_group_id int DEFAULT NULL ,
   flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
-  tenant_id int NOT NULL DEFAULT '-1' ,
+  tenant_id int DEFAULT '-1' ,
   operator int DEFAULT NULL ,
   operate_time timestamp DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
@@ -356,7 +356,7 @@ CREATE TABLE t_ds_task_definition (
   resource_ids varchar(255) DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id),
+  PRIMARY KEY (id) ,
   CONSTRAINT task_definition_unique UNIQUE (name, project_code)
 ) ;
 
@@ -398,9 +398,9 @@ CREATE TABLE t_ds_process_task_relation (
   project_code bigint DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   pre_task_code bigint DEFAULT NULL ,
-  pre_task_version int DEFAULT 0 ,
+  pre_task_version int DEFAULT '0' ,
   post_task_code bigint DEFAULT NULL ,
-  post_task_version int DEFAULT 0 ,
+  post_task_version int DEFAULT '0' ,
   condition_type int DEFAULT NULL ,
   condition_params text ,
   create_time timestamp DEFAULT NULL ,
@@ -416,9 +416,9 @@ CREATE TABLE t_ds_process_task_relation_log (
   project_code bigint DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   pre_task_code bigint DEFAULT NULL ,
-  pre_task_version int DEFAULT 0 ,
+  pre_task_version int DEFAULT '0' ,
   post_task_code bigint DEFAULT NULL ,
-  post_task_version int DEFAULT 0 ,
+  post_task_version int DEFAULT '0' ,
   condition_type int DEFAULT NULL ,
   condition_params text ,
   operator int DEFAULT NULL ,
