@@ -17,65 +17,56 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore
+/**
+ * ProcessAlertManager Test
+ */
+@RunWith(PowerMockRunner.class)
 public class ProcessAlertManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManagerTest.class);
 
-    @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
+    @InjectMocks
+    ProcessAlertManager processAlertManager = new ProcessAlertManager();
 
-    @Autowired
-    ProcessInstanceMapper processInstanceMapper;
-
-    @Autowired
-    TaskInstanceMapper taskInstanceMapper;
-
-    @Autowired
-    ProjectMapper projectMapper;
-
-    ProcessAlertManager processAlertManager;
+    @Mock
+    private AlertDao alertDao;
 
     /**
      * send worker alert fault tolerance
      */
     @Test
-    public void sendWarningWorkerLeranceFaultTest() {
+    public void sendWarningWorkerToleranceFaultTest() {
         // process instance
-        ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setName("test");
 
-        // set process definition
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(47);
-        processInstance.setProcessDefinition(processDefinition);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setName("test-task-1");
+        taskInstance.setHost("127.0.0.1");
+        taskInstance.setRetryTimes(3);
+        List<TaskInstance> taskInstanceList = new ArrayList<>();
+        taskInstanceList.add(taskInstance);
 
-        // fault task instance
-        TaskInstance toleranceTask1 = taskInstanceMapper.selectById(5038);
-        TaskInstance toleranceTask2 = taskInstanceMapper.selectById(5039);
-
-        List<TaskInstance> toleranceTaskList = new ArrayList<>(2);
-        toleranceTaskList.add(toleranceTask1);
-        toleranceTaskList.add(toleranceTask2);
-
-        processAlertManager.sendAlertWorkerToleranceFault(processInstance, toleranceTaskList);
+        processAlertManager.sendAlertWorkerToleranceFault(processInstance, taskInstanceList);
     }
 
 
@@ -85,25 +76,18 @@ public class ProcessAlertManagerTest {
     @Test
     public void sendWarnningOfProcessInstanceTest() {
         // process instance
-        ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setWarningType(WarningType.SUCCESS);
+        processInstance.setState(ExecutionStatus.SUCCESS);
+        processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
+        processInstance.setWarningGroupId(1);
 
-        // set process definition
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(47);
-        processInstance.setProcessDefinition(processDefinition);
+        ProjectUser projectUser = new ProjectUser();
+        TaskInstance taskInstance = new TaskInstance();
+        List<TaskInstance> taskInstanceList = new ArrayList<>();
+        taskInstanceList.add(taskInstance);
 
-        // fault task instance
-        TaskInstance toleranceTask1 = taskInstanceMapper.selectById(5038);
-        toleranceTask1.setState(ExecutionStatus.FAILURE);
-        TaskInstance toleranceTask2 = taskInstanceMapper.selectById(5039);
-        toleranceTask2.setState(ExecutionStatus.FAILURE);
-
-        List<TaskInstance> toleranceTaskList = new ArrayList<>(2);
-        toleranceTaskList.add(toleranceTask1);
-        toleranceTaskList.add(toleranceTask2);
-
-        ProjectUser projectUser = projectMapper.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-
-        processAlertManager.sendAlertProcessInstance(processInstance, toleranceTaskList, projectUser);
+        processAlertManager.sendAlertProcessInstance(processInstance, taskInstanceList, projectUser);
     }
 
 }

@@ -186,7 +186,7 @@ public class ProcessAlertManager {
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alertDao.addAlert(alert);
-            logger.info("add alert to db , alert : {}", alert.toString());
+            logger.info("add alert to db , alert : {}", alert);
 
         } catch (Exception e) {
             logger.error("send alert failed:{} ", e.getMessage());
@@ -240,7 +240,7 @@ public class ProcessAlertManager {
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert.toString());
+        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**
