@@ -26,7 +26,9 @@ import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.ConditionsTaskExecThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -74,6 +76,11 @@ public class ConditionsTaskTest {
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
                 .thenReturn(processInstance);
+        User user = new User();
+        user.setId(1);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setCode(1L);
+        processService.saveTaskDefinition(user, 1L, getTaskNode(), taskDefinition);
     }
 
     private TaskInstance testBasicInit(ExecutionStatus expectResult) {
@@ -112,7 +119,7 @@ public class ConditionsTaskTest {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
         ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
         taskExecThread.call();
-        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+        Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, taskExecThread.getTaskInstance().getState());
     }
 
     @Test
@@ -127,6 +134,8 @@ public class ConditionsTaskTest {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-1000");
         taskNode.setName("C");
+        taskNode.setCode(1L);
+        taskNode.setVersion(1);
         taskNode.setType(TaskType.CONDITIONS.getDesc());
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
 
@@ -168,6 +177,8 @@ public class ConditionsTaskTest {
         taskInstance.setId(1000);
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskType(taskNode.getType().toUpperCase());
+        taskInstance.setTaskCode(taskNode.getCode());
+        taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
         taskInstance.setProcessInstanceId(processInstance.getId());
         return taskInstance;
     }
