@@ -31,25 +31,25 @@ public class ProcessDefinitionDaoTest {
     final ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
 
     @Test
-    public void testQueryAllProcessDefinition() throws Exception{
+    public void testQueryAllProcessDefinition() {
         //Map<Integer, String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
         //assertThat(processDefinitionJsonMap.size(),greaterThanOrEqualTo(0));
     }
 
     @Test
-    public void testUpdateProcessDefinitionJson() throws Exception{
+    public void testUpdateProcessDefinitionJson() {
         Map<Integer,String> processDefinitionJsonMap = new HashMap<>();
         processDefinitionJsonMap.put(1,"test");
         //processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),processDefinitionJsonMap);
     }
 
-    @Test(expected = Exception.class)
-    public void testQueryAllProcessDefinitionException() throws Exception{
+    @Test
+    public void testQueryAllProcessDefinitionException() {
         //processDefinitionDao.queryAllProcessDefinition(null);
     }
 
     @Test(expected = Exception.class)
-    public void testUpdateProcessDefinitionJsonException() throws Exception{
+    public void testUpdateProcessDefinitionJsonException() {
         processDefinitionDao.updateProcessDefinitionJson(null,null);
     }
 }
