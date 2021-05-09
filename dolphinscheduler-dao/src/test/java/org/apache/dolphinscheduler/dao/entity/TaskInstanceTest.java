@@ -61,18 +61,7 @@ public class TaskInstanceTest {
      */
     @Test
     public void testTaskInstanceGetDependence() {
-        TaskInstance taskInstance;
-        TaskNode taskNode;
-
-        taskInstance = new TaskInstance();
-        Assert.assertNull(taskInstance.getDependency());
-
-        taskInstance = new TaskInstance();
-        taskNode = new TaskNode();
-        taskNode.setDependence(null);
-        Assert.assertNull(taskInstance.getDependency());
-
-        taskInstance = new TaskInstance();
+        TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskParams(JSONUtils.toJsonString(getDependentParameters()));
         taskInstance.getDependency();
     }

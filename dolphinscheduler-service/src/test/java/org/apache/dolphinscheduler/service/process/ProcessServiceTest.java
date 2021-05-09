@@ -318,8 +318,10 @@ public class ProcessServiceTest {
         processDefinition.setId(111);
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
+        processInstance.setProcessDefinitionVersion(1);
+        processInstance.setProcessDefinitionCode(1L);
         Mockito.when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
-        Assert.assertEquals("111_222_333", processService.formatTaskAppId(taskInstance));
+        Assert.assertEquals("", processService.formatTaskAppId(taskInstance));
 
     }
 
