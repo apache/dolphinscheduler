@@ -56,6 +56,7 @@ public class AlertServerTest {
 
         PluginDao pluginDao = PowerMockito.mock(PluginDao.class);
         PowerMockito.when(DaoFactory.getDaoInstance(PluginDao.class)).thenReturn(pluginDao);
+        PowerMockito.when(pluginDao.checkPluginDefineTableExist()).thenReturn(true);
 
         AlertChannel alertChannelMock = PowerMockito.mock(AlertChannel.class);
 
@@ -80,15 +81,11 @@ public class AlertServerTest {
         AlertServer alertServer = AlertServer.getInstance();
         Assert.assertNotNull(alertServer);
 
-        new Thread(() -> {
-            alertServer.start();
-        })
-                .start();
+        new Thread(() -> alertServer.start()).start();
 
         Thread.sleep(5 * Constants.ALERT_SCAN_INTERVAL);
 
         alertServer.stop();
-
     }
 
 }

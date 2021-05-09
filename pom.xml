@@ -915,6 +915,9 @@
                         <include>**/remote/command/future/ResponseFutureTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesRequestCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesResponseCommandTest.java</include>
+                        <include>**/remote/command/log/ViewLogRequestCommandTest.java</include>
                         <include>**/remote/utils/HostTest.java</include>
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
@@ -968,6 +971,7 @@
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/processdure/ProcedureTaskTest.java</include>
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/task/AbstractCommandExecutorTest.java</include>
@@ -1032,16 +1036,18 @@
                         <include>**/plugin/alert/feishu/FeiShuSenderTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
+                        <include>**/plugin/alert/slack/SlackAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/slack/SlackAlertPluginTest.java</include>
+                        <include>**/plugin/alert/slack/SlackSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
-                        <include>**/alert/utils/DingTalkUtilsTest.java</include>
-                        <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
