@@ -18,7 +18,9 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -26,6 +28,7 @@ import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.ConditionsTaskExecThread;
@@ -74,6 +77,13 @@ public class ConditionsTaskTest {
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
                 .thenReturn(processInstance);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
     }
 
     private TaskInstance testBasicInit(ExecutionStatus expectResult) {
@@ -98,17 +108,16 @@ public class ConditionsTaskTest {
 
         // for ConditionsTaskExecThread.waitTaskQuit
         List<TaskInstance> conditions = Stream.of(
-                getTaskInstanceForValidTaskList(1001, "1", expectResult)
+                getTaskInstanceForValidTaskList(expectResult)
         ).collect(Collectors.toList());
         Mockito.when(processService
                 .findValidTaskListByProcessId(processInstance.getId()))
                 .thenReturn(conditions);
-
         return taskInstance;
     }
 
     @Test
-    public void testBasicSuccess() throws Exception {
+    public void testBasicSuccess() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
         ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
         taskExecThread.call();
@@ -127,6 +136,8 @@ public class ConditionsTaskTest {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-1000");
         taskNode.setName("C");
+        taskNode.setCode(1L);
+        taskNode.setVersion(1);
         taskNode.setType(TaskType.CONDITIONS.getDesc());
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
 
@@ -168,14 +179,17 @@ public class ConditionsTaskTest {
         taskInstance.setId(1000);
         taskInstance.setName(taskNode.getName());
         taskInstance.setTaskType(taskNode.getType().toUpperCase());
+        taskInstance.setTaskCode(taskNode.getCode());
+        taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
         taskInstance.setProcessInstanceId(processInstance.getId());
+        taskInstance.setTaskParams(taskNode.getTaskParams());
         return taskInstance;
     }
 
-    private TaskInstance getTaskInstanceForValidTaskList(int id, String name, ExecutionStatus state) {
+    private TaskInstance getTaskInstanceForValidTaskList(ExecutionStatus state) {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(id);
-        taskInstance.setName(name);
+        taskInstance.setId(1001);
+        taskInstance.setName("1");
         taskInstance.setState(state);
         return taskInstance;
     }

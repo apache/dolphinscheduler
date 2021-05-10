@@ -64,7 +64,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
-
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id", "cxc_1113")
                 .header(SESSION_ID, sessionId)
                 .param("processInstanceId", "1203"))
