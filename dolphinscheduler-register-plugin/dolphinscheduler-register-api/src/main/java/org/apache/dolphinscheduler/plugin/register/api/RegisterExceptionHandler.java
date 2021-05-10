@@ -15,8 +15,9 @@ package org.apache.dolphinscheduler.plugin.register.api;/*
  * limitations under the License.
  */
 
-public interface RegisterFactory {
+public class RegisterExceptionHandler {
 
-    static Register getRegister(String registerName);
+   public static void handleException(Exception e){
 
+   }
 }

@@ -25,6 +25,10 @@ public class ZookeeperConfiguration {
 
     public static final String MAX_RETRIES_NAME = "max.retries";
 
+    public static final String MAX_SLEEP_TIME_MILLI_SECONDS_NAME = "max.sleep.time";
+
+    public static final String SERVERS_NAME = "servers";
+
 
     public static String HOSTS;
 
@@ -32,10 +36,18 @@ public class ZookeeperConfiguration {
 
     public static int MAX_RETRIES;
 
-    public static void initConfiguration(Map<String, Object> config) {
+    public static int MAX_SLEEP_TIME_MILLI_SECONDS;
 
+    public static String SERVERS;
+
+    public static void initConfiguration(Map<String, Object> config) {
+        //assert null and set default
+        SERVERS = config.get(SERVERS_NAME).toString();
         HOSTS = config.get(HOSTS_NAME).toString();
         NAMESPACE = config.get(NAMESPACE_NAME).toString();
         MAX_RETRIES = (int) config.get(MAX_RETRIES_NAME);
+        MAX_SLEEP_TIME_MILLI_SECONDS = (int) config.get(MAX_SLEEP_TIME_MILLI_SECONDS_NAME);
+
+
     }
 }

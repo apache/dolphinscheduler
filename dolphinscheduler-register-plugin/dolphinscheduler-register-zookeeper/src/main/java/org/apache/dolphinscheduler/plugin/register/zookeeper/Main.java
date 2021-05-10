@@ -15,12 +15,15 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
+import org.apache.dolphinscheduler.spi.register.Register;
+
+import java.util.HashMap;
+
 public class Main {
 
 
-
     public static void main(String[] args) {
-        ZookeeperRegister zk=new ZookeeperRegister();
-
+        Register register=new ZookeeperRegister();
+        register.register(new HashMap<>());
     }
 }

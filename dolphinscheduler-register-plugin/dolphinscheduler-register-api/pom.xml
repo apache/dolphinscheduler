@@ -11,5 +11,12 @@
 
     <artifactId>dolphinscheduler-register-api</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+        </dependency>
+    </dependencies>
+
 
 </project>

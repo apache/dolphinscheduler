@@ -15,20 +15,38 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
-import org.apache.dolphinscheduler.plugin.register.api.Register;
-import org.apache.dolphinscheduler.plugin.register.api.SubscribeListener;
+
+import org.apache.dolphinscheduler.plugin.register.api.AbstractRegister;
+import org.apache.dolphinscheduler.plugin.register.api.RegisterExceptionHandler;
+import org.apache.dolphinscheduler.spi.register.Register;
+import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.transaction.TransactionOp;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-public class ZookeeperRegister implements Register {
+public class ZookeeperRegister extends AbstractRegister {
 
     private CuratorFramework client;
 
+
     @Override
     public void register(Map<String, Object> registerData) {
+        ZookeeperConfiguration.initConfiguration(registerData);
+        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
+                .connectString(ZookeeperConfiguration.SERVERS)
+                .retryPolicy(new ExponentialBackoffRetry(ZookeeperConfiguration.MAX_SLEEP_TIME_MILLI_SECONDS, ZookeeperConfiguration.MAX_RETRIES, ZookeeperConfiguration.MAX_SLEEP_TIME_MILLI_SECONDS))
+                .namespace(ZookeeperConfiguration.NAMESPACE);
+
+        client = builder.build();
+        client.start();
+        super.register(registerData);
 
     }
 
@@ -55,22 +73,47 @@ public class ZookeeperRegister implements Register {
     @Override
     public void remove(String key) {
 
+        try {
+            client.delete().deletingChildrenIfNeeded().forPath(key);
+        } catch (Exception e) {
+            RegisterExceptionHandler.handleException(e);
+        }
+    }
+
+    @Override
+    public boolean isExisted(String key) {
+        try {
+            return null != client.checkExists().forPath(key);
+        } catch (Exception e) {
+            RegisterExceptionHandler.handleException(e);
+            return false;
+        }
     }
 
     @Override
     public void persist(String key, String value) {
-
+        try {
+            if (!isExisted(key)) {
+                client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(key, value.getBytes(StandardCharsets.UTF_8));
+            } else {
+                update(key, value);
+            }
+        } catch (Exception e) {
+            RegisterExceptionHandler.handleException(e);
+        }
     }
 
     @Override
     public void update(String key, String value) {
-
+        try {
+            TransactionOp transactionOp = client.transactionOp();
+            client.transaction().forOperations(transactionOp.check().forPath(key), transactionOp.setData().forPath(key, value.getBytes(StandardCharsets.UTF_8)));
+        } catch (Exception e) {
+            RegisterExceptionHandler.handleException(e);
+        }
     }
 
-    @Override
-    public void remove() {
 
-    }
 
     @Override
     public List<String> getChildren(String path) {

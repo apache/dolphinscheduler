@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.register;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.register.api;
-
 import java.util.List;
 import java.util.Map;
 
-public interface RegisterCenter {
+public interface Register  {
 
-    void register(Map<String, Object> registerData) throws Exception;
+
+
+    void register(Map<String, Object> registerData);
 
     void upRegister();
 
@@ -39,11 +39,11 @@ public interface RegisterCenter {
     void update(String key, String value);
 
 
-    void remove();
+
 
     List<String> getChildren(String path);
 
     String getData(String key);
 
-
+    boolean isExisted(String key);
 }

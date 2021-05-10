@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.register.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,5 +15,9 @@ package org.apache.dolphinscheduler.plugin.register.api;/*
  * limitations under the License.
  */
 
-public interface Register extends RegisterClient{
+package org.apache.dolphinscheduler.spi.register;
+
+public interface SubscribeListener {
+
+    void listener(String path);
 }
