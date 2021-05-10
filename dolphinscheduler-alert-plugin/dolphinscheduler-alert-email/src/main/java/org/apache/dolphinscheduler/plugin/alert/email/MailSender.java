@@ -173,6 +173,7 @@ public class MailSender {
         }
 
         receivers.removeIf(StringUtils::isEmpty);
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 
         if (showType.equals(ShowType.TABLE.getDescp()) || showType.equals(ShowType.TEXT.getDescp())) {
             // send email
@@ -204,7 +205,9 @@ public class MailSender {
         } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + EmailConstants.EXCEL_SUFFIX_XLS : htmlTable(content, false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp())
+                        ? "Please see the attachment " + title + EmailConstants.EXCEL_SUFFIX_XLSX
+                        : htmlTable(content, false));
 
                 attachment(title, content, partContent);
 
@@ -338,7 +341,7 @@ public class MailSender {
         part1.setContent(partContent, EmailConstants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLS);
+        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLSX);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -347,7 +350,7 @@ public class MailSender {
         ExcelUtils.genExcelFile(content, title, xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLS, EmailConstants.UTF_8, "B"));
+        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLSX, EmailConstants.UTF_8, "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
@@ -378,7 +381,6 @@ public class MailSender {
 
         // send
         email.setDebug(true);
-        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         email.send();
 
         alertResult.setStatus("true");
@@ -394,12 +396,12 @@ public class MailSender {
     public void deleteFile(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                logger.info("delete success: {}", file.getAbsolutePath() + file.getName());
+                logger.info("delete success: {}", file.getAbsolutePath());
             } else {
-                logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
+                logger.info("delete fail: {}", file.getAbsolutePath());
             }
         } else {
-            logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
+            logger.info("file not exists: {}", file.getAbsolutePath());
         }
     }
 

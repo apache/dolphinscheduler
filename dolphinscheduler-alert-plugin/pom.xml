@@ -36,6 +36,7 @@
         <module>dolphinscheduler-alert-script</module>
         <module>dolphinscheduler-alert-http</module>
         <module>dolphinscheduler-alert-feishu</module>
+        <module>dolphinscheduler-alert-slack</module>
     </modules>
 
     <dependencies>
