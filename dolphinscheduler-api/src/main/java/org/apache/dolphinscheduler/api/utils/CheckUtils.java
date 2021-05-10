@@ -128,7 +128,7 @@ public class CheckUtils {
     public static boolean checkTaskNodeParameters(TaskNode taskNode) {
         AbstractParameters abstractParameters;
         String taskType = taskNode.getType();
-        if(taskType == null) {
+        if (taskType == null) {
             return false;
         }
         if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
