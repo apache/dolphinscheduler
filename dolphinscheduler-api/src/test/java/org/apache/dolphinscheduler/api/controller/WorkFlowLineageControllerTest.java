@@ -22,13 +22,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,37 +57,59 @@ import org.springframework.util.MultiValueMap;
  */
 public class WorkFlowLineageControllerTest extends AbstractControllerTest {
 
-    private static Logger logger = LoggerFactory.getLogger(WorkFlowLineageControllerTest.class);
+    @InjectMocks
+    private WorkFlowLineageController workFlowLineageController;
 
-    @Test
-    public void testQueryWorkFlowLineageByName() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("searchVal","test");
-        MvcResult mvcResult = mockMvc.perform(get("/lineages/1/list-name")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+    @Mock
+    private WorkFlowLineageServiceImpl workFlowLineageService;
 
+    @Before
+    public void init() {
+        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+
+        ProjectMapper projectMapper = Mockito.mock(ProjectMapper.class);
+        Mockito.when(applicationContext.getBean(ProjectMapper.class)).thenReturn(projectMapper);
+        Project project = new Project();
+        project.setId(1);
+        project.setCode(1L);
+        Mockito.when(projectMapper.selectById(1)).thenReturn(project);
     }
 
     @Test
-    public  void testQueryWorkFlowLineageByIds() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("ids","1");
-        MvcResult mvcResult = mockMvc.perform(get("/lineages/1/list-ids")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+    public void testQueryWorkFlowLineageByName() {
+        int projectId = 1;
+        String searchVal = "test";
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, 1);
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(searchVal, projectId)).thenReturn(result);
+        Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectId, searchVal);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+
+    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    @Test
+    public  void testQueryWorkFlowLineageByIds() {
+        int projectId = 1;
+        String ids = "1";
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, 1);
+        Set<Integer> idSet = new HashSet<>();
+        idSet.add(1);
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByIds(idSet, projectId)).thenReturn(result);
+        Result response = workFlowLineageController.queryWorkFlowLineageByIds(user, projectId, ids);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
 }
