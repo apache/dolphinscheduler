@@ -18,10 +18,14 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.SubProcessTaskExecThread;
@@ -39,9 +43,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({
-        Stopper.class,
-})
+@PrepareForTest({ Stopper.class })
 public class SubProcessTaskTest {
 
     /**
@@ -70,6 +72,9 @@ public class SubProcessTaskTest {
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
+        AlertDao alertDao = Mockito.mock(AlertDao.class);
+        Mockito.when(applicationContext.getBean(AlertDao.class)).thenReturn(alertDao);
+
         processInstance = getProcessInstance();
         Mockito.when(processService
                 .findProcessInstanceById(processInstance.getId()))
@@ -84,6 +89,13 @@ public class SubProcessTaskTest {
         Mockito.when(processService
                 .submitTask(Mockito.any()))
                 .thenAnswer(t -> t.getArgument(0));
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
     }
 
     private TaskInstance testBasicInit(ExecutionStatus expectResult) {
@@ -102,7 +114,7 @@ public class SubProcessTaskTest {
     }
 
     @Test
-    public void testBasicSuccess() throws Exception {
+    public void testBasicSuccess() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
         SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
         taskExecThread.call();
@@ -110,7 +122,7 @@ public class SubProcessTaskTest {
     }
 
     @Test
-    public void testBasicFailure() throws Exception {
+    public void testBasicFailure() {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
         SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
         taskExecThread.call();
@@ -121,6 +133,8 @@ public class SubProcessTaskTest {
         TaskNode taskNode = new TaskNode();
         taskNode.setId("tasks-10");
         taskNode.setName("S");
+        taskNode.setCode(1L);
+        taskNode.setVersion(1);
         taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         taskNode.setRunFlag(FLOWNODE_RUN_FLAG_NORMAL);
         return taskNode;
@@ -130,7 +144,8 @@ public class SubProcessTaskTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(100);
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-
+        processInstance.setWarningGroupId(0);
+        processInstance.setName("S");
         return processInstance;
     }
 
@@ -148,6 +163,8 @@ public class SubProcessTaskTest {
         taskInstance.setName("S");
         taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
         taskInstance.setName(taskNode.getName());
+        taskInstance.setTaskCode(taskNode.getCode());
+        taskInstance.setTaskDefinitionVersion(taskNode.getVersion());
         taskInstance.setTaskType(taskNode.getType().toUpperCase());
         taskInstance.setProcessInstanceId(processInstance.getId());
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);

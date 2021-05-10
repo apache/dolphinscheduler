@@ -127,11 +127,14 @@ public class CheckUtils {
      */
     public static boolean checkTaskNodeParameters(TaskNode taskNode) {
         AbstractParameters abstractParameters;
-
-        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskNode.getType())) {
-            abstractParameters = TaskParametersUtils.getParameters(taskNode.getType().toUpperCase(), taskNode.getDependence());
+        String taskType = taskNode.getType();
+        if (taskType == null) {
+            return false;
+        }
+        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getDependence());
         } else {
-            abstractParameters = TaskParametersUtils.getParameters(taskNode.getType().toUpperCase(), taskNode.getParams());
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getParams());
         }
 
         if (abstractParameters != null) {

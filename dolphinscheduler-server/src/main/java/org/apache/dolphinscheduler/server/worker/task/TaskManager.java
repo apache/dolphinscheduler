@@ -45,7 +45,12 @@ public class TaskManager {
      * @throws IllegalArgumentException illegal argument exception
      */
     public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger, AlertClientService alertClientService) throws IllegalArgumentException {
-        switch (taskExecutionContext.getTaskType()) {
+        String taskType = taskExecutionContext.getTaskType();
+        if (taskType == null) {
+            logger.error("task type is null");
+            throw new IllegalArgumentException("task type is null");
+        }
+        switch (taskType) {
             case "SHELL":
             case "WATERDROP":
                 return new ShellTask(taskExecutionContext, logger);
@@ -68,7 +73,7 @@ public class TaskManager {
             case "SQOOP":
                 return new SqoopTask(taskExecutionContext, logger);
             default:
-                logger.error("not support task type: {}", taskExecutionContext.getTaskType());
+                logger.error("not support task type: {}", taskType);
                 throw new IllegalArgumentException("not support task type");
         }
     }

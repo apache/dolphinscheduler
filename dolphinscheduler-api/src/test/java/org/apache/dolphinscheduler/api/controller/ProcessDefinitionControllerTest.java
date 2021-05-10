@@ -45,8 +45,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
@@ -54,8 +52,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessDefinitionControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
 
     @InjectMocks
     private ProcessDefinitionController processDefinitionController;
@@ -383,13 +379,6 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testQueryProcessDefinitionVersions() {
         String projectName = "test";
-
-        Result result = processDefinitionController.queryProcessDefinitionVersions(user, projectName, 1, -10, 1);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-
-        result = processDefinitionController.queryProcessDefinitionVersions(user, projectName, -1, 10, 1);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-
         Map<String, Object> resultMap = new HashMap<>();
         putMsg(resultMap, Status.SUCCESS);
         resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionLog>(1, 10));
@@ -400,7 +389,7 @@ public class ProcessDefinitionControllerTest {
                 , 10
                 , 1))
                 .thenReturn(resultMap);
-        result = processDefinitionController.queryProcessDefinitionVersions(
+        Result result = processDefinitionController.queryProcessDefinitionVersions(
                 user
                 , projectName
                 , 1
