@@ -23,12 +23,14 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.datasource.SpringConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
@@ -329,8 +331,12 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
+        processDefinition.setProjectCode(1L);
         taskInstance.setProcessDefine(processDefinition);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskInstance.setTaskDefine(taskDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
@@ -363,8 +369,12 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setUserId(2);
-        processDefinition.setProjectId(1);
+        processDefinition.setProjectCode(1L);
         taskInstance.setProcessDefine(processDefinition);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskInstance.setTaskDefine(taskDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
