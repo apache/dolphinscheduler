@@ -97,36 +97,36 @@ public class TaskManagerTest {
     public void testNewTask() {
 
         taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.WATERDROP.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.HTTP.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.MR.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.SPARK.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.FLINK.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.PYTHON.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.DATAX.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
         taskExecutionContext.setTaskType(TaskType.SQOOP.getDesc());
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNull() {
         taskExecutionContext.setTaskType(null);
-        TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
+        TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNotExists() {
-        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
-        TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
+        taskExecutionContext.setTaskType("ttt");
+        TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
     }
 
     @Test
@@ -163,7 +163,7 @@ public class TaskManagerTest {
         Map<String, String> definedParams = new HashMap<>();
         definedParams.put("time_gb", "2020-12-16 00:00:00");
         taskExecutionContext.setDefinedParams(definedParams);
-        ShellTask shellTask = (ShellTask) TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
+        ShellTask shellTask = (ShellTask) TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
         shellTask.setResultString("shell return");
         String shellReturn = shellTask.getResultString();
         shellTask.init();

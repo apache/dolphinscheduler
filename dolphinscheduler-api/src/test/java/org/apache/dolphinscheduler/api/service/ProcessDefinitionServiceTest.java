@@ -449,24 +449,11 @@ public class ProcessDefinitionServiceTest {
         definition.setConnects("[]");
 
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
-
-        Mockito.when(processService.saveProcessDefinition(Mockito.eq(loginUser)
-                , Mockito.eq(project2)
-                , Mockito.anyString()
-                , Mockito.anyString()
-                , Mockito.anyString()
-                , Mockito.anyString()
-                , Mockito.any(ProcessData.class)
-                , Mockito.any(ProcessDefinition.class)
-                ,true))
-                .thenReturn(1);
-
         Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(getProcessData());
 
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
                 loginUser, projectName, "46", 1);
-        Assert.assertEquals(Status.SUCCESS, map3.get(Constants.STATUS));
-
+        Assert.assertEquals(Status.COPY_PROCESS_DEFINITION_ERROR, map3.get(Constants.STATUS));
     }
 
     @Test
@@ -501,10 +488,6 @@ public class ProcessDefinitionServiceTest {
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
         definition.setConnects("[]");
-
-        // check target project result == null
-        Mockito.when(processDefineMapper.updateById(definition)).thenReturn(46);
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
 
         putMsg(result, Status.SUCCESS);
 
@@ -800,7 +783,6 @@ public class ProcessDefinitionServiceTest {
 
         //task instance not exist
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
-        Mockito.when(processInstanceService.queryByProcessDefineCode(46L, 10)).thenReturn(processInstanceList);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNullRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNullRes.get(Constants.STATUS));
@@ -837,7 +819,6 @@ public class ProcessDefinitionServiceTest {
         taskInstance.setTaskParams("\"processDefinitionId\": \"222\",\n");
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
-        Mockito.when(processInstanceService.queryByProcessDefineCode(46L, 10)).thenReturn(processInstanceList);
         Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
 
@@ -1104,7 +1085,7 @@ public class ProcessDefinitionServiceTest {
         when(response.getOutputStream()).thenReturn(outputStream);
         processDefinitionService.batchExportProcessDefinitionByIds(
                 loginUser, projectName, "1", response);
-
+        Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinition));
     }
 
     /**
@@ -1221,14 +1202,6 @@ public class ProcessDefinitionServiceTest {
         } else {
             result.put(Constants.MSG, status.getMsg());
         }
-    }
-
-    @Test
-    public void testExportProcessMetaData() {
-        int processDefinitionId = 111;
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(processDefinitionId);
-        Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinition));
     }
 
     @Test

@@ -229,7 +229,7 @@ public class DataAnalysisServiceTest {
     @Test
     public void testCountDefinitionByUser() {
         Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(user, 1);
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(user, 0);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 

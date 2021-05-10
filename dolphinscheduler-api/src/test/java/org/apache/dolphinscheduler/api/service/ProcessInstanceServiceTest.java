@@ -53,7 +53,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,8 +144,8 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(processDefineMapper.selectById(Mockito.anyInt())).thenReturn(getProcessDefinition());
         when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class)
-                , Mockito.any(), Mockito.any(), Mockito.any(),Mockito.any(), Mockito.any(),
-                eq("192.168.xx.xx"),  Mockito.any(),  Mockito.any())).thenReturn(pageReturn);
+                , Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                eq("192.168.xx.xx"), Mockito.any(), Mockito.any())).thenReturn(pageReturn);
 
         Map<String, Object> dataParameterRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "20200101 00:00:00",
                 "20200102 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
@@ -355,7 +354,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testUpdateProcessInstance() throws ParseException {
+    public void testUpdateProcessInstance() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>();
@@ -390,11 +389,15 @@ public class ProcessInstanceServiceTest {
         processInstance.setState(ExecutionStatus.SUCCESS);
         processInstance.setTimeout(3000);
         processInstance.setCommandType(CommandType.STOP);
+        processInstance.setProcessDefinitionCode(46L);
+        processInstance.setProcessDefinitionVersion(1);
         ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setId(1);
         processDefinition.setUserId(1);
         Tenant tenant = new Tenant();
         tenant.setId(1);
         tenant.setTenantCode("test_tenant");
+        when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
@@ -406,10 +409,10 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
-        when(processDefineMapper.updateById(processDefinition)).thenReturn(1);
         when(processService.saveProcessDefinition(Mockito.any(), Mockito.any(),
                 Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.any(), Mockito.any(), true)).thenReturn(1);
+                Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyBoolean())).thenReturn(1);
+        when(processService.findProcessDefinition(46L, 0)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectName);
 
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
@@ -479,7 +482,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testViewVariables() throws Exception {
+    public void testViewVariables() {
         //process instance not null
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setCommandType(CommandType.SCHEDULER);
