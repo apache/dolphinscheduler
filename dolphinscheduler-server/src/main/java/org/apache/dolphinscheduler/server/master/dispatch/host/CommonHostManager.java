@@ -18,37 +18,32 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *  round robin host manager
+ *  common host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
     /**
-     * zookeeper registry center
+     * server node manager
      */
     @Autowired
-    protected ZookeeperRegistryCenter registryCenter;
-
-    /**
-     * zookeeperNodeManager
-     */
-    @Autowired
-    protected ZookeeperNodeManager zookeeperNodeManager;
+    protected ServerNodeManager serverNodeManager;
 
     /**
      * select host
@@ -57,47 +52,49 @@ public abstract class CommonHostManager implements HostManager {
      */
     @Override
     public Host select(ExecutionContext context) {
-        Host host = new Host();
-        Collection<String> nodes = null;
+        List<HostWorker> candidates = null;
         String workerGroup = context.getWorkerGroup();
-        // executor type
         ExecutorType executorType = context.getExecutorType();
         switch (executorType) {
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerGroupNodes(workerGroup);
+                candidates = getWorkerCandidates(workerGroup);
                 break;
             case CLIENT:
                 break;
             default:
                 throw new IllegalArgumentException("invalid executorType : " + executorType);
+        }
 
+        if (CollectionUtils.isEmpty(candidates)) {
+            return new Host();
         }
-        if (nodes == null || nodes.isEmpty()) {
-            return host;
-        }
-        List<HostWorker> candidateHosts = new ArrayList<>();
-        nodes.forEach(node -> {
-            String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
-            String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
-            int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
-            if (StringUtils.isNotEmpty(heartbeat)) {
-                String[] parts = heartbeat.split(Constants.COMMA);
-                if (ResInfo.isNewHeartbeatWithWeight(parts)) {
-                    hostWeight = Integer.parseInt(parts[10]);
-                }
-            }
-            candidateHosts.add(HostWorker.of(node, hostWeight, workerGroup));
-        });
-        return select(candidateHosts);
+        return select(candidates);
     }
 
     protected abstract HostWorker select(Collection<HostWorker> nodes);
 
-    public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
-        this.zookeeperNodeManager = zookeeperNodeManager;
+    protected List<HostWorker> getWorkerCandidates(String workerGroup) {
+        List<HostWorker> hostWorkers = new ArrayList<>();
+        Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            for (String node : nodes) {
+                String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
+                int hostWeight = getWorkerHostWeightFromHeartbeat(heartbeat);
+                hostWorkers.add(HostWorker.of(node, hostWeight, workerGroup));
+            }
+        }
+        return hostWorkers;
     }
 
-    public ZookeeperNodeManager getZookeeperNodeManager() {
-        return zookeeperNodeManager;
+    protected int getWorkerHostWeightFromHeartbeat(String heartbeat) {
+        int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
+        if (StringUtils.isNotEmpty(heartbeat)) {
+            String[] parts = heartbeat.split(Constants.COMMA);
+            if (ResInfo.isNewHeartbeatWithWeight(parts)) {
+                hostWeight = Integer.parseInt(parts[10]);
+            }
+        }
+        return hostWeight;
     }
+
 }

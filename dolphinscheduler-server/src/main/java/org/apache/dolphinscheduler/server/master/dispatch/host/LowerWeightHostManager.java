@@ -47,16 +47,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  round robin host manager
+ *  lower weight host manager
  */
 public class LowerWeightHostManager extends CommonHostManager {
 
     private final Logger logger = LoggerFactory.getLogger(LowerWeightHostManager.class);
-
-    /**
-     * round robin host manager
-     */
-    private RoundRobinHostManager roundRobinHostManager;
 
     /**
      * selector
@@ -85,12 +80,10 @@ public class LowerWeightHostManager extends CommonHostManager {
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
         this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),0, 5, TimeUnit.SECONDS);
-        this.roundRobinHostManager = new RoundRobinHostManager();
-        this.roundRobinHostManager.setZookeeperNodeManager(getZookeeperNodeManager());
     }
 
     @PreDestroy
-    public void close(){
+    public void close() {
         this.executorService.shutdownNow();
     }
 
@@ -137,39 +130,46 @@ public class LowerWeightHostManager extends CommonHostManager {
         @Override
         public void run() {
             try {
-                Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
-                Set<Map.Entry<String, Set<String>>> entries = workerGroupNodes.entrySet();
                 Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
-                for (Map.Entry<String, Set<String>> entry : entries) {
+                Map<String, Set<String>> workerGroupNodes = serverNodeManager.getWorkerGroupNodes();
+                for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
                     String workerGroup = entry.getKey();
                     Set<String> nodes = entry.getValue();
-                    String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for (String node : nodes) {
-                        String heartbeat = registryCenter.getRegisterOperator().get(workerGroupPath + "/" + node);
-                        if (ResInfo.isValidHeartbeatForZKInfo(heartbeat)) {
-                            String[] parts = heartbeat.split(Constants.COMMA);
-                            int status = Integer.parseInt(parts[8]);
-                            if (status == Constants.ABNORMAL_NODE_STATUS) {
-                                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
-                                        Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
-                                continue;
-                            }
-                            double cpu = Double.parseDouble(parts[0]);
-                            double memory = Double.parseDouble(parts[1]);
-                            double loadAverage = Double.parseDouble(parts[2]);
-                            long startTime = DateUtils.stringToDate(parts[6]).getTime();
-                            int weight = ResInfo.isNewHeartbeatWithWeight(parts) ? Integer.parseInt(parts[10]) : Constants.DEFAULT_WORKER_HOST_WEIGHT;
-                            HostWeight hostWeight = new HostWeight(HostWorker.of(node, weight, workerGroup), cpu, memory, loadAverage, startTime);
+                        String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
+                        HostWeight hostWeight = getHostWeight(node, workerGroup, heartbeat);
+                        if (hostWeight != null) {
                             hostWeights.add(hostWeight);
                         }
                     }
-                    workerHostWeights.put(workerGroup, hostWeights);
+                    if (!hostWeights.isEmpty()) {
+                        workerHostWeights.put(workerGroup, hostWeights);
+                    }
                 }
                 syncWorkerHostWeight(workerHostWeights);
             } catch (Throwable ex) {
                 logger.error("RefreshResourceTask error", ex);
             }
+        }
+
+        public HostWeight getHostWeight(String addr, String workerGroup, String heartbeat) {
+            if (ResInfo.isValidHeartbeatForZKInfo(heartbeat)) {
+                String[] parts = heartbeat.split(Constants.COMMA);
+                int status = Integer.parseInt(parts[8]);
+                if (status == Constants.ABNORMAL_NODE_STATUS) {
+                    logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+                            addr, Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+                    return null;
+                }
+                double cpu = Double.parseDouble(parts[0]);
+                double memory = Double.parseDouble(parts[1]);
+                double loadAverage = Double.parseDouble(parts[2]);
+                long startTime = DateUtils.stringToDate(parts[6]).getTime();
+                int weight = getWorkerHostWeightFromHeartbeat(heartbeat);
+                return new HostWeight(HostWorker.of(addr, weight, workerGroup), cpu, memory, loadAverage, startTime);
+            }
+            return null;
         }
     }
 

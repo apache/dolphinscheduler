@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.utils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.apache.dolphinscheduler.common.enums.DbType;
+
+import org.junit.Test;
 
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
 import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.junit.Assert;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * DataxUtils Tester.
@@ -42,6 +45,7 @@ public class DataxUtilsTest {
         assertEquals(DataxUtils.DATAX_READER_PLUGIN_POSTGRESQL, DataxUtils.getReaderPluginName(DbType.POSTGRESQL));
         assertEquals(DataxUtils.DATAX_READER_PLUGIN_SQLSERVER, DataxUtils.getReaderPluginName(DbType.SQLSERVER));
         assertEquals(DataxUtils.DATAX_READER_PLUGIN_ORACLE, DataxUtils.getReaderPluginName(DbType.ORACLE));
+        assertEquals(DataxUtils.DATAX_READER_PLUGIN_CLICKHOUSE, DataxUtils.getReaderPluginName(DbType.CLICKHOUSE));
         assertTrue(DataxUtils.getReaderPluginName(DbType.DB2) == null);
     }
 
@@ -56,6 +60,7 @@ public class DataxUtilsTest {
         assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_POSTGRESQL, DataxUtils.getWriterPluginName(DbType.POSTGRESQL));
         assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_SQLSERVER, DataxUtils.getWriterPluginName(DbType.SQLSERVER));
         assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_ORACLE, DataxUtils.getWriterPluginName(DbType.ORACLE));
+        assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_CLICKHOUSE, DataxUtils.getWriterPluginName(DbType.CLICKHOUSE));
         assertTrue(DataxUtils.getWriterPluginName(DbType.DB2) == null);
     }
 

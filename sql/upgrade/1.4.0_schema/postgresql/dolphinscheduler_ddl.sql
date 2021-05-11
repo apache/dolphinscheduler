@@ -268,6 +268,42 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_alertgroup_A_create_user_id();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_alertgroup_A_create_user_id();
 
+-- uc_dolphin_T_t_ds_alertgroup_A_add_UN_groupName
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_alertgroup_A_add_UN_groupName() RETURNS void AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_stat_all_indexes
+          WHERE relname='t_ds_alertgroup'
+                            AND indexrelname ='t_ds_alertgroup_name_UN')
+      THEN
+         ALTER TABLE t_ds_process_definition ADD CONSTRAINT t_ds_alertgroup_name_UN UNIQUE (group_name);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_alertgroup_A_add_UN_groupName();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_alertgroup_A_add_UN_groupName();
+
+-- uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName() RETURNS void AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_stat_all_indexes
+          WHERE relname='t_ds_datasource'
+                            AND indexrelname ='t_ds_datasource_name_UN')
+      THEN
+         ALTER TABLE t_ds_process_definition ADD CONSTRAINT t_ds_datasource_name_UN UNIQUE (name, type);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName();
+
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
@@ -281,3 +317,7 @@ DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_alertgroup_A_create_user_id();
 -- ALTER TABLE t_ds_process_definition_version DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
 -- DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
+
+-- ALTER TABLE t_ds_command DROP COLUMN "dependence";
+
+-- ALTER TABLE t_ds_error_command DROP COLUMN "dependence";

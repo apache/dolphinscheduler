@@ -156,6 +156,11 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
 
     /**
+     * sudo enable
+     */
+    public static final String SUDO_ENABLE = "sudo.enable";
+
+    /**
      * string true
      */
     public static final String STRING_TRUE = "true";
@@ -376,19 +381,9 @@ public final class Constants {
     public static final int DEFAULT_MASTER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
-     * master reserved memory
-     */
-    public static final double DEFAULT_MASTER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
-
-    /**
      * worker cpu load
      */
     public static final int DEFAULT_WORKER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
-
-    /**
-     * worker reserved memory
-     */
-    public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
     /**
      * worker host weight
@@ -785,8 +780,8 @@ public final class Constants {
     /**
      * master/worker server use for zk
      */
-    public static final String MASTER_PREFIX = "master";
-    public static final String WORKER_PREFIX = "worker";
+    public static final String MASTER_TYPE = "master";
+    public static final String WORKER_TYPE = "worker";
     public static final String DELETE_ZK_OP = "delete";
     public static final String ADD_ZK_OP = "add";
     public static final String ALIAS = "alias";

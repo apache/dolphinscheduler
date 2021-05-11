@@ -16,72 +16,72 @@
   -->
 
 <assembly
-		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>src</id>
-	<formats>
-		<format>zip</format>
-	</formats>
-	<includeBaseDirectory>true</includeBaseDirectory>
-	<baseDirectory>${project.build.finalName}-src-release</baseDirectory>
+        xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>src</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>${project.build.finalName}-src</baseDirectory>
 
-	<fileSets>
-		<fileSet>
-			<directory>${basedir}/../</directory>
-			<useDefaultExcludes>true</useDefaultExcludes>
-			<includes>
-				<include>**/*</include>
-			</includes>
-			<excludes>
-				<!-- github ignore -->
-				<exclude>**/.github/**</exclude>
-				<exclude>.travis.yml</exclude>
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/../</directory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <!-- github ignore -->
+                <exclude>**/.github/**</exclude>
+                <exclude>.travis.yml</exclude>
 
-				<!-- maven ignore -->
-				<exclude>**/target/**</exclude>
-				<exclude>**/*.class</exclude>
-				<exclude>**/*.jar</exclude>
-				<exclude>**/*.war</exclude>
-				<exclude>**/*.zip</exclude>
-				<exclude>**/*.tar</exclude>
-				<exclude>**/*.tar.gz</exclude>
+                <!-- maven ignore -->
+                <exclude>**/target/**</exclude>
+                <exclude>**/*.class</exclude>
+                <exclude>**/*.jar</exclude>
+                <exclude>**/*.war</exclude>
+                <exclude>**/*.zip</exclude>
+                <exclude>**/*.tar</exclude>
+                <exclude>**/*.tar.gz</exclude>
 
-				<!-- maven plugin ignore -->
-				<exclude>release.properties</exclude>
-				<exclude>**/pom.xml.releaseBackup</exclude>
-				<exclude>**/cobertura.ser</exclude>
-				<exclude>*.gpg</exclude>
+                <!-- maven plugin ignore -->
+                <exclude>release.properties</exclude>
+                <exclude>**/pom.xml.releaseBackup</exclude>
+                <exclude>**/cobertura.ser</exclude>
+                <exclude>*.gpg</exclude>
 
-				<!-- node ignore -->
-				<exclude>**/dolphinscheduler-ui/dist/**</exclude>
-				<exclude>**/dolphinscheduler-ui/node/**</exclude>
-				<exclude>**/dolphinscheduler-ui/node_modules/**</exclude>
+                <!-- node ignore -->
+                <exclude>**/dolphinscheduler-ui/dist/**</exclude>
+                <exclude>**/dolphinscheduler-ui/node/**</exclude>
+                <exclude>**/dolphinscheduler-ui/node_modules/**</exclude>
 
-				<!-- eclipse ignore -->
-				<exclude>**/.settings/**</exclude>
-				<exclude>**/.project</exclude>
-				<exclude>**/.classpath</exclude>
+                <!-- eclipse ignore -->
+                <exclude>**/.settings/**</exclude>
+                <exclude>**/.project</exclude>
+                <exclude>**/.classpath</exclude>
 
-				<!-- idea ignore -->
-				<exclude>**/.idea/**</exclude>
-				<exclude>**/*.ipr</exclude>
-				<exclude>**/*.iml</exclude>
-				<exclude>**/*.iws</exclude>
+                <!-- idea ignore -->
+                <exclude>**/.idea/**</exclude>
+                <exclude>**/*.ipr</exclude>
+                <exclude>**/*.iml</exclude>
+                <exclude>**/*.iws</exclude>
 
-				<!-- temp ignore -->
-				<exclude>**/logs/**</exclude>
-				<exclude>**/*.log</exclude>
-				<exclude>**/*.doc</exclude>
-				<exclude>**/*.cache</exclude>
-				<exclude>**/*.diff</exclude>
-				<exclude>**/*.patch</exclude>
-				<exclude>**/*.tmp</exclude>
+                <!-- temp ignore -->
+                <exclude>**/logs/**</exclude>
+                <exclude>**/*.log</exclude>
+                <exclude>**/*.doc</exclude>
+                <exclude>**/*.cache</exclude>
+                <exclude>**/*.diff</exclude>
+                <exclude>**/*.patch</exclude>
+                <exclude>**/*.tmp</exclude>
 
-				<!-- system ignore -->
-				<exclude>**/.DS_Store</exclude>
-				<exclude>**/Thumbs.db</exclude>
-			</excludes>
-		</fileSet>
-	</fileSets>
+                <!-- system ignore -->
+                <exclude>**/.DS_Store</exclude>
+                <exclude>**/Thumbs.db</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
 </assembly>

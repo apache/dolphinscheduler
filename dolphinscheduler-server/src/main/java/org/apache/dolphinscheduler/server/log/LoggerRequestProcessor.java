@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.log;
 
-import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -31,6 +30,7 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.utils.Constants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,9 +42,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,16 +52,16 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 
 /**
- *  logger request process logic
+ * logger request process logic
  */
 public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
-    private final ThreadPoolExecutor executor;
+    private final ExecutorService executor;
 
     public LoggerRequestProcessor() {
-        this.executor = new ThreadPoolExecutor(4, 4, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(100));
+        this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1);
     }
 
     @Override
@@ -137,11 +135,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @throws Exception exception
      */
     private byte[] getFileContentBytes(String filePath) {
-        InputStream in = null;
-        ByteArrayOutputStream bos = null;
-        try {
-            in = new FileInputStream(filePath);
-            bos  = new ByteArrayOutputStream();
+        try (InputStream in = new FileInputStream(filePath);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {
@@ -149,10 +144,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             }
             return bos.toByteArray();
         } catch (IOException e) {
-            logger.error("get file bytes error",e);
-        } finally {
-            IOUtils.closeQuietly(bos);
-            IOUtils.closeQuietly(in);
+            logger.error("get file bytes error", e);
         }
         return new byte[0];
     }
@@ -166,14 +158,14 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return part file content
      */
     private List<String> readPartFileContent(String filePath,
-                                            int skipLine,
-                                            int limit) {
+                                             int skipLine,
+                                             int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
                 return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
             } catch (IOException e) {
-                logger.error("read file error",e);
+                logger.error("read file error", e);
             }
         } else {
             logger.info("file path: {} not exists", filePath);

@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
@@ -45,6 +46,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -107,6 +109,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private ProjectMapper projectMapper;
 
 
     /**
@@ -243,6 +248,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public User queryUser(int id) {
         return userMapper.selectById(id);
+    }
+
+    @Override
+    public List<User> queryUser(List<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return userMapper.selectByIds(ids);
     }
 
     /**
@@ -480,6 +493,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User tempUser = userMapper.selectById(id);
         if (tempUser == null) {
             putMsg(result, Status.USER_NOT_EXIST, id);
+            return result;
+        }
+        // check if is a project owner
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(id);
+        if (CollectionUtils.isNotEmpty(projects)) {
+            String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
+            putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
             return result;
         }
         // delete user

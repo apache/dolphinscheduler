@@ -624,7 +624,16 @@ export default {
   },
   deleteWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('worker-group/delete-by-id', payload, res => {
+      io.post('worker-group/delete-by-id', payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  getWorkerAddresses ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('worker-group/worker-address-list', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
