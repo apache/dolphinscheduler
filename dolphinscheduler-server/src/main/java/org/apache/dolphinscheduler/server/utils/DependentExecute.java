@@ -70,12 +70,13 @@ public class DependentExecute {
     /**
      * logger
      */
-    private Logger logger =  LoggerFactory.getLogger(DependentExecute.class);
+    private Logger logger = LoggerFactory.getLogger(DependentExecute.class);
 
     /**
      * constructor
-     * @param itemList  item list
-     * @param relation  relation
+     *
+     * @param itemList item list
+     * @param relation relation
      */
     public DependentExecute(List<DependentItem> itemList, DependentRelation relation) {
         this.dependItemList = itemList;
@@ -84,6 +85,7 @@ public class DependentExecute {
 
     /**
      * get dependent item for one dependent item
+     *
      * @param dependentItem dependent item
      * @param currentTime   current time
      * @return DependResult
@@ -95,6 +97,7 @@ public class DependentExecute {
 
     /**
      * calculate dependent result for one dependent item.
+     *
      * @param dependentItem dependent item
      * @param dateIntervals date intervals
      * @return dateIntervals
@@ -103,17 +106,17 @@ public class DependentExecute {
                                                  List<DateInterval> dateIntervals) {
 
         DependResult result = DependResult.FAILED;
-        for(DateInterval dateInterval : dateIntervals){
+        for (DateInterval dateInterval : dateIntervals) {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
-                                                    dateInterval);
-            if(processInstance == null){
+                    dateInterval);
+            if (processInstance == null) {
                 return DependResult.WAITING;
             }
             // need to check workflow for updates, so get all task and check the task state
             if (dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)) {
                 result = dependResultByProcessInstance(processInstance);
             } else {
-                result = getDependTaskResult(dependentItem.getDepTasks(),processInstance);
+                result = getDependTaskResult(dependentItem.getDepTasks(), processInstance);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -124,6 +127,7 @@ public class DependentExecute {
 
     /**
      * depend type = depend_all
+     *
      * @return
      */
     private DependResult dependResultByProcessInstance(ProcessInstance processInstance) {
@@ -138,6 +142,7 @@ public class DependentExecute {
 
     /**
      * get depend task result
+     *
      * @param taskName
      * @param processInstance
      * @return
@@ -173,14 +178,15 @@ public class DependentExecute {
      * find the last one process instance that :
      * 1. manual run and finish between the interval
      * 2. schedule run and schedule time between the interval
-     * @param definitionCode  definition code
-     * @param dateInterval  date interval
+     *
+     * @param definitionCode definition code
+     * @param dateInterval   date interval
      * @return ProcessInstance
      */
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval) {
 
         ProcessInstance runningProcess = processService.findLastRunningProcess(definitionCode, dateInterval.getStartTime(), dateInterval.getEndTime());
-        if(runningProcess != null){
+        if (runningProcess != null) {
             return runningProcess;
         }
 
@@ -200,6 +206,7 @@ public class DependentExecute {
 
     /**
      * get dependent result by task/process instance state
+     *
      * @param state state
      * @return DependResult
      */
@@ -216,6 +223,7 @@ public class DependentExecute {
 
     /**
      * get dependent result by task instance state when task instance is null
+     *
      * @param state state
      * @return DependResult
      */
@@ -232,6 +240,7 @@ public class DependentExecute {
 
     /**
      * judge depend item finished
+     *
      * @param currentTime current time
      * @return boolean
      */
@@ -245,6 +254,7 @@ public class DependentExecute {
 
     /**
      * get model depend result
+     *
      * @param currentTime current time
      * @return DependResult
      */
@@ -265,8 +275,9 @@ public class DependentExecute {
 
     /**
      * get dependent item result
-     * @param item          item
-     * @param currentTime   current time
+     *
+     * @param item        item
+     * @param currentTime current time
      * @return DependResult
      */
     private DependResult getDependResultForItem(DependentItem item, Date currentTime) {
