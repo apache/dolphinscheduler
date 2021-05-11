@@ -59,7 +59,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
- *  procedure task
+ * procedure task
  */
 public class ProcedureTask extends AbstractTask {
 
@@ -77,7 +77,7 @@ public class ProcedureTask extends AbstractTask {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger logger
+     * @param logger               logger
      */
     public ProcedureTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
@@ -118,7 +118,6 @@ public class ProcedureTask extends AbstractTask {
             // get jdbc connection
             connection = DatasourceUtil.getConnection(dbType, connectionParam);
 
-
             // combining local and global parameters
             Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                     taskExecutionContext.getDefinedParams(),
@@ -146,14 +145,14 @@ public class ProcedureTask extends AbstractTask {
             logger.error("procedure task error", e);
             throw e;
         } finally {
-            close(stmt,connection);
+            close(stmt, connection);
         }
     }
 
     /**
      * print outParameter
      *
-     * @param stmt CallableStatement
+     * @param stmt            CallableStatement
      * @param outParameterMap outParameterMap
      * @throws SQLException SQLException
      */
@@ -175,13 +174,13 @@ public class ProcedureTask extends AbstractTask {
     /**
      * get output parameter
      *
-     * @param stmt CallableStatement
+     * @param stmt      CallableStatement
      * @param paramsMap paramsMap
      * @return outParameterMap
      * @throws Exception Exception
      */
     private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<String, Property> paramsMap) throws Exception {
-        Map<Integer,Property> outParameterMap = new HashMap<>();
+        Map<Integer, Property> outParameterMap = new HashMap<>();
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;
         }
@@ -195,7 +194,7 @@ public class ProcedureTask extends AbstractTask {
         int index = 1;
         for (Property property : userDefParamsList) {
             logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
-                    ,property.getProp(),
+                    , property.getProp(),
                     property.getDirect(),
                     property.getType(),
                     property.getValue());
@@ -203,9 +202,9 @@ public class ProcedureTask extends AbstractTask {
             if (property.getDirect().equals(Direct.IN)) {
                 ParameterUtils.setInParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
             } else if (property.getDirect().equals(Direct.OUT)) {
-                setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
+                setOutParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
                 property.setValue(paramsMap.get(property.getProp()).getValue());
-                outParameterMap.put(index,property);
+                outParameterMap.put(index, property);
             }
             index++;
         }
@@ -227,33 +226,34 @@ public class ProcedureTask extends AbstractTask {
     }
 
     /**
-    * close jdbc resource
-    *
-    * @param stmt stmt
-    * @param connection connection
-    */
+     * close jdbc resource
+     *
+     * @param stmt       stmt
+     * @param connection connection
+     */
     private void close(PreparedStatement stmt, Connection connection) {
         if (stmt != null) {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                logger.error("close prepared statement error : {}",e.getMessage(),e);
+                logger.error("close prepared statement error : {}", e.getMessage(), e);
             }
         }
         if (connection != null) {
             try {
                 connection.close();
             } catch (SQLException e) {
-                logger.error("close connection error : {}",e.getMessage(),e);
+                logger.error("close connection error : {}", e.getMessage(), e);
             }
         }
     }
 
     /**
      * get output parameter
-     * @param stmt stmt
-     * @param index index
-     * @param prop prop
+     *
+     * @param stmt     stmt
+     * @param index    index
+     * @param prop     prop
      * @param dataType dataType
      * @throws SQLException SQLException
      */
@@ -299,13 +299,13 @@ public class ProcedureTask extends AbstractTask {
     /**
      * set out parameter
      *
-     * @param index index
-     * @param stmt stmt
+     * @param index    index
+     * @param stmt     stmt
      * @param dataType dataType
-     * @param value value
+     * @param value    value
      * @throws Exception exception
      */
-    private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception {
+    private void setOutParameter(int index, CallableStatement stmt, DataType dataType, String value) throws Exception {
         int sqlType;
         switch (dataType) {
             case VARCHAR:
