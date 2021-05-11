@@ -85,7 +85,7 @@
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.email.version>1.5</commons.email.version>
-        <poi.version>3.17</poi.version>
+        <poi.version>4.1.2</poi.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
         <commons.collections4.version>4.1</commons.collections4.version>
         <guava.version>24.1-jre</guava.version>
@@ -447,6 +447,11 @@
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
 
@@ -916,6 +921,9 @@
                         <include>**/remote/command/future/ResponseFutureTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesRequestCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesResponseCommandTest.java</include>
+                        <include>**/remote/command/log/ViewLogRequestCommandTest.java</include>
                         <include>**/remote/utils/HostTest.java</include>
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
@@ -939,7 +947,6 @@
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/registry/ServerNodeManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
-                        <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
                         <include>**/server/master/ConditionsTaskTest.java</include>
@@ -989,6 +996,7 @@
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
+                        <include>**/service/alert/ProcessAlertManagerTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
