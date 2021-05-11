@@ -930,7 +930,7 @@ public class MasterExecThread implements Runnable {
             if (!sendTimeWarning && checkProcessTimeOut(processInstance)) {
                 processAlertManager.sendProcessTimeoutAlert(processInstance,
                         processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
+                        processInstance.getProcessDefinitionVersion()));
                 sendTimeWarning = true;
             }
             for (Map.Entry<MasterBaseTaskExecThread, Future<Boolean>> entry : activeTaskNode.entrySet()) {
