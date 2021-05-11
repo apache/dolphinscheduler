@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.plugin;
 
 import java.util.Objects;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -29,6 +30,7 @@ public class DolphinSchedulerPluginLoaderTest {
      * Method: loadPlugins()
      */
     @Test
+    @Ignore
     public void testLoadPlugins() {
         PluginManagerTest pluginManager = new PluginManagerTest();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();

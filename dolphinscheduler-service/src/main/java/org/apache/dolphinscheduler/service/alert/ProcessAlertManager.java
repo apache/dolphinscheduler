@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -36,21 +35,25 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
- * alert manager
+ * process alert manager
  */
-public class AlertManager {
+@Component
+public class ProcessAlertManager {
 
     /**
      * logger of AlertManager
      */
-    private static final Logger logger = LoggerFactory.getLogger(AlertManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManager.class);
 
     /**
      * alert dao
      */
-    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+    @Autowired
+    private AlertDao alertDao;
 
     /**
      * command type convert chinese
@@ -183,7 +186,7 @@ public class AlertManager {
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alertDao.addAlert(alert);
-            logger.info("add alert to db , alert : {}", alert.toString());
+            logger.info("add alert to db , alert : {}", alert);
 
         } catch (Exception e) {
             logger.error("send alert failed:{} ", e.getMessage());
@@ -237,7 +240,7 @@ public class AlertManager {
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert.toString());
+        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**

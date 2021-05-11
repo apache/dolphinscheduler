@@ -55,7 +55,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.utils.AlertManager;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
@@ -148,7 +148,7 @@ public class MasterExecThread implements Runnable {
     /**
      * alert manager
      */
-    private AlertManager alertManager;
+    private ProcessAlertManager processAlertManager;
 
     /**
      * the object of DAG
@@ -186,7 +186,7 @@ public class MasterExecThread implements Runnable {
     public MasterExecThread(ProcessInstance processInstance
             , ProcessService processService
             , NettyRemotingClient nettyRemotingClient
-            , AlertManager alertManager
+            , ProcessAlertManager processAlertManager
             , MasterConfig masterConfig) {
         this.processService = processService;
 
@@ -196,7 +196,7 @@ public class MasterExecThread implements Runnable {
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
         this.nettyRemotingClient = nettyRemotingClient;
-        this.alertManager = alertManager;
+        this.processAlertManager = processAlertManager;
     }
 
     @Override
@@ -367,7 +367,7 @@ public class MasterExecThread implements Runnable {
         }
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        alertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
+        processAlertManager.sendAlertProcessInstance(processInstance, taskInstances, projectUser);
     }
 
     /**
@@ -928,10 +928,9 @@ public class MasterExecThread implements Runnable {
 
             // send warning email if process time out.
             if (!sendTimeWarning && checkProcessTimeOut(processInstance)) {
-                alertManager.sendProcessTimeoutAlert(processInstance,
+                processAlertManager.sendProcessTimeoutAlert(processInstance,
                         processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                processInstance.getProcessDefinitionVersion()));
-
+                processInstance.getProcessDefinitionVersion());
                 sendTimeWarning = true;
             }
             for (Map.Entry<MasterBaseTaskExecThread, Future<Boolean>> entry : activeTaskNode.entrySet()) {
@@ -993,7 +992,7 @@ public class MasterExecThread implements Runnable {
             }
             // send alert
             if (CollectionUtils.isNotEmpty(this.recoverToleranceFaultTaskList)) {
-                alertManager.sendAlertWorkerToleranceFault(processInstance, recoverToleranceFaultTaskList);
+                processAlertManager.sendAlertWorkerToleranceFault(processInstance, recoverToleranceFaultTaskList);
                 this.recoverToleranceFaultTaskList.clear();
             }
             // updateProcessInstance completed task status
