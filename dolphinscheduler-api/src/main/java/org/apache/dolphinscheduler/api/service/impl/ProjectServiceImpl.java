@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -94,15 +96,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Date now = new Date();
 
+        try {
         project = Project
                 .newBuilder()
                 .name(name)
+                .code(SnowFlakeUtils.getInstance().nextId())
                 .description(desc)
                 .userId(loginUser.getId())
                 .userName(loginUser.getUserName())
                 .createTime(now)
                 .updateTime(now)
                 .build();
+        } catch (SnowFlakeException e) {
+            putMsg(result, Status.CREATE_PROJECT_ERROR);
+            return result;
+        }
 
         if (projectMapper.insert(project) > 0) {
             result.put(Constants.DATA_LIST, project.getId());
@@ -224,7 +232,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
 
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
         if (!processDefinitionList.isEmpty()) {
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);

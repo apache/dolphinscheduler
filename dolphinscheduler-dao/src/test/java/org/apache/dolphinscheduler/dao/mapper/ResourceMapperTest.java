@@ -253,8 +253,8 @@ public class ResourceMapperTest {
                 "",
                 null
         );
-        Assert.assertNotEquals(resourceIPage.getTotal(), 0);
-        Assert.assertNotEquals(resourceIPage1.getTotal(), 0);
+        Assert.assertEquals(resourceIPage.getTotal(), 0);
+        Assert.assertEquals(resourceIPage1.getTotal(), 0);
 
     }
 
@@ -377,8 +377,9 @@ public class ResourceMapperTest {
     public void deleteIdsTest() {
         // create a general user
         User generalUser1 = createGeneralUser("user1");
+        User generalUser = createGeneralUser("user");
 
-        Resource resource = createResource(generalUser1);
+        Resource resource = createResource(generalUser);
         Resource resource1 = createResource(generalUser1);
 
         List<Integer> resourceList = new ArrayList<>();

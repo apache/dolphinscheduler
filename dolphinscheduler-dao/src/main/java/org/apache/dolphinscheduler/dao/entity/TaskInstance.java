@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -58,25 +59,25 @@ public class TaskInstance implements Serializable {
     private String taskType;
 
     /**
-     * process definition id
-     */
-    private int processDefinitionId;
-
-    /**
      * process instance id
      */
     private int processInstanceId;
+
+    /**
+     * task code
+     */
+    private long taskCode;
+
+    /**
+     * task definition version
+     */
+    private int taskDefinitionVersion;
 
     /**
      * process instance name
      */
     @TableField(exist = false)
     private String processInstanceName;
-
-    /**
-     * task json
-     */
-    private String taskJson;
 
     /**
      * state
@@ -147,6 +148,12 @@ public class TaskInstance implements Serializable {
     private ProcessDefinition processDefine;
 
     /**
+     * task definition
+     */
+    @TableField(exist = false)
+    private TaskDefinition taskDefine;
+
+    /**
      * process id
      */
     private int pid;
@@ -165,7 +172,7 @@ public class TaskInstance implements Serializable {
      * dependency
      */
     @TableField(exist = false)
-    private String dependency;
+    private DependentParameters dependency;
 
     /**
      * duration
@@ -216,7 +223,7 @@ public class TaskInstance implements Serializable {
      * varPool string
      */
     private String varPool;
-    
+
     /**
      * executor name
      */
@@ -232,6 +239,11 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
+    /**
+     * task params
+     */
+    private String taskParams;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
@@ -245,7 +257,7 @@ public class TaskInstance implements Serializable {
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
-    
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }
@@ -260,6 +272,14 @@ public class TaskInstance implements Serializable {
 
     public void setProcessDefine(ProcessDefinition processDefine) {
         this.processDefine = processDefine;
+    }
+
+    public TaskDefinition getTaskDefine() {
+        return taskDefine;
+    }
+
+    public void setTaskDefine(TaskDefinition taskDefine) {
+        this.taskDefine = taskDefine;
     }
 
     public int getId() {
@@ -286,28 +306,12 @@ public class TaskInstance implements Serializable {
         this.taskType = taskType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
     public int getProcessInstanceId() {
         return processInstanceId;
     }
 
     public void setProcessInstanceId(int processInstanceId) {
         this.processInstanceId = processInstanceId;
-    }
-
-    public String getTaskJson() {
-        return taskJson;
-    }
-
-    public void setTaskJson(String taskJson) {
-        this.taskJson = taskJson;
     }
 
     public ExecutionStatus getState() {
@@ -410,15 +414,15 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-    public String getDependency() {
-        if (this.dependency != null) {
-            return this.dependency;
+    public DependentParameters getDependency() {
+        if (this.dependency == null) {
+            Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+            this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
         }
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        return taskNode == null ? null : taskNode.getDependence();
+        return this.dependency;
     }
 
-    public void setDependency(String dependency) {
+    public void setDependency(DependentParameters dependency) {
         this.dependency = dependency;
     }
 
@@ -495,15 +499,15 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isSubProcess() {
-        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+        return TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public boolean isDependTask() {
-        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+        return TaskType.DEPENDENT.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     public boolean isConditionsTask() {
-        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
+        return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**
@@ -569,10 +573,8 @@ public class TaskInstance implements Serializable {
                 + "id=" + id
                 + ", name='" + name + '\''
                 + ", taskType='" + taskType + '\''
-                + ", processDefinitionId=" + processDefinitionId
                 + ", processInstanceId=" + processInstanceId
                 + ", processInstanceName='" + processInstanceName + '\''
-                + ", taskJson='" + taskJson + '\''
                 + ", state=" + state
                 + ", firstSubmitTime=" + firstSubmitTime
                 + ", submitTime=" + submitTime
@@ -600,5 +602,29 @@ public class TaskInstance implements Serializable {
                 + ", executorName='" + executorName + '\''
                 + ", delayTime=" + delayTime
                 + '}';
+    }
+
+    public long getTaskCode() {
+        return taskCode;
+    }
+
+    public void setTaskCode(long taskCode) {
+        this.taskCode = taskCode;
+    }
+
+    public int getTaskDefinitionVersion() {
+        return taskDefinitionVersion;
+    }
+
+    public void setTaskDefinitionVersion(int taskDefinitionVersion) {
+        this.taskDefinitionVersion = taskDefinitionVersion;
+    }
+
+    public String getTaskParams() {
+        return taskParams;
+    }
+
+    public void setTaskParams(String taskParams) {
+        this.taskParams = taskParams;
     }
 }

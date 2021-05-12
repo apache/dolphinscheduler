@@ -123,17 +123,18 @@ public class ProjectUser {
     public void setPerm(int perm) {
         this.perm = perm;
     }
+
     @Override
     public String toString() {
-        return "ProjectUser{" +
-                "id=" + id +
-                ", projectId=" + projectId +
-                ", projectName='" + projectName + '\'' +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", perm=" + perm +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "ProjectUser{"
+               + "id=" + id
+               + ", userId=" + userId
+               + ", projectId=" + projectId
+               + ", projectName='" + projectName + '\''
+               + ", userName='" + userName + '\''
+               + ", perm=" + perm
+               + ", createTime=" + createTime
+               + ", updateTime=" + updateTime
+               + '}';
     }
 }

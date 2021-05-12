@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper">
+    <sql id="baseSql">
+        id, code, `name`, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
+        resource_ids, operator, operate_time, create_time, update_time
+    </sql>
+    <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
+        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
+        td.timeout, td.delay_time, td.resource_ids, td.operator,td.operate_time, td.create_time, td.update_time,
+        u.user_name,p.name as project_name
+        from t_ds_task_definition_log td
+        JOIN t_ds_user u ON td.user_id = u.id
+        JOIN  t_ds_project p ON td.project_code = p.code
+        WHERE p.code = #{projectCode}
+        and td.name = #{taskDefinitionName}
+    </select>
+    <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
+        select max(version)
+        from t_ds_task_definition_log
+        WHERE code = #{taskDefinitionCode}
+    </select>
+    <select id="queryByDefinitionCodeAndVersion" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition_log
+        WHERE code = #{taskDefinitionCode}
+        and version = #{version}
+    </select>
+    <select id="queryByTaskDefinitions" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition_log
+        WHERE  1 = 1
+        <if test="taskDefinitions != null and taskDefinitions.size != 0">
+            and
+            <foreach collection="taskDefinitions" index="index" item="item" open="(" separator=" or " close=")">
+                (code = #{item.code}
+                and version = #{item.version})
+            </foreach>
+        </if>
+    </select>
+</mapper>

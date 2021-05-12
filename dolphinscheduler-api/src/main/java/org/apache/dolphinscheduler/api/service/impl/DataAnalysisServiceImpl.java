@@ -43,13 +43,14 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 projectId,
                 startDate,
                 endDate,
-            (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
+            (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectCodes));
     }
 
     /**
@@ -121,7 +122,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 projectId,
                 startDate,
                 endDate,
-            (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+            (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectCodes));
         // process state count needs to remove state of forced success
         if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
             ((TaskCountDto)result.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
@@ -130,7 +131,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     }
 
     private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
-            , TriFunction<Date, Date, Integer[], List<ExecuteStatusCount>> instanceStateCounter) {
+            , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
@@ -148,9 +149,10 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
+        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectMapper.selectById(projectId).getCode() };
         List<ExecuteStatusCount> processInstanceStateCounts =
-                instanceStateCounter.apply(start, end, projectIdArray);
+                instanceStateCounter.apply(start, end, projectCodeArray);
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
@@ -171,10 +173,14 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     @Override
     public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
-
-        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
+        boolean checkProject = checkProject(loginUser, projectId, result);
+        if (!checkProject) {
+            return result;
+        }
+        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectMapper.selectById(projectId).getCode() };
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
-                loginUser.getId(), projectIdArray, isAdmin(loginUser));
+                loginUser.getId(), projectCodeArray, isAdmin(loginUser));
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
         result.put(Constants.DATA_LIST, dto);
@@ -222,14 +228,15 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
+        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectMapper.selectById(projectId).getCode() };
         // count normal command state
-        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectIdArray)
+        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
-        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(start, end, projectIdArray)
+        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(start, end, projectCodeArray)
                 .stream()
                 .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
@@ -245,17 +252,16 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Integer[] getProjectIdsArrays(User loginUser, int projectId) {
-        List<Integer> projectIds = new ArrayList<>();
-        if (projectId != 0) {
-            projectIds.add(projectId);
-        } else if (loginUser.getUserType() == UserType.GENERAL_USER) {
-            projectIds = processService.getProjectIdListHavePerm(loginUser.getId());
-            if (projectIds.isEmpty()) {
-                projectIds.add(0);
-            }
+    private Long[] getProjectCodesArrays(User loginUser) {
+        List<Project> projectList = projectMapper.queryRelationProjectListByUserId(
+                loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId());
+        Set<Long> projectCodes = new HashSet<>();
+        projectList.forEach(project -> projectCodes.add(project.getCode()));
+        if (loginUser.getUserType() == UserType.GENERAL_USER) {
+            List<Project> createProjects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
+            createProjects.forEach(project -> projectCodes.add(project.getCode()));
         }
-        return projectIds.toArray(new Integer[0]);
+        return projectCodes.toArray(new Long[0]);
     }
 
     /**

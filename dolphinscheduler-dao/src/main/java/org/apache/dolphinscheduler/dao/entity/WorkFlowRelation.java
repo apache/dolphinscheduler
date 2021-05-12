@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Objects;
+
 public class WorkFlowRelation {
     private int sourceWorkFlowId;
     private int targetWorkFlowId;
@@ -34,5 +36,25 @@ public class WorkFlowRelation {
 
     public void setTargetWorkFlowId(int targetWorkFlowId) {
         this.targetWorkFlowId = targetWorkFlowId;
+    }
+
+    public WorkFlowRelation() {
+    }
+
+    public WorkFlowRelation(int sourceWorkFlowId, int targetWorkFlowId) {
+        this.sourceWorkFlowId = sourceWorkFlowId;
+        this.targetWorkFlowId = targetWorkFlowId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof WorkFlowRelation
+                && this.sourceWorkFlowId == ((WorkFlowRelation) obj).getSourceWorkFlowId()
+                && this.targetWorkFlowId == ((WorkFlowRelation) obj).getTargetWorkFlowId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sourceWorkFlowId, targetWorkFlowId);
     }
 }

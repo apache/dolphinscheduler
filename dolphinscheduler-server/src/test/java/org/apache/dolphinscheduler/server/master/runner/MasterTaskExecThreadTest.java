@@ -18,6 +18,10 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -50,25 +54,34 @@ public class MasterTaskExecThreadTest {
 
     @Before
     public void setUp() {
-
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         this.springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
         this.zookeeperRegistryCenter = PowerMockito.mock(ZookeeperRegistryCenter.class);
         PowerMockito.when(SpringApplicationContext.getBean(ZookeeperRegistryCenter.class))
                 .thenReturn(this.zookeeperRegistryCenter);
+        ProcessService processService = Mockito.mock(ProcessService.class);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
+                .thenReturn(processService);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
         this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
     }
 
     @Test
-    public void testExistsValidWorkerGroup1(){
+    public void testExistsValidWorkerGroup1() {
 
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(Sets.newHashSet());
         boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
         Assert.assertFalse(b);
     }
+
     @Test
-    public void testExistsValidWorkerGroup2(){
+    public void testExistsValidWorkerGroup2() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
         workerGorups.add("test2");
@@ -79,7 +92,7 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testExistsValidWorkerGroup3(){
+    public void testExistsValidWorkerGroup3() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
 
@@ -90,11 +103,9 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testPauseTask(){
-
-
+    public void testPauseTask() {
         ProcessService processService = Mockito.mock(ProcessService.class);
-        Mockito.when(this.springApplicationContext.getBean(ProcessService.class))
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
                 .thenReturn(processService);
 
         TaskInstance taskInstance = getTaskInstance();
@@ -104,19 +115,27 @@ public class MasterTaskExecThreadTest {
         Mockito.when(processService.updateTaskInstance(taskInstance))
                 .thenReturn(true);
 
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
+
         MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
         masterTaskExecThread.pauseTask();
         org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
     }
 
-    private TaskInstance getTaskInstance(){
+    private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setId(252612);
         taskInstance.setName("C");
-        taskInstance.setTaskJson("{}");
         taskInstance.setProcessInstanceId(10111);
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskInstance.setTaskCode(1L);
+        taskInstance.setTaskDefinitionVersion(1);
         return taskInstance;
     }
 

@@ -78,7 +78,7 @@ public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
      */
     @Override
     public void afterPropertiesSet() {
-        TaskNodeParamFactory.register(TaskType.SQL.name(), this);
-        TaskNodeParamFactory.register(TaskType.PROCEDURE.name(), this);
+        TaskNodeParamFactory.register(TaskType.SQL.getDesc(), this);
+        TaskNodeParamFactory.register(TaskType.PROCEDURE.getDesc(), this);
     }
 }

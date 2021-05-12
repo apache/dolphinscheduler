@@ -17,6 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.task.procedure;
 
+import static org.apache.dolphinscheduler.common.enums.DataType.BOOLEAN;
+import static org.apache.dolphinscheduler.common.enums.DataType.DATE;
+import static org.apache.dolphinscheduler.common.enums.DataType.DOUBLE;
+import static org.apache.dolphinscheduler.common.enums.DataType.FLOAT;
+import static org.apache.dolphinscheduler.common.enums.DataType.INTEGER;
+import static org.apache.dolphinscheduler.common.enums.DataType.LONG;
+import static org.apache.dolphinscheduler.common.enums.DataType.TIME;
+import static org.apache.dolphinscheduler.common.enums.DataType.TIMESTAMP;
+import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
@@ -49,7 +59,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
- *  procedure task
+ * procedure task
  */
 public class ProcedureTask extends AbstractTask {
 
@@ -65,8 +75,9 @@ public class ProcedureTask extends AbstractTask {
 
     /**
      * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger    logger
+     * @param logger               logger
      */
     public ProcedureTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
@@ -134,13 +145,14 @@ public class ProcedureTask extends AbstractTask {
             logger.error("procedure task error", e);
             throw e;
         } finally {
-            close(stmt,connection);
+            close(stmt, connection);
         }
     }
 
     /**
      * print outParameter
-     * @param stmt CallableStatement
+     *
+     * @param stmt            CallableStatement
      * @param outParameterMap outParameterMap
      * @throws SQLException SQLException
      */
@@ -162,13 +174,13 @@ public class ProcedureTask extends AbstractTask {
     /**
      * get output parameter
      *
-     * @param stmt CallableStatement
+     * @param stmt      CallableStatement
      * @param paramsMap paramsMap
      * @return outParameterMap
      * @throws Exception Exception
      */
     private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<String, Property> paramsMap) throws Exception {
-        Map<Integer,Property> outParameterMap = new HashMap<>();
+        Map<Integer, Property> outParameterMap = new HashMap<>();
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;
         }
@@ -182,7 +194,7 @@ public class ProcedureTask extends AbstractTask {
         int index = 1;
         for (Property property : userDefParamsList) {
             logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
-                    ,property.getProp(),
+                    , property.getProp(),
                     property.getDirect(),
                     property.getType(),
                     property.getValue());
@@ -190,9 +202,9 @@ public class ProcedureTask extends AbstractTask {
             if (property.getDirect().equals(Direct.IN)) {
                 ParameterUtils.setInParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
             } else if (property.getDirect().equals(Direct.OUT)) {
-                setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
+                setOutParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
                 property.setValue(paramsMap.get(property.getProp()).getValue());
-                outParameterMap.put(index,property);
+                outParameterMap.put(index, property);
             }
             index++;
         }
@@ -201,46 +213,47 @@ public class ProcedureTask extends AbstractTask {
     }
 
     /**
-     * set timtou
+     * set timeout
+     *
      * @param stmt CallableStatement
-     * @throws SQLException SQLException
      */
     private void setTimeout(CallableStatement stmt) throws SQLException {
-        Boolean failed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED;
-        Boolean warnFailed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
+        Boolean failed = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED;
+        Boolean warnFailed = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
         if (failed || warnFailed) {
             stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
         }
     }
 
     /**
-    * close jdbc resource
-    *
-    * @param stmt stmt
-    * @param connection connection
-    */
+     * close jdbc resource
+     *
+     * @param stmt       stmt
+     * @param connection connection
+     */
     private void close(PreparedStatement stmt, Connection connection) {
         if (stmt != null) {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                logger.error("close prepared statement error : {}",e.getMessage(),e);
+                logger.error("close prepared statement error : {}", e.getMessage(), e);
             }
         }
         if (connection != null) {
             try {
                 connection.close();
             } catch (SQLException e) {
-                logger.error("close connection error : {}",e.getMessage(),e);
+                logger.error("close connection error : {}", e.getMessage(), e);
             }
         }
     }
 
     /**
      * get output parameter
-     * @param stmt stmt
-     * @param index index
-     * @param prop prop
+     *
+     * @param stmt     stmt
+     * @param index    index
+     * @param prop     prop
      * @param dataType dataType
      * @throws SQLException SQLException
      */
@@ -256,22 +269,22 @@ public class ProcedureTask extends AbstractTask {
                 logger.info("out prameter long key : {} , value : {}", prop, stmt.getLong(index));
                 break;
             case FLOAT:
-                logger.info("out prameter float key : {} , value : {}",prop,stmt.getFloat(index));
+                logger.info("out prameter float key : {} , value : {}", prop, stmt.getFloat(index));
                 break;
             case DOUBLE:
-                logger.info("out prameter double key : {} , value : {}",prop,stmt.getDouble(index));
+                logger.info("out prameter double key : {} , value : {}", prop, stmt.getDouble(index));
                 break;
             case DATE:
-                logger.info("out prameter date key : {} , value : {}",prop,stmt.getDate(index));
+                logger.info("out prameter date key : {} , value : {}", prop, stmt.getDate(index));
                 break;
             case TIME:
-                logger.info("out prameter time key : {} , value : {}",prop,stmt.getTime(index));
+                logger.info("out prameter time key : {} , value : {}", prop, stmt.getTime(index));
                 break;
             case TIMESTAMP:
-                logger.info("out prameter timestamp key : {} , value : {}",prop,stmt.getTimestamp(index));
+                logger.info("out prameter timestamp key : {} , value : {}", prop, stmt.getTimestamp(index));
                 break;
             case BOOLEAN:
-                logger.info("out prameter boolean key : {} , value : {}",prop, stmt.getBoolean(index));
+                logger.info("out prameter boolean key : {} , value : {}", prop, stmt.getBoolean(index));
                 break;
             default:
                 break;
@@ -286,13 +299,13 @@ public class ProcedureTask extends AbstractTask {
     /**
      * set out parameter
      *
-     * @param index index
-     * @param stmt stmt
+     * @param index    index
+     * @param stmt     stmt
      * @param dataType dataType
-     * @param value value
+     * @param value    value
      * @throws Exception exception
      */
-    private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception {
+    private void setOutParameter(int index, CallableStatement stmt, DataType dataType, String value) throws Exception {
         int sqlType;
         switch (dataType) {
             case VARCHAR:
@@ -329,6 +342,5 @@ public class ProcedureTask extends AbstractTask {
         } else {
             stmt.registerOutParameter(index, sqlType, value);
         }
-
     }
 }

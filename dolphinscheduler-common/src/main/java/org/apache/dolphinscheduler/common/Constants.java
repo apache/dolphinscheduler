@@ -423,6 +423,11 @@ public final class Constants {
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
 
     /**
+     * normal running task
+     */
+    public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
+
+    /**
      * datasource configuration path
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
@@ -640,6 +645,11 @@ public final class Constants {
     public static final int EXIT_CODE_FAILURE = -1;
 
     /**
+     * process or task definition failure
+     */
+    public static final int DEFINITION_FAILURE = -1;
+
+    /**
      * date format of yyyyMMdd
      */
     public static final String PARAMETER_FORMAT_DATE = "yyyyMMdd";
@@ -769,6 +779,8 @@ public final class Constants {
     public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
     public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
+    public static final String CONDITION_RESULT = "conditionResult";
+    public static final String DEPENDENCE = "dependence";
     public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
     public static final String RWXR_XR_X = "rwxr-xr-x";
@@ -1075,6 +1087,11 @@ public final class Constants {
      * pstree, get pud and sub pid
      */
     public static final String PSTREE = "pstree";
+
+    /**
+     * snow flake, data center id, this id must be greater than 0 and less than 32
+     */
+    public static final String SNOW_FLAKE_DATA_CENTER_ID = "data.center.id";
 
     /**
      * docker & kubernetes

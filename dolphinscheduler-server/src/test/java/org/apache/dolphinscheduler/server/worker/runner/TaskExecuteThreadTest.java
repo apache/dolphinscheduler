@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
@@ -75,10 +76,11 @@ public class TaskExecuteThreadTest {
         // init task execution context, logger
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessId(12345);
-        taskExecutionContext.setProcessDefineId(1);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
-        taskExecutionContext.setTaskType("");
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");
@@ -90,7 +92,8 @@ public class TaskExecuteThreadTest {
 
         taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(
                 LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineId(),
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()
         ));
@@ -126,7 +129,7 @@ public class TaskExecuteThreadTest {
 
     @Test
     public void testNormalExecution() {
-        taskExecutionContext.setTaskType("SQL");
+        taskExecutionContext.setTaskType(TaskType.SQL.getDesc());
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskExecutionContext.setTenantCode("test");
@@ -141,7 +144,7 @@ public class TaskExecuteThreadTest {
 
     @Test
     public void testDelayExecution() {
-        taskExecutionContext.setTaskType("PYTHON");
+        taskExecutionContext.setTaskType(TaskType.PYTHON.getDesc());
         taskExecutionContext.setStartTime(null);
         taskExecutionContext.setDelayTime(1);
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);

@@ -21,6 +21,10 @@ import localStore from '@/module/util/localStorage'
 const projectName = localStore.getItem('projectName')
 
 export default {
+  // process definition code
+  code: '',
+  // process definition version
+  version: '',
   // name
   name: '',
   // description

@@ -102,7 +102,7 @@
               <span><el-button type="primary" size="mini" icon="el-icon-s-unfold" @click="_export(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Version Info')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button></span>
+              <span><el-button type="primary" size="mini" icon="el-icon-info" @click="_version(scope.row)" circle></el-button></span>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -356,11 +356,11 @@
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionCode, fromThis }) {
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
-          processDefinitionId: processDefinitionId
+          processDefinitionCode: processDefinitionCode
         }).then(res => {
           this.versionData.processDefinitionVersions = res.data.lists
           this.versionData.total = res.data.totalCount
@@ -377,7 +377,7 @@
         * @param processDefinitionId the process definition id user want to delete
         * @param fromThis fromThis
       */
-      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, processDefinitionCode, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
@@ -386,7 +386,7 @@
           this.mVersionGetProcessDefinitionVersionsPage({
             pageNo: 1,
             pageSize: 10,
-            processDefinitionId: processDefinitionId,
+            processDefinitionCode: processDefinitionCode,
             fromThis: fromThis
           })
         }).catch(e => {
@@ -397,7 +397,7 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
-          processDefinitionId: item.id
+          processDefinitionCode: item.code
         }).then(res => {
           let processDefinitionVersions = res.data.lists
           let total = res.data.totalCount

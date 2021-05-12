@@ -196,18 +196,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * check whether the process definition can be executed
      *
      * @param processDefinition process definition
-     * @param processDefineId process definition id
+     * @param processDefineCode process definition code
      * @return check result code
      */
     @Override
-    public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId) {
+    public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, long processDefineCode) {
         Map<String, Object> result = new HashMap<>();
         if (processDefinition == null) {
             // check process definition exists
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
         } else if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
             // check process definition online
-            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefineId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefineCode);
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
@@ -244,9 +244,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
-            result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
+            result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionCode());
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }

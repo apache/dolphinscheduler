@@ -347,8 +347,7 @@ public class ZKMasterClient extends AbstractZKClient {
         logger.info("failover process list size:{} ", needFailoverProcessInstanceList.size());
         //updateProcessInstance host is null and insert into command
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
-            logger.info("failover process instance id: {} host:{}",
-                    processInstance.getId(), processInstance.getHost());
+            logger.info("failover process instance id: {} host:{}", processInstance.getId(), processInstance.getHost());
             if (Constants.NULL.equals(processInstance.getHost())) {
                 continue;
             }
