@@ -420,7 +420,7 @@ public abstract class AbstractCommandExecutor {
                     if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
                         break;
                     }
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             }
         } catch (Exception e) {
