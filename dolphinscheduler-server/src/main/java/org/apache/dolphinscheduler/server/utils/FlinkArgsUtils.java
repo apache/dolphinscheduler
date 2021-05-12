@@ -124,6 +124,10 @@ public class FlinkArgsUtils {
 
         ResourceInfo mainJar = param.getMainJar();
         if (mainJar != null) {
+            if (ProgramType.PYTHON == programType) {
+                // -py
+                args.add(Constants.FLINK_CLI_OPTION_PYTHON);
+            }
             args.add(mainJar.getRes());
         }
 
