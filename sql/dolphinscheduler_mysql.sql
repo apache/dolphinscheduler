@@ -393,7 +393,7 @@ DROP TABLE IF EXISTS `t_ds_process_definition`;
 CREATE TABLE `t_ds_process_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
   `version` int(11) DEFAULT NULL COMMENT 'process definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
@@ -456,7 +456,7 @@ CREATE TABLE `t_ds_task_definition` (
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
-  `task_params` text COMMENT 'job custom parameters',
+  `task_params` longtext COMMENT 'job custom parameters',
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
   `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
