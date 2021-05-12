@@ -23,11 +23,12 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *  taskInstance state manager
@@ -74,9 +75,8 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
         taskInstance.setId(taskExecutionContext.getTaskInstanceId());
         taskInstance.setName(taskExecutionContext.getTaskName());
         taskInstance.setStartTime(taskExecutionContext.getStartTime());
-        taskInstance.setTaskType(taskInstance.getTaskType());
-        taskInstance.setExecutePath(taskInstance.getExecutePath());
-        taskInstance.setTaskJson(taskInstance.getTaskJson());
+        taskInstance.setTaskType(taskExecutionContext.getTaskType());
+        taskInstance.setExecutePath(taskExecutionContext.getExecutePath());
         taskInstanceCache.put(taskExecutionContext.getTaskInstanceId(), taskInstance);
     }
 

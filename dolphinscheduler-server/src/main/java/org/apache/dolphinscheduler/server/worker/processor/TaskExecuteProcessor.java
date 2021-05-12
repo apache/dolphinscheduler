@@ -133,9 +133,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         setTaskCache(taskExecutionContext);
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-            taskExecutionContext.getProcessDefineId(),
-            taskExecutionContext.getProcessInstanceId(),
-            taskExecutionContext.getTaskInstanceId()));
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId()));
 
         taskExecutionContext.setHost(NetUtils.getAddr(workerConfig.getListenPort()));
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
@@ -201,7 +202,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if (taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())) {
+        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
             ackCommand.setExecutePath(null);
         } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
@@ -217,8 +218,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      * @return execute local path
      */
     private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
-        return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
-            taskExecutionContext.getProcessDefineId(),
+        return FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+            taskExecutionContext.getProcessDefineCode(),
+            taskExecutionContext.getProcessDefineVersion(),
             taskExecutionContext.getProcessInstanceId(),
             taskExecutionContext.getTaskInstanceId());
     }
