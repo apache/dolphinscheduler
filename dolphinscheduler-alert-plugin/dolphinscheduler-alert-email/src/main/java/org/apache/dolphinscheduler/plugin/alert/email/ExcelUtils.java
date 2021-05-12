@@ -110,7 +110,11 @@ public class ExcelUtils {
                 for (int j = 0; j < values.length; j++) {
                     Cell cell1 = row.createCell(j);
                     cell1.setCellStyle(cellStyle);
-                    cell1.setCellValue(String.valueOf(values[j]));
+                    if (values[j] instanceof Number) {
+                        cell1.setCellValue(Double.parseDouble(String.valueOf(values[j])));
+                    } else {
+                        cell1.setCellValue(String.valueOf(values[j]));
+                    }
                 }
             }
 
