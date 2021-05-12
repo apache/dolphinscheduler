@@ -49,6 +49,11 @@ public class ProcessDefinition {
     private int id;
 
     /**
+     * code
+     */
+    private Long code;
+
+    /**
      * name
      */
     private String name;
@@ -56,7 +61,7 @@ public class ProcessDefinition {
     /**
      * version
      */
-    private long version;
+    private int version;
 
     /**
      * release state : online/offline
@@ -65,12 +70,21 @@ public class ProcessDefinition {
 
     /**
      * project id
+     * TODO: delete
      */
+    @TableField(exist = false)
     private int projectId;
 
     /**
-     * definition json string
+     * project code
      */
+    private Long projectCode;
+
+    /**
+     * definition json string
+     * TODO: delete
+     */
+    @TableField(exist = false)
     private String processDefinitionJson;
 
     /**
@@ -136,6 +150,7 @@ public class ProcessDefinition {
 
     /**
      * connects array for web
+     * TODO: delete
      */
     private String connects;
 
@@ -158,11 +173,13 @@ public class ProcessDefinition {
     /**
      * modify user name
      */
+    @TableField(exist = false)
     private String modifyBy;
 
     /**
      * resource ids
      */
+    @TableField(exist = false)
     private String resourceIds;
 
     /**
@@ -170,6 +187,8 @@ public class ProcessDefinition {
      */
     @TableField(exist = false)
     private int warningGroupId;
+
+    public ProcessDefinition(){}
 
     public String getName() {
         return name;
@@ -179,11 +198,11 @@ public class ProcessDefinition {
         this.name = name;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 
@@ -366,6 +385,22 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
+    public Long getCode() {
+        return code;
+    }
+
+    public void setCode(Long code) {
+        this.code = code;
+    }
+
+    public Long getProjectCode() {
+        return projectCode;
+    }
+
+    public void setProjectCode(Long projectCode) {
+        this.projectCode = projectCode;
+    }
+
     public int getWarningGroupId() {
         return warningGroupId;
     }
@@ -379,9 +414,11 @@ public class ProcessDefinition {
         return "ProcessDefinition{"
             + "id=" + id
             + ", name='" + name + '\''
+            + ", code=" + code
             + ", version=" + version
             + ", releaseState=" + releaseState
             + ", projectId=" + projectId
+            + ", projectCode=" + projectCode
             + ", processDefinitionJson='" + processDefinitionJson + '\''
             + ", description='" + description + '\''
             + ", globalParams='" + globalParams + '\''
@@ -403,5 +440,4 @@ public class ProcessDefinition {
             + ", resourceIds='" + resourceIds + '\''
             + '}';
     }
-
 }

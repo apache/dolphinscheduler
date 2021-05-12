@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper">
+    <sql id="baseSql">
+        id, code, `name`, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        worker_group, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
+        resource_ids, create_time, update_time
+    </sql>
+    <select id="queryByDefinitionName" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        WHERE project_code = #{projectCode}
+        and `name` = #{taskDefinitionName}
+    </select>
+    <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        where project_code = #{projectCode}
+        order by create_time desc
+    </select>
+
+    <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        where id in
+        <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </select>
+
+    <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+        SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
+        FROM t_ds_task_definition td
+        JOIN t_ds_user tu on tu.id=td.user_id
+        where 1 = 1
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and td.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        group by td.user_id,tu.user_name
+    </select>
+    <select id="queryByDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select td.id, td.code, td.name, td.version, td.description, td.project_code, td.user_id, td.task_type, td.task_params,
+        td.flag, td.task_priority, td.worker_group, td.fail_retry_times, td.fail_retry_interval, td.timeout_flag, td.timeout_notify_strategy,
+        td.timeout, td.delay_time, td.resource_ids, td.create_time, td.update_time, u.user_name,p.name as project_name
+        from t_ds_task_definition td
+        JOIN t_ds_user u ON td.user_id = u.id
+        JOIN t_ds_project p ON td.project_code = p.code
+        WHERE td.id = #{taskDefinitionId}
+    </select>
+    <select id="queryByDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_definition
+        where code = #{taskDefinitionCode}
+    </select>
+    <select id="listResources" resultType="java.util.HashMap">
+        SELECT id,resource_ids
+        FROM t_ds_task_definition
+        WHERE  resource_ids is not null and resource_ids != ''
+    </select>
+
+    <select id="listResourcesByUser" resultType="java.util.HashMap">
+        SELECT id,resource_ids
+        FROM t_ds_task_definition
+        WHERE user_id = #{userId} and resource_ids is not null and resource_ids != ''
+    </select>
+    <delete id="deleteByCode">
+        delete from t_ds_task_definition
+        where code = #{code}
+    </delete>
+</mapper>
