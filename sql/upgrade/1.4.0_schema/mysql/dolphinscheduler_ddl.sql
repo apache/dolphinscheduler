@@ -307,7 +307,7 @@ BEGIN
                      AND TABLE_SCHEMA=(SELECT DATABASE())
                      AND COLUMN_NAME ='t_ds_datasource_name_UN')
     THEN
-        ALTER TABLE t_ds_datasource ADD UNIQUE KEY `t_ds_datasource_name_UN` ('name', 'type');
+        ALTER TABLE t_ds_datasource ADD UNIQUE KEY `t_ds_datasource_name_UN` (`name`, `type`);
     END IF;
 END;
 
