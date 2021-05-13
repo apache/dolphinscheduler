@@ -93,12 +93,12 @@ public class DolphinPluginLoader {
 
     private void loadPlugin(String plugin)
             throws Exception {
-        logger.info("-- Loading Alert plugin {} --", plugin);
+        logger.info("-- Loading plugin {} --", plugin);
         URLClassLoader pluginClassLoader = buildPluginClassLoader(plugin);
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(pluginClassLoader)) {
             loadPlugin(pluginClassLoader);
         }
-        logger.info("-- Finished loading Alert plugin {} --", plugin);
+        logger.info("-- Finished loading plugin {} --", plugin);
     }
 
     private void loadPlugin(URLClassLoader pluginClassLoader) {
