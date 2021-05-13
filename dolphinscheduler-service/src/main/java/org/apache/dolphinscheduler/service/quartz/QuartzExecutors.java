@@ -60,6 +60,7 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -220,16 +221,18 @@ public class QuartzExecutors {
      * add task trigger , if this task already exists, return this task with updated trigger
      *
      * @param clazz job class name
-     * @param jobName job name
-     * @param jobGroupName job group name
-     * @param startDate job start date
-     * @param endDate job end date
-     * @param cronExpression cron expression
-     * @param jobDataMap job parameters data map
+     * @param projectId projectId
+     * @param schedule schedule
      */
-    public void addJob(Class<? extends Job> clazz, String jobName, String jobGroupName, Date startDate, Date endDate,
-                       String cronExpression,
-                       Map<String, Object> jobDataMap) {
+    public void addJob(Class<? extends Job> clazz, int projectId, final Schedule schedule) {
+        String jobName = QuartzExecutors.buildJobName(schedule.getId());
+        String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
+        Date startDate = schedule.getStartTime();
+        Date endDate = schedule.getEndTime();
+        Map<String, Object> jobDataMap = QuartzExecutors.buildDataMap(projectId, schedule);
+        String cronExpression = schedule.getCrontab();
+        String timezoneId = schedule.getTimezoneId();
+
         lock.writeLock().lock();
         try {
 
@@ -263,8 +266,15 @@ public class QuartzExecutors {
              * current time (taking into account any associated Calendar),
              * but it does not want to be fired now.
              */
-            CronTrigger cronTrigger = newTrigger().withIdentity(triggerKey).startAt(startDate).endAt(endDate)
-                    .withSchedule(cronSchedule(cronExpression).withMisfireHandlingInstructionDoNothing())
+            CronTrigger cronTrigger = newTrigger()
+                    .withIdentity(triggerKey)
+                    .startAt(DateUtils.getTimezoneDate(startDate, timezoneId))
+                    .endAt(DateUtils.getTimezoneDate(endDate, timezoneId))
+                    .withSchedule(
+                            cronSchedule(cronExpression)
+                                    .withMisfireHandlingInstructionDoNothing()
+                                    .inTimeZone(DateUtils.getTimezone(timezoneId))
+                    )
                     .forJob(jobDetail).build();
 
             if (scheduler.checkExists(triggerKey)) {
@@ -368,14 +378,13 @@ public class QuartzExecutors {
      * add params to map
      *
      * @param projectId project id
-     * @param scheduleId schedule id
      * @param schedule schedule
      * @return data map
      */
-    public static Map<String, Object> buildDataMap(int projectId, int scheduleId, Schedule schedule) {
+    public static Map<String, Object> buildDataMap(int projectId, Schedule schedule) {
         Map<String, Object> dataMap = new HashMap<>(8);
         dataMap.put(PROJECT_ID, projectId);
-        dataMap.put(SCHEDULE_ID, scheduleId);
+        dataMap.put(SCHEDULE_ID, schedule.getId());
         dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));
 
         return dataMap;
