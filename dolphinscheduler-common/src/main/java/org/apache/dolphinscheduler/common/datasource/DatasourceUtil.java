@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.datasource;
 
 import org.apache.dolphinscheduler.common.datasource.clickhouse.ClickHouseDatasourceProcessor;
 import org.apache.dolphinscheduler.common.datasource.db2.Db2DatasourceProcessor;
+import org.apache.dolphinscheduler.common.datasource.hana.HanaDatasourceProcessor;
 import org.apache.dolphinscheduler.common.datasource.hive.HiveDatasourceProcessor;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceProcessor;
 import org.apache.dolphinscheduler.common.datasource.oracle.OracleDatasourceProcessor;
@@ -49,6 +50,7 @@ public class DatasourceUtil {
     private static final DatasourceProcessor sqlServerProcessor = new SqlServerDatasourceProcessor();
     private static final DatasourceProcessor db2PROCESSOR = new Db2DatasourceProcessor();
     private static final DatasourceProcessor prestoPROCESSOR = new PrestoDatasourceProcessor();
+    private static final DatasourceProcessor hanaPROCESSOR = new HanaDatasourceProcessor();
 
     /**
      * check datasource param
@@ -113,6 +115,8 @@ public class DatasourceUtil {
                 return db2PROCESSOR;
             case PRESTO:
                 return prestoPROCESSOR;
+            case HANA:
+                return hanaPROCESSOR;
             default:
                 throw new IllegalArgumentException("datasource type illegal:" + dbType);
         }

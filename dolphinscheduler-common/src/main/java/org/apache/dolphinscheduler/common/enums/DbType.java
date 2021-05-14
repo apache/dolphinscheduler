@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,11 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
 import java.util.HashMap;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * data base types
@@ -34,6 +36,7 @@ public enum DbType {
      * 6 sqlserver
      * 7 db2
      * 8 presto
+     * 9 hana
      */
     MYSQL(0, "mysql"),
     POSTGRESQL(1, "postgresql"),
@@ -43,7 +46,8 @@ public enum DbType {
     ORACLE(5, "oracle"),
     SQLSERVER(6, "sqlserver"),
     DB2(7, "db2"),
-    PRESTO(8, "presto");
+    PRESTO(8, "presto"),
+    HANA(9, "hana");
 
     DbType(int code, String descp) {
         this.code = code;
@@ -63,16 +67,16 @@ public enum DbType {
     }
 
 
-    private static HashMap<Integer, DbType> DB_TYPE_MAP =new HashMap<>();
+    private static HashMap<Integer, DbType> DB_TYPE_MAP = new HashMap<>();
 
     static {
-        for (DbType dbType:DbType.values()){
-            DB_TYPE_MAP.put(dbType.getCode(),dbType);
+        for (DbType dbType : DbType.values()) {
+            DB_TYPE_MAP.put(dbType.getCode(), dbType);
         }
     }
 
-    public static DbType of(int type){
-        if(DB_TYPE_MAP.containsKey(type)){
+    public static DbType of(int type) {
+        if (DB_TYPE_MAP.containsKey(type)) {
             return DB_TYPE_MAP.get(type);
         }
         return null;

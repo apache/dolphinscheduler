@@ -38,6 +38,8 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_CLICKHOUSE = "clickhousereader";
 
+    public static final String DATAX_READER_PLUGIN_RDBMS = "rdbmsreader";
+
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
     public static final String DATAX_WRITER_PLUGIN_POSTGRESQL = "postgresqlwriter";
@@ -47,6 +49,8 @@ public class DataxUtils {
     public static final String DATAX_WRITER_PLUGIN_SQLSERVER = "sqlserverwriter";
 
     public static final String DATAX_WRITER_PLUGIN_CLICKHOUSE = "clickhousewriter";
+
+    public static final String DATAX_WRITER_PLUGIN_RDBMS = "rdbmswriter";
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -60,6 +64,8 @@ public class DataxUtils {
                 return DATAX_READER_PLUGIN_SQLSERVER;
             case CLICKHOUSE:
                 return DATAX_READER_PLUGIN_CLICKHOUSE;
+            case HANA:
+                return DATAX_READER_PLUGIN_RDBMS;
             default:
                 return null;
         }
@@ -77,6 +83,8 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_SQLSERVER;
             case CLICKHOUSE:
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
+            case HANA:
+                return DATAX_WRITER_PLUGIN_RDBMS;
             default:
                 return null;
         }
@@ -92,6 +100,8 @@ public class DataxUtils {
                 return new OracleStatementParser(sql);
             case SQLSERVER:
                 return new SQLServerStatementParser(sql);
+            case HANA:
+                return new SQLStatementParser(sql);
             default:
                 return null;
         }
@@ -129,6 +139,8 @@ public class DataxUtils {
                 return String.format("\"%s\"", column);
             case SQLSERVER:
                 return String.format("`%s`", column);
+            case HANA:
+                return String.format("\"%s\"", column);
             default:
                 return column;
         }
