@@ -34,6 +34,7 @@ public enum DbType {
      * 6 sqlserver
      * 7 db2
      * 8 presto
+     * 9 hana
      */
     MYSQL(0, "mysql"),
     POSTGRESQL(1, "postgresql"),
@@ -43,7 +44,8 @@ public enum DbType {
     ORACLE(5, "oracle"),
     SQLSERVER(6, "sqlserver"),
     DB2(7, "db2"),
-    PRESTO(8, "presto");
+    PRESTO(8, "presto"),
+    HANA(9, "hana");
 
     DbType(int code, String descp) {
         this.code = code;
