@@ -242,15 +242,11 @@ public class QuartzExecutors {
             if (scheduler.checkExists(jobKey)) {
 
                 jobDetail = scheduler.getJobDetail(jobKey);
-                if (jobDataMap != null) {
-                    jobDetail.getJobDataMap().putAll(jobDataMap);
-                }
+                jobDetail.getJobDataMap().putAll(jobDataMap);
             } else {
                 jobDetail = newJob(clazz).withIdentity(jobKey).build();
 
-                if (jobDataMap != null) {
-                    jobDetail.getJobDataMap().putAll(jobDataMap);
-                }
+                jobDetail.getJobDataMap().putAll(jobDataMap);
 
                 scheduler.addJob(jobDetail, false, true);
 

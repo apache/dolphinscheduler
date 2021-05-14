@@ -342,7 +342,7 @@
       if (this.timingData.item.crontab) {
         this.crontab = item.crontab
         this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
-        this.timezoneId = item.timezoneId === null ? Intl.DateTimeFormat().resolvedOptions().timeZone : item.timezoneId
+        this.timezoneId = item.timezoneId === null ? moment.tz.guess() : item.timezoneId
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
