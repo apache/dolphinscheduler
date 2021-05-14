@@ -74,7 +74,6 @@
             :value="item">
           </el-option>
         </el-select>
-
       </div>
     </div>
     <div class="clearfix list">
@@ -160,9 +159,10 @@
   </div>
 </template>
 <script>
+  import moment from 'moment-timezone'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import { warningTypeList, availableTimezoneIDList } from './util'
+  import { warningTypeList } from './util'
   import { vCrontab } from '@/module/components/crontab/index'
   import { formatDate } from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
@@ -176,14 +176,14 @@
         processDefinitionId: 0,
         failureStrategy: 'CONTINUE',
         warningTypeList: warningTypeList,
-        availableTimezoneIDList: availableTimezoneIDList,
+        availableTimezoneIDList: moment.tz.names(),
         warningType: 'NONE',
         notifyGroupList: [],
         warningGroupId: '',
         spinnerLoading: false,
         scheduleTime: '',
         crontab: '0 0 * * * ? *',
-        timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timezoneId: moment.tz.guess(),
         cronPopover: false,
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',

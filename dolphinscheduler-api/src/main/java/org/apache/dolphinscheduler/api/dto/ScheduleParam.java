@@ -30,8 +30,8 @@ public class ScheduleParam {
     private Date startTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
-    private String timezoneId;
     private String crontab;
+    private String timezoneId;
 
     public ScheduleParam() {
     }
@@ -59,14 +59,6 @@ public class ScheduleParam {
         this.endTime = endTime;
     }
 
-    public String getTimezoneId() {
-        return timezoneId;
-    }
-
-    public void setTimezoneId(String timezoneId) {
-        this.timezoneId = timezoneId;
-    }
-
     public String getCrontab() {
         return crontab;
     }
@@ -75,13 +67,21 @@ public class ScheduleParam {
         this.crontab = crontab;
     }
 
+    public String getTimezoneId() {
+        return timezoneId;
+    }
+
+    public void setTimezoneId(String timezoneId) {
+        this.timezoneId = timezoneId;
+    }
+
     @Override
     public String toString() {
         return "ScheduleParam{"
                 + "startTime=" + startTime
                 + ", endTime=" + endTime
-                + ", timezoneId=" + timezoneId
                 + ", crontab='" + crontab + '\''
+                + ", timezoneId='" + timezoneId + '\''
                 + '}';
     }
 }
