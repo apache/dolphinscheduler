@@ -33,7 +33,7 @@
           <m-datasource
             ref="refDs"
             @on-dsData="_onDsData"
-            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER', 'CLICKHOUSE']"
+            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER', 'CLICKHOUSE', 'HANA']"
             :data="{ type:dsType,datasource:datasource }">
           </m-datasource>
         </div>
@@ -59,7 +59,7 @@
           <m-datasource
             ref="refDt"
             @on-dsData="_onDtData"
-            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
+            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER', 'HANA']"
             :data="{ type:dtType,datasource:datatarget }">
           </m-datasource>
         </div>

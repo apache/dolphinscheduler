@@ -266,6 +266,10 @@
           {
             value: 'PRESTO',
             label: 'PRESTO'
+          },
+          {
+            value: 'HANA',
+            label: 'HANA'
           }
         ]
       }
@@ -476,6 +480,9 @@
             break
           case 'PRESTO':
             defaultPort = '8080'
+            break
+          case 'HANA':
+            defaultPort = '30015'
             break
           default:
             break
