@@ -27,7 +27,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SparkparametersTest {
+public class SparkParametersTest {
 
     @Test
     public void getResourceFilesList() {
