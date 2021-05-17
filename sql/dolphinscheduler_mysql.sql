@@ -352,7 +352,7 @@ CREATE TABLE `t_ds_datasource` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_datasource_name_UN` ('name', 'type')
+  UNIQUE KEY `t_ds_datasource_name_UN` (`name`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
