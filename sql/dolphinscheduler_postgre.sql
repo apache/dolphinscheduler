@@ -614,6 +614,7 @@ CREATE TABLE t_ds_schedules (
   process_definition_id int NOT NULL ,
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
+  timezone_id varchar(40) default NULL ,
   crontab varchar(256) NOT NULL ,
   failure_strategy int NOT NULL ,
   user_id int NOT NULL ,
