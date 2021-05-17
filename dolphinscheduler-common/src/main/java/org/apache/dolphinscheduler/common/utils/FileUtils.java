@@ -383,7 +383,10 @@ public class FileUtils {
      * @throws IOException in case deletion is unsuccessful
      */
     public static void deleteFile(String filename) throws IOException {
-        org.apache.commons.io.FileUtils.forceDelete(new File(filename));
+        File file = new File(filename);
+        if (file.exists()) {
+            org.apache.commons.io.FileUtils.forceDelete(file);
+        }
     }
 
     /**
