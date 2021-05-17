@@ -750,6 +750,7 @@ CREATE TABLE `t_ds_schedules` (
   `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
+  `timezone_id` varchar(40) DEFAULT NULL COMMENT 'timezoneId',
   `crontab` varchar(256) NOT NULL COMMENT 'crontab description',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',

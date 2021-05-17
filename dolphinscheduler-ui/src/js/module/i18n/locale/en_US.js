@@ -399,6 +399,7 @@ export default {
   'Import process': 'Import process',
   'Timing state': 'Timing state',
   Timing: 'Timing',
+  Timezone: 'Timezone',
   TreeView: 'TreeView',
   'Mailbox already exists! Recipients and copyers cannot repeat': 'Mailbox already exists! Recipients and copyers cannot repeat',
   'Mailbox input is illegal': 'Mailbox input is illegal',

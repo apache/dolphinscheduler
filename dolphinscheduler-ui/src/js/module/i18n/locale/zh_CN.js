@@ -399,6 +399,7 @@ export default {
   'Import process': '导入工作流',
   'Timing state': '定时状态',
   Timing: '定时',
+  Timezone: '时区',
   TreeView: '树形图',
   'Mailbox already exists! Recipients and copyers cannot repeat': '邮箱已存在！收件人和抄送人不能重复',
   'Mailbox input is illegal': '邮箱输入不合法',

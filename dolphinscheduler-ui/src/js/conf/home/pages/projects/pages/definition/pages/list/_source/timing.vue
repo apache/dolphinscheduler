@@ -62,6 +62,21 @@
       </div>
     </div>
     <div class="clearfix list">
+      <div class="text">
+        {{$t('Timezone')}}
+      </div>
+      <div class="cont">
+        <el-select v-model=timezoneId filterable placeholder="Timezone">
+          <el-option
+            v-for="item in availableTimezoneIDList"
+            :key="item"
+            :label="item"
+            :value="item">
+          </el-option>
+        </el-select>
+      </div>
+    </div>
+    <div class="clearfix list">
       <div style = "padding-left: 150px;">{{$t('Next five execution times')}}</div>
       <ul style = "padding-left: 150px;">
         <li v-for="(time,i) in previewTimes" :key='i'>{{time}}</li>
@@ -144,6 +159,7 @@
   </div>
 </template>
 <script>
+  import moment from 'moment-timezone'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
@@ -160,12 +176,14 @@
         processDefinitionId: 0,
         failureStrategy: 'CONTINUE',
         warningTypeList: warningTypeList,
+        availableTimezoneIDList: moment.tz.names(),
         warningType: 'NONE',
         notifyGroupList: [],
         warningGroupId: '',
         spinnerLoading: false,
         scheduleTime: '',
         crontab: '0 0 * * * ? *',
+        timezoneId: moment.tz.guess(),
         cronPopover: false,
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
@@ -204,7 +222,8 @@
             schedule: JSON.stringify({
               startTime: this.scheduleTime[0],
               endTime: this.scheduleTime[1],
-              crontab: this.crontab
+              crontab: this.crontab,
+              timezoneId: this.timezoneId
             }),
             failureStrategy: this.failureStrategy,
             warningType: this.warningType,
@@ -323,6 +342,7 @@
       if (this.timingData.item.crontab) {
         this.crontab = item.crontab
         this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
+        this.timezoneId = item.timezoneId === null ? moment.tz.guess() : item.timezoneId
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
