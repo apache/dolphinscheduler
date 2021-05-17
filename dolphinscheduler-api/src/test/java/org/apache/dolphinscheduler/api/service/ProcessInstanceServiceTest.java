@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
@@ -91,6 +92,11 @@ public class ProcessInstanceServiceTest {
             "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
             "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
+    private String shellJson2 = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\"," +
+            "\"params\":{\"resourceList\":[],\"localParams\":[{\"prop\":\"BATCH_TIME\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${system.datetime}\"}],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
+            "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
+            "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
+            "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
     @Test
     public void testQueryProcessInstanceList() {
@@ -408,6 +414,26 @@ public class ProcessInstanceServiceTest {
         Map<String, Object> successRes = processInstanceService.viewVariables(1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
+
+    @Test
+    public void testViewVariablesNotSchedule() throws Exception {
+        //process instance not null
+        ProcessInstance processInstance = getProcessInstance();
+        processInstance.setCommandType(CommandType.SCHEDULER);
+        processInstance.setScheduleTime(null);
+        processInstance.setProcessInstanceJson(shellJson2);
+        processInstance.setGlobalParams("");
+        processInstance.setStartTime(DateUtils.stringToDate("2021-05-16 14:50:00"));
+        when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
+        Map<String, Object> successRes = processInstanceService.viewVariables(1);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        Property property = ((ArrayList<Property>)((HashMap) ((HashMap) ((HashMap) successRes.get("data")).get("localParams")).get("shell-1")).get("localParamsList")).get(0);
+        Assert.assertEquals("BATCH_TIME", property.getProp());
+        Assert.assertEquals("20210516145000", property.getValue());
+
+    }
+
 
     @Test
     public void testViewGantt() throws Exception {
