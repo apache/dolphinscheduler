@@ -20,20 +20,12 @@ package org.apache.dolphinscheduler.server.worker.task;
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.utils.ParamUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -110,6 +102,13 @@ public abstract class AbstractTask {
      */
     public abstract void handle() throws Exception;
 
+    /**
+     * result processing
+     *
+     * @throws Exception exception
+     */
+    public void after() throws Exception {
+    }
 
     /**
      * cancel application
@@ -186,42 +185,6 @@ public abstract class AbstractTask {
      * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
-
-
-    /**
-     * result processing
-     */
-    public void after() {
-        if (getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
-            // task recor flat : if true , start up qianfan
-            if (TaskRecordDao.getTaskRecordFlag() && typeIsNormalTask(taskExecutionContext.getTaskType())) {
-                AbstractParameters params = TaskParametersUtils.getParameters(taskExecutionContext.getTaskType(), taskExecutionContext.getTaskParams());
-
-                // replace placeholder
-                Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                        taskExecutionContext.getDefinedParams(),
-                        params.getLocalParametersMap(),
-                        CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                        taskExecutionContext.getScheduleTime());
-                if (paramsMap != null && !paramsMap.isEmpty()
-                        && paramsMap.containsKey("v_proc_date")) {
-                    String vProcDate = paramsMap.get("v_proc_date").getValue();
-                    if (!StringUtils.isEmpty(vProcDate)) {
-                        TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskExecutionContext.getTaskName(), vProcDate);
-                        logger.info("task record status : {}", taskRecordState);
-                        if (taskRecordState == TaskRecordStatus.FAILURE) {
-                            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-                        }
-                    }
-                }
-            }
-
-        } else if (getExitStatusCode() == Constants.EXIT_CODE_KILL) {
-            setExitStatusCode(Constants.EXIT_CODE_KILL);
-        } else {
-            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-        }
-    }
 
     private boolean typeIsNormalTask(String taskType) {
         return !(TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(taskType) || TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType));
