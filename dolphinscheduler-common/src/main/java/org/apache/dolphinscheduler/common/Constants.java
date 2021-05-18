@@ -432,14 +432,6 @@ public final class Constants {
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
-    public static final String TASK_RECORD_URL = "task.record.datasource.url";
-
-    public static final String TASK_RECORD_FLAG = "task.record.flag";
-
-    public static final String TASK_RECORD_USER = "task.record.datasource.username";
-
-    public static final String TASK_RECORD_PWD = "task.record.datasource.password";
-
     public static final String DEFAULT = "Default";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
@@ -447,11 +439,6 @@ public final class Constants {
     public static final String NULL = "NULL";
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
-
-    public static final String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
-
-    public static final String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
-
 
     /**
      * command parameter keys
