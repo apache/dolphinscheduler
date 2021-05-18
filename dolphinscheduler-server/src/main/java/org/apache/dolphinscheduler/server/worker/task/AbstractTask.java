@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 
-import java.util.List;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 
 /**
