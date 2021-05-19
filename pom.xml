@@ -628,10 +628,7 @@
     </dependencyManagement>
 
     <build>
-
         <finalName>apache-dolphinscheduler-${project.version}</finalName>
-
-
         <pluginManagement>
             <plugins>
                 <plugin>
