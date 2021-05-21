@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -48,7 +49,7 @@ public class CommonUtilsTest {
     @Test
     public void loadKerberosConf(){
         try {
-            CommonUtils.loadKerberosConf();
+            CommonUtils.loadKerberosConf(new Configuration());
             Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.fail("load Kerberos Conf failed");

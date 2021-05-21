@@ -91,30 +91,48 @@ public class CommonUtils {
     /**
      * load kerberos configuration
      *
-     * @throws Exception errors
+     * @param configuration
+     * @return load kerberos config return true
+     * @throws Exception
      */
-    public static void loadKerberosConf() throws Exception {
-        loadKerberosConf(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH),
+    public static boolean loadKerberosConf(Configuration configuration) throws Exception {
+        return loadKerberosConf(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH),
                 PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
+                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), configuration);
     }
 
     /**
      * load kerberos configuration
+     *
      * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
      * @param loginUserKeytabUsername loginUserKeytabUsername
      * @param loginUserKeytabPath loginUserKeytabPath
      * @throws IOException errors
      */
     public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath) throws IOException {
+        loadKerberosConf(javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath, new Configuration());
+    }
+
+    /**
+     * load kerberos configuration
+     *
+     * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
+     * @param loginUserKeytabUsername loginUserKeytabUsername
+     * @param loginUserKeytabPath loginUserKeytabPath
+     * @param configuration configuration
+     * @return load kerberos config return true
+     * @throws IOException errors
+     */
+    public static boolean loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath, Configuration configuration) throws IOException {
         if (CommonUtils.getKerberosStartupState()) {
             System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf, PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)));
-            Configuration configuration = new Configuration();
             configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, Constants.KERBEROS);
             UserGroupInformation.setConfiguration(configuration);
             UserGroupInformation.loginUserFromKeytab(StringUtils.defaultIfBlank(loginUserKeytabUsername, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)),
                     StringUtils.defaultIfBlank(loginUserKeytabPath, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)));
+            return true;
         }
+        return false;
     }
 
     /**
