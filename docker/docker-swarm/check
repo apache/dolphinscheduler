@@ -17,7 +17,7 @@
 #
 echo "------ dolphinscheduler check - server - status -------"
 sleep 60
-server_name=$(docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml top
+server_name=$(docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml top | grep java)
 echo "server name:" $server_name
 server_num=$(docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml top | grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l)
 if [ $server_num -eq 5 ]
