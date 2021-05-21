@@ -90,7 +90,6 @@ public class ProjectController extends BaseController {
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
-
         Map<String, Object> result = projectService.createProject(loginUser, projectName, description);
         return returnDataList(result);
     }
