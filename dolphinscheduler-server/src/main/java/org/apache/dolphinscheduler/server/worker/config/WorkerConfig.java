@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
+    @Value("${worker.listen.port:1234}")
+    private int listenPort;
+
     @Value("${worker.exec.threads:100}")
     private int workerExecThreads;
 
@@ -46,9 +49,6 @@ public class WorkerConfig {
 
     @Value("${worker.reserved.memory:0.3}")
     private double workerReservedMemory;
-
-    @Value("${worker.listen.port:1234}")
-    private int listenPort;
 
     @Value("#{'${worker.groups:default}'.split(',')}")
     private Set<String> workerGroups;

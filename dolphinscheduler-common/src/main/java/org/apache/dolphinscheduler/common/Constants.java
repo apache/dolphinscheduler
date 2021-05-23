@@ -94,10 +94,18 @@ public final class Constants {
 
 
     /**
+     * hadoop configuration
+     */
+    public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
+
+    public static final String HADOOP_RM_STATE_STANDBY = "STANDBY";
+
+    public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
+
+    /**
      * yarn.resourcemanager.ha.rm.ids
      */
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
-    public static final String YARN_RESOURCEMANAGER_HA_XX = "xx";
 
 
     /**
@@ -153,7 +161,6 @@ public final class Constants {
      * development.state
      */
     public static final String DEVELOPMENT_STATE = "development.state";
-    public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
 
     /**
      * sudo enable
@@ -264,15 +271,6 @@ public final class Constants {
      * AT SIGN
      */
     public static final String AT_SIGN = "@";
-
-
-    public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
-
-    public static final String WORKER_RESERVED_MEMORY = "worker.reserved.memory";
-
-    public static final String MASTER_MAX_CPULOAD_AVG = "master.max.cpuload.avg";
-
-    public static final String MASTER_RESERVED_MEMORY = "master.reserved.memory";
 
 
     /**
@@ -472,15 +470,6 @@ public final class Constants {
      * complement data end date
      */
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
-
-    /**
-     * hadoop configuration
-     */
-    public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
-
-    public static final String HADOOP_RM_STATE_STANDBY = "STANDBY";
-
-    public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
 
 
     /**
@@ -833,11 +822,6 @@ public final class Constants {
      * loginUserFromKeytab user
      */
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
-
-    /**
-     * default worker group id
-     */
-    public static final int DEFAULT_WORKER_ID = -1;
 
     /**
      * loginUserFromKeytab path

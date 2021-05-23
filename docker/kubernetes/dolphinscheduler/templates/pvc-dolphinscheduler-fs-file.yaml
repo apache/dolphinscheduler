@@ -21,8 +21,7 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-fs-file
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-fs-file
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep
 spec:
