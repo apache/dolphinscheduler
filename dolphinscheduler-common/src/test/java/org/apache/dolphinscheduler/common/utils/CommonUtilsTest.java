@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
