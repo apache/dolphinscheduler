@@ -55,8 +55,16 @@ public class CommonUtilsTest {
 
     @Test
     public void getKerberosStartupState() {
-        logger.info("kerberos startup state: {}",CommonUtils.getKerberosStartupState());
-        Assert.assertTrue(true);
+        boolean kerberosStartupState = CommonUtils.getKerberosStartupState();
+        logger.info("kerberos startup state: {}",kerberosStartupState);
+        Assert.assertFalse(kerberosStartupState);
+        PowerMockito.mockStatic(PropertyUtils.class);
+        PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
+        PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(Boolean.TRUE);
+        kerberosStartupState = CommonUtils.getKerberosStartupState();
+        logger.info("kerberos startup state: {}",kerberosStartupState);
+        Assert.assertTrue(kerberosStartupState);
+
     }
 
     @Test
@@ -72,6 +80,8 @@ public class CommonUtilsTest {
             PowerMockito.mockStatic(UserGroupInformation.class);
             boolean result = CommonUtils.loadKerberosConf(new Configuration());
             Assert.assertTrue(result);
+
+            CommonUtils.loadKerberosConf(null, null, null);
 
         } catch (Exception e) {
             Assert.fail("load Kerberos Conf failed");
