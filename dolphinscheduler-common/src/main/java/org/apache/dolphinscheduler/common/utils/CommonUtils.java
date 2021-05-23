@@ -93,9 +93,9 @@ public class CommonUtils {
      *
      * @param configuration
      * @return load kerberos config return true
-     * @throws Exception
+     * @throws IOException errors
      */
-    public static boolean loadKerberosConf(Configuration configuration) throws Exception {
+    public static boolean loadKerberosConf(Configuration configuration) throws IOException {
         return loadKerberosConf(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH),
                 PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
                 PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), configuration);
