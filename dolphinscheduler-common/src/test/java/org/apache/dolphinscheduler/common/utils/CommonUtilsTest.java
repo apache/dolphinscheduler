@@ -24,6 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * configuration test
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(value = { PropertyUtils.class })
+@PrepareForTest(value = { PropertyUtils.class, UserGroupInformation.class})
 public class CommonUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
     @Test
@@ -68,8 +69,9 @@ public class CommonUtilsTest {
             PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("hdfs-mycluster@ESZ.COM");
             PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/opt/hdfs.headless.keytab");
 
-            CommonUtils.loadKerberosConf(new Configuration());
-            Assert.assertTrue(true);
+            PowerMockito.mockStatic(UserGroupInformation.class);
+            boolean result = CommonUtils.loadKerberosConf(new Configuration());
+            Assert.assertTrue(result);
 
         } catch (Exception e) {
             Assert.fail("load Kerberos Conf failed");
