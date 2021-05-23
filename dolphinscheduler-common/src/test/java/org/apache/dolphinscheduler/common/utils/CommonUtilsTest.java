@@ -14,21 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+
 import org.apache.hadoop.conf.Configuration;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * configuration test
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(value = { PropertyUtils.class })
 public class CommonUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
     @Test
@@ -36,21 +45,32 @@ public class CommonUtilsTest {
         logger.info(CommonUtils.getSystemEnvPath());
         Assert.assertTrue(true);
     }
+
     @Test
     public void isDevelopMode() {
         logger.info("develop mode: {}",CommonUtils.isDevelopMode());
         Assert.assertTrue(true);
     }
+
     @Test
-    public void getKerberosStartupState(){
+    public void getKerberosStartupState() {
         logger.info("kerberos startup state: {}",CommonUtils.getKerberosStartupState());
         Assert.assertTrue(true);
     }
+
     @Test
-    public void loadKerberosConf(){
+    public void loadKerberosConf() {
         try {
+            PowerMockito.mockStatic(PropertyUtils.class);
+            PowerMockito.when(PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE)).thenReturn("HDFS");
+            PowerMockito.when(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)).thenReturn(Boolean.TRUE);
+            PowerMockito.when(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)).thenReturn("/opt/krb5.conf");
+            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)).thenReturn("hdfs-mycluster@ESZ.COM");
+            PowerMockito.when(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)).thenReturn("/opt/hdfs.headless.keytab");
+
             CommonUtils.loadKerberosConf(new Configuration());
             Assert.assertTrue(true);
+
         } catch (Exception e) {
             Assert.fail("load Kerberos Conf failed");
         }
@@ -81,11 +101,11 @@ public class CommonUtilsTest {
     }
 
     @Test
-    public void test(){
-        InetAddress IP = null;
+    public void test() {
+        InetAddress ip;
         try {
-            IP = InetAddress.getLocalHost();
-            logger.info(IP.getHostAddress());
+            ip = InetAddress.getLocalHost();
+            logger.info(ip.getHostAddress());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
