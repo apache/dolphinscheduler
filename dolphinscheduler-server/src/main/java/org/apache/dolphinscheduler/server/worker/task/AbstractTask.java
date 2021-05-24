@@ -135,7 +135,7 @@ public abstract class AbstractTask {
             // we should must use foreach to iterate the element, otherwise will throw a ConcurrentModifiedException(#issue 5528)
             StringJoiner joiner = new StringJoiner("\n\t");
             logs.forEach(joiner::add);
-            logger.info(" -> {}", joiner.toString());
+            logger.info(" -> {}", joiner);
         }
     }
 
