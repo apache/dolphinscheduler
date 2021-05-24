@@ -22,9 +22,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -490,6 +492,34 @@ public class DateUtils {
      */
     public static String getCurrentTimeStamp() {
         return getCurrentTime(Constants.YYYYMMDDHHMMSSSSS);
+    }
+
+    /**
+     * transform date to target timezone date
+     * <p>e.g.
+     * <p> if input date is 2020-01-01 00:00:00 current timezone is CST
+     * <p>targetTimezoneId is MST
+     * <p>this method will return 2020-01-01 15:00:00
+     */
+    public static Date getTimezoneDate(Date date, String targetTimezoneId) {
+        if (StringUtils.isEmpty(targetTimezoneId)) {
+            return date;
+        }
+
+        String dateToString = dateToString(date);
+        LocalDateTime localDateTime = LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
+        return Date.from(zonedDateTime.toInstant());
+    }
+
+    /**
+     * get timezone by timezoneId
+     */
+    public static TimeZone getTimezone(String timezoneId) {
+        if (StringUtils.isEmpty(timezoneId)) {
+            return null;
+        }
+        return TimeZone.getTimeZone(timezoneId);
     }
 
     static final long C0 = 1L;

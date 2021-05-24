@@ -600,6 +600,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
+            try {
+                FileUtils.deleteFile(localFilename);
+            } catch (IOException ex) {
+                logger.error("delete local tmp file:{} error", localFilename, ex);
+            }
             logger.error(e.getMessage(), e);
             return false;
         }
@@ -691,7 +696,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // get all resource id of process definitions those is released
         List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+        Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource,true);

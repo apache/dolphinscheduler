@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RoundRobin
 
 import java.util.Collection;
 
-
 /**
  *  round robin host manager
  */
@@ -36,7 +35,7 @@ public class RoundRobinHostManager extends CommonHostManager {
     /**
      * set round robin
      */
-    public RoundRobinHostManager(){
+    public RoundRobinHostManager() {
         this.selector = new RoundRobinSelector();
     }
 

@@ -127,14 +127,8 @@ public class HadoopUtils implements Closeable {
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
 
             if (resUploadType == ResUploadType.HDFS) {
-                if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-                    System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
-                            PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
-                    configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                if (CommonUtils.loadKerberosConf(configuration)) {
                     hdfsUser = "";
-                    UserGroupInformation.setConfiguration(configuration);
-                    UserGroupInformation.loginUserFromKeytab(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
                 }
 
                 String defaultFS = configuration.get(Constants.FS_DEFAULTFS);
@@ -156,20 +150,15 @@ public class HadoopUtils implements Closeable {
                     logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULTFS, defaultFS);
                 }
 
-                if (fs == null) {
-                    if (StringUtils.isNotEmpty(hdfsUser)) {
-                        UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
-                        ugi.doAs(new PrivilegedExceptionAction<Boolean>() {
-                            @Override
-                            public Boolean run() throws Exception {
-                                fs = FileSystem.get(configuration);
-                                return true;
-                            }
-                        });
-                    } else {
-                        logger.warn("hdfs.root.user is not set value!");
+                if (StringUtils.isNotEmpty(hdfsUser)) {
+                    UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
+                    ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
                         fs = FileSystem.get(configuration);
-                    }
+                        return true;
+                    });
+                } else {
+                    logger.warn("hdfs.root.user is not set value!");
+                    fs = FileSystem.get(configuration);
                 }
             } else if (resUploadType == ResUploadType.S3) {
                 System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);
@@ -214,7 +203,8 @@ public class HadoopUtils implements Closeable {
         if (logger.isDebugEnabled()) {
             logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         }
-        return String.format(appUrl, applicationId);
+        String activeResourceManagerPort = String.valueOf(PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088));
+        return String.format(appUrl, activeResourceManagerPort, applicationId);
     }
 
     public String getJobHistoryUrl(String applicationId) {
@@ -247,7 +237,7 @@ public class HadoopUtils implements Closeable {
      *
      * @param hdfsFilePath hdfs file path
      * @param skipLineNums skip line numbers
-     * @param limit        read how many lines
+     * @param limit read how many lines
      * @return content of file
      * @throws IOException errors
      */
@@ -282,10 +272,10 @@ public class HadoopUtils implements Closeable {
     /**
      * copy files between FileSystems
      *
-     * @param srcPath      source hdfs path
-     * @param dstPath      destination hdfs path
+     * @param srcPath source hdfs path
+     * @param dstPath destination hdfs path
      * @param deleteSource whether to delete the src
-     * @param overwrite    whether to overwrite an existing file
+     * @param overwrite whether to overwrite an existing file
      * @return if success or not
      * @throws IOException errors
      */
@@ -297,10 +287,10 @@ public class HadoopUtils implements Closeable {
      * the src file is on the local disk.  Add it to FS at
      * the given dst name.
      *
-     * @param srcFile      local file
-     * @param dstHdfsPath  destination hdfs path
+     * @param srcFile local file
+     * @param dstHdfsPath destination hdfs path
      * @param deleteSource whether to delete the src
-     * @param overwrite    whether to overwrite an existing file
+     * @param overwrite whether to overwrite an existing file
      * @return if success or not
      * @throws IOException errors
      */
@@ -317,9 +307,9 @@ public class HadoopUtils implements Closeable {
      * copy hdfs file to local
      *
      * @param srcHdfsFilePath source hdfs file path
-     * @param dstFile         destination file
-     * @param deleteSource    delete source
-     * @param overwrite       overwrite
+     * @param dstFile destination file
+     * @param deleteSource delete source
+     * @param overwrite overwrite
      * @return result of copy hdfs file to local
      * @throws IOException errors
      */
@@ -348,9 +338,9 @@ public class HadoopUtils implements Closeable {
      * delete a file
      *
      * @param hdfsFilePath the path to delete.
-     * @param recursive    if path is a directory and set to
-     *                     true, the directory is deleted else throws an exception. In
-     *                     case of a file the recursive can be set to either true or false.
+     * @param recursive if path is a directory and set to
+     * true, the directory is deleted else throws an exception. In
+     * case of a file the recursive can be set to either true or false.
      * @return true if delete is successful else false.
      * @throws IOException errors
      */
@@ -487,7 +477,7 @@ public class HadoopUtils implements Closeable {
     /**
      * hdfs resource dir
      *
-     * @param tenantCode   tenant code
+     * @param tenantCode tenant code
      * @param resourceType resource type
      * @return hdfs resource dir
      */
@@ -515,7 +505,7 @@ public class HadoopUtils implements Closeable {
      * hdfs user dir
      *
      * @param tenantCode tenant code
-     * @param userId     user id
+     * @param userId user id
      * @return hdfs resource dir
      */
     public static String getHdfsUserDir(String tenantCode, int userId) {
@@ -536,8 +526,8 @@ public class HadoopUtils implements Closeable {
      * get hdfs file name
      *
      * @param resourceType resource type
-     * @param tenantCode   tenant code
-     * @param fileName     file name
+     * @param tenantCode tenant code
+     * @param fileName file name
      * @return hdfs file name
      */
     public static String getHdfsFileName(ResourceType resourceType, String tenantCode, String fileName) {
@@ -551,7 +541,7 @@ public class HadoopUtils implements Closeable {
      * get absolute path and name for resource file on hdfs
      *
      * @param tenantCode tenant code
-     * @param fileName   file name
+     * @param fileName file name
      * @return get absolute path and name for file on hdfs
      */
     public static String getHdfsResourceFileName(String tenantCode, String fileName) {
@@ -565,7 +555,7 @@ public class HadoopUtils implements Closeable {
      * get absolute path and name for udf file on hdfs
      *
      * @param tenantCode tenant code
-     * @param fileName   file name
+     * @param fileName file name
      * @return get absolute path and name for udf file on hdfs
      */
     public static String getHdfsUdfFileName(String tenantCode, String fileName) {
@@ -587,7 +577,7 @@ public class HadoopUtils implements Closeable {
      * getAppAddress
      *
      * @param appAddress app address
-     * @param rmHa       resource manager ha
+     * @param rmHa resource manager ha
      * @return app address
      */
     public static String getAppAddress(String appAddress, String rmHa) {
@@ -636,9 +626,6 @@ public class HadoopUtils implements Closeable {
 
         /**
          * get active resourcemanager
-         *
-         * @param rmIds
-         * @return
          */
         public static String getAcitveRMName(String rmIds) {
 
@@ -669,9 +656,6 @@ public class HadoopUtils implements Closeable {
 
         /**
          * get ResourceManager state
-         *
-         * @param url
-         * @return
          */
         public static String getRMState(String url) {
 

@@ -36,17 +36,17 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
-        <developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
-        <url>https://github.com/apache/incubator-dolphinscheduler</url>
+        <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
+        <url>https://github.com/apache/dolphinscheduler</url>
         <tag>HEAD</tag>
     </scm>
     <mailingLists>
         <mailingList>
             <name>DolphinScheduler Developer List</name>
-            <post>dev@dolphinscheduler.incubator.apache.org</post>
-            <subscribe>dev-subscribe@dolphinscheduler.incubator.apache.org</subscribe>
-            <unsubscribe>dev-unsubscribe@dolphinscheduler.incubator.apache.org</unsubscribe>
+            <post>dev@dolphinscheduler.apache.org</post>
+            <subscribe>dev-subscribe@dolphinscheduler.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@dolphinscheduler.apache.org</unsubscribe>
         </mailingList>
     </mailingLists>
     <parent>
@@ -60,8 +60,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
-        <spring.version>5.1.18.RELEASE</spring.version>
-        <spring.boot.version>2.1.17.RELEASE</spring.boot.version>
+        <spring.version>5.1.19.RELEASE</spring.version>
+        <spring.boot.version>2.1.18.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
@@ -85,14 +85,14 @@
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.email.version>1.5</commons.email.version>
-        <poi.version>3.17</poi.version>
+        <poi.version>4.1.2</poi.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
         <commons.collections4.version>4.1</commons.collections4.version>
         <guava.version>24.1-jre</guava.version>
-        <postgresql.version>42.1.4</postgresql.version>
+        <postgresql.version>42.2.5</postgresql.version>
         <hive.jdbc.version>2.1.0</hive.jdbc.version>
         <commons.io.version>2.4</commons.io.version>
-        <oshi.core.version>3.5.0</oshi.core.version>
+        <oshi.core.version>3.9.1</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
@@ -449,6 +449,11 @@
                 <artifactId>poi</artifactId>
                 <version>${poi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
 
             <!-- hadoop -->
             <dependency>
@@ -623,10 +628,7 @@
     </dependencyManagement>
 
     <build>
-
-        <finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
-
-
+        <finalName>apache-dolphinscheduler-${project.version}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -795,6 +797,9 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                        <include>**/api/controller/ProjectControllerTest.java</include>
+                        <include>**/api/controller/QueueControllerTest.java</include>
+                        <include>**/api/configuration/TrafficConfigurationTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
@@ -805,6 +810,7 @@
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LocaleChangeInterceptorTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
+                        <include>**/api/interceptor/RateLimitInterceptorTest.java</include>
                         <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigLDAPTest.java</include>
@@ -821,7 +827,8 @@
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/MonitorServiceTest.java</include>
                         <include>**/api/service/ProcessDefinitionServiceTest.java</include>
-                        <include>**/api/service/ProcessDefinitionVersionServiceTest.java</include>
+                        <include>**/api/service/ProcessTaskRelationServiceImplTest.java</include>
+                        <include>**/api/service/TaskDefinitionServiceImplTest.java</include>
                         <include>**/api/service/ProcessInstanceServiceTest.java</include>
                         <include>**/api/service/ProjectServiceTest.java</include>
                         <include>**/api/service/QueueServiceTest.java</include>
@@ -854,6 +861,7 @@
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/HttpParametersTest.java</include>
+                        <include>**/common/task/SparkParametersTest.java</include>
                         <include>**/common/task/SqlParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
@@ -864,7 +872,6 @@
                         <include>**/common/utils/DependentUtilsTest.java</include>
                         <include>**/common/utils/EncryptionUtilsTest.java</include>
                         <include>**/common/utils/FileUtilsTest.java</include>
-                        <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/NetUtilsTest.java</include>
@@ -888,6 +895,16 @@
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
                         <include>**/common/plugin/DolphinSchedulerPluginLoaderTest.java</include>
+                        <include>**/common/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/db2/Db2DatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/hive/HiveDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/mysql/MysqlDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/oracle/OracleDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/postgresql/PostgreSqlDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/presto/PrestoDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/spark/SparkDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/sqlserver/SqlServerDatasourceProcessorTest.java</include>
+                        <include>**/common/datasource/DatasourceUtilTest.java</include>
                         <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
@@ -902,6 +919,9 @@
                         <include>**/remote/command/future/ResponseFutureTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/command/log/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesRequestCommandTest.java</include>
+                        <include>**/remote/command/log/GetLogBytesResponseCommandTest.java</include>
+                        <include>**/remote/command/log/ViewLogRequestCommandTest.java</include>
                         <include>**/remote/utils/HostTest.java</include>
                         <include>**/remote/utils/NettyUtilTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
@@ -923,8 +943,8 @@
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/registry/ServerNodeManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
-                        <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
                         <include>**/server/master/ConditionsTaskTest.java</include>
@@ -934,7 +954,7 @@
                         <include>**/server/master/processor/TaskAckProcessorTest.java</include>
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
-                        <include>**/server/register/ZookeeperNodeManagerTest.java</include>
+                        <include>**/server/master/zk/ZKMasterClientTest.java</include>
                         <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
@@ -950,16 +970,17 @@
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/processdure/ProcedureTaskTest.java</include>
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/task/AbstractCommandExecutorTest.java</include>
+                        <include>**/server/worker/task/PythonCommandExecutorTest.java</include>
                         <include>**/server/worker/task/ShellTaskReturnTest.java</include>
-                        <include>**/server/worker/EnvFileTest.java</include>
+                        <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
@@ -972,10 +993,10 @@
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
                         <include>**/service/alert/AlertClientServiceTest.java</include>
+                        <include>**/service/alert/ProcessAlertManagerTest.java</include>
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
-                        <include>**/dao/mapper/ProcessDefinitionVersionMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
                         <include>**/dao/mapper/ProjectMapperTest.java</include>
@@ -1017,16 +1038,18 @@
                         <include>**/plugin/alert/feishu/FeiShuSenderTest.java</include>
                         <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
                         <include>**/plugin/alert/http/HttpSenderTest.java</include>
+                        <include>**/plugin/alert/slack/SlackAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/slack/SlackAlertPluginTest.java</include>
+                        <include>**/plugin/alert/slack/SlackSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
-                        <include>**/alert/utils/DingTalkUtilsTest.java</include>
-                        <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
