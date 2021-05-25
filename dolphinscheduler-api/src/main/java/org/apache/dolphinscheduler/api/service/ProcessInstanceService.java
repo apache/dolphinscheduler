@@ -516,10 +516,9 @@ public class ProcessInstanceService extends BaseDAGService {
             throw new RuntimeException("workflow instance is null");
         }
 
-        Date scheduleTime = processInstance.getScheduleTime();
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(processInstance.getCmdTypeIfComplement(),
-                        scheduleTime != null ? scheduleTime : processInstance.getStartTime());
+                        processInstance.getScheduleTime());
 
 
         String workflowInstanceJson = processInstance.getProcessInstanceJson();
