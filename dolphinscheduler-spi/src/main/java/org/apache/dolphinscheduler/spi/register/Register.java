@@ -20,8 +20,6 @@ import java.util.Map;
 
 public interface Register  {
 
-
-
     void init(Map<String, String> registerData);
 
     void subscribe(String path, SubscribeListener subscribeListener);
@@ -36,9 +34,6 @@ public interface Register  {
 
     void update(String key, String value);
 
-
-
-
     List<String> getChildren(String path);
 
     String getData(String key);
@@ -46,4 +41,8 @@ public interface Register  {
     boolean isExisted(String key);
 
     boolean delete(String key) throws Exception;
+
+    boolean acquireLock(String key);
+
+    boolean releaseLock(String key);
 }

@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
-import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
-import org.apache.dolphinscheduler.spi.register.SubscribeListener;
-
 import java.util.HashMap;
 
 public class ListenerManager {

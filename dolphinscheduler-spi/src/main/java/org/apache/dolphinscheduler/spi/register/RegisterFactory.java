@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.register;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,7 +15,7 @@ package org.apache.dolphinscheduler.spi.register;/*
  * limitations under the License.
  */
 
-import java.util.Map;
+package org.apache.dolphinscheduler.spi.register;
 
 public interface RegisterFactory {
 

@@ -40,6 +40,7 @@ import org.apache.curator.framework.api.transaction.TransactionOp;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
@@ -58,6 +59,9 @@ public class ZookeeperRegister implements Register {
     private CuratorFramework client;
 
     private Map<String, TreeCache> treeCacheMap = new HashMap<>();
+
+    private Map<String, InterProcessMutex> lockMap = new HashMap<>();
+
 
     private static RetryPolicy buildRetryPolicy(Map<String, String> registerData) {
         int baseSleepTimeMs = BASE_SLEEP_TIME.getParameterValue(registerData.get(BASE_SLEEP_TIME.getName()));
@@ -106,14 +110,6 @@ public class ZookeeperRegister implements Register {
 
             throw new RegisterException("zookeeper connect error", e);
         }
-
-        //test
-        try {
-            client.create().forPath("/kris", "123456".getBytes());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-       // super.init(registerData);
     }
 
     @Override
@@ -231,8 +227,34 @@ public class ZookeeperRegister implements Register {
                 .deletingChildrenIfNeeded()
                 .withVersion(4)
                 .forPath(nodePath);
-
         return true;
 
+    }
+
+    @Override
+    public boolean acquireLock(String key) {
+        InterProcessMutex interProcessMutex = new InterProcessMutex(client, key);
+        String localKey=key+Thread.currentThread().getId();
+        lockMap.put(localKey,interProcessMutex);
+        try {
+            interProcessMutex.acquire();
+            return true;
+        } catch (Exception e) {
+            throw new RegisterException("zookeeper get lock error", e);
+        }
+    }
+
+    @Override
+    public boolean releaseLock(String key) {
+        String localKey=key+Thread.currentThread().getId();
+        if (null == lockMap.get(localKey)) {
+            return false;
+        }
+        try {
+            lockMap.get(localKey).release();
+        } catch (Exception e) {
+            throw new RegisterException("zookeeper release lock error", e);
+        }
+        return true;
     }
 }

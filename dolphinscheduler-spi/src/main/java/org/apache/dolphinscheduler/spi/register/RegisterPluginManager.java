@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
-import static java.util.Objects.requireNonNull;
-
-import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
+import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * The plug-in address of the registry needs to be configured.
  * Multi-registries are not supported.
  * When the plug-in directory contains multiple plug-ins, only the configured plug-in will be used.
+ * todo It’s not good to put it here, consider creating a separate API module for each plugin
  */
 public class RegisterPluginManager extends AbstractDolphinPluginManager {
 
