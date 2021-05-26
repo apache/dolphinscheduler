@@ -27,6 +27,6 @@ public class ZookeeperRegisterFactory implements RegisterFactory {
 
     @Override
     public Register create() {
-        return  new ZookeeperRegister();
+        return new ZookeeperRegister();
     }
 }

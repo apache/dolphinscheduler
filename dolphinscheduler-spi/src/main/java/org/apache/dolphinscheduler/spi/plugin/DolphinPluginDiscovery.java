@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.plugin;
+package org.apache.dolphinscheduler.spi.plugin;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createDirectories;

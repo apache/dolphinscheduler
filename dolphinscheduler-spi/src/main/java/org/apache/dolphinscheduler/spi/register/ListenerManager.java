@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.register.api;
+package org.apache.dolphinscheduler.spi.register;
 
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;

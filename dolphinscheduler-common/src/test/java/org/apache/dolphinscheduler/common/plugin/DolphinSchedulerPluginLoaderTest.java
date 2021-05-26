@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.plugin;
 
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
+
 import java.util.Objects;
 
 import org.junit.Ignore;

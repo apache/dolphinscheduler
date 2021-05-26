@@ -26,8 +26,8 @@ import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperCon
 import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SERVERS;
 import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SESSION_TIMEOUT_MS;
 
-import org.apache.dolphinscheduler.plugin.register.api.ListenerManager;
-import org.apache.dolphinscheduler.plugin.register.api.RegisterException;
+import org.apache.dolphinscheduler.spi.register.ListenerManager;
+import org.apache.dolphinscheduler.spi.register.RegisterException;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.Register;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
@@ -227,8 +227,8 @@ public class ZookeeperRegister implements Register {
 
     public boolean delete(String nodePath) throws Exception {
         client.delete()
-                .guaranteed()					// 如果删除失败，那么在后端还是继续会删除，直到成功
-                .deletingChildrenIfNeeded()	// 如果有子节点，就删除
+                .guaranteed()
+                .deletingChildrenIfNeeded()
                 .withVersion(4)
                 .forPath(nodePath);
 

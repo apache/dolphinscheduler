@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.register.api;
+package org.apache.dolphinscheduler.spi.register;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.dolphinscheduler.common.plugin.AbstractDolphinPluginManager;
+import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
-import org.apache.dolphinscheduler.spi.register.Register;
-import org.apache.dolphinscheduler.spi.register.RegisterFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +67,6 @@ public class RegisterPluginManager extends AbstractDolphinPluginManager {
     }
 
     public static Register getRegister() {
-        System.out.println("lsllsllll");
         return register;
     }
 

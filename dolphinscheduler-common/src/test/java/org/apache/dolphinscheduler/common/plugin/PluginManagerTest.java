@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.plugin;
 
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

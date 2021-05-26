@@ -15,23 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.register.api;
+package org.apache.dolphinscheduler.spi.plugin;
 
-/**
- * All register connection status must be converted to this
- */
-public enum RegisterConnectState {
-    CONNECTED("connected", 1),
-    RECONNECTED("reconnected", 2),
-    SUSPENDED("suspended", 3),
-    LOST("lost", 4);
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 
-    private String description;
+public abstract class AbstractDolphinPluginManager {
 
-    private int state;
-
-    RegisterConnectState(String description, int state) {
-        this.description = description;
-        this.state = state;
-    }
+    public abstract void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin);
 }

@@ -17,7 +17,6 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
 
 import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SERVERS;
 
-import org.apache.dolphinscheduler.plugin.register.api.TestListener;
 import org.apache.dolphinscheduler.spi.register.Register;
 
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class Main {
         register.init(registerConfig);
         register.persist("/xxx/sd","kriis");
        // register.persist();
-        register.subscribe("/xxx", new TestListener());
+       // register.subscribe("/xxx", new TestListener());
        // register.delete("/xxx/sd");
         //register.
         while (true){
