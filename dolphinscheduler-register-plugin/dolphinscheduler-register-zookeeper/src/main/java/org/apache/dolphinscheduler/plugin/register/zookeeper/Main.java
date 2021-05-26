@@ -15,15 +15,39 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
+import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SERVERS;
+
+import org.apache.dolphinscheduler.plugin.register.api.TestListener;
 import org.apache.dolphinscheduler.spi.register.Register;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+
+        Map<String,String> registerConfig = new HashMap<>();
+
+
+        registerConfig.put("servers","127.0.0.1:2181");
+
+        System.out.printf(SERVERS.getName());
+
         Register register=new ZookeeperRegister();
-        register.register(new HashMap<>());
+        register.init(registerConfig);
+        register.persist("/xxx/sd","kriis");
+       // register.persist();
+        register.subscribe("/xxx", new TestListener());
+       // register.delete("/xxx/sd");
+        //register.
+        while (true){
+
+        }
+
+
     }
+
+
 }

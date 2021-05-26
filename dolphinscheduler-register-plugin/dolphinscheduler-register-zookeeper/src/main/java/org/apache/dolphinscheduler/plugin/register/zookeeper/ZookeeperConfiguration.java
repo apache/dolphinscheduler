@@ -15,39 +15,48 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
-import java.util.Map;
+import java.util.function.Function;
 
-public class ZookeeperConfiguration {
+public enum ZookeeperConfiguration {
 
-    public static final String HOSTS_NAME = "hosts";
+    NAME_SPACE("nameSpace", "dolphinscheduler", value -> value),
+    SERVERS("servers", null, value -> value),
 
-    public static final String NAMESPACE_NAME = "namespace";
+    /**
+     * Initial amount of time to wait between retries
+     */
+    BASE_SLEEP_TIME("baseSleepTimeMs", 60, Integer::valueOf),
+    MAX_SLEEP_TIME("maxSleepMs", 300, Integer::valueOf),
+    DIGEST("digest", null, value -> value),
 
-    public static final String MAX_RETRIES_NAME = "max.retries";
-
-    public static final String MAX_SLEEP_TIME_MILLI_SECONDS_NAME = "max.sleep.time";
-
-    public static final String SERVERS_NAME = "servers";
-
-
-    public static String HOSTS;
-
-    public static String NAMESPACE;
-
-    public static int MAX_RETRIES;
-
-    public static int MAX_SLEEP_TIME_MILLI_SECONDS;
-
-    public static String SERVERS;
-
-    public static void initConfiguration(Map<String, Object> config) {
-        //assert null and set default
-        SERVERS = config.get(SERVERS_NAME).toString();
-        HOSTS = config.get(HOSTS_NAME).toString();
-        NAMESPACE = config.get(NAMESPACE_NAME).toString();
-        MAX_RETRIES = (int) config.get(MAX_RETRIES_NAME);
-        MAX_SLEEP_TIME_MILLI_SECONDS = (int) config.get(MAX_SLEEP_TIME_MILLI_SECONDS_NAME);
+    MAX_RETRIES("maxRetries", 5, Integer::valueOf),
 
 
+    //todo
+    SESSION_TIMEOUT_MS("sessionTimeoutMS", 1000, Integer::valueOf),
+    CONNECTION_TIMEOUT_MS("connectionTimeoutMS", 1000, Integer::valueOf),
+
+    BLOCK_UNTIL_CONNECTED_WAIT_MS("blockUntilConnectedWait", 600, Integer::valueOf),
+    ;
+    private final String name;
+
+    public String getName() {
+        return name;
     }
+
+    private final Object defaultValue;
+
+    private final Function<String, Object> converter;
+
+    <T> ZookeeperConfiguration(String name, T defaultValue, Function<String, T> converter) {
+        this.name = name;
+        this.defaultValue = defaultValue;
+        this.converter = (Function<String, Object>) converter;
+    }
+
+    public <T> T getParameterValue(String param) {
+        Object value = param != null ? converter.apply(param) : defaultValue;
+        return (T) value;
+    }
+
 }

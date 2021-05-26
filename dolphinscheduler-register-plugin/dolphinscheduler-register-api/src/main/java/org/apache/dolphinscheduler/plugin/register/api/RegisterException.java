@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.plugin.register.api;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+public class RegisterException extends RuntimeException{
 
-public interface SubscribeListener {
+   public RegisterException(String message, Throwable cause) {
+      super(message, cause);
+   }
 
-    void notify(DataChangeEvent dataChangeEvent);
-
+   public RegisterException(String message) {
+      super(message);
+   }
 }

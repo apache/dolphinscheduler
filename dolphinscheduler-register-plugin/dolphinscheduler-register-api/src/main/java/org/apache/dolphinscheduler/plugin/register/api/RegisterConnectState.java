@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.register.api;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,9 +15,23 @@ package org.apache.dolphinscheduler.plugin.register.api;/*
  * limitations under the License.
  */
 
-public class RegisterExceptionHandler {
+package org.apache.dolphinscheduler.plugin.register.api;
 
-   public static void handleException(Exception e){
+/**
+ * All register connection status must be converted to this
+ */
+public enum RegisterConnectState {
+    CONNECTED("connected", 1),
+    RECONNECTED("reconnected", 2),
+    SUSPENDED("suspended", 3),
+    LOST("lost", 4);
 
-   }
+    private String description;
+
+    private int state;
+
+    RegisterConnectState(String description, int state) {
+        this.description = description;
+        this.state = state;
+    }
 }

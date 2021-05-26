@@ -22,13 +22,11 @@ public interface Register  {
 
 
 
-    void register(Map<String, Object> registerData);
+    void init(Map<String, String> registerData);
 
-    void upRegister();
+    void subscribe(String path, SubscribeListener subscribeListener);
 
-    void subscribe(String key, SubscribeListener subscribeListener);
-
-    void unsubscribe(String key, SubscribeListener subscribeListener);
+    void unsubscribe(String path);
 
     String get(String key);
 
@@ -46,4 +44,6 @@ public interface Register  {
     String getData(String key);
 
     boolean isExisted(String key);
+
+    boolean delete(String key) throws Exception;
 }

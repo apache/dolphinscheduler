@@ -21,5 +21,5 @@ public interface RegisterFactory {
 
     String getName();
 
-    Register getRegister(Map<String,String> configs);
+    Register create();
 }

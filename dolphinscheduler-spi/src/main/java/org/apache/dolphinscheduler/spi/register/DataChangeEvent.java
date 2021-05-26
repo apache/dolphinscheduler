@@ -17,8 +17,18 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
-public interface SubscribeListener {
+public enum DataChangeEvent {
 
-    void notify(DataChangeEvent dataChangeEvent);
+    ADD("ADD", 1),
+    REMOVE("REMOVE", 2),
+    UPDATE("UPDATE",3);
 
+    private String type;
+
+    private int value;
+
+    DataChangeEvent(String type, int value) {
+        this.type = type;
+        this.value = value;
+    }
 }

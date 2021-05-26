@@ -69,4 +69,9 @@
             <unpack/>
         </artifact>
     </artifactSet>
+    <artifactSet to="lib/plugin/regiser/zookeeper">
+        <artifact id="${project.groupId}:dolphinscheduler-register-zookeeeper:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
 </runtime>

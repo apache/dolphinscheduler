@@ -17,6 +17,20 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
 
 public class ZookeeperConstants {
 
-    public static final String HOST="host";
+    private static final String HOSTS_NAME = "hosts";
+
+    public static final String NAMESPACE_NAME = "namespace";
+
+    private static final String MAX_RETRIES_NAME = "max.retries";
+
+    private static final String MAX_SLEEP_TIME_MILLI_SECONDS_NAME = "max.sleep.time";
+
+    private static final String SERVERS_NAME = "servers";
+
+    private static final String SESSION_TIMEOUT_MILLIS_SECONDS_NAME = "sessionTimeoutMilliseconds";
+
+    private static final String CONNECTION_TIMEOUT_MILLIS_SECONDS_NAME = "connectionTimeoutMilliseconds";
+
+    public static final String DIGEST_NAME = "digest";
 
 }

@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+package org.apache.dolphinscheduler.plugin.register.zookeeper;
 
-public interface SubscribeListener {
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.register.RegisterFactory;
 
-    void notify(DataChangeEvent dataChangeEvent);
+import com.google.common.collect.ImmutableList;
 
+public class ZookeeperRegisterPlugin implements DolphinSchedulerPlugin {
+
+    @Override
+    public Iterable<RegisterFactory> getRegisterFactorys() {
+        return ImmutableList.of(new ZookeeperRegisterFactory());
+    }
 }

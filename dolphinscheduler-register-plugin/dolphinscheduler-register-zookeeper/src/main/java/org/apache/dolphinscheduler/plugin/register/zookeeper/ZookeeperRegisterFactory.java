@@ -15,12 +15,8 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
-
-
 import org.apache.dolphinscheduler.spi.register.Register;
 import org.apache.dolphinscheduler.spi.register.RegisterFactory;
-
-import java.util.Map;
 
 public class ZookeeperRegisterFactory implements RegisterFactory {
 
@@ -30,7 +26,7 @@ public class ZookeeperRegisterFactory implements RegisterFactory {
     }
 
     @Override
-    public Register getRegister(Map<String, String> configs) {
+    public Register create() {
         return  new ZookeeperRegister();
     }
 }

@@ -15,10 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+package org.apache.dolphinscheduler.plugin.register.zookeeper;
 
-public interface SubscribeListener {
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.state.ConnectionState;
+import org.apache.curator.framework.state.ConnectionStateListener;
 
-    void notify(DataChangeEvent dataChangeEvent);
+public class ZookeeperConnectionStateListener implements ConnectionStateListener {
+    @Override
+    public void stateChanged(CuratorFramework client, ConnectionState newState) {
 
+    }
 }

@@ -5,11 +5,13 @@
     <parent>
         <artifactId>dolphinscheduler-register-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>${revision}</version>
+        <version>1.3.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-register-zookeeper</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
     <properties>
     <curator.version>4.3.0</curator.version>
     </properties>
@@ -35,6 +37,10 @@
             <version>${curator.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>dolphinscheduler-register-zookeeper-${project.version}</finalName>
+    </build>
 
 
 </project>
