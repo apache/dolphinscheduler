@@ -127,14 +127,8 @@ public class HadoopUtils implements Closeable {
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
 
             if (resUploadType == ResUploadType.HDFS) {
-                if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-                    System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
-                            PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
-                    configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                if (CommonUtils.loadKerberosConf(configuration)) {
                     hdfsUser = "";
-                    UserGroupInformation.setConfiguration(configuration);
-                    UserGroupInformation.loginUserFromKeytab(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
                 }
 
                 String defaultFS = configuration.get(Constants.FS_DEFAULTFS);
@@ -156,20 +150,15 @@ public class HadoopUtils implements Closeable {
                     logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULTFS, defaultFS);
                 }
 
-                if (fs == null) {
-                    if (StringUtils.isNotEmpty(hdfsUser)) {
-                        UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
-                        ugi.doAs(new PrivilegedExceptionAction<Boolean>() {
-                            @Override
-                            public Boolean run() throws Exception {
-                                fs = FileSystem.get(configuration);
-                                return true;
-                            }
-                        });
-                    } else {
-                        logger.warn("hdfs.root.user is not set value!");
+                if (StringUtils.isNotEmpty(hdfsUser)) {
+                    UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
+                    ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
                         fs = FileSystem.get(configuration);
-                    }
+                        return true;
+                    });
+                } else {
+                    logger.warn("hdfs.root.user is not set value!");
+                    fs = FileSystem.get(configuration);
                 }
             } else if (resUploadType == ResUploadType.S3) {
                 System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);

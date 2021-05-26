@@ -39,4 +39,13 @@
         <module>dolphinscheduler-alert-slack</module>
     </modules>
 
+    <dependencies>
+        <!-- dolphinscheduler -->
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
 </project>

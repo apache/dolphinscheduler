@@ -539,6 +539,7 @@ MIT licenses
     js-cookie 2.2.1: https://github.com/js-cookie/js-cookie MIT
     jsplumb 2.8.6: https://github.com/jsplumb/jsplumb MIT and GPLv2
     lodash 4.17.11: https://github.com/lodash/lodash MIT
+    moment-timezone 0.5.33: https://github.com/moment/moment-timezone MIT
     vue-treeselect 0.4.0: https://github.com/riophae/vue-treeselect MIT
     vue	2.5.17:	https://github.com/vuejs/vue	MIT
     vue-router 2.7.0: https://github.com/vuejs/vue-router MIT

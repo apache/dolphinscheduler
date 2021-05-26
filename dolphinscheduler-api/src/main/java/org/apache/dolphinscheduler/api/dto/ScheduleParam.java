@@ -14,62 +14,74 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * schedule parameters
  */
 public class ScheduleParam {
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-  private Date startTime;
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-  private Date endTime;
-  private String crontab;
 
-  public ScheduleParam() {
-  }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endTime;
+    private String crontab;
+    private String timezoneId;
 
-  public ScheduleParam(Date startTime, Date endTime, String crontab) {
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.crontab = crontab;
-  }
+    public ScheduleParam() {
+    }
 
-  public Date getStartTime() {
-    return startTime;
-  }
+    public ScheduleParam(Date startTime, Date endTime, String timezoneId, String crontab) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.timezoneId = timezoneId;
+        this.crontab = crontab;
+    }
 
-  public void setStartTime(Date startTime) {
-    this.startTime = startTime;
-  }
+    public Date getStartTime() {
+        return startTime;
+    }
 
-  public Date getEndTime() {
-    return endTime;
-  }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-  public void setEndTime(Date endTime) {
-    this.endTime = endTime;
-  }
+    public Date getEndTime() {
+        return endTime;
+    }
 
-  public String getCrontab() {
-    return crontab;
-  }
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
-  public void setCrontab(String crontab) {
-    this.crontab = crontab;
-  }
+    public String getCrontab() {
+        return crontab;
+    }
 
+    public void setCrontab(String crontab) {
+        this.crontab = crontab;
+    }
 
-  @Override
-  public String toString() {
-    return "ScheduleParam{" +
-            "startTime=" + startTime +
-            ", endTime=" + endTime +
-            ", crontab='" + crontab + '\'' +
-            '}';
-  }
+    public String getTimezoneId() {
+        return timezoneId;
+    }
+
+    public void setTimezoneId(String timezoneId) {
+        this.timezoneId = timezoneId;
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduleParam{"
+                + "startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", crontab='" + crontab + '\''
+                + ", timezoneId='" + timezoneId + '\''
+                + '}';
+    }
 }

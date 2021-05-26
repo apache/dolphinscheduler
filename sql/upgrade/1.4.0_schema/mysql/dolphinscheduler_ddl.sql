@@ -307,7 +307,7 @@ BEGIN
                      AND TABLE_SCHEMA=(SELECT DATABASE())
                      AND COLUMN_NAME ='t_ds_datasource_name_UN')
     THEN
-        ALTER TABLE t_ds_datasource ADD UNIQUE KEY `t_ds_datasource_name_UN` ('name', 'type');
+        ALTER TABLE t_ds_datasource ADD UNIQUE KEY `t_ds_datasource_name_UN` (`name`, `type`);
     END IF;
 END;
 
@@ -316,6 +316,26 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName();
 DROP PROCEDURE uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName;
+
+-- uc_dolphin_T_t_ds_schedules_A_add_timezone
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_schedules_A_add_timezone;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+                   WHERE TABLE_NAME='t_ds_schedules'
+                     AND TABLE_SCHEMA=(SELECT DATABASE())
+                     AND COLUMN_NAME ='timezone_id')
+    THEN
+        ALTER TABLE t_ds_schedules ADD COLUMN `timezone_id` varchar(40) default NULL COMMENT 'schedule timezone id' AFTER `end_time`;
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
+DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

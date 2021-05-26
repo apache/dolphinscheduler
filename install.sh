@@ -43,8 +43,10 @@ sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common.propert
 sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common.properties
+sed -i ${txt} "s#resource.manager.httpaddress.port.*#resource.manager.httpaddress.port=${resourceManagerHttpAddressPort}#g" conf/common.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common.properties
-sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common.properties
+sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:%s/ws/v1/cluster/apps/%s#g" conf/common.properties
+sed -i ${txt} "s#yarn.job.history.status.address.*#yarn.job.history.status.address=http://${singleYarnIp}:19888/ws/v1/history/mapreduce/jobs/%s#g" conf/common.properties
 sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common.properties
 sed -i ${txt} "s#resource.upload.path.*#resource.upload.path=${resourceUploadPath}#g" conf/common.properties
 sed -i ${txt} "s#resource.storage.type.*#resource.storage.type=${resourceStorageType}#g" conf/common.properties
@@ -56,9 +58,9 @@ sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeep
 sed -i ${txt} "s#\#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/zookeeper.properties
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
 
-sed -i ${txt} "s#alert.plugin.dir.*#alert.plugin.dir=${alertPluginDir}#g" conf/alert.properties
+sed -i ${txt} "s#\#alert.plugin.dir.*#alert.plugin.dir=${alertPluginDir}#g" conf/alert.properties
 
-sed -i ${txt} "s#alert.listen.host.*#alert.listen.host=${alertServer}#g" conf/worker.properties
+sed -i ${txt} "s#\#alert.listen.host.*#alert.listen.host=${alertServer}#g" conf/worker.properties
 
 # 2.create directory
 echo "2.create directory"
