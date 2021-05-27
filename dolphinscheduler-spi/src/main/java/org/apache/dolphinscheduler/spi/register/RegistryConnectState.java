@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,18 +15,23 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
-import org.apache.dolphinscheduler.spi.register.Register;
-import org.apache.dolphinscheduler.spi.register.RegisterFactory;
+package org.apache.dolphinscheduler.spi.register;
 
-public class ZookeeperRegisterFactory implements RegisterFactory {
+/**
+ * All registry connection status must be converted to this
+ */
+public enum RegistryConnectState {
+    CONNECTED("connected", 1),
+    RECONNECTED("reconnected", 2),
+    SUSPENDED("suspended", 3),
+    LOST("lost", 4);
 
-    @Override
-    public String getName() {
-        return "zookeeper";
-    }
+    private String description;
 
-    @Override
-    public Register create() {
-        return new ZookeeperRegister();
+    private int state;
+
+    RegistryConnectState(String description, int state) {
+        this.description = description;
+        this.state = state;
     }
 }

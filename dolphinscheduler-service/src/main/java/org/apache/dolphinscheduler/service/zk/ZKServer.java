@@ -77,7 +77,7 @@ public class ZKServer {
 
     private void registerHook() {
         /*
-         *  register hooks, which are called before the process exits
+         *  registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }

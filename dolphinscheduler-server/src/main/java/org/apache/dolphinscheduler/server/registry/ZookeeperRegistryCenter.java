@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * zookeeper register center
+ * zookeeper registry center
  */
 @Service
 public class ZookeeperRegistryCenter implements InitializingBean {

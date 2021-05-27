@@ -15,17 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.spi.register;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.junit.Test;
+public class RegistryException extends RuntimeException {
 
-import static org.junit.Assert.assertNotNull;
+    public RegistryException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-public class PropertyUtilsTest {
-
-    @Test
-    public void getString() {
-        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULTFS));
+    public RegistryException(String message) {
+        super(message);
     }
 }

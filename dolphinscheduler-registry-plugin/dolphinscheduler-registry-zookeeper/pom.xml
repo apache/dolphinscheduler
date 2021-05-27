@@ -19,25 +19,40 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-registry-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
         <version>1.3.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.dolphinscheduler</groupId>
-    <artifactId>dolphinscheduler-register-plugin</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>dolphinscheduler-register-zookeeper</module>
-    </modules>
+
+
+    <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
+    <!-- can be load as a Alert Plugin when development and run server in IDE -->
+    <packaging>dolphinscheduler-plugin</packaging>
+    <properties>
+        <curator.version>4.3.0</curator.version>
+    </properties>
+
     <dependencies>
-        <!-- dolphinscheduler -->
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-client</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>dolphinscheduler-registry-zookeeper-${project.version}</finalName>
+    </build>
 
 </project>

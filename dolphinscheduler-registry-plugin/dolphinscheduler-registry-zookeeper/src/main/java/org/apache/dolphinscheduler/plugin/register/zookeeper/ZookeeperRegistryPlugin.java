@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.register.zookeeper;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.state.ConnectionState;
-import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.register.RegistryFactory;
 
-public class ZookeeperConnectionStateListener implements ConnectionStateListener {
+import com.google.common.collect.ImmutableList;
+
+public class ZookeeperRegistryPlugin implements DolphinSchedulerPlugin {
+
     @Override
-    public void stateChanged(CuratorFramework client, ConnectionState newState) {
-
+    public Iterable<RegistryFactory> getRegisterFactorys() {
+        return ImmutableList.of(new ZookeeperRegistryFactory());
     }
 }

@@ -147,7 +147,7 @@ public class WorkerServer implements IStoppable {
         this.retryReportTaskStatusThread.start();
 
         /**
-         * register hooks, which are called before the process exits
+         * registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {

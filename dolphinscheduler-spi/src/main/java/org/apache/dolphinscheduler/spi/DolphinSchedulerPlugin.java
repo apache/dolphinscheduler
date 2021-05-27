@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.spi;
 import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.register.RegisterFactory;
+import org.apache.dolphinscheduler.spi.register.RegistryFactory;
 
 /**
  * Dolphinscheduler plugin interface
@@ -37,5 +37,5 @@ public interface DolphinSchedulerPlugin {
         return emptyList();
     }
 
-    default Iterable<RegisterFactory> getRegisterFactorys(){return emptyList();}
+    default Iterable<RegistryFactory> getRegisterFactorys(){return emptyList();}
 }

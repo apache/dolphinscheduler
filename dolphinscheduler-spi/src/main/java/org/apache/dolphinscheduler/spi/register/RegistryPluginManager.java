@@ -30,43 +30,43 @@ import org.slf4j.LoggerFactory;
  * When the plug-in directory contains multiple plug-ins, only the configured plug-in will be used.
  * todo It’s not good to put it here, consider creating a separate API module for each plugin
  */
-public class RegisterPluginManager extends AbstractDolphinPluginManager {
+public class RegistryPluginManager extends AbstractDolphinPluginManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(RegisterPluginManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegistryPluginManager.class);
 
-    private RegisterFactory registerFactory;
+    private RegistryFactory registryFactory;
 
-    public static Register register;
+    public static Registry registry;
 
     private String registerPluginName;
 
-    public RegisterPluginManager(String registerPluginName) {
+    public RegistryPluginManager(String registerPluginName) {
         this.registerPluginName = registerPluginName;
     }
 
     @Override
     public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
-        for (RegisterFactory registerFactory : dolphinSchedulerPlugin.getRegisterFactorys()) {
-            logger.info("Registering Register Plugin '{}'", registerFactory.getName());
-            if (registerPluginName.equals(registerFactory.getName())) {
-                this.registerFactory = registerFactory;
+        for (RegistryFactory registryFactory : dolphinSchedulerPlugin.getRegisterFactorys()) {
+            logger.info("Registering Registry Plugin '{}'", registryFactory.getName());
+            if (registerPluginName.equals(registryFactory.getName())) {
+                this.registryFactory = registryFactory;
                 loadRegister();
                 return;
             }
         }
-        if (null == register) {
-            throw new RegisterException(String.format("not found %s register plugin ", registerPluginName));
+        if (null == registry) {
+            throw new RegistryException(String.format("not found %s registry plugin ", registerPluginName));
         }
     }
 
     private void loadRegister() {
-        try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(registerFactory.getClass().getClassLoader())) {
-            register = registerFactory.create();
+        try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(registryFactory.getClass().getClassLoader())) {
+            registry = registryFactory.create();
         }
     }
 
-    public static Register getRegister() {
-        return register;
+    public static Registry getRegister() {
+        return registry;
     }
 
 }

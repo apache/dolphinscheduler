@@ -44,7 +44,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
     private TreeCache treeCache;
 
     /**
-     * register a unified listener of /${dsRoot},
+     * registry a unified listener of /${dsRoot},
      */
     @Override
     protected void registerListener() {

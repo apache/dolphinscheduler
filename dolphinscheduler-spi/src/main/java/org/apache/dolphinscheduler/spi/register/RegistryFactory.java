@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
-public interface RegisterFactory {
+public interface RegistryFactory {
 
     String getName();
 
-    Register create();
+    Registry create();
 }

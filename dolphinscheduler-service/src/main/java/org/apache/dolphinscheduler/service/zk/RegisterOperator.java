@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * register operator
+ * registry operator
  */
 @Component
 public class RegisterOperator extends ZookeeperCachedOperator {

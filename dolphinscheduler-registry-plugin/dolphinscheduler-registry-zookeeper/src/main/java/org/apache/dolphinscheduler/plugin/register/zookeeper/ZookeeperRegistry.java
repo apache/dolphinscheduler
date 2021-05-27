@@ -27,9 +27,9 @@ import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperCon
 import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SESSION_TIMEOUT_MS;
 
 import org.apache.dolphinscheduler.spi.register.ListenerManager;
-import org.apache.dolphinscheduler.spi.register.RegisterException;
+import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
-import org.apache.dolphinscheduler.spi.register.Register;
+import org.apache.dolphinscheduler.spi.register.Registry;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.apache.curator.RetryPolicy;
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Strings;
 
-public class ZookeeperRegister implements Register {
+public class ZookeeperRegistry implements Registry {
 
     private CuratorFramework client;
 
@@ -100,15 +100,16 @@ public class ZookeeperRegister implements Register {
             buildDigest(builder, digest);
         }
         client = builder.build();
+
         client.start();
         try {
             if (!client.blockUntilConnected(BLOCK_UNTIL_CONNECTED_WAIT_MS.getParameterValue(registerData.get(BLOCK_UNTIL_CONNECTED_WAIT_MS.getName())), TimeUnit.MILLISECONDS)) {
                 client.close();
-                throw new RegisterException("zookeeper connect timeout");
+                throw new RegistryException("zookeeper connect timeout");
             }
         } catch (Exception e) {
 
-            throw new RegisterException("zookeeper connect error", e);
+            throw new RegistryException("zookeeper connect error", e);
         }
     }
 
@@ -171,7 +172,7 @@ public class ZookeeperRegister implements Register {
         try {
             client.delete().deletingChildrenIfNeeded().forPath(key);
         } catch (Exception e) {
-            throw new RegisterException("zookeeper remove error", e);
+            throw new RegistryException("zookeeper remove error", e);
         }
     }
 
@@ -180,7 +181,7 @@ public class ZookeeperRegister implements Register {
         try {
             return null != client.checkExists().forPath(key);
         } catch (Exception e) {
-            throw new RegisterException("zookeeper check key is existed error", e);
+            throw new RegistryException("zookeeper check key is existed error", e);
         }
     }
 
@@ -193,7 +194,7 @@ public class ZookeeperRegister implements Register {
                 update(key, value);
             }
         } catch (Exception e) {
-            throw new RegisterException("zookeeper persist error", e);
+            throw new RegistryException("zookeeper persist error", e);
         }
     }
 
@@ -203,7 +204,7 @@ public class ZookeeperRegister implements Register {
             TransactionOp transactionOp = client.transactionOp();
             client.transaction().forOperations(transactionOp.check().forPath(key), transactionOp.setData().forPath(key, value.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
-            throw new RegisterException("zookeeper update error", e);
+            throw new RegistryException("zookeeper update error", e);
         }
     }
 
@@ -212,7 +213,7 @@ public class ZookeeperRegister implements Register {
         try {
             return client.getChildren().forPath(key);
         } catch (Exception e) {
-            throw new RegisterException("zookeeper get children error", e);
+            throw new RegistryException("zookeeper get children error", e);
         }
     }
 
@@ -240,7 +241,7 @@ public class ZookeeperRegister implements Register {
             interProcessMutex.acquire();
             return true;
         } catch (Exception e) {
-            throw new RegisterException("zookeeper get lock error", e);
+            throw new RegistryException("zookeeper get lock error", e);
         }
     }
 
@@ -253,8 +254,12 @@ public class ZookeeperRegister implements Register {
         try {
             lockMap.get(localKey).release();
         } catch (Exception e) {
-            throw new RegisterException("zookeeper release lock error", e);
+            throw new RegistryException("zookeeper release lock error", e);
         }
         return true;
+    }
+
+    public  CuratorFramework getClient(){
+        return client;
     }
 }

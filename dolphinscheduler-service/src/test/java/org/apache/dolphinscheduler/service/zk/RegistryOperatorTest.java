@@ -33,10 +33,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * register operator test
+ * registry operator test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class RegisterOperatorTest {
+public class RegistryOperatorTest {
 
     private static ZKServer zkServer;
 

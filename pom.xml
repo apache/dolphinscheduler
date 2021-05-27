@@ -942,7 +942,7 @@
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
-                        <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/registry/MasterRegistryTest.java</include>
                         <include>**/server/master/registry/ServerNodeManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
@@ -955,7 +955,7 @@
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
                         <include>**/server/master/zk/ZKMasterClientTest.java</include>
-                        <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
+                        <include>**/server/registry/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
@@ -1168,6 +1168,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
-        <module>dolphinscheduler-register-plugin</module>
+        <module>dolphinscheduler-registry-plugin</module>
     </modules>
 </project>

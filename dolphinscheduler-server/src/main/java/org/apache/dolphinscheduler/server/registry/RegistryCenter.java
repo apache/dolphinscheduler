@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.register;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,34 +15,32 @@ package org.apache.dolphinscheduler.spi.register;/*
  * limitations under the License.
  */
 
-import java.util.List;
+package org.apache.dolphinscheduler.server.registry;
+
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.spi.register.Registry;
+import org.apache.dolphinscheduler.spi.register.RegistryException;
+
 import java.util.Map;
 
-public interface Register  {
+public class RegistryCenter {
 
-    void init(Map<String, String> registerData);
 
-    void subscribe(String path, SubscribeListener subscribeListener);
+   private static Registry registry;
 
-    void unsubscribe(String path);
+    public static final String REGISTRY_PREFIX="registry";
 
-    String get(String key);
+    public static void init(){
+        Map<String,String> registryConfig= PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
 
-    void remove(String key);
+        if(registryConfig.isEmpty()){
+            throw new RegistryException("registry config param is null");
+        }
 
-    void persist(String key, String value);
 
-    void update(String key, String value);
+    }
 
-    List<String> getChildren(String path);
-
-    String getData(String key);
-
-    boolean isExisted(String key);
-
-    boolean delete(String key) throws Exception;
-
-    boolean acquireLock(String key);
-
-    boolean releaseLock(String key);
+    public static Registry getRegistry(){
+        return registry;
+    }
 }

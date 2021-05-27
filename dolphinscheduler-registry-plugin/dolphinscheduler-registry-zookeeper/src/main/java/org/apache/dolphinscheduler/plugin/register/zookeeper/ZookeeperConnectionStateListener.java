@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+package org.apache.dolphinscheduler.plugin.register.zookeeper;
 
-public class RegisterException extends RuntimeException {
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.state.ConnectionState;
+import org.apache.curator.framework.state.ConnectionStateListener;
 
-    public RegisterException(String message, Throwable cause) {
-        super(message, cause);
+public class ZookeeperConnectionStateListener implements ConnectionStateListener {
+    @Override
+    public void stateChanged(CuratorFramework client, ConnectionState newState) {
+     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 
-    public RegisterException(String message) {
-        super(message);
-    }
 }

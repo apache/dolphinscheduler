@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.register.zookeeper;
+import org.apache.dolphinscheduler.spi.register.Registry;
+import org.apache.dolphinscheduler.spi.register.RegistryFactory;
 
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.register.RegisterFactory;
-
-import com.google.common.collect.ImmutableList;
-
-public class ZookeeperRegisterPlugin implements DolphinSchedulerPlugin {
+public class ZookeeperRegistryFactory implements RegistryFactory {
 
     @Override
-    public Iterable<RegisterFactory> getRegisterFactorys() {
-        return ImmutableList.of(new ZookeeperRegisterFactory());
+    public String getName() {
+        return "zookeeper";
+    }
+
+    @Override
+    public Registry create() {
+        return new ZookeeperRegistry();
     }
 }

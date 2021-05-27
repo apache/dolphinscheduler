@@ -17,17 +17,18 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
 
 import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SERVERS;
 
-import org.apache.dolphinscheduler.spi.register.Register;
+import org.apache.dolphinscheduler.spi.register.Registry;
+
+import org.apache.curator.framework.state.ConnectionState;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
-
+        System.out.println("xxxxxxx<<<<<<<<<<<<<<<<<");
         Map<String, String> registerConfig = new HashMap<>();
 
 
@@ -35,18 +36,30 @@ public class Main {
 
         System.out.printf(SERVERS.getName());
 
-        Register register = new ZookeeperRegister();
-        register.init(registerConfig);
-        register.persist("/xxx/sd", "kriis");
-       // boolean sb = register.acquireLock("/kristen");
-        sb(register);
-        sb(register);
+        ZookeeperRegistry registry = new ZookeeperRegistry();
+        registry.init(registerConfig);
+        registry.persist("/xxx/sd", "kriis");
+        System.out.println("xxxxxxx<<<<<<<<<<<<<<<<<");
+       registry.getClient().getConnectionStateListenable().addListener( (client,newState) -> {
+           System.out.println("xxxxxxx<<<<<<<<<<<<<<<<<");
+           if (newState == ConnectionState.LOST) {
+              System.out.println("xxxxxxx<<<<<<<<<<<<<<<<<");
+           } else if (newState == ConnectionState.RECONNECTED) {
+               System.out.println("xxxxxxx<<<<<<<<<<<<<<<<<");
+           } else if (newState == ConnectionState.SUSPENDED) {
+               System.out.println("xxxxxxx<<<<<<<<<<<<<<<<<");
+           }
+       });
+
+        // boolean sb = registry.acquireLock("/kristen");
+        sb(registry);
+        sb(registry);
 
 
-        // register.persist();
-        // register.subscribe("/xxx", new TestListener());
-        // register.delete("/xxx/sd");
-        //register.
+        // registry.persist();
+        // registry.subscribe("/xxx", new TestListener());
+        // registry.delete("/xxx/sd");
+        //registry.
         while (true) {
 
         }
@@ -54,14 +67,14 @@ public class Main {
 
     }
 
-    public static void sb(Register register) {
+    public static void sb(Registry registry) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                register.persist("/xxx/sd", "kriis");
-                boolean sb = register.acquireLock("/kristen");
+                registry.persist("/xxx/sd", "kriis");
+                boolean sb = registry.acquireLock("/kristen");
                 System.out.printf(Thread.currentThread().getName());
-                register.releaseLock("/kristen");
+                registry.releaseLock("/kristen");
 
             }
         }).start();

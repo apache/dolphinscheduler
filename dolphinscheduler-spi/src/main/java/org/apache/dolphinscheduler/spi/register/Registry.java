@@ -1,4 +1,4 @@
-/*
+package org.apache.dolphinscheduler.spi.register;/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,23 +15,34 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.register;
+import java.util.List;
+import java.util.Map;
 
-/**
- * All register connection status must be converted to this
- */
-public enum RegisterConnectState {
-    CONNECTED("connected", 1),
-    RECONNECTED("reconnected", 2),
-    SUSPENDED("suspended", 3),
-    LOST("lost", 4);
+public interface Registry {
 
-    private String description;
+    void init(Map<String, String> registerData);
 
-    private int state;
+    void subscribe(String path, SubscribeListener subscribeListener);
 
-    RegisterConnectState(String description, int state) {
-        this.description = description;
-        this.state = state;
-    }
+    void unsubscribe(String path);
+
+    String get(String key);
+
+    void remove(String key);
+
+    void persist(String key, String value);
+
+    void update(String key, String value);
+
+    List<String> getChildren(String path);
+
+    String getData(String key);
+
+    boolean isExisted(String key);
+
+    boolean delete(String key) throws Exception;
+
+    boolean acquireLock(String key);
+
+    boolean releaseLock(String key);
 }
