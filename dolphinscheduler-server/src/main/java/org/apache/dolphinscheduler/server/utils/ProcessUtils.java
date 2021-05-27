@@ -450,11 +450,6 @@ public class ProcessUtils {
             }
             if (StringUtils.isNotEmpty(log)) {
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);
-                String workerDir = taskExecutionContext.getExecutePath();
-                if (StringUtils.isEmpty(workerDir)) {
-                    logger.error("task instance work dir is empty");
-                    throw new RuntimeException("task instance work dir is empty");
-                }
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
                     return appIds;
