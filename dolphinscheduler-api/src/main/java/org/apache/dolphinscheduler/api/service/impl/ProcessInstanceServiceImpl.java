@@ -629,6 +629,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         // global params
         List<Property> globalParams = new ArrayList<>();
 
+        if (userDefinedParams != null && userDefinedParams.length() > 0) {
+            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
+        }
         // global param string
         String globalParamStr = ParameterUtils.convertParameterPlaceholders(JSONUtils.toJsonString(globalParams), timeParams);
         globalParams = JSONUtils.toList(globalParamStr, Property.class);
@@ -636,9 +639,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             timeParams.put(property.getProp(), property.getValue());
         }
 
-        if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
-        }
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(processInstance, timeParams);
 

@@ -509,9 +509,6 @@ public class ProcessInstanceServiceTest {
 
         when(taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(),Flag.YES)).thenReturn(Arrays.asList(taskInstance));
 
-//        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version))
-//                .thenReturn(new TaskDefinitionLog());
-
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion())).thenReturn(taskDefinitionLog);
 
