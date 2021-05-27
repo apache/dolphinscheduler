@@ -449,6 +449,14 @@ public class ProcessUtils {
                         taskExecutionContext.getLogPath());
             }
             if (StringUtils.isNotEmpty(log)) {
+                if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
+                    taskExecutionContext.setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                            taskExecutionContext.getProcessDefineCode(),
+                            taskExecutionContext.getProcessDefineVersion(),
+                            taskExecutionContext.getProcessInstanceId(),
+                            taskExecutionContext.getTaskInstanceId()));
+                    FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
+                }
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
