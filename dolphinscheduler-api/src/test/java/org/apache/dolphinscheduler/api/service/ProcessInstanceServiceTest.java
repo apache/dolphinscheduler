@@ -35,29 +35,15 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -101,6 +87,9 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
     LoggerServiceImpl loggerService;
@@ -493,6 +482,45 @@ public class ProcessInstanceServiceTest {
         Map<String, Object> successRes = processInstanceService.viewVariables(1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
+
+    @Test
+    public void testViewVariablesNotSchedule() throws Exception {
+        String shellJson2 = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\"," +
+                "\"params\":{\"resourceList\":[],\"localParams\":[{\"prop\":\"BATCH_TIME\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${system.datetime}\"}],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
+                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
+                "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
+                "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+
+
+        //process instance not null
+        ProcessInstance processInstance = getProcessInstance();
+        processInstance.setCommandType(CommandType.SCHEDULER);
+        processInstance.setScheduleTime(null);
+        processInstance.setProcessInstanceJson(shellJson2);
+        processInstance.setGlobalParams("");
+        processInstance.setStartTime(DateUtils.stringToDate("2021-05-15 22:50:00"));
+        when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
+
+        TaskInstance taskInstance = getTaskInstance();
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setName("shell-1");
+        taskDefinitionLog.setTaskParams("{\"resourceList\":[],\"localParams\":[{\"prop\":\"BATCH_TIME\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${system.datetime}\"}],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}");
+
+
+        when(taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(),Flag.YES)).thenReturn(Arrays.asList(taskInstance));
+
+//        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version))
+//                .thenReturn(new TaskDefinitionLog());
+
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion())).thenReturn(taskDefinitionLog);
+
+        Map<String, Object> successRes = processInstanceService.viewVariables(1);
+        Property property = ((ArrayList<Property>)((HashMap) ((HashMap) ((HashMap) successRes.get("data")).get("localParams")).get("shell-1")).get("localParamsList")).get(0);
+        Assert.assertEquals("BATCH_TIME", property.getProp());
+        Assert.assertEquals("20210515225000", property.getValue());
+    }
+
 
     @Test
     public void testViewGantt() throws Exception {

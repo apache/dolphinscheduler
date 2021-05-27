@@ -621,9 +621,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new RuntimeException("workflow instance is null");
         }
 
+        Date scheduleTime = processInstance.getScheduleTime();
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(processInstance.getCmdTypeIfComplement(),
-                        processInstance.getScheduleTime());
+                        scheduleTime !=null ? scheduleTime : processInstance.getStartTime());
         String userDefinedParams = processInstance.getGlobalParams();
         // global params
         List<Property> globalParams = new ArrayList<>();
@@ -661,8 +662,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
             String parameter = taskDefinitionLog.getTaskParams();
-            Map<String, String> map = JSONUtils.toMap(parameter);
-            String localParams = map.get(LOCAL_PARAMS);
+            Map<String, Object> map = JSONUtils.toMap(parameter,String.class,Object.class);
+            String localParams = JSONUtils.toJsonString(map.get(LOCAL_PARAMS));
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
