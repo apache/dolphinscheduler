@@ -495,8 +495,18 @@ public class SqlTask extends AbstractTask {
         //parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
-        for (int i = 1; i <= sqlParamsMap.size(); i++) {
-            logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
+        if(sqlParamsMap == null) { 
+        	logger.info("printReplacedSql: sqlParamsMap is null.");
+        }
+        else {         	
+        	for (int i = 1; i <= sqlParamsMap.size(); i++) {
+        		if(sqlParamsMap.get(i) == null ) { 
+        			logger.info("printReplacedSql:  sqlParamsMap.get({}) is null.", i);
+        		}
+        		else {         			
+        			logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
+        		}
+        	}
         }
         logger.info("Sql Params are {}", logPrint);
     }

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
@@ -33,6 +34,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -147,5 +150,19 @@ public class SqlTaskTest {
 
         String result = Whitebox.invokeMethod(sqlTask, "resultProcess", resultSet);
         Assert.assertNotNull(result);
+    }
+    
+    @Test
+    public void shouldntThrowIllegalArgument_When_SqlParamsMapIsNullOrItsGet_printReplacedSql() {
+    	
+    	sqlTask.printReplacedSql("", "", "", null);
+    	
+    	
+    	Map<Integer, Property> sqlParamsMap = new HashMap<>();
+    	sqlParamsMap.put(1, null); 
+    	
+    	sqlTask.printReplacedSql("", "", "", sqlParamsMap);
+
+    	   
     }
 }
