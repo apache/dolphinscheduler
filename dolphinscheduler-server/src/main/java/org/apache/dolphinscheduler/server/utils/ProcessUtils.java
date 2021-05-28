@@ -455,8 +455,8 @@ public class ProcessUtils {
                             taskExecutionContext.getProcessDefineVersion(),
                             taskExecutionContext.getProcessInstanceId(),
                             taskExecutionContext.getTaskInstanceId()));
-                    FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
                 }
+                FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
