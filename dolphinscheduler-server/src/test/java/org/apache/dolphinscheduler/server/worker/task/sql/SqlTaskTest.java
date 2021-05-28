@@ -153,7 +153,7 @@ public class SqlTaskTest {
     }
     
     @Test
-    public void shouldntThrowIllegalArgument_When_SqlParamsMapIsNullOrItsGet_printReplacedSql() {
+    public void shouldntThrowNullPointerException_When_SqlParamsMapIsNullOrItsGet_printReplacedSql() {
     	
     	sqlTask.printReplacedSql("", "", "", null);
     	
