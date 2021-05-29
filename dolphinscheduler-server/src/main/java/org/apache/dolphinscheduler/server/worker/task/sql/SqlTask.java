@@ -330,8 +330,8 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                            ? sqlParameters.getTitle()
-                            : taskExecutionContext.getTaskName() + " query result sets", result);
+                    ? sqlParameters.getTitle()
+                    : taskExecutionContext.getTaskName() + " query result sets", result);
         }
         logger.debug("execute sql result : {}", result);
         return result;
@@ -478,8 +478,16 @@ public class SqlTask extends AbstractTask {
             String paramName = m.group(1);
             Property prop = paramsPropsMap.get(paramName);
 
-            sqlParamsMap.put(index, prop);
-            index++;
+            if (prop == null) {
+                logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
+                        + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskExecutionContext.getTaskInstanceId());
+            }
+            else {
+                sqlParamsMap.put(index, prop);
+                index++;
+                logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
+            }
+
         }
     }
 
@@ -495,18 +503,13 @@ public class SqlTask extends AbstractTask {
         //parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
-        if(sqlParamsMap == null) { 
-        	logger.info("printReplacedSql: sqlParamsMap is null.");
+        if (sqlParamsMap == null) {
+            logger.info("printReplacedSql: sqlParamsMap is null.");
         }
-        else {         	
-        	for (int i = 1; i <= sqlParamsMap.size(); i++) {
-        		if(sqlParamsMap.get(i) == null ) { 
-        			logger.info("printReplacedSql:  sqlParamsMap.get({}) is null.", i);
-        		}
-        		else {         			
-        			logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
-        		}
-        	}
+        else {
+            for (int i = 1; i <= sqlParamsMap.size(); i++) {
+                logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
+            }
         }
         logger.info("Sql Params are {}", logPrint);
     }
