@@ -161,10 +161,10 @@ public class SqlTaskTest {
     }
 
     @Test
-    public void shouldntThrowNullPointerException_When_paramNameIsNotFoundInparamsPropsMap_setSqlParamsMap() {
+    public void shouldntPutPropertyInSqlParamsMap_When_paramNameIsNotFoundInparamsPropsMap_setSqlParamsMap() {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         Map<String, Property> paramsPropsMap = new HashMap<>();
-        paramsPropsMap.put("validPropertyName", new Property() );
+        paramsPropsMap.put("validPropertyName", new Property());
 
         taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         PowerMockito.when(taskExecutionContext.getTaskInstanceId()).thenReturn(1);
