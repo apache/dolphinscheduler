@@ -624,7 +624,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         Date scheduleTime = processInstance.getScheduleTime();
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(processInstance.getCmdTypeIfComplement(),
-                        scheduleTime !=null ? scheduleTime : processInstance.getStartTime());
+                        scheduleTime != null ? scheduleTime : processInstance.getStartTime());
         String userDefinedParams = processInstance.getGlobalParams();
         // global params
         List<Property> globalParams = new ArrayList<>();
