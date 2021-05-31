@@ -414,7 +414,21 @@ public abstract class AbstractCommandExecutor {
                     }
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
                         || applicationStatus.equals(ExecutionStatus.KILL)) {
-                        return false;
+                        //Try again 10 times every 15 seconds
+                        for (int i = 0; i < 10; i++) {
+                            applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+                            if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
+                                    applicationStatus.equals(ExecutionStatus.KILL)) {
+                                ThreadUtils.sleep(15000);
+                            }else{
+                                break;
+                            }
+                        }
+                        //Judge the state again
+                        if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
+                                applicationStatus.equals(ExecutionStatus.KILL)) {
+                            return false;
+                        }
                     }
 
                     if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
