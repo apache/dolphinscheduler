@@ -23,9 +23,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-
-import org.apache.curator.framework.state.ConnectionState;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -53,7 +51,7 @@ public class MasterRegistry {
      * zookeeper registry center
      */
     @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    private RegistryCenter registryCenter;
 
     /**
      * master config
@@ -83,8 +81,10 @@ public class MasterRegistry {
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         String localNodePath = getMasterPath();
-        zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(localNodePath, "");
-        zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
+        //todo
+        registryCenter.persist(localNodePath, "");
+       /* todo
+       zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
             (client, newState) -> {
                 if (newState == ConnectionState.LOST) {
                     logger.error("master : {} connection lost from zookeeper", address);
@@ -93,17 +93,18 @@ public class MasterRegistry {
                 } else if (newState == ConnectionState.SUSPENDED) {
                     logger.warn("master : {} connection SUSPENDED ", address);
                 }
-            });
+            });*/
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterMaxCpuloadAvg(),
                 masterConfig.getMasterReservedMemory(),
                 Sets.newHashSet(getMasterPath()),
                 Constants.MASTER_TYPE,
-                zookeeperRegistryCenter);
+                registryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
+
     }
 
     /**
@@ -112,8 +113,8 @@ public class MasterRegistry {
     public void unRegistry() {
         String address = getLocalAddress();
         String localNodePath = getMasterPath();
-        zookeeperRegistryCenter.getRegisterOperator().remove(localNodePath);
-        logger.info("master node : {} unRegistry to ZK.", address);
+        registryCenter.remove(localNodePath);
+        logger.info("master node : {} unRegistry to register center.", address);
         heartBeatExecutor.shutdown();
         logger.info("heartbeat executor shutdown");
     }
@@ -123,7 +124,7 @@ public class MasterRegistry {
      */
     public String getMasterPath() {
         String address = getLocalAddress();
-        return this.zookeeperRegistryCenter.getMasterPath() + "/" + address;
+        return this.registryCenter.getMasterPath() + "/" + address;
     }
 
     /**
@@ -135,10 +136,11 @@ public class MasterRegistry {
 
     /**
      * get zookeeper registry center
+     *
      * @return ZookeeperRegistryCenter
      */
-    public ZookeeperRegistryCenter getZookeeperRegistryCenter() {
-        return zookeeperRegistryCenter;
+    public RegistryCenter getRegistryCenter() {
+        return registryCenter;
     }
 
 }

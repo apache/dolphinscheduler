@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -132,9 +132,10 @@ public class WorkerServer implements IStoppable {
         // worker registry
         try {
             this.workerRegistry.registry();
-            this.workerRegistry.getZookeeperRegistryCenter().setStoppable(this);
+            this.workerRegistry.getRegistryCenter().setStoppable(this);
             Set<String> workerZkPaths = this.workerRegistry.getWorkerZkPaths();
-            this.workerRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(workerZkPaths, ZKNodeType.WORKER, Constants.DELETE_ZK_OP);
+
+            this.workerRegistry.getRegistryCenter().handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_ZK_OP);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);

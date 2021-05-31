@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
+import org.apache.dolphinscheduler.api.utils.RegistryMonitor;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,14 +59,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Autowired
     WorkerGroupMapper workerGroupMapper;
 
-    @Autowired
-    protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     @Autowired
-    private ZookeeperMonitor zookeeperMonitor;
+    private RegistryMonitor registryMonitor;
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Resource
+    RegistryCenter registryCenter;
 
     /**
      * create or update a worker group
@@ -140,8 +143,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
         }
         // check zookeeper
-        String workerGroupPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
-        return zookeeperCachedOperator.isExisted(workerGroupPath);
+        String workerGroupPath =  Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
+        return registryCenter.isExisted(workerGroupPath);
     }
 
     /**
@@ -150,7 +153,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
-        Map<String, String> serverMaps = zookeeperMonitor.getServerMaps(ZKNodeType.WORKER, true);
+        Map<String, String> serverMaps = registryMonitor.getServerMaps(NodeType.WORKER, true);
         for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
             if (!serverMaps.containsKey(addr)) {
                 return addr;
@@ -245,10 +248,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         // worker groups from database
         List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
         // worker groups from zookeeper
-        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
+        String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
         List<String> workerGroupList = null;
         try {
-            workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
+            workerGroupList = registryCenter.getChildrenKeys(workerPath);
         } catch (Exception e) {
             logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
         }
@@ -266,7 +269,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
             List<String> childrenNodes = null;
             try {
-                childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
+                childrenNodes = registryCenter.getChildrenKeys(workerGroupPath);
             } catch (Exception e) {
                 logger.error("getChildrenNodes exception: {}, workerGroupPath: {}", e.getMessage(), workerGroupPath);
             }
@@ -277,7 +280,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
-                String registeredValue = zookeeperCachedOperator.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
+                String registeredValue = registryCenter.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setSystemDefault(true);
@@ -323,7 +326,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> getWorkerAddressList() {
         Map<String, Object> result = new HashMap<>();
-        List<String> serverNodeList = zookeeperMonitor.getServerNodeList(ZKNodeType.WORKER, true);
+        List<String> serverNodeList = registryMonitor.getServerNodeList(NodeType.WORKER, true);
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;

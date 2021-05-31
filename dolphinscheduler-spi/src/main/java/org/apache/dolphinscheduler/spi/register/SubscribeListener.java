@@ -19,6 +19,6 @@ package org.apache.dolphinscheduler.spi.register;
 
 public interface SubscribeListener {
 
-    void notify(DataChangeEvent dataChangeEvent);
+    void notify(String path,DataChangeEvent dataChangeEvent);
 
 }

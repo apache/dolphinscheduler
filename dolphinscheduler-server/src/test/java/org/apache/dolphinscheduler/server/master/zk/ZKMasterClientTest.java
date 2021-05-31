@@ -24,12 +24,8 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.registry.DependencyConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
-import org.apache.dolphinscheduler.service.zk.RegisterOperator;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
-import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.Set;
 
@@ -47,11 +43,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = {DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,
         ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class, SpringConnectionFactory.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, ServerNodeManager.class,
-        ZKMasterClient.class, RegisterOperator.class})
+        MasterRegistryClient.class, RegisterOperator.class})
 public class ZKMasterClientTest {
 
     @Autowired
-    private ZKMasterClient zkMasterClient;
+    private MasterRegistryClient zkMasterClient;
 
     @Autowired
     private ServerNodeManager serverNodeManager;

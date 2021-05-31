@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.zk;
+package org.apache.dolphinscheduler.service.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.COLON;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -44,9 +46,12 @@ import org.springframework.stereotype.Component;
  * abstract zookeeper client
  */
 @Component
-public abstract class AbstractZKClient extends RegisterOperator {
+public abstract class AbstractRegistryClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractZKClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractRegistryClient.class);
+
+    @Resource
+    RegistryCenter registryCenter;
 
     /**
      * get active master num
@@ -57,8 +62,8 @@ public abstract class AbstractZKClient extends RegisterOperator {
         List<String> childrenList = new ArrayList<>();
         try {
             // read master node parent path from conf
-            if (super.isExisted(getZNodeParentPath(ZKNodeType.MASTER))) {
-                childrenList = super.getChildrenKeys(getZNodeParentPath(ZKNodeType.MASTER));
+            if (registryCenter.isExisted(getZNodeParentPath(NodeType.MASTER))) {
+                childrenList = registryCenter.getChildrenKeys(getZNodeParentPath(NodeType.MASTER));
             }
         } catch (Exception e) {
             logger.error("getActiveMasterNum error", e);
@@ -67,21 +72,14 @@ public abstract class AbstractZKClient extends RegisterOperator {
     }
 
     /**
-     * @return zookeeper quorum
-     */
-    public String getZookeeperQuorum() {
-        return getZookeeperConfig().getServerList();
-    }
-
-    /**
      * get server list.
      *
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @return server list
      */
-    public List<Server> getServerList(ZKNodeType zkNodeType) {
-        Map<String, String> serverMaps = getServerMaps(zkNodeType);
-        String parentPath = getZNodeParentPath(zkNodeType);
+    public List<Server> getServerList(NodeType nodeType) {
+        Map<String, String> serverMaps = getServerMaps(nodeType);
+        String parentPath = getZNodeParentPath(nodeType);
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
@@ -105,16 +103,16 @@ public abstract class AbstractZKClient extends RegisterOperator {
     /**
      * get server zk nodes.
      *
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @return result : list<zknode>
      */
-    public List<String> getServerZkNodes(ZKNodeType zkNodeType) {
-        String path = getZNodeParentPath(zkNodeType);
-        List<String> serverList = super.getChildrenKeys(path);
-        if (zkNodeType == ZKNodeType.WORKER) {
+    public List<String> getServerZkNodes(NodeType nodeType) {
+        String path = getZNodeParentPath(nodeType);
+        List<String> serverList = registryCenter.getChildrenKeys(path);
+        if (nodeType == NodeType.WORKER) {
             List<String> workerList = new ArrayList<>();
             for (String group : serverList) {
-                List<String> groupServers = super.getChildrenKeys(path + Constants.SLASH + group);
+                List<String> groupServers = registryCenter.getChildrenKeys(path + Constants.SLASH + group);
                 for (String groupServer : groupServers) {
                     workerList.add(group + Constants.SLASH + groupServer);
                 }
@@ -127,21 +125,21 @@ public abstract class AbstractZKClient extends RegisterOperator {
     /**
      * get server list map.
      *
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @param hostOnly host only
      * @return result : {host : resource info}
      */
-    public Map<String, String> getServerMaps(ZKNodeType zkNodeType, boolean hostOnly) {
+    public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         Map<String, String> serverMap = new HashMap<>();
         try {
-            String path = getZNodeParentPath(zkNodeType);
-            List<String> serverList = getServerZkNodes(zkNodeType);
+            String path = getZNodeParentPath(nodeType);
+            List<String> serverList = getServerZkNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
-                if (zkNodeType == ZKNodeType.WORKER && hostOnly) {
+                if (nodeType == NodeType.WORKER && hostOnly) {
                     host = server.split(Constants.SLASH)[1];
                 }
-                serverMap.putIfAbsent(host, super.get(path + Constants.SLASH + server));
+                serverMap.putIfAbsent(host, registryCenter.get(path + Constants.SLASH + server));
             }
         } catch (Exception e) {
             logger.error("get server list failed", e);
@@ -153,27 +151,27 @@ public abstract class AbstractZKClient extends RegisterOperator {
     /**
      * get server list map.
      *
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @return result : {host : resource info}
      */
-    public Map<String, String> getServerMaps(ZKNodeType zkNodeType) {
-        return getServerMaps(zkNodeType, false);
+    public Map<String, String> getServerMaps(NodeType nodeType) {
+        return getServerMaps(nodeType, false);
     }
 
     /**
      * get server node set.
      *
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @param hostOnly host only
      * @return result : set<host>
      */
-    public Set<String> getServerNodeSet(ZKNodeType zkNodeType, boolean hostOnly) {
+    public Set<String> getServerNodeSet(NodeType nodeType, boolean hostOnly) {
         Set<String> serverSet = new HashSet<>();
         try {
-            List<String> serverList = getServerZkNodes(zkNodeType);
+            List<String> serverList = getServerZkNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
-                if (zkNodeType == ZKNodeType.WORKER && hostOnly) {
+                if (nodeType == NodeType.WORKER && hostOnly) {
                     host = server.split(Constants.SLASH)[1];
                 }
                 serverSet.add(host);
@@ -187,12 +185,12 @@ public abstract class AbstractZKClient extends RegisterOperator {
     /**
      * get server node list.
      *
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @param hostOnly host only
      * @return result : list<host>
      */
-    public List<String> getServerNodeList(ZKNodeType zkNodeType, boolean hostOnly) {
-        Set<String> serverSet = getServerNodeSet(zkNodeType, hostOnly);
+    public List<String> getServerNodeList(NodeType nodeType, boolean hostOnly) {
+        Set<String> serverSet = getServerNodeSet(nodeType, hostOnly);
         List<String> serverList = new ArrayList<>(serverSet);
         Collections.sort(serverList);
         return serverList;
@@ -202,17 +200,17 @@ public abstract class AbstractZKClient extends RegisterOperator {
      * check the zookeeper node already exists
      *
      * @param host host
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @return true if exists
      */
-    public boolean checkZKNodeExists(String host, ZKNodeType zkNodeType) {
-        String path = getZNodeParentPath(zkNodeType);
+    public boolean checkZKNodeExists(String host, NodeType nodeType) {
+        String path = getZNodeParentPath(nodeType);
         if (StringUtils.isEmpty(path)) {
             logger.error("check zk node exists error, host:{}, zk node type:{}",
-                    host, zkNodeType);
+                    host, nodeType);
             return false;
         }
-        Map<String, String> serverMaps = getServerMaps(zkNodeType, true);
+        Map<String, String> serverMaps = getServerMaps(nodeType, true);
         for (String hostKey : serverMaps.keySet()) {
             if (hostKey.contains(host)) {
                 return true;
@@ -225,30 +223,38 @@ public abstract class AbstractZKClient extends RegisterOperator {
      * @return get worker node parent path
      */
     protected String getWorkerZNodeParentPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
+        return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
     }
 
     /**
      * @return get master node parent path
      */
     protected String getMasterZNodeParentPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS;
+        return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
     }
+
+    /**
+     * @return get dead server node parent path
+     */
+    protected String getDeadZNodeParentPath() {
+        return Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
+    }
+
 
     /**
      * @return get master lock path
      */
     public String getMasterLockPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS;
+        return  Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
     }
 
     /**
-     * @param zkNodeType zookeeper node type
+     * @param nodeType zookeeper node type
      * @return get zookeeper node parent path
      */
-    public String getZNodeParentPath(ZKNodeType zkNodeType) {
+    public String getZNodeParentPath(NodeType nodeType) {
         String path = "";
-        switch (zkNodeType) {
+        switch (nodeType) {
             case MASTER:
                 return getMasterZNodeParentPath();
             case WORKER:
@@ -266,21 +272,21 @@ public abstract class AbstractZKClient extends RegisterOperator {
      * @return get master start up lock path
      */
     public String getMasterStartUpLockPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
+        return  Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
     }
 
     /**
      * @return get master failover lock path
      */
     public String getMasterFailoverLockPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
+        return  Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
     }
 
     /**
      * @return get worker failover lock path
      */
     public String getWorkerFailoverLockPath() {
-        return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS;
+        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS;
     }
 
     /**
@@ -308,9 +314,9 @@ public abstract class AbstractZKClient extends RegisterOperator {
      */
     protected void initSystemZNode() {
         try {
-            persist(getMasterZNodeParentPath(), "");
-            persist(getWorkerZNodeParentPath(), "");
-            persist(getDeadZNodeParentPath(), "");
+            registryCenter.persist(getMasterZNodeParentPath(), "");
+            registryCenter.persist(getWorkerZNodeParentPath(), "");
+            registryCenter.persist(getDeadZNodeParentPath(), "");
 
             logger.info("initialize server nodes success.");
         } catch (Exception e) {
@@ -318,13 +324,4 @@ public abstract class AbstractZKClient extends RegisterOperator {
         }
     }
 
-    @Override
-    public String toString() {
-        return "AbstractZKClient{"
-                + "zkClient=" + getZkClient()
-                + ", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\''
-                + ", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\''
-                + ", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\''
-                + '}';
-    }
 }

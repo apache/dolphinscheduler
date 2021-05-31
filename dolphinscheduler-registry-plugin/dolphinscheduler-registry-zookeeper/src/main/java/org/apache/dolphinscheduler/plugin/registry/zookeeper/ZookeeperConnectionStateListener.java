@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
 
-/**
- * zk node type
- */
-public enum ZKNodeType {
+package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
-    /**
-     * 0 master node;
-     * 1 worker node;
-     * 2 dead_server node;
-     */
-    MASTER, WORKER, DEAD_SERVER;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.state.ConnectionState;
+import org.apache.curator.framework.state.ConnectionStateListener;
+
+public class ZookeeperConnectionStateListener implements ConnectionStateListener {
+    @Override
+    public void stateChanged(CuratorFramework client, ConnectionState newState) {
+     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>");
+    }
+
 }

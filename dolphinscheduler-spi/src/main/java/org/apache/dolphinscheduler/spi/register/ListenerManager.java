@@ -39,12 +39,12 @@ public class ListenerManager {
         listeners.remove(path);
     }
 
-    public static void dataChange(String path, DataChangeEvent dataChangeEvent) {
-        SubscribeListener notifyListener = listeners.get(path);
+    public static void dataChange(String key,String path, DataChangeEvent dataChangeEvent) {
+        SubscribeListener notifyListener = listeners.get(key);
         if (null == notifyListener) {
             return;
         }
-        notifyListener.notify(dataChangeEvent);
+        notifyListener.notify(path,dataChangeEvent);
     }
 
 }

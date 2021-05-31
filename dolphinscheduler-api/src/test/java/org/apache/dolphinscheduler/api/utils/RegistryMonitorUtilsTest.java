@@ -14,33 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.api.utils;
 
-package org.apache.dolphinscheduler.server.registry;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.junit.Assert;
+import org.junit.Test;
+import java.util.List;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.register.Registry;
-import org.apache.dolphinscheduler.spi.register.RegistryException;
-
-import java.util.Map;
-
-public class RegistryCenter {
+/**
+ * zookeeper monitor utils test
+ */
+public class RegistryMonitorUtilsTest {
 
 
-   private static Registry registry;
+    @Test
+    public void testGetMasterList(){
 
-    public static final String REGISTRY_PREFIX="registry";
+        RegistryMonitor registryMonitor = new RegistryMonitor();
 
-    public static void init(){
-        Map<String,String> registryConfig= PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
 
-        if(registryConfig.isEmpty()){
-            throw new RegistryException("registry config param is null");
-        }
+        List<Server> masterServerList = registryMonitor.getMasterServers();
+
+        List<Server> workerServerList = registryMonitor.getWorkerServers();
+
+        Assert.assertTrue(masterServerList.size() >= 0);
+        Assert.assertTrue(workerServerList.size() >= 0);
 
 
     }
 
-    public static Registry getRegistry(){
-        return registry;
-    }
 }

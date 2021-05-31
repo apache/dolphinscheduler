@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.zk;
+package org.apache.dolphinscheduler.service.registry;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;

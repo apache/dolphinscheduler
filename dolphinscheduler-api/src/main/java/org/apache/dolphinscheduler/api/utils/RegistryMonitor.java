@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
-import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
+import org.apache.dolphinscheduler.service.registry.AbstractRegistryClient;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -32,24 +30,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * monitor zookeeper info
+ * monitor zookeeper info todo registry-spi
  */
 @Component
-public class ZookeeperMonitor extends AbstractZKClient {
+public class RegistryMonitor extends AbstractRegistryClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RegistryMonitor.class);
 
     /**
      *
      * @return zookeeper info list
      */
     public List<ZookeeperRecord> zookeeperInfoList() {
-        String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
+      /*  String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
         try {
             return zookeeperInfoList(zookeeperServers);
         } catch (Exception e) {
             LOG.error(e.getMessage(),e);
-        }
+        }*/
         return null;
     }
 
@@ -58,7 +56,7 @@ public class ZookeeperMonitor extends AbstractZKClient {
      * @return master server information
      */
     public List<Server> getMasterServers() {
-        return getServerList(ZKNodeType.MASTER);
+        return getServerList(NodeType.MASTER);
     }
 
     /**
@@ -66,13 +64,12 @@ public class ZookeeperMonitor extends AbstractZKClient {
      * @return worker server informations
      */
     public List<Server> getWorkerServers() {
-        return getServerList(ZKNodeType.WORKER);
+        return getServerList(NodeType.WORKER);
     }
 
     private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
-
         List<ZookeeperRecord> list = new ArrayList<>(5);
-
+       /*
         if (StringUtils.isNotBlank(zookeeperServers)) {
             String[] zookeeperServersArray = zookeeperServers.split(",");
 
@@ -99,7 +96,7 @@ public class ZookeeperMonitor extends AbstractZKClient {
                 list.add(zookeeperRecord);
 
             }
-        }
+        }*/
 
         return list;
     }

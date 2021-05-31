@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.monitor;
 
-import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,13 +28,13 @@ import java.util.Map;
  * zk monitor server impl
  */
 @Component
-public class ZKMonitorImpl extends AbstractMonitor {
+public class RegistryMonitorImpl extends AbstractMonitor {
 
     /**
      * zookeeper operator
      */
     @Autowired
-    private ZookeeperOperator zookeeperOperator;
+    private RegistryCenter registryCenter;
 
 
     /**
@@ -47,7 +47,7 @@ public class ZKMonitorImpl extends AbstractMonitor {
 
         Map<String,String> maps = new HashMap<>();
 
-        List<String> childrenList = zookeeperOperator.getChildrenKeys(path);
+        List<String> childrenList = registryCenter.getChildrenKeys(path);
 
         if (childrenList == null){
             return maps;

@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,22 +15,17 @@ package org.apache.dolphinscheduler.plugin.register.zookeeper;/*
  * limitations under the License.
  */
 
-public class ZookeeperConstants {
+package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
-    private static final String HOSTS_NAME = "hosts";
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.apache.dolphinscheduler.spi.register.RegistryFactory;
 
-    public static final String NAMESPACE_NAME = "namespace";
+import com.google.common.collect.ImmutableList;
 
-    private static final String MAX_RETRIES_NAME = "max.retries";
+public class ZookeeperRegistryPlugin implements DolphinSchedulerPlugin {
 
-    private static final String MAX_SLEEP_TIME_MILLI_SECONDS_NAME = "max.sleep.time";
-
-    private static final String SERVERS_NAME = "servers";
-
-    private static final String SESSION_TIMEOUT_MILLIS_SECONDS_NAME = "sessionTimeoutMilliseconds";
-
-    private static final String CONNECTION_TIMEOUT_MILLIS_SECONDS_NAME = "connectionTimeoutMilliseconds";
-
-    public static final String DIGEST_NAME = "digest";
-
+    @Override
+    public Iterable<RegistryFactory> getRegisterFactorys() {
+        return ImmutableList.of(new ZookeeperRegistryFactory());
+    }
 }

@@ -14,33 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils;
-
-import org.apache.dolphinscheduler.common.model.Server;
-import org.junit.Assert;
-import org.junit.Test;
-import java.util.List;
+package org.apache.dolphinscheduler.common.enums;
 
 /**
- * zookeeper monitor utils test
+ * zk node type
  */
-public class ZookeeperMonitorUtilsTest {
+public enum NodeType {
 
-
-    @Test
-    public void testGetMasterList(){
-
-        ZookeeperMonitor zookeeperMonitor = new ZookeeperMonitor();
-
-
-        List<Server> masterServerList = zookeeperMonitor.getMasterServers();
-
-        List<Server> workerServerList = zookeeperMonitor.getWorkerServers();
-
-        Assert.assertTrue(masterServerList.size() >= 0);
-        Assert.assertTrue(workerServerList.size() >= 0);
-
-
-    }
-
+    /**
+     * 0 master node;
+     * 1 worker node;
+     * 2 dead_server node;
+     */
+    MASTER, WORKER, DEAD_SERVER;
 }

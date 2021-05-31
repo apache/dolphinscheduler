@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class RemoveZKNode implements CommandLineRunner {
      * zookeeper operator
      */
     @Autowired
-    private ZookeeperOperator zookeeperOperator;
+    private RegistryCenter registryCenter;
 
     public static void main(String[] args) {
 
@@ -52,8 +52,8 @@ public class RemoveZKNode implements CommandLineRunner {
             return;
         }
 
-        zookeeperOperator.remove(args[0]);
-        zookeeperOperator.close();
+        registryCenter.remove(args[0]);
+        registryCenter.close();
 
     }
 }

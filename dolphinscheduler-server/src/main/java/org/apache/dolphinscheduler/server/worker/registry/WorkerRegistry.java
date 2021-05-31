@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -26,10 +27,8 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-
-import org.apache.curator.framework.state.ConnectionState;
 
 import java.util.Date;
 import java.util.Set;
@@ -59,7 +58,7 @@ public class WorkerRegistry {
      * zookeeper registry center
      */
     @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    private RegistryCenter registryCenter;
 
     /**
      * worker config
@@ -89,10 +88,11 @@ public class WorkerRegistry {
 
     /**
      * get zookeeper registry center
+     *
      * @return ZookeeperRegistryCenter
      */
-    public ZookeeperRegistryCenter getZookeeperRegistryCenter() {
-        return zookeeperRegistryCenter;
+    public RegistryCenter getRegistryCenter() {
+        return registryCenter;
     }
 
     /**
@@ -104,8 +104,11 @@ public class WorkerRegistry {
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
 
         for (String workerZKPath : workerZkPaths) {
-            zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
-            zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
+            registryCenter.persist(workerZKPath, "");
+            //  zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
+           /*
+           //todo
+           zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
                 (client,newState) -> {
                     if (newState == ConnectionState.LOST) {
                         logger.error("worker : {} connection lost from zookeeper", address);
@@ -114,7 +117,7 @@ public class WorkerRegistry {
                     } else if (newState == ConnectionState.SUSPENDED) {
                         logger.warn("worker : {} connection SUSPENDED ", address);
                     }
-                });
+                });*/
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 
@@ -124,7 +127,7 @@ public class WorkerRegistry {
                 workerConfig.getHostWeight(),
                 workerZkPaths,
                 Constants.WORKER_TYPE,
-                zookeeperRegistryCenter);
+                registryCenter);
 
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} heartbeat interval {} s", address, workerHeartbeatInterval);
@@ -137,7 +140,7 @@ public class WorkerRegistry {
         String address = getLocalAddress();
         Set<String> workerZkPaths = getWorkerZkPaths();
         for (String workerZkPath : workerZkPaths) {
-            zookeeperRegistryCenter.getRegisterOperator().remove(workerZkPath);
+            registryCenter.remove(workerZkPath);
             logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
         }
         this.heartBeatExecutor.shutdownNow();
@@ -150,7 +153,7 @@ public class WorkerRegistry {
     public Set<String> getWorkerZkPaths() {
         Set<String> workerZkPaths = Sets.newHashSet();
         String address = getLocalAddress();
-        String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
+        String workerZkPathPrefix = this.registryCenter.getWorkerPath();
 
         for (String workGroup : this.workerGroups) {
             StringJoiner workerZkPathJoiner = new StringJoiner(SLASH);
@@ -171,6 +174,27 @@ public class WorkerRegistry {
      */
     private String getLocalAddress() {
         return NetUtils.getAddr(workerConfig.getListenPort());
+    }
+
+
+    /**
+     * get host ip:port, string format: parentPath/ip:port
+     *
+     * @param path path
+     * @return host ip:port, string format: parentPath/ip:port
+     */
+    protected String getHostByEventDataPath(String path) {
+        if (StringUtils.isEmpty(path)) {
+            logger.error("empty path!");
+            return "";
+        }
+        String[] pathArray = path.split(SINGLE_SLASH);
+        if (pathArray.length < 1) {
+            logger.error("parse ip error: {}", path);
+            return "";
+        }
+        return pathArray[pathArray.length - 1];
+
     }
 
 }

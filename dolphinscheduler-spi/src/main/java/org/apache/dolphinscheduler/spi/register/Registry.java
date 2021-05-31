@@ -22,6 +22,8 @@ public interface Registry {
 
     void init(Map<String, String> registerData);
 
+    void close();
+
     void subscribe(String path, SubscribeListener subscribeListener);
 
     void unsubscribe(String path);

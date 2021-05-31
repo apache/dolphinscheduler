@@ -15,16 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.register.zookeeper;
+package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.BASE_SLEEP_TIME;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.BLOCK_UNTIL_CONNECTED_WAIT_MS;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.CONNECTION_TIMEOUT_MS;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.DIGEST;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.MAX_RETRIES;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.NAME_SPACE;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SERVERS;
-import static org.apache.dolphinscheduler.plugin.register.zookeeper.ZookeeperConfiguration.SESSION_TIMEOUT_MS;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.BASE_SLEEP_TIME;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.BLOCK_UNTIL_CONNECTED_WAIT_MS;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.CONNECTION_TIMEOUT_MS;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.DIGEST;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.MAX_RETRIES;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.NAME_SPACE;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.SERVERS;
+import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperConfiguration.SESSION_TIMEOUT_MS;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.apache.dolphinscheduler.spi.register.ListenerManager;
 import org.apache.dolphinscheduler.spi.register.RegistryException;
@@ -42,6 +44,7 @@ import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
@@ -50,7 +53,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Strings;
 
@@ -103,7 +105,7 @@ public class ZookeeperRegistry implements Registry {
 
         client.start();
         try {
-            if (!client.blockUntilConnected(BLOCK_UNTIL_CONNECTED_WAIT_MS.getParameterValue(registerData.get(BLOCK_UNTIL_CONNECTED_WAIT_MS.getName())), TimeUnit.MILLISECONDS)) {
+            if (!client.blockUntilConnected(BLOCK_UNTIL_CONNECTED_WAIT_MS.getParameterValue(registerData.get(BLOCK_UNTIL_CONNECTED_WAIT_MS.getName())), MILLISECONDS)) {
                 client.close();
                 throw new RegistryException("zookeeper connect timeout");
             }
@@ -140,7 +142,7 @@ public class ZookeeperRegistry implements Registry {
                     break;
             }
             if (null != eventType && null != dataPath) {
-                ListenerManager.dataChange(dataPath, eventType);
+                ListenerManager.dataChange(path,dataPath, eventType);
             }
         };
         treeCache.getListenable().addListener(treeCacheListener);
@@ -234,20 +236,27 @@ public class ZookeeperRegistry implements Registry {
 
     @Override
     public boolean acquireLock(String key) {
+
         InterProcessMutex interProcessMutex = new InterProcessMutex(client, key);
-        String localKey=key+Thread.currentThread().getId();
-        lockMap.put(localKey,interProcessMutex);
+        String localKey = key + Thread.currentThread().getId();
         try {
             interProcessMutex.acquire();
+            lockMap.put(localKey, interProcessMutex);
             return true;
         } catch (Exception e) {
-            throw new RegistryException("zookeeper get lock error", e);
+            try {
+                interProcessMutex.release();
+                throw new RegistryException("zookeeper get lock error", e);
+            } catch (Exception exception) {
+                throw new RegistryException("zookeeper release lock error", e);
+            }
         }
+
     }
 
     @Override
     public boolean releaseLock(String key) {
-        String localKey=key+Thread.currentThread().getId();
+        String localKey = key + Thread.currentThread().getId();
         if (null == lockMap.get(localKey)) {
             return false;
         }
@@ -259,7 +268,23 @@ public class ZookeeperRegistry implements Registry {
         return true;
     }
 
-    public  CuratorFramework getClient(){
+    public CuratorFramework getClient() {
         return client;
+    }
+
+
+    @Override
+    public void close() {
+        treeCacheMap.forEach((key, value) -> value.close());
+        waitForCacheClose(500);
+        CloseableUtils.closeQuietly(client);
+    }
+
+    private void waitForCacheClose(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

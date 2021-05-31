@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 
 import java.util.Date;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class HeartBeatTask implements Runnable {
     private int hostWeight; // worker host weight
     private Set<String> heartBeatPaths;
     private String serverType;
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    private RegistryCenter registryCenter;
 
     // server stop or not
     protected IStoppable stoppable = null;
@@ -53,13 +54,13 @@ public class HeartBeatTask implements Runnable {
                          double reservedMemory,
                          Set<String> heartBeatPaths,
                          String serverType,
-                         ZookeeperRegistryCenter zookeeperRegistryCenter) {
+                         RegistryCenter registryCenter) {
         this.startTime = startTime;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.reservedMemory = reservedMemory;
         this.heartBeatPaths = heartBeatPaths;
         this.serverType = serverType;
-        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
+        this.registryCenter = registryCenter;
     }
 
     public HeartBeatTask(String startTime,
@@ -68,14 +69,14 @@ public class HeartBeatTask implements Runnable {
                          int hostWeight,
                          Set<String> heartBeatPaths,
                          String serverType,
-                         ZookeeperRegistryCenter zookeeperRegistryCenter) {
+                         RegistryCenter registryCenter) {
         this.startTime = startTime;
         this.maxCpuloadAvg = maxCpuloadAvg;
         this.reservedMemory = reservedMemory;
         this.hostWeight = hostWeight;
         this.heartBeatPaths = heartBeatPaths;
         this.serverType = serverType;
-        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
+        this.registryCenter = registryCenter;
     }
 
     @Override
@@ -83,8 +84,8 @@ public class HeartBeatTask implements Runnable {
         try {
             // check dead or not in zookeeper
             for (String heartBeatPath : heartBeatPaths) {
-                if (zookeeperRegistryCenter.checkIsDeadServer(heartBeatPath, serverType)) {
-                    zookeeperRegistryCenter.getStoppable().stop("i was judged to death, release resources and stop myself");
+                if (registryCenter.checkIsDeadServer(heartBeatPath, serverType)) {
+                    registryCenter.getStoppable().stop("i was judged to death, release resources and stop myself");
                     return;
                 }
             }
@@ -116,7 +117,7 @@ public class HeartBeatTask implements Runnable {
             }
 
             for (String heartBeatPath : heartBeatPaths) {
-                zookeeperRegistryCenter.getRegisterOperator().update(heartBeatPath, builder.toString());
+                registryCenter.update(heartBeatPath, builder.toString());
             }
         } catch (Throwable ex) {
             logger.error("error write heartbeat info", ex);

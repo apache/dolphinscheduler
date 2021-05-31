@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class TaskCallbackService {
      * zookeeper registry center
      */
     @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    private RegistryCenter registryCenter;
 
 
     /**
@@ -104,7 +104,7 @@ public class TaskCallbackService {
         Set<String> masterNodes = null;
         int ntries = 0;
         while (Stopper.isRunning()) {
-            masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
+            masterNodes = registryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
                 logger.info("try {} times but not find any master for task : {}.",
                         ntries + 1,
