@@ -58,19 +58,19 @@ public class RegistryCenter implements InitializingBean {
     /**
      * nodes namespace
      */
-    public String NODES;
+    private static String NODES;
 
     /**
      * master path
      */
-    public String MASTER_PATH;
+    private static String MASTER_PATH;
 
     /**
      * worker path
      */
-    public String WORKER_PATH;
+    private static String WORKER_PATH;
 
-    public final String EMPTY = "";
+    private static final String EMPTY = "";
 
     @Override
     public void afterPropertiesSet() throws Exception {

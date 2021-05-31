@@ -258,22 +258,18 @@ public class PropertyUtils {
         properties.setProperty(key, value);
     }
 
-    public static Set<String> s(){
-        return properties.stringPropertyNames();
-    }
-
-    public static Map<String, String> getPropertiesByPrefix(String prefix){
-        if(Strings.isEmpty(prefix)){
+    public static Map<String, String> getPropertiesByPrefix(String prefix) {
+        if (Strings.isEmpty(prefix)) {
             return null;
         }
-       Set<Object> keys= properties.keySet();
-        if(keys.isEmpty()){
+        Set<Object> keys = properties.keySet();
+        if (keys.isEmpty()) {
             return null;
         }
         Map<String, String> propertiesMap = new HashMap<>();
-        keys.forEach(k->{
-            if(k.toString().contains(prefix)){
-                propertiesMap.put( k.toString(),properties.getProperty((String) k));
+        keys.forEach(k -> {
+            if (k.toString().contains(prefix)) {
+                propertiesMap.put(k.toString(), properties.getProperty((String) k));
             }
         });
         return propertiesMap;

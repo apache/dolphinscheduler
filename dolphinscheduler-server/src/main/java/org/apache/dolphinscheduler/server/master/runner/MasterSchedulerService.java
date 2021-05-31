@@ -132,7 +132,7 @@ public class MasterSchedulerService extends Thread {
                     continue;
                 }
                 // todo 串行执行 为何还需要判断状态？
-               /* if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
+                /* if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
                     scheduleProcess();
                 }*/
                 scheduleProcess();

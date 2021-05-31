@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**

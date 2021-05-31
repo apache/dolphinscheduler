@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public class MasterRegistryDataListener implements SubscribeListener {
 
-    private static final Logger logger= LoggerFactory.getLogger(MasterRegistryDataListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(MasterRegistryDataListener.class);
 
     @Resource
     MasterRegistryClient masterRegistryClient;
@@ -52,7 +52,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
      * monitor master
      *
      * @param event event
-     * @param path  path
+     * @param path path
      */
     public void handleMasterEvent(DataChangeEvent event, String path) {
         switch (event) {
@@ -71,7 +71,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
      * monitor worker
      *
      * @param event event
-     * @param path  path
+     * @param path path
      */
     public void handleWorkerEvent(DataChangeEvent event, String path) {
         switch (event) {
@@ -86,6 +86,5 @@ public class MasterRegistryDataListener implements SubscribeListener {
                 break;
         }
     }
-
 
 }

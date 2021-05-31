@@ -38,11 +38,10 @@ public class RegistryMonitor extends AbstractRegistryClient {
     private static final Logger LOG = LoggerFactory.getLogger(RegistryMonitor.class);
 
     /**
-     *
      * @return zookeeper info list
      */
     public List<ZookeeperRecord> zookeeperInfoList() {
-      /*  String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
+        /*  String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
         try {
             return zookeeperInfoList(zookeeperServers);
         } catch (Exception e) {
@@ -53,6 +52,7 @@ public class RegistryMonitor extends AbstractRegistryClient {
 
     /**
      * get master servers
+     *
      * @return master server information
      */
     public List<Server> getMasterServers() {
@@ -61,6 +61,7 @@ public class RegistryMonitor extends AbstractRegistryClient {
 
     /**
      * master construct is the same with worker, use the master instead
+     *
      * @return worker server informations
      */
     public List<Server> getWorkerServers() {
@@ -69,7 +70,7 @@ public class RegistryMonitor extends AbstractRegistryClient {
 
     private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
         List<ZookeeperRecord> list = new ArrayList<>(5);
-       /*
+        /*
         if (StringUtils.isNotBlank(zookeeperServers)) {
             String[] zookeeperServersArray = zookeeperServers.split(",");
 

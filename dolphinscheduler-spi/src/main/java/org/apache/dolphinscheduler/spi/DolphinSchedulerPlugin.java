@@ -37,5 +37,7 @@ public interface DolphinSchedulerPlugin {
         return emptyList();
     }
 
-    default Iterable<RegistryFactory> getRegisterFactorys(){return emptyList();}
+    default Iterable<RegistryFactory> getRegisterFactorys() {
+        return emptyList();
+    }
 }

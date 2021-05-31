@@ -82,7 +82,7 @@ public class MasterRegistry {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         String localNodePath = getMasterPath();
         registryCenter.persist(localNodePath, "");
-       /* todo
+        /* todo
        zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
             (client, newState) -> {
                 if (newState == ConnectionState.LOST) {

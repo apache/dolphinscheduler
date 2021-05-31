@@ -28,10 +28,10 @@ import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperCon
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import org.apache.dolphinscheduler.spi.register.ListenerManager;
-import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
+import org.apache.dolphinscheduler.spi.register.ListenerManager;
 import org.apache.dolphinscheduler.spi.register.Registry;
+import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import org.apache.curator.RetryPolicy;
@@ -63,7 +63,6 @@ public class ZookeeperRegistry implements Registry {
     private Map<String, TreeCache> treeCacheMap = new HashMap<>();
 
     private Map<String, InterProcessMutex> lockMap = new HashMap<>();
-
 
     private static RetryPolicy buildRetryPolicy(Map<String, String> registerData) {
         int baseSleepTimeMs = BASE_SLEEP_TIME.getParameterValue(registerData.get(BASE_SLEEP_TIME.getName()));
@@ -140,6 +139,7 @@ public class ZookeeperRegistry implements Registry {
                     eventType = DataChangeEvent.REMOVE;
                     dataPath = event.getData().getPath();
                     break;
+                default:
             }
             if (null != eventType && null != dataPath) {
                 ListenerManager.dataChange(path,dataPath, eventType);
@@ -154,7 +154,6 @@ public class ZookeeperRegistry implements Registry {
         }
         ListenerManager.addListener(path, subscribeListener);
     }
-
 
     @Override
     public void unsubscribe(String path) {
@@ -271,7 +270,6 @@ public class ZookeeperRegistry implements Registry {
     public CuratorFramework getClient() {
         return client;
     }
-
 
     @Override
     public void close() {

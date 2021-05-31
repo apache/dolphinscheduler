@@ -24,7 +24,7 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 public class ZookeeperConnectionStateListener implements ConnectionStateListener {
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
-     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>");
+        // todo
     }
 
 }
