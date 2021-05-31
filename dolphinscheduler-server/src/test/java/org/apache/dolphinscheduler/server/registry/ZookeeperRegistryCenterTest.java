@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -24,6 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * zookeeper registry center test
  */
 @RunWith(MockitoJUnitRunner.class)
+@Ignore
 public class ZookeeperRegistryCenterTest {
 /*
     @InjectMocks
