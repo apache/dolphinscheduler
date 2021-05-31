@@ -240,7 +240,6 @@ public abstract class AbstractRegistryClient {
         return Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
     }
 
-
     /**
      * @return get master lock path
      */
@@ -266,7 +265,6 @@ public abstract class AbstractRegistryClient {
         }
         return path;
     }
-
 
     /**
      * @return get master start up lock path

@@ -77,11 +77,11 @@ public class RegistryCenter implements InitializingBean {
         NODES = "/nodes";
         MASTER_PATH = NODES + "/master";
         WORKER_PATH = NODES + "/worker";
+        init();
 
     }
 
     public static final String REGISTRY_PREFIX = "registry";
-
 
     /**
      * init node persist
@@ -136,15 +136,15 @@ public class RegistryCenter implements InitializingBean {
         registry.subscribe(path, subscribeListener);
     }
 
-    public  boolean isExisted(String key){
+    public boolean isExisted(String key) {
         return registry.isExisted(key);
     }
 
-    public boolean getLock(String key){
+    public boolean getLock(String key) {
         return registry.acquireLock(key);
     }
 
-    public boolean releaseLock(String key){
+    public boolean releaseLock(String key) {
         return registry.releaseLock(key);
     }
 
@@ -164,7 +164,6 @@ public class RegistryCenter implements InitializingBean {
 
         return !registry.isExisted(zNode) || registry.isExisted(deadServerPath);
     }
-
 
     /**
      * @return get dead server node parent path
@@ -272,10 +271,7 @@ public class RegistryCenter implements InitializingBean {
                 String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
                 if (!registry.isExisted(deadServerPath)) {
                     //add dead server info to zk dead server path : /dead-servers/
-
                     registry.persist(deadServerPath, (type + UNDERLINE + host));
-
-
                     logger.info("{} server dead , and {} added to zk dead server path success",
                             nodeType, zNode);
                 }
@@ -379,6 +375,5 @@ public class RegistryCenter implements InitializingBean {
     public List<String> getChildrenKeys(final String key) {
         return registry.getChildren(key);
     }
-
 
 }

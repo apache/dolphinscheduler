@@ -84,8 +84,6 @@ public class MasterRegistryClient extends AbstractRegistryClient {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
 
             registryCenter.getLock(znodeLock);
-
-
             // master registry
             masterRegistry.registry();
             String registryPath = this.masterRegistry.getMasterPath();
@@ -120,7 +118,6 @@ public class MasterRegistryClient extends AbstractRegistryClient {
         masterRegistry.unRegistry();
         registryCenter.close();
     }
-
 
     /**
      * remove zookeeper node path

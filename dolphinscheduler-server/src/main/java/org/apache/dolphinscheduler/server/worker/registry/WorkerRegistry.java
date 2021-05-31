@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 
 import java.util.Date;
 import java.util.Set;
@@ -105,9 +105,7 @@ public class WorkerRegistry {
 
         for (String workerZKPath : workerZkPaths) {
             registryCenter.persist(workerZKPath, "");
-            //  zookeeperRegistryCenter.getRegisterOperator().persistEphemeral(workerZKPath, "");
-           /*
-           //todo
+            /*todo
            zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
                 (client,newState) -> {
                     if (newState == ConnectionState.LOST) {
@@ -175,7 +173,6 @@ public class WorkerRegistry {
     private String getLocalAddress() {
         return NetUtils.getAddr(workerConfig.getListenPort());
     }
-
 
     /**
      * get host ip:port, string format: parentPath/ip:port

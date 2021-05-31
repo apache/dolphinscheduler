@@ -81,7 +81,6 @@ public class MasterRegistry {
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         String localNodePath = getMasterPath();
-        //todo
         registryCenter.persist(localNodePath, "");
        /* todo
        zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
