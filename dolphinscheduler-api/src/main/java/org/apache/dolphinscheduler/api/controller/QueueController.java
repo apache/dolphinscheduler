@@ -171,7 +171,6 @@ public class QueueController extends BaseController {
      */
     @ApiOperation(value = "verifyQueue", notes = "VERIFY_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
