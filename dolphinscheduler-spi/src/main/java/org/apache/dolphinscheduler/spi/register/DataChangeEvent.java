@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
+/**
+ * Monitor the type of data changes
+ */
 public enum DataChangeEvent {
 
     ADD("ADD", 1),

@@ -17,9 +17,18 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
+/**
+ * Registry the component factory, all registry must implement this interface
+ */
 public interface RegistryFactory {
 
+    /**
+     * get registry component name
+     */
     String getName();
 
+    /**
+     * get registry
+     */
     Registry create();
 }

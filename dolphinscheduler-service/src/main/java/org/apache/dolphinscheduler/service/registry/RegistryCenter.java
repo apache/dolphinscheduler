@@ -48,6 +48,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * All business parties use this class to access the registry
+ */
 @Component
 public class RegistryCenter {
 
@@ -77,20 +80,20 @@ public class RegistryCenter {
 
     private static final String EMPTY = "";
 
-    public static final String REGISTRY_PREFIX = "registry";
+    private static final String REGISTRY_PREFIX = "registry";
 
-    public static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
+    private static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
 
-    public static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
+    private static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
 
-    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
+    private static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
 
-    public static final String REGISTRY_PLUGIN_NAME = "registry.plugin.name";
+    private static final String REGISTRY_PLUGIN_NAME = "registry.plugin.name";
 
     /**
      * default registry plugin dir
-     **/
-    public static final String REGISTRY_PLUGIN_PATH = "lib/plugin/registry";
+     */
+    private static final String REGISTRY_PLUGIN_PATH = "lib/plugin/registry";
 
     /**
      * init node persist
@@ -103,7 +106,7 @@ public class RegistryCenter {
 
             if (null == registryPluginManager) {
                 installRegistryPlugin();
-                registry = registryPluginManager.getRegister();
+                registry = registryPluginManager.getRegistry();
             }
             Map<String, String> registryConfig = PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
 
@@ -115,6 +118,9 @@ public class RegistryCenter {
         }
     }
 
+    /**
+     * install registry plugin
+     */
     private void installRegistryPlugin() {
         DolphinPluginManagerConfig registryPluginManagerConfig = new DolphinPluginManagerConfig();
         registryPluginManagerConfig.setPlugins(PropertyUtils.getString(REGISTRY_PLUGIN_BINDING));

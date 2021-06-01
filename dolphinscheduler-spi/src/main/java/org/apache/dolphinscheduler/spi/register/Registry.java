@@ -18,33 +18,74 @@ package org.apache.dolphinscheduler.spi.register;/*
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The final display of all registry component data must follow a tree structure.
+ * Therefore, some registry may need to do a layer of internal conversion, such as Etcd
+ */
 public interface Registry {
 
+    /**
+     * initialize registry center.
+     */
     void init(Map<String, String> registerData);
 
+    /**
+     * close registry
+     */
     void close();
 
+    /**
+     * subscribe registry data change, a path can only be monitored by one listener
+     */
     void subscribe(String path, SubscribeListener subscribeListener);
 
+    /**
+     * unsubscribe
+     */
     void unsubscribe(String path);
 
+    /**
+     * get key
+     */
     String get(String key);
 
+    /**
+     * delete
+     */
     void remove(String key);
 
+    /**
+     * persist data
+     */
     void persist(String key, String value);
 
+    /**
+     * update data
+     */
     void update(String key, String value);
 
+    /**
+     * get children keys
+     */
     List<String> getChildren(String path);
 
-    String getData(String key);
-
+    /**
+     * Judge node is exist or not.
+     */
     boolean isExisted(String key);
 
-    boolean delete(String key) throws Exception;
+    /**
+     * delete kay
+     */
+    boolean delete(String key);
 
+    /**
+     * Obtain a distributed lock
+     */
     boolean acquireLock(String key);
 
+    /**
+     * release key
+     */
     boolean releaseLock(String key);
 }

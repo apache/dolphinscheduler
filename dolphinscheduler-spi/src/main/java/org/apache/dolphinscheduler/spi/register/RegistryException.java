@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
+/**
+ * registry exception
+ */
 public class RegistryException extends RuntimeException {
 
     public RegistryException(String message, Throwable cause) {

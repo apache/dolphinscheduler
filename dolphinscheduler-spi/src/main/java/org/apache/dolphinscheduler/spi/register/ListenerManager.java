@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.spi.register;
 
 import java.util.HashMap;
 
+/**
+ * The registry node monitors subscriptions
+ */
 public class ListenerManager {
 
     /**
@@ -27,18 +30,31 @@ public class ListenerManager {
      */
     private static HashMap<String, SubscribeListener> listeners = new HashMap<>();
 
+    /**
+     * Check whether the key has been monitored
+     */
     public static boolean checkHasListeners(String path) {
         return null != listeners.get(path);
     }
 
+    /**
+     * add listener(A node can only be monitored by one listener)
+     */
     public static void addListener(String path, SubscribeListener listener) {
         listeners.put(path, listener);
     }
 
+    /**
+     * remove listener
+     */
     public static void removeListener(String path) {
         listeners.remove(path);
     }
 
+    /**
+     *
+     *After the data changes, it is distributed to the corresponding listener for processing
+     */
     public static void dataChange(String key,String path, DataChangeEvent dataChangeEvent) {
         SubscribeListener notifyListener = listeners.get(key);
         if (null == notifyListener) {

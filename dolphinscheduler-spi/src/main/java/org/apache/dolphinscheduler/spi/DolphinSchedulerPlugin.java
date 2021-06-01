@@ -33,10 +33,18 @@ import org.apache.dolphinscheduler.spi.register.RegistryFactory;
  */
 public interface DolphinSchedulerPlugin {
 
+    /**
+     * get alert channel factory
+     * @return alert channel factory
+     */
     default Iterable<AlertChannelFactory> getAlertChannelFactorys() {
         return emptyList();
     }
 
+    /**
+     * get registry plugin factory
+     * @return registry factory
+     */
     default Iterable<RegistryFactory> getRegisterFactorys() {
         return emptyList();
     }

@@ -50,7 +50,7 @@ public class RegistryPluginManager extends AbstractDolphinPluginManager {
             logger.info("Registering Registry Plugin '{}'", registryFactory.getName());
             if (registerPluginName.equals(registryFactory.getName())) {
                 this.registryFactory = registryFactory;
-                loadRegister();
+                loadRegistry();
                 return;
             }
         }
@@ -59,13 +59,20 @@ public class RegistryPluginManager extends AbstractDolphinPluginManager {
         }
     }
 
-    private void loadRegister() {
+    /**
+     * load registry
+     */
+    private void loadRegistry() {
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(registryFactory.getClass().getClassLoader())) {
             registry = registryFactory.create();
         }
     }
 
-    public  Registry getRegister() {
+    /**
+     * get registry
+     * @return registry
+     */
+    public  Registry getRegistry() {
         if (null == registry) {
             throw new RegistryException("not install registry");
         }

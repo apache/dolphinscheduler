@@ -22,6 +22,9 @@ import org.apache.dolphinscheduler.spi.register.RegistryFactory;
 
 import com.google.common.collect.ImmutableList;
 
+/**
+ * zookeeper registry plugin
+ */
 public class ZookeeperRegistryPlugin implements DolphinSchedulerPlugin {
 
     @Override

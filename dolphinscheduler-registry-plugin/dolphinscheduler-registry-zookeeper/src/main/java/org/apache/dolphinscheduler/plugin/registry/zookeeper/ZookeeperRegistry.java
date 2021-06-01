@@ -60,10 +60,21 @@ public class ZookeeperRegistry implements Registry {
 
     private CuratorFramework client;
 
+    /**
+     * treeCache map
+     * k-subscribe key
+     * v-listener
+     */
     private Map<String, TreeCache> treeCacheMap = new HashMap<>();
 
+    /**
+     * Distributed lock map
+     */
     private Map<String, InterProcessMutex> lockMap = new HashMap<>();
 
+    /**
+     * build retry policy
+     */
     private static RetryPolicy buildRetryPolicy(Map<String, String> registerData) {
         int baseSleepTimeMs = BASE_SLEEP_TIME.getParameterValue(registerData.get(BASE_SLEEP_TIME.getName()));
         int maxRetries = MAX_RETRIES.getParameterValue(registerData.get(MAX_RETRIES.getName()));
@@ -71,6 +82,9 @@ public class ZookeeperRegistry implements Registry {
         return new ExponentialBackoffRetry(baseSleepTimeMs, maxRetries, maxSleepMs);
     }
 
+    /**
+     * build digest
+     */
     private static void buildDigest(CuratorFrameworkFactory.Builder builder, String digest) {
         builder.authorization(DIGEST.getName(), digest.getBytes(StandardCharsets.UTF_8))
                 .aclProvider(new ACLProvider() {
@@ -219,16 +233,16 @@ public class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public String getData(String key) {
-        return null;
-    }
-
-    public boolean delete(String nodePath) throws Exception {
-        client.delete()
-                .guaranteed()
-                .deletingChildrenIfNeeded()
-                .withVersion(4)
-                .forPath(nodePath);
+    public boolean delete(String nodePath) {
+        try {
+            client.delete()
+                    .guaranteed()
+                    .deletingChildrenIfNeeded()
+                    .withVersion(4)
+                    .forPath(nodePath);
+        } catch (Exception e) {
+          throw new RegistryException("zookeeper delete key error",e);
+        }
         return true;
 
     }
