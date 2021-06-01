@@ -241,7 +241,7 @@ public class ZookeeperRegistry implements Registry {
                     .withVersion(4)
                     .forPath(nodePath);
         } catch (Exception e) {
-          throw new RegistryException("zookeeper delete key error",e);
+            throw new RegistryException("zookeeper delete key error",e);
         }
         return true;
 
