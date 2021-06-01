@@ -25,8 +25,6 @@ import org.apache.dolphinscheduler.service.registry.AbstractRegistryClient;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,8 +32,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RegistryMonitor extends AbstractRegistryClient {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RegistryMonitor.class);
 
     /**
      * @return zookeeper info list

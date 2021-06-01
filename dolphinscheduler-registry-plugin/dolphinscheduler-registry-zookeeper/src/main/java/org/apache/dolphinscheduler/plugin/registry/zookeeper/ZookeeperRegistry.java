@@ -109,7 +109,7 @@ public class ZookeeperRegistry implements Registry {
                 throw new RegistryException("zookeeper connect timeout");
             }
         } catch (InterruptedException e) {
-            Thread.interrupted();
+            Thread.currentThread().interrupt();
             throw new RegistryException("zookeeper connect error", e);
         }
     }
