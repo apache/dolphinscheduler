@@ -50,8 +50,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
@@ -527,14 +527,14 @@ public class ProcessInstanceServiceTest {
                 + "\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${system.datetime}\"}],"
                 + "\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}");
 
-        when(taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(),Flag.YES))
+        when(taskInstanceMapper.findValidTaskListByProcessId(processInstance.getId(), Flag.YES))
                 .thenReturn(Arrays.asList(taskInstance));
 
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion())).thenReturn(taskDefinitionLog);
 
         Map<String, Object> successRes = processInstanceService.viewVariables(1);
-        Property property = ((ArrayList<Property>)((HashMap) ((HashMap) ((HashMap) successRes.get("data"))
+        Property property = ((ArrayList<Property>) ((HashMap) ((HashMap) ((HashMap) successRes.get("data"))
                 .get("localParams")).get("shell-1")).get("localParamsList")).get(0);
         Assert.assertEquals("BATCH_TIME", property.getProp());
         Assert.assertEquals("20210515225000", property.getValue());

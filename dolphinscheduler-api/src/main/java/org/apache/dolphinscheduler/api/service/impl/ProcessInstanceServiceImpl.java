@@ -662,7 +662,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
             String parameter = taskDefinitionLog.getTaskParams();
-            Map<String, Object> map = JSONUtils.toMap(parameter,String.class,Object.class);
+            Map<String, Object> map = JSONUtils.toMap(parameter, String.class, Object.class);
             String localParams = JSONUtils.toJsonString(map.get(LOCAL_PARAMS));
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
