@@ -50,9 +50,11 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.base.Strings;
 
@@ -129,9 +131,9 @@ public class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public void subscribe(String path, SubscribeListener subscribeListener) {
+    public boolean subscribe(String path, SubscribeListener subscribeListener) {
         if (null != treeCacheMap.get(path)) {
-            return;
+            return false;
         }
         TreeCache treeCache = new TreeCache(client, path);
         TreeCacheListener treeCacheListener = (client, event) -> {
@@ -167,6 +169,7 @@ public class ZookeeperRegistry implements Registry {
             throw new RegistryException("start zookeeper tree cache error", e);
         }
         ListenerManager.addListener(path, subscribeListener);
+        return true;
     }
 
     @Override
@@ -178,7 +181,11 @@ public class ZookeeperRegistry implements Registry {
 
     @Override
     public String get(String key) {
-        return null;
+        try {
+            return Arrays.toString(client.getData().forPath(key));
+        } catch (Exception e) {
+            throw new RegistryException("zookeeper get data error", e);
+        }
     }
 
     @Override
@@ -236,15 +243,12 @@ public class ZookeeperRegistry implements Registry {
     public boolean delete(String nodePath) {
         try {
             client.delete()
-                    .guaranteed()
                     .deletingChildrenIfNeeded()
-                    .withVersion(4)
                     .forPath(nodePath);
         } catch (Exception e) {
-            throw new RegistryException("zookeeper delete key error",e);
+            throw new RegistryException("zookeeper delete key error", e);
         }
         return true;
-
     }
 
     @Override

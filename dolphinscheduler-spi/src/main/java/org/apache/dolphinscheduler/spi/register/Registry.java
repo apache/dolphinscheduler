@@ -37,7 +37,7 @@ public interface Registry {
     /**
      * subscribe registry data change, a path can only be monitored by one listener
      */
-    void subscribe(String path, SubscribeListener subscribeListener);
+    boolean subscribe(String path, SubscribeListener subscribeListener);
 
     /**
      * unsubscribe
@@ -81,6 +81,7 @@ public interface Registry {
 
     /**
      * Obtain a distributed lock
+     * todo It is best to add expiration time, and automatically release the lock after expiration
      */
     boolean acquireLock(String key);
 
