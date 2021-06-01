@@ -108,8 +108,8 @@ public class ZookeeperRegistry implements Registry {
                 client.close();
                 throw new RegistryException("zookeeper connect timeout");
             }
-        } catch (Exception e) {
-
+        } catch (InterruptedException e) {
+            Thread.interrupted();
             throw new RegistryException("zookeeper connect error", e);
         }
     }
@@ -142,7 +142,7 @@ public class ZookeeperRegistry implements Registry {
                 default:
             }
             if (null != eventType && null != dataPath) {
-                ListenerManager.dataChange(path,dataPath, eventType);
+                ListenerManager.dataChange(path, dataPath, eventType);
             }
         };
         treeCache.getListenable().addListener(treeCacheListener);
@@ -150,7 +150,7 @@ public class ZookeeperRegistry implements Registry {
         try {
             treeCache.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RegistryException("start zookeeper tree cache error", e);
         }
         ListenerManager.addListener(path, subscribeListener);
     }
