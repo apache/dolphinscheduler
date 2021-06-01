@@ -1044,6 +1044,7 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
+                        <!--registry plugin -->
                         <include>**/plugin/registry/zookeeper/ZookeeperRegistryTest.java</include>
 
                     </includes>

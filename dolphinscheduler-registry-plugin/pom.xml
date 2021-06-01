@@ -27,9 +27,7 @@
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-registry-plugin</artifactId>
     <packaging>pom</packaging>
-    <modules>
-        <module>dolphinscheduler-registry-zookeeper</module>
-    </modules>
+
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -39,5 +37,7 @@
         </dependency>
     </dependencies>
 
-
+    <modules>
+        <module>dolphinscheduler-registry-zookeeper</module>
+    </modules>
 </project>
