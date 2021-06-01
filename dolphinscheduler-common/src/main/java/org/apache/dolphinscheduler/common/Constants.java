@@ -526,6 +526,11 @@ public final class Constants {
     public static final int SLEEP_TIME_MILLIS = 1000;
 
     /**
+     * master task instance cache-database refresh interval
+     */
+    public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
+
+    /**
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
