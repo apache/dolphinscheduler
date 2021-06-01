@@ -99,6 +99,7 @@ public class WorkerRegistry {
      * registry
      */
     public void registry() {
+        registryCenter.init();
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();

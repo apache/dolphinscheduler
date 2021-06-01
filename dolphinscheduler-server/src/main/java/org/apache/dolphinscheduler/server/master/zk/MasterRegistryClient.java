@@ -79,6 +79,7 @@ public class MasterRegistryClient extends AbstractRegistryClient {
     RegistryCenter registryCenter;
 
     public void start() {
+        registryCenter.init();
         String znodeLock = getMasterStartUpLockPath();
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters

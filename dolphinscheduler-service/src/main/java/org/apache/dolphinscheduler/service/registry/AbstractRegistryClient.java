@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 /**
  * abstract zookeeper client
  */
-@Component
+
 public abstract class AbstractRegistryClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractRegistryClient.class);

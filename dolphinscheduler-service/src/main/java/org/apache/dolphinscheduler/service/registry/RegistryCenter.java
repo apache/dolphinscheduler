@@ -29,8 +29,11 @@ import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.spi.register.Registry;
 import org.apache.dolphinscheduler.spi.register.RegistryException;
+import org.apache.dolphinscheduler.spi.register.RegistryPluginManager;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import java.util.HashSet;
@@ -41,11 +44,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.ImmutableList;
+
 @Component
-public class RegistryCenter implements InitializingBean {
+public class RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryCenter.class);
 
@@ -65,6 +69,7 @@ public class RegistryCenter implements InitializingBean {
      */
     private static String MASTER_PATH;
 
+    private RegistryPluginManager registryPluginManager;
     /**
      * worker path
      */
@@ -72,22 +77,34 @@ public class RegistryCenter implements InitializingBean {
 
     private static final String EMPTY = "";
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        NODES = "/nodes";
-        MASTER_PATH = NODES + "/master";
-        WORKER_PATH = NODES + "/worker";
-        init();
-
-    }
-
     public static final String REGISTRY_PREFIX = "registry";
+
+    public static final String REGISTRY_PLUGIN_BINDING = "registry.plugin.binding";
+
+    public static final String REGISTRY_PLUGIN_DIR = "registry.plugin.dir";
+
+    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
+
+    public static final String REGISTRY_PLUGIN_NAME = "registry.plugin.name";
+
+    /**
+     * default registry plugin dir
+     **/
+    public static final String REGISTRY_PLUGIN_PATH = "lib/plugin/registry";
 
     /**
      * init node persist
      */
     public void init() {
+        NODES = "/nodes";
+        MASTER_PATH = NODES + "/master";
+        WORKER_PATH = NODES + "/worker";
         if (isStarted.compareAndSet(false, true)) {
+
+            if (null == registryPluginManager) {
+                installRegistryPlugin();
+                registry = registryPluginManager.getRegister();
+            }
             Map<String, String> registryConfig = PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
 
             if (registryConfig.isEmpty()) {
@@ -96,7 +113,30 @@ public class RegistryCenter implements InitializingBean {
             registry.init(registryConfig);
             initNodes();
         }
+    }
 
+    private void installRegistryPlugin() {
+        DolphinPluginManagerConfig registryPluginManagerConfig = new DolphinPluginManagerConfig();
+        registryPluginManagerConfig.setPlugins(PropertyUtils.getString(REGISTRY_PLUGIN_BINDING));
+        if (StringUtils.isNotBlank(PropertyUtils.getString(REGISTRY_PLUGIN_DIR))) {
+            registryPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(REGISTRY_PLUGIN_DIR, REGISTRY_PLUGIN_PATH).trim());
+        }
+
+        if (StringUtils.isNotBlank(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY))) {
+            registryPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
+        }
+        if (StringUtils.isNotBlank(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY))) {
+            registryPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
+        }
+
+        registryPluginManager = new RegistryPluginManager(System.getProperty(REGISTRY_PLUGIN_NAME));
+
+        DolphinPluginLoader registryPluginLoader = new DolphinPluginLoader(registryPluginManagerConfig, ImmutableList.of(registryPluginManager));
+        try {
+            registryPluginLoader.loadPlugins();
+        } catch (Exception e) {
+            throw new RuntimeException("Load registry Plugin Failed !", e);
+        }
     }
 
     /**
