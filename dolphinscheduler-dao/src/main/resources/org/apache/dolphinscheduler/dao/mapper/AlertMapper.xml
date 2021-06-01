@@ -29,4 +29,13 @@
         from t_ds_alert
         where alert_status = #{alertStatus}
     </select>
+
+    <insert id="insertAlertWhenServerCrash">
+        insert into t_ds_alert(title, content, alert_status, log, alertgroup_id, create_time, update_time)
+        SELECT #{alert.title}, #{alert.content}, #{alert.alertStatus.code}, #{alert.log}, #{alert.alertGroupId},
+               #{alert.createTime}, #{alert.updateTime}
+        from t_ds_alert
+        where content = #{alert.content} and alert_status = #{alert.alertStatus.code}
+        having count(*) = 0
+    </insert>
 </mapper>
