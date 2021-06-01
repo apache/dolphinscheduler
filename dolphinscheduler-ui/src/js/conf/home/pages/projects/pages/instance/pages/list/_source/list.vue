@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/instance/list/' + scope.row.id , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
+                <router-link :to="{ path: `/projects/${projectId}/instance/list/${scope.row.id}` , query:{id: scope.row.processDefinitionId}}" tag="a" class="links"><span class="ellipsis">{{ scope.row.name }}</span></router-link>
               </div>
             </el-popover>
           </template>
@@ -234,7 +234,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { tasksState, runningType } from '@/conf/home/pages/dag/_source/config'
 
   export default {
@@ -292,7 +292,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.id}` })
       },
       /**
        * Rerun
@@ -433,7 +433,7 @@
         }
       },
       _gantt (item) {
-        this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/instance/gantt/${item.id}` })
       },
       _topCheckBoxClick (v) {
         this.list.forEach((item, i) => {
@@ -480,6 +480,9 @@
     created () {
     },
     mounted () {
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     components: { }
   }
