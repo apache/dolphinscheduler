@@ -17,7 +17,26 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
@@ -25,7 +44,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupServiceTest {
-/*
+
 
     @InjectMocks
     private WorkerGroupServiceImpl workerGroupService;
@@ -36,15 +55,10 @@ public class WorkerGroupServiceTest {
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
 
-    @Mock
-    private ZookeeperCachedOperator zookeeperCachedOperator;
-
-    @Mock
-    private RegistryMonitor registryMonitor;
 
     private String groupName = "groupName000001";
 
-    @Before
+    /*    @Before
     public void init() {
         ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
         zookeeperConfig.setDsRoot("/dolphinscheduler_qzw");
@@ -66,17 +80,15 @@ public class WorkerGroupServiceTest {
         Mockito.when(zookeeperCachedOperator.get(workerPath + "/default" + "/" + defaultAddressList.get(0))).thenReturn("0.01,0.17,0.03,25.83,8.0,1.0,2020-07-21 11:17:59,2020-07-21 14:39:20,0,13238");
     }
 
-    */
-/**
+*//**
      *  create or update a worker group
      *//*
-
     @Test
     public void testSaveWorkerGroup() {
         // worker server maps
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("127.0.0.1:1234", "0.3,0.07,4.4,7.42,16.0,0.3,2021-03-19 20:17:58,2021-03-19 20:25:29,0,79214");
-        Mockito.when(registryMonitor.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+        Mockito.when(zookeeperMonitor.getServerMaps(ZKNodeType.WORKER, true)).thenReturn(serverMaps);
 
         User user = new User();
         // general user add
@@ -93,14 +105,12 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
         result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1:1234");
         Assert.assertEquals(Status.NAME_EXIST, result.get(Constants.STATUS));
-    }
+    }*/
 
-    */
-/**
+    /**
      * query worker group paging
-     *//*
-
-    @Test
+     */
+    /* @Test
     public void testQueryAllGroupPaging() {
         User user = new User();
         // general user add
@@ -108,8 +118,7 @@ public class WorkerGroupServiceTest {
         Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, null);
         PageInfo<WorkerGroup> pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
         Assert.assertEquals(pageInfo.getLists().size(), 1);
-    }
-
+    }*/
     @Test
     public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup();
@@ -117,13 +126,11 @@ public class WorkerGroupServiceTest {
         Assert.assertEquals(workerGroups.size(), 1);
     }
 
-    */
-/**
+    /**
      * delete group by id
-     *//*
-
+     */
     @Test
-    public  void testDeleteWorkerGroupById() {
+    public void testDeleteWorkerGroupById() {
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         WorkerGroup wg2 = getWorkerGroup(2);
@@ -141,11 +148,9 @@ public class WorkerGroupServiceTest {
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.get(Constants.MSG));
     }
 
-    */
-/**
+    /**
      * get processInstances
-     *//*
-
+     */
     private List<ProcessInstance> getProcessInstanceList() {
         List<ProcessInstance> processInstances = new ArrayList<>();
         processInstances.add(new ProcessInstance());
@@ -160,12 +165,9 @@ public class WorkerGroupServiceTest {
         Assert.assertEquals("default", workerGroups.toArray()[0]);
     }
 
-    */
-/**
+    /**
      * get Group
-     * @return
-     *//*
-
+     */
     private WorkerGroup getWorkerGroup(int id) {
         WorkerGroup workerGroup = new WorkerGroup();
         workerGroup.setName(groupName);
@@ -182,6 +184,5 @@ public class WorkerGroupServiceTest {
         list.add(getWorkerGroup());
         return list;
     }
-*/
 
 }
