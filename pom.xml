@@ -792,6 +792,9 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                        <!--registry plugin -->
+                        <include>**/plugin/registry/zookeeper/ZookeeperRegistryTest.java</include>
+                        <!-- API -->
                         <include>**/api/controller/ProjectControllerTest.java</include>
                         <include>**/api/controller/QueueControllerTest.java</include>
                         <include>**/api/configuration/TrafficConfigurationTest.java</include>
@@ -1044,9 +1047,6 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
-                        <!--registry plugin -->
-                        <include>**/plugin/registry/zookeeper/ZookeeperRegistryTest.java</include>
-
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>

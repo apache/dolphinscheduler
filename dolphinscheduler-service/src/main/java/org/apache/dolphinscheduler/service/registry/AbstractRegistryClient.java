@@ -40,10 +40,9 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
- * abstract zookeeper client
+ * abstract registry client
  */
 
 public abstract class AbstractRegistryClient {
@@ -62,8 +61,8 @@ public abstract class AbstractRegistryClient {
         List<String> childrenList = new ArrayList<>();
         try {
             // read master node parent path from conf
-            if (registryCenter.isExisted(getZNodeParentPath(NodeType.MASTER))) {
-                childrenList = registryCenter.getChildrenKeys(getZNodeParentPath(NodeType.MASTER));
+            if (registryCenter.isExisted(getNodeParentPath(NodeType.MASTER))) {
+                childrenList = registryCenter.getChildrenKeys(getNodeParentPath(NodeType.MASTER));
             }
         } catch (Exception e) {
             logger.error("getActiveMasterNum error", e);
@@ -79,7 +78,7 @@ public abstract class AbstractRegistryClient {
      */
     public List<Server> getServerList(NodeType nodeType) {
         Map<String, String> serverMaps = getServerMaps(nodeType);
-        String parentPath = getZNodeParentPath(nodeType);
+        String parentPath = getNodeParentPath(nodeType);
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
@@ -101,13 +100,13 @@ public abstract class AbstractRegistryClient {
     }
 
     /**
-     * get server zk nodes.
+     * get server nodes.
      *
-     * @param nodeType zookeeper node type
-     * @return result : list<zknode>
+     * @param nodeType registry node type
+     * @return result : list<node>
      */
     public List<String> getServerZkNodes(NodeType nodeType) {
-        String path = getZNodeParentPath(nodeType);
+        String path = getNodeParentPath(nodeType);
         List<String> serverList = registryCenter.getChildrenKeys(path);
         if (nodeType == NodeType.WORKER) {
             List<String> workerList = new ArrayList<>();
@@ -132,7 +131,7 @@ public abstract class AbstractRegistryClient {
     public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         Map<String, String> serverMap = new HashMap<>();
         try {
-            String path = getZNodeParentPath(nodeType);
+            String path = getNodeParentPath(nodeType);
             List<String> serverList = getServerZkNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
@@ -203,8 +202,8 @@ public abstract class AbstractRegistryClient {
      * @param nodeType zookeeper node type
      * @return true if exists
      */
-    public boolean checkZKNodeExists(String host, NodeType nodeType) {
-        String path = getZNodeParentPath(nodeType);
+    public boolean checkNodeExists(String host, NodeType nodeType) {
+        String path = getNodeParentPath(nodeType);
         if (StringUtils.isEmpty(path)) {
             logger.error("check zk node exists error, host:{}, zk node type:{}",
                     host, nodeType);
@@ -222,21 +221,21 @@ public abstract class AbstractRegistryClient {
     /**
      * @return get worker node parent path
      */
-    protected String getWorkerZNodeParentPath() {
+    protected String getWorkerNodeParentPath() {
         return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
     }
 
     /**
      * @return get master node parent path
      */
-    protected String getMasterZNodeParentPath() {
+    protected String getMasterNodeParentPath() {
         return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
     }
 
     /**
      * @return get dead server node parent path
      */
-    protected String getDeadZNodeParentPath() {
+    protected String getDeadNodeParentPath() {
         return Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
     }
 
@@ -251,15 +250,15 @@ public abstract class AbstractRegistryClient {
      * @param nodeType zookeeper node type
      * @return get zookeeper node parent path
      */
-    public String getZNodeParentPath(NodeType nodeType) {
+    public String getNodeParentPath(NodeType nodeType) {
         String path = "";
         switch (nodeType) {
             case MASTER:
-                return getMasterZNodeParentPath();
+                return getMasterNodeParentPath();
             case WORKER:
-                return getWorkerZNodeParentPath();
+                return getWorkerNodeParentPath();
             case DEAD_SERVER:
-                return getDeadZNodeParentPath();
+                return getDeadNodeParentPath();
             default:
                 break;
         }
@@ -312,13 +311,13 @@ public abstract class AbstractRegistryClient {
      */
     protected void initSystemZNode() {
         try {
-            registryCenter.persist(getMasterZNodeParentPath(), "");
-            registryCenter.persist(getWorkerZNodeParentPath(), "");
-            registryCenter.persist(getDeadZNodeParentPath(), "");
+            registryCenter.persist(getMasterNodeParentPath(), "");
+            registryCenter.persist(getWorkerNodeParentPath(), "");
+            registryCenter.persist(getDeadNodeParentPath(), "");
 
             logger.info("initialize server nodes success.");
         } catch (Exception e) {
-            logger.error("init system znode failed", e);
+            logger.error("init system node failed", e);
         }
     }
 

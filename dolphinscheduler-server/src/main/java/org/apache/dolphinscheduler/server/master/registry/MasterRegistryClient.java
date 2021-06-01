@@ -92,7 +92,7 @@ public class MasterRegistryClient extends AbstractRegistryClient {
             // init system znode
             this.initSystemZNode();
 
-            while (!checkZKNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
+            while (!checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
@@ -245,7 +245,7 @@ public class MasterRegistryClient extends AbstractRegistryClient {
         }
 
         // if the worker node exists in zookeeper, we must check the task starts after the worker
-        if (checkZKNodeExists(taskInstance.getHost(), NodeType.WORKER)) {
+        if (checkNodeExists(taskInstance.getHost(), NodeType.WORKER)) {
             //if task start after worker starts, there is no need to failover the task.
             if (checkTaskAfterWorkerStart(taskInstance)) {
                 taskNeedFailover = false;
