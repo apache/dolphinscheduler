@@ -447,11 +447,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
+        ProcessDefinition processDefinition = processDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
+            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name.trim());
         }
         return result;
     }
