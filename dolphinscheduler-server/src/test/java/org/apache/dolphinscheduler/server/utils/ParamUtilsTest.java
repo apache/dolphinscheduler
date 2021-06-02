@@ -17,23 +17,24 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test ParamUtils
@@ -49,8 +50,11 @@ public class ParamUtilsTest {
 
     public Map<String, Property> localParams = new HashMap<>();
 
+    public Map<String, Property> varPoolParams = new HashMap<>();
+
     /**
      * Init params
+     *
      * @throws Exception
      */
     @Before
@@ -71,6 +75,14 @@ public class ParamUtilsTest {
         localProperty.setType(DataType.VARCHAR);
         localProperty.setValue("${global_param}");
         localParams.put("local_param", localProperty);
+
+        Property varProperty = new Property();
+        varProperty.setProp("local_param");
+        varProperty.setDirect(Direct.IN);
+        varProperty.setType(DataType.VARCHAR);
+        varProperty.setValue("${global_param}");
+        varPoolParams.put("varPool", varProperty);
+
     }
 
     /**
@@ -85,11 +97,11 @@ public class ParamUtilsTest {
         String expected1 = "{\"local_param\":{\"prop\":\"local_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"}}";
         //Define expected date , the month is 0-base
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019,11,30);
+        calendar.set(2019, 11, 30);
         Date date = calendar.getTime();
 
         //Invoke convert
-        Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap, localParams, CommandType.START_PROCESS, date);
+        Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap, localParams, varPoolParams,CommandType.START_PROCESS, date);
         String result = JSONUtils.toJsonString(paramsMap);
         assertEquals(expected, result);
 
@@ -101,12 +113,12 @@ public class ParamUtilsTest {
         }
 
         //Invoke convert with null globalParams
-        Map<String, Property> paramsMap1 = ParamUtils.convert(null, globalParamsMap, localParams, CommandType.START_PROCESS, date);
+        Map<String, Property> paramsMap1 = ParamUtils.convert(null, globalParamsMap, localParams,varPoolParams, CommandType.START_PROCESS, date);
         String result1 = JSONUtils.toJsonString(paramsMap1);
         assertEquals(expected1, result1);
 
         //Null check, invoke convert with null globalParams and null localParams
-        Map<String, Property> paramsMap2 = ParamUtils.convert(null, globalParamsMap, null, CommandType.START_PROCESS, date);
+        Map<String, Property> paramsMap2 = ParamUtils.convert(null, globalParamsMap, null, varPoolParams,CommandType.START_PROCESS, date);
         assertNull(paramsMap2);
     }
 

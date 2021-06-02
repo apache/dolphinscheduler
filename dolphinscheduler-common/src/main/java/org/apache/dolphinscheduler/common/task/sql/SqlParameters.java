@@ -17,12 +17,19 @@
 
 package org.apache.dolphinscheduler.common.task.sql;
 
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Sql/Hql parameter
@@ -206,6 +213,51 @@ public class SqlParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public void dealOutParam(String result) {
+        if (StringUtils.isEmpty(result)) {
+            return;
+        }
+        if (CollectionUtils.isNotEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        List<Map<String, String>> sqlResult = getListMapByString(result);
+        if (CollectionUtils.isEmpty(sqlResult)) {
+            return;
+        }
+        //if sql return more than one line
+        if (sqlResult.size() > 1) {
+            Map<String, List<String>> sqlResultFormat = new HashMap<>();
+            //init sqlResultFormat
+            Set<String> keySet = sqlResult.get(0).keySet();
+            for (String key : keySet) {
+                sqlResultFormat.put(key, new ArrayList<>());
+            }
+            for (Map<String, String> info : sqlResult) {
+                for (String key : info.keySet()) {
+                    sqlResultFormat.get(key).add(info.get(key));
+                }
+            }
+            for (Property info : outProperty) {
+                if (info.getType() == DataType.LIST) {
+                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                }
+            }
+        } else {
+            //result only one line
+            Map<String, String> firstRow = sqlResult.get(0);
+            for (Property info : outProperty) {
+                info.setValue(firstRow.get(info.getProp()));
+                varPool.add(info);
+            }
+        }
+
     }
 
     @Override

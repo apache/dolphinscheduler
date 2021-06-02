@@ -105,7 +105,6 @@ public class ShellTask extends AbstractTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
-            setResult(shellCommandExecutor.getTaskResultString());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("shell task error", e);
@@ -169,6 +168,7 @@ public class ShellTask extends AbstractTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
             taskExecutionContext.getDefinedParams(),
             shellParameters.getLocalParametersMap(),
+            shellParameters.getVarPoolMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
         // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
@@ -187,18 +187,5 @@ public class ShellTask extends AbstractTask {
             paramsMap.put(Constants.PARAMETER_DATETIME, p);
         }
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
-
-    public void setResult(String result) {
-        Map<String, Property> localParams = shellParameters.getLocalParametersMap();
-        List<Map<String, String>> outProperties = new ArrayList<>();
-        Map<String, String> p = new HashMap<>();
-        localParams.forEach((k,v) -> {
-            if (v.getDirect() == Direct.OUT) {
-                p.put(k, result);
-            }
-        });
-        outProperties.add(p);
-        resultString = JSONUtils.toJsonString(outProperties);
     }
 }

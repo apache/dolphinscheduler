@@ -14,52 +14,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.shell;
 
-
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * shell parameters
  */
 public class ShellParameters extends AbstractParameters {
-  /**
-   * shell script
-   */
-  private String rawScript;
+    /**
+     * shell script
+     */
+    private String rawScript;
 
-  /**
-   * resource list
-   */
-  private List<ResourceInfo> resourceList;
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
-  public String getRawScript() {
-    return rawScript;
-  }
+    public String getRawScript() {
+        return rawScript;
+    }
 
-  public void setRawScript(String rawScript) {
-    this.rawScript = rawScript;
-  }
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
+    }
 
-  public List<ResourceInfo> getResourceList() {
-    return resourceList;
-  }
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
 
-  public void setResourceList(List<ResourceInfo> resourceList) {
-    this.resourceList = resourceList;
-  }
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
 
-  @Override
-  public boolean checkParameters() {
-    return rawScript != null && !rawScript.isEmpty();
-  }
+    @Override
+    public boolean checkParameters() {
+        return rawScript != null && !rawScript.isEmpty();
+    }
 
-  @Override
-  public List<ResourceInfo> getResourceFilesList() {
-    return resourceList;
-  }
+    @Override
+    public List<ResourceInfo> getResourceFilesList() {
+        return resourceList;
+    }
+
+    @Override
+    public void dealOutParam(String result) {
+        if (StringUtils.isEmpty(result)) {
+            return;
+        }
+        if (CollectionUtils.isNotEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        Map<String, String> taskResult = getMapByString(result);
+        if (taskResult == null || taskResult.size() == 0) {
+            return;
+        }
+        for (Property info : outProperty) {
+            info.setValue(taskResult.get(info.getProp()));
+            varPool.add(info);
+        }
+    }
+
 }

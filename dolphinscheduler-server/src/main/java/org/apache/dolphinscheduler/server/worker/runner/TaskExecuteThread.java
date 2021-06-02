@@ -165,8 +165,7 @@ public class TaskExecuteThread implements Runnable, Delayed {
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
-            responseCommand.setVarPool(task.getVarPool());
-            responseCommand.setResult(task.getResultString());
+            responseCommand.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
         } catch (Exception e) {
             logger.error("task scheduler failure", e);
