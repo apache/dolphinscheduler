@@ -91,6 +91,7 @@ public class MasterTaskExecThreadTest {
     public void testExistsValidWorkerGroup3() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
+
         /*  Mockito.when(registryCenter.getWorkerGroupDirectly()).thenReturn(workerGorups);
           Mockito.when(registryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGorups);
         boolean b = masterTaskExecThread.existsValidWorkerGroup("test1");
