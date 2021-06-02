@@ -82,17 +82,6 @@ public class MasterRegistry {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         String localNodePath = getMasterPath();
         registryCenter.persist(localNodePath, "");
-        /* todo
-       zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable().addListener(
-            (client, newState) -> {
-                if (newState == ConnectionState.LOST) {
-                    logger.error("master : {} connection lost from zookeeper", address);
-                } else if (newState == ConnectionState.RECONNECTED) {
-                    logger.info("master : {} reconnected to zookeeper", address);
-                } else if (newState == ConnectionState.SUSPENDED) {
-                    logger.warn("master : {} connection SUSPENDED ", address);
-                }
-            });*/
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterMaxCpuloadAvg(),
