@@ -46,14 +46,14 @@ import com.google.common.collect.Sets;
  */
 @Ignore
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class WorkerRegistryTest {
+public class WorkerRegistryClientTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistryTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
 
     private static final String TEST_WORKER_GROUP = "test";
 
     @InjectMocks
-    private WorkerRegistry workerRegistry;
+    private WorkerRegistryClient workerRegistryClient;
 
     @Mock
     private RegistryCenter registryCenter;
@@ -106,9 +106,9 @@ public class WorkerRegistryTest {
     @Test
     public void testRegistry() {
 
-        workerRegistry.init();
+        workerRegistryClient.init();
 
-        workerRegistry.registry();
+        workerRegistryClient.registry();
 
         //  String workerPath = zookeeperRegistryCenter.getWorkerPath();
 
@@ -124,20 +124,20 @@ public class WorkerRegistryTest {
             i++;
         }*/
 
-        workerRegistry.unRegistry();
+        workerRegistryClient.unRegistry();
 
         workerConfig.getWorkerGroups().add(StringUtils.EMPTY);
-        workerRegistry.init();
-        workerRegistry.registry();
+        workerRegistryClient.init();
+        workerRegistryClient.registry();
 
-        workerRegistry.unRegistry();
+        workerRegistryClient.unRegistry();
 
         // testEmptyWorkerGroupsRegistry
         workerConfig.getWorkerGroups().remove(StringUtils.EMPTY);
         workerConfig.getWorkerGroups().remove(TEST_WORKER_GROUP);
         workerConfig.getWorkerGroups().remove(DEFAULT_WORKER_GROUP);
-        workerRegistry.init();
-        workerRegistry.registry();
+        workerRegistryClient.init();
+        workerRegistryClient.registry();
 
         /*  List<String> testWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + TEST_WORKER_GROUP);
         List<String> defaultWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + DEFAULT_WORKER_GROUP);
@@ -172,7 +172,7 @@ public class WorkerRegistryTest {
 
     @Test
     public void testGetWorkerZkPaths() {
-        workerRegistry.init();
-        Assert.assertEquals(workerGroups.size(), workerRegistry.getWorkerZkPaths().size());
+        workerRegistryClient.init();
+        Assert.assertEquals(workerGroups.size(), workerRegistryClient.getWorkerZkPaths().size());
     }
 }

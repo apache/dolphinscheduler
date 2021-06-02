@@ -24,8 +24,7 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.apache.dolphinscheduler.service.registry.AbstractRegistryClient;
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
@@ -50,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
@@ -100,13 +98,7 @@ public class ServerNodeManager implements InitializingBean {
      * zk client
      */
     @Autowired
-    private RegistryClient zkClient;
-
-    /**
-     * zookeeper registry center
-     */
-    @Autowired
-    private RegistryCenter registryCenter;
+    private RegistryClient registryClient;
 
     /**
      * worker group mapper
@@ -139,11 +131,11 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init MasterNodeListener listener
          */
-        registryCenter.subscribe(registryCenter.getMasterPath(), new MasterDataListener());
+        registryClient.subscribe(registryClient.getMasterPath(), new MasterDataListener());
         /**
          * init WorkerNodeListener listener
          */
-        registryCenter.subscribe(registryCenter.getWorkerPath(), new MasterDataListener());
+        registryClient.subscribe(registryClient.getWorkerPath(), new MasterDataListener());
     }
 
     /**
@@ -153,23 +145,16 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * master nodes from zookeeper
          */
-        Set<String> initMasterNodes = registryCenter.getMasterNodesDirectly();
+        Set<String> initMasterNodes = registryClient.getMasterNodesDirectly();
         syncMasterNodes(initMasterNodes);
 
         /**
          * worker group nodes from zookeeper
          */
-        Set<String> workerGroups = registryCenter.getWorkerGroupDirectly();
+        Set<String> workerGroups = registryClient.getWorkerGroupDirectly();
         for (String workerGroup : workerGroups) {
-            syncWorkerGroupNodes(workerGroup, registryCenter.getWorkerGroupNodesDirectly(workerGroup));
+            syncWorkerGroupNodes(workerGroup, registryClient.getWorkerGroupNodesDirectly(workerGroup));
         }
-    }
-
-    /**
-     * zookeeper client
-     */
-    @Component
-    static class RegistryClient extends AbstractRegistryClient {
     }
 
     /**
@@ -180,7 +165,7 @@ public class ServerNodeManager implements InitializingBean {
         @Override
         public void run() {
             // sync worker node info
-            Map<String, String> newWorkerNodeInfo = zkClient.getServerMaps(NodeType.WORKER, true);
+            Map<String, String> newWorkerNodeInfo = registryClient.getServerMaps(NodeType.WORKER, true);
             syncWorkerNodeInfo(newWorkerNodeInfo);
 
             // sync worker group nodes from database
@@ -210,18 +195,18 @@ public class ServerNodeManager implements InitializingBean {
 
         @Override
         public void notify(String path, DataChangeEvent dataChangeEvent) {
-            if (registryCenter.isWorkerPath(path)) {
+            if (registryClient.isWorkerPath(path)) {
                 try {
                     if (dataChangeEvent == DataChangeEvent.ADD) {
                         logger.info("worker group node : {} added.", path);
                         String group = parseGroup(path);
-                        Set<String> currentNodes = registryCenter.getWorkerGroupNodesDirectly(group);
+                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         logger.info("currentNodes : {}", currentNodes);
                         syncWorkerGroupNodes(group, currentNodes);
                     } else if (dataChangeEvent == DataChangeEvent.REMOVE) {
                         logger.info("worker group node : {} down.", path);
                         String group = parseGroup(path);
-                        Set<String> currentNodes = registryCenter.getWorkerGroupNodesDirectly(group);
+                        Set<String> currentNodes = registryClient.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
                     }
@@ -250,16 +235,16 @@ public class ServerNodeManager implements InitializingBean {
     class MasterDataListener implements SubscribeListener {
         @Override
         public void notify(String path, DataChangeEvent dataChangeEvent) {
-            if (registryCenter.isMasterPath(path)) {
+            if (registryClient.isMasterPath(path)) {
                 try {
                     if (dataChangeEvent.equals(DataChangeEvent.ADD)) {
                         logger.info("master node : {} added.", path);
-                        Set<String> currentNodes = registryCenter.getMasterNodesDirectly();
+                        Set<String> currentNodes = registryClient.getMasterNodesDirectly();
                         syncMasterNodes(currentNodes);
                     }
                     if (dataChangeEvent.equals(DataChangeEvent.REMOVE)) {
                         logger.info("master node : {} down.", path);
-                        Set<String> currentNodes = registryCenter.getMasterNodesDirectly();
+                        Set<String> currentNodes = registryClient.getMasterNodesDirectly();
                         syncMasterNodes(currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "MASTER");
                     }
@@ -390,7 +375,7 @@ public class ServerNodeManager implements InitializingBean {
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();
-        registryCenter.close();
+        registryClient.close();
     }
 
 }

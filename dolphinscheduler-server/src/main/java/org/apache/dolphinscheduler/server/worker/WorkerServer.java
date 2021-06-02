@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
-import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
@@ -75,7 +75,7 @@ public class WorkerServer implements IStoppable {
      * worker registry
      */
     @Autowired
-    private WorkerRegistry workerRegistry;
+    private WorkerRegistryClient workerRegistryClient;
 
     /**
      * worker config
@@ -131,11 +131,11 @@ public class WorkerServer implements IStoppable {
 
         // worker registry
         try {
-            this.workerRegistry.registry();
-            this.workerRegistry.getRegistryCenter().setStoppable(this);
-            Set<String> workerZkPaths = this.workerRegistry.getWorkerZkPaths();
+            this.workerRegistryClient.registry();
+            this.workerRegistryClient.setRegistryStoppable(this);
+            Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
 
-            this.workerRegistry.getRegistryCenter().handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_ZK_OP);
+            this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
@@ -179,7 +179,7 @@ public class WorkerServer implements IStoppable {
 
             // close
             this.nettyRemotingServer.close();
-            this.workerRegistry.unRegistry();
+            this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);

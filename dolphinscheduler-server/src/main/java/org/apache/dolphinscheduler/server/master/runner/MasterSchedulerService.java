@@ -62,7 +62,7 @@ public class MasterSchedulerService extends Thread {
      * zookeeper master client
      */
     @Autowired
-    private MasterRegistryClient zkMasterClient;
+    private MasterRegistryClient masterRegistryClient;
 
     /**
      * master config
@@ -145,7 +145,7 @@ public class MasterSchedulerService extends Thread {
     private void scheduleProcess() throws Exception {
 
         try {
-            zkMasterClient.blockAcquireMutex();
+            masterRegistryClient.blockAcquireMutex();
 
             int activeCount = masterExecService.getActiveCount();
             // make sure to scan and delete command  table in one transaction
@@ -177,7 +177,7 @@ public class MasterSchedulerService extends Thread {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } finally {
-            zkMasterClient.releaseLock();
+            masterRegistryClient.releaseLock();
         }
     }
 

@@ -118,7 +118,7 @@ public class MasterServer implements IStoppable {
 
         // self tolerant
         this.masterRegistryClient.start();
-        this.masterRegistryClient.setStoppable(this);
+        this.masterRegistryClient.setRegistryStoppable(this);
 
         // scheduler start
         this.masterSchedulerService.start();
@@ -175,7 +175,7 @@ public class MasterServer implements IStoppable {
             // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-            this.masterRegistryClient.close();
+            this.masterRegistryClient.closeRegistry();
             // close quartz
             try {
                 QuartzExecutors.getInstance().shutdown();

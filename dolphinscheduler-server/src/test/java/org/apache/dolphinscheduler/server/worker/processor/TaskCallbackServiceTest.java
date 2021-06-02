@@ -17,32 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
-import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
-
-import java.util.Date;
-
-import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import io.netty.channel.Channel;
 
 /**
  * test task call back service
@@ -52,7 +29,7 @@ import io.netty.channel.Channel;
 @Ignore
 public class TaskCallbackServiceTest {
 
-    @Autowired
+   /* @Autowired
     private TaskCallbackService taskCallbackService;
 
     @Autowired
@@ -67,11 +44,11 @@ public class TaskCallbackServiceTest {
     @Autowired
     private TaskExecuteProcessor taskExecuteProcessor;
 
-    /**
+    *//**
      * send ack test
      *
      * @throws Exception
-     */
+     *//*
     @Test
     public void testSendAck() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
@@ -100,11 +77,11 @@ public class TaskCallbackServiceTest {
         nettyRemotingClient.close();
     }
 
-    /**
+    *//**
      * send result test
      *
      * @throws Exception
-     */
+     *//*
     @Test
     public void testSendResult() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
@@ -196,5 +173,5 @@ public class TaskCallbackServiceTest {
         nettyRemotingServer.close();
         nettyRemotingClient.close();
     }
-
+*/
 }

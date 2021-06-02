@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.service.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.ADD_ZK_OP;
-import static org.apache.dolphinscheduler.common.Constants.DELETE_ZK_OP;
+import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
+import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
 import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
 import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.RegistryPluginManager;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,14 +43,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
 
 /**
  * All business parties use this class to access the registry
  */
-@Component
 public class RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryCenter.class);
@@ -65,20 +62,20 @@ public class RegistryCenter {
     /**
      * nodes namespace
      */
-    private static String NODES;
+    protected static String NODES;
 
     /**
      * master path
      */
-    private static String MASTER_PATH;
+    protected static String MASTER_PATH;
 
     private RegistryPluginManager registryPluginManager;
     /**
      * worker path
      */
-    private static String WORKER_PATH;
+    protected static String WORKER_PATH;
 
-    private static final String EMPTY = "";
+    protected static final String EMPTY = "";
 
     private static final String REGISTRY_PREFIX = "registry";
 
@@ -115,7 +112,16 @@ public class RegistryCenter {
             }
             registry.init(registryConfig);
             initNodes();
+
         }
+    }
+
+    /**
+     * init nodes
+     */
+    private void initNodes() {
+        persist(MASTER_PATH, EMPTY);
+        persist(WORKER_PATH, EMPTY);
     }
 
     /**
@@ -143,14 +149,6 @@ public class RegistryCenter {
         } catch (Exception e) {
             throw new RuntimeException("Load registry Plugin Failed !", e);
         }
-    }
-
-    /**
-     * init nodes
-     */
-    private void initNodes() {
-        registry.persist(MASTER_PATH, EMPTY);
-        registry.persist(WORKER_PATH, EMPTY);
     }
 
     /**
@@ -192,23 +190,6 @@ public class RegistryCenter {
 
     public boolean releaseLock(String key) {
         return registry.releaseLock(key);
-    }
-
-    /**
-     * check dead server or not , if dead, stop self
-     *
-     * @param zNode node path
-     * @param serverType master or worker prefix
-     * @return true if not exists
-     * @throws Exception errors
-     */
-    public boolean checkIsDeadServer(String zNode, String serverType) throws Exception {
-        // ip_sequence_no
-        String[] zNodesPath = zNode.split("\\/");
-        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
-        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
-
-        return !registry.isExisted(zNode) || registry.isExisted(deadServerPath);
     }
 
     /**
@@ -268,58 +249,27 @@ public class RegistryCenter {
      * opType(add): if find dead server , then add to zk deadServerPath
      * opType(delete): delete path from zk
      *
-     * @param zNode node path
+     * @param nodeSet node path set
      * @param nodeType master or worker
      * @param opType delete or add
      * @throws Exception errors
      */
-    public void handleDeadServer(String zNode, NodeType nodeType, String opType) throws Exception {
-        String host = getHostByEventDataPath(zNode);
-        String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
-
-        //check server restart, if restart , dead server path in zk should be delete
-        if (opType.equals(DELETE_ZK_OP)) {
-            removeDeadServerByHost(host, type);
-
-        } else if (opType.equals(ADD_ZK_OP)) {
-            String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
-            if (!registry.isExisted(deadServerPath)) {
-                //add dead server info to zk dead server path : /dead-servers/
-
-                registry.persist(deadServerPath, (type + UNDERLINE + host));
-
-                logger.info("{} server dead , and {} added to zk dead server path success",
-                        nodeType, zNode);
-            }
-        }
-
-    }
-
-    /**
-     * opType(add): if find dead server , then add to zk deadServerPath
-     * opType(delete): delete path from zk
-     *
-     * @param zNodeSet node path set
-     * @param nodeType master or worker
-     * @param opType delete or add
-     * @throws Exception errors
-     */
-    public void handleDeadServer(Set<String> zNodeSet, NodeType nodeType, String opType) throws Exception {
+    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
 
         String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
-        for (String zNode : zNodeSet) {
-            String host = getHostByEventDataPath(zNode);
+        for (String node : nodeSet) {
+            String host = getHostByEventDataPath(node);
             //check server restart, if restart , dead server path in zk should be delete
-            if (opType.equals(DELETE_ZK_OP)) {
+            if (opType.equals(DELETE_OP)) {
                 removeDeadServerByHost(host, type);
 
-            } else if (opType.equals(ADD_ZK_OP)) {
+            } else if (opType.equals(ADD_OP)) {
                 String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
                 if (!registry.isExisted(deadServerPath)) {
                     //add dead server info to zk dead server path : /dead-servers/
                     registry.persist(deadServerPath, (type + UNDERLINE + host));
-                    logger.info("{} server dead , and {} added to zk dead server path success",
-                            nodeType, zNode);
+                    logger.info("{} server dead , and {} added to registry dead server path success",
+                            nodeType, node);
                 }
             }
 
@@ -362,44 +312,6 @@ public class RegistryCenter {
                 logger.info("{} server {} deleted from zk dead server path success", serverType, host);
             }
         }
-    }
-
-    /**
-     * get master nodes directly
-     *
-     * @return master nodes
-     */
-    public Set<String> getMasterNodesDirectly() {
-        List<String> masters = getChildrenKeys(MASTER_PATH);
-        return new HashSet<>(masters);
-    }
-
-    /**
-     * get worker nodes directly
-     *
-     * @return master nodes
-     */
-    public Set<String> getWorkerNodesDirectly() {
-        List<String> workers = getChildrenKeys(WORKER_PATH);
-        return new HashSet<>(workers);
-    }
-
-    /**
-     * get worker group directly
-     *
-     * @return worker group nodes
-     */
-    public Set<String> getWorkerGroupDirectly() {
-        List<String> workers = getChildrenKeys(getWorkerPath());
-        return new HashSet<>(workers);
-    }
-
-    /**
-     * get worker group nodes
-     */
-    public Set<String> getWorkerGroupNodesDirectly(String workerGroup) {
-        List<String> workers = getChildrenKeys(getWorkerGroupPath(workerGroup));
-        return new HashSet<>(workers);
     }
 
     /**

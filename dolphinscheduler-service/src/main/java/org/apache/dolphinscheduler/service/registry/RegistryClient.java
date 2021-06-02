@@ -17,8 +17,14 @@
 
 package org.apache.dolphinscheduler.service.registry;
 
+import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
 import static org.apache.dolphinscheduler.common.Constants.COLON;
+import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
 import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
+import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -40,14 +46,16 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * abstract registry client
  */
+@Service
+public  class RegistryClient extends RegistryCenter{
 
-public abstract class AbstractRegistryClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractRegistryClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
     @Resource
     RegistryCenter registryCenter;
@@ -309,7 +317,7 @@ public abstract class AbstractRegistryClient {
     /**
      * init system znode
      */
-    protected void initSystemZNode() {
+    public void initSystemNode() {
         try {
             registryCenter.persist(getMasterNodeParentPath(), "");
             registryCenter.persist(getWorkerNodeParentPath(), "");
@@ -321,4 +329,88 @@ public abstract class AbstractRegistryClient {
         }
     }
 
+    /**
+     * opType(add): if find dead server , then add to zk deadServerPath
+     * opType(delete): delete path from zk
+     *
+     * @param node node path
+     * @param nodeType master or worker
+     * @param opType delete or add
+     * @throws Exception errors
+     */
+    public void handleDeadServer(String node, NodeType nodeType, String opType) throws Exception {
+        String host = getHostByEventDataPath(node);
+        String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
+
+        //check server restart, if restart , dead server path in zk should be delete
+        if (opType.equals(DELETE_OP)) {
+            removeDeadServerByHost(host, type);
+
+        } else if (opType.equals(ADD_OP)) {
+            String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
+            if (!isExisted(deadServerPath)) {
+                //add dead server info to zk dead server path : /dead-servers/
+
+                persist(deadServerPath, (type + UNDERLINE + host));
+
+                logger.info("{} server dead , and {} added to zk dead server path success",
+                        nodeType, node);
+            }
+        }
+
+    }
+
+    /**
+     * check dead server or not , if dead, stop self
+     *
+     * @param zNode node path
+     * @param serverType master or worker prefix
+     * @return true if not exists
+     * @throws Exception errors
+     */
+    public boolean checkIsDeadServer(String zNode, String serverType) throws Exception {
+        // ip_sequence_no
+        String[] zNodesPath = zNode.split("\\/");
+        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
+        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
+
+        return !isExisted(zNode) || isExisted(deadServerPath);
+    }
+    /**
+     * get master nodes directly
+     *
+     * @return master nodes
+     */
+    public Set<String> getMasterNodesDirectly() {
+        List<String> masters = getChildrenKeys(MASTER_PATH);
+        return new HashSet<>(masters);
+    }
+
+    /**
+     * get worker nodes directly
+     *
+     * @return master nodes
+     */
+    public Set<String> getWorkerNodesDirectly() {
+        List<String> workers = getChildrenKeys(WORKER_PATH);
+        return new HashSet<>(workers);
+    }
+
+    /**
+     * get worker group directly
+     *
+     * @return worker group nodes
+     */
+    public Set<String> getWorkerGroupDirectly() {
+        List<String> workers = getChildrenKeys(getWorkerPath());
+        return new HashSet<>(workers);
+    }
+
+    /**
+     * get worker group nodes
+     */
+    public Set<String> getWorkerGroupNodesDirectly(String workerGroup) {
+        List<String> workers = getChildrenKeys(getWorkerGroupPath(workerGroup));
+        return new HashSet<>(workers);
+    }
 }

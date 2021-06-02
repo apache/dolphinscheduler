@@ -26,28 +26,36 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.registry.AbstractRegistryClient;
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Sets;
 
 /**
  * zookeeper master client
@@ -55,7 +63,7 @@ import org.springframework.stereotype.Component;
  * single instance
  */
 @Component
-public class MasterRegistryClient extends AbstractRegistryClient {
+public class MasterRegistryClient {
 
     /**
      * logger
@@ -67,56 +75,47 @@ public class MasterRegistryClient extends AbstractRegistryClient {
      */
     @Autowired
     private ProcessService processService;
-
-    /**
-     * master registry
-     */
     @Autowired
-    private MasterRegistry masterRegistry;
-
-    @Resource
-    RegistryCenter registryCenter;
+    private RegistryClient registryClient;
 
     public void start() {
-        registryCenter.init();
-        String znodeLock = getMasterStartUpLockPath();
+        init();
+        String znodeLock = registryClient.getMasterStartUpLockPath();
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
 
-            registryCenter.getLock(znodeLock);
+            registryClient.getLock(znodeLock);
             // master registry
-            masterRegistry.registry();
-            String registryPath = this.masterRegistry.getMasterPath();
-            masterRegistry.getRegistryCenter().handleDeadServer(registryPath, NodeType.MASTER, Constants.DELETE_ZK_OP);
+            registry();
+            String registryPath = getMasterPath();
+            registryClient.handleDeadServer(registryPath, NodeType.MASTER, Constants.DELETE_OP);
 
-            // init system znode
-            this.initSystemZNode();
+            // init system node
+            registryClient.initSystemNode();
 
-            while (!checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
+            while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
             // self tolerant
-            if (getActiveMasterNum() == 1) {
+            if (registryClient.getActiveMasterNum() == 1) {
                 removeNodePath(null, NodeType.MASTER, true);
                 removeNodePath(null, NodeType.WORKER, true);
             }
-            registryCenter.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
+            registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             logger.error("master start up exception", e);
         } finally {
-
-            registryCenter.releaseLock(znodeLock);
+            registryClient.releaseLock(znodeLock);
         }
     }
 
-    public void setStoppable(IStoppable stoppable) {
-        masterRegistry.getRegistryCenter().setStoppable(stoppable);
+    public void setRegistryStoppable(IStoppable stoppable) {
+        registryClient.setStoppable(stoppable);
     }
 
-    public void close() {
-        masterRegistry.unRegistry();
-        registryCenter.close();
+    public void closeRegistry() {
+        unRegistry();
     }
 
     /**
@@ -130,17 +129,17 @@ public class MasterRegistryClient extends AbstractRegistryClient {
         logger.info("{} node deleted : {}", nodeType, path);
         String failoverPath = getFailoverLockPath(nodeType);
         try {
-            registryCenter.getLock(failoverPath);
+            registryClient.getLock(failoverPath);
 
             String serverHost = null;
             if (StringUtils.isNotEmpty(path)) {
-                serverHost = registryCenter.getHostByEventDataPath(path);
+                serverHost = registryClient.getHostByEventDataPath(path);
                 if (StringUtils.isEmpty(serverHost)) {
                     logger.error("server down error: unknown path: {}", path);
                     return;
                 }
                 // handle dead server
-                registryCenter.handleDeadServer(path, nodeType, Constants.ADD_ZK_OP);
+                registryClient.handleDeadServer(path, nodeType, Constants.ADD_OP);
             }
             //failover server
             if (failover) {
@@ -150,7 +149,7 @@ public class MasterRegistryClient extends AbstractRegistryClient {
             logger.error("{} server failover failed.", nodeType);
             logger.error("failover exception ", e);
         } finally {
-            registryCenter.releaseLock(failoverPath);
+            registryClient.releaseLock(failoverPath);
         }
     }
 
@@ -182,9 +181,9 @@ public class MasterRegistryClient extends AbstractRegistryClient {
     private String getFailoverLockPath(NodeType nodeType) {
         switch (nodeType) {
             case MASTER:
-                return getMasterFailoverLockPath();
+                return registryClient.getMasterFailoverLockPath();
             case WORKER:
-                return getWorkerFailoverLockPath();
+                return registryClient.getWorkerFailoverLockPath();
             default:
                 return "";
         }
@@ -245,7 +244,7 @@ public class MasterRegistryClient extends AbstractRegistryClient {
         }
 
         // if the worker node exists in zookeeper, we must check the task starts after the worker
-        if (checkNodeExists(taskInstance.getHost(), NodeType.WORKER)) {
+        if (registryClient.checkNodeExists(taskInstance.getHost(), NodeType.WORKER)) {
             //if task start after worker starts, there is no need to failover the task.
             if (checkTaskAfterWorkerStart(taskInstance)) {
                 taskNeedFailover = false;
@@ -265,7 +264,7 @@ public class MasterRegistryClient extends AbstractRegistryClient {
             return false;
         }
         Date workerServerStartDate = null;
-        List<Server> workerServers = getServerList(NodeType.WORKER);
+        List<Server> workerServers = registryClient.getServerList(NodeType.WORKER);
         for (Server workerServer : workerServers) {
             if (taskInstance.getHost().equals(workerServer.getHost() + Constants.COLON + workerServer.getPort())) {
                 workerServerStartDate = workerServer.getCreateTime();
@@ -340,10 +339,81 @@ public class MasterRegistryClient extends AbstractRegistryClient {
     }
 
     public void blockAcquireMutex() {
-        registryCenter.getLock(getMasterLockPath());
+        registryClient.getLock(registryClient.getMasterLockPath());
     }
 
     public void releaseLock() {
-        registryCenter.releaseLock(getMasterLockPath());
+        registryClient.releaseLock(registryClient.getMasterLockPath());
     }
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
+    /**
+     * heartbeat executor
+     */
+    private ScheduledExecutorService heartBeatExecutor;
+
+    /**
+     * master start time
+     */
+    private String startTime;
+
+    @PostConstruct
+    public void init() {
+        this.startTime = DateUtils.dateToString(new Date());
+        this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
+    }
+
+    /**
+     * registry
+     */
+    public void registry() {
+        String address = NetUtils.getAddr(masterConfig.getListenPort());
+        String localNodePath = getMasterPath();
+        registryClient.persist(localNodePath, "");
+        int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+                masterConfig.getMasterMaxCpuloadAvg(),
+                masterConfig.getMasterReservedMemory(),
+                Sets.newHashSet(getMasterPath()),
+                Constants.MASTER_TYPE,
+                registryClient);
+
+        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
+        logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
+
+    }
+
+    /**
+     * remove registry info
+     */
+    public void unRegistry() {
+        String address = getLocalAddress();
+        String localNodePath = getMasterPath();
+        registryClient.remove(localNodePath);
+        logger.info("master node : {} unRegistry to register center.", address);
+        heartBeatExecutor.shutdown();
+        logger.info("heartbeat executor shutdown");
+        registryClient.close();
+    }
+
+    /**
+     * get master path
+     */
+    public String getMasterPath() {
+        String address = getLocalAddress();
+        return this.getMasterPath() + "/" + address;
+    }
+
+    /**
+     * get local address
+     */
+    private String getLocalAddress() {
+        return NetUtils.getAddr(masterConfig.getListenPort());
+    }
+
 }

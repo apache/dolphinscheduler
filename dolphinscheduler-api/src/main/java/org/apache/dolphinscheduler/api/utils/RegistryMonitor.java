@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.utils;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
-import org.apache.dolphinscheduler.service.registry.AbstractRegistryClient;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * monitor zookeeper info todo registry-spi
  */
 @Component
-public class RegistryMonitor extends AbstractRegistryClient {
+public class RegistryMonitor extends RegistryClient {
 
     /**
      * @return zookeeper info list
