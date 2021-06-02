@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheMan
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Date;
 import java.util.Set;
@@ -55,7 +55,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * zookeeper register center
      */
-    private RegistryCenter registryCenter;
+    private RegistryClient registryClient;
 
     /**
      * constructor of MasterTaskExecThread
@@ -66,7 +66,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         super(taskInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
-        this.registryCenter = SpringApplicationContext.getBean(RegistryCenter.class);
+        this.registryClient = SpringApplicationContext.getBean(RegistryClient.class);
     }
 
     /**
@@ -209,7 +209,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * @return whether exists
      */
     public Boolean existsValidWorkerGroup(String taskInstanceWorkerGroup) {
-        Set<String> workerGroups = registryCenter.getWorkerGroupDirectly();
+        Set<String> workerGroups = registryClient.getWorkerGroupDirectly();
         // not worker group
         if (CollectionUtils.isEmpty(workerGroups)) {
             return false;
@@ -219,7 +219,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         if (!workerGroups.contains(taskInstanceWorkerGroup)) {
             return false;
         }
-        Set<String> workers = registryCenter.getWorkerGroupNodesDirectly(taskInstanceWorkerGroup);
+        Set<String> workers = registryClient.getWorkerGroupNodesDirectly(taskInstanceWorkerGroup);
         if (CollectionUtils.isEmpty(workers)) {
             return false;
         }
