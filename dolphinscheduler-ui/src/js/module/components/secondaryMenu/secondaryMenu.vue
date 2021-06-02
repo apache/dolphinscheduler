@@ -27,7 +27,8 @@
             <div class="name" @click="_toggleSubMenu(item)">
               <a href="javascript:">
                 <em class="fa icon" :class="item.icon"></em>
-                <span>{{item.name}}</span>
+                <span v-if="type=='projects' && item.id==0">{{ curProjectName }}</span>
+                <span v-else>{{ item.name }}</span>
                 <em class="fa angle" :class="item.isOpen ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" v-if="item.children.length"></em>
               </a>
             </div>
@@ -64,7 +65,8 @@
         index: 0,
         id: this.$route.params.id,
         isTogHide: false,
-        isLeft: true
+        isLeft: true,
+        curProjectName: localStorage.getItem('projectName')
       }
     },
     props: {
