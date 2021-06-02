@@ -454,11 +454,11 @@ public class ProcessDefinitionService extends BaseDAGService {
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name.trim());
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name.trim());
         }
         return result;
     }
