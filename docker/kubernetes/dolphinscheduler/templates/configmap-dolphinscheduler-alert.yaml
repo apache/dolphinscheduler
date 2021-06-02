@@ -21,22 +21,9 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-alert
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
-  ALERT_PLUGIN_DIR: {{ .Values.alert.configmap.ALERT_PLUGIN_DIR | quote }}
-  XLS_FILE_PATH: {{ .Values.alert.configmap.XLS_FILE_PATH | quote }}
-  MAIL_SERVER_HOST: {{ .Values.alert.configmap.MAIL_SERVER_HOST | quote }}
-  MAIL_SERVER_PORT: {{ .Values.alert.configmap.MAIL_SERVER_PORT | quote }}
-  MAIL_SENDER: {{ .Values.alert.configmap.MAIL_SENDER | quote }}
-  MAIL_USER: {{ .Values.alert.configmap.MAIL_USER | quote }}
-  MAIL_PASSWD: {{ .Values.alert.configmap.MAIL_PASSWD | quote }}
-  MAIL_SMTP_STARTTLS_ENABLE: {{ .Values.alert.configmap.MAIL_SMTP_STARTTLS_ENABLE | quote }}
-  MAIL_SMTP_SSL_ENABLE: {{ .Values.alert.configmap.MAIL_SMTP_SSL_ENABLE | quote }}
-  MAIL_SMTP_SSL_TRUST: {{ .Values.alert.configmap.MAIL_SMTP_SSL_TRUST | quote }}
-  ENTERPRISE_WECHAT_ENABLE: {{ .Values.alert.configmap.ENTERPRISE_WECHAT_ENABLE | quote }}
-  ENTERPRISE_WECHAT_CORP_ID: {{ .Values.alert.configmap.ENTERPRISE_WECHAT_CORP_ID | quote }}
-  ENTERPRISE_WECHAT_SECRET: {{ .Values.alert.configmap.ENTERPRISE_WECHAT_SECRET | quote }}
-  ENTERPRISE_WECHAT_AGENT_ID: {{ .Values.alert.configmap.ENTERPRISE_WECHAT_AGENT_ID | quote }}
-  ENTERPRISE_WECHAT_USERS: {{ .Values.alert.configmap.ENTERPRISE_WECHAT_USERS | quote }}
+  {{- range $key, $value := .Values.alert.configmap }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
 {{- end }}

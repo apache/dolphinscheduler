@@ -14,7 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,5 +64,33 @@ public class StringUtilsTest {
         //"test" string
         b = StringUtils.isNotBlank("test");
         Assert.assertTrue(b);
+    }
+
+    @Test
+    public void testTrim() {
+        String trim = StringUtils.trim(null);
+        Assert.assertNull(trim);
+
+        trim = StringUtils.trim(" test ");
+        Assert.assertEquals("test", trim);
+    }
+
+    @Test
+    public void testDefaultIfBlank() {
+        String defaultStr = StringUtils.defaultIfBlank("", "defaultStr");
+        Assert.assertEquals("defaultStr", defaultStr);
+
+        defaultStr = StringUtils.defaultIfBlank("test", "defaultStr");
+        Assert.assertEquals("test", defaultStr);
+    }
+
+    @Test
+    public void testJoin() {
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("3");
+        list.add("4");
+        String join = StringUtils.join(list,  ",");
+        Assert.assertEquals("1,3,4", join);
     }
 }

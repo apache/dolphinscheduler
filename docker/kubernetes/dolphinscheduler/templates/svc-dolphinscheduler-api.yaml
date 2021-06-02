@@ -20,16 +20,35 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-api
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.annotations }}
+  annotations:
+    {{- range $key, $value := .Values.api.service.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 spec:
+  type: {{ .Values.api.service.type }}
+  {{- if and (eq .Values.api.service.type "ClusterIP") .Values.api.service.clusterIP }}
+  clusterIP: {{ .Values.api.service.clusterIP }}
+  {{- end }}
   ports:
     - port: 12345
-      targetPort: tcp-port
+      targetPort: api-port
+      {{- if and (eq .Values.api.service.type "NodePort") .Values.api.service.nodePort }}
+      nodePort: {{ .Values.api.service.nodePort }}
+      {{- end }}
       protocol: TCP
-      name: tcp-port
+      name: api-port
+  {{- if .Values.api.service.externalIPs }}
+  externalIPs:
+    {{- toYaml .Values.api.service.externalIPs | nindent 4 }}
+  {{- end }}
+  {{- if and (eq .Values.api.service.type "ExternalName") .Values.api.service.externalName }}
+  externalName: {{ .Values.api.service.externalName }}
+  {{- end }}
+  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.api.service.loadBalancerIP }}
+  {{- end }}
   selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: api
+    {{- include "dolphinscheduler.api.labels" . | nindent 4 }}

@@ -17,46 +17,44 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table>
-        <tr>
-          <th>
-            <span>{{$t('#')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Group')}}</span>
-          </th>
-          <th>
-            <span>IPList</span>
-          </th>
-          <th>
-            <span>{{$t('Create Time')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Update Time')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="$index">
-          <td>
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td>
-            <span>
-              {{item.name}}
-            </span>
-          </td>
-          <td>
-            <span>{{item.ipList.join(',')}}</span>
-          </td>
-          <td>
-            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-        </tr>
-      </table>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="name" :label="$t('Group')"></el-table-column>
+        <el-table-column :label="$t('Addresses')" min-width="300">
+          <template slot-scope="scope">
+            <span style="display: inline-block; margin-right: 10px">{{scope.row.addrList}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Create Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Update Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="100">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Edit')" placement="top" v-if="!scope.row.systemDefault">
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('Delete')" placement="top" v-if="!scope.row.systemDefault">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -77,18 +75,13 @@
     },
     methods: {
       ...mapActions('security', ['deleteWorkerGroups']),
-      _closeDelete (i) {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
-      },
       _delete (item, i) {
         this.deleteWorkerGroups({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
@@ -108,6 +101,6 @@
       this.list = this.workerGroupList
     },
     mounted () {},
-    components: {},
+    components: {}
   }
 </script>

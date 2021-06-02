@@ -1,0 +1,63 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+projectManage:
+  createProjectButton:  创建项目
+  projectName: selenium_project_1
+  description:  test create project description
+  projectTitle:  项目 - DolphinScheduler
+
+workflowDefine:
+  workflowDefine:  工作流定义
+  shellTaskName:  shell_task_selenium_1
+  shellTaskDescription: shell task description test
+  taskTimeout:  '60'
+  shellScript: echo "shell task test"
+  customParameter1:  selenium_parameter
+  customParameterValue1:  selenium_parameter_123
+  customParameter2:  selenium_parameter_delete
+  customParameterValue2:  selenium_parameter_delete_456
+  workflowDefineTitle: 工作流定义 - DolphinScheduler
+  createWorkflowTitle:  创建流程定义 - DolphinScheduler
+  workflowName:  selenium_shell_1
+  workflowDescription:  test selenium_shell_1 description
+  workflowTimeout:  '30'
+  globalParameter1:  selenium_global_parameters_1
+  globalParameterValue1:  selenium_global_parameters_value_1
+  globalParameter2:  selenium_global_parameters_2
+  globalParameterValue2:  selenium_global_parameters_value_2
+  online: 上线
+  offline:  下线
+
+runWorkflow:
+  recipient:  123456789@qq.com
+  Cc: qwe12312sds@qq.com
+  online: 上线
+  offline:  下线
+
+timing:
+  recipient:  test123456@qq.com
+  Cc:  test.123qwe@qq.com
+  editRecipient:  test.edit123456@qq.com
+  editCc:  test.edit123qwe@qq.com
+  timingTitle:  定时任务列表 - DolphinScheduler
+  online: 上线
+  offline:  下线
+
+processInstance:
+  processInstanceTitle: 工作流实例 - DolphinScheduler
+  rerun: 重跑

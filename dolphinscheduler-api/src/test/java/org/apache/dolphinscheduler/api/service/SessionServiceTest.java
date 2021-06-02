@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import java.util.Calendar;
+import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -24,6 +25,12 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,18 +45,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-
+/**
+ * session service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class SessionServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
 
     @InjectMocks
-    private SessionService sessionService;
+    private SessionServiceImpl sessionService;
 
     @Mock
     private SessionMapper sessionMapper;
@@ -59,7 +64,6 @@ public class SessionServiceTest {
     @Before
     public void setUp() {
     }
-
 
     @After
     public void after(){

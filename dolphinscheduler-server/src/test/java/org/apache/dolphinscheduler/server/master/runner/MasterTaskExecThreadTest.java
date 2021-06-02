@@ -18,95 +18,124 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.consumer.TaskPriorityQueueConsumer;
-import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
-import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
-import org.apache.dolphinscheduler.server.registry.DependencyConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
-import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
-        NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.springframework.context.ApplicationContext;
+
+import com.google.common.collect.Sets;
+
+@RunWith(MockitoJUnitRunner.Silent.class)
+@PrepareForTest(MasterTaskExecThread.class)
 public class MasterTaskExecThreadTest {
 
+    private MasterTaskExecThread masterTaskExecThread;
+
+    private SpringApplicationContext springApplicationContext;
+
+    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+
+    @Before
+    public void setUp() {
+        ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
+        this.springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        this.zookeeperRegistryCenter = PowerMockito.mock(ZookeeperRegistryCenter.class);
+        PowerMockito.when(SpringApplicationContext.getBean(ZookeeperRegistryCenter.class))
+                .thenReturn(this.zookeeperRegistryCenter);
+        ProcessService processService = Mockito.mock(ProcessService.class);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
+                .thenReturn(processService);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
+        this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
+    }
 
     @Test
-    public void testExistsValidWorkerGroup1(){
-        ZookeeperRegistryCenter zookeeperRegistryCenter = Mockito.mock(ZookeeperRegistryCenter.class);
-        Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(null);
-        MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(null);
-        masterTaskExecThread.existsValidWorkerGroup("default");
+    public void testExistsValidWorkerGroup1() {
+
+        Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(Sets.newHashSet());
+        boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
+        Assert.assertFalse(b);
     }
+
     @Test
-    public void testExistsValidWorkerGroup2(){
-        ZookeeperRegistryCenter zookeeperRegistryCenter = Mockito.mock(ZookeeperRegistryCenter.class);
+    public void testExistsValidWorkerGroup2() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
         workerGorups.add("test2");
 
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(workerGorups);
-        MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(null);
-        masterTaskExecThread.existsValidWorkerGroup("default");
+        boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
+        Assert.assertFalse(b);
     }
 
     @Test
-    public void testExistsValidWorkerGroup3(){
-        ZookeeperRegistryCenter zookeeperRegistryCenter = Mockito.mock(ZookeeperRegistryCenter.class);
+    public void testExistsValidWorkerGroup3() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
 
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(workerGorups);
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGorups);
-        MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(null);
-        masterTaskExecThread.existsValidWorkerGroup("test1");
+        boolean b = masterTaskExecThread.existsValidWorkerGroup("test1");
+        Assert.assertTrue(b);
     }
 
     @Test
-    public void testPauseTask(){
-
-
+    public void testPauseTask() {
         ProcessService processService = Mockito.mock(ProcessService.class);
-        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
-        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
-        springApplicationContext.setApplicationContext(applicationContext);
-        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        Mockito.when(SpringApplicationContext.getBean(ProcessService.class))
+                .thenReturn(processService);
 
         TaskInstance taskInstance = getTaskInstance();
         Mockito.when(processService.findTaskInstanceById(252612))
                 .thenReturn(taskInstance);
 
         Mockito.when(processService.updateTaskInstance(taskInstance))
-        .thenReturn(true);
+                .thenReturn(true);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTimeoutFlag(TimeoutFlag.OPEN);
+        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
+        taskDefinition.setTimeout(0);
+        Mockito.when(processService.findTaskDefinition(1L, 1))
+                .thenReturn(taskDefinition);
 
         MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
         masterTaskExecThread.pauseTask();
         org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
     }
 
-    private TaskInstance getTaskInstance(){
+    private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskInstance.setTaskCode(1L);
+        taskInstance.setTaskDefinitionVersion(1);
         return taskInstance;
     }
 

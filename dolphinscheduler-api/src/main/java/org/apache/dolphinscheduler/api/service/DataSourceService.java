@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
+<<<<<<< HEAD
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,186 +26,47 @@ import com.jcraft.jsch.Session;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+=======
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
+import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.datasource.*;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
+import java.util.Map;
 
 /**
- * datasource service
+ * data source service
  */
-@Service
-public class DataSourceService extends BaseService{
-
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceService.class);
-
-    public static final String NAME = "name";
-    public static final String NOTE = "note";
-    public static final String TYPE = "type";
-    public static final String HOST = "host";
-    public static final String PORT = "port";
-    public static final String PRINCIPAL = "principal";
-    public static final String DATABASE = "database";
-    public static final String USER_NAME = "userName";
-    public static final String PASSWORD = Constants.PASSWORD;
-    public static final String OTHER = "other";
-
-
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
-
-
-    @Autowired
-    private DataSourceUserMapper datasourceUserMapper;
+public interface DataSourceService {
 
     /**
      * create data source
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param desc data source description
-     * @param type data source type
-     * @param parameter datasource parameters
+     * @param datasourceParam datasource parameter
      * @return create result code
      */
-    public Map<String, Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
-
-        Map<String, Object> result = new HashMap<>(5);
-        // check name can use or not
-        if (checkName(name)) {
-            putMsg(result, Status.DATASOURCE_EXIST);
-            return result;
-        }
-        Boolean isConnection = checkConnection(type, parameter);
-        if (!isConnection) {
-            logger.info("connect failed, type:{}, parameter:{}", type, parameter);
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
-        }
-
-        BaseDataSource datasource = DataSourceFactory.getDatasource(type, parameter);
-        if (datasource == null) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, parameter);
-            return result;
-        }
-
-        // build datasource
-        DataSource dataSource = new DataSource();
-        Date now = new Date();
-
-        dataSource.setName(name.trim());
-        dataSource.setNote(desc);
-        dataSource.setUserId(loginUser.getId());
-        dataSource.setUserName(loginUser.getUserName());
-        dataSource.setType(type);
-        dataSource.setConnectionParams(parameter);
-        dataSource.setCreateTime(now);
-        dataSource.setUpdateTime(now);
-        dataSourceMapper.insert(dataSource);
-
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
+    Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
     /**
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param desc data source description
-     * @param type data source type
-     * @param parameter datasource parameters
      * @param id data source id
+     * @param dataSourceParam data source params
      * @return update result code
      */
-    public Map<String, Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
-
-        Map<String, Object> result = new HashMap<>();
-        // determine whether the data source exists
-        DataSource dataSource = dataSourceMapper.selectById(id);
-        if (dataSource == null) {
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-            return result;
-        }
-
-        if(!hasPerm(loginUser, dataSource.getUserId())){
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
-        //check name can use or not
-        if(!name.trim().equals(dataSource.getName()) && checkName(name)){
-            putMsg(result, Status.DATASOURCE_EXIST);
-            return result;
-        }
-        //check password，if the password is not updated, set to the old password.
-        ObjectNode paramObject = JSONUtils.parseObject(parameter);
-        String password = paramObject.path(Constants.PASSWORD).asText();
-        if (StringUtils.isBlank(password)) {
-            String oldConnectionParams = dataSource.getConnectionParams();
-            ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
-            paramObject.put(Constants.PASSWORD, oldParams.path(Constants.PASSWORD).asText());
-        }
-        // connectionParams json
-        String connectionParams = paramObject.toString();
-
-        Boolean isConnection = checkConnection(type, connectionParams);
-        if (!isConnection) {
-            logger.info("connect failed, type:{}, parameter:{}", type, parameter);
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
-        }
-        Date now = new Date();
-
-        dataSource.setName(name.trim());
-        dataSource.setNote(desc);
-        dataSource.setUserName(loginUser.getUserName());
-        dataSource.setType(type);
-        dataSource.setConnectionParams(connectionParams);
-        dataSource.setUpdateTime(now);
-        dataSourceMapper.updateById(dataSource);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    private boolean checkName(String name) {
-        List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
-        if (queryDataSource != null && queryDataSource.size() > 0) {
-            return true;
-        }
-        return false;
-    }
-
+    Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
      * updateProcessInstance datasource
+     *
      * @param id datasource id
      * @return data source detail
      */
+<<<<<<< HEAD
     public Map<String, Object> queryDataSource(int id) {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
@@ -292,85 +155,37 @@ public class DataSourceService extends BaseService{
         return result;
     }
 
+=======
+    Map<String, Object> queryDataSource(int id);
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 
     /**
      * query datasource list by keyword
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
-    public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-        IPage<DataSource> dataSourceList = null;
-        Page<DataSource> dataSourcePage = new Page(pageNo, pageSize);
-
-        if (isAdmin(loginUser)) {
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
-        }else{
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, loginUser.getId(), searchVal);
-        }
-
-        List<DataSource> dataSources = dataSourceList.getRecords();
-        handlePasswd(dataSources);
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
-        pageInfo.setTotalCount((int)(dataSourceList.getTotal()));
-        pageInfo.setLists(dataSources);
-        result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * handle datasource connection password for safety
-     * @param dataSourceList
-     */
-    private void handlePasswd(List<DataSource> dataSourceList) {
-
-        for (DataSource dataSource : dataSourceList) {
-
-            String connectionParams  = dataSource.getConnectionParams();
-            ObjectNode  object = JSONUtils.parseObject(connectionParams);
-            object.put(Constants.PASSWORD, Constants.XXXXXX);
-            dataSource.setConnectionParams(object.toString());
-
-        }
-    }
+    Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query data resource list
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
-    public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>(5);
-
-        List<DataSource> datasourceList;
-
-        if (isAdmin(loginUser)) {
-            datasourceList = dataSourceMapper.listAllDataSourceByType(type);
-        }else{
-            datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
-        }
-
-        result.put(Constants.DATA_LIST, datasourceList);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
+    Map<String, Object> queryDataSourceList(User loginUser, Integer type);
 
     /**
      * verify datasource exists
      *
-     * @param loginUser login user
-     * @param name datasource name
+     * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
+<<<<<<< HEAD
     public Result verifyDataSourceName(User loginUser, String name) {
         Result result = new Result();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
@@ -473,14 +288,18 @@ public class DataSourceService extends BaseService{
         }
         return session;
     }
+=======
+    Result<Object> verifyDataSourceName(String name);
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type      data source type
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
+<<<<<<< HEAD
     public boolean checkConnection(DbType type, String parameter) {
         Boolean isConnection = false;
 
@@ -508,14 +327,17 @@ public class DataSourceService extends BaseService{
         return isConnection;
     }
 
+=======
+    Result<Object> checkConnection(DbType type, ConnectionParam parameter);
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 
     /**
      * test connection
      *
-     * @param loginUser login user
      * @param id datasource id
      * @return connect result code
      */
+<<<<<<< HEAD
     public boolean connectionTest(User loginUser, int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
         return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
@@ -639,132 +461,34 @@ public class DataSourceService extends BaseService{
 
         return sb.toString();
     }
+=======
+    Result<Object> connectionTest(int id);
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 
     /**
      * delete datasource
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param datasourceId data source id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
-    public Result delete(User loginUser, int datasourceId) {
-        Result result = new Result();
-        try {
-            //query datasource by id
-            DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-            if(dataSource == null){
-                logger.error("resource id {} not exist", datasourceId);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-            if(!hasPerm(loginUser, dataSource.getUserId())){
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
-            dataSourceMapper.deleteById(datasourceId);
-            datasourceUserMapper.deleteByDatasourceId(datasourceId);
-            putMsg(result, Status.SUCCESS);
-        } catch (Exception e) {
-            logger.error("delete datasource error",e);
-            throw new RuntimeException("delete datasource error");
-        }
-        return result;
-    }
+    Result<Object> delete(User loginUser, int datasourceId);
 
     /**
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
-    public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
-
-        Map<String, Object> result = new HashMap<>();
-        //only admin operate
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
-        /**
-         * query all data sources except userId
-         */
-        List<DataSource> resultList = new ArrayList<>();
-        List<DataSource> datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
-        Set<DataSource> datasourceSet = null;
-        if (datasourceList != null && datasourceList.size() > 0) {
-            datasourceSet = new HashSet<>(datasourceList);
-
-            List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
-
-            Set<DataSource> authedDataSourceSet = null;
-            if (authedDataSourceList != null && authedDataSourceList.size() > 0) {
-                authedDataSourceSet = new HashSet<>(authedDataSourceList);
-                datasourceSet.removeAll(authedDataSourceSet);
-
-            }
-            resultList = new ArrayList<>(datasourceSet);
-        }
-        result.put(Constants.DATA_LIST, resultList);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
+    Map<String, Object> unauthDatasource(User loginUser, Integer userId);
 
     /**
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
-    public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
-
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
-        List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
-        result.put(Constants.DATA_LIST, authedDatasourceList);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-
-    /**
-     * get host and port by address
-     *
-     * @param address   address
-     * @return sting array: [host,port]
-     */
-    private String[] getHostsAndPort(String address) {
-        return getHostsAndPort(address,Constants.DOUBLE_SLASH);
-    }
-
-    /**
-     * get host and port by address
-     *
-     * @param address   address
-     * @param separator separator
-     * @return sting array: [host,port]
-     */
-    private String[] getHostsAndPort(String address,String separator) {
-        String[] result = new String[2];
-        String[] tmpArray = address.split(separator);
-        String hostsAndPorts = tmpArray[tmpArray.length - 1];
-        StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = hostsAndPorts.split(Constants.COMMA);
-        String port = hostPortArray[0].split(Constants.COLON)[1];
-        for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
-        }
-        hosts.deleteCharAt(hosts.length() - 1);
-        result[0] = hosts.toString();
-        result[1] = port;
-        return result;
-    }
+    Map<String, Object> authedDatasource(User loginUser, Integer userId);
 }

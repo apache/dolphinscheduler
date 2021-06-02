@@ -16,26 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
+import org.apache.dolphinscheduler.util.YmlReader;
 
 public class UserManageData  {
-    /**
-     * create user
-     */
-    public static final String USERNAME = "selenium_user_1";
-
-    public static final String PASSWORD = "123456qwe";
-
-    public static final String EMAIL = "123456789@qq.com";
-
-    public static final String PHONE = "15811112222";
-
-    public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
-
-    /**
-     * edit user
-     */
-    public static final String EDIT_USERNAME = "selenium_user_edit";
-    public static final String EDIT_PASSWORD = "123456qwe";
-    public static final String EDIT_EMAIL = "123456_edit@qq.com";
-    public static final String EDIT_PHONE = "15800001111";
+    public String getUserData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String userData = ymlReader.getDataYml("testData/security_zh_cn", "userManage", param);
+        return  userData;
+    }
 }

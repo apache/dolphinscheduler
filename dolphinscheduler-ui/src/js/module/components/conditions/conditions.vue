@@ -20,20 +20,20 @@
       <slot name="button-group"></slot>
     </div>
     <div class="right">
-      <div class="from-box">
+      <div class="form-box">
         <slot name="search-group" v-if="isShow"></slot>
         <template v-if="!isShow">
           <div class="list">
-            <x-button type="ghost" size="small" @click="_ckQuery" icon="ans-icon-search"></x-button>
+            <el-button size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
           </div>
           <div class="list">
-            <x-input v-model="searchVal"
-                     @on-enterkey="_ckQuery"
-                     size="small"
+            <el-input v-model="searchVal"
+                     @keyup.enter="_ckQuery"
+                     size="mini"
                      :placeholder="$t('Please enter keyword')"
                      type="text"
                      style="width:180px;">
-            </x-input>
+            </el-input>
           </div>
         </template>
       </div>

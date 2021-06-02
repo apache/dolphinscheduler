@@ -22,21 +22,24 @@
         <m-datasource
                 ref="refDs"
                 @on-dsData="_onDsData"
-                :supportType="['MYSQL','POSTGRESQL','CLICKHOUSE', 'ORACLE', 'SQLSERVER']"
                 :data="{ type:type,datasource:datasource }">
         </m-datasource>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('methods')}}</div>
+      <div slot="text">
+        <el-tooltip :content="$t('The procedure method script example')" placement="top">
+          <span>{{$t('SQL Statement')}}<em class="el-icon-question" /></span>
+        </el-tooltip>
+      </div>
       <div slot="content">
-        <x-input
-                type="input"
-                :disabled="isDetails"
-                v-model="method"
-                :placeholder="$t('Please enter method(optional)')"
-                autocomplete="off">
-        </x-input>
+        <el-input
+          :autosize="{minRows:5}"
+          type="textarea"
+          :disabled="isDetails"
+          v-model="method"
+          :placeholder="$t('Please enter the procedure method')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -103,7 +106,7 @@
 
         // Verification function
         if (!this.method) {
-          this.$message.warning(`${i18n.$t('Please enter method')}`)
+          this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
           return false
         }
 
@@ -111,6 +114,7 @@
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
+
         // storage
         this.$emit('on-params', {
           type: this.type,
@@ -122,9 +126,9 @@
       }
     },
     watch: {
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this.$emit('on-cache-params', val)
       }
     },
     computed: {
@@ -162,6 +166,3 @@
     components: { mListBox, mDatasource, mLocalParams }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-</style>

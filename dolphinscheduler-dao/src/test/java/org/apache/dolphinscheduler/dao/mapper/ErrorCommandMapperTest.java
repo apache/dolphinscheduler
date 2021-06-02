@@ -73,8 +73,9 @@ public class ErrorCommandMapperTest {
         ErrorCommand errorCommand = insertOne();
 
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
         processDefinition.setName("def 1");
-        processDefinition.setProjectId(1010);
+        processDefinition.setProjectCode(1010L);
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
@@ -87,16 +88,16 @@ public class ErrorCommandMapperTest {
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
                 null,
                 null,
-                new Integer[0]
+                new Long[0]
         );
 
-        Integer[] projectIdArray = new Integer[2];
-        projectIdArray[0] = processDefinition.getProjectId();
-        projectIdArray[1] = 200;
+        Long[] projectCodeArray = new Long[2];
+        projectCodeArray[0] = processDefinition.getProjectCode();
+        projectCodeArray[1] = 200L;
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
                 null,
                 null,
-                projectIdArray
+                projectCodeArray
         );
 
         Assert.assertNotEquals(commandCounts.size(), 0);

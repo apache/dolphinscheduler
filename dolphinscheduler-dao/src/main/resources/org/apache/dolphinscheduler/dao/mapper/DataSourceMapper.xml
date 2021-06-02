@@ -18,30 +18,37 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.DataSourceMapper">
+    <sql id="baseSql">
+        id, name, note, type, user_id, connection_params, create_time, update_time
+    </sql>
     <select id="queryDataSourceByType" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where type=#{type}
         <if test="userId != 0">
-        and id in
-          (select datasource_id
-          from t_ds_relation_datasource_user
-          where user_id=#{userId}
-          union select id as datasource_id
-                from t_ds_datasource
-                where user_id=#{userId}
-         )
+            and id in
+            (select datasource_id
+            from t_ds_relation_datasource_user
+            where user_id=#{userId}
+            union select id as datasource_id
+            from t_ds_datasource
+            where user_id=#{userId}
+            )
         </if>
-
     </select>
 
     <select id="selectPaging" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select *
-        from t_ds_datasource
+        select
+        d.id, d.name, d.note, d.type, d.user_id, connection_params, d.create_time, d.update_time
+        ,
+        u.user_name as user_name
+        from t_ds_datasource d
+        join t_ds_user u on d.user_id = u.id
         where 1 =1
         <if test="userId != 0">
-         and id in
-          (select datasource_id
+            and d.id in
+            (select datasource_id
             from t_ds_relation_datasource_user
             where user_id=#{userId}
             union select id as datasource_id
@@ -50,43 +57,45 @@
             )
         </if>
         <if test="name != null and name != ''">
-             and name like concat ('%', #{name}, '%')
-         </if>
-         order by update_time desc
+            and name like concat ('%', #{name}, '%')
+        </if>
+        order by update_time desc
     </select>
     <select id="queryDataSourceByName" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where name=#{name}
     </select>
     <select id="queryAuthedDatasource" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select datasource.*
-        from t_ds_datasource datasource, t_ds_relation_datasource_user rel
-        where datasource.id = rel.datasource_id AND rel.user_id = #{userId}
+        select ds.id, ds.name, ds.note, ds.type, ds.user_id, ds.connection_params, ds.create_time, ds.update_time
+        from t_ds_datasource ds, t_ds_relation_datasource_user rel
+        where ds.id = rel.datasource_id AND rel.user_id = #{userId}
     </select>
     <select id="queryDatasourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where user_id <![CDATA[ <> ]]> #{userId}
     </select>
     <select id="listAllDataSourceByType" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where type = #{type}
     </select>
     <select id="listAuthorizedDataSource" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where
         id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId}
-        union select id as datasource_id  from t_ds_datasource where user_id=#{userId})
-        <if test="dataSourceIds != null and dataSourceIds != ''">
+        union select id as datasource_id from t_ds_datasource where user_id=#{userId})
+        <if test="dataSourceIds != null and dataSourceIds.length > 0">
             and id in
             <foreach collection="dataSourceIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
     </select>
-
-
 </mapper>

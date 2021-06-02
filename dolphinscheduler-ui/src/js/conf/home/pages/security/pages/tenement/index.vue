@@ -19,7 +19,14 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create Tenant')}}</x-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
+          <el-dialog
+            :title="item ? $t('Edit Tenant') : $t('Create Tenant')"
+            v-if="createTenementDialog"
+            :visible.sync="createTenementDialog"
+            width="auto">
+            <m-create-tenement :item="item" @onUpdate="onUpdate" @close="close"></m-create-tenement>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -30,10 +37,18 @@
                 :tenement-list="tenementList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
-
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!tenementList.length && total<=0">
@@ -68,7 +83,9 @@
           searchVal: ''
         },
         isLeft: true,
-        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
+        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
+        createTenementDialog: false,
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
@@ -95,41 +112,26 @@
         this._create(item)
       },
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateTenement, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.createTenementDialog = true
+        this.item = item
+      },
+      onUpdate () {
+        this._debounceGET('false')
+        this.createTenementDialog = false
+      },
+      close () {
+        this.createTenementDialog = false
       },
       _getList (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this.isLoading = !flag
         this.getTenantListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.tenementList = []
             this.tenementList = res.totalList
@@ -151,11 +153,10 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
     },
     beforeDestroy () {
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateTenement }
   }
 </script>

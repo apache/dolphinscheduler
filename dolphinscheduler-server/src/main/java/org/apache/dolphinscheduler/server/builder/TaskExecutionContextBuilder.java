@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.server.builder;
 
+import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.entity.*;
 
@@ -40,14 +44,27 @@ public class TaskExecutionContextBuilder {
     public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance){
         taskExecutionContext.setTaskInstanceId(taskInstance.getId());
         taskExecutionContext.setTaskName(taskInstance.getName());
+        taskExecutionContext.setFirstSubmitTime(taskInstance.getFirstSubmitTime());
         taskExecutionContext.setStartTime(taskInstance.getStartTime());
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
-        taskExecutionContext.setExecutePath(taskInstance.getExecutePath());
-        taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setResources(taskInstance.getResources());
+        taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
+        return this;
+    }
+
+    public TaskExecutionContextBuilder buildTaskDefinitionRelatedInfo(TaskDefinition taskDefinition) {
+        taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
+        if (taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN) {
+            taskExecutionContext.setTaskTimeoutStrategy(taskDefinition.getTimeoutNotifyStrategy());
+            if (taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.FAILED
+                    || taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.WARNFAILED) {
+                taskExecutionContext.setTaskTimeout(Math.min(taskDefinition.getTimeout() * SEC_2_MINUTES_TIME_UNIT, Integer.MAX_VALUE));
+            }
+        }
+        taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
         return this;
     }
 
@@ -76,8 +93,9 @@ public class TaskExecutionContextBuilder {
      * @return TaskExecutionContextBuilder
      */
     public TaskExecutionContextBuilder buildProcessDefinitionRelatedInfo(ProcessDefinition processDefinition){
-        taskExecutionContext.setProcessDefineId(processDefinition.getId());
-        taskExecutionContext.setProjectId(processDefinition.getProjectId());
+        taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
+        taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
+        taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
         return this;
     }
 

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api;
 
 import org.springframework.boot.SpringApplication;
@@ -22,19 +23,15 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ServletComponentScan
-@ComponentScan(basePackages = {"org.apache.dolphinscheduler"},
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-                pattern = "org.apache.dolphinscheduler.server.*"))
-
+@ComponentScan(value = "org.apache.dolphinscheduler",
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.apache.dolphinscheduler.server.*"))
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
-  public static void main(String[] args) {
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
-
+    public static void main(String[] args) {
+        SpringApplication.run(ApiApplicationServer.class, args);
+    }
 
 }

@@ -19,41 +19,39 @@
     <div class="text-1">
       <a href="javascript:"></a>
     </div>
-    <div class="from-model">
+    <div class="form-model">
       <div class="list">
         <label>{{$t('User Name')}}</label>
         <div>
-          <x-input
-                  size="large"
+          <el-input
                   type="text"
                   v-model.trim="userName"
                   :placeholder="$t('Please enter user name')"
                   maxlength="60"
-                  @on-enterkey="_ok">
-          </x-input>
+                  @keyup.enter.native="_ok">
+          </el-input>
         </div>
-        <p class="error" v-if="isUserPassword">
+        <p class="error" v-if="isUserName">
           {{userNameText}}
         </p>
       </div>
       <div class="list">
         <label>{{$t('Password')}}</label>
         <div>
-          <x-input
+          <el-input
                   type="password"
-                  size="large"
                   v-model="userPassword"
                   :placeholder="$t('Please enter your password')"
                   maxlength="20"
-                  @on-enterkey="_ok">
-          </x-input>
+                  @keyup.enter.native="_ok">
+          </el-input>
         </div>
         <p class="error" v-if="isUserPassword">
           {{userPasswordText}}
         </p>
       </div>
       <div class="list" style="margin-top: 10px;">
-        <x-button type="primary" shape="circle" size="large" :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('Login')} `}} </x-button>
+        <el-button style="width: 365px" type="primary" round :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('Login')} `}} </el-button>
       </div>
     </div>
   </div>
@@ -84,13 +82,13 @@
           this._gLogin().then(res => {
             setTimeout(() => {
               this.spinnerLoading = false
-              sessionStorage.setItem('isLeft',1);
-              if (res.data.hasOwnProperty("sessionId")) {
-                let sessionId=res.data.sessionId
-                sessionStorage.setItem("sessionId", sessionId)
-                cookies.set('sessionId', sessionId,{ path: '/' })
+              sessionStorage.setItem('isLeft', 1)
+              if (res.data.hasOwnProperty('sessionId')) {
+                let sessionId = res.data.sessionId
+                sessionStorage.setItem('sessionId', sessionId)
+                cookies.set('sessionId', sessionId, { path: '/' })
               }
-              
+
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {
@@ -120,7 +118,7 @@
       },
       _gLogin () {
         return new Promise((resolve, reject) => {
-          io.post(`login`, {
+          io.post('login', {
             userName: this.userName,
             userPassword: this.userPassword
           }, res => {
@@ -170,7 +168,7 @@
         margin: 0 auto;
       }
     }
-    .from-model {
+    .form-model {
       padding: 30px 20px;
       .list {
         margin-bottom: 24px;

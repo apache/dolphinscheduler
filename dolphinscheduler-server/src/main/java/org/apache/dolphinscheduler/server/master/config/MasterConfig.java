@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.common.Constants;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -25,20 +27,26 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "master.properties")
 public class MasterConfig {
 
+    @Value("${master.listen.port:5678}")
+    private int listenPort;
+
     @Value("${master.exec.threads:100}")
     private int masterExecThreads;
 
     @Value("${master.exec.task.num:20}")
     private int masterExecTaskNum;
 
+    @Value("${master.dispatch.task.num:3}")
+    private int masterDispatchTaskNumber;
+
+    @Value("${master.host.selector:LowerWeight}")
+    private String hostSelector;
+
     @Value("${master.heartbeat.interval:10}")
     private int masterHeartbeatInterval;
 
     @Value("${master.task.commit.retryTimes:5}")
     private int masterTaskCommitRetryTimes;
-
-    @Value("${master.dispatch.task.num :3}")
-    private int masterDispatchTaskNumber;
 
     @Value("${master.task.commit.interval:1000}")
     private int masterTaskCommitInterval;
@@ -48,12 +56,6 @@ public class MasterConfig {
 
     @Value("${master.reserved.memory:0.3}")
     private double masterReservedMemory;
-
-    @Value("${master.host.selector:lowerWeight}")
-    private String hostSelector;
-
-    @Value("${master.listen.port:5678}")
-    private int listenPort;
 
     public int getListenPort() {
         return listenPort;
@@ -112,7 +114,7 @@ public class MasterConfig {
     }
 
     public double getMasterMaxCpuloadAvg() {
-        if (masterMaxCpuloadAvg == -1){
+        if (masterMaxCpuloadAvg == -1) {
             return Constants.DEFAULT_MASTER_CPU_LOAD;
         }
         return masterMaxCpuloadAvg;

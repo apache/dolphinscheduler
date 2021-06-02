@@ -18,30 +18,73 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectMapper">
+    <sql id="baseSql">
+        id, name, code, description, user_id, flag, create_time, update_time
+    </sql>
+    <sql id="baseSqlV2">
+        ${alias}.id, ${alias}.name, ${alias}.code, ${alias}.description, ${alias}.user_id, ${alias}.flag, ${alias}.create_time, ${alias}.update_time
+    </sql>
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSql"/>
+        from t_ds_project
+        where code = #{code}
+    </select>
+
+    <select id="queryDetailByCode" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name
+        from t_ds_project p
+        join t_ds_user u on p.user_id = u.id
+        where p.code = #{projectCode}
+    </select>
+
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select p.*,u.user_name as user_name
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name
         from t_ds_project p
         join t_ds_user u on p.user_id = u.id
         where p.id = #{projectId}
     </select>
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select p.*,u.user_name as user_name
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name
         from t_ds_project p
         join t_ds_user u on p.user_id = u.id
         where p.name = #{projectName}
         limit 1
     </select>
     <select id="queryProjectListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select p.*,u.user_name as user_name,
-        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_id = p.id) AS def_count,
-        (SELECT COUNT(*) FROM t_ds_process_definition def, t_ds_process_instance inst WHERE def.id = inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
+        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
+        AND inst.state=1 ) as inst_running_count
         from t_ds_project p
-        join t_ds_user u on u.id=p.user_id
+        left join t_ds_user u on u.id=p.user_id
         where 1=1
         <if test="userId != 0">
             and p.id in
-            (select project_id from t_ds_relation_project_user  where user_id=#{userId}
-            union select id as project_id  from t_ds_project where user_id=#{userId}
+            (select project_id from t_ds_relation_project_user where user_id=#{userId}
+            union select id as project_id from t_ds_project where user_id=#{userId}
             )
         </if>
         <if test="searchName!=null and searchName != ''">
@@ -50,19 +93,58 @@
         order by p.create_time desc
     </select>
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select p.*
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
         from t_ds_project p,t_ds_relation_project_user rel
         where p.id = rel.project_id and rel.user_id= #{userId}
     </select>
+    <select id="queryRelationProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        from t_ds_project p left join t_ds_relation_project_user rel
+        on p.id = rel.project_id
+        where 1=1
+        <if test="userId != 0 ">
+            and rel.user_id= #{userId}
+        </if>
+    </select>
     <select id="queryProjectExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_project
         where user_id <![CDATA[ <> ]]> #{userId}
     </select>
     <select id="queryProjectCreatedByUser" resultType="org.apache.dolphinscheduler.dao.entity.Project">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_project
         where user_id = #{userId}
     </select>
+    <select id="queryProjectCreatedAndAuthorizedByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSql"/>
+        from t_ds_project where id in
+           (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+             union select id as project_id  from t_ds_project where user_id=#{userId})
+    </select>
 
+    <select id="queryProjectWithUserByProcessInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
+        select
+            dp.id project_id,
+            dp.name project_name,
+            u.user_name user_name
+        from t_ds_process_instance di
+        join t_ds_process_definition dpd on di.process_definition_code = dpd.code
+        join t_ds_project dp on dpd.project_code = dp.code
+        join t_ds_user u on dp.user_id = u.id
+        where di.id = #{processInstanceId};
+    </select>
+
+    <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select * from t_ds_project
+    </select>
 </mapper>

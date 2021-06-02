@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.config;
+
+import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.Set;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -28,14 +29,20 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
+    @Value("${worker.listen.port:1234}")
+    private int listenPort;
+
     @Value("${worker.exec.threads:100}")
     private int workerExecThreads;
 
     @Value("${worker.heartbeat.interval:10}")
     private int workerHeartbeatInterval;
 
-    @Value("${worker.fetch.task.num:3}")
-    private int workerFetchTaskNum;
+    @Value("${worker.host.weight:100}")
+    private int hostWeight;
+
+    @Value("${worker.tenant.auto.create:false}")
+    private boolean workerTenantAutoCreate;
 
     @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
@@ -46,8 +53,8 @@ public class WorkerConfig {
     @Value("#{'${worker.groups:default}'.split(',')}")
     private Set<String> workerGroups;
 
-    @Value("${worker.listen.port: 1234}")
-    private int listenPort;
+    @Value("${alert.listen.host:localhost}")
+    private String alertListenHost;
 
     public int getListenPort() {
         return listenPort;
@@ -81,12 +88,12 @@ public class WorkerConfig {
         this.workerHeartbeatInterval = workerHeartbeatInterval;
     }
 
-    public int getWorkerFetchTaskNum() {
-        return workerFetchTaskNum;
+    public boolean getWorkerTenantAutoCreate() {
+        return workerTenantAutoCreate;
     }
 
-    public void setWorkerFetchTaskNum(int workerFetchTaskNum) {
-        this.workerFetchTaskNum = workerFetchTaskNum;
+    public void setWorkerTenantAutoCreate(boolean workerTenantAutoCreate) {
+        this.workerTenantAutoCreate = workerTenantAutoCreate;
     }
 
     public double getWorkerReservedMemory() {
@@ -98,7 +105,7 @@ public class WorkerConfig {
     }
 
     public int getWorkerMaxCpuloadAvg() {
-        if (workerMaxCpuloadAvg == -1){
+        if (workerMaxCpuloadAvg == -1) {
             return Constants.DEFAULT_WORKER_CPU_LOAD;
         }
         return workerMaxCpuloadAvg;
@@ -106,5 +113,21 @@ public class WorkerConfig {
 
     public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    }
+
+    public int getHostWeight() {
+        return hostWeight;
+    }
+
+    public void setHostWeight(int hostWeight) {
+        this.hostWeight = hostWeight;
+    }
+
+    public String getAlertListenHost() {
+        return alertListenHost;
+    }
+
+    public void setAlertListenHost(String alertListenHost) {
+        this.alertListenHost = alertListenHost;
     }
 }

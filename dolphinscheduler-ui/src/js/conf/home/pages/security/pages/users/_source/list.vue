@@ -17,117 +17,96 @@
 <template>
   <div class="list-model user-list-model">
     <div class="table-box">
-      <table>
-        <tr>
-          <th>
-            <span>{{$t('#')}}</span>
-          </th>
-          <th>
-            <span>{{$t('User Name')}}</span>
-          </th>
-          <th>
-            <span>{{$t('User Type')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Tenant')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Queue')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Email')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Phone')}}</span>
-          </th>
-          <th id="state">
-            <span>{{$t('State')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Create Time')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Update Time')}}</span>
-          </th>
-          <th width="120">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td>
-            <span>
-              {{item.userName || '-'}}
-            </span>
-          </td>
-          <td>
-            <span>{{item.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
-          </td>
-          <td><span>{{item.tenantName || '-'}}</span></td>
-          <td><span>{{item.queue || '-'}}</span></td>
-          <td>
-            <span>{{item.email || '-'}}</span>
-          </td>
-          <td>
-            <span>{{item.phone || '-'}}</span>
-          </td>
-          <td>
-            <span v-if="item.state == 1">{{$t('Enable')}}</span>
-            <span v-else>{{$t('Disable')}}</span>
-          </td>
-          <td>
-            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <x-poptip
-                    :ref="'poptip-auth-' + $index"
-                    popper-class="user-list-poptip"
-                    placement="bottom-end">
-              <div class="auth-select-box">
-                <a href="javascript:" @click="_authProject(item,$index)">{{$t('Project')}}</a>
-                <a href="javascript:" @click="_authFile(item,$index)">{{$t('Resources')}}</a>
-                <a href="javascript:" @click="_authDataSource(item,$index)">{{$t('Datasource')}}</a>
-                <a href="javascript:" @click="_authUdfFunc(item,$index)">{{$t('UDF Function')}}</a>
-              </div>
-              <template slot="reference">
-                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="ans-icon-user-empty" :disabled="item.userType === 'ADMIN_USER'"></x-button>
-              </template>
-            </x-poptip>
-
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-edit" :title="$t('Edit')" @click="_edit(item)">
-            </x-button>
-            <x-poptip
-                    :ref="'poptip-delete-' + $index"
-                    placement="bottom-end"
-                    width="90">
-              <p>{{$t('Delete?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
-              </div>
-              <template slot="reference">
-                <x-button
-                        type="error"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('delete')"
-                        :disabled="item.userType === 'ADMIN_USER'"
-                        icon="ans-icon-trash">
-                </x-button>
-              </template>
-            </x-poptip>
-          </td>
-        </tr>
-      </table>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
+        <el-table-column :label="$t('User Type')" width="80">
+          <template slot-scope="scope">
+            {{scope.row.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="tenantCode" :label="$t('Tenant')" min-width="120"></el-table-column>
+        <el-table-column prop="queue" :label="$t('Queue')" width="90"></el-table-column>
+        <el-table-column prop="email" :label="$t('Email')" min-width="200"></el-table-column>
+        <el-table-column prop="phone" :label="$t('Phone')" width="100">
+          <template slot-scope="scope">
+            <span>{{scope.row.phone | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('State')" width="60">
+          <template slot-scope="scope">
+            {{scope.row.state === 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Create Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Update Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="100" fixed="right">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Authorize')" placement="top">
+              <el-dropdown trigger="click">
+                <el-button type="warning" size="mini" icon="el-icon-user" circle></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="_authProject(scope.row,scope.$index)">{{$t('Project')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authFile(scope.row,scope.$index)">{{$t('Resources')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authDataSource(scope.row,scope.$index)">{{$t('Datasource')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.$index)">{{$t('UDF Function')}}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-tooltip>
+            <el-tooltip :content="$t('Edit')" placement="top">
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('Delete')" placement="top">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
+    <el-dialog
+      v-if="authProjectDialog"
+      :visible.sync="authProjectDialog"
+      width="auto">
+      <m-transfer :transferData="transferData" @onUpdateAuthProject="onUpdateAuthProject" @closeAuthProject="closeAuthProject"></m-transfer>
+    </el-dialog>
+
+    <el-dialog
+      v-if="authDataSourceDialog"
+      :visible.sync="authDataSourceDialog"
+      width="auto">
+      <m-transfer :transferData="transferData" @onUpdateAuthDataSource="onUpdateAuthDataSource" @closeAuthDataSource="closeAuthDataSource"></m-transfer>
+    </el-dialog>
+
+    <el-dialog
+      v-if="authUdfFuncDialog"
+      :visible.sync="authUdfFuncDialog"
+      width="auto">
+      <m-transfer :transferData="transferData" @onUpdateAuthUdfFunc="onUpdateAuthUdfFunc" @closeAuthUdfFunc="closeAuthUdfFunc"></m-transfer>
+    </el-dialog>
+
+    <el-dialog
+      v-if="resourceDialog"
+      :visible.sync="resourceDialog"
+      width="auto">
+      <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -141,7 +120,28 @@
     name: 'user-list',
     data () {
       return {
-        list: []
+        list: [],
+        authProjectDialog: false,
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: ''
+          }
+        },
+        item: {},
+        authDataSourceDialog: false,
+        authUdfFuncDialog: false,
+        resourceData: {
+          fileSourceList: [],
+          udfSourceList: [],
+          fileTargetList: [],
+          udfTargetList: [],
+          type: {
+            name: ''
+          }
+        },
+        resourceDialog: false
       }
     },
     props: {
@@ -150,19 +150,14 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization','getResourceList']),
-      _closeDelete (i) {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
-      },
+      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization', 'getResourceList']),
       _delete (item, i) {
         this.deleteUser({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
@@ -170,7 +165,6 @@
         this.$emit('on-edit', item)
       },
       _authProject (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getAuthList({
           id: item.id,
           type: 'project',
@@ -188,47 +182,35 @@
               name: v.name
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (projectIds) {
-                    self._grantAuthorization('users/grant-project', {
-                      userId: item.id,
-                      projectIds: projectIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: `${i18n.$t('Project')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = `${i18n.$t('Project')}`
+          this.authProjectDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
+      onUpdateAuthProject (projectIds) {
+        this._grantAuthorization('users/grant-project', {
+          userId: this.item.id,
+          projectIds: projectIds
+        })
+        this.authProjectDialog = false
+      },
+
+      closeAuthProject () {
+        this.authProjectDialog = false
+      },
+
       /*
         getAllLeaf
        */
       getAllLeaf (data) {
         let result = []
-        let getLeaf = (data)=> {
+        let getLeaf = (data) => {
           data.forEach(item => {
-            if (item.children.length==0) {
+            if (item.children.length === 0) {
               result.push(item)
             } else {
               getLeaf(item.children)
@@ -239,25 +221,17 @@
         return result
       },
       _authFile (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getResourceList({
           id: item.id,
           type: 'file',
           category: 'resources'
         }).then(data => {
-          // let sourceListPrs = _.map(data[0], v => {
-          //   return {
-          //     id: v.id,
-          //     name: v.alias,
-          //     type: v.type
-          //   }
-          // })
           let fileSourceList = []
           let udfSourceList = []
-          data[0].forEach((value,index,array)=>{
-            if(value.type =='FILE'){
+          data[0].forEach((value, index, array) => {
+            if (value.type === 'FILE') {
               fileSourceList.push(value)
-            } else{
+            } else {
               udfSourceList.push(value)
             }
           })
@@ -265,17 +239,17 @@
           let udfTargetList = []
 
           let pathId = []
-          data[1].forEach(v=>{
+          data[1].forEach(v => {
             let arr = []
             arr[0] = v
-            if(this.getAllLeaf(arr).length>0) {
+            if (this.getAllLeaf(arr).length > 0) {
               pathId.push(this.getAllLeaf(arr)[0])
             }
           })
-          data[1].forEach((value,index,array)=>{
-            if(value.type =='FILE'){
+          data[1].forEach((value, index, array) => {
+            if (value.type === 'FILE') {
               fileTargetList.push(value)
-            } else{
+            } else {
               udfTargetList.push(value)
             }
           })
@@ -285,45 +259,31 @@
           udfTargetList = _.map(udfTargetList, v => {
             return v.id
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mResource, {
-                on: {
-                  onUpdate (resourceIds) {
-                    self._grantAuthorization('users/grant-file', {
-                      userId: item.id,
-                      resourceIds: resourceIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  // sourceListPrs: sourceListPrs,
-                  // targetListPrs: targetListPrs,
-                  fileSourceList: fileSourceList,
-                  udfSourceList: udfSourceList,
-                  fileTargetList: fileTargetList,
-                  udfTargetList: udfTargetList,
-                  type: {
-                    name: `${i18n.$t('Resources')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.resourceData.fileSourceList = fileSourceList
+          this.resourceData.udfSourceList = udfSourceList
+          this.resourceData.fileTargetList = fileTargetList
+          this.resourceData.udfTargetList = udfTargetList
+          this.resourceData.type.name = `${i18n.$t('Resources')}`
+          this.resourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
+
+      onUpdateAuthResource (resourceIds) {
+        this._grantAuthorization('users/grant-file', {
+          userId: this.item.id,
+          resourceIds: resourceIds
+        })
+        this.resourceDialog = false
+      },
+
+      closeAuthResource () {
+        this.resourceDialog = false
+      },
+
       _authDataSource (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getAuthList({
           id: item.id,
           type: 'datasource',
@@ -341,41 +301,27 @@
               name: v.name
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (datasourceIds) {
-                    self._grantAuthorization('users/grant-datasource', {
-                      userId: item.id,
-                      datasourceIds: datasourceIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: `${i18n.$t('Datasource')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = `${i18n.$t('Datasource')}`
+          this.authDataSourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
+      onUpdateAuthDataSource (datasourceIds) {
+        this._grantAuthorization('users/grant-datasource', {
+          userId: this.item.id,
+          datasourceIds: datasourceIds
+        })
+        this.authDataSourceDialog = false
+      },
+      closeAuthDataSource () {
+        this.authDataSourceDialog = false
+      },
+
       _authUdfFunc (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getAuthList({
           id: item.id,
           type: 'udf-func',
@@ -393,39 +339,27 @@
               name: v.funcName
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (udfIds) {
-                    self._grantAuthorization('users/grant-udf-func', {
-                      userId: item.id,
-                      udfIds: udfIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: 'UDF Function'
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = `${i18n.$t('UDF Function')}`
+          this.authUdfFuncDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
+      onUpdateAuthUdfFunc (udfIds) {
+        this._grantAuthorization('users/grant-udf-func', {
+          userId: this.item.id,
+          udfIds: udfIds
+        })
+        this.authUdfFuncDialog = false
+      },
+
+      closeAuthUdfFunc () {
+        this.authUdfFuncDialog = false
+      },
+
       _grantAuthorization (api, param) {
         this.grantAuthorization({
           api: api,
@@ -450,7 +384,7 @@
     },
     mounted () {
     },
-    components: { }
+    components: { mTransfer, mResource }
   }
 </script>
 

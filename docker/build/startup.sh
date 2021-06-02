@@ -18,15 +18,18 @@
 
 set -e
 
-DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
-DOLPHINSCHEDULER_SCRIPT=${DOLPHINSCHEDULER_HOME}/script
-DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
+export DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
+export MASTER_START_ENABLED=false
+export WORKER_START_ENABLED=false
+export API_START_ENABLED=false
+export ALERT_START_ENABLED=false
+export LOGGER_START_ENABLED=false
 
-# start database
-initDatabase() {
-    echo "test ${DATABASE_TYPE} service"
+# wait database
+waitDatabase() {
+    echo "try to connect ${DATABASE_TYPE} ..."
     while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
-        counter=$((counter+1))
+        local counter=$((counter+1))
         if [ $counter == 30 ]; then
             echo "Error: Couldn't connect to ${DATABASE_TYPE}."
             exit 1
@@ -34,32 +37,21 @@ initDatabase() {
         echo "Trying to connect to ${DATABASE_TYPE} at ${DATABASE_HOST}:${DATABASE_PORT}. Attempt $counter."
         sleep 5
     done
-
-    echo "connect ${DATABASE_TYPE} service"
-    if [ ${DATABASE_TYPE} = "mysql" ]; then
-        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "select 1" 2>&1)
-        if [ "$(echo '${v}' | grep 'ERROR' | wc -l)" -eq 1 ]; then
-            echo "Error: Can't connect to database...${v}"
-            exit 1
-        fi
-    else
-        v=$(sudo -u postgres PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
-        if [ "$(echo '${v}' | grep 'FATAL' | wc -l)" -eq 1 ]; then
-            echo "Error: Can't connect to database...${v}"
-            exit 1
-        fi
-    fi
-
-    echo "import sql data"
-    ${DOLPHINSCHEDULER_SCRIPT}/create-dolphinscheduler.sh
+    echo "${DATABASE_TYPE} connection is ok"
 }
 
-# start zk
-initZK() {
-    echo "connect remote zookeeper"
+# init database
+initDatabase() {
+    echo "import sql data"
+    ${DOLPHINSCHEDULER_HOME}/script/create-dolphinscheduler.sh
+}
+
+# wait zk
+waitZK() {
+    echo "try to connect zookeeper ..."
     echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
         while ! nc -z ${line%:*} ${line#*:}; do
-            counter=$((counter+1))
+            local counter=$((counter+1))
             if [ $counter == 30 ]; then
                 echo "Error: Couldn't connect to zookeeper."
                 exit 1
@@ -68,105 +60,55 @@ initZK() {
             sleep 5
         done
     done
-}
-
-# start nginx
-initNginx() {
-    echo "start nginx"
-    nginx &
-}
-
-# start master-server
-initMasterServer() {
-    echo "start master-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop master-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start master-server
-}
-
-# start worker-server
-initWorkerServer() {
-    echo "start worker-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop worker-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start worker-server
-}
-
-# start api-server
-initApiServer() {
-    echo "start api-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop api-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start api-server
-}
-
-# start logger-server
-initLoggerServer() {
-    echo "start logger-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop logger-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start logger-server
-}
-
-# start alert-server
-initAlertServer() {
-    echo "start alert-server"
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh stop alert-server
-    ${DOLPHINSCHEDULER_BIN}/dolphinscheduler-daemon.sh start alert-server
+    echo "zookeeper connection is ok"
 }
 
 # print usage
 printUsage() {
     echo -e "Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system,"
     echo -e "dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.\n"
-    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server | frontend ]\n"
-    printf "%-13s:  %s\n" "all"           "Run master-server, worker-server, api-server, alert-server and frontend."
+    echo -e "Usage: [ all | master-server | worker-server | api-server | alert-server ]\n"
+    printf "%-13s:  %s\n" "all"           "Run master-server, worker-server, api-server and alert-server"
     printf "%-13s:  %s\n" "master-server" "MasterServer is mainly responsible for DAG task split, task submission monitoring."
-    printf "%-13s:  %s\n" "worker-server" "WorkerServer is mainly responsible for task execution and providing log services.."
-    printf "%-13s:  %s\n" "api-server"    "ApiServer is mainly responsible for processing requests from the front-end UI layer."
+    printf "%-13s:  %s\n" "worker-server" "WorkerServer is mainly responsible for task execution and providing log services."
+    printf "%-13s:  %s\n" "api-server"    "ApiServer is mainly responsible for processing requests and providing the front-end UI layer."
     printf "%-13s:  %s\n" "alert-server"  "AlertServer mainly include Alarms."
-    printf "%-13s:  %s\n" "frontend"      "Frontend mainly provides various visual operation interfaces of the system."
 }
 
 # init config file
 source /root/startup-init-conf.sh
 
-LOGFILE=/var/log/nginx/access.log
 case "$1" in
     (all)
-        initZK
+        waitZK
+        waitDatabase
         initDatabase
-        initMasterServer
-        initWorkerServer
-        initApiServer
-        initAlertServer
-        initLoggerServer
-        initNginx
-        LOGFILE=/var/log/nginx/access.log
+        export MASTER_START_ENABLED=true
+        export WORKER_START_ENABLED=true
+        export API_START_ENABLED=true
+        export ALERT_START_ENABLED=true
+        export LOGGER_START_ENABLED=true
     ;;
     (master-server)
-        initZK
-        initDatabase
-        initMasterServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
+        waitZK
+        waitDatabase
+        export MASTER_START_ENABLED=true
     ;;
     (worker-server)
-        initZK
-        initDatabase
-        initWorkerServer
-        initLoggerServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
+        waitZK
+        waitDatabase
+        export WORKER_START_ENABLED=true
+        export LOGGER_START_ENABLED=true
     ;;
     (api-server)
-        initZK
+        waitZK
+        waitDatabase
         initDatabase
-        initApiServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
+        export API_START_ENABLED=true
     ;;
     (alert-server)
-        initDatabase
-        initAlertServer
-        LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
-    ;;
-    (frontend)
-        initNginx
-        LOGFILE=/var/log/nginx/access.log
+        waitDatabase
+        export ALERT_START_ENABLED=true
     ;;
     (help)
         printUsage
@@ -178,9 +120,8 @@ case "$1" in
     ;;
 esac
 
-# init directories and log files
-mkdir -p ${DOLPHINSCHEDULER_LOGS} && mkdir -p /var/log/nginx/ && cat /dev/null >> ${LOGFILE}
+# init directories
+mkdir -p ${DOLPHINSCHEDULER_HOME}/logs
 
-echo "tail begin"
-exec bash -c "tail -n 1 -f ${LOGFILE}"
-
+# start supervisord
+supervisord -n -u root

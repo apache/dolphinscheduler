@@ -17,7 +17,18 @@
 <template>
   <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
-      <m-conditions @on-conditions="_onConditions"></m-conditions>
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group" v-if="isADMIN">
+          <el-button size="mini" @click="_create('')">{{$t('Create worker group')}}</el-button>
+          <el-dialog
+            :title="item ? $t('Edit worker group') : $t('Create worker group')"
+            v-if="createWorkerGroupDialog"
+            :visible.sync="createWorkerGroupDialog"
+            width="50%">
+            <m-create-worker :item="item" :worker-address-list="workerAddressList" @onUpdate="onUpdate" @close="close"></m-create-worker>
+          </el-dialog>
+        </template>
+      </m-conditions>
     </template>
     <template slot="content">
       <template v-if="workerGroupList.length || total>0">
@@ -28,7 +39,16 @@
                 :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!workerGroupList.length && total<=0">
@@ -44,11 +64,11 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateWorker from './_source/createWorker'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import mCreateWorker from './_source/createWorker'
 
   export default {
     name: 'worker-groups-index',
@@ -57,18 +77,21 @@
         total: null,
         isLoading: false,
         workerGroupList: [],
+        workerAddressList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
           searchVal: ''
         },
-        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
+        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
+        createWorkerGroupDialog: false,
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getWorkerGroups']),
+      ...mapActions('security', ['getWorkerGroups', 'getWorkerAddresses']),
       /**
        * Inquire
        */
@@ -89,36 +112,21 @@
         this._create(item)
       },
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateWorker, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.createWorkerGroupDialog = true
+        this.item = item
+      },
+      onUpdate () {
+        this._debounceGET('false')
+        this.createWorkerGroupDialog = false
+      },
+      close () {
+        this.createWorkerGroupDialog = false
       },
       _getList (flag) {
         this.isLoading = !flag
         this.getWorkerGroups(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.workerGroupList = []
             this.workerGroupList = res.totalList
@@ -127,6 +135,11 @@
           }
         }).catch(e => {
           this.isLoading = false
+        })
+      },
+      _getWorkerAddressList () {
+        this.getWorkerAddresses().then(res => {
+          this.workerAddressList = res.data.map(x => ({ id: x, label: x }))
         })
       }
     },
@@ -137,10 +150,11 @@
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
-    created () {},
-    mounted () {
-      this.$modal.destroy()
+    created () {
+      this._getWorkerAddressList()
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
+    mounted () {
+    },
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWorker }
   }
 </script>

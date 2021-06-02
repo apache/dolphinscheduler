@@ -17,19 +17,25 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
-import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.service.zk.RegisterOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 /**
- *  zookeeper register center
+ * zookeeper register center
  */
 @Service
 public class ZookeeperRegistryCenter implements InitializingBean {
@@ -38,10 +44,9 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
 
     @Autowired
-    protected ZookeeperCachedOperator zookeeperCachedOperator;
-
+    protected RegisterOperator registerOperator;
     @Autowired
-    private  ZookeeperConfig zookeeperConfig;
+    private ZookeeperConfig zookeeperConfig;
 
     /**
      * nodes namespace
@@ -59,6 +64,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     public String WORKER_PATH;
 
     public final String EMPTY = "";
+
+    private IStoppable stoppable;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -82,23 +89,22 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      * init nodes
      */
     private void initNodes() {
-        zookeeperCachedOperator.persist(MASTER_PATH, EMPTY);
-        zookeeperCachedOperator.persist(WORKER_PATH, EMPTY);
+        registerOperator.persist(MASTER_PATH, EMPTY);
+        registerOperator.persist(WORKER_PATH, EMPTY);
     }
 
     /**
      * close
      */
     public void close() {
-        if (isStarted.compareAndSet(true, false)) {
-            if (zookeeperCachedOperator != null) {
-                zookeeperCachedOperator.close();
-            }
+        if (isStarted.compareAndSet(true, false) && registerOperator != null) {
+            registerOperator.close();
         }
     }
 
     /**
      * get master path
+     *
      * @return master path
      */
     public String getMasterPath() {
@@ -107,6 +113,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker path
+     *
      * @return worker path
      */
     public String getWorkerPath() {
@@ -114,7 +121,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     }
 
     /**
-     *  get master nodes directly
+     * get master nodes directly
+     *
      * @return master nodes
      */
     public Set<String> getMasterNodesDirectly() {
@@ -123,7 +131,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     }
 
     /**
-     *  get worker nodes directly
+     * get worker nodes directly
+     *
      * @return master nodes
      */
     public Set<String> getWorkerNodesDirectly() {
@@ -133,6 +142,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group directly
+     *
      * @return worker group nodes
      */
     public Set<String> getWorkerGroupDirectly() {
@@ -142,6 +152,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group nodes
+     *
      * @param workerGroup
      * @return
      */
@@ -152,6 +163,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * whether worker path
+     *
      * @param path path
      * @return result
      */
@@ -161,6 +173,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * whether master path
+     *
      * @param path path
      * @return result
      */
@@ -170,6 +183,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group path
+     *
      * @param workerGroup workerGroup
      * @return worker group path
      */
@@ -179,19 +193,47 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get children nodes
+     *
      * @param key key
      * @return children nodes
      */
     public List<String> getChildrenKeys(final String key) {
-        return zookeeperCachedOperator.getChildrenKeys(key);
+        return registerOperator.getChildrenKeys(key);
     }
 
     /**
-     * get zookeeperCachedOperator
-     * @return zookeeperCachedOperator
+     * @return get dead server node parent path
      */
-    public ZookeeperCachedOperator getZookeeperCachedOperator() {
-        return zookeeperCachedOperator;
+    public String getDeadZNodeParentPath() {
+        return registerOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS;
     }
 
+    public void setStoppable(IStoppable stoppable) {
+        this.stoppable = stoppable;
+    }
+
+    public IStoppable getStoppable() {
+        return stoppable;
+    }
+
+    /**
+     * check dead server or not , if dead, stop self
+     *
+     * @param zNode      node path
+     * @param serverType master or worker prefix
+     * @return true if not exists
+     * @throws Exception errors
+     */
+    protected boolean checkIsDeadServer(String zNode, String serverType) throws Exception {
+        // ip_sequence_no
+        String[] zNodesPath = zNode.split("\\/");
+        String ipSeqNo = zNodesPath[zNodesPath.length - 1];
+        String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
+
+        return !registerOperator.isExisted(zNode) || registerOperator.isExisted(deadServerPath);
+    }
+
+    public RegisterOperator getRegisterOperator() {
+        return registerOperator;
+    }
 }

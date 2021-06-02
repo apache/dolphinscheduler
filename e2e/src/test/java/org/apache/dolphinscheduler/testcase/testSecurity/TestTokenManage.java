@@ -24,7 +24,7 @@ public class TestTokenManage extends BaseTest {
     private TokenManagePage tokenManagePage;
 
     @Test(groups={"functionTests","token"},dependsOnGroups = { "login" },description = "TestTokenManage")
-    public void testUserManage() throws InterruptedException {
+    public void testTokenManage() throws InterruptedException {
         tokenManagePage = new TokenManagePage(driver);
         //generate token
         System.out.println("start create token");

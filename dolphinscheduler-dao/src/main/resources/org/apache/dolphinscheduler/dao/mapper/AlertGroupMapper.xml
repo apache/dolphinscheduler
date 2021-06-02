@@ -18,8 +18,14 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper">
+    <sql id="baseSql">
+        id
+        , group_name, description,alert_instance_ids, create_user_id,create_time, update_time
+    </sql>
     <select id="queryAlertGroupPage" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select * from t_ds_alertgroup
+        select
+        <include refid="baseSql"/>
+        from t_ds_alertgroup
         where 1 = 1
         <if test="groupName != null and groupName != ''">
             and group_name like concat('%', #{groupName}, '%')
@@ -27,21 +33,41 @@
         order by update_time desc
     </select>
     <select id="queryByGroupName" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select * from t_ds_alertgroup
+        select
+        <include refid="baseSql"/>
+        from t_ds_alertgroup
         where group_name=#{groupName}
     </select>
+
+    <select id="existGroupName" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_alertgroup
+        where group_name=#{groupName} limit 1
+    </select>
+
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select * from t_ds_alertgroup t
-        left join t_ds_relation_user_alertgroup r on t.id=r.alertgroup_id
-        where r.user_id=#{userId}
+        select
+        <include refid="baseSql"/>
+        from t_ds_alertgroup
+        where create_user_id = #{userId}
     </select>
-    <select id="queryByAlertType" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select * from t_ds_alertgroup
-        where group_type=#{alertType}
-    </select>
+
     <select id="queryAllGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_alertgroup
         order by update_time desc
+    </select>
+
+    <select id="queryInstanceIdsList" resultType="String">
+        select
+        alert_instance_ids
+        from t_ds_alertgroup
+        order by update_time desc
+    </select>
+
+    <select id="queryAlertGroupInstanceIdsById" resultType="String">
+        select alert_instance_ids  from t_ds_alertgroup
+        where id = #{alertGroupId}
     </select>
 </mapper>

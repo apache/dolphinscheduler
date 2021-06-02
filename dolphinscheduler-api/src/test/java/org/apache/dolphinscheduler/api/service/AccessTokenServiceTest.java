@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.Calendar;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -27,9 +30,14 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.junit.After;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,131 +46,119 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
+/**
+ * access token service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class AccessTokenServiceTest {
 
-
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceTest.class);
 
-
     @InjectMocks
-    private AccessTokenService accessTokenService ;
+    private AccessTokenServiceImpl accessTokenService;
 
     @Mock
     private AccessTokenMapper accessTokenMapper;
 
-    @Before
-    public void setUp() {
-
-    }
-
-
-    @After
-    public void after(){
-
-    }
-
-
-
     @Test
-    public  void testQueryAccessTokenList(){
+    @SuppressWarnings("unchecked")
+    public void testQueryAccessTokenList() {
 
         IPage<AccessToken> tokenPage = new Page<>();
         tokenPage.setRecords(getList());
         tokenPage.setTotal(1L);
-        when(accessTokenMapper.selectAccessTokenPage(any(Page.class),eq("zhangsan"),eq(0))).thenReturn(tokenPage);
+        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
 
-        User user =new User();
-        Map<String, Object> result = accessTokenService.queryAccessTokenList(user,"zhangsan",1,10);
+        User user = new User();
+        Map<String, Object> result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(pageInfo.getTotalCount()>0);
+        Assert.assertTrue(pageInfo.getTotalCount() > 0);
     }
 
     @Test
-    public  void testCreateToken(){
+    public void testCreateToken() {
 
-
-       when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
-        Map<String, Object> result = accessTokenService.createToken(1,getDate(),"AccessTokenServiceTest");
+        when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
+        Map<String, Object> result = accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
-    public  void testGenerateToken(){
+    public void testGenerateToken() {
 
-        Map<String, Object> result = accessTokenService.generateToken(Integer.MAX_VALUE,getDate());
+        Map<String, Object> result = accessTokenService.generateToken(getLoginUser(), Integer.MAX_VALUE,getDate());
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         String token = (String) result.get(Constants.DATA_LIST);
         Assert.assertNotNull(token);
     }
 
     @Test
-    public  void testDelAccessTokenById(){
+    public void testDelAccessTokenById() {
 
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         User userLogin = new User();
         // not exist
-        Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin,0);
+        Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin, 0);
         logger.info(result.toString());
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
         // no operate
-        result = accessTokenService.delAccessTokenById(userLogin,1);
+        result = accessTokenService.delAccessTokenById(userLogin, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //success
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
-        result = accessTokenService.delAccessTokenById(userLogin,1);
+        result = accessTokenService.delAccessTokenById(userLogin, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
-    public  void testUpdateToken(){
+    public void testUpdateToken() {
 
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
-        Map<String, Object> result = accessTokenService.updateToken(1,Integer.MAX_VALUE,getDate(),"token");
+        Map<String, Object> result = accessTokenService.updateToken(getLoginUser(), 1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         // not exist
-        result = accessTokenService.updateToken(2,Integer.MAX_VALUE,getDate(),"token");
+        result = accessTokenService.updateToken(getLoginUser(), 2,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST, result.get(Constants.STATUS));
 
+    }
+
+
+    private User getLoginUser(){
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        return loginUser;
     }
 
     /**
      * create entity
-     * @return
      */
-    private AccessToken getEntity(){
+    private AccessToken getEntity() {
         AccessToken accessToken = new AccessToken();
         accessToken.setId(1);
         accessToken.setUserId(1);
         accessToken.setToken("AccessTokenServiceTest");
-        Date date = DateUtils.add(new Date(),Calendar.DAY_OF_MONTH, 30);
+        Date date = DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 30);
         accessToken.setExpireTime(date);
         return accessToken;
     }
 
     /**
      * entity list
-     * @return
      */
-    private List<AccessToken> getList(){
+    private List<AccessToken> getList() {
 
         List<AccessToken> list = new ArrayList<>();
         list.add(getEntity());
@@ -170,13 +166,11 @@ public class AccessTokenServiceTest {
     }
 
 
-
     /**
      * get dateStr
-     * @return
      */
-    private String getDate(){
+    private String getDate() {
         Date date = DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 30);
-       return DateUtils.dateToString(date);
+        return DateUtils.dateToString(date);
     }
 }

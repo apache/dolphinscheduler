@@ -18,97 +18,143 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper">
+
+    <sql id="baseSql">
+        ${alias}.id, ${alias}.user_id, ${alias}.func_name, ${alias}.class_name, ${alias}.type, ${alias}.arg_types,
+        ${alias}.database, ${alias}.description, ${alias}.resource_id, ${alias}.resource_name, ${alias}.create_time, ${alias}.update_time
+    </sql>
+
     <select id="selectUdfById" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
         where id = #{id}
     </select>
 
     <select id="queryUdfByIdStr" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
         where 1 = 1
-        <if test="ids != null and ids != ''">
-            and id in
+        <if test="ids != null and ids.length > 0">
+            and udf.id in
             <foreach collection="ids" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
         <if test="funcNames != null and funcNames != ''">
-            and func_name = #{funcNames}
+            and udf.func_name = #{funcNames}
         </if>
-        order by id asc
+        order by udf.id asc
     </select>
     <select id="queryUdfFuncPaging" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
         where 1=1
         <if test="searchVal!= null and searchVal != ''">
-            and func_name like concat('%', #{searchVal}, '%')
+            and udf.func_name like concat('%', #{searchVal}, '%')
         </if>
         <if test="userId != 0">
-            and id in (
-              select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
-              union select id as udf_id  from t_ds_udfs where user_id=#{userId})
+            and udf.id in (
+            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+            union select id as udf_id from t_ds_udfs where user_id=#{userId})
         </if>
-        order by create_time desc
+        order by udf.create_time desc
     </select>
     <select id="getUdfFuncByType" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
-        where type=#{type}
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
+        where udf.type=#{type}
         <if test="userId != 0">
-            and id in (
+            and udf.id in (
             select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
-            union select id as udf_id  from t_ds_udfs where user_id=#{userId})
+            union select id as udf_id from t_ds_udfs where user_id=#{userId})
         </if>
     </select>
     <select id="queryUdfFuncExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
-        where user_id <![CDATA[ <> ]]> #{userId}
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
+        where udf.user_id <![CDATA[ <> ]]> #{userId}
     </select>
     <select id="queryAuthedUdfFunc" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        SELECT u.*
-        from t_ds_udfs u,t_ds_relation_udfs_user rel
-        WHERE u.id = rel.udf_id
+        SELECT
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf,t_ds_relation_udfs_user rel
+        WHERE udf.id = rel.udf_id
         AND rel.user_id = #{userId}
     </select>
     <select id="listAuthorizedUdfFunc" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
         where
-        id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
-        union select id as udf_id  from t_ds_udfs where user_id=#{userId})
-        <if test="udfIds != null and udfIds != ''">
-            and id in
+        udf.id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+        union select id as udf_id from t_ds_udfs where user_id=#{userId})
+        <if test="udfIds != null and udfIds.length > 0">
+            and udf.id in
             <foreach collection="udfIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
     </select>
     <select id="listUdfByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
         where 1=1
-        <if test="resourceIds != null and resourceIds != ''">
-            and resource_id in
+        <if test="resourceIds != null and resourceIds.length > 0">
+            and udf.resource_id in
             <foreach collection="resourceIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
     </select>
     <select id="listAuthorizedUdfByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select *
-        from t_ds_udfs
+        select
+        <include refid="baseSql">
+            <property name="alias" value="udf"/>
+        </include>
+        from t_ds_udfs udf
         where
-        id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
-        union select id as udf_id  from t_ds_udfs where user_id=#{userId})
-        <if test="resourceIds != null and resourceIds != ''">
-            and resource_id in
+        udf.id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+        union select id as udf_id from t_ds_udfs where user_id=#{userId})
+        <if test="resourceIds != null and resourceIds.length > 0">
+            and udf.resource_id in
             <foreach collection="resourceIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
     </select>
+    <update id="batchUpdateUdfFunc" parameterType="java.util.List">
+        <foreach collection="udfFuncList" item="udf" index="index" open="" close="" separator=";">
+            update t_ds_udfs
+            <set>
+                resource_name=#{udf.resourceName},
+                update_time=#{udf.updateTime}
+            </set>
+            <where>
+                id=#{udf.id}
+            </where>
+        </foreach>
+    </update>
 </mapper>
+

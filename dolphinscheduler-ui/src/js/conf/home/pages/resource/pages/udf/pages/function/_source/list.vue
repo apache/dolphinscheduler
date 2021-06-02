@@ -14,107 +14,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-v-ps<template>
+<template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
-        <tr>
-          <th scope="col">
-            <span>{{$t('#')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('UDF Function Name')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('Class Name')}}</span>
-          </th>
-          <!-- <th scope="col">
-            <span>{{$t('Parameter')}}</span>
-          </th> -->
-          <th scope="col" width="80">
-            <span>{{$t('type')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('Description')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('Jar Package')}}</span>
-          </th>
-          <!-- <th scope="col">
-            <span>{{$t('Library Name')}}</span>
-          </th> -->
-          <th scope="col" width="150">
-            <span>{{$t('Update Time')}}</span>
-          </th>
-          <th scope="col" width="80">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="$index">
-          <td>
-            <span>{{$index + 1}}</span>
-          </td>
-          <td>
-            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.funcName, maxWidth: '500px'}">
-              <a href="javascript:" class="links">{{item.funcName}}</a>
-            </span>
-          </td>
-          <td><span class="ellipsis">{{item.className || '-'}}</span></td>
-          <!-- <td>
-            <span>{{item.argTypes || '-'}}</span>
-          </td> -->
-          <td>
-            <span>{{item.type}}</span>
-          </td>
-          <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.resourceName" class="ellipsis" v-tooltip.large.top.start.light="{text: item.resourceName, maxWidth: '500px'}">{{item.resourceName}}</span>
-            <span v-else>-</span>
-          </td>
-          <!-- <td>
-            <span>{{item.database || '-'}}</span>
-          </td> -->
-          <td>
-            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    data-toggle="tooltip"
-                    :title="$t('Edit')"
-                    @click="_edit(item)"
-                    icon="ans-icon-edit">
-            </x-button>
-            <x-poptip
-                    :ref="'poptip-' + $index"
-                    placement="bottom-end"
-                    width="90">
-              <p>{{$t('Delete?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" min-width="120"></el-table-column>
+        <el-table-column :label="$t('UDF Function Name')">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>{{ scope.row.funcName }}</p>
+              <div slot="reference" class="name-wrapper">
+                <a href="javascript:" class="links">{{ scope.row.funcName }}</a>
               </div>
-              <template slot="reference">
-                <x-button
-                        type="error"
-                        shape="circle"
-                        size="xsmall"
-                        icon="ans-icon-trash"
-                        data-toggle="tooltip"
-                        :title="$t('delete')">
-                </x-button>
-              </template>
-            </x-poptip>
-          </td>
-        </tr>
-      </table>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column prop="className" :label="$t('Class Name')" min-width="120"></el-table-column>
+        <el-table-column prop="type" :label="$t('type')"></el-table-column>
+        <el-table-column :label="$t('Description')" min-width="150">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resourceName" :label="$t('Jar Package')" min-width="150"></el-table-column>
+        <el-table-column :label="$t('Update Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" min-width="100">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
+    <el-dialog
+      :visible.sync="createUdfDialog"
+      width="auto">
+      <m-create-udf :item="item" @onUpdate="onUpdate" @close="close"></m-create-udf>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -125,7 +78,10 @@ v-ps<template>
     name: 'udf-manage-list',
     data () {
       return {
-        list: []
+        list: [],
+        spinnerLoading: false,
+        createUdfDialog: false,
+        item: {}
       }
     },
     props: {
@@ -135,47 +91,29 @@ v-ps<template>
     },
     methods: {
       ...mapActions('resource', ['deleteUdf']),
-      _closeDelete (i) {
-        this.$refs[`poptip-${i}`][0].doClose()
-      },
       _delete (item, i) {
+        this.spinnerLoading = true
         this.deleteUdf({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
+          this.spinnerLoading = false
         }).catch(e => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
+          this.spinnerLoading = false
         })
       },
       _edit (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          width: '800px',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateUdf, {
-              on: {
-                onUpdate () {
-                  self.$emit('on-update')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.createUdfDialog = true
+      },
+      onUpdate () {
+        this.$emit('on-update')
+        this.createUdfDialog = false
+      },
+      close () {
+        this.createUdfDialog = false
       }
     },
     watch: {
@@ -191,6 +129,6 @@ v-ps<template>
     mounted () {
       this.list = this.udfFuncList
     },
-    components: { }
+    components: { mCreateUdf }
   }
 </script>

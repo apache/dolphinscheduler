@@ -18,24 +18,67 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper">
+    <sql id="baseSql">
+        id, code, name, version, release_state, project_code, user_id, description,
+        global_params, flag, locations, connects, warning_group_id, create_time, timeout,
+        tenant_id, update_time
+    </sql>
+
+    <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
+        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+        pd.tenant_id, pd.update_time
+        from t_ds_process_definition pd
+        WHERE pd.project_code = #{projectCode}
+        and pd.name = #{processDefinitionName}
+    </select>
+
+    <delete id="deleteByCode">
+        delete from t_ds_process_definition
+        where code = #{code}
+    </delete>
+
+    <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition
+        where code = #{code}
+    </select>
+    <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_definition
+        where 1 = 1
+        <if test="codes != null and codes.size() != 0">
+            and code in
+            <foreach collection="codes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select pd.*,u.user_name,p.name as project_name,t.tenant_code,t.tenant_name,q.queue,q.queue_name
+        select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, p.id as project_id, pd.user_id, pd.description,
+        pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+        pd.tenant_id, pd.update_time,
+        u.user_name,p.name as project_name,t.tenant_code,q.queue,q.queue_name
         from t_ds_process_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
-        JOIN  t_ds_project p ON pd.project_id = p.id
+        JOIN  t_ds_project p ON pd.project_code = p.code
         JOIN  t_ds_tenant t ON t.id = u.tenant_id
         JOIN t_ds_queue q ON t.queue_id = q.id
-        WHERE p.id = #{projectId}
+        WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>
     <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        SELECT td.id, td.name, td.version, td.release_state, td.project_id, td.user_id, td.description, td.global_params,
-               td.flag, td.receivers, td.receivers_cc, td.timeout, td.tenant_id, td.modify_by, td.update_time, td.create_time,
-               sc.schedule_release_state, tu.user_name
+        SELECT td.id, td.code, td.name, td.version, td.release_state, td.project_code, td.user_id, td.description,
+        td.global_params, td.flag, td.warning_group_id, td.timeout, td.tenant_id, td.update_time, td.create_time,
+        sc.schedule_release_state, tu.user_name
         FROM t_ds_process_definition td
-        left join (select process_definition_id,release_state as schedule_release_state from t_ds_schedules group by process_definition_id,release_state) sc on sc.process_definition_id = td.id
-        left join t_ds_user tu on  td.user_id = tu.id
-        where td.project_id = #{projectId}
+        left join (select process_definition_id,release_state as schedule_release_state from t_ds_schedules group by
+        process_definition_id,release_state) sc on sc.process_definition_id = td.id
+        left join t_ds_user tu on td.user_id = tu.id
+        where td.project_code = #{projectCode}
         <if test=" searchVal != null and searchVal != ''">
             and td.name like concat('%', #{searchVal}, '%')
         </if>
@@ -46,18 +89,21 @@
     </select>
 
     <select id="queryAllDefinitionList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_definition
-        where project_id = #{projectId}
+        where project_code = #{projectCode}
         order by create_time desc
     </select>
     <select id="queryDefinitionListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_definition
         where tenant_id = #{tenantId}
     </select>
     <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_process_definition
         where id in
         <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
@@ -69,37 +115,69 @@
         FROM t_ds_process_definition td
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
-        <if test="projectIds != null and projectIds.length != 0">
-            and td.project_id in
-            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and td.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         group by td.user_id,tu.user_name
     </select>
+    
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT
-            pd.*, u.user_name,
-            p.name AS project_name
+            pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
+            pd.global_params, pd.flag, pd.locations, pd.connects, pd.warning_group_id, pd.create_time, pd.timeout,
+            pd.tenant_id, pd.update_time, u.user_name,p.name AS project_name
         FROM
             t_ds_process_definition pd,
             t_ds_user u,
             t_ds_project p
         WHERE
-            pd.user_id = u.id AND pd.project_id = p.id
+            pd.user_id = u.id AND pd.project_code = p.code
         AND pd.id = #{processDefineId}
     </select>
 
-
     <select id="listResources" resultType="java.util.HashMap">
-        SELECT id,resource_ids
-        FROM t_ds_process_definition
-        WHERE release_state = 1 and resource_ids is not null and resource_ids != ''
+        SELECT distinct pd.code,td.resource_ids
+        FROM t_ds_process_task_relation ptr
+        join t_ds_process_definition pd
+            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
+                and ptr.project_code=pd.project_code and  pd.release_state = 1
+        join t_ds_task_definition td
+            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+        WHERE  td.resource_ids is not null and td.resource_ids != ''
     </select>
 
     <select id="listResourcesByUser" resultType="java.util.HashMap">
-        SELECT id,resource_ids
-        FROM t_ds_process_definition
-        WHERE user_id = #{userId} and release_state = 1 and resource_ids is not null and resource_ids != ''
+        SELECT distinct pd.code,td.resource_ids
+        FROM t_ds_process_task_relation ptr
+        join t_ds_process_definition pd
+            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
+                and ptr.project_code=pd.project_code and  pd.release_state = 1
+        join t_ds_task_definition td
+            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+        WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
+    </select>
+
+    <select id="listProjectIds" resultType="java.lang.Integer">
+        SELECT DISTINCT(id) as project_id
+        FROM t_ds_project
+    </select>
+
+
+    <update id="updateVersionByProcessDefinitionId">
+        update  t_ds_process_definition
+        set version = #{version}
+        where id = #{processDefinitionId}
+    </update>
+
+    <select id="queryHasAssociatedDefinitionByIdAndVersion" resultType="java.lang.Integer">
+        select id
+        from t_ds_process_definition
+        where id = #{processDefinitionId}
+        and version = #{version} limit 1
     </select>
 </mapper>

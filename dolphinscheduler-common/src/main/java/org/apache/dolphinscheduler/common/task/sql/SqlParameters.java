@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.sql;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,16 @@ public class SqlParameters extends AbstractParameters {
     private int sqlType;
 
     /**
+     * send email
+     */
+    private Boolean sendEmail;
+
+    /**
+     * display rows
+     */
+    private int displayRows;
+
+    /**
      * udf list
      */
     private String udfs;
@@ -75,19 +86,13 @@ public class SqlParameters extends AbstractParameters {
     private List<String> postStatements;
 
     /**
+     * groupId
+     */
+    private int groupId;
+    /**
      * title
      */
     private String title;
-
-    /**
-     * receivers
-     */
-    private String receivers;
-
-    /**
-     * receivers cc
-     */
-    private String receiversCc;
 
     public String getType() {
         return type;
@@ -129,6 +134,22 @@ public class SqlParameters extends AbstractParameters {
         this.sqlType = sqlType;
     }
 
+    public Boolean getSendEmail() {
+        return sendEmail;
+    }
+
+    public void setSendEmail(Boolean sendEmail) {
+        this.sendEmail = sendEmail;
+    }
+
+    public int getDisplayRows() {
+        return displayRows;
+    }
+
+    public void setDisplayRows(int displayRows) {
+        this.displayRows = displayRows;
+    }
+
     public String getShowType() {
         return showType;
     }
@@ -153,21 +174,6 @@ public class SqlParameters extends AbstractParameters {
         this.title = title;
     }
 
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
-    }
     public List<String> getPreStatements() {
         return preStatements;
     }
@@ -184,6 +190,14 @@ public class SqlParameters extends AbstractParameters {
         this.postStatements = postStatements;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
     @Override
     public boolean checkParameters() {
         return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
@@ -196,19 +210,20 @@ public class SqlParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "SqlParameters{" +
-                "type='" + type + '\'' +
-                ", datasource=" + datasource +
-                ", sql='" + sql + '\'' +
-                ", sqlType=" + sqlType +
-                ", udfs='" + udfs + '\'' +
-                ", showType='" + showType + '\'' +
-                ", connParams='" + connParams + '\'' +
-                ", title='" + title + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", preStatements=" + preStatements +
-                ", postStatements=" + postStatements +
-                '}';
+        return "SqlParameters{"
+                + "type='" + type + '\''
+                + ", datasource=" + datasource
+                + ", sql='" + sql + '\''
+                + ", sqlType=" + sqlType
+                + ", sendEmail=" + sendEmail
+                + ", displayRows=" + displayRows
+                + ", udfs='" + udfs + '\''
+                + ", showType='" + showType + '\''
+                + ", connParams='" + connParams + '\''
+                + ", groupId='" + groupId + '\''
+                + ", title='" + title + '\''
+                + ", preStatements=" + preStatements
+                + ", postStatements=" + postStatements
+                + '}';
     }
 }

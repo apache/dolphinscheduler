@@ -14,16 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * alertgroup mapper interface
@@ -49,23 +51,35 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
     List<AlertGroup> queryByGroupName(@Param("groupName") String groupName);
 
     /**
+     * Judge whether the alert group exist
+     * @param groupName groupName
+     * @return if exist return true else return null
+     */
+    Boolean existGroupName(@Param("groupName") String groupName);
+
+    /**
      * query by userId
      * @param userId userId
      * @return alertgroup list
      */
     List<AlertGroup> queryByUserId(@Param("userId") int userId);
 
-
-    /**
-     * query by alert type
-     * @param alertType alertType
-     * @return alertgroup list
-     */
-    List<AlertGroup> queryByAlertType(@Param("alertType") AlertType alertType);
-
     /**
      * query all group list
      * @return alertgroup list
      */
     List<AlertGroup> queryAllGroupList();
+
+    /**
+     * query instance ids All
+     * @return list
+     */
+    List<String> queryInstanceIdsList();
+
+    /**
+     * queryAlertGroupInstanceIdsById
+     * @param alertGroupId
+     * @return
+     */
+    String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
 }

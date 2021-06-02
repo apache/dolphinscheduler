@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.locator.security.AlertManageLocator;
 import org.openqa.selenium.WebDriver;
 
 public class AlertManagePage extends PageCommon {
+    AlertManageData alertManageData = new AlertManageData();
+
     /**
      * Unique constructor
      * @param driver driver
@@ -31,51 +33,52 @@ public class AlertManagePage extends PageCommon {
     }
 
     /**
-     * createTenant
+     * create alert
      *
      * @return Whether to enter the specified page after create tenant
      */
     public boolean createAlert() throws InterruptedException {
         // click  alert manage
-        Thread.sleep(500);
         System.out.println("start click alert manage button");
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
-        Thread.sleep(500);
+
+        //determine whether the create alert button exists
+        ifTextExists(AlertManageLocator.CLICK_CREATE_ALERT,alertManageData.getAlertData("createAlert"));
 
         // click  create alert button
         System.out.println("start click create alert  button");
         clickElement(AlertManageLocator.CLICK_CREATE_ALERT);
-        Thread.sleep(500);
-
         // input alert data
         System.out.println("start input  alert ");
-        sendInput(AlertManageLocator.INPUT_ALERT_NAME, AlertManageData.ALERT_NAME);
+        sendInput(AlertManageLocator.INPUT_ALERT_NAME, alertManageData.getAlertData("alertName"));
 
         clickElement(AlertManageLocator.CLICK_ALERT_TYPE);
 
         clickElement(AlertManageLocator.SELECT_ALERT_EMAIL);
 
-        sendInput(AlertManageLocator.INPUT_ALERT_DESCRIPTION, AlertManageData.DESCRIPTION);
+        sendInput(AlertManageLocator.INPUT_ALERT_DESCRIPTION, alertManageData.getAlertData("description"));
 
         // click  button
         clickButton(AlertManageLocator.SUBMIT_ALERT);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(AlertManageData.ALERT_MANAGE);
+        return ifTextExists(AlertManageLocator.ALERT_NAME, alertManageData.getAlertData("alertName"));
     }
 
     public boolean deleteAlert() throws InterruptedException {
 
-        // click  user manage
+        // click  alert manage
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
 
-        // click  delete user button
+        ifTextExists(AlertManageLocator.ALERT_NAME, alertManageData.getAlertData("alertName"));
+
+        // click  delete alert button
         clickButton(AlertManageLocator.DELETE_ALERT_BUTTON);
 
         // click confirm delete button
         clickButton(AlertManageLocator.CONFIRM_DELETE_ALERT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(AlertManageData.ALERT_MANAGE);
+        return ifTitleContains(alertManageData.getAlertData("alertTitle"));
     }
 }

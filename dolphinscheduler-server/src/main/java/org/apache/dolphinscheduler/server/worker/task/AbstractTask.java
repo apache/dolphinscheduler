@@ -14,12 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
 
+import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
+
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
-import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+<<<<<<< HEAD
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
@@ -38,9 +42,14 @@ import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.slf4j.Logger;
+=======
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 
 import java.util.List;
-import java.util.Map;
+import java.util.StringJoiner;
+
+import org.slf4j.Logger;
 
 /**
  * executive task
@@ -48,20 +57,30 @@ import java.util.Map;
 public abstract class AbstractTask {
 
     /**
+     * varPool string
+     */
+    protected String varPool;
+
+    /**
      * taskExecutionContext
      **/
     TaskExecutionContext taskExecutionContext;
 
     /**
-     *  log record
+     * log record
      */
     protected Logger logger;
 
 
     /**
-     *  SHELL process pid
+     * SHELL process pid
      */
     protected int processId;
+
+    /**
+     * SHELL result string
+     */
+    protected String resultString;
 
     /**
      * other resource manager appId , for example : YARN etc
@@ -75,14 +94,15 @@ public abstract class AbstractTask {
     protected volatile boolean cancel = false;
 
     /**
-     *  exit code
+     * exit code
      */
     protected volatile int exitStatusCode = -1;
 
     /**
      * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger    logger
+     * @param logger logger
      */
     protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         this.taskExecutionContext = taskExecutionContext;
@@ -91,6 +111,7 @@ public abstract class AbstractTask {
 
     /**
      * init task
+     *
      * @throws Exception exception
      */
     public void init() throws Exception {
@@ -98,13 +119,22 @@ public abstract class AbstractTask {
 
     /**
      * task handle
+     *
      * @throws Exception exception
      */
     public abstract void handle() throws Exception;
 
+    /**
+     * result processing
+     *
+     * @throws Exception exception
+     */
+    public void after() throws Exception {
+    }
 
     /**
      * cancel application
+     *
      * @param status status
      * @throws Exception exception
      */
@@ -114,16 +144,34 @@ public abstract class AbstractTask {
 
     /**
      * log handle
+     *
      * @param logs log list
      */
     public void logHandle(List<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
-        logger.info(" -> {}", String.join("\n\t", logs));
+        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
+            logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
+        } else {
+            // note: if the logs is a SynchronizedList and will be modified concurrently,
+            // we should must use foreach to iterate the element, otherwise will throw a ConcurrentModifiedException(#issue 5528)
+            StringJoiner joiner = new StringJoiner("\n\t");
+            logs.forEach(joiner::add);
+            logger.info(" -> {}", joiner);
+        }
+    }
+
+    public void setVarPool(String varPool) {
+        this.varPool = varPool;
+    }
+
+    public String getVarPool() {
+        return varPool;
     }
 
     /**
      * get exit status code
-     * @return  exit status code
+     *
+     * @return exit status code
      */
     public int getExitStatusCode() {
         return exitStatusCode;
@@ -149,12 +197,22 @@ public abstract class AbstractTask {
         this.processId = processId;
     }
 
+    public String getResultString() {
+        return resultString;
+    }
+
+    public void setResultString(String resultString) {
+        this.resultString = resultString;
+    }
+
     /**
      * get task parameters
+     *
      * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
 
+<<<<<<< HEAD
 
 
     /**
@@ -248,15 +306,20 @@ public abstract class AbstractTask {
                 throw new IllegalArgumentException("not support this task type");
         }
         return paramsClass;
+=======
+    private boolean typeIsNormalTask(String taskType) {
+        return !(TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(taskType) || TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType));
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
     }
 
     /**
      * get exit status according to exitCode
+     *
      * @return exit status
      */
-    public ExecutionStatus getExitStatus(){
+    public ExecutionStatus getExitStatus() {
         ExecutionStatus status;
-        switch (getExitStatusCode()){
+        switch (getExitStatusCode()) {
             case Constants.EXIT_CODE_SUCCESS:
                 status = ExecutionStatus.SUCCESS;
                 break;

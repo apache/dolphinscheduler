@@ -20,21 +20,17 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
-    app.kubernetes.io/instance: {{ .Release.Name }}-worker-headless
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   clusterIP: "None"
   ports:
-    - port: {{ .Values.worker.configmap.WORKER_LISTEN_PORT }}
+    - port: 1234
       targetPort: worker-port
       protocol: TCP
       name: worker-port
     - port: 50051
-      targetPort: logs-port
+      targetPort: logger-port
       protocol: TCP
-      name: logs-port
+      name: logger-port
   selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: worker
+    {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}

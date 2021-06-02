@@ -17,99 +17,82 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
-        <tr>
-          <th scope="col" style="min-width: 50px">
-            <span>{{$t('#')}}</span>
-          </th>
-          <th scope="col" style="min-width: 200px;max-width: 300px;">
-            <span>{{$t('Name')}}</span>
-          </th>
-          <th scope="col" style="min-width: 200px;max-width: 300px;">
-            <span>{{$t('Process Instance')}}</span>
-          </th>
-          <th scope="col" style="min-width: 60px">
-            <span>{{$t('Executor')}}</span>
-          </th>
-          <th scope="col" style="min-width: 70px">
-            <span style="margin-left: 5px">{{$t('Node Type')}}</span>
-          </th>
-          <th scope="col" style="min-width: 30px">
-            <span>{{$t('State')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('Submit Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('Start Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('End Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 130px">
-            <span>{{$t('host')}}</span>
-          </th>
-          <th scope="col" style="min-width: 70px">
-            <span>{{$t('Duration')}}(s)</span>
-          </th>
-          <th scope="col" style="min-width: 60px">
-            <div style="width: 50px">
-              <span>{{$t('Retry Count')}}</span>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="name" :label="$t('Name')"></el-table-column>
+        <el-table-column :label="$t('Process Instance')" min-width="200">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>{{ scope.row.processInstanceName }}</p>
+              <div slot="reference" class="name-wrapper">
+                <a href="javascript:" class="links" @click="_go(scope.row)"><span class="ellipsis">{{scope.row.processInstanceName}}</span></a>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
+        <el-table-column prop="taskType" :label="$t('Node Type')"></el-table-column>
+        <el-table-column :label="$t('State')" width="50">
+          <template slot-scope="scope">
+            <span v-html="_rtState(scope.row.state)" style="cursor: pointer;"></span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Submit Time')" width="135">
+          <template slot-scope="scope">
+            <span v-if="scope.row.submitTime">{{scope.row.submitTime | formatDate}}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Start Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.startTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('End Time')" width="135">
+          <template slot-scope="scope">
+            <span>{{scope.row.endTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Duration')">
+          <template slot-scope="scope">
+            <span>{{scope.row.duration | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="retryTimes" :label="$t('Retry Count')"></el-table-column>
+        <el-table-column :label="$t('host')" min-width="210">
+          <template slot-scope="scope">
+            <span>{{scope.row.host | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="80" fixed="right">
+          <template slot-scope="scope">
+            <div>
+              <el-tooltip :content="$t('Force success')" placement="top" :enterable="false">
+                <span>
+                  <el-button type="primary" size="mini" icon="el-icon-success" :disabled="!(scope.row.state === 'FAILURE' || scope.row.state === 'NEED_FAULT_TOLERANCE' || scope.row.state === 'KILL')" @click="_forceSuccess(scope.row)" circle></el-button>
+                </span>
+              </el-tooltip>
+              <el-tooltip :content="$t('View log')" placement="top" :enterable="false">
+                <span><el-button type="primary" size="mini" :disabled="scope.row.taskType==='SUB_PROCESS'? true: false"  icon="el-icon-tickets" @click="_refreshLog(scope.row)" circle></el-button></span>
+              </el-tooltip>
             </div>
-          </th>
-          <th scope="col" style="min-width: 60px">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
-            <span class="ellipsis" :title="item.name">{{item.name}}</span>
-          </td>
-          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;"><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis" :title="item.processInstanceName">{{item.processInstanceName}}</span></a></td>
-          <td>
-            <span v-if="item.executorName">{{item.executorName}}</span>
-            <span v-else>-</span>
-          </td>
-          <td><span style="margin-left: 5px">{{item.taskType}}</span></td>
-          <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
-          <td>
-            <span v-if="item.submitTime">{{item.submitTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.startTime">{{item.startTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td><span>{{item.host || '-'}}</span></td>
-          <td><span>{{item.duration}}</span></td>
-          <td><span>{{item.retryTimes}}</span></td>
-          <td>
-            <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    data-toggle="tooltip"
-                    :title="$t('View log')"
-                    icon="ans-icon-log"
-                    @click="_refreshLog(item)">
-            </x-button>
-          </td>
-        </tr>
-      </table>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
+    <el-dialog
+      :show-close="false"
+      :visible.sync="logDialog"
+      width="auto">
+      <m-log :key="logId" :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
+    </el-dialog>
   </div>
 </template>
 <script>
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'list',
@@ -117,7 +100,11 @@
       return {
         list: [],
         isAuth: Permissions.getAuth(),
-        backfillItem: {}
+        backfillItem: {},
+        logDialog: false,
+        item: {},
+        source: '',
+        logId: null
       }
     },
     props: {
@@ -126,39 +113,39 @@
       pageSize: Number
     },
     methods: {
+      ...mapActions('dag', ['forceTaskSuccess']),
       _rtState (code) {
         let o = tasksState[code]
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       _refreshLog (item) {
-        let self = this
-        let instance = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mLog, {
-              on: {
-                ok () {
-                },
-                close () {
-                  instance.remove()
-                }
-              },
-              props: {
-                self: self,
-                source: 'list',
-                logId: item.id
-              }
-            })
+        this.item = item
+        this.source = 'list'
+        this.logId = item.id
+        this.logDialog = true
+      },
+      ok () {},
+      close () {
+        this.logDialog = false
+      },
+      _forceSuccess (item) {
+        this.forceTaskSuccess({ taskInstanceId: item.id }).then(res => {
+          if (res.code === 0) {
+            this.$message.success(res.msg)
+            setTimeout(this._onUpdate, 1000)
+          } else {
+            this.$message.error(res.msg)
           }
+        }).catch(e => {
+          this.$message.error(e.msg)
         })
+      },
+      _onUpdate () {
+        this.$emit('on-update')
       },
       _go (item) {
         this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
-      },
+      }
     },
     watch: {
       taskInstanceList (a) {
@@ -173,6 +160,6 @@
     mounted () {
       this.list = this.taskInstanceList
     },
-    components: { }
+    components: { mLog }
   }
 </script>

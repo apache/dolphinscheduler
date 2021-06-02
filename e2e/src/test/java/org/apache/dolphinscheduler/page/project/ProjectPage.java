@@ -17,12 +17,13 @@
 package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.ProjectData;
 import org.apache.dolphinscheduler.locator.project.ProjectLocator;
 import org.openqa.selenium.WebDriver;
 
 public class ProjectPage extends PageCommon {
+    ProjectData projectData = new ProjectData();
+
     public ProjectPage(WebDriver driver) {
         super(driver);
     }
@@ -32,8 +33,7 @@ public class ProjectPage extends PageCommon {
      */
     public boolean jumpProjectManagePage() throws InterruptedException {
         clickTopElement(ProjectLocator.PROJECT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSAND);
-        return ifTitleContains(ProjectData.PROJECT_TITLE);
+        return ifTitleContains(projectData.getProjectData("projectTitle"));
     }
 
     /**
@@ -42,18 +42,18 @@ public class ProjectPage extends PageCommon {
      * @return Whether to enter the specified page after create project
      */
     public boolean createProject() throws InterruptedException {
-        Thread.sleep(500);
+        ifTextExists(ProjectLocator.CREATE_PROJECT_BUTTON, projectData.getProjectData("createProjectButton"));
         clickElement(ProjectLocator.CREATE_PROJECT_BUTTON);
 
         // input create project data
-        sendInput(ProjectLocator.PROJECT_NAME, ProjectData.PROJECT_NAME);
-        sendInput(ProjectLocator.PROJECT_DESCRIPTION, ProjectData.DESCRIPTION);
+        sendInput(ProjectLocator.PROJECT_NAME, projectData.getProjectData("projectName"));
+        sendInput(ProjectLocator.PROJECT_DESCRIPTION, projectData.getProjectData("description"));
 
         // click submit  button
         clickButton(ProjectLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(ProjectData.PROJECT_TITLE);
+        return ifTextExists(ProjectLocator.LIST_PROJECT_NAME, projectData.getProjectData("projectName"));
     }
 
     /**
@@ -69,6 +69,6 @@ public class ProjectPage extends PageCommon {
         clickElement(ProjectLocator.CONFIRM_DELETE_PROJECT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(ProjectData.PROJECT_TITLE);
+        return ifTitleContains(projectData.getProjectData("projectTitle"));
     }
 }

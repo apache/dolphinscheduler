@@ -14,23 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * python command executor
@@ -46,7 +52,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * python
      */
     public static final String PYTHON = "python";
-
+    private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
 
     /**
      * constructor
@@ -109,64 +115,70 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     }
 
     /**
-     * get python home
-     * @return python home
+     * Gets the command path to which Python can execute
+     * @return python command path
      */
     @Override
     protected String commandInterpreter() {
         String pythonHome = getPythonHome(taskExecutionContext.getEnvFile());
-        if (StringUtils.isEmpty(pythonHome)){
-            return PYTHON;
-        }
-        return pythonHome;
+        return getPythonCommand(pythonHome);
     }
 
-
+    /**
+     * get python command
+     *
+     * @param pythonHome python home
+     * @return python command
+     */
+    public static String getPythonCommand(String pythonHome) {
+        if (StringUtils.isEmpty(pythonHome)) {
+            return PYTHON;
+        }
+        File file = new File(pythonHome);
+        if (file.exists() && file.isFile()) {
+            return pythonHome;
+        }
+        if (PYTHON_PATH_PATTERN.matcher(pythonHome).find()) {
+            return pythonHome;
+        }
+        return pythonHome + "/bin/python";
+    }
 
     /**
-     *  get the absolute path of the Python command
-     *  note :
-     *  common.properties
-     *  PYTHON_HOME configured under common.properties is Python absolute path, not PYTHON_HOME itself
-     *
-     *  for example :
-     *  your PYTHON_HOM is /opt/python3.7/
-     *  you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
-     *  dolphinscheduler.env.path file.
+     * get python home
      *
      * @param envPath env path
      * @return python home
      */
-    private static String getPythonHome(String envPath){
+    public static String getPythonHome(String envPath) {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
             String line;
-            while ((line = br.readLine()) != null){
-                if (line.contains(Constants.PYTHON_HOME)){
+            while ((line = br.readLine()) != null) {
+                if (line.contains(Constants.PYTHON_HOME)) {
                     sb.append(line);
                     break;
                 }
             }
             String result = sb.toString();
-            if (org.apache.commons.lang.StringUtils.isEmpty(result)){
+            if (StringUtils.isEmpty(result)) {
                 return null;
             }
             String[] arrs = result.split(Constants.EQUAL_SIGN);
-            if (arrs.length == 2){
+            if (arrs.length == 2) {
                 return arrs[1];
             }
-
-        }catch (IOException e){
-            logger.error("read file failure",e);
-        }finally {
+        } catch (IOException e) {
+            logger.error("read file failure", e);
+        } finally {
             try {
-                if (br != null){
+                if (br != null) {
                     br.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         }
         return null;

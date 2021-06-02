@@ -19,11 +19,13 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +35,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -56,9 +59,10 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one udf
+     *
      * @return UdfFunc
      */
-    private UdfFunc insertOne(){
+    private UdfFunc insertOne() {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setUserId(1);
         udfFunc.setFuncName("dolphin_udf_func");
@@ -74,9 +78,10 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one udf
+     *
      * @return
      */
-    private UdfFunc insertOne(User user){
+    private UdfFunc insertOne(User user) {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setUserId(user.getId());
         udfFunc.setFuncName("dolphin_udf_func");
@@ -92,9 +97,10 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one user
+     *
      * @return User
      */
-    private User insertOneUser(){
+    private User insertOneUser() {
         User user = new User();
         user.setUserName("user1");
         user.setUserPassword("1");
@@ -109,9 +115,10 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one user
+     *
      * @return User
      */
-    private User insertOneUser(String userName){
+    private User insertOneUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("1");
@@ -126,11 +133,12 @@ public class UdfFuncMapperTest {
 
     /**
      * insert UDFUser
-     * @param user user
+     *
+     * @param user    user
      * @param udfFunc udf func
      * @return UDFUser
      */
-    private UDFUser insertOneUDFUser(User user,UdfFunc udfFunc){
+    private UDFUser insertOneUDFUser(User user, UdfFunc udfFunc) {
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(udfFunc.getId());
         udfUser.setUserId(user.getId());
@@ -142,9 +150,10 @@ public class UdfFuncMapperTest {
 
     /**
      * create general user
+     *
      * @return User
      */
-    private User createGeneralUser(String userName){
+    private User createGeneralUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("1");
@@ -161,7 +170,7 @@ public class UdfFuncMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         UdfFunc udfFunc = insertOne();
         udfFunc.setResourceName("dolphin_resource_update");
@@ -178,24 +187,12 @@ public class UdfFuncMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         //insertOne
         UdfFunc udfFunc = insertOne();
         //delete
         int delete = udfFuncMapper.deleteById(udfFunc.getId());
         Assert.assertEquals(delete, 1);
-    }
-
-    /**
-     * test query
-     */
-    @Test
-    public void testQuery(){
-        //insertOne
-        UdfFunc udfFunc = insertOne();
-        //query
-        List<UdfFunc> udfFuncList = udfFuncMapper.selectList(null);
-        Assert.assertNotEquals(udfFuncList.size(), 0);
     }
 
     /**
@@ -207,9 +204,9 @@ public class UdfFuncMapperTest {
         UdfFunc udfFunc = insertOne();
         //insertOne
         UdfFunc udfFunc1 = insertOne();
-        int[] idArray = new int[]{udfFunc.getId(),udfFunc1.getId()};
+        int[] idArray = new int[]{udfFunc.getId(), udfFunc1.getId()};
         //queryUdfByIdStr
-        List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray,"");
+        List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");
         Assert.assertNotEquals(udfFuncList.size(), 0);
     }
 
@@ -223,8 +220,8 @@ public class UdfFuncMapperTest {
         //insertOne
         UdfFunc udfFunc = insertOne(user);
         //queryUdfFuncPaging
-        Page<UdfFunc> page = new Page(1,3);
-        IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page,user.getId(),"");
+        Page<UdfFunc> page = new Page(1, 3);
+        IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page, user.getId(), "");
         Assert.assertNotEquals(udfFuncIPage.getTotal(), 0);
 
     }
@@ -279,7 +276,7 @@ public class UdfFuncMapperTest {
     }
 
     @Test
-    public void testListAuthorizedUdfFunc(){
+    public void testListAuthorizedUdfFunc() {
         //create general user
         User generalUser1 = createGeneralUser("user1");
         User generalUser2 = createGeneralUser("user2");
@@ -289,18 +286,30 @@ public class UdfFuncMapperTest {
         UdfFunc unauthorizdUdfFunc = insertOne(generalUser2);
 
         //udf function ids
-        Integer[] udfFuncIds = new Integer[]{udfFunc.getId(),unauthorizdUdfFunc.getId()};
+        Integer[] udfFuncIds = new Integer[]{udfFunc.getId(), unauthorizdUdfFunc.getId()};
 
         List<UdfFunc> authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
 
-        Assert.assertEquals(generalUser1.getId(),udfFunc.getUserId());
-        Assert.assertNotEquals(generalUser1.getId(),unauthorizdUdfFunc.getUserId());
+        Assert.assertEquals(generalUser1.getId(), udfFunc.getUserId());
+        Assert.assertNotEquals(generalUser1.getId(), unauthorizdUdfFunc.getUserId());
         Assert.assertFalse(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(udfFuncIds)));
 
 
         //authorize object unauthorizdUdfFunc to generalUser1
-        insertOneUDFUser(generalUser1,unauthorizdUdfFunc);
+        insertOneUDFUser(generalUser1, unauthorizdUdfFunc);
         authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
         Assert.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(udfFuncIds)));
+    }
+
+    @Test
+    public void batchUpdateUdfFuncTest() {
+        //create general user
+        User generalUser1 = createGeneralUser("user1");
+        UdfFunc udfFunc = insertOne(generalUser1);
+        udfFunc.setResourceName("/updateTest");
+        List<UdfFunc> udfFuncList = new ArrayList<>();
+        udfFuncList.add(udfFunc);
+        Assert.assertTrue(udfFuncMapper.batchUpdateUdfFunc(udfFuncList) > 0);
+
     }
 }

@@ -18,55 +18,48 @@
   <m-conditions>
     <template slot="search-group">
       <div class="list">
-        <x-button type="ghost" size="small" @click="_ckQuery" icon="ans-icon-search"></x-button>
+        <el-button type="ghost" size="mini" @click="_ckQuery" icon="el-icon-search"></el-button>
       </div>
       <div class="list">
-        <x-datepicker
-                :value="[searchParams.startDate,searchParams.endDate]"
-                ref="datepicker"
-                @on-change="_onChangeStartStop"
-                type="daterange"
-                format="YYYY-MM-DD HH:mm:ss"
-                placement="bottom-end"
-                :panelNum="2">
-          <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
-            <em slot="suffix"
-               @click.stop="_dateEmpty()"
-               class="ans-icon-fail-solid"
-               v-show="value"
-               style="font-size: 13px;cursor: pointer;margin-top: 1px;">
-            </em>
-          </x-input>
-        </x-datepicker>
+        <el-date-picker
+          v-model="dataTime"
+          type="datetimerange"
+          size="mini"
+          @change="_onChangeStartStop"
+          range-separator="-"
+          :start-placeholder="$t('startDate')"
+          :end-placeholder="$t('endDate')"
+          value-format="yyyy-MM-dd HH:mm:ss">
+        </el-date-picker>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.destTable" style="width: 120px;" size="small" :placeholder="$t('Target Table')"></x-input>
+        <el-input v-model="searchParams.destTable" style="width: 120px;" size="mini" :placeholder="$t('Target Table')"></el-input>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.sourceTable" style="width: 120px;" size="small" :placeholder="$t('Source Table')"></x-input>
+        <el-input v-model="searchParams.sourceTable" style="width: 120px;" size="mini" :placeholder="$t('Source Table')"></el-input>
       </div>
       <div class="list">
-        <x-select style="width: 90px;" @on-change="_onChangeState" :value="searchParams.state">
-          <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 90px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down"></x-input>
-          <x-option
+        <el-select style="width: 90px;" @change="_onChangeState" :value="searchParams.state" :placeholder="$t('State')" size="mini">
+          <el-option
                   v-for="city in stateList"
                   :key="city.label"
                   :value="city.code"
                   :label="city.label">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
       <div class="list">
-        <x-datepicker
-                v-model="searchParams.taskDate"
-                @on-change="_onChangeDate"
-                format="YYYY-MM-DD"
-                :panelNum="1">
-          <x-input slot="input" readonly slot-scope="{value}" style="width: 130px;" :value="value" size="small" :placeholder="$t('Date')"></x-input>
-        </x-datepicker>
+        <el-date-picker
+          v-model="searchParams.taskDate"
+          value-format="yyyy-MM-dd"
+          size="mini"
+          @change="_onChangeDate"
+          type="date"
+          :placeholder="$t('Date')">
+        </el-date-picker>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.taskName" style="width: 130px;" size="small" :placeholder="$t('Task Name')"></x-input>
+        <el-input v-model="searchParams.taskName" style="width: 130px;" size="mini" :placeholder="$t('Task Name')"></el-input>
       </div>
     </template>
   </m-conditions>
@@ -80,27 +73,27 @@
       return {
         stateList: [
           {
-            label: `${this.$t('none')}`,
-            code: ``
+            label: `${this.$t('None')}`,
+            code: ''
           },
           {
-            label: `${this.$t('success')}`,
-            code: `成功`
+            label: `${this.$t('Success')}`,
+            code: '成功'
           },
           {
-            label: `${this.$t('waiting')}`,
-            code: `等待`
+            label: `${this.$t('Waiting')}`,
+            code: '等待'
           },
           {
-            label: `${this.$t('execution')}`,
-            code: `执行中`
+            label: `${this.$t('Execution')}`,
+            code: '执行中'
           },
           {
-            label: `${this.$t('finish')}`,
-            code: `完成`
+            label: `${this.$t('Finish')}`,
+            code: '完成'
           }, {
-            label: `${this.$t('failed')}`,
-            code: `失败`
+            label: `${this.$t('Failed')}`,
+            code: '失败'
           }
         ],
         searchParams: {
@@ -111,7 +104,8 @@
           taskDate: '',
           startDate: '',
           endDate: ''
-        }
+        },
+        dataTime: []
       }
     },
     props: {},
@@ -130,7 +124,7 @@
        * change state
        */
       _onChangeState (val) {
-        this.searchParams.state = val.value
+        this.searchParams.state = val
       },
       /**
        * empty date
@@ -141,7 +135,7 @@
         this.$refs.datepicker.empty()
       },
       _onChangeDate (val) {
-        this.searchParams.taskDate = val.replace(/-/g, '')
+        this.searchParams.taskDate = val
       }
     },
     created () {

@@ -14,32 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
+
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.api.transaction.CuratorOp;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
 /**
  * zk base operator
@@ -55,26 +58,32 @@ public class ZookeeperOperator implements InitializingBean {
     protected CuratorFramework zkClient;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         this.zkClient = buildClient();
-        initStateLister();
-        registerListener();
+        initStateListener();
+        treeCacheStart();
     }
 
     /**
      * this method is for sub class,
      */
-    protected void registerListener(){}
+    protected void registerListener() {
+        // Used by sub class
+    }
 
-    public void initStateLister() {
+    protected void treeCacheStart() {
+        // Used by sub class
+    }
+
+    public void initStateListener() {
         checkNotNull(zkClient);
 
         zkClient.getConnectionStateListenable().addListener((client, newState) -> {
-            if(newState == ConnectionState.LOST){
+            if (newState == ConnectionState.LOST) {
                 logger.error("connection lost from zookeeper");
-            } else if(newState == ConnectionState.RECONNECTED){
+            } else if (newState == ConnectionState.RECONNECTED) {
                 logger.info("reconnected to zookeeper");
-            } else if(newState == ConnectionState.SUSPENDED){
+            } else if (newState == ConnectionState.SUSPENDED) {
                 logger.warn("connection SUSPENDED to zookeeper");
             }
         });
@@ -83,7 +92,8 @@ public class ZookeeperOperator implements InitializingBean {
     private CuratorFramework buildClient() {
         logger.info("zookeeper registry center init, server lists is: {}.", zookeeperConfig.getServerList());
 
-        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(),"zookeeper quorum can't be null")))
+        CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(),
+                "zookeeper quorum can't be null")))
                 .retryPolicy(new ExponentialBackoffRetry(zookeeperConfig.getBaseSleepTimeMs(), zookeeperConfig.getMaxRetries(), zookeeperConfig.getMaxSleepMs()));
 
         //these has default value
@@ -110,11 +120,9 @@ public class ZookeeperOperator implements InitializingBean {
         zkClient = builder.build();
         zkClient.start();
         try {
-            if (!zkClient.blockUntilConnected(zookeeperConfig.getMaxWaitTime(), TimeUnit.MILLISECONDS)) {
-                throw new IllegalStateException("Connect zookeeper expire max wait time");
-            }
+            zkClient.blockUntilConnected();
         } catch (final Exception ex) {
-            throw new RuntimeException(ex);
+            throw new ServiceException(ex);
         }
         return zkClient;
     }
@@ -129,21 +137,21 @@ public class ZookeeperOperator implements InitializingBean {
     }
 
     public List<String> getChildrenKeys(final String key) {
-        List<String> values;
         try {
-            values = zkClient.getChildren().forPath(key);
-            return values;
+            return zkClient.getChildren().forPath(key);
+        } catch (NoNodeException ex) {
+            return new ArrayList<>();
         } catch (InterruptedException ex) {
             logger.error("getChildrenKeys key : {} InterruptedException", key);
             throw new IllegalStateException(ex);
         } catch (Exception ex) {
             logger.error("getChildrenKeys key : {}", key, ex);
-            throw new RuntimeException(ex);
+            throw new ServiceException(ex);
         }
     }
 
-    public boolean hasChildren(final String key){
-        Stat stat ;
+    public boolean hasChildren(final String key) {
+        Stat stat;
         try {
             stat = zkClient.checkExists().forPath(key);
             return stat.getNumChildren() >= 1;
@@ -175,28 +183,26 @@ public class ZookeeperOperator implements InitializingBean {
 
     public void update(final String key, final String value) {
         try {
-
-            CuratorOp check = zkClient.transactionOp().check().forPath(key);
-            CuratorOp setData = zkClient.transactionOp().setData().forPath(key, value.getBytes(StandardCharsets.UTF_8));
-            zkClient.transaction().forOperations(check, setData);
-
+            zkClient.inTransaction().check().forPath(key).and().setData().forPath(key, value.getBytes(StandardCharsets.UTF_8)).and().commit();
         } catch (Exception ex) {
             logger.error("update key : {} , value : {}", key, value, ex);
         }
     }
 
-    public void persistEphemeral(final String key, final String value) {
+    public void persistEphemeral(final String path, final String value) {
         try {
-            if (isExisted(key)) {
+            // If the ephemeral node exist and the data is not equals to the given value
+            // delete the old node
+            if (isExisted(path) && !value.equals(get(path))) {
                 try {
-                    zkClient.delete().deletingChildrenIfNeeded().forPath(key);
-                } catch (KeeperException.NoNodeException ignore) {
+                    zkClient.delete().deletingChildrenIfNeeded().forPath(path);
+                } catch (NoNodeException ignore) {
                     //NOP
                 }
             }
-            zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
+            zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, value.getBytes(StandardCharsets.UTF_8));
         } catch (final Exception ex) {
-            logger.error("persistEphemeral key : {} , value : {}", key, value, ex);
+            logger.error("persistEphemeral path : {} , value : {}", path, value, ex);
         }
     }
 
@@ -227,7 +233,7 @@ public class ZookeeperOperator implements InitializingBean {
             if (isExisted(key)) {
                 zkClient.delete().deletingChildrenIfNeeded().forPath(key);
             }
-        } catch (KeeperException.NoNodeException ignore) {
+        } catch (NoNodeException ignore) {
             //NOP
         } catch (final Exception ex) {
             logger.error("remove key : {}", key, ex);

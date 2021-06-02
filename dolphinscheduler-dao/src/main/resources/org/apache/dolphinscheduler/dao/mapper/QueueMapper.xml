@@ -18,19 +18,24 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.QueueMapper">
+    <sql id="baseSql">
+        id, queue_name, queue, create_time, update_time
+    </sql>
     <select id="queryQueuePaging" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_queue
-        where  1= 1
+        where 1= 1
         <if test="searchVal != null and searchVal != ''">
             and queue_name like concat('%', #{searchVal}, '%')
         </if>
-        order by  update_time desc
+        order by update_time desc
     </select>
     <select id="queryAllQueueList" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_queue
-        where  1=1
+        where 1=1
         <if test="queue != null and queue != ''">
             and queue = #{queue}
         </if>
@@ -38,5 +43,15 @@
             and queue_name =#{queueName}
         </if>
     </select>
-
+    <select id="existQueue" resultType="java.lang.Boolean">
+        select 1 = 1
+        from t_ds_queue
+        where 1 = 1
+        <if test="queue != null and queue != ''">
+            and queue = #{queue}
+        </if>
+        <if test="queueName != null and queueName != ''">
+            and queue_name =#{queueName}
+        </if>
+    </select>
 </mapper>

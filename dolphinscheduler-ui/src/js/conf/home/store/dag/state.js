@@ -21,6 +21,10 @@ import localStore from '@/module/util/localStorage'
 const projectName = localStore.getItem('projectName')
 
 export default {
+  // process definition code
+  code: '',
+  // process definition version
+  version: '',
   // name
   name: '',
   // description
@@ -45,6 +49,8 @@ export default {
   isEditDag: false,
   // Current project
   projectName: projectName || '',
+  // Whether to go online the process definition
+  releaseState: 'ONLINE',
   // Whether to update the process definition
   syncDefine: true,
   // tasks processList
@@ -95,6 +101,11 @@ export default {
     {
       id: 7,
       code: 'DB2',
+      disabled: false
+    },
+    {
+      id: 8,
+      code: 'PRESTO',
       disabled: false
     }
   ],

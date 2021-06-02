@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.COLON;
+
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
- *  server address
+ * server address
  */
 public class Host implements Serializable {
 
@@ -45,7 +47,14 @@ public class Host implements Serializable {
     public Host(String ip, int port) {
         this.ip = ip;
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
+    }
+
+    public Host(String address) {
+        String[] parts = splitAddress(address);
+        this.ip = parts[0];
+        this.port = Integer.parseInt(parts[1]);
+        this.address = address;
     }
 
     public String getAddress() {
@@ -53,6 +62,9 @@ public class Host implements Serializable {
     }
 
     public void setAddress(String address) {
+        String[] parts = splitAddress(address);
+        this.ip = parts[0];
+        this.port = Integer.parseInt(parts[1]);
         this.address = address;
     }
 
@@ -62,7 +74,7 @@ public class Host implements Serializable {
 
     public void setIp(String ip) {
         this.ip = ip;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
     public int getPort() {
@@ -71,57 +83,55 @@ public class Host implements Serializable {
 
     public void setPort(int port) {
         this.port = port;
-        this.address = ip + ":" + port;
+        this.address = ip + COLON + port;
     }
 
     /**
      * address convert host
+     *
      * @param address address
      * @return host
      */
-    public static Host of(String address){
-        if(address == null) {
+    public static Host of(String address) {
+        String[] parts = splitAddress(address);
+        return new Host(parts[0], Integer.parseInt(parts[1]));
+    }
+
+    /**
+     * address convert host
+     *
+     * @param address address
+     * @return host
+     */
+    public static String[] splitAddress(String address) {
+        if (address == null) {
             throw new IllegalArgumentException("Host : address is null.");
         }
-        String[] parts = address.split(":");
+        String[] parts = address.split(COLON);
         if (parts.length != 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
-        Host host = new Host(parts[0], Integer.parseInt(parts[1]));
-        return host;
+        return parts;
     }
 
     /**
      * whether old version
+     *
      * @param address address
      * @return old version is true , otherwise is false
      */
-    public static Boolean isOldVersion(String address){
-        String[] parts = address.split(":");
-        return parts.length != 2 ? true : false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Host host = (Host) o;
-        return Objects.equals(getAddress(), host.getAddress());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getAddress());
+    public static Boolean isOldVersion(String address) {
+        String[] parts = address.split(COLON);
+        return parts.length != 2;
     }
 
     @Override
     public String toString() {
-        return "Host{" +
-                "address='" + address + '\'' +
-                '}';
+        return "Host{"
+                + "address='" + address + '\''
+                + ", ip='" + ip + '\''
+                + ", port=" + port
+                + '}';
     }
+
 }

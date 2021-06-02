@@ -74,6 +74,9 @@
   .icos-SHELL {
     background: url("../img/toolbar_SHELL.png") no-repeat 50% 50%;
   }
+  .icos-WATERDROP {
+    background: url("../img/toolbar_WATERDROP.png") no-repeat 50% 50%;
+  }
   .icos-SUB_PROCESS {
     background: url("../img/toolbar_SUB_PROCESS.png") no-repeat 50% 50%;
   }
@@ -204,7 +207,6 @@
         .operation {
           overflow: hidden;
           display: inline-block;
-          margin-right: 10px;
           a {
             float: left;
             width: 28px;
@@ -274,8 +276,9 @@ svg path:hover {
   background: #fff;
   border-radius: 3px;
   box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.1);
-  padding: 4px 0;
+  padding: 4px 4px;
   visibility:hidden;
+  z-index: 10000;
   a {
     height: 30px;
     line-height: 28px;
@@ -543,7 +546,7 @@ svg path:hover {
   }
 }
 
-.from-mirror {
+.form-mirror {
   width: 100%;
   position: relative;
   z-index: 0;
@@ -560,9 +563,9 @@ svg path:hover {
   }
 }
 
-.ans-drawer.ans-drawer-right {
-  width: 628px;
-  left: auto;
+.ans-modal-box.ans-drawer.ans-drawer-right.dagMask.mask {
+    width: 628px;
+    left: auto;
 }
 
 

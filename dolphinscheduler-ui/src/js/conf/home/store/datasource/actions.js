@@ -20,7 +20,7 @@ import io from '@/module/io'
 export default {
   /**
    * Data source creation
-   * @param "type": string,//MYSQL, POSTGRESQL, HIVE, SPARK, CLICKHOUSE, ORACLE, SQLSERVER
+   * @param "type": string,//MYSQL, POSTGRESQL, HIVE, SPARK, CLICKHOUSE, ORACLE, SQLSERVER, PRESTO
    * @param "name": string,
    * @param "desc": string,
    * @param "parameter":string //{"address":"jdbc:hive2://192.168.220.189:10000","autoReconnect":"true","characterEncoding":"utf8","database":"default","initialTimeout":3000,"jdbcUrl":"jdbc:hive2://192.168.220.189:10000/default","maxReconnect":10,"password":"","useUnicode":true,"user":"hive"}
@@ -29,7 +29,9 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/create', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => {
+        // do nothing
+      }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
@@ -42,14 +44,16 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/connect', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => {
+        // do nothing
+      }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })
   },
   /**
    * Query data source list - no paging
-   * @param "type": string//MYSQL, POSTGRESQL, HIVE, SPARK, CLICKHOUSE, ORACLE, SQLSERVER
+   * @param "type": string//MYSQL, POSTGRESQL, HIVE, SPARK, CLICKHOUSE, ORACLE, SQLSERVER, PRESTO
    */
   getDatasourcesList ({ state }, payload) {
     return new Promise((resolve, reject) => {
@@ -94,7 +98,9 @@ export default {
     return new Promise((resolve, reject) => {
       io.post('datasources/update', payload, res => {
         resolve(res)
-      }).catch(e => {
+      }, () => {
+        // do nothing
+      }, { emulateJSON: false }).catch(e => {
         reject(e)
       })
     })

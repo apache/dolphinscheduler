@@ -20,64 +20,68 @@
          v-for="(item,$index) in localParamsList"
          :key="item.id"
          @click="_getIndex($index)">
-      <x-input
-              :disabled="isDetails"
+      <el-input
+              :disabled="isDetails || item.ifFixed"
               type="text"
+              size="small"
               v-model="localParamsList[$index].prop"
               :placeholder="$t('prop(required)')"
               maxlength="256"
-              @on-blur="_verifProp()"
+              @blur="_verifProp()"
               :style="inputStyle">
-      </x-input>
+      </el-input>
       <template v-if="hide">
-        <x-select
+        <el-select
                 style="width: 80px;"
+                size="small"
                 @change="_handleDirectChanged"
                 v-model="localParamsList[$index].direct"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in directList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
-        <x-select
+          </el-option>
+        </el-select>
+        <el-select
                 style="width: 118px;"
+                size="small"
                 @change="_handleTypeChanged"
                 v-model="localParamsList[$index].type"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in typeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </template>
-      <x-input
+      <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="localParamsList[$index].value"
               :placeholder="$t('value(optional)')"
               maxlength="256"
-              @on-blur="_handleValue()"
+              @blur="_handleValue()"
               :style="inputStyle">
-      </x-input>
-      <span class="lt-add">
+      </el-input>
+      <span class="lt-add" v-show="!item.ifFixed">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <em class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('Delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (localParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+          <em class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
     <span class="add-dp" v-if="!localParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+        <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
     </span>
   </div>
@@ -193,7 +197,7 @@
     },
     computed: {
       inputStyle () {
-        return `width:${this.hide ? 160 : 262}px`
+        return `width:${this.hide ? 160 : 252}px`
       }
     },
     mounted () {
@@ -208,31 +212,33 @@
       margin-bottom: 6px;
       .lt-add {
         padding-left: 4px;
+        line-height: 32px;
         a {
-          .iconfont {
-            font-size: 18px;
+          .iconfont, [class^="el-icon"] {
+            font-size: 17px;
             vertical-align: middle;
-            margin-bottom: -2px;
             display: inline-block;
+            margin-top: 0;
           }
         }
       }
     }
     .add {
+      line-height: 32px;
       a {
         color: #000;
-        .iconfont {
-          font-size: 16px;
+        .iconfont, [class^="el-icon"] {
+          font-size: 18px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: -5px;
+          margin-top: 0;
         }
       }
     }
-    .add-dp{
+    .add-dp {
       a {
         color: #0097e0;
-        .iconfont {
+        .iconfont, [class^="el-icon"] {
           font-size: 18px;
           vertical-align: middle;
           display: inline-block;

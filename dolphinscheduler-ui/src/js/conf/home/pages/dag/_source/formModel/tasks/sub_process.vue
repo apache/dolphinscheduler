@@ -16,34 +16,32 @@
  */
 <template>
   <div class="sub_process-model">
-    <div class="clearfix list">
-      <div class="text-box">
-        <span>{{$t('Child Node')}}</span>
+    <m-list-box>
+      <div slot="text">{{$t('Child Node')}}</div>
+      <div slot="content">
+        <el-select
+                style="width: 100%;"
+                size="small"
+                filterable
+                v-model="wdiCurr"
+                :disabled="isDetails"
+                @change="_handleWdiChanged">
+          <el-option
+                v-for="city in processDefinitionList"
+                :key="city.code"
+                :value="city.id"
+                :label="city.code">
+          </el-option>
+        </el-select>
       </div>
-      <div class="cont-box">
-        <div class="label-box">
-          <x-select
-                  style="width: 100%;"
-                  filterable
-                  v-model="wdiCurr"
-                  :disabled="isDetails"
-                  @on-change="_handleWdiChanged">
-            <x-option
-                    v-for="city in processDefinitionList"
-                    :key="city.code"
-                    :value="city.id"
-                    :label="city.code">
-            </x-option>
-          </x-select>
-        </div>
-      </div>
-    </div>
+    </m-list-box>
   </div>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import disabledState from '@/module/mixin/disabledState'
+  import mListBox from './_source/listBox'
 
   export default {
     name: 'sub_process',
@@ -77,7 +75,7 @@
        * The selected process defines the upper component name padding
        */
       _handleWdiChanged (o) {
-        this.$emit('on-set-process-name', this._handleName(o.value))
+        this.$emit('on-set-process-name', this._handleName(o))
       },
       /**
        * Return the name according to the process definition id
@@ -96,7 +94,7 @@
     created () {
       let processListS = _.cloneDeep(this.store.state.dag.processListS)
       let id = null
-      if(this.router.history.current.name==='projects-instance-details') {
+      if (this.router.history.current.name === 'projects-instance-details') {
         id = this.router.history.current.query.id || null
       } else {
         id = this.router.history.current.params.id || null
@@ -118,12 +116,13 @@
         this.wdiCurr = o.params.processDefinitionId
       } else {
         if (this.processDefinitionList.length) {
-          this.wdiCurr = this.processDefinitionList[0]['id']
+          this.wdiCurr = this.processDefinitionList[0].id
           this.$emit('on-set-process-name', this._handleName(this.wdiCurr))
         }
       }
     },
     mounted () {
-    }
+    },
+    components: { mListBox }
   }
 </script>

@@ -33,7 +33,11 @@ public enum DbType {
      * 5 oracle
      * 6 sqlserver
      * 7 db2
+<<<<<<< HEAD
      * 8 remoteserver
+=======
+     * 8 presto
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
      */
     MYSQL(0, "mysql"),
     POSTGRESQL(1, "postgresql"),
@@ -43,7 +47,11 @@ public enum DbType {
     ORACLE(5, "oracle"),
     SQLSERVER(6, "sqlserver"),
     DB2(7, "db2"),
+<<<<<<< HEAD
     REMOTESERVER(8, "remoteserver");
+=======
+    PRESTO(8, "presto");
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 
     DbType(int code, String descp) {
         this.code = code;
@@ -75,6 +83,6 @@ public enum DbType {
         if(DB_TYPE_MAP.containsKey(type)){
             return DB_TYPE_MAP.get(type);
         }
-        throw new IllegalArgumentException("invalid type : " + type);
+        return null;
     }
 }

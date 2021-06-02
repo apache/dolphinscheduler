@@ -14,12 +14,12 @@ There are three branches in the remote repository currently:
 
 So, you should fork the `dev` branch.
 
-After forking the [dolphinscheduler upstream source repository](https://github.com/apache/incubator-dolphinscheduler/fork) to your personal repository, you can set your  personal development environment.
+After forking the [dolphinscheduler upstream source repository](https://github.com/apache/dolphinscheduler/fork) to your personal repository, you can set your  personal development environment.
 
 ```sh
 $ cd <your work direcotry>
 $ git clone < your personal forked dolphinscheduler repo>
-$ cd incubator-dolphinscheduler
+$ cd dolphinscheduler
 ```
 
 ## Set git remote as ``upstream``
@@ -27,7 +27,7 @@ $ cd incubator-dolphinscheduler
 Add remote repository address, named upstream
 
 ```sh
-git remote add upstream https://github.com/apache/incubator-dolphinscheduler.git
+git remote add upstream https://github.com/apache/dolphinscheduler.git
 ```
 
 View repository:
@@ -56,7 +56,7 @@ If remote branch has a new branch `DEV-1.0`, you need to synchronize this branch
 
 ```
 git checkout -b dev-1.0 upstream/dev-1.0
-git push --set-upstream origin dev1.0
+git push --set-upstream origin dev-1.0
 ```
 
 ## Create your feature branch

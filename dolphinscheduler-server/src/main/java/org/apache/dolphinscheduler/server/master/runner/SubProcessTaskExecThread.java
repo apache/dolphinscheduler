@@ -93,7 +93,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             return false;
         }
 
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
         return true;
@@ -130,19 +130,20 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
         while (Stopper.isRunning()) {
             // waiting for subflow process instance establishment
             if (subProcessInstance == null) {
-
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-
                 if(!setTaskInstanceState()){
                     continue;
                 }
             }
             subProcessInstance = processService.findProcessInstanceById(subProcessInstance.getId());
+            if (checkTaskTimeout()) {
+                this.checkTimeoutFlag = !alertTimeout();
+                handleTimeoutFailed();
+            }
             updateParentProcessState();
             if (subProcessInstance.getState().typeIsFinished()){
                 break;
             }
-
             if(this.processInstance.getState() == ExecutionStatus.READY_PAUSE){
                 // parent process "ready to pause" , child process "pause"
                 pauseSubProcess();

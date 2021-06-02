@@ -20,50 +20,51 @@
          v-for="(item,$index) in httpParamsList"
          :key="item.id"
          @click="_getIndex($index)">
-      <x-input
+      <el-input
         :disabled="isDetails"
         type="text"
+        size="small"
         v-model="httpParamsList[$index].prop"
         :placeholder="$t('prop(required)')"
-        @on-blur="_verifProp()"
+        @blur="_verifProp()"
         :style="inputStyle">
-      </x-input>
-      <x-select
+      </el-input>
+      <el-select
         @change="_handlePositionChanged"
         v-model="httpParamsList[$index].httpParametersType"
         :placeholder="$t('Http Parameters Position')"
         :disabled="isDetails"
         :style="inputStyle"
       >
-        <x-option
+        <el-option
           v-for="position in positionList"
           :key="position.code"
           :value="position.id"
           :label="position.code">
-        </x-option>
-      </x-select>
-      <x-input
+        </el-option>
+      </el-select>
+      <el-input
         :disabled="isDetails"
         type="text"
         v-model="httpParamsList[$index].value"
         :placeholder="$t('value(required)')"
-        @on-blur="_handleValue()"
+        @blur="_handleValue()"
         :style="inputStyle">
-      </x-input>
+      </el-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <em class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('Delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (httpParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <em class="ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+          <em class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
     <span class="add-dp" v-if="!httpParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+        <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
     </span>
   </div>
@@ -82,7 +83,7 @@
         // Current execution index
         httpParamsIndex: null,
         // 参数位置的下拉框
-        positionList:positionList
+        positionList: positionList
       }
     },
     mixins: [disabledState],
@@ -141,7 +142,7 @@
           if (!v.prop) {
             flag = false
           }
-          if(v.value === ''){
+          if (v.value === '') {
             this.$message.warning(`${i18n.$t('value is empty')}`)
             return false
           }
@@ -172,7 +173,7 @@
           }
         })
         if (!flag) {
-            this.$message.warning(`${i18n.$t('value is empty')}`)
+          this.$message.warning(`${i18n.$t('value is empty')}`)
           return false
         }
         this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
@@ -190,7 +191,7 @@
     },
     computed: {
       inputStyle () {
-        return "width:30%"
+        return 'width:30%'
       }
     },
     mounted () {
@@ -201,35 +202,41 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .user-def-params-model {
+    .el-input__inner {
+      height: 32px;
+      line-height: 32px;
+    }
     .select-listpp {
       margin-bottom: 6px;
       .lt-add {
         padding-left: 4px;
+        line-height: 32px;
         a {
-          .iconfont {
-            font-size: 18px;
+          .iconfont, [class^="el-icon"] {
+            font-size: 17px;
             vertical-align: middle;
-            margin-bottom: -2px;
             display: inline-block;
+            margin-top: 0;
           }
         }
       }
     }
     .add {
+      line-height: 32px;
       a {
         color: #000;
-        .iconfont {
-          font-size: 16px;
+        .iconfont, [class^="el-icon"] {
+          font-size: 18px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: -5px;
+          margin-top: 0px;
         }
       }
     }
-    .add-dp{
+    .add-dp {
       a {
         color: #0097e0;
-        .iconfont {
+        .iconfont, [class^="el-icon"] {
           font-size: 18px;
           vertical-align: middle;
           display: inline-block;
@@ -239,4 +246,3 @@
     }
   }
 </style>
-

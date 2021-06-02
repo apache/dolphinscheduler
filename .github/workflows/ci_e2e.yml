@@ -30,12 +30,10 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
-      - name: checkout submodules
-        shell: bash
-        run: |
-          git submodule sync --recursive
-          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+        with:
+          submodule: true
+      - name: Check License Header
+        uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -47,7 +45,7 @@ jobs:
           sh ./docker/build/hooks/build
       - name: Docker Run
         run: |
-          export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
+          export VERSION=$(cat $(pwd)/pom.xml | grep '<revision>' -m 1 | awk '{print $1}' | sed 's/<revision>//' | sed 's/<\/revision>//')
           sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
           docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d
       - name: Check Server Status
@@ -58,12 +56,14 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
           sudo apt-get install -f -y
-          wget -N https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip
+          google-chrome -version
+          googleVersion=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          wget -N https://chromedriver.storage.googleapis.com/${googleVersion}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv -f chromedriver /usr/local/share/chromedriver
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
-      - name: Run e2e Test
-        run: cd ./e2e && mvn -B clean test
+#     - name: Run e2e Test
+#       run: cd ./e2e && mvn -B clean test
       - name: Collect logs
         if: failure()
         uses: actions/upload-artifact@v2

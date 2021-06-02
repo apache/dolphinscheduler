@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * round robin selector
@@ -30,26 +29,75 @@ import java.util.List;
 public class RoundRobinSelectorTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSelectWithIllegalArgumentException(){
+    public void testSelectWithIllegalArgumentException() {
         RoundRobinSelector selector = new RoundRobinSelector();
-        selector.select(Collections.EMPTY_LIST);
+        selector.select(null);
     }
 
     @Test
-    public void testSelect1(){
-        RoundRobinSelector<String> selector = new RoundRobinSelector();
-        String result = selector.select(Arrays.asList("1"));
-        Assert.assertTrue(StringUtils.isNotEmpty(result));
-        Assert.assertTrue(result.equalsIgnoreCase("1"));
+    public void testSelect1() {
+        RoundRobinSelector selector = new RoundRobinSelector();
+        List<HostWorker> hostOneList = Arrays.asList(
+            new HostWorker("192.168.1.1", 80, 20, "kris"),
+            new HostWorker("192.168.1.2", 80, 10, "kris"));
+
+        List<HostWorker> hostTwoList = Arrays.asList(
+            new HostWorker("192.168.1.1", 80, 20, "kris"),
+            new HostWorker("192.168.1.2", 80, 10, "kris"),
+            new HostWorker("192.168.1.3", 80, 10, "kris"));
+
+        HostWorker result;
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.2", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.2", result.getIp());
+
+        // add new host
+        result = selector.select(hostTwoList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostTwoList);
+        Assert.assertEquals("192.168.1.3", result.getIp());
+
+        result = selector.select(hostTwoList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostTwoList);
+        Assert.assertEquals("192.168.1.2", result.getIp());
+        result = selector.select(hostTwoList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostTwoList);
+        Assert.assertEquals("192.168.1.3", result.getIp());
+
+        // remove host3
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.2", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
     }
 
     @Test
-    public void testSelect(){
-        RoundRobinSelector<Integer> selector = new RoundRobinSelector();
-        List<Integer> sources = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
-        int result = selector.select(sources);
-        Assert.assertTrue(result == 1);
-        int result2 = selector.select(Arrays.asList(1,2,3,4,5,6,7));
-        Assert.assertTrue(result2 == 2);
+    public void testWeightRoundRobinSelector() {
+        RoundRobinSelector selector = new RoundRobinSelector();
+        HostWorker result;
+        result = selector.select(
+            Arrays.asList(new HostWorker("192.168.1.1", 11, 20, "kris"), new HostWorker("192.168.1.2", 22, 80, "kris")));
+        Assert.assertEquals("192.168.1.2", result.getIp());
     }
+
 }

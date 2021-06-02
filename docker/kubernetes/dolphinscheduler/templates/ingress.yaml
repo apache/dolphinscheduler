@@ -15,14 +15,19 @@
 # limitations under the License.
 #
 {{- if .Values.ingress.enabled }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" }}
 apiVersion: networking.k8s.io/v1beta1
+{{- else }}
+apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   rules:
   - host: {{ .Values.ingress.host }}
@@ -30,14 +35,22 @@ spec:
       paths:
         - path: {{ .Values.ingress.path }}
           backend:
-            serviceName: {{ include "dolphinscheduler.fullname" . }}-frontend
-            servicePort: tcp-port
+            {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+            service:
+              name: {{ include "dolphinscheduler.fullname" . }}-api
+              port:
+                name: api-port
+            {{- else }}
+            serviceName: {{ include "dolphinscheduler.fullname" . }}-api
+            servicePort: api-port
+            {{- end }}
+          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+          pathType: Prefix
+          {{- end }}
   {{- if .Values.ingress.tls.enabled }}
   tls:
     hosts:
-      {{- range .Values.ingress.tls.hosts }}
-      - {{ . | quote }}
-    {{- end }}
+      - {{ .Values.ingress.host }}
     secretName: {{ .Values.ingress.tls.secretName }}
   {{- end }}
 {{- end }}

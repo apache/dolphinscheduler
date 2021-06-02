@@ -18,7 +18,7 @@
   <div class="script-model">
     <m-list-box>
       <div slot="content">
-        <div class="from-mirror1">
+        <div class="form-mirror1">
           <textarea
             id="code-shell-mirror1"
             name="code-shell-mirror1"
@@ -27,14 +27,10 @@
         </div>
       </div>
     </m-list-box>
-    <a class="ans-modal-box-close">
-      <em class="ans-icon-min" @click="closeModal"></em>
-    </a>
   </div>
 </template>
 <script>
   import _ from 'lodash'
-  import i18n from '@/module/i18n'
   import mListBox from './listBox'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
@@ -46,7 +42,7 @@
     data () {
       return {
         // script
-        rawScript: '',
+        rawScript: ''
       }
     },
     mixins: [disabledState],
@@ -59,13 +55,13 @@
        */
       _handlerEditor () {
         // editor
-        let self =this
+        let self = this
         editor = codemirror('code-shell-mirror1', {
           mode: 'shell',
           readOnly: this.isDetails
         })
-        editor.on("change",function(){
-          self.$emit('getSriptBoxValue',editor.getValue())
+        editor.on('change', function () {
+          self.$emit('getSriptBoxValue', editor.getValue())
         })
 
         this.keypress = () => {
@@ -82,10 +78,6 @@
         editor.setValue(this.rawScript)
 
         return editor
-      },
-      closeModal() {
-        let self = this
-        self.$emit('closeAble')
       }
     },
     watch: {},
@@ -115,10 +107,9 @@
   .script-model {
     width:100%;
   }
-  .from-mirror1 {
+  .form-mirror1 {
     .CodeMirror {
-      min-height: 600px;
-      max-height: 700px;
+      height: calc(70vh - 90px);
     }
   }
 </style>

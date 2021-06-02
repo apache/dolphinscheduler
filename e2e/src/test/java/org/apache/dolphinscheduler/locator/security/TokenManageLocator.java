@@ -24,6 +24,8 @@ public class TokenManageLocator {
 
     public static final By CLICK_CREATE_TOKEN = By.xpath("//div[2]/div/div[2]/div[2]/div/div[1]/button/span");
 
+    public static final By CREATE_TOKEN_POPUP = By.xpath("//div[5]/div/div[2]/div/div[1]/span");
+
     public static final By SELECT_USER = By.xpath("//div[2]/div[2]/div/div/div/span/i");
 
     public static final By CLICK_GENERATE_TOKEN_BUTTON = By.xpath("//div[3]/div[2]/button/span");
@@ -31,7 +33,9 @@ public class TokenManageLocator {
     public static final By CLICK_SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
 
     //edit token
-    public static final By CLICK_EDIT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[7]/button/i");
+    public static final By TOKEN = By.xpath("//table/tr[2]/td[1]/span");
+    public static final By EDIT_TOKEN_BUTTON = By.xpath("//table/tr[2]/td[7]/button");
+
 
     //delete token
     public static final By CLICK_DELETE_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[7]/span/button");

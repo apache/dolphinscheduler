@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.shell;
 
+import static java.util.Calendar.DAY_OF_MONTH;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -31,6 +34,7 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -40,6 +44,10 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,6 +105,11 @@ public class ShellTask extends AbstractTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
+<<<<<<< HEAD
+=======
+            setResult(shellCommandExecutor.getTaskResultString());
+            setVarPool(shellCommandExecutor.getVarPool());
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
         } catch (Exception e) {
             logger.error("shell task error", e);
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
@@ -118,7 +131,11 @@ public class ShellTask extends AbstractTask {
      */
     private String buildCommand() throws Exception {
         // generate scripts
+<<<<<<< HEAD
         String fileName = String.format("%s/%s_node.sh",
+=======
+        String fileName = String.format("%s/%s_node.%s",
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
             taskExecutionContext.getExecutePath(),
             taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
@@ -129,6 +146,7 @@ public class ShellTask extends AbstractTask {
         }
 
         String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+<<<<<<< HEAD
         /**
          *  combining local and global parameters
          */
@@ -177,4 +195,68 @@ public class ShellTask extends AbstractTask {
         return shellParameters;
     }
 
+=======
+        script = parseScript(script);
+        shellParameters.setRawScript(script);
+
+        logger.info("raw script : {}", shellParameters.getRawScript());
+        logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
+
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+
+        if (OSUtils.isWindows()) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
+        Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+
+        return fileName;
+    }
+
+    @Override
+    public AbstractParameters getParameters() {
+        return shellParameters;
+    }
+
+    private String parseScript(String script) {
+        // combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+            taskExecutionContext.getDefinedParams(),
+            shellParameters.getLocalParametersMap(),
+            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+            taskExecutionContext.getScheduleTime());
+        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+        if (taskExecutionContext.getScheduleTime() != null) {
+            if (paramsMap == null) {
+                paramsMap = new HashMap<>();
+            }
+            Date date = taskExecutionContext.getScheduleTime();
+            if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+                date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
+            }
+            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
+            Property p = new Property();
+            p.setValue(dateTime);
+            p.setProp(Constants.PARAMETER_DATETIME);
+            paramsMap.put(Constants.PARAMETER_DATETIME, p);
+        }
+        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+    }
+
+    public void setResult(String result) {
+        Map<String, Property> localParams = shellParameters.getLocalParametersMap();
+        List<Map<String, String>> outProperties = new ArrayList<>();
+        Map<String, String> p = new HashMap<>();
+        localParams.forEach((k,v) -> {
+            if (v.getDirect() == Direct.OUT) {
+                p.put(k, result);
+            }
+        });
+        outProperties.add(p);
+        resultString = JSONUtils.toJsonString(outProperties);
+    }
+>>>>>>> cc9e5d5d34fcf2279b267cca7df37a9e80eeba07
 }

@@ -1,0 +1,72 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<runtime>
+    <!-- Target -->
+    <archive name="${project.artifactId}-${project.version}.tar.gz" hardLinkIncludes="**/*.jar"/>
+    <!-- Notices -->
+    <fileSet to="/">
+        <directory path="${basedir}/../">
+            <include>DISCLAIMER</include>
+            <include>install.sh</include>
+            <include>LICENSE</include>
+            <include>NOTICE</include>
+        </directory>
+
+    </fileSet>
+
+    <!-- Server -->
+    <artifactSet to="bin">
+        <artifact id="io.airlift:launcher:tar.gz:bin:${dep.packaging.version}">
+            <unpack/>
+        </artifact>
+        <artifact id="io.airlift:launcher:tar.gz:properties:${dep.packaging.version}">
+            <unpack filter="true"/>
+        </artifact>
+    </artifactSet>
+
+    <!-- Plugins -->
+    <artifactSet to="lib/plugin/alert/email">
+        <artifact id="${project.groupId}:dolphinscheduler-alert-email:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/alert/script">
+        <artifact id="${project.groupId}:dolphinscheduler-alert-script:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/alert/wechat">
+        <artifact id="${project.groupId}:dolphinscheduler-alert-wechat:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/alert/dingtalk">
+        <artifact id="${project.groupId}:dolphinscheduler-alert-dingtalk:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/alert/http">
+        <artifact id="${project.groupId}:dolphinscheduler-alert-http:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+    <artifactSet to="lib/plugin/alert/feishu">
+        <artifact id="${project.groupId}:dolphinscheduler-alert-feishu:zip:${project.version}">
+            <unpack/>
+        </artifact>
+    </artifactSet>
+</runtime>

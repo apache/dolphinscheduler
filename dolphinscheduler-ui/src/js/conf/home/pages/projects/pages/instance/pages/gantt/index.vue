@@ -24,15 +24,15 @@
               <span>{{$t('Task Status')}}</span>
             </a>
             <a href="javascript:" v-for="(item) in tasksState" :key="item.id">
-              <em class="ans-icon-rect-solid" :style="{color:item.color}"></em>
+              <em class="ri-checkbox-blank-fill" :style="{color:item.color}"></em>
               <span>{{item.desc}}</span>
             </a>
           </div>
         </div>
-        <template v-show="!isNodata">
+        <template v-if="!isNodata">
           <div class="gantt"></div>
         </template>
-        <template v-if="isNodata">
+        <template v-else>
           <m-no-data></m-no-data>
         </template>
         <m-spin :is-spin="isLoading">
@@ -47,8 +47,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
-  import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -111,7 +109,7 @@
     destroyed () {
     },
     computed: {},
-    components: { mConditions, mSecondaryMenu, mListConstruction, mSpin, mNoData }
+    components: { mListConstruction, mSpin, mNoData }
   }
 </script>
 

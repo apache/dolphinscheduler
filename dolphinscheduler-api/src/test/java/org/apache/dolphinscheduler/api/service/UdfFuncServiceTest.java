@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.UdfFuncServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,6 +32,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,25 +51,29 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * udf func service test
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(PropertyUtils.class)
 public class UdfFuncServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceTest.class);
 
     @InjectMocks
-    private UdfFuncService udfFuncService;
+    private UdfFuncServiceImpl udfFuncService;
+
     @Mock
     private ResourceMapper resourceMapper;
+
     @Mock
     private UdfFuncMapper udfFuncMapper;
+
     @Mock
     private UDFUserMapper udfUserMapper;
-
 
     @Before
     public void setUp() {
@@ -149,9 +159,11 @@ public class UdfFuncServiceTest {
     }
 
     @Test
-    public  void testQueryResourceList(){
-        Mockito.when(udfFuncMapper.getUdfFuncByType(1, 1)).thenReturn(getList());
-        Map<String, Object> result = udfFuncService.queryResourceList(getLoginUser(),1);
+    public  void testQueryUdfFuncList(){
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(udfFuncMapper.getUdfFuncByType(user.getId(), UdfType.HIVE.ordinal())).thenReturn(getList());
+        Map<String, Object> result = udfFuncService.queryUdfFuncList(user,UdfType.HIVE.ordinal());
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         List<UdfFunc> udfFuncList = (List<UdfFunc>) result.get(Constants.DATA_LIST);
@@ -160,6 +172,8 @@ public class UdfFuncServiceTest {
 
     @Test
     public  void testDelete(){
+        Mockito.when(udfFuncMapper.deleteById(Mockito.anyInt())).thenReturn(1);
+        Mockito.when(udfUserMapper.deleteByUdfFuncId(Mockito.anyInt())).thenReturn(1);
         Result result= udfFuncService.delete(122);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());

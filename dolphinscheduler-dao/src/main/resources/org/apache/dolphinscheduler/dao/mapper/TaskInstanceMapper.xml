@@ -18,6 +18,18 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper">
+    <sql id="baseSql">
+        id, name, task_type, process_instance_id, task_code, task_definition_version, state, submit_time,
+        start_time, end_time, host, execute_path, log_path, alert_flag, retry_times, pid, app_link,
+        flag, retry_interval, max_retry_times, task_instance_priority, worker_group, executor_id,
+        first_submit_time, delay_time, task_params, var_pool
+    </sql>
+    <sql id="baseSqlV2">
+        ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.task_code, ${alias}.task_definition_version, ${alias}.process_instance_id, ${alias}.state, ${alias}.submit_time,
+        ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.execute_path, ${alias}.log_path, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid, ${alias}.app_link,
+        ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group, ${alias}.executor_id,
+        ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.task_params, ${alias}.var_pool
+    </sql>
     <update id="setFailoverByHostAndStateArray">
         update t_ds_task_instance
         set state = #{destStatus}
@@ -35,14 +47,16 @@
         and flag = 1
     </select>
     <select id="findValidTaskListByProcessId" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_task_instance
-        WHERE  process_instance_id = #{processInstanceId}
+        WHERE process_instance_id = #{processInstanceId}
         and flag = #{flag}
         order by start_time desc
     </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select *
+        select
+        <include refid="baseSql"/>
         from t_ds_task_instance
         where 1 = 1
         <if test="host != null and host != ''">
@@ -56,14 +70,14 @@
         </if>
     </select>
     <select id="countTaskInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
-        select  state, count(0) as count
+        select state, count(0) as count
         from t_ds_task_instance t
-        left join t_ds_process_definition  d on d.id=t.process_definition_id
-        left join t_ds_project p on p.id=d.project_id
+        left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
+        left join t_ds_project p on p.code=d.project_code
         where 1=1
-        <if test="projectIds != null and projectIds.length != 0">
-            and d.project_id in
-            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and d.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
@@ -73,7 +87,8 @@
         group by t.state
     </select>
     <select id="queryByInstanceIdAndName" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select  *
+        select
+        <include refid="baseSql"/>
         from t_ds_task_instance
         where process_instance_id = #{processInstanceId}
         and name = #{name}
@@ -82,11 +97,12 @@
     </select>
     <select id="countTask" resultType="java.lang.Integer">
         select count(1) as count
-        from t_ds_task_instance task,t_ds_process_definition process
-        where task.process_definition_id=process.id
-        <if test="projectIds != null and projectIds.length != 0">
-            and process.project_id in
-            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+        from t_ds_task_instance task,t_ds_task_definition_log define
+        where task.task_code=define.code
+        and task.task_definition_version=define.version
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and define.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
@@ -98,11 +114,16 @@
         </if>
     </select>
     <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select instance.*,process.name as process_instance_name
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="instance"/>
+        </include>
+        ,
+        process.name as process_instance_name
         from t_ds_task_instance instance
-        join t_ds_process_definition define ON instance.process_definition_id = define.id
-        join  t_ds_process_instance process on process.id=instance.process_instance_id
-        where define.project_id = #{projectId}
+        left join t_ds_task_definition_log define on define.code=instance.task_code and define.version=instance.task_definition_version
+        left join t_ds_process_instance process on process.id=instance.process_instance_id
+        where define.project_code = #{projectCode}
         <if test="startTime != null">
             and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
@@ -110,13 +131,13 @@
             and instance.process_instance_id = #{processInstanceId}
         </if>
         <if test="searchVal != null and searchVal != ''">
-            and  instance.name like concat('%', #{searchVal}, '%')
+            and instance.name like concat('%', #{searchVal}, '%')
         </if>
         <if test="taskName != null and taskName != ''">
             and instance.name=#{taskName}
         </if>
         <if test="states != null and states.length != 0">
-            and instance.state in 
+            and instance.state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
@@ -126,6 +147,9 @@
         </if>
         <if test="executorId != 0">
             and instance.executor_id = #{executorId}
+        </if>
+        <if test="processInstanceName != null and processInstanceName != ''">
+            and process.name like concat('%', #{processInstanceName}, '%')
         </if>
         order by instance.start_time desc
     </select>

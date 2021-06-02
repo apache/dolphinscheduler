@@ -20,17 +20,13 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-master-headless
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master-headless
-    app.kubernetes.io/instance: {{ .Release.Name }}-master-headless
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   clusterIP: "None"
   ports:
-    - port: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+    - port: 5678
       targetPort: master-port
       protocol: TCP
       name: master-port
   selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: master
+    {{- include "dolphinscheduler.master.labels" . | nindent 4 }}

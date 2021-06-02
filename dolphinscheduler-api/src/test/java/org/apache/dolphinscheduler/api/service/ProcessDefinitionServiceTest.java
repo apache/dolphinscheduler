@@ -14,23 +14,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.apache.http.entity.ContentType;
-import org.json.JSONException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,72 +77,178 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+/**
+ * process definition service test
+ */
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceTest {
 
+    private static final String SHELL_JSON = "{\n"
+            + "    \"globalParams\": [\n"
+            + "        \n"
+            + "    ],\n"
+            + "    \"tasks\": [\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9527\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \n"
+            + "            ]\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"tenantId\": 1,\n"
+            + "    \"timeout\": 0\n"
+            + "}";
+    private static final String CYCLE_SHELL_JSON = "{\n"
+            + "    \"globalParams\": [\n"
+            + "        \n"
+            + "    ],\n"
+            + "    \"tasks\": [\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9527\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"tasks-9529\"\n"
+            + "            ]\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9528\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"tasks-9527\"\n"
+            + "            ]\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9529\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"tasks-9528\"\n"
+            + "            ]\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"tenantId\": 1,\n"
+            + "    \"timeout\": 0\n"
+            + "}";
     @InjectMocks
-    ProcessDefinitionService processDefinitionService;
-
-    @Mock
-    private DataSourceMapper dataSourceMapper;
-
+    private ProcessDefinitionServiceImpl processDefinitionService;
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
-
+    @Mock
+    private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
     private ProjectMapper projectMapper;
-
     @Mock
-    private ProjectService projectService;
-
+    private ProjectServiceImpl projectService;
     @Mock
     private ScheduleMapper scheduleMapper;
-
-
-
     @Mock
     private ProcessService processService;
-
     @Mock
-    private ProcessInstanceMapper processInstanceMapper;
-
+    private ProcessInstanceService processInstanceService;
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
-
-    private String sqlDependentJson = "{\"globalParams\":[]," +
-            "\"tasks\":[{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
-            "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\"," +
-            "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\"" +
-            ",\"localParams\":[],\"connParams\":\"\"," +
-            "\"preStatements\":[],\"postStatements\":[]}," +
-            "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-            "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\"," +
-            "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-            "\"preTasks\":[\"dependent\"]},{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
-            "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-            "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
-            "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
-            "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-            "\"timeout\":{\"strategy\":\"\",\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
-            "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
-
-    private String shellJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\"," +
-            "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
-            "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-            "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
-            "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
     @Test
     public void testQueryProcessDefinitionList() {
@@ -115,25 +260,26 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project not found
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.queryProcessDefinitionList(loginUser,"project_test1");
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Map<String, Object> map = processDefinitionService.queryProcessDefinitionList(loginUser, "project_test1");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         //project check auth success
         putMsg(result, Status.SUCCESS, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         List<ProcessDefinition> resourceList = new ArrayList<>();
         resourceList.add(getProcessDefinition());
-        Mockito.when(processDefineMapper.queryAllDefinitionList(project.getId())).thenReturn(resourceList);
-        Map<String, Object> checkSuccessRes = processDefinitionService.queryProcessDefinitionList(loginUser,"project_test1");
+        Mockito.when(processDefineMapper.queryAllDefinitionList(project.getCode())).thenReturn(resourceList);
+        Map<String, Object> checkSuccessRes = processDefinitionService.queryProcessDefinitionList(loginUser, "project_test1");
         Assert.assertEquals(Status.SUCCESS, checkSuccessRes.get(Constants.STATUS));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testQueryProcessDefinitionListPaging() {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
@@ -144,14 +290,30 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project not found
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.queryProcessDefinitionListPaging(loginUser, "project_test1", "",1, 5,0);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Map<String, Object> map = processDefinitionService.queryProcessDefinitionListPaging(loginUser, "project_test1", "", 1, 5, 0);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
+        putMsg(result, Status.SUCCESS, projectName);
+        loginUser.setId(1);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Page<ProcessDefinition> page = new Page<>(1, 10);
+        page.setTotal(30);
+        Mockito.when(processDefineMapper.queryDefineListPaging(
+                Mockito.any(IPage.class)
+                , Mockito.eq("")
+                , Mockito.eq(loginUser.getId())
+                , Mockito.eq(project.getCode())
+                , Mockito.anyBoolean())).thenReturn(page);
+
+        Map<String, Object> map1 = processDefinitionService.queryProcessDefinitionListPaging(
+                loginUser, projectName, "", 1, 10, loginUser.getId());
+
+        Assert.assertEquals(Status.SUCCESS, map1.get(Constants.STATUS));
     }
 
     @Test
@@ -165,22 +327,33 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.queryProcessDefinitionById(loginUser,
                 "project_test1", 1);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         //project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Mockito.when(processDefineMapper.selectById(1)).thenReturn(null);
+
+        String processDefinitionJson = "{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
+                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
+                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
+                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
+                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
+                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
+                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}";
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+        Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(processData);
+
         Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionById(loginUser,
                 "project_test1", 1);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
 
         //instance exit
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
@@ -190,7 +363,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testCopyProcessDefinition()  throws Exception{
+    public void testQueryProcessDefinitionByName() {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
@@ -200,38 +373,132 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+
+        //project check auth fail
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Map<String, Object> map = processDefinitionService.queryProcessDefinitionByName(loginUser,
+                "project_test1", "test_def");
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
+
         //project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(processDefineMapper.queryByDefineName(project.getCode(), "test_def")).thenReturn(null);
+
+        ProcessData processData = getProcessData();
+        Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(processData);
+        Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionByName(loginUser,
+                "project_test1", "test_def");
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
+
+        //instance exit
+        Mockito.when(processDefineMapper.queryByDefineName(project.getCode(), "test")).thenReturn(getProcessDefinition());
+        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByName(loginUser,
+                "project_test1", "test");
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testBatchCopyProcessDefinition() {
+
+        String projectName = "project_test1";
+        Project project = getProject(projectName);
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        // copy project definition ids empty test
+        Map<String, Object> map = processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, StringUtils.EMPTY, 0);
+        Assert.assertEquals(Status.PROCESS_DEFINITION_IDS_IS_EMPTY, map.get(Constants.STATUS));
+
+        Map<String, Object> result = new HashMap<>();
+
+        // project check auth fail
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Map<String, Object> map1 = processDefinitionService.batchCopyProcessDefinition(
+                loginUser, projectName, String.valueOf(project.getId()), 0);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map1.get(Constants.STATUS));
+
+        // project check auth success, target project is null
+        putMsg(result, Status.SUCCESS, projectName);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(projectMapper.queryDetailById(0)).thenReturn(null);
+        Map<String, Object> map2 = processDefinitionService.batchCopyProcessDefinition(
+                loginUser, projectName, String.valueOf(project.getId()), 0);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map2.get(Constants.STATUS));
+
+        // project check auth success, target project name not equal project name, check auth target project fail
+        Project project1 = getProject(projectName);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project1);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+
+        putMsg(result, Status.SUCCESS, projectName);
+        String projectName2 = "project_test2";
+        Project project2 = getProject(projectName2);
+        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(project2);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project2, projectName2)).thenReturn(result);
+        Mockito.when(projectMapper.queryDetailById(1)).thenReturn(project2);
+        // instance exit
+        ProcessDefinition definition = getProcessDefinition();
+        definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
+        definition.setConnects("[]");
+
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
+        Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(getProcessData());
+
+        Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
+                loginUser, projectName, "46", 1);
+        Assert.assertEquals(Status.COPY_PROCESS_DEFINITION_ERROR, map3.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testBatchMoveProcessDefinition() {
+        String projectName = "project_test1";
+        Project project1 = getProject(projectName);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project1);
+
+        String projectName2 = "project_test2";
+        Project project2 = getProject(projectName2);
+        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(project2);
+
+        int targetProjectId = 2;
+        Mockito.when(projectMapper.queryDetailById(targetProjectId)).thenReturn(getProjectById(targetProjectId));
+
+        Project project = getProject(projectName);
+        Project targetProject = getProjectById(targetProjectId);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectName);
+
+        Map<String, Object> result2 = new HashMap<>();
+        putMsg(result2, Status.SUCCESS, targetProject.getName());
+
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project2, projectName2)).thenReturn(result);
 
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
-        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
         definition.setConnects("[]");
-        //instance exit
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
 
-        Map<String, Object> createProcessResult = new HashMap<>(5);
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.createProcessDefinition(
-                loginUser,
-                definition.getProjectName(),
-                definition.getName(),
-                definition.getProcessDefinitionJson(),
-                definition.getDescription(),
-                definition.getLocations(),
-                definition.getConnects())).thenReturn(createProcessResult);
-
-        Map<String, Object> successRes = processDefinitionService.copyProcessDefinition(loginUser,
-                "project_test1", 46);
+        Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(
+                loginUser, "project_test1", "46", 2);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
-    public void deleteProcessDefinitionByIdTest() throws Exception {
+    public void deleteProcessDefinitionByIdTest() {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
@@ -241,15 +508,15 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
 
         //project check auth fail
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.deleteProcessDefinitionById(loginUser, "project_test1", 6);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         //project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Mockito.when(processDefineMapper.selectById(1)).thenReturn(null);
         Map<String, Object> instanceNotexitRes = processDefinitionService.deleteProcessDefinitionById(loginUser,
                 "project_test1", 1);
@@ -317,40 +584,38 @@ public class ProcessDefinitionServiceTest {
 
         Project project = getProject(projectName);
         User loginUser = new User();
-        loginUser.setId(-1);
+        loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         //project check auth fail
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-                6, ReleaseState.OFFLINE.getCode());
+                6, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
-        //project check auth success, processs definition online
+        // project check auth success, processs definition online
         putMsg(result, Status.SUCCESS, projectName);
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
-        Mockito.when(processDefineMapper.updateById(getProcessDefinition())).thenReturn(1);
-        Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-                46, ReleaseState.ONLINE.getCode());
+        Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
+                loginUser, "project_test1", 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
 
-        //release error code
-        Map<String, Object> failRes = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-                46, 2);
+        // project check auth success, processs definition online
+        ProcessDefinition processDefinition1 = getProcessDefinition();
+        processDefinition1.setResourceIds("1,2");
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition1);
+        Mockito.when(processService.getUserById(1)).thenReturn(loginUser);
+        Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
+                loginUser, "project_test1", 46, ReleaseState.ONLINE);
+        Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
+
+        // release error code
+        Map<String, Object> failRes = processDefinitionService.releaseProcessDefinition(
+                loginUser, "project_test1", 46, ReleaseState.getEnum(2));
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
 
-        //FIXME has function exit code 1 when exception
-        //process definition offline
-//        List<Schedule> schedules = new ArrayList<>();
-//        Schedule schedule = getSchedule();
-//        schedules.add(schedule);
-//        Mockito.when(scheduleMapper.selectAllByProcessDefineArray(new int[]{46})).thenReturn(schedules);
-//        Mockito.when(scheduleMapper.updateById(schedule)).thenReturn(1);
-//        Map<String, Object> offlineRes = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-//                46, ReleaseState.OFFLINE.getCode());
-//        Assert.assertEquals(Status.SUCCESS, offlineRes.get(Constants.STATUS));
     }
 
     @Test
@@ -364,25 +629,25 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
 
         //project check auth fail
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.verifyProcessDefinitionName(loginUser,
                 "project_test1", "test_pdf");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         //project check auth success, process not exist
         putMsg(result, Status.SUCCESS, projectName);
-        Mockito.when(processDefineMapper.queryByDefineName(project.getId(),"test_pdf")).thenReturn(null);
+        Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(null);
         Map<String, Object> processNotExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
                 "project_test1", "test_pdf");
         Assert.assertEquals(Status.SUCCESS, processNotExistRes.get(Constants.STATUS));
 
         //process exist
-        Mockito.when(processDefineMapper.queryByDefineName(project.getId(),"test_pdf")).thenReturn(getProcessDefinition());
+        Mockito.when(processDefineMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(getProcessDefinition());
         Map<String, Object> processExistRes = processDefinitionService.verifyProcessDefinitionName(loginUser,
                 "project_test1", "test_pdf");
-        Assert.assertEquals(Status.PROCESS_INSTANCE_EXIST, processExistRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));
     }
 
     @Test
@@ -391,72 +656,99 @@ public class ProcessDefinitionServiceTest {
         Map<String, Object> dataNotValidRes = processDefinitionService.checkProcessNodeList(null, "");
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
 
-        //task not empty
-        String processDefinitionJson = shellJson;
+        // task not empty
+        String processDefinitionJson = SHELL_JSON;
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-        assert processData != null;
+        Assert.assertNotNull(processData);
         Map<String, Object> taskEmptyRes = processDefinitionService.checkProcessNodeList(processData, processDefinitionJson);
         Assert.assertEquals(Status.SUCCESS, taskEmptyRes.get(Constants.STATUS));
 
-        //task empty
+        // task empty
         processData.setTasks(null);
         Map<String, Object> taskNotEmptyRes = processDefinitionService.checkProcessNodeList(processData, processDefinitionJson);
-        Assert.assertEquals(Status.DATA_IS_NULL, taskNotEmptyRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROCESS_DAG_IS_EMPTY, taskNotEmptyRes.get(Constants.STATUS));
+
+        // task cycle
+        String processDefinitionJsonCycle = CYCLE_SHELL_JSON;
+        ProcessData processDataCycle = JSONUtils.parseObject(processDefinitionJsonCycle, ProcessData.class);
+        Map<String, Object> taskCycleRes = processDefinitionService.checkProcessNodeList(processDataCycle, processDefinitionJsonCycle);
+        Assert.assertEquals(Status.PROCESS_NODE_HAS_CYCLE, taskCycleRes.get(Constants.STATUS));
 
         //json abnormal
-        String abnormalJson = processDefinitionJson.replaceAll("SHELL","");
+        String abnormalJson = processDefinitionJson.replaceAll(TaskType.SHELL.getDesc(), "");
         processData = JSONUtils.parseObject(abnormalJson, ProcessData.class);
         Map<String, Object> abnormalTaskRes = processDefinitionService.checkProcessNodeList(processData, abnormalJson);
         Assert.assertEquals(Status.PROCESS_NODE_S_PARAMETER_INVALID, abnormalTaskRes.get(Constants.STATUS));
     }
 
     @Test
-    public void testGetTaskNodeListByDefinitionId() throws Exception {
+    public void testGetTaskNodeListByDefinitionId() {
         //process definition not exist
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(null);
-        Map<String, Object> processDefinitionNullRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(null);
+        Map<String, Object> processDefinitionNullRes = processDefinitionService.getTaskNodeListByDefinitionCode(46L);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
         //process data null
         ProcessDefinition processDefinition = getProcessDefinition();
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
-        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionCode(46L);
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, successRes.get(Constants.STATUS));
 
         //success
-        processDefinition.setProcessDefinitionJson(shellJson);
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
-        Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionId(46);
+        Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(new ProcessData());
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Map<String, Object> dataNotValidRes = processDefinitionService.getTaskNodeListByDefinitionCode(46L);
         Assert.assertEquals(Status.SUCCESS, dataNotValidRes.get(Constants.STATUS));
     }
 
     @Test
-    public void testGetTaskNodeListByDefinitionIdList() throws Exception {
+    public void testGetTaskNodeListByDefinitionIdList() {
         //process definition not exist
-        String defineIdList = "46";
-        Integer[] idArray = {46};
-        Mockito.when(processDefineMapper.queryDefinitionListByIdList(idArray)).thenReturn(null);
-        Map<String, Object> processNotExistRes = processDefinitionService.getTaskNodeListByDefinitionIdList(defineIdList);
+        String defineCodeList = "46";
+        Long[] codeArray = {46L};
+        List<Long> codeList = Arrays.asList(codeArray);
+        Mockito.when(processDefineMapper.queryByCodes(codeList)).thenReturn(null);
+        Map<String, Object> processNotExistRes = processDefinitionService.getTaskNodeListByDefinitionCodeList(defineCodeList);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processNotExistRes.get(Constants.STATUS));
 
         //process definition exist
         ProcessDefinition processDefinition = getProcessDefinition();
-        processDefinition.setProcessDefinitionJson(shellJson);
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
-        Mockito.when(processDefineMapper.queryDefinitionListByIdList(idArray)).thenReturn(processDefinitionList);
-        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionIdList(defineIdList);
+        Mockito.when(processDefineMapper.queryByCodes(codeList)).thenReturn(processDefinitionList);
+        ProcessData processData = getProcessData();
+        Mockito.when(processService.genProcessData(processDefinition)).thenReturn(processData);
+
+        Map<String, Object> successRes = processDefinitionService.getTaskNodeListByDefinitionCodeList(defineCodeList);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    private ProcessData getProcessData() {
+        ProcessData processData = new ProcessData();
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        processData.setTasks(taskNodeList);
+        List<Property> properties = new ArrayList<>();
+        processData.setGlobalParams(properties);
+        processData.setTenantId(10);
+        processData.setTimeout(100);
+        return processData;
     }
 
     @Test
     public void testQueryProcessDefinitionAllByProjectId() {
         int projectId = 1;
+        Long projectCode = 2L;
+        Project project = new Project();
+        project.setId(projectId);
+        project.setCode(projectCode);
+        Mockito.when(projectMapper.selectById(projectId)).thenReturn(project);
+
         ProcessDefinition processDefinition = getProcessDefinition();
-        processDefinition.setProcessDefinitionJson(shellJson);
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
-        Mockito.when(processDefineMapper.queryAllDefinitionList(projectId)).thenReturn(processDefinitionList);
+        Project test = getProject("test");
+        Mockito.when(projectMapper.selectById(projectId)).thenReturn(test);
+        Mockito.when(processDefineMapper.queryAllDefinitionList(test.getCode())).thenReturn(processDefinitionList);
         Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionAllByProjectId(projectId);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -465,7 +757,7 @@ public class ProcessDefinitionServiceTest {
     public void testViewTree() throws Exception {
         //process definition not exist
         ProcessDefinition processDefinition = getProcessDefinition();
-        processDefinition.setProcessDefinitionJson(shellJson);
+        processDefinition.setProcessDefinitionJson(SHELL_JSON);
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(null);
         Map<String, Object> processDefinitionNullRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
@@ -474,7 +766,7 @@ public class ProcessDefinitionServiceTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setName("test_instance");
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setHost("192.168.xx.xx");
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
@@ -483,204 +775,125 @@ public class ProcessDefinitionServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
-        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         taskInstance.setId(1);
         taskInstance.setName("test_task_instance");
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setHost("192.168.xx.xx");
 
         //task instance not exist
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
-        Mockito.when(processInstanceMapper.queryByProcessDefineId(46, 10)).thenReturn(processInstanceList);
-        Mockito.when(taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), "shell-1")).thenReturn(null);
+        Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNullRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNullRes.get(Constants.STATUS));
 
         //task instance exist
-        Mockito.when(taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), "shell-1")).thenReturn(taskInstance);
         Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
-    }
-
-    /**
-     * add datasource param and dependent when export process
-     * @throws JSONException
-     */
-    @Test
-    public void testAddTaskNodeSpecialParam() throws JSONException {
-
-        Mockito.when(dataSourceMapper.selectById(1)).thenReturn(getDataSource());
-        Mockito.when(processDefineMapper.queryByDefineId(2)).thenReturn(getProcessDefinition());
-
-        String corSqlDependentJson = processDefinitionService.addExportTaskNodeSpecialParam(sqlDependentJson);
-
-        JSONAssert.assertEquals(sqlDependentJson,corSqlDependentJson,false);
 
     }
 
     @Test
-    public void testExportProcessMetaDataStr() {
-        Mockito.when(scheduleMapper.queryByProcessDefinitionId(46)).thenReturn(getSchedulerList());
+    public void testSubProcessViewTree() throws Exception {
+
         ProcessDefinition processDefinition = getProcessDefinition();
-        processDefinition.setProcessDefinitionJson(sqlDependentJson);
+        processDefinition.setProcessDefinitionJson(SHELL_JSON);
+        List<ProcessInstance> processInstanceList = new ArrayList<>();
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setName("test_instance");
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setHost("192.168.xx.xx");
+        processInstance.setStartTime(new Date());
+        processInstance.setEndTime(new Date());
+        processInstanceList.add(processInstance);
 
-        String exportProcessMetaDataStr = processDefinitionService.exportProcessMetaDataStr(46, processDefinition);
-        Assert.assertNotEquals(sqlDependentJson,exportProcessMetaDataStr);
-    }
-
-    @Test
-    public void testAddExportTaskNodeSpecialParam() throws JSONException {
-        String shellData = shellJson;
-
-        String resultStr = processDefinitionService.addExportTaskNodeSpecialParam(shellData);
-        JSONAssert.assertEquals(shellJson, resultStr, false);
-    }
-
-    @Test
-    public void testImportProcessSchedule() {
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-
-        String currentProjectName = "test";
-        String processDefinitionName = "test_process";
-        Integer processDefinitionId = 1;
-        Schedule schedule = getSchedule();
-
-        ProcessMeta processMeta = getProcessMeta();
-
-        int insertFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMeta,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, insertFlag);
-
-        ProcessMeta processMetaCron = new ProcessMeta();
-        processMetaCron.setScheduleCrontab(schedule.getCrontab());
-
-        int insertFlagCron = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, insertFlagCron);
-
-        WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setName("ds-test-workergroup");
-        List<WorkerGroup> workerGroups = new ArrayList<>();
-        workerGroups.add(workerGroup);
-
-        processMetaCron.setScheduleWorkerGroupName("ds-test");
-        int insertFlagWorker = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, insertFlagWorker);
-
-        int workerNullFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, workerNullFlag);
-
-
-    }
-
-    /**
-     * import sub process test
-     */
-    @Test
-    public void testImportSubProcess() {
-
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-
-        Project testProject = getProject("test");
-
-        //Recursive subprocess sub2 process in sub1 process and sub1process in top process
-        String topProcessJson = "{\"globalParams\":[]," +
-                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-38634\",\"name\":\"shell1\"," +
-                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false}," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}," +
-                "{\"type\":\"SUB_PROCESS\",\"id\":\"tasks-44207\",\"name\":\"shell-4\"," +
-                "\"params\":{\"processDefinitionId\":39},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-                "\"dependence\":{},\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false}," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[\"shell1\"]}],\"tenantId\":1,\"timeout\":0}";
-
-        String sub1ProcessJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-84090\"," +
-                "\"name\":\"shell-4\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-4\\\"\"}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false}," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]},{\"type\":\"SUB_PROCESS\"," +
-                "\"id\":\"tasks-87364\",\"name\":\"shell-5\"," +
-                "\"params\":{\"processDefinitionId\":46},\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{}," +
-                "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
-                "\"workerGroupId\":-1,\"preTasks\":[\"shell-4\"]}],\"tenantId\":1,\"timeout\":0}";
-
-        String sub2ProcessJson = "{\"globalParams\":[]," +
-                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-52423\",\"name\":\"shell-5\"," +
-                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo \\\"shell-5\\\"\"},\"description\":\"\"," +
-                "\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-                "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
-
-
-        ObjectNode jsonObject = JSONUtils.parseObject(topProcessJson);
-        ArrayNode jsonArray = (ArrayNode) jsonObject.path("tasks");
-
-        String originSubJson = jsonArray.toString();
-
-        Map<Integer, Integer> subProcessIdMap = new HashMap<>(20);
-
-        ProcessDefinition shellDefinition1 = new ProcessDefinition();
-        shellDefinition1.setId(39);
-        shellDefinition1.setName("shell-4");
-        shellDefinition1.setProjectId(2);
-        shellDefinition1.setProcessDefinitionJson(sub1ProcessJson);
-
-        ProcessDefinition shellDefinition2 = new ProcessDefinition();
-        shellDefinition2.setId(46);
-        shellDefinition2.setName("shell-5");
-        shellDefinition2.setProjectId(2);
-        shellDefinition2.setProcessDefinitionJson(sub2ProcessJson);
-
-        Mockito.when(processDefineMapper.queryByDefineId(39)).thenReturn(shellDefinition1);
-        Mockito.when(processDefineMapper.queryByDefineId(46)).thenReturn(shellDefinition2);
-        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "shell-5")).thenReturn(null);
-        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "shell-4")).thenReturn(null);
-        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "testProject")).thenReturn(shellDefinition2);
-
-        processDefinitionService.importSubProcess(loginUser,testProject, jsonArray, subProcessIdMap);
-
-        String correctSubJson = jsonArray.toString();
-
-        Assert.assertEquals(originSubJson, correctSubJson);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setStartTime(new Date());
+        taskInstance.setEndTime(new Date());
+        taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
+        taskInstance.setId(1);
+        taskInstance.setName("test_task_instance");
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setHost("192.168.xx.xx");
+        taskInstance.setTaskParams("\"processDefinitionId\": \"222\",\n");
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
+        Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(46, 10);
+        Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
 
     }
 
     @Test
     public void testImportProcessDefinitionById() throws IOException {
 
-        String processJson = "[{\"projectName\":\"testProject\",\"processDefinitionName\":\"shell-4\"," +
-                "\"processDefinitionJson\":\"{\\\"tenantId\\\":1,\\\"globalParams\\\":[]," +
-                "\\\"tasks\\\":[{\\\"workerGroupId\\\":\\\"default\\\",\\\"description\\\":\\\"\\\",\\\"runFlag\\\":\\\"NORMAL\\\"," +
-                "\\\"type\\\":\\\"SHELL\\\",\\\"params\\\":{\\\"rawScript\\\":\\\"#!/bin/bash\\\\necho \\\\\\\"shell-4\\\\\\\"\\\"," +
-                "\\\"localParams\\\":[],\\\"resourceList\\\":[]},\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}," +
-                "\\\"maxRetryTimes\\\":\\\"0\\\",\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-4\\\"," +
-                "\\\"dependence\\\":{},\\\"retryInterval\\\":\\\"1\\\",\\\"preTasks\\\":[],\\\"id\\\":\\\"tasks-84090\\\"}," +
-                "{\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-5\\\",\\\"workerGroupId\\\":\\\"default\\\\," +
-                "\\\"description\\\":\\\"\\\",\\\"dependence\\\":{},\\\"preTasks\\\":[\\\"shell-4\\\"],\\\"id\\\":\\\"tasks-87364\\\"," +
-                "\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SUB_PROCESS\\\",\\\"params\\\":{\\\"processDefinitionId\\\":46}," +
-                "\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}}],\\\"timeout\\\":0}\"," +
-                "\"processDefinitionDescription\":\"\",\"processDefinitionLocations\":\"{\\\"tasks-84090\\\":{\\\"name\\\":\\\"shell-4\\\"," +
-                "\\\"targetarr\\\":\\\"\\\",\\\"x\\\":128,\\\"y\\\":114},\\\"tasks-87364\\\":{\\\"name\\\":\\\"shell-5\\\"," +
-                "\\\"targetarr\\\":\\\"tasks-84090\\\",\\\"x\\\":266,\\\"y\\\":115}}\"," +
-                "\"processDefinitionConnects\":\"[{\\\"endPointSourceId\\\":\\\"tasks-84090\\\"," +
-                "\\\"endPointTargetId\\\":\\\"tasks-87364\\\"}]\"}]";
+        String processJson = "[\n"
+                + "    {\n"
+                + "        \"projectName\": \"testProject\",\n"
+                + "        \"processDefinitionName\": \"shell-4\",\n"
+                + "        \"processDefinitionJson\": \"{\\\"tenantId\\\":1"
+                + ",\\\"globalParams\\\":[],\\\"tasks\\\":[{\\\"workerGroupId\\\":\\\"3\\\",\\\"description\\\""
+                + ":\\\"\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SHELL\\\",\\\"params\\\":{\\\"rawScript\\\""
+                + ":\\\"#!/bin/bash\\\\necho \\\\\\\"shell-4\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}"
+                + ",\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"},\\\"maxRetryTimes\\\":\\\"0\\\""
+                + ",\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-4\\\",\\\"dependence\\\":{}"
+                + ",\\\"retryInterval\\\":\\\"1\\\",\\\"preTasks\\\":[],\\\"id\\\":\\\"tasks-84090\\\"}"
+                + ",{\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-5\\\",\\\"workerGroupId\\\""
+                + ":\\\"3\\\",\\\"description\\\":\\\"\\\",\\\"dependence\\\":{},\\\"preTasks\\\":[\\\"shell-4\\\"]"
+                + ",\\\"id\\\":\\\"tasks-87364\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SUB_PROCESS\\\""
+                + ",\\\"params\\\":{\\\"processDefinitionId\\\":46},\\\"timeout\\\":{\\\"enable\\\":false"
+                + ",\\\"strategy\\\":\\\"\\\"}}],\\\"timeout\\\":0}\",\n"
+                + "        \"processDefinitionDescription\": \"\",\n"
+                + "        \"processDefinitionLocations\": \"{\\\"tasks-84090\\\":{\\\"name\\\":\\\"shell-4\\\""
+                + ",\\\"targetarr\\\":\\\"\\\",\\\"x\\\":128,\\\"y\\\":114},\\\"tasks-87364\\\":{\\\"name\\\""
+                + ":\\\"shell-5\\\",\\\"targetarr\\\":\\\"tasks-84090\\\",\\\"x\\\":266,\\\"y\\\":115}}\",\n"
+                + "        \"processDefinitionConnects\": \"[{\\\"endPointSourceId\\\":\\\"tasks-84090\\\""
+                + ",\\\"endPointTargetId\\\":\\\"tasks-87364\\\"}]\"\n"
+                + "    }\n"
+                + "]";
 
-        String subProcessJson = "{\"globalParams\":[]," +
-                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-52423\",\"name\":\"shell-5\"," +
-                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo \\\"shell-5\\\"\"},\"description\":\"\"," +
-                "\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-                "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":\\\"default\\\\," +
-                "\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+        String subProcessJson = "{\n"
+                + "    \"globalParams\": [\n"
+                + "        \n"
+                + "    ],\n"
+                + "    \"tasks\": [\n"
+                + "        {\n"
+                + "            \"type\": \"SHELL\",\n"
+                + "            \"id\": \"tasks-52423\",\n"
+                + "            \"name\": \"shell-5\",\n"
+                + "            \"params\": {\n"
+                + "                \"resourceList\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"localParams\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"rawScript\": \"echo \\\"shell-5\\\"\"\n"
+                + "            },\n"
+                + "            \"description\": \"\",\n"
+                + "            \"runFlag\": \"NORMAL\",\n"
+                + "            \"dependence\": {\n"
+                + "                \n"
+                + "            },\n"
+                + "            \"maxRetryTimes\": \"0\",\n"
+                + "            \"retryInterval\": \"1\",\n"
+                + "            \"timeout\": {\n"
+                + "                \"strategy\": \"\",\n"
+                + "                \"interval\": null,\n"
+                + "                \"enable\": false\n"
+                + "            },\n"
+                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "            \"workerGroupId\": \"3\",\n"
+                + "            \"preTasks\": [\n"
+                + "                \n"
+                + "            ]\n"
+                + "        }\n"
+                + "    ],\n"
+                + "    \"tenantId\": 1,\n"
+                + "    \"timeout\": 0\n"
+                + "}";
 
-        FileUtils.writeStringToFile(new File("/tmp/task.json"),processJson);
+        FileUtils.writeStringToFile(new File("/tmp/task.json"), processJson);
 
         File file = new File("/tmp/task.json");
 
@@ -694,7 +907,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
 
         String currentProjectName = "testProject";
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, currentProjectName);
 
         ProcessDefinition shellDefinition2 = new ProcessDefinition();
@@ -705,124 +918,237 @@ public class ProcessDefinitionServiceTest {
 
         Mockito.when(projectMapper.queryByName(currentProjectName)).thenReturn(getProject(currentProjectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, getProject(currentProjectName), currentProjectName)).thenReturn(result);
-        Mockito.when(processDefineMapper.queryByDefineId(46)).thenReturn(shellDefinition2);
 
-        //import process
-//        Map<String, Object> importProcessResult = processDefinitionService.importProcessDefinition(loginUser, multipartFile, currentProjectName);
-//
-//        Assert.assertEquals(Status.SUCCESS, importProcessResult.get(Constants.STATUS));
-//
-//        boolean delete = file.delete();
-//
-//        Assert.assertTrue(delete);
+        Map<String, Object> importProcessResult = processDefinitionService.importProcessDefinition(loginUser, multipartFile, currentProjectName);
 
-//        String processMetaJson = "";
-//        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
-//
-//        processMetaJson = "{\"scheduleWorkerGroupId\":-1}";
-//        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
-//
-//        processMetaJson = "{\"scheduleWorkerGroupId\":-1,\"projectName\":\"test\"}";
-//        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
-//
-//        processMetaJson = "{\"scheduleWorkerGroupId\":-1,\"projectName\":\"test\",\"processDefinitionName\":\"test_definition\"}";
-//        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
+        Assert.assertEquals(Status.SUCCESS, importProcessResult.get(Constants.STATUS));
 
+        boolean delete = file.delete();
 
-    }
-
-    /**
-     * check import process metadata
-     * @param file file
-     * @param loginUser login user
-     * @param currentProjectName current project name
-     * @param processMetaJson process meta json
-     * @throws IOException IO exception
-     */
-    private void improssProcessCheckData(File file, User loginUser, String currentProjectName, String processMetaJson) throws IOException {
-        //check null
-        FileUtils.writeStringToFile(new File("/tmp/task.json"),processMetaJson);
-
-        File fileEmpty = new File("/tmp/task.json");
-
-        FileInputStream fileEmptyInputStream = new FileInputStream("/tmp/task.json");
-
-        MultipartFile multiFileEmpty = new MockMultipartFile(fileEmpty.getName(), fileEmpty.getName(),
-                ContentType.APPLICATION_OCTET_STREAM.toString(), fileEmptyInputStream);
-
-        Map<String, Object> resEmptyProcess = processDefinitionService.importProcessDefinition(loginUser, multiFileEmpty, currentProjectName);
-
-        Assert.assertEquals(Status.DATA_IS_NULL, resEmptyProcess.get(Constants.STATUS));
-
-        boolean deleteFlag = file.delete();
-
-        Assert.assertTrue(deleteFlag);
+        Assert.assertTrue(delete);
     }
 
     @Test
-    public void testUpdateProcessDefinition () {
+    public void testUpdateProcessDefinition() {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         String projectName = "project_test1";
         Project project = getProject(projectName);
 
+        ProcessDefinition processDefinition = getProcessDefinition();
+
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(processService.findProcessDefineById(1)).thenReturn(getProcessDefinition());
+        Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
 
+        String sqlDependentJson = "{\n"
+                + "    \"globalParams\": [\n"
+                + "        \n"
+                + "    ],\n"
+                + "    \"tasks\": [\n"
+                + "        {\n"
+                + "            \"type\": \"SQL\",\n"
+                + "            \"id\": \"tasks-27297\",\n"
+                + "            \"name\": \"sql\",\n"
+                + "            \"params\": {\n"
+                + "                \"type\": \"MYSQL\",\n"
+                + "                \"datasource\": 1,\n"
+                + "                \"sql\": \"select * from test\",\n"
+                + "                \"udfs\": \"\",\n"
+                + "                \"sqlType\": \"1\",\n"
+                + "                \"title\": \"\",\n"
+                + "                \"receivers\": \"\",\n"
+                + "                \"receiversCc\": \"\",\n"
+                + "                \"showType\": \"TABLE\",\n"
+                + "                \"localParams\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"connParams\": \"\",\n"
+                + "                \"preStatements\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"postStatements\": [\n"
+                + "                    \n"
+                + "                ]\n"
+                + "            },\n"
+                + "            \"description\": \"\",\n"
+                + "            \"runFlag\": \"NORMAL\",\n"
+                + "            \"dependence\": {\n"
+                + "                \n"
+                + "            },\n"
+                + "            \"maxRetryTimes\": \"0\",\n"
+                + "            \"retryInterval\": \"1\",\n"
+                + "            \"timeout\": {\n"
+                + "                \"strategy\": \"\",\n"
+                + "                \"enable\": false\n"
+                + "            },\n"
+                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "            \"workerGroupId\": -1,\n"
+                + "            \"preTasks\": [\n"
+                + "                \"dependent\"\n"
+                + "            ]\n"
+                + "        },\n"
+                + "        {\n"
+                + "            \"type\": \"DEPENDENT\",\n"
+                + "            \"id\": \"tasks-33787\",\n"
+                + "            \"name\": \"dependent\",\n"
+                + "            \"params\": {\n"
+                + "                \n"
+                + "            },\n"
+                + "            \"description\": \"\",\n"
+                + "            \"runFlag\": \"NORMAL\",\n"
+                + "            \"dependence\": {\n"
+                + "                \"relation\": \"AND\",\n"
+                + "                \"dependTaskList\": [\n"
+                + "                    {\n"
+                + "                        \"relation\": \"AND\",\n"
+                + "                        \"dependItemList\": [\n"
+                + "                            {\n"
+                + "                                \"projectId\": 2,\n"
+                + "                                \"definitionId\": 46,\n"
+                + "                                \"depTasks\": \"ALL\",\n"
+                + "                                \"cycle\": \"day\",\n"
+                + "                                \"dateValue\": \"today\"\n"
+                + "                            }\n"
+                + "                        ]\n"
+                + "                    }\n"
+                + "                ]\n"
+                + "            },\n"
+                + "            \"maxRetryTimes\": \"0\",\n"
+                + "            \"retryInterval\": \"1\",\n"
+                + "            \"timeout\": {\n"
+                + "                \"strategy\": \"\",\n"
+                + "                \"enable\": false\n"
+                + "            },\n"
+                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "            \"workerGroupId\": -1,\n"
+                + "            \"preTasks\": [\n"
+                + "                \n"
+                + "            ]\n"
+                + "        }\n"
+                + "    ],\n"
+                + "    \"tenantId\": 1,\n"
+                + "    \"timeout\": 0\n"
+                + "}";
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
                 sqlDependentJson, "", "", "");
 
         Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
     }
 
+    @Test
+    public void testBatchExportProcessDefinitionByIds() throws IOException {
+        processDefinitionService.batchExportProcessDefinitionByIds(
+                null, null, null, null);
+
+        String processDefinitionJson = "{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
+                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
+                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
+                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
+                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
+                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
+                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}";
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+
+        String projectName = "project_test1";
+        Project project = getProject(projectName);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUNT);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+
+        processDefinitionService.batchExportProcessDefinitionByIds(
+                loginUser, projectName, "1", null);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setId(1);
+        processDefinition.setProcessDefinitionJson(processDefinitionJson);
+        Map<String, Object> checkResult = new HashMap<>();
+        checkResult.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(checkResult);
+        Mockito.when(processDefineMapper.queryByDefineId(1)).thenReturn(processDefinition);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+        Mockito.when(processService.genProcessData(processDefinition)).thenReturn(processData);
+
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        processDefinitionService.batchExportProcessDefinitionByIds(
+                loginUser, projectName, "1", response);
+        Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinition));
+    }
+
     /**
      * get mock datasource
+     *
      * @return DataSource
      */
-    private DataSource getDataSource(){
+    private DataSource getDataSource() {
         DataSource dataSource = new DataSource();
         dataSource.setId(2);
         dataSource.setName("test");
-        return  dataSource;
+        return dataSource;
     }
 
     /**
      * get mock processDefinition
+     *
      * @return ProcessDefinition
      */
-    private ProcessDefinition getProcessDefinition(){
-
+    private ProcessDefinition getProcessDefinition() {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectId(2);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
+        processDefinition.setCode(9999L);
 
-        return  processDefinition;
+        return processDefinition;
     }
 
     /**
      * get mock Project
+     *
      * @param projectName projectName
      * @return Project
      */
-    private Project getProject(String projectName){
+    private Project getProject(String projectName) {
         Project project = new Project();
+        project.setCode(1L);
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);
-        return  project;
+        return project;
+    }
+
+    /**
+     * get mock Project
+     *
+     * @param projectId projectId
+     * @return Project
+     */
+    private Project getProjectById(int projectId) {
+        Project project = new Project();
+        project.setId(projectId);
+        project.setName("project_test2");
+        project.setUserId(1);
+        return project;
     }
 
     /**
      * get mock schedule
+     *
      * @return schedule
      */
     private Schedule getSchedule() {
@@ -845,6 +1171,7 @@ public class ProcessDefinitionServiceTest {
 
     /**
      * get mock processMeta
+     *
      * @return processMeta
      */
     private ProcessMeta getProcessMeta() {
@@ -876,4 +1203,19 @@ public class ProcessDefinitionServiceTest {
             result.put(Constants.MSG, status.getMsg());
         }
     }
+
+    @Test
+    public void testImportProcessSchedule() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Integer processDefinitionId = 111;
+        String processDefinitionName = "testProcessDefinition";
+        String projectName = "project_test1";
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUNT);
+        ProcessMeta processMeta = new ProcessMeta();
+        Assert.assertEquals(0, processDefinitionService.importProcessSchedule(loginUser, projectName, processMeta, processDefinitionName, processDefinitionId));
+    }
+
 }

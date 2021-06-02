@@ -17,113 +17,72 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
-        <tr>
-          <th scope="col">
-            <span>{{$t('#')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('Name')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('Whether directory')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('File Name')}}</span>
-          </th>
-          <th scope="col">
-            <span>{{$t('Description')}}</span>
-          </th>
-          <th scope="col" width="100">
-            <span>{{$t('Size')}}</span>
-          </th>
-          <th scope="col" width="140">
-            <span>{{$t('Update Time')}}</span>
-          </th>
-          <th scope="col" width="140">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td>
-            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
-              <a href="javascript:" class="links" @click="_go(item)">{{item.alias}}</a>
-            </span>
-          </td>
-          <td>
-            <span>{{item.directory? $t('Yes') : $t('No')}}</span>
-          </td>
-          <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
-          <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span>{{_rtSize(item.size)}}</span>
-          </td>
-          <td>
-            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    data-toggle="tooltip"
-                    :title="$t('Edit')"
-                    :disabled="_rtDisb(item)"
-                    @click="_edit(item,$index)"
-                    icon="ans-icon-edit">
-            </x-button>
-            <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    icon="ans-icon-play"
-                    data-toggle="tooltip"
-                    :title="$t('Rename')"
-                    @click="_rename(item,$index)">
-            </x-button>
-
-            <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    data-toggle="tooltip"
-                    :title="$t('Download')"
-                    :disabled="item.directory? true: false"
-                    @click="_downloadFile(item)"
-                    icon="ans-icon-download">
-            </x-button>
-
-            <x-poptip
-                    :ref="'poptip-' + $index"
-                    placement="bottom-end"
-                    width="90">
-              <p>{{$t('Delete?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column :label="$t('Name')">
+          <template slot-scope="scope">
+            <el-popover trigger="hover" placement="top">
+              <p>{{ scope.row.alias }}</p>
+              <div slot="reference" class="name-wrapper">
+                <a href="javascript:" class="links" @click="_go(scope.row)">{{ scope.row.alias }}</a>
               </div>
-              <template slot="reference">
-                <x-button
-                        icon="ans-icon-trash"
-                        type="error"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('delete')">
-                </x-button>
-              </template>
-            </x-poptip>
-          </td>
-        </tr>
-      </table>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column prop="userName" :label="$t('Resource userName')"></el-table-column>
+        <el-table-column :label="$t('Whether directory')" width="100">
+          <template slot-scope="scope">
+            {{scope.row.directory? $t('Yes') : $t('No')}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="fileName" :label="$t('File Name')"></el-table-column>
+        <el-table-column :label="$t('Description')" width="200">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Size')">
+          <template slot-scope="scope">
+            {{_rtSize(scope.row.size)}}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Update Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="150">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Edit')" placement="top">
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Rename')" placement="top">
+              <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Download')" placement="top">
+              <span><el-button type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
+            </el-tooltip>
+            <el-tooltip :content="$t('Delete')" placement="top">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
+    <el-dialog
+      :visible.sync="renameDialog"
+      width="auto">
+      <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -138,7 +97,10 @@
     name: 'file-manage-list',
     data () {
       return {
-        list: []
+        list: [],
+        renameDialog: false,
+        item: {},
+        index: null
       }
     },
     props: {
@@ -154,7 +116,7 @@
       },
       _go (item) {
         localStore.setItem('file', `${item.alias}|${item.size}`)
-        if(item.directory) {
+        if (item.directory) {
           localStore.setItem('currentDir', `${item.fullName}`)
           this.$router.push({ path: `/resource/file/subdirectory/${item.id}` })
         } else {
@@ -162,54 +124,38 @@
         }
       },
       _downloadFile (item) {
-        downloadFile('/dolphinscheduler/resources/download', {
+        downloadFile('resources/download', {
           id: item.id
         })
       },
       _rtSize (val) {
         return bytesToSize(parseInt(val))
       },
-      _closeDelete (i) {
-        this.$refs[`poptip-${i}`][0].doClose()
-      },
       _delete (item, i) {
         this.deleteResource({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
       _rename (item, i) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mRename, {
-              on: {
-                onUpDate (item) {
-                  self.$set(self.list, i, item)
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.index = i
+        this.renameDialog = true
       },
+
+      onUpDate (item) {
+        this.$set(this.list, this.index, item)
+        this.renameDialog = false
+      },
+
+      close () {
+        this.renameDialog = false
+      },
+
       _rtDisb ({ alias, size }) {
         let i = alias.lastIndexOf('.')
         let a = alias.substring(i, alias.length)
@@ -235,6 +181,6 @@
     mounted () {
       this.list = this.fileResourcesList
     },
-    components: { }
+    components: { mRename }
   }
 </script>
