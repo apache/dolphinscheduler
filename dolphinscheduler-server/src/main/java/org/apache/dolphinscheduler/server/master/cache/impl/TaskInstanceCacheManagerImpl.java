@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.cache.impl;
 import static org.apache.dolphinscheduler.common.Constants.CACHE_REFRESH_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -30,12 +29,13 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,9 +43,7 @@ import org.springframework.stereotype.Component;
  *  taskInstance state manager
  */
 @Component
-public class TaskInstanceCacheManagerImpl extends Thread implements TaskInstanceCacheManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceCacheManagerImpl.class);
+public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
 
     /**
      * taskInstance cache
@@ -58,33 +56,26 @@ public class TaskInstanceCacheManagerImpl extends Thread implements TaskInstance
     @Autowired
     private ProcessService processService;
 
+    /**
+     * taskInstance cache refresh timer
+     */
+    private Timer refreshTaskInstanceTimer = null;
+
+    final Object lock = new Object();
+
     @PostConstruct
     public void init() {
-        super.setName("TaskInstanceCacheRefreshThread");
-        super.start();
+        //issue#5539 add thread to fetch task state from database in a fixed rate
+        this.refreshTaskInstanceTimer = new Timer(true);
+        refreshTaskInstanceTimer.scheduleAtFixedRate(
+                new RefreshTaskInstanceTimerTask(), CACHE_REFRESH_TIME_MILLIS, CACHE_REFRESH_TIME_MILLIS
+        );
     }
 
-    /**
-     * issue#5539 add thread to fetch task state from database in a fixed rate
-     */
-    @Override
-    public void run() {
-        while (Stopper.isRunning()) {
-            try {
-                for (Entry<Integer, TaskInstance> taskInstanceEntry : taskInstanceCache.entrySet()) {
-                    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceEntry.getKey());
-                    if (null != taskInstance && taskInstance.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                        logger.debug("task {} need fault tolerance, update instance cache", taskInstance.getId());
-                        taskInstanceCache.put(taskInstanceEntry.getKey(), taskInstance);
-                    }
-                }
-                Thread.sleep(CACHE_REFRESH_TIME_MILLIS);
-            } catch (InterruptedException e) {
-                logger.error("task instance state refresh thread error", e);
-            }
-        }
+    @PreDestroy
+    public void close() {
+        this.refreshTaskInstanceTimer.cancel();
     }
-
 
     /**
      * get taskInstance by taskInstance id
@@ -152,6 +143,23 @@ public class TaskInstanceCacheManagerImpl extends Thread implements TaskInstance
      */
     @Override
     public void removeByTaskInstanceId(Integer taskInstanceId) {
-        taskInstanceCache.remove(taskInstanceId);
+        synchronized (lock) {
+            taskInstanceCache.remove(taskInstanceId);
+        }
+    }
+
+    class RefreshTaskInstanceTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            synchronized (lock) {
+                for (Entry<Integer, TaskInstance> taskInstanceEntry : taskInstanceCache.entrySet()) {
+                    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceEntry.getKey());
+                    if (null != taskInstance && taskInstance.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
+                        taskInstanceCache.put(taskInstanceEntry.getKey(), taskInstance);
+                    }
+                }
+            }
+
+        }
     }
 }

@@ -143,8 +143,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     this.checkTimeoutFlag = !alertTimeout();
                 }
                 // updateProcessInstance task instance
-                //taskInstance = processService.findTaskInstanceById(taskInstance.getId());
-
                 //issue#5539 Check status of taskInstance from cache
                 taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
