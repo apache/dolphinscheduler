@@ -46,14 +46,13 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**
  * abstract registry client
  */
 @Service
-public  class RegistryClient extends RegistryCenter{
+public class RegistryClient extends RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
@@ -251,7 +250,7 @@ public  class RegistryClient extends RegistryCenter{
      * @return get master lock path
      */
     public String getMasterLockPath() {
-        return  Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
+        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
     }
 
     /**
@@ -277,14 +276,14 @@ public  class RegistryClient extends RegistryCenter{
      * @return get master start up lock path
      */
     public String getMasterStartUpLockPath() {
-        return  Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
+        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
     }
 
     /**
      * @return get master failover lock path
      */
     public String getMasterFailoverLockPath() {
-        return  Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
+        return Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
     }
 
     /**
@@ -376,6 +375,7 @@ public  class RegistryClient extends RegistryCenter{
 
         return !isExisted(zNode) || isExisted(deadServerPath);
     }
+
     /**
      * get master nodes directly
      *
