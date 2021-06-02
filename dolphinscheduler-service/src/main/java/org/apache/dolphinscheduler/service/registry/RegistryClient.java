@@ -56,9 +56,6 @@ public class RegistryClient extends RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
-    @Resource
-    RegistryCenter registryCenter;
-
     /**
      * get active master num
      *
@@ -68,8 +65,8 @@ public class RegistryClient extends RegistryCenter {
         List<String> childrenList = new ArrayList<>();
         try {
             // read master node parent path from conf
-            if (registryCenter.isExisted(getNodeParentPath(NodeType.MASTER))) {
-                childrenList = registryCenter.getChildrenKeys(getNodeParentPath(NodeType.MASTER));
+            if (isExisted(getNodeParentPath(NodeType.MASTER))) {
+                childrenList = getChildrenKeys(getNodeParentPath(NodeType.MASTER));
             }
         } catch (Exception e) {
             logger.error("getActiveMasterNum error", e);
@@ -114,11 +111,11 @@ public class RegistryClient extends RegistryCenter {
      */
     public List<String> getServerZkNodes(NodeType nodeType) {
         String path = getNodeParentPath(nodeType);
-        List<String> serverList = registryCenter.getChildrenKeys(path);
+        List<String> serverList = getChildrenKeys(path);
         if (nodeType == NodeType.WORKER) {
             List<String> workerList = new ArrayList<>();
             for (String group : serverList) {
-                List<String> groupServers = registryCenter.getChildrenKeys(path + Constants.SLASH + group);
+                List<String> groupServers = getChildrenKeys(path + Constants.SLASH + group);
                 for (String groupServer : groupServers) {
                     workerList.add(group + Constants.SLASH + groupServer);
                 }
@@ -145,7 +142,7 @@ public class RegistryClient extends RegistryCenter {
                 if (nodeType == NodeType.WORKER && hostOnly) {
                     host = server.split(Constants.SLASH)[1];
                 }
-                serverMap.putIfAbsent(host, registryCenter.get(path + Constants.SLASH + server));
+                serverMap.putIfAbsent(host, get(path + Constants.SLASH + server));
             }
         } catch (Exception e) {
             logger.error("get server list failed", e);
@@ -318,9 +315,9 @@ public class RegistryClient extends RegistryCenter {
      */
     public void initSystemNode() {
         try {
-            registryCenter.persist(getMasterNodeParentPath(), "");
-            registryCenter.persist(getWorkerNodeParentPath(), "");
-            registryCenter.persist(getDeadNodeParentPath(), "");
+            persist(getMasterNodeParentPath(), "");
+            persist(getWorkerNodeParentPath(), "");
+            persist(getDeadNodeParentPath(), "");
 
             logger.info("initialize server nodes success.");
         } catch (Exception e) {

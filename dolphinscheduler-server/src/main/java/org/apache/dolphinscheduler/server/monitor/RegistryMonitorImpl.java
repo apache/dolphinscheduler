@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.monitor;
 
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * zk monitor server impl
@@ -34,27 +36,28 @@ public class RegistryMonitorImpl extends AbstractMonitor {
      * zookeeper operator
      */
     @Autowired
-    private RegistryCenter registryCenter;
+    private RegistryClient registryClient;
 
 
     /**
      * get active nodes map by path
+     *
      * @param path path
      * @return active nodes map
      */
     @Override
-    protected Map<String,String> getActiveNodesByPath(String path) {
+    protected Map<String, String> getActiveNodesByPath(String path) {
 
-        Map<String,String> maps = new HashMap<>();
+        Map<String, String> maps = new HashMap<>();
 
-        List<String> childrenList = registryCenter.getChildrenKeys(path);
+        List<String> childrenList = registryClient.getChildrenKeys(path);
 
-        if (childrenList == null){
+        if (childrenList == null) {
             return maps;
         }
 
-        for (String child : childrenList){
-            maps.put(child.split("_")[0],child);
+        for (String child : childrenList) {
+            maps.put(child.split("_")[0], child);
         }
 
         return maps;

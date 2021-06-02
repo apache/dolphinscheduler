@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,7 +67,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     ProcessInstanceMapper processInstanceMapper;
 
     @Resource
-    RegistryCenter registryCenter;
+    RegistryClient registryClient;
 
     /**
      * create or update a worker group
@@ -144,7 +144,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         // check zookeeper
         String workerGroupPath =  Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
-        return registryCenter.isExisted(workerGroupPath);
+        return registryClient.isExisted(workerGroupPath);
     }
 
     /**
@@ -251,7 +251,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
         List<String> workerGroupList = null;
         try {
-            workerGroupList = registryCenter.getChildrenKeys(workerPath);
+            workerGroupList = registryClient.getChildrenKeys(workerPath);
         } catch (Exception e) {
             logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
         }
@@ -269,7 +269,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
             List<String> childrenNodes = null;
             try {
-                childrenNodes = registryCenter.getChildrenKeys(workerGroupPath);
+                childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
             } catch (Exception e) {
                 logger.error("getChildrenNodes exception: {}, workerGroupPath: {}", e.getMessage(), workerGroupPath);
             }
@@ -280,7 +280,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
-                String registeredValue = registryCenter.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
+                String registeredValue = registryClient.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setSystemDefault(true);
