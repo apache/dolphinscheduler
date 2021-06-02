@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -311,7 +309,7 @@ public class RegistryClient extends RegistryCenter {
     }
 
     /**
-     * init system znode
+     * init system node
      */
     public void initSystemNode() {
         try {
@@ -410,4 +408,74 @@ public class RegistryClient extends RegistryCenter {
         List<String> workers = getChildrenKeys(getWorkerGroupPath(workerGroup));
         return new HashSet<>(workers);
     }
+
+    /**
+     * opType(add): if find dead server , then add to zk deadServerPath
+     * opType(delete): delete path from zk
+     *
+     * @param nodeSet node path set
+     * @param nodeType master or worker
+     * @param opType delete or add
+     * @throws Exception errors
+     */
+    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
+
+        String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
+        for (String node : nodeSet) {
+            String host = getHostByEventDataPath(node);
+            //check server restart, if restart , dead server path in zk should be delete
+            if (opType.equals(DELETE_OP)) {
+                removeDeadServerByHost(host, type);
+
+            } else if (opType.equals(ADD_OP)) {
+                String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
+                if (!isExisted(deadServerPath)) {
+                    //add dead server info to zk dead server path : /dead-servers/
+                    persist(deadServerPath, (type + UNDERLINE + host));
+                    logger.info("{} server dead , and {} added to registry dead server path success",
+                            nodeType, node);
+                }
+            }
+
+        }
+
+    }
+
+    /**
+     * get host ip:port, string format: parentPath/ip:port
+     *
+     * @param path path
+     * @return host ip:port, string format: parentPath/ip:port
+     */
+    public String getHostByEventDataPath(String path) {
+        if (StringUtils.isEmpty(path)) {
+            logger.error("empty path!");
+            return "";
+        }
+        String[] pathArray = path.split(SINGLE_SLASH);
+        if (pathArray.length < 1) {
+            logger.error("parse ip error: {}", path);
+            return "";
+        }
+        return pathArray[pathArray.length - 1];
+
+    }
+
+    /**
+     * remove dead server by host
+     *
+     * @param host host
+     * @param serverType serverType
+     */
+    public void removeDeadServerByHost(String host, String serverType) throws Exception {
+        List<String> deadServers = getChildrenKeys(getDeadZNodeParentPath());
+        for (String serverPath : deadServers) {
+            if (serverPath.startsWith(serverType + UNDERLINE + host)) {
+                String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
+                remove(server);
+                logger.info("{} server {} deleted from zk dead server path success", serverType, host);
+            }
+        }
+    }
+
 }

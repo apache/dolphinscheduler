@@ -40,8 +40,6 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -186,45 +184,6 @@ public class MasterRegistryClient {
                 return registryClient.getWorkerFailoverLockPath();
             default:
                 return "";
-        }
-    }
-
-    /**
-     * monitor master
-     *
-     * @param event event
-     * @param path path
-     */
-    public void handleMasterEvent(TreeCacheEvent event, String path) {
-        switch (event.getType()) {
-            case NODE_ADDED:
-                logger.info("master node added : {}", path);
-                break;
-            case NODE_REMOVED:
-                removeNodePath(path, NodeType.MASTER, true);
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * monitor worker
-     *
-     * @param event event
-     * @param path path
-     */
-    public void handleWorkerEvent(TreeCacheEvent event, String path) {
-        switch (event.getType()) {
-            case NODE_ADDED:
-                logger.info("worker node added : {}", path);
-                break;
-            case NODE_REMOVED:
-                logger.info("worker node deleted : {}", path);
-                removeNodePath(path, NodeType.WORKER, true);
-                break;
-            default:
-                break;
         }
     }
 
@@ -406,7 +365,7 @@ public class MasterRegistryClient {
      */
     public String getMasterPath() {
         String address = getLocalAddress();
-        return this.getMasterPath() + "/" + address;
+        return registryClient.getMasterPath() + "/" + address;
     }
 
     /**

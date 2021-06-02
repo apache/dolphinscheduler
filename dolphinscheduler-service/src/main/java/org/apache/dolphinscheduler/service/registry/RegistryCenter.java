@@ -17,16 +17,9 @@
 
 package org.apache.dolphinscheduler.service.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
-import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
-import static org.apache.dolphinscheduler.common.Constants.MASTER_TYPE;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
@@ -38,7 +31,6 @@ import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -67,13 +59,13 @@ public class RegistryCenter {
     /**
      * master path
      */
-    protected static String MASTER_PATH;
+    protected static String MASTER_PATH = "/nodes/master";
 
     private RegistryPluginManager registryPluginManager;
     /**
      * worker path
      */
-    protected static String WORKER_PATH;
+    protected static String WORKER_PATH = "/nodes/worker";
 
     protected static final String EMPTY = "";
 
@@ -96,9 +88,6 @@ public class RegistryCenter {
      * init node persist
      */
     public void init() {
-        NODES = "/nodes";
-        MASTER_PATH = NODES + "/master";
-        WORKER_PATH = NODES + "/worker";
         if (isStarted.compareAndSet(false, true)) {
 
             if (null == registryPluginManager) {
@@ -243,75 +232,6 @@ public class RegistryCenter {
      */
     public String getWorkerGroupPath(String workerGroup) {
         return WORKER_PATH + "/" + workerGroup;
-    }
-
-    /**
-     * opType(add): if find dead server , then add to zk deadServerPath
-     * opType(delete): delete path from zk
-     *
-     * @param nodeSet node path set
-     * @param nodeType master or worker
-     * @param opType delete or add
-     * @throws Exception errors
-     */
-    public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {
-
-        String type = (nodeType == NodeType.MASTER) ? MASTER_TYPE : WORKER_TYPE;
-        for (String node : nodeSet) {
-            String host = getHostByEventDataPath(node);
-            //check server restart, if restart , dead server path in zk should be delete
-            if (opType.equals(DELETE_OP)) {
-                removeDeadServerByHost(host, type);
-
-            } else if (opType.equals(ADD_OP)) {
-                String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
-                if (!registry.isExisted(deadServerPath)) {
-                    //add dead server info to zk dead server path : /dead-servers/
-                    registry.persist(deadServerPath, (type + UNDERLINE + host));
-                    logger.info("{} server dead , and {} added to registry dead server path success",
-                            nodeType, node);
-                }
-            }
-
-        }
-
-    }
-
-    /**
-     * get host ip:port, string format: parentPath/ip:port
-     *
-     * @param path path
-     * @return host ip:port, string format: parentPath/ip:port
-     */
-    public String getHostByEventDataPath(String path) {
-        if (StringUtils.isEmpty(path)) {
-            logger.error("empty path!");
-            return "";
-        }
-        String[] pathArray = path.split(SINGLE_SLASH);
-        if (pathArray.length < 1) {
-            logger.error("parse ip error: {}", path);
-            return "";
-        }
-        return pathArray[pathArray.length - 1];
-
-    }
-
-    /**
-     * remove dead server by host
-     *
-     * @param host host
-     * @param serverType serverType
-     */
-    public void removeDeadServerByHost(String host, String serverType) throws Exception {
-        List<String> deadServers = registry.getChildren(getDeadZNodeParentPath());
-        for (String serverPath : deadServers) {
-            if (serverPath.startsWith(serverType + UNDERLINE + host)) {
-                String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-                registry.remove(server);
-                logger.info("{} server {} deleted from zk dead server path success", serverType, host);
-            }
-        }
     }
 
     /**
