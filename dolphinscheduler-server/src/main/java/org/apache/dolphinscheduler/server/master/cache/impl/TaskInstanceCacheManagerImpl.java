@@ -61,8 +61,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     private Timer refreshTaskInstanceTimer = null;
 
-    final Object lock = new Object();
-
     @PostConstruct
     public void init() {
         //issue#5539 add thread to fetch task state from database in a fixed rate
@@ -88,7 +86,8 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
         TaskInstance taskInstance = taskInstanceCache.get(taskInstanceId);
         if (taskInstance == null) {
             taskInstance = processService.findTaskInstanceById(taskInstanceId);
-            taskInstanceCache.put(taskInstanceId,taskInstance);
+            TaskInstance finalTaskInstance = taskInstance;
+            taskInstanceCache.computeIfAbsent(taskInstanceId, k -> finalTaskInstance);
         }
         return taskInstance;
     }
@@ -143,20 +142,16 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     @Override
     public void removeByTaskInstanceId(Integer taskInstanceId) {
-        synchronized (lock) {
-            taskInstanceCache.remove(taskInstanceId);
-        }
+        taskInstanceCache.remove(taskInstanceId);
     }
 
     class RefreshTaskInstanceTimerTask extends TimerTask {
         @Override
         public void run() {
-            synchronized (lock) {
-                for (Entry<Integer, TaskInstance> taskInstanceEntry : taskInstanceCache.entrySet()) {
-                    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceEntry.getKey());
-                    if (null != taskInstance && taskInstance.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                        taskInstanceCache.put(taskInstanceEntry.getKey(), taskInstance);
-                    }
+            for (Entry<Integer, TaskInstance> taskInstanceEntry : taskInstanceCache.entrySet()) {
+                TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceEntry.getKey());
+                if (null != taskInstance && taskInstance.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
+                    taskInstanceCache.computeIfPresent(taskInstanceEntry.getKey(), (k, v) -> taskInstance);
                 }
             }
 
