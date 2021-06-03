@@ -71,7 +71,7 @@ public class ShellParameters extends AbstractParameters {
         if (StringUtils.isEmpty(result)) {
             return;
         }
-        if (CollectionUtils.isNotEmpty(localParams)) {
+        if (CollectionUtils.isEmpty(localParams)) {
             return;
         }
         List<Property> outProperty = getOutProperty(localParams);

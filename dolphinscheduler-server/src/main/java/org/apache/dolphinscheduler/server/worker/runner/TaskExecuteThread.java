@@ -151,10 +151,10 @@ public class TaskExecuteThread implements Runnable, Delayed {
                     taskExecutionContext.getTaskInstanceId()));
 
             task = TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
-
             // task init
             task.init();
-
+            //init varPool
+            task.getParameters().setVarPool(taskExecutionContext.getVarPool());
             // task handle
             task.handle();
 

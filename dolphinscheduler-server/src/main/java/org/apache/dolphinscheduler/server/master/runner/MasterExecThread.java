@@ -469,8 +469,6 @@ public class MasterExecThread implements Runnable {
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
-        //update processInstance for update the globalParams
-        this.processInstance = this.processService.findProcessInstanceById(this.processInstance.getId());
         TaskInstance taskInstance = findTaskIfExists(taskNode.getCode(), taskNode.getVersion());
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
@@ -501,6 +499,9 @@ public class MasterExecThread implements Runnable {
 
             // retry task instance interval
             taskInstance.setRetryInterval(taskNode.getRetryInterval());
+
+            //set task param
+            taskInstance.setTaskParams(taskNode.getTaskParams());
 
             // task instance priority
             if (taskNode.getTaskInstancePriority() == null) {

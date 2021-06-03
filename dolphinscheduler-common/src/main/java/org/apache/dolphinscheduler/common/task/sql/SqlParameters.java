@@ -220,7 +220,7 @@ public class SqlParameters extends AbstractParameters {
         if (StringUtils.isEmpty(result)) {
             return;
         }
-        if (CollectionUtils.isNotEmpty(localParams)) {
+        if (CollectionUtils.isEmpty(localParams)) {
             return;
         }
         List<Property> outProperty = getOutProperty(localParams);
@@ -241,19 +241,20 @@ public class SqlParameters extends AbstractParameters {
             }
             for (Map<String, String> info : sqlResult) {
                 for (String key : info.keySet()) {
-                    sqlResultFormat.get(key).add(info.get(key));
+                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
                 }
             }
             for (Property info : outProperty) {
                 if (info.getType() == DataType.LIST) {
                     info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    varPool.add(info);
                 }
             }
         } else {
             //result only one line
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
-                info.setValue(firstRow.get(info.getProp()));
+                info.setValue(String.valueOf(firstRow.get(info.getProp())));
                 varPool.add(info);
             }
         }

@@ -103,8 +103,12 @@ public abstract class AbstractParameters implements IParameters {
         return varPool;
     }
 
-    public void setVarPool(List<Property> varPool) {
-        this.varPool = varPool;
+    public void setVarPool(String varPool) {
+        if (StringUtils.isEmpty(varPool)) {
+            this.varPool = new ArrayList<>();
+        } else {
+            this.varPool = JSONUtils.toList(varPool, Property.class);
+        }
     }
 
     public void dealOutParam(String result) {
@@ -138,8 +142,7 @@ public abstract class AbstractParameters implements IParameters {
      * @return
      */
     public static Map<String, String> getMapByString(String result) {
-        result = result.replace("$VarPool$","@VarPool@");
-        String[] formatResult = result.split("@VarPool@");
+        String[] formatResult = result.split("\\$VarPool\\$");
         Map<String, String> format = new HashMap<>();
         for (String info : formatResult) {
             if (StringUtils.isNotEmpty(info) && info.contains("=")) {
