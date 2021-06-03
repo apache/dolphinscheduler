@@ -325,6 +325,7 @@ public class MasterRegistryClient {
     public void init() {
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
+        registryClient.init();
     }
 
     /**

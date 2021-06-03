@@ -77,17 +77,17 @@ public class WorkerRegistryClient {
     private Set<String> workerGroups;
 
     @PostConstruct
-    public void init() {
+    public void initWorkRegistry() {
         this.workerGroups = workerConfig.getWorkerGroups();
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
+        registryClient.init();
     }
 
     /**
      * registry
      */
     public void registry() {
-        init();
         String address = NetUtils.getAddr(workerConfig.getListenPort());
         Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
@@ -128,22 +128,22 @@ public class WorkerRegistryClient {
      * get worker path
      */
     public Set<String> getWorkerZkPaths() {
-        Set<String> workerZkPaths = Sets.newHashSet();
+        Set<String> workerPaths = Sets.newHashSet();
         String address = getLocalAddress();
         String workerZkPathPrefix = registryClient.getWorkerPath();
 
         for (String workGroup : this.workerGroups) {
-            StringJoiner workerZkPathJoiner = new StringJoiner(SLASH);
-            workerZkPathJoiner.add(workerZkPathPrefix);
+            StringJoiner workerPathJoiner = new StringJoiner(SLASH);
+            workerPathJoiner.add(workerZkPathPrefix);
             if (StringUtils.isEmpty(workGroup)) {
                 workGroup = DEFAULT_WORKER_GROUP;
             }
             // trim and lower case is need
-            workerZkPathJoiner.add(workGroup.trim().toLowerCase());
-            workerZkPathJoiner.add(address);
-            workerZkPaths.add(workerZkPathJoiner.toString());
+            workerPathJoiner.add(workGroup.trim().toLowerCase());
+            workerPathJoiner.add(address);
+            workerPaths.add(workerPathJoiner.toString());
         }
-        return workerZkPaths;
+        return workerPaths;
     }
 
     public void handleDeadServer(Set<String> nodeSet, NodeType nodeType, String opType) throws Exception {

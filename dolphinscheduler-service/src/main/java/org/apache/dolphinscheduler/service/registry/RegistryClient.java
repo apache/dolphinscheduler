@@ -32,8 +32,6 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -107,7 +105,7 @@ public class RegistryClient extends RegistryCenter {
      * @param nodeType registry node type
      * @return result : list<node>
      */
-    public List<String> getServerZkNodes(NodeType nodeType) {
+    public List<String> getServerNodes(NodeType nodeType) {
         String path = getNodeParentPath(nodeType);
         List<String> serverList = getChildrenKeys(path);
         if (nodeType == NodeType.WORKER) {
@@ -134,7 +132,7 @@ public class RegistryClient extends RegistryCenter {
         Map<String, String> serverMap = new HashMap<>();
         try {
             String path = getNodeParentPath(nodeType);
-            List<String> serverList = getServerZkNodes(nodeType);
+            List<String> serverList = getServerNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
                 if (nodeType == NodeType.WORKER && hostOnly) {
@@ -169,7 +167,7 @@ public class RegistryClient extends RegistryCenter {
     public Set<String> getServerNodeSet(NodeType nodeType, boolean hostOnly) {
         Set<String> serverSet = new HashSet<>();
         try {
-            List<String> serverList = getServerZkNodes(nodeType);
+            List<String> serverList = getServerNodes(nodeType);
             for (String server : serverList) {
                 String host = server;
                 if (nodeType == NodeType.WORKER && hostOnly) {
@@ -289,26 +287,6 @@ public class RegistryClient extends RegistryCenter {
     }
 
     /**
-     * release mutex
-     *
-     * @param mutex mutex
-     */
-    public void releaseMutex(InterProcessMutex mutex) {
-        if (mutex != null) {
-            try {
-                mutex.release();
-            } catch (Exception e) {
-                if ("instance must be started before calling this method".equals(e.getMessage())) {
-                    logger.warn("lock release");
-                } else {
-                    logger.error("lock release failed", e);
-                }
-
-            }
-        }
-    }
-
-    /**
      * init system node
      */
     public void initSystemNode() {
@@ -357,18 +335,18 @@ public class RegistryClient extends RegistryCenter {
     /**
      * check dead server or not , if dead, stop self
      *
-     * @param zNode node path
+     * @param node node path
      * @param serverType master or worker prefix
      * @return true if not exists
      * @throws Exception errors
      */
-    public boolean checkIsDeadServer(String zNode, String serverType) throws Exception {
+    public boolean checkIsDeadServer(String node, String serverType) throws Exception {
         // ip_sequence_no
-        String[] zNodesPath = zNode.split("\\/");
+        String[] zNodesPath = node.split("\\/");
         String ipSeqNo = zNodesPath[zNodesPath.length - 1];
         String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + serverType + UNDERLINE + ipSeqNo;
 
-        return !isExisted(zNode) || isExisted(deadServerPath);
+        return !isExisted(node) || isExisted(deadServerPath);
     }
 
     /**
@@ -467,7 +445,7 @@ public class RegistryClient extends RegistryCenter {
      * @param host host
      * @param serverType serverType
      */
-    public void removeDeadServerByHost(String host, String serverType) throws Exception {
+    public void removeDeadServerByHost(String host, String serverType) {
         List<String> deadServers = getChildrenKeys(getDeadZNodeParentPath());
         for (String serverPath : deadServers) {
             if (serverPath.startsWith(serverType + UNDERLINE + host)) {

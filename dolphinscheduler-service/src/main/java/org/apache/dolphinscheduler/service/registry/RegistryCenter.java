@@ -47,7 +47,7 @@ public class RegistryCenter {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    private static Registry registry;
+    private Registry registry;
 
     private IStoppable stoppable;
 

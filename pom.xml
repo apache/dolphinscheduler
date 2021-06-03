@@ -988,10 +988,7 @@
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
-                        <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
-                        <include>**/service/zk/ZKServerTest.java</include>
-                        <include>**/service/zk/CuratorZookeeperClientTest.java</include>
-                        <include>**/service/zk/RegisterOperatorTest.java</include>
+                        <include>**/service/registry/RegistryClientTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
