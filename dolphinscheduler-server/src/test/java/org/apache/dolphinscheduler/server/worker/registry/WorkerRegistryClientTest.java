@@ -17,19 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.mockito.BDDMockito.given;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.service.registry.RegistryCenter;
-
-import org.apache.curator.framework.imps.CuratorFrameworkImpl;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,7 +41,6 @@ import com.google.common.collect.Sets;
 /**
  * worker registry test
  */
-@Ignore
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class WorkerRegistryClientTest {
 
@@ -56,123 +52,51 @@ public class WorkerRegistryClientTest {
     private WorkerRegistryClient workerRegistryClient;
 
     @Mock
-    private RegistryCenter registryCenter;
-
-    @Mock
-    private CuratorFrameworkImpl zkClient;
+    private RegistryClient registryClient;
 
     @Mock
     private WorkerConfig workerConfig;
 
-    private static final Set<String> workerGroups;
+    @Mock
+    private Set<String> workerGroups = Sets.newHashSet("127.0.0.1");
+
+    @Mock
+    private ScheduledExecutorService heartBeatExecutor;
+
+    //private static final Set<String> workerGroups;
 
     static {
-        workerGroups = Sets.newHashSet(DEFAULT_WORKER_GROUP, TEST_WORKER_GROUP);
+        // workerGroups = Sets.newHashSet(DEFAULT_WORKER_GROUP, TEST_WORKER_GROUP);
     }
 
     @Before
     public void before() {
 
-        Mockito.when(workerConfig.getWorkerGroups()).thenReturn(workerGroups);
+        given(registryClient.getWorkerPath()).willReturn("/nodes/worker");
+        given(workerConfig.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
+        //given(heartBeatExecutor.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
+        //scheduleAtFixedRate
+        given(heartBeatExecutor.scheduleAtFixedRate(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(TimeUnit.class))).willReturn(null);
 
-        /*  Mockito.when(registryCenter.getWorkerPath()).thenReturn("/dolphinscheduler/nodes/worker");
-        Mockito.when(registryCenter.getRegisterOperator()).thenReturn(registerOperator);
-        Mockito.when(zookeeperRegistryCenter.getRegisterOperator().getZkClient()).thenReturn(zkClient);
-        Mockito.when(zookeeperRegistryCenter.getRegisterOperator().getZkClient().getConnectionStateListenable()).thenReturn(
-                new Listenable<ConnectionStateListener>() {
-                    @Override
-                    public void addListener(ConnectionStateListener connectionStateListener) {
-                        LOGGER.info("add listener");
-                    }
-
-                    @Override
-                    public void addListener(ConnectionStateListener connectionStateListener, Executor executor) {
-                        LOGGER.info("add listener executor");
-                    }
-
-                    @Override
-                    public void removeListener(ConnectionStateListener connectionStateListener) {
-                        LOGGER.info("remove listener");
-                    }
-                });
-*/
-        Mockito.when(workerConfig.getWorkerHeartbeatInterval()).thenReturn(10);
-
-        Mockito.when(workerConfig.getWorkerReservedMemory()).thenReturn(1.1);
-
-        Mockito.when(workerConfig.getWorkerMaxCpuloadAvg()).thenReturn(1);
     }
 
     @Test
     public void testRegistry() {
+        //workerRegistryClient.initWorkRegistry();
+        // System.out.println(this.workerGroups.iterator());
+        //Set<String> workerGroups = Sets.newHashSet("127.0.0.1");
+        //workerRegistryClient.registry();
+       // workerRegistryClient.handleDeadServer();
 
-        workerRegistryClient.init();
-
-        workerRegistryClient.registry();
-
-        //  String workerPath = zookeeperRegistryCenter.getWorkerPath();
-
-        /*  int i = 0;
-        for (String workerGroup : workerConfig.getWorkerGroups()) {
-            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getAddr(workerConfig.getListenPort()));
-            String heartbeat = zookeeperRegistryCenter.getRegisterOperator().get(workerZkPath);
-            if (0 == i) {
-                Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/test/"));
-            } else {
-                Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/default/"));
-            }
-            i++;
-        }*/
-
-        workerRegistryClient.unRegistry();
-
-        workerConfig.getWorkerGroups().add(StringUtils.EMPTY);
-        workerRegistryClient.init();
-        workerRegistryClient.registry();
-
-        workerRegistryClient.unRegistry();
-
-        // testEmptyWorkerGroupsRegistry
-        workerConfig.getWorkerGroups().remove(StringUtils.EMPTY);
-        workerConfig.getWorkerGroups().remove(TEST_WORKER_GROUP);
-        workerConfig.getWorkerGroups().remove(DEFAULT_WORKER_GROUP);
-        workerRegistryClient.init();
-        workerRegistryClient.registry();
-
-        /*  List<String> testWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + TEST_WORKER_GROUP);
-        List<String> defaultWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + DEFAULT_WORKER_GROUP);
-
-        Assert.assertEquals(0, testWorkerGroupPathZkChildren.size());
-        Assert.assertEquals(0, defaultWorkerGroupPathZkChildren.size());
-        workerRegistry.unRegistry();*/
     }
 
     @Test
     public void testUnRegistry() {
-      /*  workerRegistry.init();
-        workerRegistry.registry();
 
-        workerRegistry.unRegistry();
-        String workerPath = zookeeperRegistryCenter.getWorkerPath();
-
-        for (String workerGroup : workerConfig.getWorkerGroups()) {
-            String workerGroupPath = workerPath + "/" + workerGroup.trim();
-            List<String> childrenKeys = zookeeperRegistryCenter.getRegisterOperator().getChildrenKeys(workerGroupPath);
-            Assert.assertTrue(childrenKeys.isEmpty());
-        }
-
-        // testEmptyWorkerGroupsUnRegistry
-        workerConfig.getWorkerGroups().remove(TEST_WORKER_GROUP);
-        workerConfig.getWorkerGroups().remove(DEFAULT_WORKER_GROUP);
-        workerRegistry.init();
-        workerRegistry.registry();
-
-        workerRegistry.unRegistry();*/
     }
 
     @Test
     public void testGetWorkerZkPaths() {
-        workerRegistryClient.init();
-        Assert.assertEquals(workerGroups.size(), workerRegistryClient.getWorkerZkPaths().size());
+
     }
 }

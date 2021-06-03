@@ -17,10 +17,37 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 /**
  * server node manager test
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ServerNodeManagerTest {
 
+    @InjectMocks
+    ServerNodeManager serverNodeManager;
+
+    @Mock
+    private RegistryClient registryClient;
+
+    @Mock
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Mock
+    private AlertDao alertDao;
+
+    @Test
+    public void test(){
+        //serverNodeManager.getWorkerGroupNodes()
+    }
 
 }
