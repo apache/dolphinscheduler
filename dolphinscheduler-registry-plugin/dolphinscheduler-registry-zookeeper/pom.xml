@@ -29,9 +29,6 @@
     <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
     <!-- can be load as a Alert Plugin when development and run server in IDE -->
     <packaging>dolphinscheduler-plugin</packaging>
-    <properties>
-        <curator.version>4.3.0</curator.version>
-    </properties>
 
     <dependencies>
         <dependency>

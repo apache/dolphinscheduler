@@ -56,7 +56,6 @@
     </parent>
 
     <properties>
-        <revision>1.3.6-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
@@ -988,6 +987,7 @@
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/registry/RegistryClientTest.java</include>
+                        <include>**/service/registry/RegistryPluginTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
