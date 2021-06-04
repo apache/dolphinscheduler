@@ -43,6 +43,8 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import org.apache.commons.collections.MapUtils;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -282,11 +284,11 @@ public class SqlTask extends AbstractTask {
 
     public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
         String result = null;
-        for (Property info :properties) {
+        for (Property info : properties) {
             if (Direct.OUT == info.getDirect()) {
-                List<Map<String,String>> updateRL = new ArrayList<>();
-                Map<String,String> updateRM = new HashMap<>();
-                updateRM.put(info.getProp(),updateResult);
+                List<Map<String, String>> updateRL = new ArrayList<>();
+                Map<String, String> updateRM = new HashMap<>();
+                updateRM.put(info.getProp(), updateResult);
                 updateRL.add(updateRM);
                 result = JSONUtils.toJsonString(updateRL);
                 break;
@@ -330,8 +332,8 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                            ? sqlParameters.getTitle()
-                            : taskExecutionContext.getTaskName() + " query result sets", result);
+                    ? sqlParameters.getTitle()
+                    : taskExecutionContext.getTaskName() + " query result sets", result);
         }
         logger.debug("execute sql result : {}", result);
         return result;
@@ -494,6 +496,10 @@ public class SqlTask extends AbstractTask {
     public void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
         //parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
+        if (MapUtils.isEmpty(sqlParamsMap)) {
+            logger.info("sqlParamsMap should not be Empty");
+            return;
+        }
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
         for (int i = 1; i <= sqlParamsMap.size(); i++) {
             logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
