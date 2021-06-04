@@ -415,15 +415,7 @@ public abstract class AbstractCommandExecutor {
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
                         || applicationStatus.equals(ExecutionStatus.KILL)) {
                         //Try again 10 times every 15 seconds
-                        for (int i = 0; i < 10; i++) {
-                            applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                            if (applicationStatus.equals(ExecutionStatus.FAILURE)
-                                 || applicationStatus.equals(ExecutionStatus.KILL)) {
-                                ThreadUtils.sleep(15000);
-                            } else {
-                                break;
-                            }
-                        }
+                        applicationStatus = retryExecutionStatus(appId);
                         //Judge the state again
                         if (applicationStatus.equals(ExecutionStatus.FAILURE)
                             || applicationStatus.equals(ExecutionStatus.KILL)) {
@@ -444,7 +436,26 @@ public abstract class AbstractCommandExecutor {
         return result;
 
     }
-
+    /**
+     *
+     * @param appId
+     * @return appId ExecutionStatus
+     * @throws Exception
+     */
+    private ExecutionStatus retryExecutionStatus(String appId) throws Exception {
+        ExecutionStatus applicationStatus = null;
+        for (int i = 0; i < 10; i++) {
+            applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+            if (applicationStatus.equals(ExecutionStatus.FAILURE)
+                    || applicationStatus.equals(ExecutionStatus.KILL)) {
+                ThreadUtils.sleep(10000);
+            } else {
+                break;
+            }
+        }
+        return applicationStatus;
+    }
+    
     public int getProcessId() {
         return getProcessId(process);
     }
