@@ -33,7 +33,7 @@ public class RegistryPluginTest {
         DolphinPluginManagerConfig registryPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
 
-        String registryPluginZkPath=path+"../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml";
+        String registryPluginZkPath = path + "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml";
         registryPluginManagerConfig.setPlugins(registryPluginZkPath);
         RegistryPluginManager registryPluginManager = new RegistryPluginManager("zookeeper");
 
