@@ -1157,6 +1157,7 @@
     <modules>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
+        <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
@@ -1165,7 +1166,6 @@
         <module>dolphinscheduler-alert</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
-        <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
     </modules>
