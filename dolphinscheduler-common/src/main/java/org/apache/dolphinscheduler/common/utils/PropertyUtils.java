@@ -269,7 +269,7 @@ public class PropertyUtils {
         Map<String, String> propertiesMap = new HashMap<>();
         keys.forEach(k -> {
             if (k.toString().contains(prefix)) {
-                propertiesMap.put(k.toString(), properties.getProperty((String) k));
+                propertiesMap.put(k.toString().replaceFirst(prefix + ".", ""), properties.getProperty((String) k));
             }
         });
         return propertiesMap;

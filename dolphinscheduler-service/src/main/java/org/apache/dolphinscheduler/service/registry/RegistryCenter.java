@@ -77,28 +77,31 @@ public class RegistryCenter {
 
     private static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
 
-    private static final String REGISTRY_PLUGIN_NAME = "registry.plugin.name";
+    private static final String REGISTRY_PLUGIN_NAME = "plugin.name";
 
     /**
      * default registry plugin dir
      */
     private static final String REGISTRY_PLUGIN_PATH = "lib/plugin/registry";
 
+    private static final String REGISTRY_CONFIG_FILE_PATH = "/registry.properties";
+
     /**
      * init node persist
      */
     public void init() {
         if (isStarted.compareAndSet(false, true)) {
-
-            if (null == registryPluginManager) {
-                installRegistryPlugin();
-                registry = registryPluginManager.getRegistry();
-            }
+            PropertyUtils.loadPropertyFile(REGISTRY_CONFIG_FILE_PATH);
             Map<String, String> registryConfig = PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
 
             if (registryConfig.isEmpty()) {
                 throw new RegistryException("registry config param is null");
             }
+            if (null == registryPluginManager) {
+                installRegistryPlugin(registryConfig.get(REGISTRY_PLUGIN_NAME));
+                registry = registryPluginManager.getRegistry();
+            }
+
             registry.init(registryConfig);
             initNodes();
 
@@ -116,18 +119,21 @@ public class RegistryCenter {
     /**
      * install registry plugin
      */
-    private void installRegistryPlugin() {
+    private void installRegistryPlugin(String registryPluginName) {
         DolphinPluginManagerConfig registryPluginManagerConfig = new DolphinPluginManagerConfig();
         registryPluginManagerConfig.setPlugins(PropertyUtils.getString(REGISTRY_PLUGIN_BINDING));
         if (StringUtils.isNotBlank(PropertyUtils.getString(REGISTRY_PLUGIN_DIR))) {
-            registryPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(REGISTRY_PLUGIN_DIR, REGISTRY_PLUGIN_PATH).trim());
+            registryPluginManagerConfig.setPlugins(PropertyUtils.getString(REGISTRY_PLUGIN_DIR, REGISTRY_PLUGIN_PATH).trim());
         }
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY))) {
             registryPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
         }
+        if (StringUtils.isNotBlank(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY))) {
+            registryPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
+        }
 
-        registryPluginManager = new RegistryPluginManager(System.getProperty(REGISTRY_PLUGIN_NAME));
+        registryPluginManager = new RegistryPluginManager(registryPluginName);
 
         DolphinPluginLoader registryPluginLoader = new DolphinPluginLoader(registryPluginManagerConfig, ImmutableList.of(registryPluginManager));
         try {
