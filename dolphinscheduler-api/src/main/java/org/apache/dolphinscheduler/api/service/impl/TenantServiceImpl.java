@@ -95,6 +95,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return result;
         }
 
+        if (!RegexUtils.isValidWindowUserName(tenantCode)) {
+            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
+            return result;
+        }
+
         if (checkTenantExists(tenantCode)) {
             putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
             return result;
