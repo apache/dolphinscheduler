@@ -136,6 +136,7 @@ jetty-util-6.1.26.jar
 jetty-util-9.4.33.v20201020.jar
 jetty-webapp-9.4.33.v20201020.jar
 jetty-xml-9.4.33.v20201020.jar
+jline-0.9.94.jar
 jna-4.5.2.jar
 jna-platform-4.5.2.jar
 joda-time-2.10.8.jar
