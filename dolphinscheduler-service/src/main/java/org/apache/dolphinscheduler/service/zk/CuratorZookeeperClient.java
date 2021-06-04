@@ -27,12 +27,15 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,5 +127,10 @@ public class CuratorZookeeperClient implements InitializingBean {
 
     public CuratorFramework getZkClient() {
         return zkClient;
+    }
+
+    @PreDestroy
+    public void close() {
+        CloseableUtils.closeQuietly(zkClient);
     }
 }
