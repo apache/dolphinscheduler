@@ -183,6 +183,8 @@ public class MasterServer implements IStoppable {
             } catch (Exception e) {
                 logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
+            // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
+            springApplicationContext.close();
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
         }
