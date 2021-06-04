@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -112,7 +113,8 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(taskExecutionContextCacheManager);
 
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineId(),
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()));
 
@@ -137,8 +139,9 @@ public class TaskExecuteProcessorTest {
                 .thenReturn(taskExecutionContext);
 
         PowerMockito.mockStatic(FileUtils.class);
-        PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
-                taskExecutionContext.getProcessDefineId(),
+        PowerMockito.when(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()))
                 .thenReturn(taskExecutionContext.getExecutePath());
@@ -169,10 +172,11 @@ public class TaskExecuteProcessorTest {
     public TaskExecutionContext getTaskExecutionContext() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessId(12345);
-        taskExecutionContext.setProcessDefineId(1);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
-        taskExecutionContext.setTaskType("sql");
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
+        taskExecutionContext.setTaskType(TaskType.SQL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");

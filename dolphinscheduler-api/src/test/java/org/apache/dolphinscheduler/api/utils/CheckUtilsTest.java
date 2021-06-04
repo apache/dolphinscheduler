@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
@@ -41,34 +42,17 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CheckUtilsTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(CheckUtilsTest.class);
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
 
     /**
      * check username
      */
     @Test
     public void testCheckUserName() {
-
         assertTrue(CheckUtils.checkUserName("test01"));
-
         assertFalse(CheckUtils.checkUserName(null));
-
         assertFalse(CheckUtils.checkUserName("test01@abc"));
     }
 
@@ -77,9 +61,7 @@ public class CheckUtilsTest {
      */
     @Test
     public void testCheckEmail() {
-
         assertTrue(CheckUtils.checkEmail("test01@gmail.com"));
-
         assertFalse(CheckUtils.checkEmail("test01@gmail"));
     }
 
@@ -88,12 +70,9 @@ public class CheckUtilsTest {
      */
     @Test
     public void testCheckDesc() {
-
         Map<String, Object> objectMap = CheckUtils.checkDesc("I am desc");
         Status status = (Status) objectMap.get(Constants.STATUS);
-
-        assertEquals(status.getCode(),Status.SUCCESS.getCode());
-
+        assertEquals(status.getCode(), Status.SUCCESS.getCode());
     }
 
     @Test
@@ -104,18 +83,15 @@ public class CheckUtilsTest {
         assertFalse(CheckUtils.checkOtherParams("{}"));
         assertFalse(CheckUtils.checkOtherParams("{\"key1\":111}"));
     }
+
     /**
      * check passwd
      */
     @Test
     public void testCheckPassword() {
-
         assertFalse(CheckUtils.checkPassword(null));
-
         assertFalse(CheckUtils.checkPassword("a"));
-
         assertFalse(CheckUtils.checkPassword("1234567890abcderfasdf2"));
-
         assertTrue(CheckUtils.checkPassword("123456"));
     }
 
@@ -124,103 +100,148 @@ public class CheckUtilsTest {
      */
     @Test
     public void testCheckPhone() {
-
         // phone can be null
         assertTrue(CheckUtils.checkPhone(null));
-
         assertFalse(CheckUtils.checkPhone("14567134578654"));
-
         assertTrue(CheckUtils.checkPhone("17362537263"));
     }
+
     @Test
     public void testCheckTaskNodeParameters() {
+        TaskNode taskNode = new TaskNode();
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
 
-        assertFalse(CheckUtils.checkTaskNodeParameters(null,null));
-        assertFalse(CheckUtils.checkTaskNodeParameters(null,"unKnown"));
-        assertFalse(CheckUtils.checkTaskNodeParameters("unKnown","unKnown"));
-        assertFalse(CheckUtils.checkTaskNodeParameters("unKnown",null));
+        taskNode.setType("unKnown");
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
+
+        taskNode.setParams("unKnown");
+        taskNode.setType("unKnown");
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
+
+        taskNode.setParams("unKnown");
+        taskNode.setType(null);
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // sub SubProcessParameters
         SubProcessParameters subProcessParameters = new SubProcessParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(subProcessParameters), TaskType.SUB_PROCESS.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(subProcessParameters));
+        taskNode.setType(TaskType.SUB_PROCESS.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
+
         subProcessParameters.setProcessDefinitionId(1234);
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(subProcessParameters), TaskType.SUB_PROCESS.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(subProcessParameters));
+        taskNode.setType(TaskType.SUB_PROCESS.getDesc());
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // ShellParameters
         ShellParameters shellParameters = new ShellParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(shellParameters), TaskType.SHELL.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(shellParameters));
+        taskNode.setType(TaskType.SHELL.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         shellParameters.setRawScript("");
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(shellParameters), TaskType.SHELL.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(shellParameters));
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         shellParameters.setRawScript("sss");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(shellParameters), TaskType.SHELL.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(shellParameters));
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // ProcedureParameters
         ProcedureParameters procedureParameters = new ProcedureParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(procedureParameters), TaskType.PROCEDURE.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(procedureParameters));
+        taskNode.setType(TaskType.PROCEDURE.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         procedureParameters.setDatasource(1);
         procedureParameters.setType("xx");
         procedureParameters.setMethod("yy");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(procedureParameters), TaskType.PROCEDURE.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(procedureParameters));
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // SqlParameters
         SqlParameters sqlParameters = new SqlParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(sqlParameters), TaskType.SQL.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
+        taskNode.setType(TaskType.SQL.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         sqlParameters.setDatasource(1);
         sqlParameters.setType("xx");
         sqlParameters.setSql("yy");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(sqlParameters), TaskType.SQL.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // MapReduceParameters
         MapReduceParameters mapreduceParameters = new MapReduceParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(mapreduceParameters), TaskType.MR.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(mapreduceParameters));
+        taskNode.setType(TaskType.MR.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
 
         ResourceInfo resourceInfoMapreduce = new ResourceInfo();
         resourceInfoMapreduce.setId(1);
         resourceInfoMapreduce.setRes("");
         mapreduceParameters.setMainJar(resourceInfoMapreduce);
         mapreduceParameters.setProgramType(ProgramType.JAVA);
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(mapreduceParameters), TaskType.MR.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(mapreduceParameters));
+        taskNode.setType(TaskType.MR.getDesc());
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // SparkParameters
         SparkParameters sparkParameters = new SparkParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(sparkParameters), TaskType.SPARK.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(sparkParameters));
+        taskNode.setType(TaskType.SPARK.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         sparkParameters.setMainJar(new ResourceInfo());
         sparkParameters.setProgramType(ProgramType.SCALA);
         sparkParameters.setSparkVersion("1.1.1");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(sparkParameters), TaskType.SPARK.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(sparkParameters));
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // PythonParameters
         PythonParameters pythonParameters = new PythonParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(pythonParameters), TaskType.PYTHON.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(pythonParameters));
+        taskNode.setType(TaskType.PYTHON.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         pythonParameters.setRawScript("ss");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(pythonParameters), TaskType.PYTHON.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(pythonParameters));
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // DependentParameters
         DependentParameters dependentParameters = new DependentParameters();
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(dependentParameters), TaskType.DEPENDENT.toString()));
+        taskNode.setDependence(JSONUtils.toJsonString(dependentParameters));
+        taskNode.setType(TaskType.DEPENDENT.getDesc());
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // FlinkParameters
         FlinkParameters flinkParameters = new FlinkParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(flinkParameters), TaskType.FLINK.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(flinkParameters));
+        taskNode.setType(TaskType.FLINK.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         flinkParameters.setMainJar(new ResourceInfo());
         flinkParameters.setProgramType(ProgramType.JAVA);
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(flinkParameters), TaskType.FLINK.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(flinkParameters));
+        taskNode.setType(TaskType.FLINK.getDesc());
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // HTTP
         HttpParameters httpParameters = new HttpParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(httpParameters), TaskType.HTTP.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(httpParameters));
+        taskNode.setType(TaskType.HTTP.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         httpParameters.setUrl("httpUrl");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(httpParameters), TaskType.HTTP.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(httpParameters));
+        taskNode.setType(TaskType.HTTP.getDesc());
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // DataxParameters
         DataxParameters dataxParameters = new DataxParameters();
-        assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(dataxParameters), TaskType.DATAX.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(dataxParameters));
+        taskNode.setType(TaskType.DATAX.getDesc());
+        assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
         dataxParameters.setCustomConfig(0);
         dataxParameters.setDataSource(111);
         dataxParameters.setDataTarget(333);
-        dataxParameters.setSql("sql");
+        dataxParameters.setSql(TaskType.SQL.getDesc());
         dataxParameters.setTargetTable("tar");
-        assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(dataxParameters), TaskType.DATAX.toString()));
+        taskNode.setParams(JSONUtils.toJsonString(dataxParameters));
+        taskNode.setType(TaskType.DATAX.getDesc());
+        assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
     }
 
 }

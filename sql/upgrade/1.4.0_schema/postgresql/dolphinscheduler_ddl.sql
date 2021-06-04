@@ -304,6 +304,23 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName();
 
+-- uc_dolphin_T_t_ds_schedules_A_add_timezone
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_schedules_A_add_timezone() RETURNS void AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_schedules'
+                            AND COLUMN_NAME ='timezone_id')
+      THEN
+ALTER TABLE t_ds_schedules ADD COLUMN timezone_id varchar(40) DEFAULT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_schedules_A_add_timezone();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_schedules_A_add_timezone();
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------

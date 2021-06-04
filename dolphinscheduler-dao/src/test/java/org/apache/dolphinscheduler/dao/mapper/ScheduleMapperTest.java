@@ -123,12 +123,19 @@ public class ScheduleMapperTest {
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(user.getId());
+        project.setCode(1L);
+        project.setUpdateTime(new Date());
+        project.setCreateTime(new Date());
         projectMapper.insert(project);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setProjectCode(project.getCode());
         processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(user.getId());
         processDefinition.setLocations("");
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
 
         Schedule schedule= insertOne();
@@ -159,12 +166,19 @@ public class ScheduleMapperTest {
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(user.getId());
+        project.setCode(1L);
+        project.setUpdateTime(new Date());
+        project.setCreateTime(new Date());
         projectMapper.insert(project);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setProjectCode(project.getCode());
         processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(user.getId());
         processDefinition.setLocations("");
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
         processDefinitionMapper.insert(processDefinition);
 
         Schedule schedule= insertOne();

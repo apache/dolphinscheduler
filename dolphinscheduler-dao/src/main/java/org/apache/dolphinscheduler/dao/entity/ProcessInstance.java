@@ -47,10 +47,17 @@ public class ProcessInstance {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+
     /**
-     * process definition id
+     * process definition code
      */
-    private int processDefinitionId;
+    private Long processDefinitionCode;
+
+    /**
+     * process definition version
+     */
+    private int processDefinitionVersion;
+
     /**
      * process state
      */
@@ -145,7 +152,9 @@ public class ProcessInstance {
 
     /**
      * process instance json
+     * TODO delete
      */
+    @TableField(exist = false)
     private String processInstanceJson;
 
     /**
@@ -179,11 +188,13 @@ public class ProcessInstance {
     /**
      * task locations for web
      */
+    @TableField(exist = false)
     private String locations;
 
     /**
      * task connects for web
      */
+    @TableField(exist = false)
     private String connects;
 
     /**
@@ -194,6 +205,7 @@ public class ProcessInstance {
     /**
      * depend processes schedule time
      */
+    @TableField(exist = false)
     private String dependenceScheduleTimes;
 
     /**
@@ -271,14 +283,6 @@ public class ProcessInstance {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
     }
 
     public ExecutionStatus getState() {
@@ -579,11 +583,26 @@ public class ProcessInstance {
         this.tenantId = tenantId;
     }
 
+    public Long getProcessDefinitionCode() {
+        return processDefinitionCode;
+    }
+
+    public void setProcessDefinitionCode(Long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
+    }
+
+    public int getProcessDefinitionVersion() {
+        return processDefinitionVersion;
+    }
+
+    public void setProcessDefinitionVersion(int processDefinitionVersion) {
+        this.processDefinitionVersion = processDefinitionVersion;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{"
                 + "id=" + id
-                + ", processDefinitionId=" + processDefinitionId
                 + ", state=" + state
                 + ", recovery=" + recovery
                 + ", startTime=" + startTime
@@ -651,6 +670,12 @@ public class ProcessInstance {
                 + timeout
                 + ", tenantId="
                 + tenantId
+                + ", processDefinitionCode='"
+                + processDefinitionCode
+                + '\''
+                + ", processDefinitionVersion='"
+                + processDefinitionVersion
+                + '\''
                 + '}';
     }
 
@@ -672,4 +697,5 @@ public class ProcessInstance {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

@@ -345,14 +345,14 @@ DROP TABLE IF EXISTS `t_ds_datasource`;
 CREATE TABLE `t_ds_datasource` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(64) NOT NULL COMMENT 'data source name',
-  `note` varchar(256) DEFAULT NULL COMMENT 'description',
+  `note` varchar(255) DEFAULT NULL COMMENT 'description',
   `type` tinyint(4) NOT NULL COMMENT 'data source type: 0:mysql,1:postgresql,2:hive,3:spark',
   `user_id` int(11) NOT NULL COMMENT 'the creator id',
   `connection_params` text NOT NULL COMMENT 'json connection params',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_datasource_name_UN` ('name', 'type')
+  UNIQUE KEY `t_ds_datasource_name_UN` (`name`, `type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -391,28 +391,25 @@ CREATE TABLE `t_ds_error_command` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_definition`;
 CREATE TABLE `t_ds_process_definition` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
   `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
   `version` int(11) DEFAULT NULL COMMENT 'process definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
-  `project_id` int(11) DEFAULT NULL COMMENT 'project id',
   `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
-  `process_definition_json` longtext COMMENT 'process definition json content',
-  `description` text,
   `global_params` text COMMENT 'global parameters',
   `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
   `locations` text COMMENT 'Node location information',
   `connects` text COMMENT 'Node connection information',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `timeout` int(11) DEFAULT '0' COMMENT 'time out',
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out, unit: minute',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `modify_by` varchar(255) DEFAULT NULL,
-  `resource_ids` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `process_definition_unique` (`name`,`project_id`),
-  KEY `process_definition_index` (`project_id`,`id`) USING BTREE
+  PRIMARY KEY (`id`,`code`),
+  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -420,30 +417,136 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_process_definition_version
+-- Table structure for t_ds_process_definition_log
 -- ----------------------------
-DROP TABLE IF EXISTS `t_ds_process_definition_version`;
-CREATE TABLE `t_ds_process_definition_version` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
+DROP TABLE IF EXISTS `t_ds_process_definition_log`;
+CREATE TABLE `t_ds_process_definition_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
   `version` int(11) DEFAULT NULL COMMENT 'process definition version',
-  `process_definition_json` longtext COMMENT 'process definition json content',
-  `description` text,
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
+  `user_id` int(11) DEFAULT NULL COMMENT 'process definition creator id',
   `global_params` text COMMENT 'global parameters',
+  `flag` tinyint(4) DEFAULT NULL COMMENT '0 not available, 1 available',
   `locations` text COMMENT 'Node location information',
   `connects` text COMMENT 'Node connection information',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `timeout` int(11) DEFAULT '0' COMMENT 'time out',
-  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `process_definition_id_and_version` (`process_definition_id`,`version`) USING BTREE,
-  KEY `process_definition_index` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
+  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of t_ds_process_definition
+-- Table structure for t_ds_task_definition
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition`;
+CREATE TABLE `t_ds_task_definition` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_params` longtext COMMENT 'job custom parameters',
+  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
+  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
+  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
+  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
+  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
+  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
+  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`,`code`),
+  UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_task_definition_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_task_definition_log`;
+CREATE TABLE `t_ds_task_definition_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `version` int(11) DEFAULT NULL COMMENT 'task definition version',
+  `description` text COMMENT 'description',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_params` text COMMENT 'job custom parameters',
+  `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
+  `task_priority` tinyint(4) DEFAULT NULL COMMENT 'job priority',
+  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
+  `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
+  `timeout_flag` tinyint(2) DEFAULT '0' COMMENT 'timeout flag:0 close, 1 open',
+  `timeout_notify_strategy` tinyint(4) DEFAULT NULL COMMENT 'timeout notification policy: 0 warning, 1 fail',
+  `timeout` int(11) DEFAULT '0' COMMENT 'timeout length,unit: minute',
+  `delay_time` int(11) DEFAULT '0' COMMENT 'delay execution time,unit: minute',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource id, separated by comma',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_process_task_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation`;
+CREATE TABLE `t_ds_process_task_relation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
+  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process version',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
+  `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
+  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
+  `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
+  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
+  `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
+  `condition_params` text COMMENT 'condition params(json)',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_process_task_relation_log
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
+CREATE TABLE `t_ds_process_task_relation_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
+  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process version',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
+  `pre_task_code` bigint(20) NOT NULL COMMENT 'pre task code',
+  `pre_task_version` int(11) NOT NULL COMMENT 'pre task version',
+  `post_task_code` bigint(20) NOT NULL COMMENT 'post task code',
+  `post_task_version` int(11) NOT NULL COMMENT 'post task version',
+  `condition_type` tinyint(2) DEFAULT NULL COMMENT 'condition type : 0 none, 1 judge 2 delay',
+  `condition_params` text COMMENT 'condition params(json)',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
+  `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_ds_process_instance
@@ -452,7 +555,8 @@ DROP TABLE IF EXISTS `t_ds_process_instance`;
 CREATE TABLE `t_ds_process_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
-  `process_definition_id` int(11) DEFAULT NULL COMMENT 'process definition id',
+  `process_definition_version` int(11) DEFAULT NULL COMMENT 'process definition version',
+  `process_definition_code` bigint(20) not NULL COMMENT 'process definition code',
   `state` tinyint(4) DEFAULT NULL COMMENT 'process instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `recovery` tinyint(4) DEFAULT NULL COMMENT 'process instance failover flag：0:normal,1:failover instance',
   `start_time` datetime DEFAULT NULL COMMENT 'process instance start time',
@@ -469,22 +573,18 @@ CREATE TABLE `t_ds_process_instance` (
   `schedule_time` datetime DEFAULT NULL COMMENT 'schedule time',
   `command_start_time` datetime DEFAULT NULL COMMENT 'command start time',
   `global_params` text COMMENT 'global parameters',
-  `process_instance_json` longtext COMMENT 'process instance json(copy的process definition 的json)',
   `flag` tinyint(4) DEFAULT '1' COMMENT 'flag',
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_sub_process` int(11) DEFAULT '0' COMMENT 'flag, whether the process is sub process',
   `executor_id` int(11) NOT NULL COMMENT 'executor id',
-  `locations` text COMMENT 'Node location information',
-  `connects` text COMMENT 'Node connection information',
   `history_cmd` text COMMENT 'history commands of process instance operation',
-  `dependence_schedule_times` text COMMENT 'depend schedule fire time',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority. 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
-  KEY `process_instance_index` (`process_definition_id`,`id`) USING BTREE,
+  KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -499,10 +599,11 @@ DROP TABLE IF EXISTS `t_ds_project`;
 CREATE TABLE `t_ds_project` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(100) DEFAULT NULL COMMENT 'project name',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
   `description` varchar(200) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE
@@ -623,7 +724,7 @@ CREATE TABLE `t_ds_resources` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `alias` varchar(64) DEFAULT NULL COMMENT 'alias',
   `file_name` varchar(64) DEFAULT NULL COMMENT 'file name',
-  `description` varchar(256) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'user id',
   `type` tinyint(4) DEFAULT NULL COMMENT 'resource type,0:FILE，1:UDF',
   `size` bigint(20) DEFAULT NULL COMMENT 'resource size',
@@ -649,14 +750,15 @@ CREATE TABLE `t_ds_schedules` (
   `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
-  `crontab` varchar(256) NOT NULL COMMENT 'crontab description',
+  `timezone_id` varchar(40) DEFAULT NULL COMMENT 'timezoneId',
+  `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',
   `warning_type` tinyint(4) NOT NULL COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(256) DEFAULT '' COMMENT 'worker group id',
+  `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
@@ -689,10 +791,10 @@ DROP TABLE IF EXISTS `t_ds_task_instance`;
 CREATE TABLE `t_ds_task_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(255) DEFAULT NULL COMMENT 'task name',
-  `task_type` varchar(64) DEFAULT NULL COMMENT 'task type',
-  `process_definition_id` int(11) DEFAULT NULL COMMENT 'process definition id',
+  `task_type` varchar(50) NOT NULL COMMENT 'task type',
+  `task_code` bigint(20) NOT NULL COMMENT 'task definition code',
+  `task_definition_version` int(11) DEFAULT NULL COMMENT 'task definition version',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
-  `task_json` longtext COMMENT 'task content json',
   `state` tinyint(4) DEFAULT NULL COMMENT 'Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
   `start_time` datetime DEFAULT NULL COMMENT 'task start time',
@@ -704,6 +806,7 @@ CREATE TABLE `t_ds_task_instance` (
   `retry_times` int(4) DEFAULT '0' COMMENT 'task retry times',
   `pid` int(4) DEFAULT NULL COMMENT 'pid of task',
   `app_link` text COMMENT 'yarn app id',
+  `task_params` text COMMENT 'job custom parameters',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `retry_interval` int(4) DEFAULT NULL COMMENT 'retry interval when task failed ',
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
@@ -715,7 +818,6 @@ CREATE TABLE `t_ds_task_instance` (
   `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
-  KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,
   CONSTRAINT `foreign_key_instance_id` FOREIGN KEY (`process_instance_id`) REFERENCES `t_ds_process_instance` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -730,7 +832,7 @@ DROP TABLE IF EXISTS `t_ds_tenant`;
 CREATE TABLE `t_ds_tenant` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
-  `description` varchar(256) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `queue_id` int(11) DEFAULT NULL COMMENT 'queue id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
@@ -795,7 +897,7 @@ CREATE TABLE `t_ds_user` (
 DROP TABLE IF EXISTS `t_ds_worker_group`;
 CREATE TABLE `t_ds_worker_group` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `name` varchar(256) NOT NULL COMMENT 'worker group name',
+  `name` varchar(255) NOT NULL COMMENT 'worker group name',
   `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
   `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',

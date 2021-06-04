@@ -17,30 +17,24 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.dao.entity.User;
+
 import java.util.Map;
 
 /**
- * task record service
+ * process task relation service
  */
-public interface TaskRecordService {
+public interface ProcessTaskRelationService {
 
     /**
-     * query task record list paging
+     * query process task relation
      *
-     * @param taskName task name
-     * @param state state
-     * @param sourceTable source table
-     * @param destTable destination table
-     * @param taskDate task date
-     * @param startDate start time
-     * @param endDate end time
-     * @param pageNo page numbere
-     * @param pageSize page size
-     * @param isHistory is history
-     * @return task record list
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionCode process definition code
      */
-    Map<String,Object> queryTaskRecordListPaging(boolean isHistory, String taskName, String startDate,
-                                                 String taskDate, String sourceTable,
-                                                 String destTable, String endDate,
-                                                 String state, Integer pageNo, Integer pageSize);
+    Map<String, Object> queryProcessTaskRelation(User loginUser,
+                                                 String projectName,
+                                                 Long processDefinitionCode);
 }
+

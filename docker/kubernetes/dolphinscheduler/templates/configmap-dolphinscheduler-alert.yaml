@@ -21,9 +21,9 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-alert
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
-  DOLPHINSCHEDULER_OPTS: {{ .Values.alert.configmap.DOLPHINSCHEDULER_OPTS | quote }}
-  ALERT_PLUGIN_DIR: {{ .Values.alert.configmap.ALERT_PLUGIN_DIR | quote }}
+  {{- range $key, $value := .Values.alert.configmap }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
 {{- end }}
