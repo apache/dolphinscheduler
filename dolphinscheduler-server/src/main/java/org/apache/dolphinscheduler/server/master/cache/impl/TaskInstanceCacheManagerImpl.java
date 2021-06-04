@@ -83,13 +83,7 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     @Override
     public TaskInstance getByTaskInstanceId(Integer taskInstanceId) {
-        TaskInstance taskInstance = taskInstanceCache.get(taskInstanceId);
-        if (taskInstance == null) {
-            taskInstance = processService.findTaskInstanceById(taskInstanceId);
-            TaskInstance finalTaskInstance = taskInstance;
-            taskInstanceCache.computeIfAbsent(taskInstanceId, k -> finalTaskInstance);
-        }
-        return taskInstance;
+        return taskInstanceCache.computeIfAbsent(taskInstanceId, k -> processService.findTaskInstanceById(taskInstanceId));
     }
 
     /**
