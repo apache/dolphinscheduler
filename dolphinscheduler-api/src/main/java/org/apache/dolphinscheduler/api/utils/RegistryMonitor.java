@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * monitor zookeeper info todo registry-spi
+ * fixme Some of the information obtained in the api belongs to the unique information of zk.
+ * I am not sure whether there is a good abstraction method. This is related to whether the specific plug-in is provided.
  */
 @Component
 public class RegistryMonitor extends RegistryClient {

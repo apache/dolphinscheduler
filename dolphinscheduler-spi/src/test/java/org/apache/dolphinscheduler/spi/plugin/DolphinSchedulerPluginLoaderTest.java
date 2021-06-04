@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.plugin;
-
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
+package org.apache.dolphinscheduler.spi.plugin;
 
 import java.util.Objects;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -31,19 +27,20 @@ public class DolphinSchedulerPluginLoaderTest {
 
     /**
      * Method: loadPlugins()
+     *
+     * The spi module cannot test specific plug-ins and should be mocked. However, the current loading method is not easy to implement, although it is ultimately the service load method.
      */
     @Test
-    @Ignore
     public void testLoadPlugins() {
         PluginManagerTest pluginManager = new PluginManagerTest();
-        DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
+        DolphinPluginManagerConfig registryPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = Objects.requireNonNull(DolphinPluginLoader.class.getClassLoader().getResource("")).getPath();
-        alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
-        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(pluginManager));
+        registryPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml");
+        DolphinPluginLoader registryPluginLoader = new DolphinPluginLoader(registryPluginManagerConfig, ImmutableList.of(pluginManager));
         try {
-            //alertPluginLoader.loadPlugins();
+            registryPluginLoader.loadPlugins();
         } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
+            throw new RuntimeException("load registry Plugin Failed !", e);
         }
     }
 }
