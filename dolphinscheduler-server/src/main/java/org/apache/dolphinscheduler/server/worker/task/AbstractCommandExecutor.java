@@ -417,10 +417,10 @@ public abstract class AbstractCommandExecutor {
                         //Try again 10 times every 15 seconds
                         for (int i = 0; i < 10; i++) {
                             applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                            if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
-                                    applicationStatus.equals(ExecutionStatus.KILL)) {
+                             if (applicationStatus.equals(ExecutionStatus.FAILURE)
+                                || applicationStatus.equals(ExecutionStatus.KILL)) {
                                 ThreadUtils.sleep(15000);
-                            }else{
+                            } else {
                                 break;
                             }
                         }
