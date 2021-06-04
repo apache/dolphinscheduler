@@ -180,14 +180,6 @@ mybatis-plus-extension-3.2.0.jar
 mybatis-spring-2.0.2.jar
 netty-3.6.2.Final.jar
 netty-all-4.1.53.Final.jar
-netty-buffer-4.1.53.Final.jar
-netty-codec-4.1.53.Final.jar
-netty-common-4.1.53.Final.jar
-netty-handler-4.1.53.Final.jar
-netty-resolver-4.1.53.Final.jar
-netty-transport-4.1.53.Final.jar
-netty-transport-native-epoll-4.1.53.Final.jar
-netty-transport-native-unix-common-4.1.53.Final.jar
 opencsv-2.3.jar
 oshi-core-3.9.1.jar
 paranamer-2.3.jar
@@ -259,6 +251,4 @@ xml-apis-1.4.01.jar
 xmlbeans-3.1.0.jar
 xmlenc-0.52.jar
 xz-1.0.jar
-zookeeper-3.4.6.jar
-zookeeper-3.5.7.jar
-zookeeper-jute-3.5.7.jar
+zookeeper-3.4.14.jar
