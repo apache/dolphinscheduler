@@ -425,8 +425,8 @@ public abstract class AbstractCommandExecutor {
                             }
                         }
                         //Judge the state again
-                        if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
-                                applicationStatus.equals(ExecutionStatus.KILL)) {
+                       if (applicationStatus.equals(ExecutionStatus.FAILURE)
+                            || applicationStatus.equals(ExecutionStatus.KILL)) {
                             return false;
                         }
                     }
