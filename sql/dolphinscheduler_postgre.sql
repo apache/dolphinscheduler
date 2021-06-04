@@ -243,7 +243,7 @@ DROP TABLE IF EXISTS t_ds_datasource;
 CREATE TABLE t_ds_datasource (
   id int NOT NULL  ,
   name varchar(64) NOT NULL ,
-  note varchar(256) DEFAULT NULL ,
+  note varchar(255) DEFAULT NULL ,
   type int NOT NULL ,
   user_id int NOT NULL ,
   connection_params text NOT NULL ,
@@ -590,7 +590,7 @@ CREATE TABLE t_ds_resources (
   id int NOT NULL  ,
   alias varchar(64) DEFAULT NULL ,
   file_name varchar(64) DEFAULT NULL ,
-  description varchar(256) DEFAULT NULL ,
+  description varchar(255) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   type int DEFAULT NULL ,
   size bigint DEFAULT NULL ,
@@ -615,7 +615,7 @@ CREATE TABLE t_ds_schedules (
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
   timezone_id varchar(40) default NULL ,
-  crontab varchar(256) NOT NULL ,
+  crontab varchar(255) NOT NULL ,
   failure_strategy int NOT NULL ,
   user_id int NOT NULL ,
   release_state int NOT NULL ,
@@ -686,7 +686,7 @@ DROP TABLE IF EXISTS t_ds_tenant;
 CREATE TABLE t_ds_tenant (
   id int NOT NULL  ,
   tenant_code varchar(64) DEFAULT NULL ,
-  description varchar(256) DEFAULT NULL ,
+  description varchar(255) DEFAULT NULL ,
   queue_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -754,7 +754,7 @@ create index version_index on t_ds_version(version);
 DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
-  name varchar(256) NOT NULL ,
+  name varchar(255) NOT NULL ,
   addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
