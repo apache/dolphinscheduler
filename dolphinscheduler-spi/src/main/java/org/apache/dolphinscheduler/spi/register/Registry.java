@@ -60,6 +60,11 @@ public interface Registry {
     void persist(String key, String value);
 
     /**
+     *persist ephemeral data
+     */
+    void persistEphemeral(String key, String value);
+
+    /**
      * update data
      */
     void update(String key, String value);

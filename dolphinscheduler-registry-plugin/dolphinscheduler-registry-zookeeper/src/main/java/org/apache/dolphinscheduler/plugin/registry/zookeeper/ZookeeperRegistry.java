@@ -209,13 +209,25 @@ public class ZookeeperRegistry implements Registry {
     @Override
     public void persist(String key, String value) {
         try {
-            if (!isExisted(key)) {
-                client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(key, value.getBytes(StandardCharsets.UTF_8));
-            } else {
-                update(key, value);
+            if (isExisted(key)) {
+                client.delete().deletingChildrenIfNeeded().forPath(key);
             }
+            client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(key, value.getBytes(StandardCharsets.UTF_8));
+
         } catch (Exception e) {
             throw new RegistryException("zookeeper persist error", e);
+        }
+    }
+
+    @Override
+    public void persistEphemeral(String key, String value) {
+        try {
+            if (isExisted(key)) {
+                client.delete().deletingChildrenIfNeeded().forPath(key);
+            }
+            client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            throw new RegistryException("zookeeper persist ephemeral error", e);
         }
     }
 

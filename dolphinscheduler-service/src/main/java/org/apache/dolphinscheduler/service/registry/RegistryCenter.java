@@ -156,6 +156,10 @@ public class RegistryCenter {
         registry.persist(key, value);
     }
 
+    public void persistEphemeral(String key, String value) {
+        registry.persistEphemeral(key, value);
+    }
+
     public void remove(String key) {
         registry.remove(key);
     }

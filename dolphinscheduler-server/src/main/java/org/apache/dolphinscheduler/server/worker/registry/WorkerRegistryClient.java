@@ -81,7 +81,6 @@ public class WorkerRegistryClient {
         this.workerGroups = workerConfig.getWorkerGroups();
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-        registryClient.init();
     }
 
     /**
@@ -93,7 +92,7 @@ public class WorkerRegistryClient {
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
 
         for (String workerZKPath : workerZkPaths) {
-            registryClient.persist(workerZKPath, "");
+            registryClient.persistEphemeral(workerZKPath, "");
             logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
         }
 

@@ -325,7 +325,6 @@ public class MasterRegistryClient {
     public void init() {
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-        registryClient.init();
     }
 
     /**
@@ -334,7 +333,7 @@ public class MasterRegistryClient {
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         String localNodePath = getMasterPath();
-        registryClient.persist(localNodePath, "");
+        registryClient.persistEphemeral(localNodePath, "");
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterMaxCpuloadAvg(),

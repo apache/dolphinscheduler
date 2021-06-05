@@ -21,10 +21,22 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ZookeeperConnectionStateListener implements ConnectionStateListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
+
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
-        // todo
+        if (newState == ConnectionState.LOST) {
+            logger.error("connection lost from zookeeper");
+        } else if (newState == ConnectionState.RECONNECTED) {
+            logger.info("reconnected to zookeeper");
+        } else if (newState == ConnectionState.SUSPENDED) {
+            logger.warn("zookeeper connection SUSPENDED");
+        }
     }
 
 }
