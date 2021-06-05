@@ -412,15 +412,12 @@ public abstract class AbstractCommandExecutor {
                     if (logger.isDebugEnabled()) {
                         logger.debug("check yarn application status, appId:{}, final state:{}", appId, applicationStatus.name());
                     }
+                    //Try again 10 times every 15 seconds
+                    applicationStatus = retryExecutionStatus(appId,applicationStatus);
+                    //Judge the state again
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
                         || applicationStatus.equals(ExecutionStatus.KILL)) {
-                        //Try again 10 times every 15 seconds
-                        applicationStatus = retryExecutionStatus(appId,applicationStatus);
-                        //Judge the state again
-                        if (applicationStatus.equals(ExecutionStatus.FAILURE)
-                            || applicationStatus.equals(ExecutionStatus.KILL)) {
-                            return false;
-                        }
+                        return false;
                     }
 
                     if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
