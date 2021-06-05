@@ -415,7 +415,7 @@ public abstract class AbstractCommandExecutor {
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
                         || applicationStatus.equals(ExecutionStatus.KILL)) {
                         //Try again 10 times every 15 seconds
-                        applicationStatus = retryExecutionStatus(appId);
+                        applicationStatus = retryExecutionStatus(appId,applicationStatus);
                         //Judge the state again
                         if (applicationStatus.equals(ExecutionStatus.FAILURE)
                             || applicationStatus.equals(ExecutionStatus.KILL)) {
@@ -442,8 +442,7 @@ public abstract class AbstractCommandExecutor {
      * @return appId ExecutionStatus
      * @throws Exception
      */
-    private ExecutionStatus retryExecutionStatus(String appId) throws Exception {
-        ExecutionStatus applicationStatus = null;
+    private ExecutionStatus retryExecutionStatus(String appId,ExecutionStatus applicationStatus) throws Exception {
         for (int i = 0; i < 10; i++) {
             applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
             if (applicationStatus.equals(ExecutionStatus.FAILURE)
