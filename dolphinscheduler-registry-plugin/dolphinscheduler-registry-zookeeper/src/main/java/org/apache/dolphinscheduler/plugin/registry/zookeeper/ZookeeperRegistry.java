@@ -291,6 +291,10 @@ public class ZookeeperRegistry implements Registry {
         }
         try {
             threadLocalLockMap.get().get(key).release();
+            threadLocalLockMap.get().remove(key);
+            if (threadLocalLockMap.get().isEmpty()) {
+                threadLocalLockMap.remove();
+            }
         } catch (Exception e) {
             throw new RegistryException("zookeeper release lock error", e);
         }
