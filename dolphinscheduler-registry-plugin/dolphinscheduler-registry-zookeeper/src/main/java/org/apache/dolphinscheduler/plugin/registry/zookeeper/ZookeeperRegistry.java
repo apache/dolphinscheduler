@@ -71,7 +71,7 @@ public class ZookeeperRegistry implements Registry {
     /**
      * Distributed lock map
      */
-    private Map<String, InterProcessMutex> lockMap = new HashMap<>();
+    private ThreadLocal<Map<String, InterProcessMutex>> threadLocalLockMap = new ThreadLocal<>();
 
     /**
      * build retry policy
@@ -266,10 +266,12 @@ public class ZookeeperRegistry implements Registry {
     public boolean acquireLock(String key) {
 
         InterProcessMutex interProcessMutex = new InterProcessMutex(client, key);
-        String localKey = key + Thread.currentThread().getId();
         try {
             interProcessMutex.acquire();
-            lockMap.put(localKey, interProcessMutex);
+            if (null == threadLocalLockMap.get()) {
+                threadLocalLockMap.set(new HashMap<>(3));
+            }
+            threadLocalLockMap.get().put(key, interProcessMutex);
             return true;
         } catch (Exception e) {
             try {
@@ -284,12 +286,11 @@ public class ZookeeperRegistry implements Registry {
 
     @Override
     public boolean releaseLock(String key) {
-        String localKey = key + Thread.currentThread().getId();
-        if (null == lockMap.get(localKey)) {
+        if (null == threadLocalLockMap.get().get(key)) {
             return false;
         }
         try {
-            lockMap.get(localKey).release();
+            threadLocalLockMap.get().get(key).release();
         } catch (Exception e) {
             throw new RegistryException("zookeeper release lock error", e);
         }
