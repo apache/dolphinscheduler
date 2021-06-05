@@ -81,6 +81,7 @@ public class WorkerRegistryClient {
         this.workerGroups = workerConfig.getWorkerGroups();
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
+        registryClient.init();
     }
 
     /**
