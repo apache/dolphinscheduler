@@ -31,6 +31,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.ListenerManager;
 import org.apache.dolphinscheduler.spi.register.Registry;
+import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
 import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
@@ -127,6 +128,11 @@ public class ZookeeperRegistry implements Registry {
             Thread.currentThread().interrupt();
             throw new RegistryException("zookeeper connect error", e);
         }
+    }
+
+    @Override
+    public void addConnectionStateListener(RegistryConnectListener registryConnectListener) {
+        client.getConnectionStateListenable().addListener(new ZookeeperConnectionStateListener(registryConnectListener));
     }
 
     @Override

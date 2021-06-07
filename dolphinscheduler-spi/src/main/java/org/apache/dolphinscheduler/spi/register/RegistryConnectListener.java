@@ -17,14 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
-/**
- * Registration center subscription. All listeners must implement this interface
- */
-public interface SubscribeListener {
 
-    /**
-     * Processing logic when the subscription node changes
-     */
-    void notify(String path, DataChangeEvent dataChangeEvent);
+public interface RegistryConnectListener {
 
+    void notify(RegistryConnectState newState);
 }

@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
+import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
+import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
@@ -28,15 +31,26 @@ public class ZookeeperConnectionStateListener implements ConnectionStateListener
 
     private static final Logger logger = LoggerFactory.getLogger(ZookeeperConnectionStateListener.class);
 
+    private RegistryConnectListener registryConnectListener;
+
+    public ZookeeperConnectionStateListener(RegistryConnectListener registryConnectListener) {
+        this.registryConnectListener = registryConnectListener;
+    }
+
     @Override
     public void stateChanged(CuratorFramework client, ConnectionState newState) {
+
         if (newState == ConnectionState.LOST) {
             logger.error("connection lost from zookeeper");
+            registryConnectListener.notify(RegistryConnectState.LOST);
         } else if (newState == ConnectionState.RECONNECTED) {
             logger.info("reconnected to zookeeper");
+            registryConnectListener.notify(RegistryConnectState.RECONNECTED);
         } else if (newState == ConnectionState.SUSPENDED) {
             logger.warn("zookeeper connection SUSPENDED");
+            registryConnectListener.notify(RegistryConnectState.SUSPENDED);
         }
+
     }
 
 }

@@ -45,6 +45,11 @@ public interface Registry {
     void unsubscribe(String path);
 
     /**
+     * Registry status monitoring, globally unique. Only one is allowed to subscribe.
+     */
+    void addConnectionStateListener(RegistryConnectListener registryConnectListener);
+
+    /**
      * get key
      */
     String get(String key);

@@ -39,6 +39,8 @@ import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
+import org.apache.dolphinscheduler.spi.register.RegistryConnectState;
 
 import java.util.Date;
 import java.util.List;
@@ -321,6 +323,8 @@ public class MasterRegistryClient {
      */
     private String startTime;
 
+    private String localNodePath;
+
     @PostConstruct
     public void init() {
         this.startTime = DateUtils.dateToString(new Date());
@@ -333,8 +337,9 @@ public class MasterRegistryClient {
      */
     public void registry() {
         String address = NetUtils.getAddr(masterConfig.getListenPort());
-        String localNodePath = getMasterPath();
+        localNodePath = getMasterPath();
         registryClient.persistEphemeral(localNodePath, "");
+        registryClient.addConnectionStateListener(new MasterRegistryConnectStateListener());
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
         HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
                 masterConfig.getMasterMaxCpuloadAvg(),
@@ -346,6 +351,19 @@ public class MasterRegistryClient {
         this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
 
+    }
+
+    class MasterRegistryConnectStateListener implements RegistryConnectListener {
+
+        @Override
+        public void notify(RegistryConnectState newState) {
+            if (RegistryConnectState.RECONNECTED == newState) {
+                registryClient.persistEphemeral(localNodePath, "");
+            }
+            if (RegistryConnectState.SUSPENDED == newState) {
+                registryClient.persistEphemeral(localNodePath, "");
+            }
+        }
     }
 
     /**

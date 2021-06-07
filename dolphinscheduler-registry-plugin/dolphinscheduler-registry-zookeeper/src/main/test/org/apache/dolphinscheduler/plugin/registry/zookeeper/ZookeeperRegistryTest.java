@@ -89,6 +89,7 @@ public class ZookeeperRegistryTest {
         preCountDownLatch.await();
         new Thread(() -> {
             try {
+                logger.info(Thread.currentThread().getName() + " :I am trying to acquire the lock");
                 registry.acquireLock("/lock");
                 logger.info(Thread.currentThread().getName() + " :I got the lock and I started working");
 

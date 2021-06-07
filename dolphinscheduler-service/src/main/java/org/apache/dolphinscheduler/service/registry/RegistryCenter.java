@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.spi.register.Registry;
+import org.apache.dolphinscheduler.spi.register.RegistryConnectListener;
 import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.RegistryPluginManager;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
@@ -174,6 +175,10 @@ public class RegistryCenter {
 
     public void subscribe(String path, SubscribeListener subscribeListener) {
         registry.subscribe(path, subscribeListener);
+    }
+
+    public void addConnectionStateListener(RegistryConnectListener registryConnectListener) {
+        registry.addConnectionStateListener(registryConnectListener);
     }
 
     public boolean isExisted(String key) {
