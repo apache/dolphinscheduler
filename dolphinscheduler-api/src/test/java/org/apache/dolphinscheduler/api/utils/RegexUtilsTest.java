@@ -62,20 +62,21 @@ public class RegexUtilsTest {
         String name1 = "10000";
         Assert.assertFalse(RegexUtils.isValidWindowUserName(name1));
 
-        String name2 = "00hayden";
+        String name2 = "00HAyden";
         Assert.assertFalse(RegexUtils.isValidWindowUserName(name2));
 
-        String name3 = "hayde123456789123456789123456789";
-        Assert.assertFalse(RegexUtils.isValidWindowUserName(name3));
+        String name3 = "HAYS1234567891289123456789";
+        Assert.assertTrue(RegexUtils.isValidWindowUserName(name3));
 
-        String name4 = "hayd123456789123456789123456789";
-        Assert.assertTrue(RegexUtils.isValidWindowUserName(name4));
+        String name4 = "HAHAHA12345678912345hjh6789123456789";
+        Assert.assertFalse(RegexUtils.isValidWindowUserName(name4));
 
-        String name5 = "h";
+        String name5 = "A  H";
         Assert.assertTrue(RegexUtils.isValidWindowUserName(name5));
 
-        String name6 = "hayden";
-        Assert.assertTrue(RegexUtils.isValidWindowUserName(name6));
+        String name6 = "    ";
+        Assert.assertFalse(RegexUtils.isValidWindowUserName(name6));
+
     }
 
     @Test

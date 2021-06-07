@@ -32,7 +32,7 @@ public class RegexUtils {
 
     private static final String LINUX_USERNAME_PATTERN = "[a-z_][a-z\\d_]{0,30}";
 
-    private static final String WINDOWS_USERNAME_PATTERN = "[a-z_][a-z\\d_]{0,30}";
+    private static final String WINDOWS_USERNAME_PATTERN = "[A-Z_][A-Z\\s\\d_]{0,30}";
 
     private RegexUtils() {
     }
