@@ -291,21 +291,6 @@ public class RegistryClient extends RegistryCenter {
     }
 
     /**
-     * init system node
-     */
-    public void initSystemNode() {
-        try {
-            persist(getMasterNodeParentPath(), "");
-            persist(getWorkerNodeParentPath(), "");
-            persist(getDeadNodeParentPath(), "");
-
-            logger.info("initialize server nodes success.");
-        } catch (Exception e) {
-            logger.error("init system node failed", e);
-        }
-    }
-
-    /**
      * opType(add): if find dead server , then add to zk deadServerPath
      * opType(delete): delete path from zk
      *

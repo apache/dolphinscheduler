@@ -217,6 +217,8 @@ public class ZookeeperRegistry implements Registry {
         try {
             if (isExisted(key)) {
                 client.delete().deletingChildrenIfNeeded().forPath(key);
+                update(key, value);
+                return;
             }
             client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(key, value.getBytes(StandardCharsets.UTF_8));
 
@@ -230,6 +232,8 @@ public class ZookeeperRegistry implements Registry {
         try {
             if (isExisted(key)) {
                 client.delete().deletingChildrenIfNeeded().forPath(key);
+                update(key, value);
+                return;
             }
             client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {

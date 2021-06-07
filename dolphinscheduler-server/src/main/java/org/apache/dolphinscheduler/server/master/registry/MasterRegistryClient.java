@@ -91,7 +91,7 @@ public class MasterRegistryClient {
             registryClient.handleDeadServer(registryPath, NodeType.MASTER, Constants.DELETE_OP);
 
             // init system node
-            registryClient.initSystemNode();
+            initMasterSystemNode();
 
             while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
@@ -116,6 +116,18 @@ public class MasterRegistryClient {
 
     public void closeRegistry() {
         unRegistry();
+    }
+
+    /**
+     * init system node
+     */
+    private void initMasterSystemNode() {
+        try {
+            registryClient.persist(Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, "");
+            logger.info("initialize master server nodes success.");
+        } catch (Exception e) {
+            logger.error("init system node failed", e);
+        }
     }
 
     /**
