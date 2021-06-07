@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.spi.register;
 
-
 public interface RegistryConnectListener {
 
     void notify(RegistryConnectState newState);
