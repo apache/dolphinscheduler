@@ -546,11 +546,11 @@ public class MasterExecThread implements Runnable {
                                 //if  property'value of loop is not empty,and the other's value is not empty too, use the earlier value
                             } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
                                 TaskInstance otherTask = allTaskInstance.get(proName);
-                                if (DateUtils.compare(otherTask.getEndTime(), preTaskInstance.getEndTime())) {
-                                    allProperty.put(proName, otherPro);
-                                } else {
+                                if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
                                     allProperty.put(proName, info);
                                     allTaskInstance.put(proName,preTaskInstance);
+                                } else {
+                                    allProperty.put(proName, otherPro);
                                 }
                             } else {
                                 allProperty.put(proName, info);
