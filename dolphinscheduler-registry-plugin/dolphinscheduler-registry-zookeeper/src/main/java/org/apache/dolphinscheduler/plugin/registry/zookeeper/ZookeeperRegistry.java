@@ -242,7 +242,7 @@ public class ZookeeperRegistry implements Registry {
     @Override
     public void update(String key, String value) {
         try {
-            if (!isExisted(key)){
+            if (!isExisted(key)) {
                 return;
             }
             TransactionOp transactionOp = client.transactionOp();
