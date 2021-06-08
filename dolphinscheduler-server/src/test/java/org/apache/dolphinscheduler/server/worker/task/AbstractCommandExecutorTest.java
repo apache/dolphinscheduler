@@ -41,13 +41,4 @@ public class AbstractCommandExecutorTest {
         shellCommandExecutor = new ShellCommandExecutor(null);
     }
 
-    @Test
-    public void testSetTaskResultString() {
-        shellCommandExecutor.setTaskResultString("shellReturn");
-    }
-
-    @Test
-    public void testGetTaskResultString() {
-        logger.info(shellCommandExecutor.getTaskResultString());
-    }
 }

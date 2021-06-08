@@ -110,8 +110,6 @@ public class TaskCallbackServiceTest {
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
         TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand();
-        String result = responseCommand.getResult();
-        responseCommand.setResult("return string");
         taskCallbackService.sendResult(1, responseCommand.convert2Command());
 
         Stopper.stop();
