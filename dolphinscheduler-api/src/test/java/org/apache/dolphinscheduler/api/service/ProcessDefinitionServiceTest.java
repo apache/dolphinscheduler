@@ -1038,7 +1038,7 @@ public class ProcessDefinitionServiceTest {
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, "test", 1,
                 "", "", "", "", 0, "root", sqlDependentJson);
 
-        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
     }
 
     @Test
