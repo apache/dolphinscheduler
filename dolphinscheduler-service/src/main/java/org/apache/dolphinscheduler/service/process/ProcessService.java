@@ -2225,6 +2225,69 @@ public class ProcessService {
     /**
      * save processDefinition (including create or update processDefinition)
      */
+    public int saveProcessDefine(User operator, Project project, String name, String description, String globalParams,
+                                 String locations, String connects, int timeout, int tenantId, long processDefinitionCode,
+                                 int processDefinitionId, Boolean isFromProcessDefine) {
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
+        Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
+        int insertVersion = version == null || version == 0 ? 1 : version + 1;
+        processDefinitionLog.setUserId(operator.getId());
+        processDefinitionLog.setCode(processDefinitionCode);
+        processDefinitionLog.setVersion(insertVersion);
+        processDefinitionLog.setName(name);
+        processDefinitionLog.setFlag(Flag.YES);
+        processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
+        processDefinitionLog.setProjectCode(project.getCode());
+        processDefinitionLog.setDescription(description);
+        processDefinitionLog.setGlobalParams(globalParams);
+        processDefinitionLog.setLocations(locations);
+        processDefinitionLog.setConnects(connects);
+        processDefinitionLog.setTimeout(timeout);
+        processDefinitionLog.setTenantId(tenantId);
+        processDefinitionLog.setOperator(operator.getId());
+        Date now = new Date();
+        processDefinitionLog.setOperateTime(now);
+        processDefinitionLog.setUpdateTime(now);
+        processDefinitionLog.setCreateTime(now);
+        int insertLog = processDefineLogMapper.insert(processDefinitionLog);
+        int result;
+        if (0 == processDefinitionId) {
+            result = processDefineMapper.insert(processDefinitionLog);
+        } else {
+            processDefinitionLog.setId(processDefinitionId);
+            result = processDefineMapper.updateById(processDefinitionLog);
+        }
+        return (insertLog & result) > 0 ? insertVersion : 0;
+    }
+
+    /**
+     * save task relations
+     */
+    public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
+                                 List<ProcessTaskRelationLog> taskRelationList) {
+        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+        if (!processTaskRelationList.isEmpty()) {
+            processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
+        }
+        Date now = new Date();
+        taskRelationList.forEach(processTaskRelationLog -> {
+            processTaskRelationLog.setProjectCode(projectCode);
+            processTaskRelationLog.setProcessDefinitionCode(processDefinitionCode);
+            processTaskRelationLog.setProcessDefinitionVersion(processDefinitionVersion);
+            processTaskRelationLog.setCreateTime(now);
+            processTaskRelationLog.setUpdateTime(now);
+            processTaskRelationLog.setOperator(operator.getId());
+            processTaskRelationLog.setOperateTime(now);
+        });
+        int result = processTaskRelationMapper.batchInsert(taskRelationList);
+        int resultLog = processTaskRelationLogMapper.batchInsert(taskRelationList);
+        return result & resultLog;
+    }
+
+    /**
+     * save processDefinition (including create or update processDefinition)
+     */
+    @Deprecated
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
                                      String connects, ProcessData processData, ProcessDefinition processDefinition,
                                      Boolean isFromProcessDefine) {
@@ -2240,6 +2303,7 @@ public class ProcessService {
     /**
      * save processDefinition
      */
+    @Deprecated
     public ProcessDefinitionLog insertProcessDefinitionLog(User operator, Long processDefinitionCode, String processDefinitionName,
                                                            ProcessData processData, Project project,
                                                            String desc, String locations, String connects) {
@@ -2280,6 +2344,7 @@ public class ProcessService {
     /**
      * handle task definition
      */
+    @Deprecated
     public Map<String, TaskDefinition> handleTaskDefinition(User operator, Long projectCode, List<TaskNode> taskNodes, Boolean isFromProcessDefine) {
         if (taskNodes == null) {
             return null;
