@@ -51,12 +51,6 @@ public class RegistryMonitor {
      * @return zookeeper info list
      */
     public List<ZookeeperRecord> zookeeperInfoList() {
-        /*  String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
-        try {
-            return zookeeperInfoList(zookeeperServers);
-        } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
-        }*/
         return null;
     }
 
