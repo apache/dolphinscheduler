@@ -58,7 +58,7 @@ public class ZookeeperRegistryTest {
     public void persistTest() {
         registry.persist("/nodes/m1", "");
         registry.persist("/nodes/m2", "");
-        Assert.assertEquals(Arrays.asList("m1", "m2"), registry.getChildren("/nodes"));
+        Assert.assertEquals(Arrays.asList("m2", "m1"), registry.getChildren("/nodes"));
         Assert.assertTrue(registry.isExisted("/nodes/m1"));
         registry.delete("/nodes/m2");
         Assert.assertFalse(registry.isExisted("/nodes/m2"));
