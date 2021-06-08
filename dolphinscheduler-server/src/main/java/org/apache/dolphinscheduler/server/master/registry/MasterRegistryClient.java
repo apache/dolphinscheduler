@@ -91,7 +91,6 @@ public class MasterRegistryClient {
             registryClient.handleDeadServer(registryPath, NodeType.MASTER, Constants.DELETE_OP);
 
             // init system node
-            initMasterSystemNode();
 
             while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
@@ -348,6 +347,7 @@ public class MasterRegistryClient {
      * registry
      */
     public void registry() {
+        initMasterSystemNode();
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         localNodePath = getMasterPath();
         registryClient.persistEphemeral(localNodePath, "");

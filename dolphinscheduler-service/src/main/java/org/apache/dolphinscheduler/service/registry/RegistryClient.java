@@ -86,7 +86,7 @@ public class RegistryClient extends RegistryCenter {
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
-            Server server = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+            Server server = ResInfo.parseHeartbeatForRegistryInfo(entry.getValue());
             if (server == null) {
                 continue;
             }

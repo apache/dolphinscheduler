@@ -25,6 +25,9 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,7 +36,15 @@ import org.springframework.stereotype.Component;
  * I am not sure whether there is a good abstraction method. This is related to whether the specific plug-in is provided.
  */
 @Component
-public class RegistryMonitor extends RegistryClient {
+public class RegistryMonitor {
+
+    @Autowired
+    RegistryClient registryClient;
+
+    @PostConstruct
+    private void init() {
+        registryClient.init();
+    }
 
     /**
      * @return zookeeper info list
@@ -54,7 +65,7 @@ public class RegistryMonitor extends RegistryClient {
      * @return master server information
      */
     public List<Server> getMasterServers() {
-        return getServerList(NodeType.MASTER);
+        return registryClient.getServerList(NodeType.MASTER);
     }
 
     /**
@@ -63,7 +74,7 @@ public class RegistryMonitor extends RegistryClient {
      * @return worker server informations
      */
     public List<Server> getWorkerServers() {
-        return getServerList(NodeType.WORKER);
+        return registryClient.getServerList(NodeType.WORKER);
     }
 
     private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {

@@ -51,7 +51,7 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,7 +187,7 @@ public class ZookeeperRegistry implements Registry {
     @Override
     public String get(String key) {
         try {
-            return Arrays.toString(client.getData().forPath(key));
+            return new String(client.getData().forPath(key), StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RegistryException("zookeeper get data error", e);
         }
@@ -216,7 +216,6 @@ public class ZookeeperRegistry implements Registry {
     public void persist(String key, String value) {
         try {
             if (isExisted(key)) {
-                client.delete().deletingChildrenIfNeeded().forPath(key);
                 update(key, value);
                 return;
             }
@@ -254,7 +253,9 @@ public class ZookeeperRegistry implements Registry {
     @Override
     public List<String> getChildren(String key) {
         try {
-            return client.getChildren().forPath(key);
+            List<String> result = client.getChildren().forPath(key);
+            result.sort(Comparator.reverseOrder());
+            return result;
         } catch (Exception e) {
             throw new RegistryException("zookeeper get children error", e);
         }
