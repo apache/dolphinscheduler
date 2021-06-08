@@ -230,7 +230,6 @@ public class ZookeeperRegistry implements Registry {
     public void persistEphemeral(String key, String value) {
         try {
             if (isExisted(key)) {
-                client.delete().deletingChildrenIfNeeded().forPath(key);
                 update(key, value);
                 return;
             }
@@ -243,6 +242,9 @@ public class ZookeeperRegistry implements Registry {
     @Override
     public void update(String key, String value) {
         try {
+            if (!isExisted(key)){
+                return;
+            }
             TransactionOp transactionOp = client.transactionOp();
             client.transaction().forOperations(transactionOp.check().forPath(key), transactionOp.setData().forPath(key, value.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
