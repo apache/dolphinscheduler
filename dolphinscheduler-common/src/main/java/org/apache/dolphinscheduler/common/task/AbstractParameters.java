@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.task;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
@@ -116,6 +117,9 @@ public abstract class AbstractParameters implements IParameters {
     }
 
     public List<Property> getOutProperty(List<Property> params) {
+        if (CollectionUtils.isEmpty(params)) {
+            return new ArrayList<>();
+        }
         List<Property> result = new ArrayList<>();
         for (Property info : params) {
             if (info.getDirect() == Direct.OUT) {
