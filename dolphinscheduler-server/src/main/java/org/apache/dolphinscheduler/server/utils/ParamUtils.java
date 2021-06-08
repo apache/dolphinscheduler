@@ -65,12 +65,14 @@ public class ParamUtils {
         }
 
         if (globalParams != null && localParams != null) {
-            globalParams.putAll(localParams);
+            localParams.putAll(globalParams);
+            globalParams = localParams;
         } else if (globalParams == null && localParams != null) {
             globalParams = localParams;
         }
         if (varParams != null) {
-            globalParams.putAll(varParams);
+            varParams.putAll(globalParams);
+            globalParams = varParams;
         }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
