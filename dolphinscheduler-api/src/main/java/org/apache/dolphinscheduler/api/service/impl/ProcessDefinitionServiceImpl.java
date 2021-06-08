@@ -250,11 +250,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
 
             // TODO check has cycle
-//            if (graphHasCycle(taskRelationList)) {
-//                logger.error("process DAG has cycle");
-//                putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
-//                return result;
-//            }
+            // if (graphHasCycle(taskRelationList)) {
+            //  logger.error("process DAG has cycle");
+            //   putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
+            //   return result;
+            // }
 
             // check whether the task relation json is normal
             for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
@@ -907,13 +907,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> createProcessResult = null;
         try {
             // TODO import
-//            createProcessResult = createProcessDefinition(loginUser
-//                    , currentProjectName,
-//                    processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp(),
-//                    importProcessParam,
-//                    processMeta.getProcessDefinitionDescription(),
-//                    processMeta.getProcessDefinitionLocations(),
-//                    processMeta.getProcessDefinitionConnects());
+            // createProcessResult = createProcessDefinition(loginUser
+            //      , currentProjectName,
+            //      processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp(),
+            //      importProcessParam,
+            //      processMeta.getProcessDefinitionDescription(),
+            //      processMeta.getProcessDefinitionLocations(),
+            //      processMeta.getProcessDefinitionConnects());
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
             logger.error("import process meta json data: {}", e.getMessage(), e);
@@ -1110,13 +1110,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
                 try {
                     // TODO import subProcess
-//                    createProcessDefinition(loginUser
-//                            , targetProject.getName(),
-//                            subProcess.getName(),
-//                            subProcessJson,
-//                            subProcess.getDescription(),
-//                            subProcess.getLocations(),
-//                            subProcess.getConnects());
+                    // createProcessDefinition(loginUser
+                    //          , targetProject.getName(),
+                    //          subProcess.getName(),
+                    //          subProcessJson,
+                    //          subProcess.getDescription(),
+                    //          subProcess.getLocations(),
+                    //          subProcess.getConnects());
                     logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), subProcess.getName());
 
                 } catch (Exception e) {
@@ -1486,14 +1486,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             processData.setTasks(taskNodeList);
             String processDefinitionJson = JSONUtils.toJsonString(processData);
             // TODO copy process
-//            return createProcessDefinition(
-//                    loginUser,
-//                    targetProject.getName(),
-//                    processDefinition.getName() + "_copy_" + currentTimeStamp,
-//                    processDefinitionJson,
-//                    processDefinition.getDescription(),
-//                    locationsJN.toString(),
-//                    processDefinition.getConnects());
+            // return createProcessDefinition(
+            //       loginUser,
+            //       targetProject.getName(),
+            //       processDefinition.getName() + "_copy_" + currentTimeStamp,
+            //       processDefinitionJson,
+            //       processDefinition.getDescription(),
+            //       locationsJN.toString(),
+            //       processDefinition.getConnects());
             // TODO remove
             return result;
 

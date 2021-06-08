@@ -122,7 +122,7 @@ public class TenantMapperTest {
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
-        Assert.assertNull(tenantMapper.queryByTenantCode("ut code"));
+        Assert.assertNotNull(tenantMapper.queryByTenantCode("ut code"));
     }
 
     /**

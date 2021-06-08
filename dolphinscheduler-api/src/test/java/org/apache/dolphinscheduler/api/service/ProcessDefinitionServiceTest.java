@@ -1035,8 +1035,8 @@ public class ProcessDefinitionServiceTest {
                 + "    \"tenantId\": 1,\n"
                 + "    \"timeout\": 0\n"
                 + "}";
-        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
-                sqlDependentJson, "", "", "");
+        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, "test", 1,
+                "", "", "", "", 0, "root", sqlDependentJson);
 
         Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
     }
