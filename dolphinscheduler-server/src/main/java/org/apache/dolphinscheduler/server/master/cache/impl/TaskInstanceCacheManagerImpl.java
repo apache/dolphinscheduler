@@ -128,6 +128,7 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
         TaskInstance taskInstance = getByTaskInstanceId(taskExecuteResponseCommand.getTaskInstanceId());
         taskInstance.setState(ExecutionStatus.of(taskExecuteResponseCommand.getStatus()));
         taskInstance.setEndTime(taskExecuteResponseCommand.getEndTime());
+        taskInstanceCache.put(taskExecuteResponseCommand.getTaskInstanceId(), taskInstance);
     }
 
     /**
