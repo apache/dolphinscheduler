@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -109,5 +110,13 @@ public class RegistryMonitor {
         }*/
 
         return list;
+    }
+
+    public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
+        return registryClient.getServerMaps(nodeType, hostOnly);
+    }
+
+    public List<String> getServerNodeList(NodeType nodeType, boolean hostOnly) {
+        return registryClient.getServerNodeList(nodeType, hostOnly);
     }
 }
