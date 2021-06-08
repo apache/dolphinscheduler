@@ -18,12 +18,14 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.model.Server;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import java.util.List;
 
 /**
  * zookeeper monitor utils test
  */
+@Ignore
 public class RegistryMonitorUtilsTest {
 
 

@@ -78,13 +78,30 @@ public class MasterRegistryClient {
     @Autowired
     private RegistryClient registryClient;
 
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
+    /**
+     * heartbeat executor
+     */
+    private ScheduledExecutorService heartBeatExecutor;
+
+    /**
+     * master start time
+     */
+    private String startTime;
+
+    private String localNodePath;
+
     public void start() {
-        init();
-        String znodeLock = registryClient.getMasterStartUpLockPath();
+        String nodeLock = registryClient.getMasterStartUpLockPath();
         try {
             // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/startup-masters
 
-            registryClient.getLock(znodeLock);
+            registryClient.getLock(nodeLock);
             // master registry
             registry();
             String registryPath = getMasterPath();
@@ -105,7 +122,7 @@ public class MasterRegistryClient {
         } catch (Exception e) {
             logger.error("master start up exception", e);
         } finally {
-            registryClient.releaseLock(znodeLock);
+            registryClient.releaseLock(nodeLock);
         }
     }
 
@@ -317,24 +334,6 @@ public class MasterRegistryClient {
     public void releaseLock() {
         registryClient.releaseLock(registryClient.getMasterLockPath());
     }
-
-    /**
-     * master config
-     */
-    @Autowired
-    private MasterConfig masterConfig;
-
-    /**
-     * heartbeat executor
-     */
-    private ScheduledExecutorService heartBeatExecutor;
-
-    /**
-     * master start time
-     */
-    private String startTime;
-
-    private String localNodePath;
 
     @PostConstruct
     public void init() {

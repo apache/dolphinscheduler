@@ -43,7 +43,7 @@ public class RegistryMonitor {
     RegistryClient registryClient;
 
     @PostConstruct
-    private void init() {
+    public void initRegistry() {
         registryClient.init();
     }
 
