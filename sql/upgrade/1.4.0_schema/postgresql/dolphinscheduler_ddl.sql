@@ -338,9 +338,9 @@ BEGIN
         CONSTRAINT task_definition_unique UNIQUE (name, project_code)
     ) ;
     create index task_definition_index on t_ds_task_definition (project_code,id);
+    DROP SEQUENCE IF EXISTS t_ds_task_definition_id_sequence;
     CREATE SEQUENCE  t_ds_task_definition_id_sequence;
     ALTER TABLE t_ds_task_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_definition_id_sequence');
-    DROP SEQUENCE IF EXISTS t_ds_task_definition_log_id_sequence;
 
 END;
 $$ LANGUAGE plpgsql;
@@ -380,9 +380,9 @@ BEGIN
         update_time timestamp DEFAULT NULL ,
         PRIMARY KEY (id)
     ) ;
+    DROP SEQUENCE IF EXISTS t_ds_task_definition_log_id_sequence;
     CREATE SEQUENCE  t_ds_task_definition_log_id_sequence;
     ALTER TABLE t_ds_task_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_definition_log_id_sequence');
-    DROP SEQUENCE IF EXISTS t_ds_process_task_relation_id_sequence;
 
 END;
 $$ LANGUAGE plpgsql;
@@ -412,9 +412,9 @@ BEGIN
         update_time timestamp DEFAULT NULL ,
         PRIMARY KEY (id)
     ) ;
+    DROP SEQUENCE IF EXISTS t_ds_process_task_relation_id_sequence;
     CREATE SEQUENCE  t_ds_process_task_relation_id_sequence;
     ALTER TABLE t_ds_process_task_relation ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_task_relation_id_sequence');
-    DROP SEQUENCE IF EXISTS t_ds_process_task_relation_log_id_sequence;
 
 END;
 $$ LANGUAGE plpgsql;
@@ -450,8 +450,7 @@ BEGIN
         update_time timestamp DEFAULT NULL ,
         PRIMARY KEY (id)
     ) ;
-    CREATE SEQUENCE  t_ds_process_definition_log_id_sequence;
-    DROP SEQUENCE IF EXISTS t_ds_pt_ds_datasourcerocess_definition_log_id_sequence;
+    DROP SEQUENCE IF EXISTS t_ds_process_definition_log_id_sequence;
     CREATE SEQUENCE  t_ds_process_definition_log_id_sequence;
     ALTER TABLE t_ds_process_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_log_id_sequence');
 
