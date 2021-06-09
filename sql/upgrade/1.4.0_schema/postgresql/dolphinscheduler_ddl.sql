@@ -497,7 +497,6 @@ delimiter ;
 SELECT ct_dolphin_T_t_ds_process_task_relation_log();
 DROP FUNCTION IF EXISTS ct_dolphin_T_t_ds_process_task_relation_log();
 
-
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
