@@ -84,6 +84,7 @@ public class ShellTaskTest {
         taskExecutionContext.setTenantCode("roo");
         taskExecutionContext.setScheduleTime(new Date());
         taskExecutionContext.setQueue("default");
+        taskExecutionContext.setVarPool("[{\"direct\":\"IN\",\"prop\":\"test\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskExecutionContext.setTaskParams(
             "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
                 +
@@ -104,6 +105,7 @@ public class ShellTaskTest {
     public void testComplementData() throws Exception {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         shellCommandExecutor.isSuccessOfYarnState(new ArrayList<>());
         shellCommandExecutor.isSuccessOfYarnState(null);
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
@@ -115,6 +117,7 @@ public class ShellTaskTest {
         taskExecutionContext.setCmdTypeIfComplement(0);
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
     }

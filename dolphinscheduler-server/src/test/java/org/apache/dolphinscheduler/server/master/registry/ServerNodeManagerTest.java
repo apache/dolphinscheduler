@@ -89,7 +89,7 @@ public class ServerNodeManagerTest {
             //ignore
         }
         Map<String, Set<String>> workerGroupNodes = serverNodeManager.getWorkerGroupNodes();
-        Assert.assertEquals(1, workerGroupNodes.size());
+        Assert.assertEquals(2, workerGroupNodes.size());
         Assert.assertEquals("default".trim(), workerGroupNodes.keySet().iterator().next());
 
         Set<String> workerNodes = serverNodeManager.getWorkerGroupNodes("default");

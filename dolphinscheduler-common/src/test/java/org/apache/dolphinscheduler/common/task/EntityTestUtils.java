@@ -42,7 +42,7 @@ public class EntityTestUtils {
         OBJECT_MAP.put("boolean", true);
     }
     
-    public static void run(List<Class> classList) 
+    public static void run(List<Class> classList)
             throws IllegalAccessException, InvocationTargetException, InstantiationException {
         for (Class temp : classList) {
             Object tempInstance = new Object();
