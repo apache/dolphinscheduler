@@ -294,7 +294,7 @@ BEGIN
           WHERE relname='t_ds_datasource'
                             AND indexrelname ='t_ds_datasource_name_UN')
       THEN
-         ALTER TABLE t_ds_alertgroup ADD CONSTRAINT t_ds_alertgroup_name_UN UNIQUE (name, type);
+         ALTER TABLE t_ds_datasource ADD CONSTRAINT t_ds_datasource_name_UN UNIQUE (name, type);
        END IF;
 END;
 $$ LANGUAGE plpgsql;
