@@ -117,7 +117,7 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_A_var_pool();
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_var_pool;
 
--- uc_dolphin_T_t_ds_task_instance_A_add_attributes
+-- uc_dolphin_T_t_ds_task_instance_A_add_task_code
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_add_task_code;
 delimiter d//
 CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_add_task_code()
@@ -651,8 +651,6 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_schedules_A_add_timezone();
 DROP PROCEDURE uc_dolphin_T_t_ds_schedules_A_add_timezone;
-
-
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
