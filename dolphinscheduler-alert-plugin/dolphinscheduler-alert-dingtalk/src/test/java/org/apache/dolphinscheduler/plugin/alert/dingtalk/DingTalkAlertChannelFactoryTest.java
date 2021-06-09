@@ -24,11 +24,13 @@ import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * DingTalkAlertChannelFactoryTest
  */
+@Ignore
 public class DingTalkAlertChannelFactoryTest {
 
     @Test

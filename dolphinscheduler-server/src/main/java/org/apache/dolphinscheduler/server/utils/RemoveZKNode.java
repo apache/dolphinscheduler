@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,7 @@ public class RemoveZKNode implements CommandLineRunner {
      * zookeeper operator
      */
     @Autowired
-    private ZookeeperOperator zookeeperOperator;
+    private RegistryClient registryClient;
 
     public static void main(String[] args) {
 
@@ -47,13 +49,13 @@ public class RemoveZKNode implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (args.length != ARGS_LENGTH){
+        if (args.length != ARGS_LENGTH) {
             logger.error("Usage: <node>");
             return;
         }
 
-        zookeeperOperator.remove(args[0]);
-        zookeeperOperator.close();
+        registryClient.remove(args[0]);
+        registryClient.close();
 
     }
 }

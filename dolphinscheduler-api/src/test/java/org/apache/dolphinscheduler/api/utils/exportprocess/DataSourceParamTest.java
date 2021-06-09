@@ -14,40 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils.exportprocess;
+
+import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.json.JSONException;
+import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.json.JSONException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * DataSourceParamTest
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
-public class DataSourceParamTest {
+public class DataSourceParamTest extends AbstractControllerTest {
 
     @Test
     public void testAddExportDependentSpecialParam() throws JSONException {
 
-        String sqlJson = "{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
-                "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\"," +
-                "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\"" +
-                ",\"localParams\":[],\"connParams\":\"\"," +
-                "\"preStatements\":[],\"postStatements\":[]}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\"," +
-                "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[\"dependent\"]}";
-
+        String sqlJson = "{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\","
+                + "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\","
+                + "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\""
+                + ",\"localParams\":[],\"connParams\":\"\","
+                + "\"preStatements\":[],\"postStatements\":[]},"
+                + "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\","
+                + "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\","
+                + "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,"
+                + "\"preTasks\":[\"dependent\"]}";
 
         ObjectNode taskNode = JSONUtils.parseObject(sqlJson);
         if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
@@ -63,15 +60,15 @@ public class DataSourceParamTest {
 
     @Test
     public void testAddImportDependentSpecialParam() throws JSONException {
-        String sqlJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-                "\"type\":\"SQL\",\"params\":{\"postStatements\":[]," +
-                "\"connParams\":\"\",\"receiversCc\":\"\",\"udfs\":\"\"," +
-                "\"type\":\"MYSQL\",\"title\":\"\",\"sql\":\"show tables\",\"" +
-                "preStatements\":[],\"sqlType\":\"1\",\"receivers\":\"\",\"datasource\":1," +
-                "\"showType\":\"TABLE\",\"localParams\":[],\"datasourceName\":\"dsmetadata\"},\"timeout\"" +
-                ":{\"enable\":false,\"strategy\":\"\"},\"maxRetryTimes\":\"0\"," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"name\":\"mysql\",\"dependence\":{}," +
-                "\"retryInterval\":\"1\",\"preTasks\":[\"dependent\"],\"id\":\"tasks-8745\"}";
+        String sqlJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\","
+                + "\"type\":\"SQL\",\"params\":{\"postStatements\":[],"
+                + "\"connParams\":\"\",\"receiversCc\":\"\",\"udfs\":\"\","
+                + "\"type\":\"MYSQL\",\"title\":\"\",\"sql\":\"show tables\",\""
+                + "preStatements\":[],\"sqlType\":\"1\",\"receivers\":\"\",\"datasource\":1,"
+                + "\"showType\":\"TABLE\",\"localParams\":[],\"datasourceName\":\"dsmetadata\"},\"timeout\""
+                + ":{\"enable\":false,\"strategy\":\"\"},\"maxRetryTimes\":\"0\","
+                + "\"taskInstancePriority\":\"MEDIUM\",\"name\":\"mysql\",\"dependence\":{},"
+                + "\"retryInterval\":\"1\",\"preTasks\":[\"dependent\"],\"id\":\"tasks-8745\"}";
 
         ObjectNode taskNode = JSONUtils.parseObject(sqlJson);
         if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {

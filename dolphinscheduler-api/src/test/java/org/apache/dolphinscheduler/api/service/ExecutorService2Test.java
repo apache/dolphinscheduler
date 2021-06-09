@@ -136,7 +136,7 @@ public class ExecutorService2Test {
         Mockito.when(processDefinitionMapper.selectById(processDefinitionId)).thenReturn(processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         Mockito.when(processService.createCommand(any(Command.class))).thenReturn(1);
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(getMasterServersList());
+        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId)).thenReturn(processInstance);
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
     }
@@ -251,7 +251,7 @@ public class ExecutorService2Test {
 
     @Test
     public void testNoMsterServers() {
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(new ArrayList<>());
+        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(new ArrayList<>());
 
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
                 processDefinitionId, cronTime, CommandType.COMPLEMENT_DATA,

@@ -21,15 +21,16 @@ import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNul
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
+import org.apache.dolphinscheduler.api.utils.RegistryMonitor;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,10 @@ import com.google.common.collect.Sets;
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
 
     @Autowired
-    private ZookeeperMonitor zookeeperMonitor;
+    private RegistryMonitor registryMonitor;
+
+    @Autowired
+    private RegistryClient registryClient;
 
     @Autowired
     private MonitorDBDao monitorDBDao;
@@ -84,7 +88,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
 
         Map<String, Object> result = new HashMap<>();
 
-        List<Server> masterServers = getServerListFromZK(true);
+        List<Server> masterServers = getServerListFromRegistry(true);
         result.put(Constants.DATA_LIST, masterServers);
         putMsg(result,Status.SUCCESS);
 
@@ -101,7 +105,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     public Map<String,Object> queryZookeeperState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
-        List<ZookeeperRecord> zookeeperRecordList = zookeeperMonitor.zookeeperInfoList();
+        List<ZookeeperRecord> zookeeperRecordList = registryMonitor.zookeeperInfoList();
 
         result.put(Constants.DATA_LIST, zookeeperRecordList);
         putMsg(result, Status.SUCCESS);
@@ -120,7 +124,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     public Map<String,Object> queryWorker(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
-        List<WorkerServerModel> workerServers = getServerListFromZK(false)
+        List<WorkerServerModel> workerServers = getServerListFromRegistry(false)
                 .stream()
                 .map((Server server) -> {
                     WorkerServerModel model = new WorkerServerModel();
@@ -155,11 +159,11 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     }
 
     @Override
-    public List<Server> getServerListFromZK(boolean isMaster) {
+    public List<Server> getServerListFromRegistry(boolean isMaster) {
 
-        checkNotNull(zookeeperMonitor);
-        ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-        return zookeeperMonitor.getServerList(zkNodeType);
+        checkNotNull(registryMonitor);
+        NodeType nodeType = isMaster ? NodeType.MASTER : NodeType.WORKER;
+        return registryClient.getServerList(nodeType);
     }
 
 }
