@@ -15,16 +15,9 @@
 # limitations under the License.
 #
 
-# zookeeper cluster.  multiple are separated by commas.  eg. 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181
-zookeeper.quorum=${ZOOKEEPER_QUORUM}
+registry.plugin.name=${REGISTRY_PLUGIN_NAME}
+registry.plugin.dir=${REGISTRY_PLUGIN_DIR}
+registry.plugin.binding=registry
+registry.servers=${REGISTRY_SERVERS}
 
-# dolphinscheduler root directory
-zookeeper.dolphinscheduler.root=${ZOOKEEPER_ROOT}
 
-# dolphinscheduler failover directory
-#zookeeper.session.timeout=60000
-#zookeeper.connection.timeout=30000
-#zookeeper.retry.base.sleep=100
-#zookeeper.retry.max.sleep=30000
-#zookeeper.retry.maxtime=10
-#zookeeper.max.wait.time=10000
