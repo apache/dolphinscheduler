@@ -95,7 +95,7 @@ public class RegistryCenter {
             PropertyUtils.loadPropertyFile(REGISTRY_CONFIG_FILE_PATH);
             Map<String, String> registryConfig = PropertyUtils.getPropertiesByPrefix(REGISTRY_PREFIX);
 
-            if (registryConfig.isEmpty()) {
+            if (null == registryConfig || registryConfig.isEmpty()) {
                 throw new RegistryException("registry config param is null");
             }
             if (null == registryPluginManager) {

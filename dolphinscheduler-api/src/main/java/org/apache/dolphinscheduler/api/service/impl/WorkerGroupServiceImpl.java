@@ -48,6 +48,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.facebook.presto.jdbc.internal.guava.base.Strings;
+
 /**
  * worker group service impl
  */
@@ -125,6 +127,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     /**
      * check worker group name exists
+     *
      * @param workerGroup worker group
      * @return boolean
      */
@@ -143,17 +146,21 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             }
         }
         // check zookeeper
-        String workerGroupPath =  Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
+        String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
         return registryClient.isExisted(workerGroupPath);
     }
 
     /**
      * check worker group addr list
+     *
      * @param workerGroup worker group
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
         Map<String, String> serverMaps = registryMonitor.getServerMaps(NodeType.WORKER, true);
+        if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
+            return null;
+        }
         for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
             if (!serverMaps.containsKey(addr)) {
                 return addr;
@@ -292,6 +299,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     /**
      * delete worker group by id
+     *
      * @param id worker group id
      * @return delete result code
      */
