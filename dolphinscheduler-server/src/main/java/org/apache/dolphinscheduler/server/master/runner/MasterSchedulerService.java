@@ -27,12 +27,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +62,7 @@ public class MasterSchedulerService extends Thread {
      * zookeeper master client
      */
     @Autowired
-    private ZKMasterClient zkMasterClient;
+    private MasterRegistryClient masterRegistryClient;
 
     /**
      * master config
@@ -134,9 +131,11 @@ public class MasterSchedulerService extends Thread {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
-                if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
+                // todo 串行执行 为何还需要判断状态？
+                /* if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
                     scheduleProcess();
-                }
+                }*/
+                scheduleProcess();
             } catch (Exception e) {
                 logger.error("master scheduler thread error", e);
             }
@@ -144,9 +143,9 @@ public class MasterSchedulerService extends Thread {
     }
 
     private void scheduleProcess() throws Exception {
-        InterProcessMutex mutex = null;
+
         try {
-            mutex = zkMasterClient.blockAcquireMutex();
+            masterRegistryClient.blockAcquireMutex();
 
             int activeCount = masterExecService.getActiveCount();
             // make sure to scan and delete command  table in one transaction
@@ -178,7 +177,7 @@ public class MasterSchedulerService extends Thread {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } finally {
-            zkMasterClient.releaseMutex(mutex);
+            masterRegistryClient.releaseLock();
         }
     }
 

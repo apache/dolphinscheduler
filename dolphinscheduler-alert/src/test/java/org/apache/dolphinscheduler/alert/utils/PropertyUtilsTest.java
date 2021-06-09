@@ -23,8 +23,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -202,20 +202,20 @@ public class PropertyUtilsTest {
     public void testGetEnum() {
 
         //Expected MASTER
-        ZKNodeType zkNodeType = PropertyUtils.getEnum("test.server.enum1", ZKNodeType.class, ZKNodeType.WORKER);
-        assertEquals(ZKNodeType.MASTER, zkNodeType);
+        NodeType nodeType = PropertyUtils.getEnum("test.server.enum1", NodeType.class, NodeType.WORKER);
+        assertEquals(NodeType.MASTER, nodeType);
 
         //Expected DEAD_SERVER
-        zkNodeType = PropertyUtils.getEnum("test.server.enum2", ZKNodeType.class, ZKNodeType.WORKER);
-        assertEquals(ZKNodeType.DEAD_SERVER, zkNodeType);
+        nodeType = PropertyUtils.getEnum("test.server.enum2", NodeType.class, NodeType.WORKER);
+        assertEquals(NodeType.DEAD_SERVER, nodeType);
 
         //If key is null, then return defaultval
-        zkNodeType = PropertyUtils.getEnum(null, ZKNodeType.class, ZKNodeType.WORKER);
-        assertEquals(ZKNodeType.WORKER, zkNodeType);
+        nodeType = PropertyUtils.getEnum(null, NodeType.class, NodeType.WORKER);
+        assertEquals(NodeType.WORKER, nodeType);
 
         //If the value doesn't define in enum ,it will log the error and return -1
-        zkNodeType = PropertyUtils.getEnum("test.server.enum3", ZKNodeType.class, ZKNodeType.WORKER);
-        assertEquals(ZKNodeType.WORKER, zkNodeType);
+        nodeType = PropertyUtils.getEnum("test.server.enum3", NodeType.class, NodeType.WORKER);
+        assertEquals(NodeType.WORKER, nodeType);
     }
 
 }

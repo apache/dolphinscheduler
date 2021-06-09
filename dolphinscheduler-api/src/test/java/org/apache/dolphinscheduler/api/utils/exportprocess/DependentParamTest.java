@@ -14,35 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils.exportprocess;
+
+import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import org.json.JSONException;
+import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.json.JSONException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * DependentParamTest
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
-public class DependentParamTest {
-
+public class DependentParamTest extends AbstractControllerTest {
 
     @Test
     public void testAddExportDependentSpecialParam() throws JSONException {
-        String dependentJson = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
-                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-                "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
-                "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
-                "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}";
+        String dependentJson = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\","
+                + "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\","
+                + "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\","
+                + "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\","
+                + "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}";
 
         ObjectNode taskNode = JSONUtils.parseObject(dependentJson);
         if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
@@ -55,8 +52,8 @@ public class DependentParamTest {
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
 
-        String dependentEmpty = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
-                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"}";
+        String dependentEmpty = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\","
+                + "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"}";
 
         ObjectNode taskEmpty = JSONUtils.parseObject(dependentEmpty);
         if (StringUtils.isNotEmpty(taskEmpty.path("type").asText())) {
@@ -73,14 +70,14 @@ public class DependentParamTest {
 
     @Test
     public void testAddImportDependentSpecialParam() throws JSONException {
-        String dependentJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
-                ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
-                "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
-                ",\"name\":\"dependent\"," +
-                "\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\"," +
-                "\"definitionName\":\"shell-1\",\"depTasks\":\"shell-1\",\"projectName\":\"test\"," +
-                "\"projectId\":1,\"cycle\":\"day\",\"definitionId\":7}],\"relation\":\"AND\"}]," +
-                "\"relation\":\"AND\"},\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
+        String dependentJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\""
+                + ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false,"
+                + "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\""
+                + ",\"name\":\"dependent\","
+                + "\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\","
+                + "\"definitionName\":\"shell-1\",\"depTasks\":\"shell-1\",\"projectName\":\"test\","
+                + "\"projectId\":1,\"cycle\":\"day\",\"definitionId\":7}],\"relation\":\"AND\"}],"
+                + "\"relation\":\"AND\"},\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
 
         ObjectNode taskNode = JSONUtils.parseObject(dependentJson);
         if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
@@ -93,10 +90,10 @@ public class DependentParamTest {
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
 
-        String dependentEmpty = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
-                ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
-                "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
-                ",\"name\":\"dependent\",\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
+        String dependentEmpty = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\""
+                + ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false,"
+                + "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\""
+                + ",\"name\":\"dependent\",\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
 
         JsonNode taskNodeEmpty = JSONUtils.parseObject(dependentEmpty);
         if (StringUtils.isNotEmpty(taskNodeEmpty.path("type").asText())) {

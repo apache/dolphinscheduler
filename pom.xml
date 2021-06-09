@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>${revision}</version>
+    <version>1.3.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -56,10 +56,10 @@
     </parent>
 
     <properties>
-        <revision>1.3.6-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
+        <zookeeper.version>3.4.14</zookeeper.version>
         <spring.version>5.1.19.RELEASE</spring.version>
         <spring.boot.version>2.1.18.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
@@ -99,6 +99,7 @@
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
         <zookeeper.version>3.4.14</zookeeper.version>
+        <curator.test>2.12.0</curator.test>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
@@ -217,6 +218,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-registry-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -250,21 +256,17 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
                 <version>${curator.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-recipes</artifactId>
-                <version>${curator.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>org.apache.zookeeper</groupId>
-                        <artifactId>zookeeper</artifactId>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -279,9 +281,37 @@
                         <artifactId>spotbugs-annotations</artifactId>
                     </exclusion>
                 </exclusions>
-                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j-1.2-api</groupId>
+                        <artifactId>org.apache.logging.log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.test}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -797,6 +827,9 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                        <!--registry plugin -->
+                        <include>**/plugin/registry/zookeeper/ZookeeperRegistryTest.java</include>
+                        <!-- API -->
                         <include>**/api/controller/ProjectControllerTest.java</include>
                         <include>**/api/controller/QueueControllerTest.java</include>
                         <include>**/api/configuration/TrafficConfigurationTest.java</include>
@@ -894,7 +927,6 @@
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
-                        <include>**/common/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/common/datasource/clickhouse/ClickHouseDatasourceProcessorTest.java</include>
                         <include>**/common/datasource/db2/Db2DatasourceProcessorTest.java</include>
                         <include>**/common/datasource/hive/HiveDatasourceProcessorTest.java</include>
@@ -942,7 +974,7 @@
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/HostWorkerTest.java</include>
-                        <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/registry/MasterRegistryClientTest.java</include>
                         <include>**/server/master/registry/ServerNodeManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
@@ -955,7 +987,7 @@
                         <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
                         <include>**/server/master/zk/ZKMasterClientTest.java</include>
-                        <include>**/server/register/ZookeeperRegistryCenterTest.java</include>
+                        <include>**/server/registry/ZookeeperRegistryCenterTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
@@ -985,10 +1017,8 @@
                         <include>**/server/worker/runner/WorkerManagerThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
-                        <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
-                        <include>**/service/zk/ZKServerTest.java</include>
-                        <include>**/service/zk/CuratorZookeeperClientTest.java</include>
-                        <include>**/service/zk/RegisterOperatorTest.java</include>
+                        <include>**/service/registry/RegistryClientTest.java</include>
+                        <include>**/service/registry/RegistryPluginTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
                         <include>**/service/queue/PeerTaskInstancePriorityQueueTest.java</include>
                         <include>**/service/log/LogClientServiceTest.java</include>
@@ -1042,6 +1072,7 @@
                         <include>**/plugin/alert/slack/SlackAlertPluginTest.java</include>
                         <include>**/plugin/alert/slack/SlackSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
+                        <include>**/spi/plugin/DolphinSchedulerPluginLoaderTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
@@ -1049,7 +1080,6 @@
                         <include>**/alert/processor/AlertRequestProcessorTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/AlertServerTest.java</include>
-
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -1156,7 +1186,9 @@
     </build>
 
     <modules>
+        <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
+        <module>dolphinscheduler-registry-plugin</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-server</module>
         <module>dolphinscheduler-common</module>
@@ -1166,7 +1198,6 @@
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
-        <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-microbench</module>
     </modules>
 </project>

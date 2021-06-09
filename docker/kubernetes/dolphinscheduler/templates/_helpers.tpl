@@ -162,8 +162,8 @@ Create a database environment variables.
   {{- end }}
 {{- end -}}
 
-{{/*
-Create a zookeeper environment variables.
+{{/* todo
+Create a rregistry environment variables.
 */}}
 {{- define "dolphinscheduler.zookeeper.env_vars" -}}
 - name: ZOOKEEPER_QUORUM
