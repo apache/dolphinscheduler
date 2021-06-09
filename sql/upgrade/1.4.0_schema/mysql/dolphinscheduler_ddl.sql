@@ -439,28 +439,6 @@ CREATE TABLE `t_ds_process_definition_log` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for t_ds_command
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_command`;
-CREATE TABLE `t_ds_command` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `command_type` tinyint(4) DEFAULT NULL COMMENT 'Command type: 0 start workflow, 1 start execution from current node, 2 resume fault-tolerant workflow, 3 resume pause process, 4 start execution from failed node, 5 complement, 6 schedule, 7 rerun, 8 pause, 9 stop, 10 resume waiting thread',
-  `process_definition_id` int(11) DEFAULT NULL COMMENT 'process definition id',
-  `command_param` text COMMENT 'json command parameters',
-  `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'Node dependency type: 0 current node, 1 forward, 2 backward',
-  `failure_strategy` tinyint(4) DEFAULT '0' COMMENT 'Failed policy: 0 end, 1 continue',
-  `warning_type` tinyint(4) DEFAULT '0' COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',
-  `warning_group_id` int(11) DEFAULT NULL COMMENT 'warning group',
-  `schedule_time` datetime DEFAULT NULL COMMENT 'schedule time',
-  `start_time` datetime DEFAULT NULL COMMENT 'start time',
-  `executor_id` int(11) DEFAULT NULL COMMENT 'executor id',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(64)  COMMENT 'worker group',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
 -- Table structure for t_ds_process_task_relation_log
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
