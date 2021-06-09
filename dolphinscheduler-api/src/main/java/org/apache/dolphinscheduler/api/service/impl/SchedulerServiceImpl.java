@@ -368,7 +368,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromZK(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);

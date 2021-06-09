@@ -91,8 +91,8 @@ public class ResInfo {
      * @param heartBeatInfo heartbeat info
      * @return heartbeat info to Server
      */
-    public static Server parseHeartbeatForZKInfo(String heartBeatInfo) {
-        if (!isValidHeartbeatForZKInfo(heartBeatInfo)) {
+    public static Server parseHeartbeatForRegistryInfo(String heartBeatInfo) {
+        if (!isValidHeartbeatForRegistryInfo(heartBeatInfo)) {
             return null;
         }
         String[] parts = heartBeatInfo.split(Constants.COMMA);
@@ -112,7 +112,7 @@ public class ResInfo {
      * @param heartBeatInfo heartbeat info
      * @return heartbeat info is valid
      */
-    public static boolean isValidHeartbeatForZKInfo(String heartBeatInfo) {
+    public static boolean isValidHeartbeatForRegistryInfo(String heartBeatInfo) {
         if (StringUtils.isNotEmpty(heartBeatInfo)) {
             String[] parts = heartBeatInfo.split(Constants.COMMA);
             return parts.length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH
