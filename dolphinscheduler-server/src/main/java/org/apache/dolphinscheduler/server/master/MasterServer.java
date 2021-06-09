@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
-import org.apache.dolphinscheduler.server.master.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
@@ -84,7 +84,7 @@ public class MasterServer implements IStoppable {
      * zk master client
      */
     @Autowired
-    private ZKMasterClient zkMasterClient;
+    private MasterRegistryClient masterRegistryClient;
 
     /**
      * scheduler service
@@ -117,8 +117,8 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         // self tolerant
-        this.zkMasterClient.start();
-        this.zkMasterClient.setStoppable(this);
+        this.masterRegistryClient.start();
+        this.masterRegistryClient.setRegistryStoppable(this);
 
         // scheduler start
         this.masterSchedulerService.start();
@@ -175,7 +175,7 @@ public class MasterServer implements IStoppable {
             // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-            this.zkMasterClient.close();
+            this.masterRegistryClient.closeRegistry();
             // close quartz
             try {
                 QuartzExecutors.getInstance().shutdown();
