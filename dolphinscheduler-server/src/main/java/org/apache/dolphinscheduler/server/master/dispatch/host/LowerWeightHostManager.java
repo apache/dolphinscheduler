@@ -154,7 +154,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
 
         public HostWeight getHostWeight(String addr, String workerGroup, String heartbeat) {
-            if (ResInfo.isValidHeartbeatForZKInfo(heartbeat)) {
+            if (ResInfo.isValidHeartbeatForRegistryInfo(heartbeat)) {
                 String[] parts = heartbeat.split(Constants.COMMA);
                 int status = Integer.parseInt(parts[8]);
                 if (status == Constants.ABNORMAL_NODE_STATUS) {
