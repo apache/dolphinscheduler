@@ -35,7 +35,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -154,10 +153,10 @@ public class SqlTaskTest {
         String result = Whitebox.invokeMethod(sqlTask, "resultProcess", resultSet);
         Assert.assertNotNull(result);
     }
-    
+
     @Test
     public void shouldntThrowNullPointerException_When_SqlParamsMapIsNull_printReplacedSql() {
-    	sqlTask.printReplacedSql("", "", "", null);
+        sqlTask.printReplacedSql("", "", "", null);
     }
 
     @Test
