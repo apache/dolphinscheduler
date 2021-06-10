@@ -154,12 +154,12 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
 
         public HostWeight getHostWeight(String addr, String workerGroup, String heartbeat) {
-            if (ResInfo.isValidHeartbeatForZKInfo(heartbeat)) {
+            if (ResInfo.isValidHeartbeatForRegistryInfo(heartbeat)) {
                 String[] parts = heartbeat.split(Constants.COMMA);
                 int status = Integer.parseInt(parts[8]);
                 if (status == Constants.ABNORMAL_NODE_STATUS) {
-                    logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
-                            Double.parseDouble(parts[3]), Double.parseDouble(parts[2]));
+                    logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+                            addr, Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
                     return null;
                 }
                 double cpu = Double.parseDouble(parts[0]);

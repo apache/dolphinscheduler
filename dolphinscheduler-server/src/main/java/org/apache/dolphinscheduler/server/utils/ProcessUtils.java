@@ -442,25 +442,22 @@ public class ProcessUtils {
     public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            LogClientService logClient = null;
             String log;
-            try {
-                logClient = new LogClientService();
+            try (LogClientService logClient = new LogClientService()) {
                 log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
                         Constants.RPC_PORT,
                         taskExecutionContext.getLogPath());
-            } finally {
-                if (logClient != null) {
-                    logClient.close();
-                }
             }
             if (StringUtils.isNotEmpty(log)) {
-                List<String> appIds = LoggerUtils.getAppIds(log, logger);
-                String workerDir = taskExecutionContext.getExecutePath();
-                if (StringUtils.isEmpty(workerDir)) {
-                    logger.error("task instance work dir is empty");
-                    throw new RuntimeException("task instance work dir is empty");
+                if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
+                    taskExecutionContext.setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                            taskExecutionContext.getProcessDefineCode(),
+                            taskExecutionContext.getProcessDefineVersion(),
+                            taskExecutionContext.getProcessInstanceId(),
+                            taskExecutionContext.getTaskInstanceId()));
                 }
+                FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
+                List<String> appIds = LoggerUtils.getAppIds(log, logger);
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
                     return appIds;

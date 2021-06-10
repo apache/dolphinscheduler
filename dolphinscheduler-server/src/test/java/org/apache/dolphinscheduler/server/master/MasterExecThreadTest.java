@@ -88,7 +88,6 @@ public class MasterExecThreadTest {
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processInstance = mock(ProcessInstance.class);
-        Mockito.when(processInstance.getProcessDefinitionId()).thenReturn(processDefinitionId);
         Mockito.when(processInstance.getState()).thenReturn(ExecutionStatus.SUCCESS);
         Mockito.when(processInstance.getHistoryCmd()).thenReturn(CommandType.COMPLEMENT_DATA.toString());
         Mockito.when(processInstance.getIsSubProcess()).thenReturn(Flag.NO);
@@ -142,7 +141,7 @@ public class MasterExecThreadTest {
             method.setAccessible(true);
             method.invoke(masterExecThread);
             // one create save, and 9(1 to 20 step 2) for next save, and last day 31 no save
-            verify(processService, times(9)).saveProcessInstance(processInstance);
+            verify(processService, times(20)).saveProcessInstance(processInstance);
         } catch (Exception e) {
             Assert.fail();
         }

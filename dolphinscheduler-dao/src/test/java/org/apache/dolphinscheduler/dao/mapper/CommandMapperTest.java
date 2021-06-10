@@ -156,13 +156,13 @@ public class CommandMapperTest {
 
         CommandCount expectedCommandCount = createCommandMap(count, CommandType.START_PROCESS, processDefinition.getId());
 
-        Integer[] projectIdArray = {processDefinition.getProjectId()};
+        Long[] projectCodeArray = {processDefinition.getProjectCode()};
 
         Date startTime = DateUtils.stringToDate("2019-12-29 00:10:00");
 
         Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
 
-        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectIdArray);
+        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectCodeArray);
 
         assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
     }
@@ -197,10 +197,13 @@ public class CommandMapperTest {
      */
     private ProcessDefinition createProcessDefinition(){
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         processDefinition.setName("ut test");
-        processDefinition.setProjectId(1);
+        processDefinition.setProjectCode(1L);
         processDefinition.setFlag(Flag.YES);
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
 
         processDefinitionMapper.insert(processDefinition);
 

@@ -231,18 +231,18 @@ public interface ProcessDefinitionService {
     /**
      * get task node details based on process definition
      *
-     * @param defineId define id
+     * @param defineCode define code
      * @return task node list
      */
-    Map<String, Object> getTaskNodeListByDefinitionId(Integer defineId);
+    Map<String, Object> getTaskNodeListByDefinitionCode(Long defineCode);
 
     /**
      * get task node details based on process definition
      *
-     * @param defineIdList define id list
+     * @param defineCodeList define code list
      * @return task node list
      */
-    Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList);
+    Map<String, Object> getTaskNodeListByDefinitionCodeList(String defineCodeList);
 
     /**
      * query process definition all by project id
@@ -275,6 +275,30 @@ public interface ProcessDefinitionService {
     Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
             , int processDefinitionId, long version);
 
+    /**
+     * query the pagination versions info by one certain process definition code
+     *
+     * @param loginUser login user info to check auth
+     * @param projectName process definition project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefinitionCode process definition code
+     * @return the pagination process definition versions info of the certain process definition
+     */
+    Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName,
+                                                       int pageNo, int pageSize, long processDefinitionCode);
+
+    /**
+     * delete one certain process definition by version number and process definition id
+     *
+     * @param loginUser login user info to check auth
+     * @param projectName process definition project name
+     * @param processDefinitionId process definition id
+     * @param version version number
+     * @return delele result code
+     */
+    Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName,
+                                                              int processDefinitionId, long version);
     /**
      * check has associated process definition
      *

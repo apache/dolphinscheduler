@@ -114,15 +114,16 @@ public class FileUtils {
     /**
      * directory of process execution
      *
-     * @param projectId project id
-     * @param processDefineId process definition id
+     * @param projectCode project code
+     * @param processDefineCode process definition Code
+     * @param processDefineVersion process definition version
      * @param processInstanceId process instance id
      * @param taskInstanceId task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId, int taskInstanceId) {
-        String fileName = String.format("%s/exec/process/%d/%d/%d/%d", DATA_BASEDIR,
-                projectId, processDefineId, processInstanceId, taskInstanceId);
+    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
+        String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
+                projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -382,7 +383,10 @@ public class FileUtils {
      * @throws IOException in case deletion is unsuccessful
      */
     public static void deleteFile(String filename) throws IOException {
-        org.apache.commons.io.FileUtils.forceDelete(new File(filename));
+        File file = new File(filename);
+        if (file.exists()) {
+            org.apache.commons.io.FileUtils.forceDelete(file);
+        }
     }
 
     /**

@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
@@ -45,6 +46,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -107,6 +109,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private ProjectMapper projectMapper;
 
 
     /**
@@ -490,6 +495,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, id);
             return result;
         }
+        // check if is a project owner
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(id);
+        if (CollectionUtils.isNotEmpty(projects)) {
+            String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
+            putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
+            return result;
+        }
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
 
@@ -533,10 +545,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-        //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteProjectRelation(0, userId);
 
+        //if the selected projectIds are empty, delete all items associated with the user
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 
@@ -606,7 +618,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             // get all resource id of process definitions those is released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);
@@ -976,13 +988,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
-     * register user, default state is 0, default tenant_id is 1, no phone, no queue
+     * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
      * @param userName user name
      * @param userPassword user password
      * @param repeatPassword repeat password
      * @param email email
-     * @return register result code
+     * @return registry result code
      * @throws Exception exception
      */
     @Override

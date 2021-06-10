@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task;
 
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
 @PrepareForTest({SpringApplicationContext.class})
 public class TaskManagerTest {
 
-    private static Logger logger = LoggerFactory.getLogger(TaskManagerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskManagerTest.class);
 
     private TaskExecutionContext taskExecutionContext;
 
@@ -63,10 +64,11 @@ public class TaskManagerTest {
         // init task execution context, logger
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setProcessId(12345);
-        taskExecutionContext.setProcessDefineId(1);
         taskExecutionContext.setProcessInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
-        taskExecutionContext.setTaskType("");
+        taskExecutionContext.setProcessDefineCode(1L);
+        taskExecutionContext.setProcessDefineVersion(1);
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
         taskExecutionContext.setLogPath("/tmp/test.log");
@@ -75,7 +77,8 @@ public class TaskManagerTest {
 
         taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(
                 LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskExecutionContext.getProcessDefineId(),
+                taskExecutionContext.getProcessDefineCode(),
+                taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()
         ));
@@ -93,44 +96,44 @@ public class TaskManagerTest {
     @Test
     public void testNewTask() {
 
-        taskExecutionContext.setTaskType("SHELL");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("WATERDROP");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("HTTP");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("MR");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("SPARK");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("FLINK");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("PYTHON");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("DATAX");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
-        taskExecutionContext.setTaskType("SQOOP");
-        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService));
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.WATERDROP.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.HTTP.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.MR.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.SPARK.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.FLINK.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.PYTHON.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.DATAX.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
+        taskExecutionContext.setTaskType(TaskType.SQOOP.getDesc());
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService));
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNull() {
         taskExecutionContext.setTaskType(null);
-        TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
+        TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNewTaskIsNotExists() {
-        taskExecutionContext.setTaskType("XXX");
-        TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
+        taskExecutionContext.setTaskType("ttt");
+        TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
     }
 
     @Test
     public void testShellTaskReturnString() {
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
-        taskExecutionContext.setTaskType("SHELL");
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setHost("127.0.0.1:1234");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");
@@ -160,7 +163,7 @@ public class TaskManagerTest {
         Map<String, String> definedParams = new HashMap<>();
         definedParams.put("time_gb", "2020-12-16 00:00:00");
         taskExecutionContext.setDefinedParams(definedParams);
-        ShellTask shellTask = (ShellTask) TaskManager.newTask(taskExecutionContext,taskLogger,alertClientService);
+        ShellTask shellTask = (ShellTask) TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
         shellTask.setResultString("shell return");
         String shellReturn = shellTask.getResultString();
         shellTask.init();

@@ -22,11 +22,14 @@ import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PAT
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
+import org.apache.directory.api.util.Strings;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,19 +60,12 @@ public class PropertyUtils {
      */
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
-            InputStream fis = null;
-            try {
-                fis = PropertyUtils.class.getResourceAsStream(fileName);
+            try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
                 properties.load(fis);
 
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
-                if (fis != null) {
-                    IOUtils.closeQuietly(fis);
-                }
                 System.exit(1);
-            } finally {
-                IOUtils.closeQuietly(fis);
             }
         }
     }
@@ -260,6 +256,23 @@ public class PropertyUtils {
      */
     public static void setValue(String key, String value) {
         properties.setProperty(key, value);
+    }
+
+    public static Map<String, String> getPropertiesByPrefix(String prefix) {
+        if (Strings.isEmpty(prefix)) {
+            return null;
+        }
+        Set<Object> keys = properties.keySet();
+        if (keys.isEmpty()) {
+            return null;
+        }
+        Map<String, String> propertiesMap = new HashMap<>();
+        keys.forEach(k -> {
+            if (k.toString().contains(prefix)) {
+                propertiesMap.put(k.toString().replaceFirst(prefix + ".", ""), properties.getProperty((String) k));
+            }
+        });
+        return propertiesMap;
     }
 
 }

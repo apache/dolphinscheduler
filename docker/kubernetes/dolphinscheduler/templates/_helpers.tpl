@@ -30,7 +30,52 @@ If release name contains chart name it will be used as a full name.
 Create a default docker image fullname.
 */}}
 {{- define "dolphinscheduler.image.fullname" -}}
-{{- printf "%s:%s" .Values.image.repository .Values.image.tag -}}
+{{- .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
+
+{{/*
+Create a default common labels.
+*/}}
+{{- define "dolphinscheduler.common.labels" -}}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/version: {{ .Chart.AppVersion }}
+{{- end -}}
+
+{{/*
+Create a master labels.
+*/}}
+{{- define "dolphinscheduler.master.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
+app.kubernetes.io/component: master
+{{ include "dolphinscheduler.common.labels" . }}
+{{- end -}}
+
+{{/*
+Create a worker labels.
+*/}}
+{{- define "dolphinscheduler.worker.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+app.kubernetes.io/component: worker
+{{ include "dolphinscheduler.common.labels" . }}
+{{- end -}}
+
+{{/*
+Create an alert labels.
+*/}}
+{{- define "dolphinscheduler.alert.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+app.kubernetes.io/component: alert
+{{ include "dolphinscheduler.common.labels" . }}
+{{- end -}}
+
+{{/*
+Create an api labels.
+*/}}
+{{- define "dolphinscheduler.api.labels" -}}
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+app.kubernetes.io/component: api
+{{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
 
 {{/*
@@ -57,4 +102,135 @@ Create a default fully qualified zookkeeper quorum.
 {{- define "dolphinscheduler.zookeeper.quorum" -}}
 {{- $port := default "2181" (.Values.zookeeper.service.port | toString) -}}
 {{- printf "%s:%s" (include "dolphinscheduler.zookeeper.fullname" .) $port -}}
+{{- end -}}
+
+{{/*
+Create a database environment variables.
+*/}}
+{{- define "dolphinscheduler.database.env_vars" -}}
+- name: DATABASE_TYPE
+  {{- if .Values.postgresql.enabled }}
+  value: "postgresql"
+  {{- else }}
+  value: {{ .Values.externalDatabase.type | quote }}
+  {{- end }}
+- name: DATABASE_DRIVER
+  {{- if .Values.postgresql.enabled }}
+  value: "org.postgresql.Driver"
+  {{- else }}
+  value: {{ .Values.externalDatabase.driver | quote }}
+  {{- end }}
+- name: DATABASE_HOST
+  {{- if .Values.postgresql.enabled }}
+  value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
+- name: DATABASE_PORT
+  {{- if .Values.postgresql.enabled }}
+  value: "5432"
+  {{- else }}
+  value: {{ .Values.externalDatabase.port | quote }}
+  {{- end }}
+- name: DATABASE_USERNAME
+  {{- if .Values.postgresql.enabled }}
+  value: {{ .Values.postgresql.postgresqlUsername }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.username | quote }}
+  {{- end }}
+- name: DATABASE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      {{- if .Values.postgresql.enabled }}
+      name: {{ template "dolphinscheduler.postgresql.fullname" . }}
+      key: postgresql-password
+      {{- else }}
+      name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+      key: database-password
+      {{- end }}
+- name: DATABASE_DATABASE
+  {{- if .Values.postgresql.enabled }}
+  value: {{ .Values.postgresql.postgresqlDatabase }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
+- name: DATABASE_PARAMS
+  {{- if .Values.postgresql.enabled }}
+  value: "characterEncoding=utf8"
+  {{- else }}
+  value: {{ .Values.externalDatabase.params | quote }}
+  {{- end }}
+{{- end -}}
+
+{{/* todo
+Create a rregistry environment variables.
+*/}}
+{{- define "dolphinscheduler.zookeeper.env_vars" -}}
+- name: ZOOKEEPER_QUORUM
+  {{- if .Values.zookeeper.enabled }}
+  value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
+  {{- else }}
+  value: {{ .Values.externalZookeeper.zookeeperQuorum }}
+  {{- end }}
+- name: ZOOKEEPER_ROOT
+  {{- if .Values.zookeeper.enabled }}
+  value: {{ .Values.zookeeper.zookeeperRoot }}
+  {{- else }}
+  value: {{ .Values.externalZookeeper.zookeeperRoot }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Create a common fs_s3a environment variables.
+*/}}
+{{- define "dolphinscheduler.fs_s3a.env_vars" -}}
+{{- if eq (default "HDFS" .Values.common.configmap.RESOURCE_STORAGE_TYPE) "S3" -}}
+- name: FS_S3A_SECRET_KEY
+  valueFrom:
+    secretKeyRef:
+      key: fs-s3a-secret-key
+      name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a sharedStoragePersistence volume.
+*/}}
+{{- define "dolphinscheduler.sharedStorage.volume" -}}
+{{- if .Values.common.sharedStoragePersistence.enabled -}}
+- name: {{ include "dolphinscheduler.fullname" . }}-shared
+  persistentVolumeClaim:
+    claimName: {{ include "dolphinscheduler.fullname" . }}-shared
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a sharedStoragePersistence volumeMount.
+*/}}
+{{- define "dolphinscheduler.sharedStorage.volumeMount" -}}
+{{- if .Values.common.sharedStoragePersistence.enabled -}}
+- mountPath: {{ .Values.common.sharedStoragePersistence.mountPath | quote }}
+  name: {{ include "dolphinscheduler.fullname" . }}-shared
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a fsFileResourcePersistence volume.
+*/}}
+{{- define "dolphinscheduler.fsFileResource.volume" -}}
+{{- if .Values.common.fsFileResourcePersistence.enabled -}}
+- name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+  persistentVolumeClaim:
+    claimName: {{ include "dolphinscheduler.fullname" . }}-fs-file
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a fsFileResourcePersistence volumeMount.
+*/}}
+{{- define "dolphinscheduler.fsFileResource.volumeMount" -}}
+{{- if .Values.common.fsFileResourcePersistence.enabled -}}
+- mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
+  name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+{{- end -}}
 {{- end -}}

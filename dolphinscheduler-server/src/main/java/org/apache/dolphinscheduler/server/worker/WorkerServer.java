@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.ZKNodeType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
-import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
@@ -75,7 +75,7 @@ public class WorkerServer implements IStoppable {
      * worker registry
      */
     @Autowired
-    private WorkerRegistry workerRegistry;
+    private WorkerRegistryClient workerRegistryClient;
 
     /**
      * worker config
@@ -131,10 +131,11 @@ public class WorkerServer implements IStoppable {
 
         // worker registry
         try {
-            this.workerRegistry.registry();
-            this.workerRegistry.getZookeeperRegistryCenter().setStoppable(this);
-            Set<String> workerZkPaths = this.workerRegistry.getWorkerZkPaths();
-            this.workerRegistry.getZookeeperRegistryCenter().getRegisterOperator().handleDeadServer(workerZkPaths, ZKNodeType.WORKER, Constants.DELETE_ZK_OP);
+            this.workerRegistryClient.registry();
+            this.workerRegistryClient.setRegistryStoppable(this);
+            Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
+
+            this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
@@ -147,7 +148,7 @@ public class WorkerServer implements IStoppable {
         this.retryReportTaskStatusThread.start();
 
         /**
-         * register hooks, which are called before the process exits
+         * registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (Stopper.isRunning()) {
@@ -178,7 +179,7 @@ public class WorkerServer implements IStoppable {
 
             // close
             this.nettyRemotingServer.close();
-            this.workerRegistry.unRegistry();
+            this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);

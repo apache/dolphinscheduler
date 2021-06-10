@@ -91,7 +91,7 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
                     ObjectNode dependentItem = (ObjectNode) dependItemList.path(k);
                     Project dependentItemProject = projectMapper.queryByName(dependentItem.path("projectName").asText());
                     if(dependentItemProject != null){
-                        ProcessDefinition definition = processDefineMapper.queryByDefineName(dependentItemProject.getId(),dependentItem.path("definitionName").asText());
+                        ProcessDefinition definition = processDefineMapper.queryByDefineName(dependentItemProject.getCode(),dependentItem.path("definitionName").asText());
                         if(definition != null){
                             dependentItem.put("projectId",dependentItemProject.getId());
                             dependentItem.put("definitionId",definition.getId());
@@ -109,6 +109,6 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
      */
     @Override
     public void afterPropertiesSet() {
-        TaskNodeParamFactory.register(TaskType.DEPENDENT.name(), this);
+        TaskNodeParamFactory.register(TaskType.DEPENDENT.getDesc(), this);
     }
 }

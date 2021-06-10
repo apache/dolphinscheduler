@@ -78,7 +78,7 @@ public class ExcelUtilsTest {
         ExcelUtils.genExcelFile(correctContent, title, xlsFilePath);
 
         //Test file exists
-        File xlsFile = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLS);
+        File xlsFile = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLSX);
         assertTrue(xlsFile.exists());
 
         //Expected RuntimeException
@@ -98,7 +98,7 @@ public class ExcelUtilsTest {
     @Test
     public void testGenExcelFileByCheckDir() {
         ExcelUtils.genExcelFile("[{\"a\": \"a\"},{\"a\": \"a\"}]", "t", "/tmp/xls");
-        File file = new File("/tmp/xls" + EmailConstants.SINGLE_SLASH + "t" + EmailConstants.EXCEL_SUFFIX_XLS);
+        File file = new File("/tmp/xls" + EmailConstants.SINGLE_SLASH + "t" + EmailConstants.EXCEL_SUFFIX_XLSX);
         file.delete();
     }
 }

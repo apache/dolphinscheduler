@@ -28,6 +28,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 
+import java.sql.SQLException;
 import java.util.Properties;
 
 import org.mybatis.spring.SqlSessionTemplate;
@@ -77,7 +78,7 @@ public class SpringConnectionFactory {
      * @return druid dataSource
      */
     @Bean(destroyMethod = "")
-    public DruidDataSource dataSource() {
+    public DruidDataSource dataSource() throws SQLException {
 
         DruidDataSource druidDataSource = new DruidDataSource();
 
@@ -104,6 +105,7 @@ public class SpringConnectionFactory {
         druidDataSource.setValidationQueryTimeout(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_VALIDATION_QUERY_TIMEOUT, 3));
         //auto commit
         druidDataSource.setDefaultAutoCommit(PropertyUtils.getBoolean(Constants.SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT, true));
+        druidDataSource.init();
         return druidDataSource;
     }
 
@@ -113,7 +115,7 @@ public class SpringConnectionFactory {
      * @return DataSourceTransactionManager
      */
     @Bean
-    public DataSourceTransactionManager transactionManager() {
+    public DataSourceTransactionManager transactionManager() throws SQLException {
         return new DataSourceTransactionManager(dataSource());
     }
 

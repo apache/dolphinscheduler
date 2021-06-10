@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,13 +113,16 @@ public class ExecutorService2Test {
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         processDefinition.setTenantId(tenantId);
         processDefinition.setUserId(userId);
+        processDefinition.setVersion(1);
+        processDefinition.setCode(1L);
 
         // processInstance
         processInstance.setId(processInstanceId);
-        processInstance.setProcessDefinitionId(processDefinitionId);
         processInstance.setState(ExecutionStatus.FAILURE);
         processInstance.setExecutorId(userId);
         processInstance.setTenantId(tenantId);
+        processInstance.setProcessDefinitionVersion(1);
+        processInstance.setProcessDefinitionCode(1L);
 
         // project
         project.setName(projectName);
@@ -134,16 +136,16 @@ public class ExecutorService2Test {
         Mockito.when(processDefinitionMapper.selectById(processDefinitionId)).thenReturn(processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         Mockito.when(processService.createCommand(any(Command.class))).thenReturn(1);
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(getMasterServersList());
+        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId)).thenReturn(processInstance);
-        Mockito.when(processService.findProcessDefineById(processDefinitionId)).thenReturn(processDefinition);
+        Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
     }
 
     /**
      * not complement
      */
     @Test
-    public void testNoComplement() throws ParseException {
+    public void testNoComplement() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
@@ -161,7 +163,7 @@ public class ExecutorService2Test {
      * not complement
      */
     @Test
-    public void testComplementWithStartNodeList() throws ParseException {
+    public void testComplementWithStartNodeList() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
@@ -180,7 +182,7 @@ public class ExecutorService2Test {
      * date error
      */
     @Test
-    public void testDateError() throws ParseException {
+    public void testDateError() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
@@ -197,7 +199,7 @@ public class ExecutorService2Test {
      * serial
      */
     @Test
-    public void testSerial() throws ParseException {
+    public void testSerial() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
@@ -215,7 +217,7 @@ public class ExecutorService2Test {
      * without schedule
      */
     @Test
-    public void testParallelWithOutSchedule() throws ParseException {
+    public void testParallelWithOutSchedule() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
@@ -233,7 +235,7 @@ public class ExecutorService2Test {
      * with schedule
      */
     @Test
-    public void testParallelWithSchedule() throws ParseException {
+    public void testParallelWithSchedule() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
@@ -248,8 +250,8 @@ public class ExecutorService2Test {
     }
 
     @Test
-    public void testNoMsterServers() throws ParseException {
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(new ArrayList<>());
+    public void testNoMsterServers() {
+        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(new ArrayList<>());
 
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
                 processDefinitionId, cronTime, CommandType.COMPLEMENT_DATA,
@@ -262,7 +264,7 @@ public class ExecutorService2Test {
     }
 
     @Test
-    public void testExecuteRepeatRunning() throws Exception {
+    public void testExecuteRepeatRunning() {
         Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         
         Map<String, Object> result = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.REPEAT_RUNNING);

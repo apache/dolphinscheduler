@@ -24,12 +24,13 @@ import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.processor.AlertRequestProcessor;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.common.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.common.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginLoader;
+import org.apache.dolphinscheduler.spi.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -47,15 +48,20 @@ import com.google.common.collect.ImmutableList;
  * alert of start
  */
 public class AlertServer {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
+
+    /**
+     * Plugin Dao
+     */
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+
     /**
      * Alert Dao
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
     private AlertSender alertSender;
-
-    private static AlertServer instance;
 
     private AlertPluginManager alertPluginManager;
 
@@ -78,11 +84,17 @@ public class AlertServer {
 
     public static final AlertServer getInstance() {
         return AlertServerHolder.INSTANCE;
-
     }
 
     private AlertServer() {
 
+    }
+
+    private void checkTable() {
+        if (!pluginDao.checkPluginDefineTableExist()) {
+            logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            System.exit(1);
+        }
     }
 
     private void initPlugin() {
@@ -101,7 +113,7 @@ public class AlertServer {
         try {
             alertPluginLoader.loadPlugins();
         } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
+            throw new RuntimeException("Load Alert Plugin Failed !", e);
         }
     }
 
@@ -128,7 +140,7 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             if (alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
-                logger.warn("No Alert Plugin . Can not send alert info. ");
+                logger.warn("No Alert Plugin . Cannot send alert info. ");
             } else {
                 List<Alert> alerts = alertDao.listWaitExecutionAlert();
                 alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
@@ -142,6 +154,7 @@ public class AlertServer {
      */
     public void start() {
         PropertyUtils.loadPropertyFile(ALERT_PROPERTIES_PATH);
+        checkTable();
         initPlugin();
         initRemoteServer();
         logger.info("alert server ready start ");

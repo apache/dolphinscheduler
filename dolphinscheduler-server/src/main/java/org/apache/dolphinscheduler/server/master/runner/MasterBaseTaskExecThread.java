@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -121,10 +121,11 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * init task timeout parameters
      */
     private void initTimeoutParams() {
-        String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
-
+        TaskDefinition taskDefinition = processService.findTaskDefinition(taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
+        boolean timeoutEnable = taskDefinition.getTimeoutFlag() == TimeoutFlag.OPEN;
+        taskTimeoutParameter = new TaskTimeoutParameter(timeoutEnable,
+                                                        taskDefinition.getTimeoutNotifyStrategy(),
+                                                        taskDefinition.getTimeout());
         if (taskTimeoutParameter.getEnable()) {
             checkTimeoutFlag = true;
         }
@@ -265,10 +266,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * call
      *
      * @return boolean
-     * @throws Exception exception
      */
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call() {
         this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
     }
@@ -283,7 +283,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         logger.warn("process id:{} process name:{} task id: {},name:{} execution time out",
                 processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
         // send warn mail
-        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(), processInstance.getId(), processInstance.getName(),
                 taskInstance.getId(), taskInstance.getName());
         return true;

@@ -31,13 +31,27 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  * project mapper interface
  */
 public interface ProjectMapper extends BaseMapper<Project> {
+    /**
+     * query project detail by code
+     * @param projectCode projectCode
+     * @return project
+     */
+    Project queryByCode(@Param("projectCode") Long projectCode);
 
     /**
+     * TODO: delete
      * query project detail by id
      * @param projectId projectId
      * @return project
      */
     Project queryDetailById(@Param("projectId") int projectId);
+
+    /**
+     * query project detail by code
+     * @param projectCode projectCode
+     * @return project
+     */
+    Project queryDetailByCode(@Param("projectCode") Long projectCode);
 
     /**
      * query project by name
@@ -70,6 +84,13 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return project list
      */
     List<Project> queryAuthedProjectListByUserId(@Param("userId") int userId);
+
+    /**
+     * query relation project list by userId
+     * @param userId userId
+     * @return project list
+     */
+    List<Project> queryRelationProjectListByUserId(@Param("userId") int userId);
 
     /**
      * query project except userId
