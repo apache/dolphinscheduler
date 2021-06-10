@@ -20,6 +20,8 @@ name: issue-robot
 on:
   issues:
     types: [opened]
+  issue_comment:
+      types: [created]
 
 jobs:
   issueRobot:
@@ -32,10 +34,9 @@ jobs:
           submodules: true
 
       - name: "Translation into English in issue"
-        uses: ./.github/actions/translation-on-issue
+        uses: ./.github/actions/issues-translate
         with:
-          translate-title: true
-          translate-body: false
+          BOT_GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - name: "Comment in issue"
         uses: ./.github/actions/comment-on-issue
