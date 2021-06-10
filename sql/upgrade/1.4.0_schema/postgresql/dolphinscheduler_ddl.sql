@@ -247,6 +247,7 @@ BEGIN
                             AND COLUMN_NAME ='code')
       THEN
          ALTER TABLE t_ds_process_definition ADD COLUMN code bigint NOT NULL;
+         ALTER TABLE t_ds_process_definition DROP CONSTRAINT t_ds_process_definition_pkey, ADD PRIMARY KEY (id, code);
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -265,6 +266,9 @@ BEGIN
                             AND COLUMN_NAME ='project_code')
       THEN
          ALTER TABLE t_ds_process_definition ADD COLUMN project_code bigint NOT NULL;
+         ALTER TABLE t_ds_process_definition DROP CONSTRAINT process_definition_unique, ADD CONSTRAINT process_definition_unique UNIQUE (name, project_code);
+         ALTER TABLE t_ds_process_definition DROP project_id, DROP process_definition_json, DROP receivers, DROP receivers_cc, DROP modify_by, DROP resource_ids;
+
        END IF;
 END;
 $$ LANGUAGE plpgsql;
