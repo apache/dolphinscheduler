@@ -278,8 +278,8 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_project_instance_A_add_code()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='code')
    THEN
-         ALTER TABLE t_ds_process_definition ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
-         ALTER TABLE t_ds_process_definition DROP PRIMARY KEY, ADD PRIMARY KEY (`id`,`code`);
+         ALTER TABLE t_ds_project ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
+         ALTER TABLE t_ds_project DROP PRIMARY KEY, ADD PRIMARY KEY (`id`,`code`);
        END IF;
  END;
 
