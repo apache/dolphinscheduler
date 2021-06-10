@@ -113,6 +113,40 @@ public class CheckUtilsTest {
     }
 
     @Test
+    public void testDealOutParam() {
+        List<Property> properties = new ArrayList<>();
+        Property property = new Property();
+        property.setProp("test1");
+        property.setDirect(Direct.OUT);
+        property.setType(DataType.VARCHAR);
+        property.setValue("test1");
+        properties.add(property);
+
+        ShellParameters shellParameters = new ShellParameters();
+        String resultShell = "key1=value1$VarPoolkey2=value2";
+        shellParameters.varPool = new ArrayList<>();
+        shellParameters.setLocalParams(properties);
+        shellParameters.dealOutParam(resultShell);
+        assertNotNull(shellParameters.getVarPool().get(0));
+
+        String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
+        SqlParameters sqlParameters = new SqlParameters();
+        String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
+        sqlParameters.setLocalParams(properties);
+        sqlParameters.varPool = new ArrayList<>();
+        sqlParameters.dealOutParam(sqlResult1);
+        assertNotNull(sqlParameters.getVarPool().get(0));
+
+        property.setType(DataType.LIST);
+        properties.clear();
+        properties.add(property);
+        sqlParameters.setLocalParams(properties);
+        sqlParameters.dealOutParam(sqlResult);
+        assertNotNull(sqlParameters.getVarPool().get(0));
+
+    }
+
+    @Test
     public void testCheckTaskNodeParameters() {
         TaskNode taskNode = new TaskNode();
         assertFalse(CheckUtils.checkTaskNodeParameters(taskNode));
@@ -139,13 +173,7 @@ public class CheckUtilsTest {
         taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
-        List<Property> properties = new ArrayList<>();
-        Property property = new Property();
-        property.setProp("test1");
-        property.setDirect(Direct.OUT);
-        property.setType(DataType.VARCHAR);
-        property.setValue("test1");
-        properties.add(property);
+
         // ShellParameters
         ShellParameters shellParameters = new ShellParameters();
         taskNode.setParams(JSONUtils.toJsonString(shellParameters));
@@ -157,11 +185,6 @@ public class CheckUtilsTest {
         shellParameters.setRawScript("sss");
         taskNode.setParams(JSONUtils.toJsonString(shellParameters));
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
-        String resultShell = "key1=value1$VarPoolkey2=value2";
-        shellParameters.varPool = new ArrayList<>();
-        shellParameters.setLocalParams(properties);
-        shellParameters.dealOutParam(resultShell);
-        assertNotNull(shellParameters.getVarPool().get(0));
 
         // ProcedureParameters
         ProcedureParameters procedureParameters = new ProcedureParameters();
@@ -175,7 +198,6 @@ public class CheckUtilsTest {
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // SqlParameters
-        String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
         SqlParameters sqlParameters = new SqlParameters();
         taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
         taskNode.setType(TaskType.SQL.getDesc());
@@ -185,19 +207,6 @@ public class CheckUtilsTest {
         sqlParameters.setSql("yy");
         taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
-
-        String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
-        sqlParameters.setLocalParams(properties);
-        sqlParameters.varPool = new ArrayList<>();
-        sqlParameters.dealOutParam(sqlResult1);
-        assertNotNull(sqlParameters.getVarPool().get(0));
-
-        property.setType(DataType.LIST);
-        properties.clear();
-        properties.add(property);
-        sqlParameters.setLocalParams(properties);
-        sqlParameters.dealOutParam(sqlResult);
-        assertNotNull(sqlParameters.getVarPool().get(0));
 
         // MapReduceParameters
         MapReduceParameters mapreduceParameters = new MapReduceParameters();

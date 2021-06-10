@@ -242,16 +242,14 @@ public class MasterExecThreadTest {
             field.setAccessible(true);
             field.set(masterExecThread, completeTaskList);
 
-            Method method = masterExecThreadClass.getDeclaredMethod("getPreVarPool", TaskInstance.class,Set.class);
-            method.setAccessible(true);
-            method.invoke(masterExecThread,taskInstance, preTaskName);
-
+            masterExecThread.getPreVarPool(taskInstance,preTaskName);
+            Assert.assertNotNull(taskInstance.getVarPool());
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             completeTaskList.put("test2",taskInstance2);
             field.setAccessible(true);
             field.set(masterExecThread, completeTaskList);
-            method.setAccessible(true);
-            method.invoke(masterExecThread,taskInstance, preTaskName);
+            masterExecThread.getPreVarPool(taskInstance,preTaskName);
+            Assert.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

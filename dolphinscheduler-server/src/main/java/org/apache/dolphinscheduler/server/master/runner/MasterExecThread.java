@@ -528,7 +528,7 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
-    private void getPreVarPool(TaskInstance taskInstance,  Set<String> preTask) {
+    public void getPreVarPool(TaskInstance taskInstance,  Set<String> preTask) {
         Map<String,Property> allProperty = new HashMap<>();
         Map<String,TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
