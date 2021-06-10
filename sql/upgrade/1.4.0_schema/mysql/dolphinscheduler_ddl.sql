@@ -278,26 +278,6 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_project_instance_A_add_code()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='code')
    THEN
-         ALTER TABLE t_ds_project ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
-       END IF;
- END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_project_instance_A_add_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_project_instance_A_add_code;
-
--- uc_dolphin_T_t_ds_process_definition_A_add_code
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_add_code;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code()
-   BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_process_definition'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='code')
-   THEN
          ALTER TABLE t_ds_process_definition ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
          ALTER TABLE t_ds_process_definition DROP PRIMARY KEY, ADD PRIMARY KEY (`id`,`code`);
        END IF;
@@ -306,8 +286,8 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code()
 d//
 
 delimiter ;
-CALL uc_dolphin_T_t_ds_process_definition_A_add_code();
-DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code;
+CALL uc_dolphin_T_t_ds_project_instance_A_add_code();
+DROP PROCEDURE uc_dolphin_T_t_ds_project_instance_A_add_code;
 
 -- uc_dolphin_T_t_ds_process_definition_A_add_project_code
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_add_project_code;
