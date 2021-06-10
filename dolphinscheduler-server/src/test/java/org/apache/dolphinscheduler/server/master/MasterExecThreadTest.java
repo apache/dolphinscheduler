@@ -44,10 +44,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -203,6 +207,53 @@ public class MasterExecThreadTest {
             List<TaskInstance> taskInstances = (List<TaskInstance>) method.invoke(masterExecThread, JSONUtils.toJsonString(cmdParam));
             Assert.assertEquals(4, taskInstances.size());
         } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testGetPreVarPool() {
+        try {
+            Set<String> preTaskName = new HashSet<>();
+            preTaskName.add("test1");
+            preTaskName.add("test2");
+            Map<String, TaskInstance> completeTaskList = new ConcurrentHashMap<>();
+
+            TaskInstance taskInstance = new TaskInstance();
+
+            TaskInstance taskInstance1 = new TaskInstance();
+            taskInstance1.setId(1);
+            taskInstance1.setName("test1");
+            taskInstance1.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"1\"}]");
+            taskInstance1.setEndTime(new Date());
+
+            TaskInstance taskInstance2 = new TaskInstance();
+            taskInstance2.setId(2);
+            taskInstance2.setName("test2");
+            taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test2\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
+            taskInstance2.setEndTime(new Date());
+
+            completeTaskList.put("test1",taskInstance1);
+            completeTaskList.put("test2",taskInstance2);
+
+            Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
+
+            Field field = masterExecThreadClass.getDeclaredField("completeTaskList");
+            field.setAccessible(true);
+            field.set(masterExecThread, completeTaskList);
+
+            Method method = masterExecThreadClass.getDeclaredMethod("getPreVarPool", TaskInstance.class,Set.class);
+            method.setAccessible(true);
+            method.invoke(masterExecThread,taskInstance, preTaskName);
+
+            taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
+            completeTaskList.put("test2",taskInstance2);
+            field.setAccessible(true);
+            field.set(masterExecThread, completeTaskList);
+            method.setAccessible(true);
+            method.invoke(masterExecThread,taskInstance, preTaskName);
+        } catch (Exception e) {
+            e.printStackTrace();
             Assert.fail();
         }
     }

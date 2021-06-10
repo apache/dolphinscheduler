@@ -19,13 +19,17 @@ package org.apache.dolphinscheduler.api.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
@@ -40,6 +44,8 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -133,6 +139,13 @@ public class CheckUtilsTest {
         taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
+        List<Property> properties = new ArrayList<>();
+        Property property = new Property();
+        property.setProp("test1");
+        property.setDirect(Direct.OUT);
+        property.setType(DataType.VARCHAR);
+        property.setValue("test1");
+        properties.add(property);
         // ShellParameters
         ShellParameters shellParameters = new ShellParameters();
         taskNode.setParams(JSONUtils.toJsonString(shellParameters));
@@ -144,6 +157,11 @@ public class CheckUtilsTest {
         shellParameters.setRawScript("sss");
         taskNode.setParams(JSONUtils.toJsonString(shellParameters));
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
+        String resultShell = "key1=value1$VarPoolkey2=value2";
+        shellParameters.varPool = new ArrayList<>();
+        shellParameters.setLocalParams(properties);
+        shellParameters.dealOutParam(resultShell);
+        assertNotNull(shellParameters.getVarPool().get(0));
 
         // ProcedureParameters
         ProcedureParameters procedureParameters = new ProcedureParameters();
@@ -157,6 +175,7 @@ public class CheckUtilsTest {
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
 
         // SqlParameters
+        String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
         SqlParameters sqlParameters = new SqlParameters();
         taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
         taskNode.setType(TaskType.SQL.getDesc());
@@ -166,6 +185,19 @@ public class CheckUtilsTest {
         sqlParameters.setSql("yy");
         taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
+
+        String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
+        sqlParameters.setLocalParams(properties);
+        sqlParameters.varPool = new ArrayList<>();
+        sqlParameters.dealOutParam(sqlResult1);
+        assertNotNull(sqlParameters.getVarPool().get(0));
+
+        property.setType(DataType.LIST);
+        properties.clear();
+        properties.add(property);
+        sqlParameters.setLocalParams(properties);
+        sqlParameters.dealOutParam(sqlResult);
+        assertNotNull(sqlParameters.getVarPool().get(0));
 
         // MapReduceParameters
         MapReduceParameters mapreduceParameters = new MapReduceParameters();

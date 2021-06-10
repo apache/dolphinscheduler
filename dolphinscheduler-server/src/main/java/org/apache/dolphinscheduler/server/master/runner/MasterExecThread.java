@@ -521,10 +521,16 @@ public class MasterExecThread implements Runnable {
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
-        Map<String,Property> allProperty = new HashMap<>();
-        Map<String,TaskInstance> allTaskInstance = new HashMap<>();
+
         //get pre task ,get all the task varPool to this task
         Set<String> preTask =  dag.getPreviousNodes(taskInstance.getName());
+        getPreVarPool(taskInstance, preTask);
+        return taskInstance;
+    }
+
+    private void getPreVarPool(TaskInstance taskInstance,  Set<String> preTask) {
+        Map<String,Property> allProperty = new HashMap<>();
+        Map<String,TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
             for (String preTaskName : preTask) {
                 TaskInstance preTaskInstance = completeTaskList.get(preTaskName);
@@ -567,7 +573,6 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
         }
-        return taskInstance;
     }
 
     private void submitPostNode(String parentNodeName) {
