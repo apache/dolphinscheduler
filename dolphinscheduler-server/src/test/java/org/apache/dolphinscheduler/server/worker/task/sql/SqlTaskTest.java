@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
@@ -156,7 +158,12 @@ public class SqlTaskTest {
 
     @Test
     public void shouldntThrowNullPointerException_When_SqlParamsMapIsNull_printReplacedSql() {
-        sqlTask.printReplacedSql("", "", "", null);
+        try {
+            sqlTask.printReplacedSql("", "", "", null);
+            assertTrue(true);
+        } catch (NullPointerException err) {
+            fail();
+        }
     }
 
     @Test
@@ -170,6 +177,6 @@ public class SqlTaskTest {
 
         sqlTask.setSqlParamsMap("notValidPropertyName", "(notValidPropertyName)", sqlParamsMap, paramsPropsMap);
 
-        assertEquals(sqlParamsMap.size(), 0);
+        assertEquals(0, sqlParamsMap.size());
     }
 }
