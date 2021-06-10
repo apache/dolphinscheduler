@@ -303,7 +303,7 @@ CREATE TABLE t_ds_process_definition (
   tenant_id int DEFAULT '-1' ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id) ,
+  PRIMARY KEY (id, code) ,
   CONSTRAINT process_definition_unique UNIQUE (name, project_code)
 ) ;
 
