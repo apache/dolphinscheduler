@@ -76,7 +76,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import Tree from './_source/tree'
   import { uuid } from '@/module/util'
   import mSpin from '@/module/components/spin/spin'
@@ -169,7 +169,7 @@
         if (id !== idsArr[0]) {
           query = { subProcessIds: ids.join(',') }
         }
-        this.$router.push({ path: `/projects/definition/tree/${id}`, query: query })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${id}`, query: query })
       },
       /**
        * Subprocess processing
@@ -185,7 +185,7 @@
         } else {
           subProcessIds.push(this.$route.params.id)
         }
-        this.$router.push({ path: `/projects/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
       },
       _onChangeSelect (o) {
         this.limit = o
@@ -201,6 +201,9 @@
       this._getViewTree()
     },
     mounted () {
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     components: { mSpin, mListConstruction, mNoData }
   }

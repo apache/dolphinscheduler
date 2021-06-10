@@ -89,12 +89,13 @@
     },
     methods: {
       ...mapActions('projects', ['deleteProjects']),
-      ...mapMutations('dag', ['setProjectName']),
+      ...mapMutations('dag', ['setProjectId', 'setProjectName']),
       _switchProjects (item) {
+        this.setProjectId(item.id)
         this.setProjectName(item.name)
-        localStore.setItem('projectName', `${item.name}`)
-        localStore.setItem('projectId', `${item.id}`)
-        this.$router.push({ path: '/projects/index' })
+        localStore.setItem('projectId', item.id)
+        localStore.setItem('projectName', item.name)
+        this.$router.push({ path: `/projects/${item.id}/index` })
       },
       /**
        * Delete Project

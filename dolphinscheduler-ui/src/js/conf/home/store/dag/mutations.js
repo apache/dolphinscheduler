@@ -18,6 +18,9 @@
 import _ from 'lodash'
 
 export default {
+  setProjectId (state, payload) {
+    state.projectId = payload
+  },
   setProjectName (state, payload) {
     state.projectName = payload
   },

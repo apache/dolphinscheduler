@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links">
+                <router-link :to="{ path: `/projects/${projectId}/definition/list/${scope.row.id}` }" tag="a" class="links">
                   <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
@@ -153,7 +153,7 @@
   import mStart from './start'
   import mTiming from './timing'
   import mRelatedItems from './relatedItems'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
   import mVersions from './versions'
 
@@ -203,7 +203,7 @@
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
-        this.$router.push({ path: `/projects/definition/tree/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${item.id}` })
       },
       /**
        * Start
@@ -243,7 +243,7 @@
        * Timing manage
        */
       _timingManage (item) {
-        this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/timing/${item.id}` })
       },
       /**
        * delete
@@ -268,7 +268,7 @@
        * edit
        */
       _edit (item) {
-        this.$router.push({ path: `/projects/definition/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/${item.id}` })
       },
       /**
        * Offline
@@ -343,7 +343,7 @@
           processDefinitionId: processDefinitionId
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
-          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+          this.$router.push({ path: `/projects/${this.projectId}/definition/list/${processDefinitionId}` })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -518,6 +518,9 @@
     created () {
     },
     mounted () {
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     components: { mVersions, mStart, mTiming, mRelatedItems }
   }
