@@ -299,6 +299,7 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code()
            AND COLUMN_NAME ='code')
    THEN
          ALTER TABLE t_ds_process_definition ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
+         ALTER TABLE t_ds_process_definition DROP PRIMARY KEY, ADD PRIMARY KEY (`id`,`code`);
        END IF;
  END;
 
@@ -318,7 +319,9 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_project_code()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='project_code')
    THEN
-         ALTER TABLE t_ds_process_definition ADD `project_code` bigint(20) NOT NULL COMMENT 'project code';
+        ALTER TABLE t_ds_process_definition ADD `project_code` bigint(20) NOT NULL COMMENT 'project code';
+        ALTER TABLE t_ds_process_definition DROP INDEX `process_definition_unique`, ADD UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE;
+        ALTER TABLE t_ds_process_definition DROP `project_id`, DROP `process_definition_json`, DROP `receivers`, DROP `receivers_cc`, DROP `modify_by`, DROP `resource_ids`;
        END IF;
  END;
 
