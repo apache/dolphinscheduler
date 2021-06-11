@@ -44,4 +44,12 @@ public interface ProcessTaskRelationLogMapper extends BaseMapper<ProcessTaskRela
                                                          @Param("processVersion") int processVersion,
                                                          @Param("taskCode") long taskCode,
                                                          @Param("taskVersion") long taskVersion);
+
+    /**
+     * batch insert process task relation
+     *
+     * @param taskRelationList taskRelationList
+     * @return int
+     */
+    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
 }
