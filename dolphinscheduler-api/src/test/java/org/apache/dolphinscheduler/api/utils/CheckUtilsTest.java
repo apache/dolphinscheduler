@@ -106,7 +106,6 @@ public class CheckUtilsTest {
         assertTrue(CheckUtils.checkPhone("17362537263"));
     }
 
-
     @Test
     public void testCheckTaskNodeParameters() {
         TaskNode taskNode = new TaskNode();
@@ -133,7 +132,6 @@ public class CheckUtilsTest {
         taskNode.setParams(JSONUtils.toJsonString(subProcessParameters));
         taskNode.setType(TaskType.SUB_PROCESS.getDesc());
         assertTrue(CheckUtils.checkTaskNodeParameters(taskNode));
-
 
         // ShellParameters
         ShellParameters shellParameters = new ShellParameters();
