@@ -89,10 +89,10 @@
   </div>
 </template>
 <script>
+  import { mapActions, mapState } from 'vuex'
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
-  import { mapActions } from 'vuex'
 
   export default {
     name: 'list',
@@ -144,7 +144,7 @@
         this.$emit('on-update')
       },
       _go (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
+        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.processInstanceId}` })
       }
     },
     watch: {
@@ -159,6 +159,9 @@
     },
     mounted () {
       this.list = this.taskInstanceList
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     components: { mLog }
   }
