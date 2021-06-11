@@ -17,8 +17,16 @@
 
 package org.apache.dolphinscheduler.common.task;
 
+import static org.junit.Assert.assertNotNull;
+
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.enums.Direct;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,6 +46,14 @@ public class SqlParametersTest {
 
     @Test
     public void testSqlParameters() {
+        List<Property> properties = new ArrayList<>();
+        Property property = new Property();
+        property.setProp("test1");
+        property.setDirect(Direct.OUT);
+        property.setType(DataType.VARCHAR);
+        property.setValue("test1");
+        properties.add(property);
+
         SqlParameters sqlParameters = new SqlParameters();
         Assert.assertTrue(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
 
@@ -63,6 +79,18 @@ public class SqlParametersTest {
         Assert.assertEquals(title, sqlParameters.getTitle());
         Assert.assertEquals(groupId, sqlParameters.getGroupId());
 
-        Assert.assertTrue(sqlParameters.checkParameters());
+        String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
+        String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
+        sqlParameters.setLocalParams(properties);
+        sqlParameters.varPool = new ArrayList<>();
+        sqlParameters.dealOutParam(sqlResult1);
+        assertNotNull(sqlParameters.getVarPool().get(0));
+
+        property.setType(DataType.LIST);
+        properties.clear();
+        properties.add(property);
+        sqlParameters.setLocalParams(properties);
+        sqlParameters.dealOutParam(sqlResult);
+        assertNotNull(sqlParameters.getVarPool().get(0));
     }
 }
