@@ -251,7 +251,6 @@ public class MasterExecThreadTest {
             masterExecThread.getPreVarPool(taskInstance,preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {
-            e.printStackTrace();
             Assert.fail();
         }
     }

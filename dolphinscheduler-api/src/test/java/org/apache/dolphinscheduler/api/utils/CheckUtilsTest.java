@@ -112,39 +112,6 @@ public class CheckUtilsTest {
         assertTrue(CheckUtils.checkPhone("17362537263"));
     }
 
-    @Test
-    public void testDealOutParam() {
-        List<Property> properties = new ArrayList<>();
-        Property property = new Property();
-        property.setProp("test1");
-        property.setDirect(Direct.OUT);
-        property.setType(DataType.VARCHAR);
-        property.setValue("test1");
-        properties.add(property);
-
-        ShellParameters shellParameters = new ShellParameters();
-        String resultShell = "key1=value1$VarPoolkey2=value2";
-        shellParameters.varPool = new ArrayList<>();
-        shellParameters.setLocalParams(properties);
-        shellParameters.dealOutParam(resultShell);
-        assertNotNull(shellParameters.getVarPool().get(0));
-
-        String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
-        SqlParameters sqlParameters = new SqlParameters();
-        String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
-        sqlParameters.setLocalParams(properties);
-        sqlParameters.varPool = new ArrayList<>();
-        sqlParameters.dealOutParam(sqlResult1);
-        assertNotNull(sqlParameters.getVarPool().get(0));
-
-        property.setType(DataType.LIST);
-        properties.clear();
-        properties.add(property);
-        sqlParameters.setLocalParams(properties);
-        sqlParameters.dealOutParam(sqlResult);
-        assertNotNull(sqlParameters.getVarPool().get(0));
-
-    }
 
     @Test
     public void testCheckTaskNodeParameters() {

@@ -1011,6 +1011,7 @@
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/task/PythonCommandExecutorTest.java</include>
+                        <include>**/server/worker/task/TaskParamsTest.java</include>
                         <include>**/server/worker/task/ShellTaskReturnTest.java</include>
                         <include>**/server/worker/task/sql/SqlTaskTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
