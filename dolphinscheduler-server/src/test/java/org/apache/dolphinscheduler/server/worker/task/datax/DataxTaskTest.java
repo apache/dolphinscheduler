@@ -456,6 +456,22 @@ public class DataxTaskTest {
     }
 
     @Test
+    public void testGetPythonCommand()   {
+        String pythonCommand = dataxTask.getPythonCommand();
+        Assert.assertEquals("python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("");
+        Assert.assertEquals("python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/usr/bin/python");
+        Assert.assertEquals("/usr/bin/python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/usr/local/bin/python2");
+        Assert.assertEquals("/usr/local/bin/python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/opt/python/bin/python3.8");
+        Assert.assertEquals("/opt/python/bin/python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/opt/soft/python");
+        Assert.assertEquals("/opt/soft/python/bin/python2.7", pythonCommand);
+    }
+
+    @Test
     public void testLoadJvmEnv()   {
         DataxTask dataxTask = new DataxTask(null,null);
         DataxParameters dataxParameters = new DataxParameters();

@@ -141,7 +141,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         if (PYTHON_PATH_PATTERN.matcher(pythonHome).find()) {
             return pythonHome;
         }
-        return pythonHome + "/bin/python";
+        return Paths.get(pythonHome, "/bin/python").toString();
     }
 
     /**
