@@ -221,6 +221,21 @@ public class JSONUtils {
     }
 
     /**
+     * from the key-value generated json  to get the str value no matter the real type of value
+     * @param json the json str
+     * @param nodeName key
+     * @return the str value of key
+     */
+    public static String getNodeString(String json, String nodeName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
+        } catch (JsonProcessingException e) {
+            return "";
+        }
+    }
+    
+    /**
      * json to map
      *
      * @param json json
