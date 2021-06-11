@@ -233,8 +233,8 @@ public class MasterExecThreadTest {
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test2\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             taskInstance2.setEndTime(new Date());
 
-            completeTaskList.put("test1",taskInstance1);
-            completeTaskList.put("test2",taskInstance2);
+            completeTaskList.put("test1", taskInstance1);
+            completeTaskList.put("test2", taskInstance2);
 
             Class<MasterExecThread> masterExecThreadClass = MasterExecThread.class;
 
@@ -242,13 +242,13 @@ public class MasterExecThreadTest {
             field.setAccessible(true);
             field.set(masterExecThread, completeTaskList);
 
-            masterExecThread.getPreVarPool(taskInstance,preTaskName);
+            masterExecThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
-            completeTaskList.put("test2",taskInstance2);
+            completeTaskList.put("test2", taskInstance2);
             field.setAccessible(true);
             field.set(masterExecThread, completeTaskList);
-            masterExecThread.getPreVarPool(taskInstance,preTaskName);
+            masterExecThread.getPreVarPool(taskInstance, preTaskName);
             Assert.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {
             Assert.fail();
