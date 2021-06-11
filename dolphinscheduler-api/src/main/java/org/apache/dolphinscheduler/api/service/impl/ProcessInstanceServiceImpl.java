@@ -674,6 +674,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 }
             }
         }
+        return localUserDefParams;
     }
 
     /**
