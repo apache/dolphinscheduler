@@ -281,26 +281,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * query tenant list
      *
-     * @param tenantCode tenant code
-     * @return tenant list
-     */
-    public Map<String, Object> queryTenantList(String tenantCode) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
-        if (CollectionUtils.isNotEmpty(resourceList)) {
-            result.put(Constants.DATA_LIST, resourceList);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-        }
-        return result;
-    }
-
-    /**
-     * query tenant list
-     *
      * @param loginUser login user
      * @return tenant list
      */

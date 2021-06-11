@@ -597,7 +597,7 @@ public class ProcessDefinitionServiceTest {
 
         // project check auth success, processs definition online
         putMsg(result, Status.SUCCESS, projectName);
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
         Map<String, Object> onlineRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, "project_test1", 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
@@ -1035,10 +1035,10 @@ public class ProcessDefinitionServiceTest {
                 + "    \"tenantId\": 1,\n"
                 + "    \"timeout\": 0\n"
                 + "}";
-        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
-                sqlDependentJson, "", "", "");
+        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, "test", 1,
+                "", "", "", "", 0, "root", sqlDependentJson);
 
-        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
+        Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
     }
 
     @Test
@@ -1112,7 +1112,7 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setProjectId(2);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
-        processDefinition.setCode(9999L);
+        processDefinition.setCode(46L);
 
         return processDefinition;
     }

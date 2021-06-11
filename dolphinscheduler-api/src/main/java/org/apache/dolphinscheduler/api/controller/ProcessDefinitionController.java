@@ -95,16 +95,18 @@ public class ProcessDefinitionController extends BaseController {
      * @param loginUser login user
      * @param projectName project name
      * @param name process definition name
-     * @param json process definition json
      * @param description description
-     * @param locations locations for nodes
+     * @param globalParams globalParams
      * @param connects connects for nodes
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param taskRelationJson relation json for nodes
      * @return create result code
      */
     @ApiOperation(value = "save", notes = "CREATE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type = "String"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type = "String"),
             @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
@@ -116,13 +118,16 @@ public class ProcessDefinitionController extends BaseController {
     public Result createProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam(value = "name", required = true) String name,
-                                          @RequestParam(value = "processDefinitionJson", required = true) String json,
-                                          @RequestParam(value = "locations", required = true) String locations,
-                                          @RequestParam(value = "connects", required = true) String connects,
-                                          @RequestParam(value = "description", required = false) String description) throws JsonProcessingException {
+                                          @RequestParam(value = "description", required = false) String description,
+                                          @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                          @RequestParam(value = "connects", required = false) String connects,
+                                          @RequestParam(value = "locations", required = false) String locations,
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                          @RequestParam(value = "tenantCode", required = true) String tenantCode,
+                                          @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson) throws JsonProcessingException {
 
-        Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
-                description, locations, connects);
+        Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, description, globalParams,
+                connects, locations, timeout, tenantCode, taskRelationJson);
         return returnDataList(result);
     }
 
@@ -207,19 +212,21 @@ public class ProcessDefinitionController extends BaseController {
      * @param loginUser login user
      * @param projectName project name
      * @param name process definition name
-     * @param id process definition id
-     * @param processDefinitionJson process definition json
+     * @param code process definition code
      * @param description description
-     * @param locations locations for nodes
+     * @param globalParams globalParams
      * @param connects connects for nodes
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param taskRelationJson relation json for nodes
      * @return update result code
      */
 
-    @ApiOperation(value = "updateProcessDefinition", notes = "UPDATE_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "update", notes = "UPDATE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "id", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type = "String"),
+            @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type = "String"),
             @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
@@ -232,15 +239,18 @@ public class ProcessDefinitionController extends BaseController {
     public Result updateProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam(value = "name", required = true) String name,
-                                          @RequestParam(value = "id", required = true) int id,
-                                          @RequestParam(value = "processDefinitionJson", required = true) String processDefinitionJson,
-                                          @RequestParam(value = "locations", required = false) String locations,
-                                          @RequestParam(value = "connects", required = false) String connects,
+                                          @RequestParam(value = "code", required = true) long code,
                                           @RequestParam(value = "description", required = false) String description,
+                                          @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                          @RequestParam(value = "connects", required = false) String connects,
+                                          @RequestParam(value = "locations", required = false) String locations,
+                                          @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                          @RequestParam(value = "tenantCode", required = true) String tenantCode,
+                                          @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
-        Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
-                processDefinitionJson, description, locations, connects);
+        Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, name, code, description, globalParams,
+                connects, locations, timeout, tenantCode, taskRelationJson);
         //  If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -248,7 +258,7 @@ public class ProcessDefinitionController extends BaseController {
 
         //  Judge whether to go online after editing,0 means offline, 1 means online
         if (releaseState == ReleaseState.ONLINE) {
-            result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, id, releaseState);
+            result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, code, releaseState);
         }
         return returnDataList(result);
     }
@@ -342,14 +352,14 @@ public class ProcessDefinitionController extends BaseController {
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param processId process definition id
+     * @param code process definition code
      * @param releaseState release state
      * @return release result code
      */
     @ApiOperation(value = "releaseProcessDefinition", notes = "RELEASE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
             @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, dataType = "ReleaseState"),
     })
     @PostMapping(value = "/release")
@@ -358,10 +368,10 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result releaseProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                           @RequestParam(value = "processId", required = true) int processId,
+                                           @RequestParam(value = "code", required = true) long code,
                                            @RequestParam(value = "releaseState", required = true) ReleaseState releaseState) {
 
-        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, processId, releaseState);
+        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, code, releaseState);
         return returnDataList(result);
     }
 
@@ -390,7 +400,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by name
+     * query detail of process definition by name
      *
      * @param loginUser login user
      * @param projectName project name

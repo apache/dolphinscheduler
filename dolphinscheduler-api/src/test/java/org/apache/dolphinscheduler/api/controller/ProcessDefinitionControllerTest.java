@@ -73,26 +73,27 @@ public class ProcessDefinitionControllerTest {
 
     @Test
     public void testCreateProcessDefinition() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\""
-                + ":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\"
-                + "necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\""
-                + ",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
-                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
-        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
+        String json = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
+                + "\"condition_type\":0,\"condition_params\":{}},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+                + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":{}}]";
 
         String projectName = "test";
         String name = "dag_test";
         String description = "desc test";
+        String globalParams = "[]";
         String connects = "[]";
+        String locations = "[]";
+        int timeout = 0;
+        String tenantCode = "root";
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, 1);
 
-        Mockito.when(processDefinitionService.createProcessDefinition(user, projectName, name, json,
-                description, locations, connects)).thenReturn(result);
+        Mockito.when(processDefinitionService.createProcessDefinition(user, projectName, name, description, globalParams,
+                connects, locations, timeout, tenantCode, json)).thenReturn(result);
 
-        Result response = processDefinitionController.createProcessDefinition(user, projectName, name, json,
-                locations, connects, description);
+        Result response = processDefinitionController.createProcessDefinition(user, projectName, name, description, globalParams,
+                connects, locations, timeout, tenantCode, json);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
@@ -121,28 +122,28 @@ public class ProcessDefinitionControllerTest {
     }
 
     @Test
-    public void updateProcessDefinition() throws Exception {
-
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\""
-                + ",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"}"
-                + ",\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\""
-                + ":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\""
-                + ":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+    public void updateProcessDefinition() {
+        String json = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
+                + "\"condition_type\":0,\"condition_params\":{}},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+                + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":{}}]";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
         String projectName = "test";
         String name = "dag_test";
         String description = "desc test";
         String connects = "[]";
-        int id = 1;
+        String globalParams = "[]";
+        int timeout = 0;
+        String tenantCode = "root";
+        long code = 123L;
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId", 1);
 
-        Mockito.when(processDefinitionService.updateProcessDefinition(user, projectName, id, name, json,
-                description, locations, connects)).thenReturn(result);
+        Mockito.when(processDefinitionService.updateProcessDefinition(user, projectName, name, code, description, globalParams,
+                connects, locations, timeout, tenantCode, json)).thenReturn(result);
 
-        Result response = processDefinitionController.updateProcessDefinition(user, projectName, name, id, json,
-                locations, connects, description,ReleaseState.OFFLINE);
+        Result response = processDefinitionController.updateProcessDefinition(user, projectName, name, code, description, globalParams,
+                connects, locations, timeout, tenantCode, json, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 

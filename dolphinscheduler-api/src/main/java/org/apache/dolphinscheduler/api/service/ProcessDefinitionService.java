@@ -40,20 +40,26 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectName project name
      * @param name process definition name
-     * @param processDefinitionJson process definition json
-     * @param desc description
-     * @param locations locations for nodes
+     * @param description description
+     * @param globalParams global params
      * @param connects connects for nodes
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param taskRelationJson relation json for nodes
      * @return create result code
      * @throws JsonProcessingException JsonProcessingException
      */
     Map<String, Object> createProcessDefinition(User loginUser,
                                                 String projectName,
                                                 String name,
-                                                String processDefinitionJson,
-                                                String desc,
+                                                String description,
+                                                String globalParams,
+                                                String connects,
                                                 String locations,
-                                                String connects) throws JsonProcessingException;
+                                                int timeout,
+                                                String tenantCode,
+                                                String taskRelationJson) throws JsonProcessingException;
 
     /**
      * query process definition list
@@ -141,19 +147,27 @@ public interface ProcessDefinitionService {
      * @param loginUser login user
      * @param projectName project name
      * @param name process definition name
-     * @param id process definition id
-     * @param processDefinitionJson process definition json
-     * @param desc description
-     * @param locations locations for nodes
+     * @param code process definition code
+     * @param description description
+     * @param globalParams global params
      * @param connects connects for nodes
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param tenantCode tenantCode
+     * @param taskRelationJson relation json for nodes
      * @return update result code
      */
     Map<String, Object> updateProcessDefinition(User loginUser,
                                                 String projectName,
-                                                int id,
                                                 String name,
-                                                String processDefinitionJson, String desc,
-                                                String locations, String connects);
+                                                long code,
+                                                String description,
+                                                String globalParams,
+                                                String connects,
+                                                String locations,
+                                                int timeout,
+                                                String tenantCode,
+                                                String taskRelationJson);
 
     /**
      * verify process definition name unique
@@ -184,13 +198,13 @@ public interface ProcessDefinitionService {
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param id process definition id
+     * @param code process definition code
      * @param releaseState release state
      * @return release result code
      */
     Map<String, Object> releaseProcessDefinition(User loginUser,
                                                  String projectName,
-                                                 int id,
+                                                 long code,
                                                  ReleaseState releaseState);
 
     /**
@@ -299,6 +313,7 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName,
                                                               int processDefinitionId, long version);
+
     /**
      * check has associated process definition
      *

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -65,4 +66,12 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     int deleteByCode(@Param("projectCode") Long projectCode,
                      @Param("processCode") Long processCode);
+
+    /**
+     * batch insert process task relation
+     *
+     * @param taskRelationList taskRelationList
+     * @return int
+     */
+    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
 }
