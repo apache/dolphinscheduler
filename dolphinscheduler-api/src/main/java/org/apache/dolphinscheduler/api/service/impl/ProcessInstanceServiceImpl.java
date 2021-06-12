@@ -662,7 +662,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
 
             String localParams = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), LOCAL_PARAMS);
-            if(StringUtils.isNotEmpty(localParams)) {
+            if (StringUtils.isNotEmpty(localParams)) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
