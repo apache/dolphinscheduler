@@ -315,9 +315,9 @@ public class SqlTask extends AbstractTask {
                 rowCount++;
             }
 
-            int displayRows = Math.min(resultJSONArray.size(),
-                    sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS);
-            logger.info("display sql result {} rows as follows:", 7);
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : Constants.DEFAULT_DISPLAY_ROWS;
+            displayRows = Math.min(displayRows, resultJSONArray.size());
+            logger.info("display sql result {} rows as follows:", displayRows);
             for (int i = 0; i < displayRows; i++) {
                 String row = JSONUtils.toJsonString(resultJSONArray.get(i));
                 logger.info("row {} : {}", i + 1, row);
