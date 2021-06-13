@@ -207,6 +207,9 @@
     },
     methods: {
       isLimitInvalid() {
+	    // 1. limit should't be empty; 
+		// 2.limit should be a non-negative number str; 
+		// 3.limit shoule be a number smaller or equal than Integer.MAX_VALUE in java.
         return !this.limit || !/^(0|[1-9]\d*)$/.test(this.limit) ||
                 parseInt(this.limit, 10) > 2147483647
       },
