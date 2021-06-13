@@ -36,28 +36,20 @@
           <span class="text-b">{{$t('Send Email')}}</span>
           <el-switch size="small" v-model="sendEmail"></el-switch>
         </div>
-                <div style="display: inline-block;" v-if="sqlType === '0'">
-                  <span class="text-b">{{$t('Log display')}}</span>
-                  <m-select-input v-model="displayRows" :list="[1,10,25,50,100]" style="width: 70px;"></m-select-input>
-                  <span>{{$t('rows of result')}}</span>
-                </div>
-
+        <div style="display: inline-block;" v-if="sqlType === '0'">
+          <span class="text-b">{{$t('Log display')}}</span>
+          <m-select-input v-model="displayRows" :list="[1,10,25,50,100]" style="width: 70px;"></m-select-input>
+          <span>{{$t('rows of result')}}</span>
+        </div>
       </div>
     </m-list-box>
-        <m-list-box>
-          <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Max Numbers Return')}}</div>
-          <div slot="content">
-            <el-input
-                                  type="input"
-                                  :disabled="isDetails"
-                                  size="medium"
-                                  v-model="limit"
-                                  :placeholder="$t('Max Numbers Return placeholder')">
-                                </el-input>
-
-          </div>
-        </m-list-box>
-
+    <m-list-box>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Max Numbers Return')}}</div>
+        <div slot="content">
+          <el-input type="input" :disabled="isDetails" size="medium" v-model="limit" :placeholder="$t('Max Numbers Return placeholder')">
+          </el-input>
+        </div>
+    </m-list-box>
     <template v-if="sqlType === '0' && sendEmail">
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
