@@ -111,8 +111,8 @@ public class SqlTask extends AbstractTask {
         Thread.currentThread().setName(threadLoggerInfoName);
 
         logger.info("Full sql parameters: {}", sqlParameters);
-        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {}, udfs : {},showType : {}, " +
-                        "connParams : {}, query max result limit : {}",
+        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {}, udfs : {},showType : {}, "
+                        + "connParams : {}, query max result limit : {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
@@ -322,12 +322,11 @@ public class SqlTask extends AbstractTask {
                 logger.info("row {} : {}", i + 1, row);
             }
         }
-
         String result = JSONUtils.toJsonString(resultJSONArray);
         if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                            ? sqlParameters.getTitle()
-                            : taskExecutionContext.getTaskName() + " query result sets", result);
+                    ? sqlParameters.getTitle()
+                    : taskExecutionContext.getTaskName() + " query result sets", result);
         }
         logger.debug("execute sql result : {}", result);
         return result;

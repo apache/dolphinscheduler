@@ -206,10 +206,12 @@
       createNodeId: Number
     },
     methods: {
-      isLimitInvalid() {
-	    // limit should't be empty;limit should be a non-negative number str; limit shoule be a number smaller or equal than Integer.MAX_VALUE in java.
-        return !this.limit || !/^(0|[1-9]\d*)$/.test(this.limit) ||
-                parseInt(this.limit, 10) > 2147483647
+      /**
+       * limit should't be empty;limit should be a non-negative number str;
+       * limit should be a number smaller or equal than Integer.MAX_VALUE in java.
+       */
+      isLimitInvalid () {
+        return !this.limit || !/^(0|[1-9]\d*)$/.test(this.limit) || parseInt(this.limit, 10) > 2147483647
       },
       setEditorVal () {
         this.item = editor.getValue()
