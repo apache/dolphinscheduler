@@ -96,7 +96,6 @@ public class SqlTask extends AbstractTask {
         logger.info("sql task params {}", taskExecutionContext.getTaskParams());
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
-
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
