@@ -201,7 +201,7 @@ public class SqlTaskTest {
         String result = Whitebox.invokeMethod(localSqlTask, "resultProcess", resultSet);
         Assert.assertEquals(1, ((SqlParameters) localSqlTask.getParameters()).getLimit());
 
-        // In fact, the virtual table has 2 rows, as we set the limit to 1, if the limit works, the `resultProcess` method
+        // In fact, the target table has 2 rows, as we set the limit to 1, if the limit works, the `resultProcess` method
         // should return [{"a":1}] rather then [{"a":1},{"a":1}]
         Assert.assertEquals("[{\"a\":1}]", result);
     }
