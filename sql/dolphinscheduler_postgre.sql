@@ -305,7 +305,7 @@ CREATE TABLE t_ds_process_definition (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id) ,
   CONSTRAINT process_definition_unique UNIQUE (name, project_code) ,
-  CONSTRAINT code_unique UNIQUE (code) ,
+  CONSTRAINT code_unique UNIQUE (code)
 ) ;
 
 create index process_definition_index on t_ds_process_definition (code,id);
