@@ -90,7 +90,7 @@ public class ProcessDefinitionMapperTest {
     private ProcessDefinition insertTwo() {
         //insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
+        processDefinition.setCode(2L);
         processDefinition.setName("def 2");
         processDefinition.setProjectCode(1010L);
         processDefinition.setUserId(101);
