@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -31,6 +32,7 @@ import java.util.Map;
 /**
  * process instance service
  */
+
 public interface ProcessInstanceService {
 
     /**
@@ -148,19 +150,21 @@ public interface ProcessInstanceService {
     Map<String, Object> viewGantt(Integer processInstanceId) throws Exception;
 
     /**
-     * query process instance by processDefinitionId and stateArray
-     * @param processDefinitionId processDefinitionId
+     * query process instance by processDefinitionCode and stateArray
+     *
+     * @param processDefinitionCode processDefinitionCode
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states);
+    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states);
 
     /**
-     * query process instance by processDefinitionId
-     * @param processDefinitionId processDefinitionId
+     * query process instance by processDefinitionCode
+     *
+     * @param processDefinitionCode processDefinitionCode
      * @param size size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size);
+    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,int size);
 
 }

@@ -428,7 +428,7 @@ public class UsersController extends BaseController {
     }
 
     /**
-     * user register
+     * user registry
      *
      * @param userName       user name
      * @param userPassword   user password

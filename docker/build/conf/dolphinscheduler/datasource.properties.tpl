@@ -15,23 +15,17 @@
 # limitations under the License.
 #
 
-# db
+# datasource configuration
 spring.datasource.driver-class-name=${DATABASE_DRIVER}
 spring.datasource.url=jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}${DATABASE_PARAMS:+?${DATABASE_PARAMS}}
 spring.datasource.username=${DATABASE_USERNAME}
 spring.datasource.password=${DATABASE_PASSWORD}
 
-# postgresql
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
-#spring.datasource.username=test
-#spring.datasource.password=test
-
-# mysql
+# mysql example
 #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 #spring.datasource.url=jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
-#spring.datasource.username=xxxx
-#spring.datasource.password=xxxx
+#spring.datasource.username=ds_user
+#spring.datasource.password=dolphinscheduler
 
 # connection configuration
 #spring.datasource.initialSize=5

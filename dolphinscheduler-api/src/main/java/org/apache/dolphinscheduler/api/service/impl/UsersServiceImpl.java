@@ -545,10 +545,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-        //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteProjectRelation(0, userId);
 
+        //if the selected projectIds are empty, delete all items associated with the user
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 
@@ -618,7 +618,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             // get all resource id of process definitions those is released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);
@@ -988,13 +988,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /**
-     * register user, default state is 0, default tenant_id is 1, no phone, no queue
+     * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
      * @param userName user name
      * @param userPassword user password
      * @param repeatPassword repeat password
      * @param email email
-     * @return register result code
+     * @return registry result code
      * @throws Exception exception
      */
     @Override

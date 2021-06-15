@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler-alert-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>${revision}</version>
+        <version>1.3.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -29,12 +29,6 @@
     <artifactId>dolphinscheduler-alert-wechat</artifactId>
     <packaging>dolphinscheduler-plugin</packaging>
      <dependencies>
-
-         <dependency>
-             <groupId>org.apache.dolphinscheduler</groupId>
-             <artifactId>dolphinscheduler-spi</artifactId>
-             <scope>provided</scope>
-         </dependency>
 
          <dependency>
              <groupId>com.google.guava</groupId>

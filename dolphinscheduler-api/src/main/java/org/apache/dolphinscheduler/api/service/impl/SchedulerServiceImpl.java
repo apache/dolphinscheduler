@@ -157,6 +157,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
+        scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
         scheduleObj.setFailureStrategy(failureStrategy);
@@ -258,6 +259,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return result;
             }
             schedule.setCrontab(scheduleParam.getCrontab());
+            schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
         if (warningType != null) {
@@ -366,7 +368,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromZK(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
@@ -471,20 +473,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     public void setSchedule(int projectId, Schedule schedule) {
-        int scheduleId = schedule.getId();
-        logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
+        logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
 
-        Date startDate = schedule.getStartTime();
-        Date endDate = schedule.getEndTime();
-
-        String jobName = QuartzExecutors.buildJobName(scheduleId);
-        String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
-
-        Map<String, Object> dataMap = QuartzExecutors.buildDataMap(projectId, scheduleId, schedule);
-
-        QuartzExecutors.getInstance().addJob(ProcessScheduleJob.class, jobName, jobGroupName, startDate, endDate,
-                schedule.getCrontab(), dataMap);
-
+        QuartzExecutors.getInstance().addJob(ProcessScheduleJob.class, projectId, schedule);
     }
 
     /**
