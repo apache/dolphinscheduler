@@ -247,7 +247,7 @@ BEGIN
                             AND COLUMN_NAME ='code')
       THEN
          ALTER TABLE t_ds_process_definition ADD COLUMN code bigint NOT NULL;
-         ALTER TABLE t_ds_process_definition DROP CONSTRAINT t_ds_process_definition_pkey, ADD PRIMARY KEY (id, code);
+         ALTER TABLE t_ds_process_definition ADD CONSTRAINT code_unique UNIQUE (code);
        END IF;
 END;
 $$ LANGUAGE plpgsql;
