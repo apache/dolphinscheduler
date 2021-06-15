@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class SensitiveDataConverterTest {
+    // Use the Function interface to make it easier to create ILoggingEvent instance.
     private static final Function<String, ILoggingEvent> LOGGING_EVENT_CREATOR = (logDetail) -> (new ILoggingEvent() {
         @Override
         public String getThreadName() {
