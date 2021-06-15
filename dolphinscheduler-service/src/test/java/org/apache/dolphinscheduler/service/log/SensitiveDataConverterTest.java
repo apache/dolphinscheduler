@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.log;
 
 
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class SensitiveDataConverterTest {
+
     // Use the Function interface to make it easier to create ILoggingEvent instance.
     private static final Function<String, ILoggingEvent> LOGGING_EVENT_CREATOR = (logDetail) -> (new ILoggingEvent() {
         @Override
@@ -110,13 +112,22 @@ public class SensitiveDataConverterTest {
     @Test
     public void convert() {
         String[] initialLogs = new String[]{
-                "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"123456\\\",\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\",\\\"database\\\":\\\"dolphinscheduler\\\",\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
-                "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.UsersController.verifyUserName, ARGS:[User{id=1, userName='admin', userPassword='Qazwsx.741', email='xxx1a@qq.com', phone='', userType=ADMIN_USER, tenantId=6, state=1, tenantCode='null', queueName='null', alertGroup='null', queue='', createTime=Tue Mar 27 15:48:50 CST 2018, updateTime=Sun Jun 13 01:00:37 CST 2021}, admin4]}"
+                "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"123456\\\"," +
+                        "\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\"," +
+                        "\\\"database\\\":\\\"dolphinscheduler\\\"," +
+                        "\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
+                "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, " +
+                        "ARGS:[User{id=1, userName='admin', userPassword='Qazwsx.741', euserType=ADMIN_USER]}"
         };
         String[] encryptedLogs = new String[]{
-                "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"******\\\",\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\",\\\"database\\\":\\\"dolphinscheduler\\\",\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
-                "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, HANDLER:org.apache.dolphinscheduler.api.controller.UsersController.verifyUserName, ARGS:[User{id=1, userName='admin', userPassword='******', email='xxx1a@qq.com', phone='', userType=ADMIN_USER, tenantId=6, state=1, tenantCode='null', queueName='null', alertGroup='null', queue='', createTime=Tue Mar 27 15:48:50 CST 2018, updateTime=Sun Jun 13 01:00:37 CST 2021}, admin4]}"
+                "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"******\\\"," +
+                        "\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\"," +
+                        "\\\"database\\\":\\\"dolphinscheduler\\\"," +
+                        "\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
+                "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, " +
+                        "ARGS:[User{id=1, userName='admin', userPassword='******', euserType=ADMIN_USER]}"
         };
+
         SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
         for (int i = 0; i < initialLogs.length; i++) {
             Assert.assertEquals(encryptedLogs[i], sensitiveDataConverter.convert(LOGGING_EVENT_CREATOR.apply(initialLogs[i])));
