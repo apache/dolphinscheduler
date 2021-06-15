@@ -185,38 +185,43 @@ public final class Constants {
     /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
+    public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
+    public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
 
     /**
      * all servers directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
+    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
+
+    /**
+     * registry node prefix
+     */
+    public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
 
     /**
      * MasterServer lock directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
 
 
     /**
      * MasterServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
     /**
      * WorkerServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
 
     /**
      * MasterServer startup  failover runing and fault tolerance process
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
 
     /**
@@ -526,6 +531,11 @@ public final class Constants {
     public static final int SLEEP_TIME_MILLIS = 1000;
 
     /**
+     * master task instance cache-database refresh interval
+     */
+    public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
+
+    /**
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
@@ -770,8 +780,8 @@ public final class Constants {
      */
     public static final String MASTER_TYPE = "master";
     public static final String WORKER_TYPE = "worker";
-    public static final String DELETE_ZK_OP = "delete";
-    public static final String ADD_ZK_OP = "add";
+    public static final String DELETE_OP = "delete";
+    public static final String ADD_OP = "add";
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
@@ -1029,11 +1039,6 @@ public final class Constants {
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
-    /**
-     * net system properties
-     */
-    public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
-
 
     public static final String EXCEL_SUFFIX_XLS = ".xls";
 
@@ -1045,9 +1050,14 @@ public final class Constants {
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
     /**
-     * Network IP gets priority, default inner outer
+     * network interface preferred
      */
-    public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED = "dolphin.scheduler.network.interface.preferred";
+
+    /**
+     * network IP gets priority, default inner outer
+     */
+    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts

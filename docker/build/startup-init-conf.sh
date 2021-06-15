@@ -35,10 +35,11 @@ export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
 export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 
 #============================================================================
-# ZooKeeper
+# Registry
 #============================================================================
-export ZOOKEEPER_QUORUM=${ZOOKEEPER_QUORUM:-"127.0.0.1:2181"}
-export ZOOKEEPER_ROOT=${ZOOKEEPER_ROOT:-"/dolphinscheduler"}
+export REGISTRY_PLUGIN_DIR=${REGISTRY_PLUGIN_DIR:-"lib/plugin/registry/zookeeper"}
+export REGISTRY_PLUGIN_NAME=${REGISTRY_PLUGIN_NAME:-"zookeeper"}
+export REGISTRY_SERVERS=${REGISTRY_SERVERS:-"127.0.0.1:2181"}
 
 #============================================================================
 # Common
