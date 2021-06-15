@@ -299,7 +299,7 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_add_code()
            AND COLUMN_NAME ='code')
    THEN
          ALTER TABLE t_ds_process_definition ADD `code` bigint(20) NOT NULL COMMENT 'encoding';
-         ALTER TABLE t_ds_process_definition DROP PRIMARY KEY, ADD PRIMARY KEY (`id`,`code`);
+         ALTER TABLE t_ds_process_definition ADD UNIQUE KEY `code_unique` (`code`);
        END IF;
  END;
 
