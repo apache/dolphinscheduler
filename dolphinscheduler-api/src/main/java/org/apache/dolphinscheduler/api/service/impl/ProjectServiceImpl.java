@@ -43,8 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,8 +66,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Autowired
     private UserMapper userMapper;
-
-    private Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     /**
      * create project
@@ -97,16 +93,16 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Date now = new Date();
 
         try {
-        project = Project
-                .newBuilder()
-                .name(name)
-                .code(SnowFlakeUtils.getInstance().nextId())
-                .description(desc)
-                .userId(loginUser.getId())
-                .userName(loginUser.getUserName())
-                .createTime(now)
-                .updateTime(now)
-                .build();
+            project = Project
+                    .newBuilder()
+                    .name(name)
+                    .code(SnowFlakeUtils.getInstance().nextId())
+                    .description(desc)
+                    .userId(loginUser.getId())
+                    .userName(loginUser.getUserName())
+                    .createTime(now)
+                    .updateTime(now)
+                    .build();
         } catch (SnowFlakeException e) {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
@@ -122,22 +118,22 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query project details by id
+     * query project details by code
      *
-     * @param projectId project id
+     * @param projectCode project code
      * @return project detail information
      */
     @Override
-    public Map<String, Object> queryById(Integer projectId) {
-
+    public Map<String, Object> queryByCode(User loginUser, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.selectById(projectId);
-
+        Project project = projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
         if (project != null) {
             result.put(Constants.DATA_LIST, project);
             putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectId);
         }
         return result;
     }
@@ -212,16 +208,16 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * delete project by id
+     * delete project by code
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return delete result code
      */
     @Override
-    public Map<String, Object> deleteProject(User loginUser, Integer projectId) {
+    public Map<String, Object> deleteProject(User loginUser, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.selectById(projectId);
+        Project project = projectMapper.queryByCode(projectCode);
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
@@ -238,7 +234,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
-        int delete = projectMapper.deleteById(projectId);
+        int delete = projectMapper.deleteById(project.getId());
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -268,14 +264,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * updateProcessInstance project
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param projectName project name
      * @param desc description
      * @param userName project owner
      * @return update result code
      */
     @Override
-    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc, String userName) {
+    public Map<String, Object> update(User loginUser, Long projectCode, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
 
         Map<String, Object> descCheck = checkDesc(desc);
@@ -283,13 +279,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return descCheck;
         }
 
-        Project project = projectMapper.selectById(projectId);
+        Project project = projectMapper.queryByCode(projectCode);
         boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
         if (!hasProjectAndPerm) {
             return result;
         }
         Project tempProject = projectMapper.queryByName(projectName);
-        if (tempProject != null && tempProject.getId() != projectId) {
+        if (tempProject != null) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
@@ -325,12 +321,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
-        /**
-         * query all project list except specified userId
-         */
+        // query all project list except specified userId
         List<Project> projectList = projectMapper.queryProjectExceptUserId(userId);
         List<Project> resultList = new ArrayList<>();
-        Set<Project> projectSet = null;
+        Set<Project> projectSet;
         if (projectList != null && !projectList.isEmpty()) {
             projectSet = new HashSet<>(projectList);
 
@@ -352,7 +346,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     private List<Project> getUnauthorizedProjects(Set<Project> projectSet, List<Project> authedProjectList) {
         List<Project> resultList;
-        Set<Project> authedProjectSet = null;
+        Set<Project> authedProjectSet;
         if (authedProjectList != null && !authedProjectList.isEmpty()) {
             authedProjectSet = new HashSet<>(authedProjectList);
             projectSet.removeAll(authedProjectSet);
@@ -361,7 +355,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         resultList = new ArrayList<>(projectSet);
         return resultList;
     }
-
 
     /**
      * query authorized project
@@ -406,7 +399,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query authorized and user create project list by user
      *
      * @param loginUser login user
-     * @return
+     * @return project list
      */
     @Override
     public Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser) {
