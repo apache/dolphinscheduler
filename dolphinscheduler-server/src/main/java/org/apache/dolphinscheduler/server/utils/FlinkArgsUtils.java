@@ -118,7 +118,7 @@ public class FlinkArgsUtils {
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
 
-        if (ProgramType.PYTHON != programType) {
+        if (ProgramType.PYTHON == programType) {
             // -py
             args.add(Constants.FLINK_PYTHON);
         } else if (programType != null && StringUtils.isNotEmpty(mainClass)) {
