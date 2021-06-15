@@ -303,8 +303,9 @@ CREATE TABLE t_ds_process_definition (
   tenant_id int DEFAULT '-1' ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id, code) ,
-  CONSTRAINT process_definition_unique UNIQUE (name, project_code)
+  PRIMARY KEY (id) ,
+  CONSTRAINT process_definition_unique UNIQUE (name, project_code) ,
+  CONSTRAINT code_unique UNIQUE (code) ,
 ) ;
 
 create index process_definition_index on t_ds_process_definition (code,id);
