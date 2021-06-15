@@ -43,7 +43,7 @@
         </div>
       </div>
     </m-list-box>
-    <m-list-box>
+    <m-list-box v-show="sqlType === '0'">
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Max Numbers Return')}}</div>
         <div slot="content">
           <el-input type="input" :disabled="isDetails" size="medium" v-model="limit" :placeholder="$t('Max Numbers Return placeholder')">
