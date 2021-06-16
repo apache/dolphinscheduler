@@ -179,6 +179,9 @@ public class SqlTaskTest {
         sqlTask.setSqlParamsMap("notValidPropertyName", "(notValidPropertyName)", sqlParamsMap, paramsPropsMap);
 
         assertEquals(0, sqlParamsMap.size());
+    }
+
+    @Test
     public void testQueryBySQLUsingLimit() throws Exception {
         TaskExecutionContext localTaskExecutionContext;
         TaskProps props = new TaskProps();
