@@ -17,17 +17,17 @@
 
 package org.apache.dolphinscheduler.service.log;
 
+import java.util.Map;
+import java.util.function.Function;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Marker;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Marker;
-
-import java.util.Map;
-import java.util.function.Function;
 
 public class SensitiveDataConverterTest {
 
@@ -112,20 +112,20 @@ public class SensitiveDataConverterTest {
     @Test
     public void convert() {
         String[] initialLogs = new String[]{
-                "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"123456\\\"," +
-                        "\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\"," +
-                        "\\\"database\\\":\\\"dolphinscheduler\\\"," +
-                        "\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
-                "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, " +
-                        "ARGS:[User{id=1, userName='admin', userPassword='Qazwsx.741', euserType=ADMIN_USER]}"
+            "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"123456\\\","
+                + "\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\","
+                + "\\\"database\\\":\\\"dolphinscheduler\\\","
+                + "\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
+            "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, "
+                + "ARGS:[User{id=1, userName='admin', userPassword='Qazwsx.741', euserType=ADMIN_USER]}"
         };
         String[] encryptedLogs = new String[]{
-                "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"******\\\"," +
-                        "\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\"," +
-                        "\\\"database\\\":\\\"dolphinscheduler\\\"," +
-                        "\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
-                "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, " +
-                        "ARGS:[User{id=1, userName='admin', userPassword='******', euserType=ADMIN_USER]}"
+            "{\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"******\\\","
+                + "\\\"address\\\":\\\"jdbc:mysql://localhost:3306\\\","
+                + "\\\"database\\\":\\\"dolphinscheduler\\\","
+                + "\\\"jdbcUrl\\\":\\\"jdbc:mysql://localhost/dolphinscheduler\\\"}",
+            "LOGIN_USER:admin, URI:/dolphinscheduler/users/verify-user-name, METHOD:GET, "
+                + "ARGS:[User{id=1, userName='admin', userPassword='******', euserType=ADMIN_USER]}"
         };
 
         SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
