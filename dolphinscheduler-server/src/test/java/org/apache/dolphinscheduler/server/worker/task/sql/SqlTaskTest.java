@@ -17,8 +17,13 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -34,6 +39,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -118,7 +125,7 @@ public class SqlTaskTest {
         PowerMockito.when(DatasourceUtil.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
         sqlTask.handle();
-        Assert.assertEquals(Constants.EXIT_CODE_SUCCESS, sqlTask.getExitStatusCode());
+        assertEquals(Constants.EXIT_CODE_SUCCESS, sqlTask.getExitStatusCode());
     }
 
     @Test
@@ -148,6 +155,30 @@ public class SqlTaskTest {
 
         String result = Whitebox.invokeMethod(sqlTask, "resultProcess", resultSet);
         Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void shouldntThrowNullPointerException_When_SqlParamsMapIsNull_printReplacedSql() {
+        try {
+            sqlTask.printReplacedSql("", "", "", null);
+            assertTrue(true);
+        } catch (NullPointerException err) {
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldntPutPropertyInSqlParamsMap_When_paramNameIsNotFoundInparamsPropsMap_setSqlParamsMap() {
+        Map<Integer, Property> sqlParamsMap = new HashMap<>();
+        Map<String, Property> paramsPropsMap = new HashMap<>();
+        paramsPropsMap.put("validPropertyName", new Property());
+
+        taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
+        PowerMockito.when(taskExecutionContext.getTaskInstanceId()).thenReturn(1);
+
+        sqlTask.setSqlParamsMap("notValidPropertyName", "(notValidPropertyName)", sqlParamsMap, paramsPropsMap);
+
+        assertEquals(0, sqlParamsMap.size());
     }
 
     @Test
