@@ -164,7 +164,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Date now = new Date();
 
         dataSource.setName(dataSource.getName().trim());
-        dataSource.setNote(dataSource.getNote());
+        dataSource.setNote(dataSourceParam.getNote());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
