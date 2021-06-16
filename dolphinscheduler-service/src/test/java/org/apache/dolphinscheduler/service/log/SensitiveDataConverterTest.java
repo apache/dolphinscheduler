@@ -31,7 +31,7 @@ import ch.qos.logback.classic.spi.LoggerContextVO;
 
 public class SensitiveDataConverterTest {
 
-    // Use the Function interface to make it easier to create ILoggingEvent instance.
+    // Use the Function interface to make it easier to create an ILoggingEvent instance.
     private static final Function<String, ILoggingEvent> LOGGING_EVENT_CREATOR = (logDetail) -> (new ILoggingEvent() {
         @Override
         public String getThreadName() {
