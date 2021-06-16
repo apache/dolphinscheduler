@@ -101,6 +101,16 @@ public class SqlParameters extends AbstractParameters {
      */
     private String title;
 
+    private int limit;
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
     public String getType() {
         return type;
     }
@@ -270,6 +280,7 @@ public class SqlParameters extends AbstractParameters {
                 + ", sqlType=" + sqlType
                 + ", sendEmail=" + sendEmail
                 + ", displayRows=" + displayRows
+                + ", limit=" + limit
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
