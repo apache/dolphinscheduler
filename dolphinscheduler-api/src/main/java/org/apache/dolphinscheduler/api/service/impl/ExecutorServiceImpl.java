@@ -182,7 +182,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     private boolean checkMasterExists(Map<String, Object> result) {
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromZK(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         // no master
         if (masterServers.isEmpty()) {

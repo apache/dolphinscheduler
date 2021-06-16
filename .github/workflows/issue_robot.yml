@@ -32,10 +32,10 @@ jobs:
           submodules: true
 
       - name: "Translation into English in issue"
-        uses: ./.github/actions/translation-on-issue
+        uses: ./.github/actions/translate-on-issue
         with:
           translate-title: true
-          translate-body: false
+          translate-body: true
 
       - name: "Comment in issue"
         uses: ./.github/actions/comment-on-issue

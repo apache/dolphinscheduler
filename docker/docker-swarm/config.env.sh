@@ -39,8 +39,10 @@ DATABASE_PARAMS=characterEncoding=utf8
 #============================================================================
 # ZooKeeper
 #============================================================================
-ZOOKEEPER_QUORUM=dolphinscheduler-zookeeper:2181
-ZOOKEEPER_ROOT=/dolphinscheduler
+
+REGISTRY_PLUGIN_DIR=lib/plugin/registry/zookeeper
+REGISTRY_PLUGIN_NAME=zookeeper
+REGISTRY_SERVERS=dolphinscheduler-zookeeper:2181
 
 #============================================================================
 # Common
