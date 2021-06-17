@@ -623,6 +623,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
         List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
+        allResourceList.forEach(resource -> resource.setUserName(loginUser.getUserName()));
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);
@@ -642,7 +643,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Map<String, Object> result = new HashMap<>();
 
         List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
-
+        allResourceList.forEach(resource -> resource.setUserName(loginUser.getUserName()));
+        
         String suffix = ".jar";
         if (programType != null) {
             switch (programType) {
