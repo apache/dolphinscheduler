@@ -202,38 +202,7 @@
        */
       reloadParam () {
         const dag = _.cloneDeep(this.store.state.dag)
-        // let fixedParam = []
-        // const tasks = this.store.state.dag.tasks
-        // for (const task of tasks) {
-        //   const localParam = task.params ? task.params.localParams : []
-        //   localParam.forEach(l => {
-        //     if (!fixedParam.some(f => { return f.prop === l.prop })) {
-        //       fixedParam.push(Object.assign({
-        //         ifFixed: true
-        //       }, l))
-        //     }
-        //   })
-        // }
-
         let globalParams = _.cloneDeep(dag.globalParams)
-        // globalParams = globalParams.map(g => {
-        //   if (fixedParam.some(f => { return g.prop === f.prop })) {
-        //     fixedParam = fixedParam.filter(f => { return g.prop !== f.prop })
-        //     return Object.assign(g, {
-        //       ifFixed: true
-        //     })
-        //   } else {
-        //     return g
-        //   }
-        // })
-
-        // let udpList = [...globalParams].sort(s => {
-        //   if (s.ifFixed) {
-        //     return -1
-        //   } else {
-        //     return 1
-        //   }
-        // })
         let udpList = [...globalParams]
         this.udpList = udpList
         this.udpListCache = udpList
