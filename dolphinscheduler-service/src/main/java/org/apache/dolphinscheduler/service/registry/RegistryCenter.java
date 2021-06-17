@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.spi.register.RegistryException;
 import org.apache.dolphinscheduler.spi.register.RegistryPluginManager;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -87,6 +88,8 @@ public class RegistryCenter {
 
     private static final String REGISTRY_CONFIG_FILE_PATH = "/registry.properties";
 
+    private static Map<String, String> REGISTRY_PROPERTIES;
+
     /**
      * init node persist
      */
@@ -98,6 +101,7 @@ public class RegistryCenter {
             if (null == registryConfig || registryConfig.isEmpty()) {
                 throw new RegistryException("registry config param is null");
             }
+            REGISTRY_PROPERTIES = Collections.unmodifiableMap(registryConfig);
             if (null == registryPluginManager) {
                 installRegistryPlugin(registryConfig.get(REGISTRY_PLUGIN_NAME));
                 registry = registryPluginManager.getRegistry();
@@ -139,6 +143,10 @@ public class RegistryCenter {
         } catch (Exception e) {
             throw new RuntimeException("Load registry Plugin Failed !", e);
         }
+    }
+
+    public static Map<String, String> getRegistryProperties() {
+        return REGISTRY_PROPERTIES;
     }
 
     /**

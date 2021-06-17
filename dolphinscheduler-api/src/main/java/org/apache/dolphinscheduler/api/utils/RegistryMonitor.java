@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * monitor zookeeper info todo registry-spi
- * fixme Some of the information obtained in the api belongs to the unique information of zk.
+ * monitor zookeeper info
  * I am not sure whether there is a good abstraction method. This is related to whether the specific plug-in is provided.
  */
 @Component
@@ -51,7 +52,37 @@ public class RegistryMonitor {
      * @return zookeeper info list
      */
     public List<ZookeeperRecord> zookeeperInfoList() {
-        return null;
+        List<ZookeeperRecord> list = new ArrayList<>(5);
+        String zookeeperServers = registryClient.getRegistryProperties().get("servers");
+        if (StringUtils.isNotBlank(zookeeperServers)) {
+            String[] zookeeperServersArray = zookeeperServers.split(",");
+
+            for (String zookeeperServer : zookeeperServersArray) {
+                ZooKeeperState state = new ZooKeeperState(zookeeperServer);
+                boolean ok = state.ruok();
+                if (ok) {
+                    state.getZookeeperInfo();
+                }
+
+                int connections = state.getConnections();
+                int watches = state.getWatches();
+                long sent = state.getSent();
+                long received = state.getReceived();
+                String mode = state.getMode();
+                float minLatency = state.getMinLatency();
+                float avgLatency = state.getAvgLatency();
+                float maxLatency = state.getMaxLatency();
+                int nodeCount = state.getNodeCount();
+                int status = ok ? 1 : 0;
+                Date date = new Date();
+
+                ZookeeperRecord zookeeperRecord = new ZookeeperRecord(zookeeperServer, connections, watches, sent, received, mode, minLatency, avgLatency, maxLatency, nodeCount, status, date);
+                list.add(zookeeperRecord);
+
+            }
+        }
+
+        return list;
     }
 
     /**
@@ -70,40 +101,6 @@ public class RegistryMonitor {
      */
     public List<Server> getWorkerServers() {
         return registryClient.getServerList(NodeType.WORKER);
-    }
-
-    private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
-        List<ZookeeperRecord> list = new ArrayList<>(5);
-        /*
-        if (StringUtils.isNotBlank(zookeeperServers)) {
-            String[] zookeeperServersArray = zookeeperServers.split(",");
-
-            for (String zookeeperServer : zookeeperServersArray) {
-                ZooKeeperState state = new ZooKeeperState(zookeeperServer);
-                boolean ok = state.ruok();
-                if (ok) {
-                    state.getZookeeperInfo();
-                }
-
-                int connections = state.getConnections();
-                int watches = state.getWatches();
-                long sent = state.getSent();
-                long received = state.getReceived();
-                String mode =  state.getMode();
-                float minLatency =  state.getMinLatency();
-                float avgLatency = state.getAvgLatency();
-                float maxLatency = state.getMaxLatency();
-                int nodeCount = state.getNodeCount();
-                int status = ok ? 1 : 0;
-                Date date = new Date();
-
-                ZookeeperRecord zookeeperRecord = new ZookeeperRecord(zookeeperServer,connections,watches,sent,received,mode,minLatency,avgLatency,maxLatency,nodeCount,status,date);
-                list.add(zookeeperRecord);
-
-            }
-        }*/
-
-        return list;
     }
 
     public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
