@@ -531,6 +531,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
 
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal,resourcesIds);
+        resourceIPage.getRecords().forEach(resource -> resource.setUserName(loginUser.getUserName()));
 
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
