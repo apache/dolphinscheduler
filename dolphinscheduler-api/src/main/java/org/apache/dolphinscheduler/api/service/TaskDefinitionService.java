@@ -57,7 +57,7 @@ public interface TaskDefinitionService {
      */
     Map<String, Object> deleteTaskDefinitionByCode(User loginUser,
                                                    String projectName,
-                                                   Long taskCode);
+                                                   long taskCode);
 
     /**
      * update task definition
@@ -69,7 +69,7 @@ public interface TaskDefinitionService {
      */
     Map<String, Object> updateTaskDefinition(User loginUser,
                                              String projectName,
-                                             Long taskCode,
+                                             long taskCode,
                                              String taskDefinitionJson);
 
     /**
@@ -82,7 +82,67 @@ public interface TaskDefinitionService {
      */
     Map<String, Object> switchVersion(User loginUser,
                                       String projectName,
-                                      Long taskCode,
+                                      long taskCode,
                                       int version);
+
+    /**
+     * query the pagination versions info by one certain task definition code
+     *
+     * @param loginUser login user info to check auth
+     * @param projectName project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param taskCode task definition code
+     * @return the pagination task definition versions info of the certain task definition
+     */
+    Map<String, Object> queryTaskDefinitionVersions(User loginUser,
+                                                    String projectName,
+                                                    int pageNo,
+                                                    int pageSize,
+                                                    long taskCode);
+
+    /**
+     * delete the certain task definition version by version and code
+     *
+     * @param loginUser login user info
+     * @param projectName the task definition project name
+     * @param taskCode the task definition code
+     * @param version the task definition version user want to delete
+     * @return delete version result code
+     */
+    Map<String, Object> deleteByCodeAndVersion(User loginUser,
+                                               String projectName,
+                                               long taskCode,
+                                               int version);
+
+    /**
+     * query detail of task definition by code
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskCode the task definition code
+     * @return task definition detail
+     */
+    Map<String, Object> queryTaskDefinitionDetail(User loginUser,
+                                                  String projectName,
+                                                  long taskCode);
+
+    /**
+     * query task definition list paging
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param userId user id
+     * @return task definition page
+     */
+    Map<String, Object> queryTaskDefinitionListPaging(User loginUser,
+                                                      String projectName,
+                                                      String searchVal,
+                                                      Integer pageNo,
+                                                      Integer pageSize,
+                                                      Integer userId);
 }
 
