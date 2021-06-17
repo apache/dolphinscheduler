@@ -163,7 +163,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, String projectName, Long taskCode) {
+    public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, String projectName, long taskCode) {
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
@@ -200,7 +200,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Map<String, Object> updateTaskDefinition(User loginUser, String projectName, Long taskCode, String taskDefinitionJson) {
+    public Map<String, Object> updateTaskDefinition(User loginUser, String projectName, long taskCode, String taskDefinitionJson) {
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
@@ -251,7 +251,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param version the version user want to switch
      */
     @Override
-    public Map<String, Object> switchVersion(User loginUser, String projectName, Long taskCode, int version) {
+    public Map<String, Object> switchVersion(User loginUser, String projectName, long taskCode, int version) {
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
@@ -276,6 +276,31 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public Map<String, Object> queryTaskDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, long taskCode) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> deleteByCodeAndVersion(User loginUser, String projectName, long taskCode, int version) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> queryTaskDefinitionDetail(User loginUser, String projectName, long taskCode) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> queryTaskDefinitionListPaging(User loginUser,
+                                                             String projectName,
+                                                             String searchVal,
+                                                             Integer pageNo,
+                                                             Integer pageSize,
+                                                             Integer userId) {
+        return null;
     }
 }
 
