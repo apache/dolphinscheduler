@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,7 +207,7 @@ public class JSONUtils {
             return null;
         }
 
-        return node.toString();
+        return node.asText();
     }
 
     /**
@@ -220,6 +221,21 @@ public class JSONUtils {
         return parseObject(json, new TypeReference<Map<String, String>>() {});
     }
 
+    /**
+     * from the key-value generated json  to get the str value no matter the real type of value
+     * @param json the json str
+     * @param nodeName key
+     * @return the str value of key
+     */
+    public static String getNodeString(String json, String nodeName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
+        } catch (JsonProcessingException e) {
+            return "";
+        }
+    }
+    
     /**
      * json to map
      *

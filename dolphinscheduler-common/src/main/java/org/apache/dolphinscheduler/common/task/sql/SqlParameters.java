@@ -51,6 +51,16 @@ public class SqlParameters extends AbstractParameters {
     private int sqlType;
 
     /**
+     * send email
+     */
+    private Boolean sendEmail;
+
+    /**
+     * display rows
+     */
+    private int displayRows;
+
+    /**
      * udf list
      */
     private String udfs;
@@ -83,6 +93,16 @@ public class SqlParameters extends AbstractParameters {
      * title
      */
     private String title;
+
+    private int limit;
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 
     public String getType() {
         return type;
@@ -122,6 +142,22 @@ public class SqlParameters extends AbstractParameters {
 
     public void setSqlType(int sqlType) {
         this.sqlType = sqlType;
+    }
+
+    public Boolean getSendEmail() {
+        return sendEmail;
+    }
+
+    public void setSendEmail(Boolean sendEmail) {
+        this.sendEmail = sendEmail;
+    }
+
+    public int getDisplayRows() {
+        return displayRows;
+    }
+
+    public void setDisplayRows(int displayRows) {
+        this.displayRows = displayRows;
     }
 
     public String getShowType() {
@@ -189,6 +225,9 @@ public class SqlParameters extends AbstractParameters {
                 + ", datasource=" + datasource
                 + ", sql='" + sql + '\''
                 + ", sqlType=" + sqlType
+                + ", sendEmail=" + sendEmail
+                + ", displayRows=" + displayRows
+                + ", limit=" + limit
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''

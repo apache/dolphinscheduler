@@ -17,15 +17,20 @@
 
 echo "------ dolphinscheduler start - build -------"
 set
+setlocal enableextensions enabledelayedexpansion
 
 if not defined VERSION (
     echo "set environment variable [VERSION]"
-    for /f %%l in (%cd%\sql\soft_version) do (set VERSION=%%l)
+    set first=1
+    for /f "tokens=3 delims=<>" %%a in ('findstr "<version>[0-9].*</version>" %cd%\pom.xml') do (
+        if !first! EQU 1 (set VERSION=%%a)
+        set first=0
+    )
 )
 
 if not defined DOCKER_REPO (
     echo "set environment variable [DOCKER_REPO]"
-    set DOCKER_REPO='dolphinscheduler'
+    set DOCKER_REPO=dolphinscheduler
 )
 
 echo "Version: %VERSION%"
@@ -39,8 +44,8 @@ call mvn clean compile package -Prelease -DskipTests=true
 if "%errorlevel%"=="1" goto :mvnFailed
 
 :: move dolphinscheduler-bin.tar.gz file to docker/build directory
-echo "move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-incubating-%VERSION%-SNAPSHOT-dolphinscheduler-bin.tar.gz %cd%\docker\build\"
-move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-incubating-%VERSION%-SNAPSHOT-dolphinscheduler-bin.tar.gz %cd%\docker\build\
+echo "move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-%VERSION%-bin.tar.gz %cd%\docker\build\"
+move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-%VERSION%-bin.tar.gz %cd%\docker\build\
 
 :: docker build
 echo "docker build --build-arg VERSION=%VERSION% -t %DOCKER_REPO%:%VERSION% %cd%\docker\build\"

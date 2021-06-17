@@ -19,10 +19,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper">
     <sql id="baseSql">
-        id, name, process_definition_id, state, recovery, start_time, end_time, run_times,host,
+        id, name, process_definition_version, process_definition_code, state, recovery, start_time, end_time, run_times,host,
         command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
-        warning_group_id, schedule_time, command_start_time, global_params, process_instance_json, flag,
-        update_time, is_sub_process, executor_id, locations, connects, history_cmd, dependence_schedule_times,
+        warning_group_id, schedule_time, command_start_time, global_params, flag,
+        update_time, is_sub_process, executor_id, history_cmd,
         process_instance_priority, worker_group, timeout, tenant_id, var_pool
     </sql>
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
@@ -72,13 +72,13 @@
         order by id asc
     </select>
 
-    <select id="queryByWorkerGroupIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
-        <if test="workerGroupId != -1">
-            and worker_group_id =#{workerGroupId}
+        <if test="workerGroupName != ''">
+            and worker_group =#{workerGroupName}
         </if>
         and state in
         <foreach collection="states" item="i" open="(" close=")" separator=",">
@@ -88,15 +88,15 @@
     </select>
 
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select instance.id, instance.process_definition_id, instance.command_type, instance.executor_id,
-        instance.name, instance.state, instance.schedule_time, instance.start_time, instance.end_time,
-        instance.run_times, instance.recovery, instance.host
+        select instance.id, instance.command_type, instance.executor_id, instance.process_definition_version,
+        instance.process_definition_code, instance.name, instance.state, instance.schedule_time, instance.start_time,
+        instance.end_time, instance.run_times, instance.recovery, instance.host
         from t_ds_process_instance instance
-        join t_ds_process_definition define ON instance.process_definition_id = define.id
+        join t_ds_process_definition define ON instance.process_definition_code = define.code
         where instance.is_sub_process=0
-        and define.project_id = #{projectId}
-        <if test="processDefinitionId != 0">
-            and instance.process_definition_id = #{processDefinitionId}
+        and define.project_code = #{projectCode}
+        <if test="processDefinitionCode != 0">
+            and instance.process_definition_code = #{processDefinitionCode}
         </if>
         <if test="searchVal != null and searchVal != ''">
             and instance.name like concat('%', #{searchVal}, '%')
@@ -104,7 +104,7 @@
         <if test="startTime != null ">
             and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
-        <if test="states != null and states != ''">
+        <if test="states != null and states.length > 0">
             and instance.state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
                 #{i}
@@ -138,42 +138,42 @@
         where tenant_id = #{originTenantId}
     </update>
 
-    <update id="updateProcessInstanceByWorkerGroupId">
+    <update id="updateProcessInstanceByWorkerGroupName">
         update t_ds_process_instance
-        set worker_group_id = #{destWorkerGroupId}
-        where worker_group_id = #{originWorkerGroupId}
+        set worker_group = #{destWorkerGroupName}
+        where worker_group = #{originWorkerGroupName}
     </update>
 
     <select id="countInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select t.state, count(0) as count
         from t_ds_process_instance t
-        join t_ds_process_definition d on d.id=t.process_definition_id
-        join t_ds_project p on p.id=d.project_id
+        join t_ds_process_definition d on d.code=t.process_definition_code
+        join t_ds_project p on p.code=d.project_code
         where 1 = 1
         and t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
             and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
-        <if test="projectIds != null and projectIds.length != 0">
-            and p.id in
-            <foreach collection="projectIds" index="index" item="i" open="(" close=")" separator=",">
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and p.code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
         group by t.state
     </select>
-    <select id="queryByProcessDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByProcessDefineCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_id=#{processDefinitionId}
+        where process_definition_code=#{processDefinitionCode}
         order by start_time desc limit #{size}
     </select>
     <select id="queryLastSchedulerProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_id=#{processDefinitionId}
+        where process_definition_code=#{processDefinitionCode}
         <if test="startTime!=null and endTime != null ">
             and schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>
@@ -183,7 +183,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_id=#{processDefinitionId}
+        where process_definition_code=#{processDefinitionCode}
         <if test="states !=null and states.length != 0">
             and state in
             <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
@@ -200,19 +200,18 @@
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_id=#{processDefinitionId}
+        where process_definition_code=#{processDefinitionCode}
         and schedule_time is null
         <if test="startTime!=null and endTime != null ">
             and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         order by end_time desc limit 1
     </select>
-    <select id="queryByProcessDefineIdAndStatus"
-            resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByProcessDefineCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
-        where process_definition_id=#{processDefinitionId}
+        where process_definition_code=#{processDefinitionCode}
         and state in
         <foreach collection="states" item="i" open="(" close=")" separator=",">
             #{i}

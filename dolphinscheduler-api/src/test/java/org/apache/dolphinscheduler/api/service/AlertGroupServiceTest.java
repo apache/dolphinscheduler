@@ -43,6 +43,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -110,6 +111,17 @@ public class AlertGroupServiceTest {
     }
 
     @Test
+    public void testCreateAlertgroupDuplicate() {
+
+        Mockito.when(alertGroupMapper.insert(any(AlertGroup.class))).thenThrow(new DuplicateKeyException("group name exist"));
+        User user = new User();
+        user.setUserType(UserType.ADMIN_USER);
+        Map<String, Object> result = alertGroupService.createAlertgroup(user, groupName, groupName, null);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ALERT_GROUP_EXIST, result.get(Constants.STATUS));
+    }
+
+    @Test
     public void testUpdateAlertgroup() {
 
         User user = new User();
@@ -128,6 +140,16 @@ public class AlertGroupServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
+    }
+
+    @Test
+    public void testUpdateAlertgroupDuplicate() {
+        User user = new User();
+        user.setUserType(UserType.ADMIN_USER);
+        Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
+        Mockito.when(alertGroupMapper.updateById(Mockito.any())).thenThrow(new DuplicateKeyException("group name exist"));
+        Map<String, Object> result = alertGroupService.updateAlertgroup(user, 2, groupName, groupName, null);
+        Assert.assertEquals(Status.ALERT_GROUP_EXIST, result.get(Constants.STATUS));
     }
 
     @Test
@@ -156,7 +178,7 @@ public class AlertGroupServiceTest {
         //group name not exist
         boolean result = alertGroupService.existGroupName(groupName);
         Assert.assertFalse(result);
-        Mockito.when(alertGroupMapper.queryByGroupName(groupName)).thenReturn(getList());
+        Mockito.when(alertGroupMapper.existGroupName(groupName)).thenReturn(true);
 
         //group name exist
         result = alertGroupService.existGroupName(groupName);

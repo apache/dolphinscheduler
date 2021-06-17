@@ -35,17 +35,26 @@ spring.servlet.multipart.max-request-size=1024MB
 server.compression.enabled=true
 server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
 
-# post content
+# max http post size
 server.jetty.max-http-form-post-size=5000000
 
-# i18n
+# messages encoding
 spring.messages.encoding=UTF-8
 
-# i18n classpath folder , file prefix messages， if have many files, use "," seperator
+# i18n classpath folder, file prefix messages. if have many files, use "," seperator
 spring.messages.basename=i18n/messages
 
 # Authentication types (supported types: PASSWORD)
 security.authentication.type=PASSWORD
+
+# Traffic control, if you turn on this config, the maximum number of request/s will be limited.
+# global max request number per second
+# default tenant-level max request number
+#traffic.control.global.switch=true
+#traffic.control.max.global.qps.rate=500
+#traffic.control.tenant.switch=true
+#traffic.control.default.tenant.qps.rate=10
+#traffic.control.customize.tenant.qps.rate={'tenant1':11,'tenant2':20}
 
 #============================================================================
 # LDAP Config

@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 
@@ -38,10 +40,8 @@ public class ResInfo {
      */
     private double loadAverage;
 
-    public ResInfo(){}
-
-    public ResInfo(double cpuUsage , double memoryUsage){
-        this.cpuUsage = cpuUsage ;
+    public ResInfo(double cpuUsage, double memoryUsage) {
+        this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
     }
 
@@ -81,35 +81,53 @@ public class ResInfo {
      * @param loadAverage load average
      * @return cpu and memory usage
      */
-    public static String getResInfoJson(double cpuUsage , double memoryUsage,double loadAverage){
+    public static String getResInfoJson(double cpuUsage, double memoryUsage, double loadAverage) {
         ResInfo resInfo = new ResInfo(cpuUsage,memoryUsage,loadAverage);
         return JSONUtils.toJsonString(resInfo);
     }
-
 
     /**
      * parse heartbeat info for zk
      * @param heartBeatInfo heartbeat info
      * @return heartbeat info to Server
      */
-    public static Server parseHeartbeatForZKInfo(String heartBeatInfo){
-        if (StringUtils.isEmpty(heartBeatInfo)) {
+    public static Server parseHeartbeatForRegistryInfo(String heartBeatInfo) {
+        if (!isValidHeartbeatForRegistryInfo(heartBeatInfo)) {
             return null;
         }
-        String[] masterArray = heartBeatInfo.split(Constants.COMMA);
-        if(masterArray.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
-            return null;
-
-        }
-        Server masterServer = new Server();
-        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[0]),
-                Double.parseDouble(masterArray[1]),
-                Double.parseDouble(masterArray[2])));
-        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[6]));
-        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[7]));
+        String[] parts = heartBeatInfo.split(Constants.COMMA);
+        Server server = new Server();
+        server.setResInfo(getResInfoJson(Double.parseDouble(parts[0]),
+                Double.parseDouble(parts[1]),
+                Double.parseDouble(parts[2])));
+        server.setCreateTime(DateUtils.stringToDate(parts[6]));
+        server.setLastHeartbeatTime(DateUtils.stringToDate(parts[7]));
         //set process id
-        masterServer.setId(Integer.parseInt(masterArray[9]));
-        return masterServer;
+        server.setId(Integer.parseInt(parts[9]));
+        return server;
+    }
+
+    /**
+     * is valid heartbeat info for zk
+     * @param heartBeatInfo heartbeat info
+     * @return heartbeat info is valid
+     */
+    public static boolean isValidHeartbeatForRegistryInfo(String heartBeatInfo) {
+        if (StringUtils.isNotEmpty(heartBeatInfo)) {
+            String[] parts = heartBeatInfo.split(Constants.COMMA);
+            return parts.length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH
+                    || parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH;
+        }
+        return false;
+    }
+
+    /**
+     * is new heartbeat info for zk with weight
+     * @param parts heartbeat info parts
+     * @return heartbeat info is new with weight
+     */
+    public static boolean isNewHeartbeatWithWeight(String[] parts) {
+        return parts.length == Constants.HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH;
     }
 
 }

@@ -25,7 +25,7 @@
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.name }}</p>
               <div slot="reference" class="name-wrapper">
-                <router-link :to="{ path: '/projects/definition/list/' + scope.row.id}" tag="a" class="links">
+                <router-link :to="{ path: `/projects/${projectId}/definition/list/${scope.row.id}` }" tag="a" class="links">
                   <span class="ellipsis">{{scope.row.name}}</span>
                 </router-link>
               </div>
@@ -55,8 +55,8 @@
         <el-table-column prop="modifyBy" :label="$t('Modify User')"></el-table-column>
         <el-table-column :label="$t('Timing state')">
           <template slot-scope="scope">
-            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
-            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'OFFLINE'" class="time_offline">{{$t('offline')}}</span>
+            <span v-if="scope.row.scheduleReleaseState === 'ONLINE'" class="time_online">{{$t('online')}}</span>
             <span v-if="!scope.row.scheduleReleaseState">-</span>
           </template>
         </el-table-column>
@@ -83,7 +83,7 @@
             <el-tooltip :content="$t('Cron Manage')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-date" :disabled="scope.row.releaseState !== 'ONLINE'" @click="_timingManage(scope.row)" circle></el-button></span>
             </el-tooltip>
-            <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
+            <el-tooltip :content="$t('Delete')" placement="top" :enterable="false">
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
@@ -102,13 +102,13 @@
               <span><el-button type="primary" size="mini" icon="el-icon-s-unfold" @click="_export(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Version Info')" placement="top" :enterable="false">
-              <span><el-button type="primary" size="mini" icon="el-icon-info" :disabled="scope.row.releaseState === 'ONLINE'" @click="_version(scope.row)" circle></el-button></span>
+              <span><el-button type="primary" size="mini" icon="el-icon-info" @click="_version(scope.row)" circle></el-button></span>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top">
+    <el-tooltip :content="$t('Delete')" placement="top">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"
@@ -153,7 +153,7 @@
   import mStart from './start'
   import mTiming from './timing'
   import mRelatedItems from './relatedItems'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
   import mVersions from './versions'
 
@@ -203,7 +203,7 @@
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
-        this.$router.push({ path: `/projects/definition/tree/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${item.id}` })
       },
       /**
        * Start
@@ -243,7 +243,7 @@
        * Timing manage
        */
       _timingManage (item) {
-        this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/timing/${item.id}` })
       },
       /**
        * delete
@@ -268,7 +268,7 @@
        * edit
        */
       _edit (item) {
-        this.$router.push({ path: `/projects/definition/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/${item.id}` })
       },
       /**
        * Offline
@@ -343,7 +343,7 @@
           processDefinitionId: processDefinitionId
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
-          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+          this.$router.push({ path: `/projects/${this.projectId}/definition/list/${processDefinitionId}` })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -356,11 +356,11 @@
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionCode, fromThis }) {
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
-          processDefinitionId: processDefinitionId
+          processDefinitionCode: processDefinitionCode
         }).then(res => {
           this.versionData.processDefinitionVersions = res.data.lists
           this.versionData.total = res.data.totalCount
@@ -377,7 +377,7 @@
         * @param processDefinitionId the process definition id user want to delete
         * @param fromThis fromThis
       */
-      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, processDefinitionCode, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
@@ -386,7 +386,7 @@
           this.mVersionGetProcessDefinitionVersionsPage({
             pageNo: 1,
             pageSize: 10,
-            processDefinitionId: processDefinitionId,
+            processDefinitionCode: processDefinitionCode,
             fromThis: fromThis
           })
         }).catch(e => {
@@ -397,7 +397,7 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
-          processDefinitionId: item.id
+          processDefinitionCode: item.code
         }).then(res => {
           let processDefinitionVersions = res.data.lists
           let total = res.data.totalCount
@@ -519,6 +519,23 @@
     },
     mounted () {
     },
+    computed: {
+      ...mapState('dag', ['projectId'])
+    },
     components: { mVersions, mStart, mTiming, mRelatedItems }
   }
 </script>
+
+<style lang="scss" rel="stylesheet/scss">
+
+  .time_online {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 3px;
+  }
+  .time_offline {
+    background-color: #ffc107;
+    color: #fff;
+    padding: 3px;
+  }
+</style>

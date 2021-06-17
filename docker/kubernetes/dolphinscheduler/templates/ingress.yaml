@@ -26,9 +26,8 @@ kind: Ingress
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   rules:
   - host: {{ .Values.ingress.host }}

@@ -20,7 +20,7 @@
       <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.projectId" @change="v => _onChangeProjectId(v, $index)" size="small">
         <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label"></el-option>
       </el-select>
-      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionId" @change="v => _onChangeDefinitionId(v, $index)" size="small">
+      <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.definitionCode" @change="v => _onChangeDefinitionCode(v, $index)" size="small">
         <el-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label"></el-option>
       </el-select>
       <el-select filterable :disabled="isDetails" style="width: 450px" v-model="el.depTasks" size="small">
@@ -34,14 +34,14 @@
       </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
-          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
-          <em class="iconfont el-icon-timer" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
-          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
+          <em class="iconfont el-icon-success" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('Success')"></em>
+          <em class="iconfont el-icon-timer" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('Waiting')"></em>
+          <em class="iconfont el-icon-error" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('Failed')"></em>
         </span>
       </template>
       <span class="operation">
         <a href="javascript:" class="delete" @click="!isDetails && _remove($index)">
-          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Delete')" ></em>
         </a>
         <a href="javascript:" class="add" @click="!isDetails && _add()" v-if="$index === (dependItemList.length - 1)">
           <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')"></em>
@@ -87,7 +87,7 @@
         let projectId = this.projectList[0].value
         this._getProcessByProjectId(projectId).then(definitionList => {
           // dependItemList index
-          let is = (value) => _.some(this.dependItemList, { definitionId: value })
+          let is = (value) => _.some(this.dependItemList, { definitionCode: value })
           let noArr = _.filter(definitionList, v => !is(v.value))
           let value = noArr[0] && noArr[0].value || null
           let val = value || definitionList[0].value
@@ -124,26 +124,12 @@
           resolve()
         })
       },
-      /**
-       * get processlist
-       */
-      _getProcessList () {
-        return new Promise((resolve, reject) => {
-          let definitionList = _.map(_.cloneDeep(this.store.state.dag.processListS), v => {
-            return {
-              value: v.id,
-              label: v.name
-            }
-          })
-          resolve(definitionList)
-        })
-      },
       _getProcessByProjectId (id) {
         return new Promise((resolve, reject) => {
           this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
             let definitionList = _.map(_.cloneDeep(res), v => {
               return {
-                value: v.id,
+                value: v.code,
                 label: v.name
               }
             })
@@ -154,14 +140,14 @@
       /**
        * get dependItemList
        */
-      _getDependItemList (ids, is = true) {
+      _getDependItemList (codes, is = true) {
         return new Promise((resolve, reject) => {
           if (is) {
-            this.store.dispatch('dag/getProcessTasksList', { processDefinitionId: ids }).then(res => {
+            this.store.dispatch('dag/getProcessTasksList', { processDefinitionCode: codes }).then(res => {
               resolve(['ALL'].concat(_.map(res, v => v.name)))
             })
           } else {
-            this.store.dispatch('dag/getTaskListDefIdAll', { processDefinitionIdList: ids }).then(res => {
+            this.store.dispatch('dag/getTaskListDefIdAll', { processDefinitionCodeList: codes }).then(res => {
               resolve(res)
             })
           }
@@ -173,17 +159,17 @@
       _onChangeProjectId (value, itemIndex) {
         this._getProcessByProjectId(value).then(definitionList => {
           /* this.$set(this.dependItemList, itemIndex, this._dlOldParams(value, definitionList, item)) */
-          let definitionId = definitionList[0].value
-          this._getDependItemList(definitionId).then(depTasksList => {
+          let definitionCode = definitionList[0].value
+          this._getDependItemList(definitionCode).then(depTasksList => {
             let item = this.dependItemList[itemIndex]
             // init set depTasks All
             item.depTasks = 'ALL'
             // set dependItemList item data
-            this.$set(this.dependItemList, itemIndex, this._cpOldParams(value, definitionId, definitionList, depTasksList, item))
+            this.$set(this.dependItemList, itemIndex, this._cpOldParams(value, definitionCode, definitionList, depTasksList, item))
           })
         })
       },
-      _onChangeDefinitionId (value, itemIndex) {
+      _onChangeDefinitionCode (value, itemIndex) {
         // get depItem list data
         this._getDependItemList(value).then(depTasksList => {
           let item = this.dependItemList[itemIndex]
@@ -201,7 +187,7 @@
       _rtNewParams (value, definitionList, depTasksList, projectId) {
         return {
           projectId: projectId,
-          definitionId: value,
+          definitionCode: value,
           // dependItem need private definitionList
           definitionList: definitionList,
           depTasks: 'ALL',
@@ -215,7 +201,7 @@
       _rtOldParams (value, definitionList, depTasksList, item) {
         return {
           projectId: item.projectId,
-          definitionId: value,
+          definitionCode: value,
           // dependItem need private definitionList
           definitionList: definitionList,
           depTasks: item.depTasks || 'ALL',
@@ -227,11 +213,11 @@
         }
       },
 
-      _cpOldParams (value, definitionId, definitionList, depTasksList, item) {
+      _cpOldParams (value, definitionCode, definitionList, depTasksList, item) {
         return {
           projectId: value,
           definitionList: definitionList,
-          definitionId: definitionId,
+          definitionCode: definitionCode,
           depTasks: item.depTasks || 'ALL',
           depTasksList: depTasksList,
           cycle: item.cycle,
@@ -257,6 +243,7 @@
       // get processlist
       this._getProjectList().then(() => {
         if (!this.dependItemList.length) {
+          if (!this.projectList.length) return
           let projectId = this.projectList[0].value
           this._getProcessByProjectId(projectId).then(definitionList => {
             let value = definitionList[0].value
@@ -265,13 +252,13 @@
             })
           })
         } else {
-          // get definitionId ids
-          let ids = _.map(this.dependItemList, v => v.definitionId).join(',')
+          // get definitionCode codes
+          let codes = _.map(this.dependItemList, v => v.definitionCode).join(',')
           // get item list
-          this._getDependItemList(ids, false).then(res => {
+          this._getDependItemList(codes, false).then(res => {
             _.map(this.dependItemList, (v, i) => {
               this._getProcessByProjectId(v.projectId).then(definitionList => {
-                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, definitionList, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
+                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionCode, definitionList, ['ALL'].concat(_.map(res[v.definitionCode] || [], v => v.name)), v))
               })
             })
           })

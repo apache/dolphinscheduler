@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RoundRobinSelector;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
 
 import java.util.Collection;
-
 
 /**
  *  round robin host manager
@@ -32,17 +30,17 @@ public class RoundRobinHostManager extends CommonHostManager {
     /**
      * selector
      */
-    private final Selector<Host> selector;
+    private final RoundRobinSelector selector;
 
     /**
      * set round robin
      */
-    public RoundRobinHostManager(){
+    public RoundRobinHostManager() {
         this.selector = new RoundRobinSelector();
     }
 
     @Override
-    public Host select(Collection<Host> nodes) {
+    public HostWorker select(Collection<HostWorker> nodes) {
         return selector.select(nodes);
     }
 

@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,6 +70,9 @@ public class ProjectServiceTest {
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
+    private UserMapper userMapper;
 
     private String projectName = "ProjectServiceTest";
 
@@ -216,7 +220,7 @@ public class ProjectServiceTest {
         Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result.get(Constants.STATUS));
 
         //DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
-        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1)).thenReturn(getProcessDefinitions());
+        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
         loginUser.setUserType(UserType.ADMIN_USER);
         result = projectService.deleteProject(loginUser, 1);
         logger.info(result.toString());
@@ -224,7 +228,7 @@ public class ProjectServiceTest {
 
         //success
         Mockito.when(projectMapper.deleteById(1)).thenReturn(1);
-        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1)).thenReturn(new ArrayList<>());
+        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
         result = projectService.deleteProject(loginUser, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -240,19 +244,24 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
         Mockito.when(projectMapper.selectById(1)).thenReturn(getProject());
         // PROJECT_NOT_FOUNT
-        Map<String, Object> result = projectService.update(loginUser, 12, projectName, "desc");
+        Map<String, Object> result = projectService.update(loginUser, 12, projectName, "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result.get(Constants.STATUS));
 
         //PROJECT_ALREADY_EXISTS
-        result = projectService.update(loginUser, 1, projectName, "desc");
+        result = projectService.update(loginUser, 1, projectName, "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS, result.get(Constants.STATUS));
 
+        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
+        result = projectService.update(loginUser, 1, "test", "desc", "testuser");
+        Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
         //success
+        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
         project.setUserId(1);
         Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
-        result = projectService.update(loginUser, 1, "test", "desc");
+        result = projectService.update(loginUser, 1, "test", "desc", "testUser");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -276,6 +285,10 @@ public class ProjectServiceTest {
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
 
+        loginUser.setUserType(UserType.GENERAL_USER);
+        result = projectService.queryAuthorizedProject(loginUser, loginUser.getId());
+        projects = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
     @Test
@@ -284,14 +297,10 @@ public class ProjectServiceTest {
         User loginUser = getLoginUser();
 
         Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(getList());
-        //USER_NO_OPERATION_PERM
-        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         //success
         loginUser.setUserType(UserType.ADMIN_USER);
-        result = projectService.queryProjectCreatedByUser(loginUser);
+        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
@@ -322,8 +331,7 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAllProjectList() {
-        Mockito.when(processDefinitionMapper.listProjectIds()).thenReturn(getProjectIds());
-        Mockito.when(projectMapper.selectBatchIds(getProjectIds())).thenReturn(getList());
+        Mockito.when(projectMapper.queryAllProject()).thenReturn(getList());
 
         Map<String, Object> result = projectService.queryAllProjectList();
         logger.info(result.toString());
@@ -348,6 +356,7 @@ public class ProjectServiceTest {
 
     private Project getProject() {
         Project project = new Project();
+        project.setCode(1L);
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);

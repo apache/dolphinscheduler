@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -204,4 +205,16 @@ public class DateUtilsTest {
         Assert.assertNull(DateUtils.format2Duration(d1, d2));
     }
 
+    @Test
+    public void testTransformToTimezone() {
+        Date date = new Date();
+        Date mst = DateUtils.getTimezoneDate(date, TimeZone.getDefault().getID());
+        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(mst));
+    }
+
+    @Test
+    public void testGetTimezone() {
+        Assert.assertNull(DateUtils.getTimezone(null));
+        Assert.assertEquals(TimeZone.getTimeZone("MST"), DateUtils.getTimezone("MST"));
+    }
 }

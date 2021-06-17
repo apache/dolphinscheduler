@@ -103,11 +103,24 @@
         select
         <include refid="baseSql"/>
         from t_ds_user
-        where queue = #{queueName}
+        where queue = #{queue}
+    </select>
+    <select id="existUser" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_user
+        where queue = #{queue} limit 1
     </select>
     <update id="updateUserQueue" parameterType="java.lang.String">
         update t_ds_user
         set queue = #{newQueue}
         where queue = #{oldQueue}
     </update>
+    <select id="selectByIds" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        select *
+        from t_ds_user
+        where id in
+        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

@@ -114,7 +114,7 @@ alter table QRTZ_PAUSED_TRIGGER_GRPS add primary key(SCHED_NAME,TRIGGER_GROUP);
 
 CREATE TABLE QRTZ_FIRED_TRIGGERS (
 SCHED_NAME character varying(120) NOT NULL,
-ENTRY_ID character varying(95) NOT NULL,
+ENTRY_ID character varying(200) NOT NULL,
 TRIGGER_NAME character varying(200) NOT NULL,
 TRIGGER_GROUP character varying(200) NOT NULL,
 INSTANCE_NAME character varying(200) NOT NULL,
@@ -208,7 +208,8 @@ CREATE TABLE t_ds_alertgroup(
   description    varchar(255) DEFAULT NULL,
   create_time    timestamp    DEFAULT NULL,
   update_time    timestamp    DEFAULT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_alertgroup_name_UN UNIQUE (group_name)
 ) ;
 
 --
@@ -228,7 +229,6 @@ CREATE TABLE t_ds_command (
   schedule_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   executor_id int DEFAULT NULL ,
-  dependence varchar(255) DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
@@ -243,13 +243,14 @@ DROP TABLE IF EXISTS t_ds_datasource;
 CREATE TABLE t_ds_datasource (
   id int NOT NULL  ,
   name varchar(64) NOT NULL ,
-  note varchar(256) DEFAULT NULL ,
+  note varchar(255) DEFAULT NULL ,
   type int NOT NULL ,
   user_id int NOT NULL ,
   connection_params text NOT NULL ,
   create_time timestamp NOT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_datasource_name_UN UNIQUE (name, type)
 ) ;
 
 --
@@ -270,7 +271,6 @@ CREATE TABLE t_ds_error_command (
   schedule_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  dependence text ,
   process_instance_priority int DEFAULT NULL ,
   worker_group varchar(64),
   message text ,
@@ -287,52 +287,147 @@ CREATE TABLE t_ds_error_command (
 DROP TABLE IF EXISTS t_ds_process_definition;
 CREATE TABLE t_ds_process_definition (
   id int NOT NULL  ,
+  code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
   version int DEFAULT NULL ,
-  release_state int DEFAULT NULL ,
-  project_id int DEFAULT NULL ,
-  user_id int DEFAULT NULL ,
-  process_definition_json text ,
   description text ,
+  project_code bigint DEFAULT NULL ,
+  release_state int DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
   global_params text ,
-  flag int DEFAULT NULL ,
   locations text ,
   connects text ,
-  warning_group_id int4 DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
+  warning_group_id int DEFAULT NULL ,
+  flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
-  tenant_id int NOT NULL DEFAULT '-1' ,
+  tenant_id int DEFAULT '-1' ,
+  create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  modify_by varchar(36) DEFAULT '' ,
-  resource_ids varchar(64),
-  PRIMARY KEY (id),
-  CONSTRAINT process_definition_unique UNIQUE (name, project_id)
+  PRIMARY KEY (id) ,
+  CONSTRAINT process_definition_unique UNIQUE (name, project_code) ,
+  CONSTRAINT code_unique UNIQUE (code)
 ) ;
 
-create index process_definition_index on t_ds_process_definition (project_id,id);
+create index process_definition_index on t_ds_process_definition (code,id);
 
---
--- Table structure for table t_ds_process_definition_version
---
-
-DROP TABLE IF EXISTS t_ds_process_definition_version;
-CREATE TABLE t_ds_process_definition_version (
+DROP TABLE IF EXISTS t_ds_process_definition_log;
+CREATE TABLE t_ds_process_definition_log (
   id int NOT NULL  ,
-  process_definition_id int NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(255) DEFAULT NULL ,
   version int DEFAULT NULL ,
-  process_definition_json text ,
   description text ,
+  project_code bigint DEFAULT NULL ,
+  release_state int DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
   global_params text ,
   locations text ,
   connects text ,
-  warning_group_id int4 DEFAULT NULL,
-  create_time timestamp DEFAULT NULL ,
+  warning_group_id int DEFAULT NULL ,
+  flag int DEFAULT NULL ,
   timeout int DEFAULT '0' ,
-  resource_ids varchar(64),
+  tenant_id int DEFAULT '-1' ,
+  operator int DEFAULT NULL ,
+  operate_time timestamp DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
-create index process_definition_id_and_version on t_ds_process_definition_version (process_definition_id,version);
+DROP TABLE IF EXISTS t_ds_task_definition;
+CREATE TABLE t_ds_task_definition (
+  id int NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(255) DEFAULT NULL ,
+  version int DEFAULT NULL ,
+  description text ,
+  project_code bigint DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
+  task_type varchar(50) DEFAULT NULL ,
+  task_params text ,
+  flag int DEFAULT NULL ,
+  task_priority int DEFAULT NULL ,
+  worker_group varchar(255) DEFAULT NULL ,
+  fail_retry_times int DEFAULT NULL ,
+  fail_retry_interval int DEFAULT NULL ,
+  timeout_flag int DEFAULT NULL ,
+  timeout_notify_strategy int DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  delay_time int DEFAULT '0' ,
+  resource_ids varchar(255) DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id) ,
+  CONSTRAINT task_definition_unique UNIQUE (name, project_code)
+) ;
+
+create index task_definition_index on t_ds_task_definition (project_code,id);
+
+DROP TABLE IF EXISTS t_ds_task_definition_log;
+CREATE TABLE t_ds_task_definition_log (
+  id int NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(255) DEFAULT NULL ,
+  version int DEFAULT NULL ,
+  description text ,
+  project_code bigint DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
+  task_type varchar(50) DEFAULT NULL ,
+  task_params text ,
+  flag int DEFAULT NULL ,
+  task_priority int DEFAULT NULL ,
+  worker_group varchar(255) DEFAULT NULL ,
+  fail_retry_times int DEFAULT NULL ,
+  fail_retry_interval int DEFAULT NULL ,
+  timeout_flag int DEFAULT NULL ,
+  timeout_notify_strategy int DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  delay_time int DEFAULT '0' ,
+  resource_ids varchar(255) DEFAULT NULL ,
+  operator int DEFAULT NULL ,
+  operate_time timestamp DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id)
+) ;
+
+DROP TABLE IF EXISTS t_ds_process_task_relation;
+CREATE TABLE t_ds_process_task_relation (
+  id int NOT NULL  ,
+  name varchar(255) DEFAULT NULL ,
+  process_definition_version int DEFAULT NULL ,
+  project_code bigint DEFAULT NULL ,
+  process_definition_code bigint DEFAULT NULL ,
+  pre_task_code bigint DEFAULT NULL ,
+  pre_task_version int DEFAULT '0' ,
+  post_task_code bigint DEFAULT NULL ,
+  post_task_version int DEFAULT '0' ,
+  condition_type int DEFAULT NULL ,
+  condition_params text ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id)
+) ;
+
+DROP TABLE IF EXISTS t_ds_process_task_relation_log;
+CREATE TABLE t_ds_process_task_relation_log (
+  id int NOT NULL  ,
+  name varchar(255) DEFAULT NULL ,
+  process_definition_version int DEFAULT NULL ,
+  project_code bigint DEFAULT NULL ,
+  process_definition_code bigint DEFAULT NULL ,
+  pre_task_code bigint DEFAULT NULL ,
+  pre_task_version int DEFAULT '0' ,
+  post_task_code bigint DEFAULT NULL ,
+  post_task_version int DEFAULT '0' ,
+  condition_type int DEFAULT NULL ,
+  condition_params text ,
+  operator int DEFAULT NULL ,
+  operate_time timestamp DEFAULT NULL ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id)
+) ;
 
 --
 -- Table structure for table t_ds_process_instance
@@ -342,7 +437,8 @@ DROP TABLE IF EXISTS t_ds_process_instance;
 CREATE TABLE t_ds_process_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_version int DEFAULT NULL ,
+  process_definition_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   recovery int DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
@@ -364,8 +460,6 @@ CREATE TABLE t_ds_process_instance (
   update_time timestamp NULL ,
   is_sub_process int DEFAULT '0' ,
   executor_id int NOT NULL ,
-  locations text ,
-  connects text ,
   history_cmd text ,
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT NULL ,
@@ -375,7 +469,7 @@ CREATE TABLE t_ds_process_instance (
   var_pool text ,
   PRIMARY KEY (id)
 ) ;
-  create index process_instance_index on t_ds_process_instance (process_definition_id,id);
+  create index process_instance_index on t_ds_process_instance (process_definition_code,id);
   create index start_time_index on t_ds_process_instance (start_time);
 
 --
@@ -386,6 +480,7 @@ DROP TABLE IF EXISTS t_ds_project;
 CREATE TABLE t_ds_project (
   id int NOT NULL  ,
   name varchar(100) DEFAULT NULL ,
+  code bigint NOT NULL,
   description varchar(200) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   flag int DEFAULT '1' ,
@@ -496,7 +591,7 @@ CREATE TABLE t_ds_resources (
   id int NOT NULL  ,
   alias varchar(64) DEFAULT NULL ,
   file_name varchar(64) DEFAULT NULL ,
-  description varchar(256) DEFAULT NULL ,
+  description varchar(255) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   type int DEFAULT NULL ,
   size bigint DEFAULT NULL ,
@@ -520,7 +615,8 @@ CREATE TABLE t_ds_schedules (
   process_definition_id int NOT NULL ,
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
-  crontab varchar(256) NOT NULL ,
+  timezone_id varchar(40) default NULL ,
+  crontab varchar(255) NOT NULL ,
   failure_strategy int NOT NULL ,
   user_id int NOT NULL ,
   release_state int NOT NULL ,
@@ -554,10 +650,10 @@ DROP TABLE IF EXISTS t_ds_task_instance;
 CREATE TABLE t_ds_task_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
-  task_type varchar(64) DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  task_type varchar(50) DEFAULT NULL ,
+  task_code bigint NOT NULL,
+  task_definition_version int DEFAULT NULL ,
   process_instance_id int DEFAULT NULL ,
-  task_json text ,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
@@ -569,6 +665,7 @@ CREATE TABLE t_ds_task_instance (
   retry_times int DEFAULT '0' ,
   pid int DEFAULT NULL ,
   app_link text ,
+  task_params text ,
   flag int DEFAULT '1' ,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
@@ -578,7 +675,8 @@ CREATE TABLE t_ds_task_instance (
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   var_pool text ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT foreign_key_instance_id FOREIGN KEY(process_instance_id) REFERENCES t_ds_process_instance(id) ON DELETE CASCADE
 ) ;
 
 --
@@ -589,7 +687,7 @@ DROP TABLE IF EXISTS t_ds_tenant;
 CREATE TABLE t_ds_tenant (
   id int NOT NULL  ,
   tenant_code varchar(64) DEFAULT NULL ,
-  description varchar(256) DEFAULT NULL ,
+  description varchar(255) DEFAULT NULL ,
   queue_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -657,11 +755,12 @@ create index version_index on t_ds_version(version);
 DROP TABLE IF EXISTS t_ds_worker_group;
 CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
-  name varchar(256) DEFAULT NULL ,
-  ip_list varchar(256) DEFAULT NULL ,
+  name varchar(255) NOT NULL ,
+  addr_list text DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id) ,
+  CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
 --
@@ -700,9 +799,21 @@ ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource
 DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
 CREATE SEQUENCE  t_ds_process_definition_id_sequence;
 ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_process_definition_version_id_sequence;
-CREATE SEQUENCE  t_ds_process_definition_version_id_sequence;
-ALTER TABLE t_ds_process_definition_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_version_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_definition_log_id_sequence;
+CREATE SEQUENCE  t_ds_process_definition_log_id_sequence;
+ALTER TABLE t_ds_process_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_log_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_task_definition_id_sequence;
+CREATE SEQUENCE  t_ds_task_definition_id_sequence;
+ALTER TABLE t_ds_task_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_definition_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_task_definition_log_id_sequence;
+CREATE SEQUENCE  t_ds_task_definition_log_id_sequence;
+ALTER TABLE t_ds_task_definition_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_definition_log_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_task_relation_id_sequence;
+CREATE SEQUENCE  t_ds_process_task_relation_id_sequence;
+ALTER TABLE t_ds_process_task_relation ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_task_relation_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_task_relation_log_id_sequence;
+CREATE SEQUENCE  t_ds_process_task_relation_log_id_sequence;
+ALTER TABLE t_ds_process_task_relation_log ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_task_relation_log_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
 CREATE SEQUENCE  t_ds_process_instance_id_sequence;
 ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');

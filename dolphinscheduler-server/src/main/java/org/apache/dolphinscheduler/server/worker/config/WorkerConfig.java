@@ -29,14 +29,20 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
+    @Value("${worker.listen.port:1234}")
+    private int listenPort;
+
     @Value("${worker.exec.threads:100}")
     private int workerExecThreads;
 
     @Value("${worker.heartbeat.interval:10}")
     private int workerHeartbeatInterval;
 
-    @Value("${worker.fetch.task.num:3}")
-    private int workerFetchTaskNum;
+    @Value("${worker.host.weight:100}")
+    private int hostWeight;
+
+    @Value("${worker.tenant.auto.create:false}")
+    private boolean workerTenantAutoCreate;
 
     @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
@@ -46,12 +52,6 @@ public class WorkerConfig {
 
     @Value("#{'${worker.groups:default}'.split(',')}")
     private Set<String> workerGroups;
-
-    @Value("${worker.listen.port: 1234}")
-    private int listenPort;
-
-    @Value("${worker.weight:100}")
-    private int weight;
 
     @Value("${alert.listen.host:localhost}")
     private String alertListenHost;
@@ -88,12 +88,12 @@ public class WorkerConfig {
         this.workerHeartbeatInterval = workerHeartbeatInterval;
     }
 
-    public int getWorkerFetchTaskNum() {
-        return workerFetchTaskNum;
+    public boolean getWorkerTenantAutoCreate() {
+        return workerTenantAutoCreate;
     }
 
-    public void setWorkerFetchTaskNum(int workerFetchTaskNum) {
-        this.workerFetchTaskNum = workerFetchTaskNum;
+    public void setWorkerTenantAutoCreate(boolean workerTenantAutoCreate) {
+        this.workerTenantAutoCreate = workerTenantAutoCreate;
     }
 
     public double getWorkerReservedMemory() {
@@ -115,12 +115,12 @@ public class WorkerConfig {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getHostWeight() {
+        return hostWeight;
     }
 
-    public void setWeight(int weight) {
-        this.weight = weight;
+    public void setHostWeight(int hostWeight) {
+        this.hostWeight = hostWeight;
     }
 
     public String getAlertListenHost() {
