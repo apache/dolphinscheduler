@@ -388,7 +388,7 @@
                   taskList.forEach(item => {
                     if (item.name === v1.name) {
                       depState = item.state
-                      const params = item.taskJson ? JSON.parse(item.taskJson).params : ''
+                      const params = item.taskParams ? JSON.parse(item.taskParams) : ''
                       let localParam = params.localParams || []
                       newTask.push({
                         id: v2.id,
