@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-public class ResourceWrapper extends Resource{
+public class ResourceWrapper extends Resource {
     private String userName;
 
     public String getUserName() {
