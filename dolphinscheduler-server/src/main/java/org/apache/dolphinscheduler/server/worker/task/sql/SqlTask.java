@@ -474,8 +474,16 @@ public class SqlTask extends AbstractTask {
             String paramName = m.group(1);
             Property prop = paramsPropsMap.get(paramName);
 
-            sqlParamsMap.put(index, prop);
-            index++;
+            if (prop == null) {
+                logger.error("setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
+                        + " with id: {}. So couldn't put Property in sqlParamsMap.", paramName, taskExecutionContext.getTaskInstanceId());
+            }
+            else {
+                sqlParamsMap.put(index, prop);
+                index++;
+                logger.info("setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.", paramName, content);
+            }
+
         }
     }
 
@@ -491,8 +499,13 @@ public class SqlTask extends AbstractTask {
         //parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
-        for (int i = 1; i <= sqlParamsMap.size(); i++) {
-            logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
+        if (sqlParamsMap == null) {
+            logger.info("printReplacedSql: sqlParamsMap is null.");
+        }
+        else {
+            for (int i = 1; i <= sqlParamsMap.size(); i++) {
+                logPrint.append(sqlParamsMap.get(i).getValue() + "(" + sqlParamsMap.get(i).getType() + ")");
+            }
         }
         logger.info("Sql Params are {}", logPrint);
     }
