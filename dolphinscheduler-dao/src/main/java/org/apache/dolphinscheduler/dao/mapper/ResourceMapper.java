@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Resource;
-
 import org.apache.dolphinscheduler.dao.entity.ResourceWrapper;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

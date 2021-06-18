@@ -28,8 +28,8 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.ResourceWrapper;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 
