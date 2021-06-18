@@ -27,4 +27,32 @@ public class ResourceWrapper extends Resource {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ResourceWrapper resource = (ResourceWrapper) o;
+
+        if (this.getId() != resource.getId()) {
+            return false;
+        }
+        if (!this.getUserName().equals(resource.getUserName())) {
+            return false;
+        }
+
+        return this.getAlias().equals(resource.getAlias();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + this.getUserName().hashCode();
+        return result;
+    }
 }
