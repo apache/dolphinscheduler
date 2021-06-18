@@ -41,11 +41,7 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -515,7 +511,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>();
-        Page<Resource> page = new Page<>(pageNo, pageSize);
+        Page<ResourceWrapper> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId = 0;
@@ -530,11 +526,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
 
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal,resourcesIds);
-        resourceIPage.getRecords().forEach(resource -> resource.setUserName(loginUser.getUserName()));
-
-        PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int)resourceIPage.getTotal());
+        IPage<ResourceWrapper> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal, resourcesIds);
+        PageInfo<ResourceWrapper> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotalCount((int) resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result,Status.SUCCESS);
@@ -623,7 +617,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
         List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
-        allResourceList.forEach(resource -> resource.setUserName(loginUser.getUserName()));
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result, Status.SUCCESS);
@@ -643,8 +636,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Map<String, Object> result = new HashMap<>();
 
         List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
-        allResourceList.forEach(resource -> resource.setUserName(loginUser.getUserName()));
-        
+
         String suffix = ".jar";
         if (programType != null) {
             switch (programType) {

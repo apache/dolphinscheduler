@@ -27,10 +27,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -235,9 +232,9 @@ public class ResourceMapperTest {
         resourcesUser.setUserId(1110);
         resourceUserMapper.insert(resourcesUser);
 
-        Page<Resource> page = new Page(1, 3);
+        Page<ResourceWrapper> page = new Page(1, 3);
 
-        IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
+        IPage<ResourceWrapper> resourceIPage = resourceMapper.queryResourcePaging(
                 page,
                 0,
                 -1,
@@ -245,7 +242,7 @@ public class ResourceMapperTest {
                 "",
                 new ArrayList<>()
         );
-        IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
+        IPage<ResourceWrapper> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
                 1110,
                 -1,

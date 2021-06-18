@@ -28,10 +28,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -263,9 +260,9 @@ public class ResourcesServiceTest {
     public void testQueryResourceListPaging() {
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
-        IPage<Resource> resourcePage = new Page<>(1, 10);
+        IPage<ResourceWrapper> resourcePage = new Page<>(1, 10);
         resourcePage.setTotal(1);
-        resourcePage.setRecords(getResourceList());
+        resourcePage.setRecords(getResourceWrapperList());
 
         Mockito.when(resourcesMapper.queryResourcePaging(Mockito.any(Page.class),
                 Mockito.eq(0), Mockito.eq(-1), Mockito.eq(0), Mockito.eq("test"), Mockito.any())).thenReturn(resourcePage);
@@ -274,6 +271,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         PageInfo pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        Assert.assertEquals("operator", ((ResourceWrapper)pageInfo.getLists().get(0)).getUserName());
 
     }
 
@@ -653,6 +651,14 @@ public class ResourcesServiceTest {
         return resources;
     }
 
+    private List<ResourceWrapper> getResourceWrapperList() {
+
+        List<ResourceWrapper> resources = new ArrayList<>();
+        resources.add(getResourceWrapper());
+        return resources;
+    }
+
+
     private Tenant getTenant() {
         Tenant tenant = new Tenant();
         tenant.setTenantCode("123");
@@ -669,6 +675,19 @@ public class ResourcesServiceTest {
         resource.setFullName("/ResourcesServiceTest.jar");
         resource.setType(ResourceType.FILE);
         return resource;
+    }
+
+    private ResourceWrapper getResourceWrapper() {
+
+        ResourceWrapper resourceWrapper = new ResourceWrapper();
+        resourceWrapper.setPid(-1);
+        resourceWrapper.setUserId(1);
+        resourceWrapper.setDescription("ResourcesServiceTest.jar");
+        resourceWrapper.setAlias("ResourcesServiceTest.jar");
+        resourceWrapper.setFullName("/ResourcesServiceTest.jar");
+        resourceWrapper.setType(ResourceType.FILE);
+        resourceWrapper.setUserName("operator");
+        return resourceWrapper;
     }
 
     private Resource getUdfResource() {

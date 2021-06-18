@@ -68,15 +68,10 @@ public class Resource {
    */
   private int userId;
 
-    /**
-     * user Name
-     */
-    private String userName;
-
-    /**
-     * resource type
-     */
-    private ResourceType type;
+  /**
+   * resource type
+   */
+  private ResourceType type;
 
   /**
    * resource size
@@ -143,15 +138,7 @@ public class Resource {
     this.size = size;
     this.createTime = createTime;
     this.updateTime = updateTime;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+  }
 
   public int getId() {
     return id;
