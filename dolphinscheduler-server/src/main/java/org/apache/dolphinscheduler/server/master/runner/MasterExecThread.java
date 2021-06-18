@@ -46,7 +46,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -59,7 +58,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -538,34 +536,7 @@ public class MasterExecThread implements Runnable {
                 if (StringUtils.isNotEmpty(preVarPool)) {
                     List<Property> properties = JSONUtils.toList(preVarPool, Property.class);
                     for (Property info : properties) {
-                        //for this taskInstance all the param in this part is IN.
-                        info.setDirect(Direct.IN);
-                        //get the pre taskInstance Property's name
-                        String proName = info.getProp();
-                        //if the Previous nodes have the Property of same name
-                        if (allProperty.containsKey(proName)) {
-                            //comparison the value of two Property
-                            Property otherPro = allProperty.get(proName);
-                            //if this property'value of loop is empty,use the other,whether the other's value is empty or not
-                            if (StringUtils.isEmpty(info.getValue())) {
-                                allProperty.put(proName, otherPro);
-                                //if  property'value of loop is not empty,and the other's value is not empty too, use the earlier value
-                            } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
-                                TaskInstance otherTask = allTaskInstance.get(proName);
-                                if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
-                                    allProperty.put(proName, info);
-                                    allTaskInstance.put(proName,preTaskInstance);
-                                } else {
-                                    allProperty.put(proName, otherPro);
-                                }
-                            } else {
-                                allProperty.put(proName, info);
-                                allTaskInstance.put(proName,preTaskInstance);
-                            }
-                        } else {
-                            allProperty.put(proName, info);
-                            allTaskInstance.put(proName,preTaskInstance);
-                        }
+                        setVarPoolValue(allProperty, allTaskInstance, preTaskInstance, info);
                     }
                 }
             }
@@ -575,16 +546,41 @@ public class MasterExecThread implements Runnable {
         }
     }
 
+    private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance, TaskInstance preTaskInstance, Property thisProperty) {
+        //for this taskInstance all the param in this part is IN.
+        thisProperty.setDirect(Direct.IN);
+        //get the pre taskInstance Property's name
+        String proName = thisProperty.getProp();
+        //if the Previous nodes have the Property of same name
+        if (allProperty.containsKey(proName)) {
+            //comparison the value of two Property
+            Property otherPro = allProperty.get(proName);
+            //if this property'value of loop is empty,use the other,whether the other's value is empty or not
+            if (StringUtils.isEmpty(thisProperty.getValue())) {
+                allProperty.put(proName, otherPro);
+                //if  property'value of loop is not empty,and the other's value is not empty too, use the earlier value
+            } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
+                TaskInstance otherTask = allTaskInstance.get(proName);
+                if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
+                    allProperty.put(proName, thisProperty);
+                    allTaskInstance.put(proName,preTaskInstance);
+                } else {
+                    allProperty.put(proName, otherPro);
+                }
+            } else {
+                allProperty.put(proName, thisProperty);
+                allTaskInstance.put(proName,preTaskInstance);
+            }
+        } else {
+            allProperty.put(proName, thisProperty);
+            allTaskInstance.put(proName,preTaskInstance);
+        }
+    }
+
     private void submitPostNode(String parentNodeName) {
         Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
-            try {
-                VarPoolUtils.convertVarPoolToMap(propToValue, processInstance.getVarPool());
-            } catch (ParseException e) {
-                logger.error("parse {} exception", processInstance.getVarPool(), e);
-                throw new RuntimeException();
-            }
             TaskNode taskNodeObject = dag.getNode(taskNode);
             taskInstances.add(createTaskInstance(processInstance, taskNodeObject));
         }

@@ -36,11 +36,6 @@ import org.slf4j.Logger;
 public abstract class AbstractTask {
 
     /**
-     * varPool string
-     */
-    protected String varPool;
-
-    /**
      * taskExecutionContext
      **/
     TaskExecutionContext taskExecutionContext;
@@ -132,14 +127,6 @@ public abstract class AbstractTask {
             logs.forEach(joiner::add);
             logger.info(" -> {}", joiner);
         }
-    }
-
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public String getVarPool() {
-        return varPool;
     }
 
     /**

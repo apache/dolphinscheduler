@@ -17,14 +17,10 @@
 
 package org.apache.dolphinscheduler.common.task.shell;
 
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * shell parameters
@@ -64,28 +60,6 @@ public class ShellParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return resourceList;
-    }
-
-    @Override
-    public void dealOutParam(String result) {
-        if (StringUtils.isEmpty(result)) {
-            return;
-        }
-        if (CollectionUtils.isEmpty(localParams)) {
-            return;
-        }
-        List<Property> outProperty = getOutProperty(localParams);
-        if (CollectionUtils.isEmpty(outProperty)) {
-            return;
-        }
-        Map<String, String> taskResult = getMapByString(result);
-        if (taskResult == null || taskResult.size() == 0) {
-            return;
-        }
-        for (Property info : outProperty) {
-            info.setValue(taskResult.get(info.getProp()));
-            varPool.add(info);
-        }
     }
 
 }
