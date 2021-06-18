@@ -999,7 +999,7 @@ public final class Constants {
     /**
      * dataSource sensitive param
      */
-    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
 
     /**
      * default worker group
