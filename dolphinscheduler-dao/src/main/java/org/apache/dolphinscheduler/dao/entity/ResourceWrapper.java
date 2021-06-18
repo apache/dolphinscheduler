@@ -46,7 +46,7 @@ public class ResourceWrapper extends Resource {
             return false;
         }
 
-        return this.getAlias().equals(resource.getAlias();
+        return this.getAlias().equals(resource.getAlias());
     }
 
     @Override
