@@ -532,6 +532,9 @@ public class MasterExecThread implements Runnable {
         if (CollectionUtils.isNotEmpty(preTask)) {
             for (String preTaskName : preTask) {
                 TaskInstance preTaskInstance = completeTaskList.get(preTaskName);
+                if (preTaskInstance == null) {
+                    continue;
+                }
                 String preVarPool = preTaskInstance.getVarPool();
                 if (StringUtils.isNotEmpty(preVarPool)) {
                     List<Property> properties = JSONUtils.toList(preVarPool, Property.class);

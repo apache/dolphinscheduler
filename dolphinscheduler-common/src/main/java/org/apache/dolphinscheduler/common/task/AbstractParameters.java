@@ -113,14 +113,15 @@ public abstract class AbstractParameters implements IParameters {
     }
 
     public void dealOutParam(String result) {
-        if (StringUtils.isEmpty(result)) {
-            return;
-        }
         if (CollectionUtils.isEmpty(localParams)) {
             return;
         }
         List<Property> outProperty = getOutProperty(localParams);
         if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        if (StringUtils.isEmpty(result)) {
+            varPool.addAll(outProperty);
             return;
         }
         Map<String, String> taskResult = getMapByString(result);
