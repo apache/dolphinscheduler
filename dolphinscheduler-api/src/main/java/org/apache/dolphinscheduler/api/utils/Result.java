@@ -73,18 +73,6 @@ public class Result<T> {
         return new Result<>(data);
     }
 
-    public Result withStatus(Status status) {
-        this.setCode(status.getCode());
-        this.setMsg(status.getMsg());
-        return this;
-    }
-
-    public Result withStatus(int code, String message) {
-        this.setCode(code);
-        this.setMsg(message);
-        return this;
-    }
-
     public boolean isSuccess() {
         return this.code != null && this.code.equals(Status.SUCCESS.getCode());
     }
