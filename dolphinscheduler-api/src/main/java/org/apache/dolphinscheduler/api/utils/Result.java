@@ -55,7 +55,7 @@ public class Result<T> {
         this.data = data;
     }
 
-    public Result(Status status) {
+    private Result(Status status) {
         if (status != null) {
             this.code = status.getCode();
             this.msg = status.getMsg();
@@ -74,7 +74,7 @@ public class Result<T> {
     }
 
     public boolean isSuccess() {
-        return this.code != null && this.code.equals(Status.SUCCESS.getCode());
+        return this.isStatus(Status.SUCCESS);
     }
 
     public boolean isFailed() {
@@ -82,7 +82,7 @@ public class Result<T> {
     }
 
     public boolean isStatus(Status status) {
-        return this.code.equals(status.getCode());
+        return this.code != null && this.code.equals(status.getCode());
     }
 
     /**

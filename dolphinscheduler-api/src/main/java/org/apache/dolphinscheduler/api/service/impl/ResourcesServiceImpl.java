@@ -1069,7 +1069,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             hadoopUtils.copyLocalToHdfs(localFilename, hdfsFileName, true, true);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            String errorMessage = String.format("copy %s to hdfs %s fail", localFilename, hdfsFileName);
             result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
             result.setMsg(String.format("copy %s to hdfs %s fail", localFilename, hdfsFileName));
             return result;

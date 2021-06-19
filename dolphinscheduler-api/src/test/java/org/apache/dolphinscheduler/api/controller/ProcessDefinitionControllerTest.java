@@ -116,7 +116,7 @@ public class ProcessDefinitionControllerTest {
         Mockito.when(processDefinitionService.verifyProcessDefinitionName(user, projectName, name)).thenReturn(result);
 
         Result response = processDefinitionController.verifyProcessDefinitionName(user, projectName, name);
-        Assert.assertTrue(response.isStatus(Status.PROCESS_DEFINE_NOT_EXIST));
+        Assert.assertTrue(response.isStatus(Status.PROCESS_DEFINITION_NAME_EXIST));
 
     }
 
