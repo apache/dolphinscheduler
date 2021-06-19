@@ -197,8 +197,7 @@ public class AlertPluginInstanceController extends BaseController {
         Result result = new Result();
         if (exist) {
             logger.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
-            result.setCode(Status.PLUGIN_INSTANCE_ALREADY_EXIT.getCode());
-            result.setMsg(Status.PLUGIN_INSTANCE_ALREADY_EXIT.getMsg());
+            result.newState(Status.PLUGIN_INSTANCE_ALREADY_EXIT);
         } else {
             result.setCode(Status.SUCCESS.getCode());
             result.setMsg(Status.SUCCESS.getMsg());

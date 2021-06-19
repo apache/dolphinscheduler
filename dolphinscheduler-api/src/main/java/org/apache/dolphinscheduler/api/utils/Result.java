@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
 /**
@@ -50,11 +51,11 @@ public class Result<T> {
     }
 
     private Result(T data) {
-        this.code  = 0;
+        this.code = 0;
         this.data = data;
     }
 
-    private Result(Status status) {
+    public Result(Status status) {
         if (status != null) {
             this.code = status.getCode();
             this.msg = status.getMsg();
@@ -70,6 +71,30 @@ public class Result<T> {
      */
     public static <T> Result<T> success(T data) {
         return new Result<>(data);
+    }
+
+    public Result withStatus(Status status) {
+        this.setCode(status.getCode());
+        this.setMsg(status.getMsg());
+        return this;
+    }
+
+    public Result withStatus(int code, String message) {
+        this.setCode(code);
+        this.setMsg(message);
+        return this;
+    }
+
+    public boolean isSuccess() {
+        return this.code != null && this.code.equals(Status.SUCCESS.getCode());
+    }
+
+    public boolean isFailed() {
+        return !this.isSuccess();
+    }
+
+    public boolean isStatus(Status status) {
+        return this.code.equals(status.getCode());
     }
 
     /**

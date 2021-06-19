@@ -87,7 +87,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         // check connect
         ConnectionParam connectionParam = DatasourceUtil.buildConnectionParams(datasourceParam);
         Result<Object> isConnection = checkConnection(datasourceParam.getType(), connectionParam);
-        if (Status.SUCCESS.getCode() != isConnection.getCode()) {
+        if (isConnection.isFailed()) {
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
             return result;
         }
@@ -157,7 +157,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
-        if (Status.SUCCESS.getCode() != isConnection.getCode()) {
+        if (isConnection.isFailed()) {
             return result;
         }
 
