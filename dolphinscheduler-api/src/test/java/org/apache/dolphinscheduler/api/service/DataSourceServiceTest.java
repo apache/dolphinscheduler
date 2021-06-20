@@ -38,8 +38,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 
-import org.apache.hadoop.fs.Stat;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;

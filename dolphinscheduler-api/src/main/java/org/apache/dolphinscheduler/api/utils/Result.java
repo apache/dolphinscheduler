@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
 /**
@@ -133,10 +132,11 @@ public class Result<T> {
 
     @Override
     public String toString() {
-        return "Status{" +
-                "code='" + code + '\'' +
-                ", msg='" + msg + '\'' +
-                ", data=" + data +
-                '}';
+        return "Status{"
+                + "code='" + code
+                + '\'' + ", msg='"
+                + msg + '\''
+                + ", data=" + data
+                + '}';
     }
 }
