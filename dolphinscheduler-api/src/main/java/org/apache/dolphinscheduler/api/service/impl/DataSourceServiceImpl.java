@@ -158,7 +158,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
         if (isConnection.isFailed()) {
-            return result;
+            return isConnection;
         }
 
         Date now = new Date();
