@@ -17,7 +17,7 @@
 
 registry.plugin.name=${REGISTRY_PLUGIN_NAME}
 registry.plugin.dir=${REGISTRY_PLUGIN_DIR}
-registry.plugin.binding=registry
+#registry.plugin.binding=registry
 registry.servers=${REGISTRY_SERVERS}
 
 
