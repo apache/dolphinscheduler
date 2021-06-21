@@ -95,6 +95,7 @@
     props: {},
     methods: {
       ...mapMutations('user', ['setUserInfo']),
+            ...mapActions('user', ['getUserInfo']),
       /**
        * edit
        */
@@ -110,6 +111,7 @@
           phone: param.phone
         })
         this.createUserDialog = false
+        this.getUserInfo()
       },
 
       close () {
