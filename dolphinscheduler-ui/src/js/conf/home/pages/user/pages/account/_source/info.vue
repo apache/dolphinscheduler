@@ -95,7 +95,7 @@
     props: {},
     methods: {
       ...mapMutations('user', ['setUserInfo']),
-            ...mapActions('user', ['getUserInfo']),
+      ...mapActions('user', ['getUserInfo']),
       /**
        * edit
        */
