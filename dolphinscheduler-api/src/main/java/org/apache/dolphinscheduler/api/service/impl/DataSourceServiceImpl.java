@@ -158,13 +158,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
         if (Status.SUCCESS.getCode() != isConnection.getCode()) {
-            return result;
+            return isConnection;
         }
 
         Date now = new Date();
 
         dataSource.setName(dataSource.getName().trim());
-        dataSource.setNote(dataSource.getNote());
+        dataSource.setNote(dataSourceParam.getNote());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));

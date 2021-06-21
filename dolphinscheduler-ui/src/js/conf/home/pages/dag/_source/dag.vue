@@ -388,7 +388,7 @@
                   taskList.forEach(item => {
                     if (item.name === v1.name) {
                       depState = item.state
-                      const params = item.taskJson ? JSON.parse(item.taskJson).params : ''
+                      const params = item.taskParams ? JSON.parse(item.taskParams) : ''
                       let localParam = params.localParams || []
                       newTask.push({
                         id: v2.id,
@@ -488,9 +488,9 @@
                   this.spinnerLoading = false
                   // Jump process definition
                   if (this.type === 'instance') {
-                    this.$router.push({ path: `/projects/instance/list/${this.urlParam.id}?_t=${new Date().getTime()}` })
+                    this.$router.push({ path: `/projects/${this.projectId}/instance/list/${this.urlParam.id}` })
                   } else {
-                    this.$router.push({ path: `/projects/definition/list/${this.urlParam.id}?_t=${new Date().getTime()}` })
+                    this.$router.push({ path: `/projects/${this.projectId}/definition/list/${this.urlParam.id}` })
                   }
                   resolve()
                 }).catch(e => {
@@ -738,7 +738,7 @@
           processDefinitionId: processDefinitionId
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
-          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}?_t=${new Date().getTime()}` })
+          this.$router.push({ path: `/projects/${this.projectId}/definition/list/${processDefinitionId}` })
         }).catch(e => {
           this.$store.state.dag.isSwitchVersion = false
           this.$message.error(e.msg || '')
@@ -882,7 +882,7 @@
       }
     },
     computed: {
-      ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
+      ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name', 'projectId'])
     },
     components: { mVersions, mFormModel, mFormLineModel, mUdp, mStart }
   }
