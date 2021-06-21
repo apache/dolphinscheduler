@@ -35,190 +35,194 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
 
 /**
- *  abstract yarn task
+ * abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractTask {
-  /**
-   * rules for extracting application ID
-   */
-  protected static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
-  /**
-   *  process task
-   */
-  private ShellCommandExecutor shellCommandExecutor;
-
-  /**
-   *  process database access
-   */
-  protected ProcessService processService;
-
-  /**
-   * Abstract Yarn Task
-   * @param taskExecutionContext taskExecutionContext
-   * @param logger    logger
-   */
-  public AbstractYarnTask(TaskExecutionContext taskExecutionContext, Logger logger) {
-    super(taskExecutionContext, logger);
-    this.processService = SpringApplicationContext.getBean(ProcessService.class);
-    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
-  }
-
-  @Override
-  public void handle() throws Exception {
-    try {
-      // SHELL task exit code
-      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
-      // get appIds from log
-      List<String> appIds = getAppIds(taskExecutionContext.getLogPath());
-      setExitStatusCode(commandExecuteResult.getExitStatusCode());
-      // if yarn task , yarn state is final state
-      if (commandExecuteResult.getExitStatusCode() == EXIT_CODE_SUCCESS){
-        setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
-      }
-      setAppIds(String.join(Constants.COMMA, appIds));
-      setProcessId(commandExecuteResult.getProcessId());
-    } catch (Exception e) {
-      logger.error("yarn process failure", e);
-      exitStatusCode = -1;
-      throw e;
-    }
-  }
-
-  /**
-   * check yarn state
-   *
-   * @param appIds application id list
-   * @return is success of yarn task state
-   */
-  public boolean isSuccessOfYarnState(List<String> appIds) {
-    boolean result = true;
-    try {
-      for (String appId : appIds) {
-        while(Stopper.isRunning()){
-          ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-          logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
-          if (ExecutionStatus.FAILURE.equals(applicationStatus) ||
-                  ExecutionStatus.KILL.equals(applicationStatus)) {
-            return false;
-          }
-          if (ExecutionStatus.SUCCESS.equals(applicationStatus)){
-            break;
-          }
-          Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-        }
-      }
-    } catch (Exception e) {
-      logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
-      result = false;
-    }
-    return result;
-
-  }
-
-
-  /**
-   * get app links
-   *
-   * @param logPath log path
-   * @return app id list
-   */
-  private List<String> getAppIds(String logPath) {
-    List<String> logs = convertFile2List(logPath);
-
-    List<String> appIds = new ArrayList<>();
     /**
-     * analysis log?get submited yarn application id
+     * rules for extracting application ID
      */
-    for (String log : logs) {
-      String appId = findAppId(log);
-      if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
-        logger.info("find app id: {}", appId);
-        appIds.add(appId);
-      }
+    protected static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
+
+    /**
+     * process database access
+     */
+    protected ProcessService processService;
+
+    /**
+     * process task
+     */
+    private ShellCommandExecutor shellCommandExecutor;
+
+    /**
+     * Abstract Yarn Task
+     *
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger               logger
+     */
+    public AbstractYarnTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+                taskExecutionContext,
+                logger);
     }
-    return appIds;
-  }
 
-  /**
-   * convert file to list
-   * @param filename file name
-   * @return line list
-   */
-  private List<String> convertFile2List(String filename) {
-    List lineList = new ArrayList<String>(100);
-    File file=new File(filename);
-
-    if (!file.exists()){
-      return lineList;
-    }
-
-    BufferedReader br = null;
-    try {
-      br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
-      String line = null;
-      while ((line = br.readLine()) != null) {
-        lineList.add(line);
-      }
-    } catch (Exception e) {
-      logger.error(String.format("read file: %s failed : ",filename),e);
-    } finally {
-      if(br != null){
+    @Override
+    public void handle() throws Exception {
         try {
-          br.close();
-        } catch (IOException e) {
-          logger.error(e.getMessage(),e);
+            // SHELL task exit code
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+            // parse appIds from log
+            List<String> appIds = parseAppIdsFromLog(taskExecutionContext.getLogPath());
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            // if yarn task , yarn state is final state
+            if (commandExecuteResult.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
+                setExitStatusCode(isSuccessOfYarnState(appIds) ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE);
+            }
+            setAppIds(String.join(Constants.COMMA, appIds));
+            setProcessId(commandExecuteResult.getProcessId());
+        } catch (Exception e) {
+            logger.error("yarn process failure", e);
+            exitStatusCode = -1;
+            throw e;
         }
-      }
+    }
+
+    /**
+     * check yarn state
+     *
+     * @param appIds application id list
+     * @return is success of yarn task state
+     */
+    public boolean isSuccessOfYarnState(List<String> appIds) {
+        boolean result = true;
+        try {
+            for (String appId : appIds) {
+                while (Stopper.isRunning()) {
+                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+                    logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
+                    if (ExecutionStatus.FAILURE.equals(applicationStatus) ||
+                            ExecutionStatus.KILL.equals(applicationStatus)) {
+                        return false;
+                    }
+                    if (ExecutionStatus.SUCCESS.equals(applicationStatus)) {
+                        break;
+                    }
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()), e);
+            result = false;
+        }
+        return result;
 
     }
-    return lineList;
-  }
 
-  /**
-   * find app id
-   * @param line line
-   * @return appid
-   */
-  private String findAppId(String line) {
-    Matcher matcher = APPLICATION_REGEX.matcher(line);
-    if (matcher.find()) {
-      return matcher.group();
+
+    /**
+     * get app links
+     *
+     * @param logPath log path
+     * @return app id list
+     */
+    private List<String> parseAppIdsFromLog(String logPath) {
+        List<String> logs = convertFile2List(logPath);
+
+        List<String> appIds = new ArrayList<>();
+        /**
+         * analysis log?get submited yarn application id
+         */
+        for (String log : logs) {
+            String appId = findAppId(log);
+            if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
+                logger.info("find app id: {}", appId);
+                appIds.add(appId);
+            }
+        }
+        return appIds;
     }
-    return null;
-  }
 
-  /**
-   * cancel application
-   * @param status status
-   * @throws Exception exception
-   */
-  @Override
-  public void cancelApplication(boolean status) throws Exception {
-    cancel = true;
-    // cancel process
-    shellCommandExecutor.cancelApplication();
-    TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
-    if (status && taskInstance != null){
-      ProcessUtils.killYarnJob(taskExecutionContext);
+    /**
+     * convert file to list
+     *
+     * @param filename file name
+     * @return line list
+     */
+    private List<String> convertFile2List(String filename) {
+        List lineList = new ArrayList<String>(100);
+        File file = new File(filename);
+
+        if (!file.exists()) {
+            return lineList;
+        }
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                lineList.add(line);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("read file: %s failed : ", filename), e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
+        }
+        return lineList;
     }
-  }
 
-  /**
-   * create command
-   * @return String
-   * @throws Exception exception
-   */
-  protected abstract String buildCommand() throws Exception;
+    /**
+     * find app id
+     *
+     * @param line line
+     * @return appid
+     */
+    private String findAppId(String line) {
+        Matcher matcher = APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
+    }
 
-  /**
-   * set main jar name
-   */
-  protected abstract void setMainJarName();
+    /**
+     * cancel application
+     *
+     * @param status status
+     * @throws Exception exception
+     */
+    @Override
+    public void cancelApplication(boolean status) throws Exception {
+        cancel = true;
+        // cancel process
+        shellCommandExecutor.cancelApplication();
+        TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+        if (status && taskInstance != null) {
+            ProcessUtils.killYarnJob(taskExecutionContext);
+        }
+    }
+
+    /**
+     * create command
+     *
+     * @return String
+     * @throws Exception exception
+     */
+    protected abstract String buildCommand() throws Exception;
+
+    /**
+     * set main jar name
+     */
+    protected abstract void setMainJarName();
 }
