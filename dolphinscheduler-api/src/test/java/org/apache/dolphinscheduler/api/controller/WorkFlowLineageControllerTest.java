@@ -73,7 +73,7 @@ public class WorkFlowLineageControllerTest extends AbstractControllerTest {
         result.put(Constants.DATA_LIST, 1);
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(searchVal, projectId)).thenReturn(result);
         Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectId, searchVal);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assert.assertTrue(response.isSuccess());
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
@@ -96,7 +96,7 @@ public class WorkFlowLineageControllerTest extends AbstractControllerTest {
         idSet.add(1);
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByIds(idSet, projectId)).thenReturn(result);
         Result response = workFlowLineageController.queryWorkFlowLineageByIds(user, projectId, ids);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assert.assertTrue(response.isSuccess());
     }
 
 }

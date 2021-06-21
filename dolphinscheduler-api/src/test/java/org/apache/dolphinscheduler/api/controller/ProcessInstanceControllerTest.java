@@ -59,7 +59,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.PROJECT_NOT_FOUNT));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
 
@@ -128,7 +128,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.TASK_INSTANCE_NOT_EXISTS));
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE));
     }
 
 
@@ -159,7 +159,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
 
@@ -175,7 +175,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test
@@ -190,6 +190,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR));
     }
 }

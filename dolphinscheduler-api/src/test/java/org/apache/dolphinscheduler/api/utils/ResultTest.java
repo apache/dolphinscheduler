@@ -31,18 +31,18 @@ public class ResultTest {
         HashMap<String, String> map = new HashMap<>();
         map.put("testdata", "test");
         Result ret = Result.success(map);
-        Assert.assertEquals(Status.SUCCESS.getCode(), ret.getCode().intValue());
+        Assert.assertTrue(ret.isSuccess());
     }
 
     @Test
     public void error() {
         Result ret = Result.error(Status.ACCESS_TOKEN_NOT_EXIST);
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST.getCode(), ret.getCode().intValue());
+        Assert.assertTrue(ret.isStatus(Status.ACCESS_TOKEN_NOT_EXIST));
     }
 
     @Test
     public void errorWithArgs() {
         Result ret = Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, "test internal server error");
-        Assert.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), ret.getCode().intValue());
+        Assert.assertTrue(ret.isStatus(Status.INTERNAL_SERVER_ERROR_ARGS));
     }
 }

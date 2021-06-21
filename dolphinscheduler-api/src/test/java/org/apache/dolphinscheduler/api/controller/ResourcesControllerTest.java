@@ -56,7 +56,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -78,7 +78,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -99,7 +99,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -121,7 +121,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -145,7 +145,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -166,7 +166,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -185,7 +185,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -212,7 +212,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -231,7 +231,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -258,7 +258,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -279,7 +279,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -299,7 +299,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -318,7 +318,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -336,7 +336,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -355,7 +355,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -374,7 +374,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -392,7 +392,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -411,7 +411,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -428,7 +428,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

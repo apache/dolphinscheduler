@@ -235,7 +235,7 @@ public class ResourcesServiceTest {
         Mockito.when(userMapper.selectById(Mockito.anyInt())).thenReturn(null);
         result = resourcesService.updateResource(user, 1, "ResourcesServiceTest1.jar", "ResourcesServiceTest", ResourceType.UDF, null);
         logger.info(result.toString());
-        Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertTrue(result.isStatus(Status.USER_NOT_EXIST));
 
         //TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
@@ -372,7 +372,8 @@ public class ResourcesServiceTest {
         PowerMockito.when(HadoopUtils.getHdfsResourceFileName("123", "test1")).thenReturn("test");
         result = resourcesService.verifyResourceName("/ResourcesServiceTest.jar", ResourceType.FILE, user);
         logger.info(result.toString());
-        Assert.assertTrue(Status.RESOURCE_EXIST.getCode() == result.getCode());
+
+        Assert.assertTrue(result.isStatus(Status.RESOURCE_EXIST));
 
         //SUCCESS
         result = resourcesService.verifyResourceName("test2", ResourceType.FILE, user);
@@ -410,7 +411,7 @@ public class ResourcesServiceTest {
         PowerMockito.when(FileUtils.suffix("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
-        Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertTrue(result.isStatus(Status.USER_NOT_EXIST));
 
         //TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
@@ -427,7 +428,7 @@ public class ResourcesServiceTest {
         }
         result = resourcesService.readResource(1, 1, 10);
         logger.info(result.toString());
-        Assert.assertTrue(Status.RESOURCE_FILE_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertTrue(result.isStatus(Status.RESOURCE_FILE_NOT_EXIST));
 
         //SUCCESS
         try {
@@ -511,13 +512,13 @@ public class ResourcesServiceTest {
         PowerMockito.when(FileUtils.suffix("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
-        Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertTrue(result.isStatus(Status.USER_NOT_EXIST));
 
         //TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
         result = resourcesService.updateResourceContent(1, "content");
         logger.info(result.toString());
-        Assert.assertTrue(Status.TENANT_NOT_EXIST.getCode() == result.getCode());
+        Assert.assertTrue(result.isStatus(Status.TENANT_NOT_EXIST));
 
         //SUCCESS
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());

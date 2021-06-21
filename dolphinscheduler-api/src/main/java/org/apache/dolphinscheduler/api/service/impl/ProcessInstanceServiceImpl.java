@@ -330,7 +330,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
                 Result<String> logResult = loggerService.queryLog(
                         taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
-                if (logResult.getCode() == Status.SUCCESS.ordinal()) {
+                if (logResult.isSuccess()) {
                     String log = logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
                     taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
