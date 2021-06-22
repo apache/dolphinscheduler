@@ -142,7 +142,7 @@ final class DolphinPluginDiscovery {
     }
 
     private static String javaName(String binaryName) {
-        return binaryName.replace('/', '.');
+        return binaryName.replace('/', '.').replace('\\', '.');
     }
 }
 
