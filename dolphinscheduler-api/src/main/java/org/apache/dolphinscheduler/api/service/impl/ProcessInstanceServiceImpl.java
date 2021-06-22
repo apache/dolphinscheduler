@@ -330,7 +330,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskInstance.getTaskType())) {
                 Result<String> logResult = loggerService.queryLog(
                         taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
-                if (logResult.getCode() == Status.SUCCESS.ordinal()) {
+                if (logResult.isSuccess()) {
                     String log = logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
                     taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
@@ -660,10 +660,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
-            String parameter = taskDefinitionLog.getTaskParams();
-            Map<String, String> map = JSONUtils.toMap(parameter);
-            String localParams = map.get(LOCAL_PARAMS);
-            if (localParams != null && !localParams.isEmpty()) {
+
+            String localParams = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), LOCAL_PARAMS);
+            if (StringUtils.isNotEmpty(localParams)) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
@@ -674,7 +673,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                     localUserDefParams.put(taskDefinitionLog.getName(), localParamsMap);
                 }
             }
-
         }
         return localUserDefParams;
     }

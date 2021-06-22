@@ -408,8 +408,9 @@ CREATE TABLE `t_ds_process_definition` (
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE,
+  UNIQUE KEY `code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------

@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.log;
 
+package org.apache.dolphinscheduler.service.log;
 
-import ch.qos.logback.classic.pattern.MessageConverter;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -26,16 +24,17 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.qos.logback.classic.pattern.ClassicConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
 /**
  * sensitive data log converter
  */
-public class SensitiveDataConverter extends MessageConverter {
-
+public class SensitiveDataConverter extends ClassicConverter {
     /**
      * password pattern
      */
     private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
-
 
     @Override
     public String convert(ILoggingEvent event) {
@@ -68,7 +67,6 @@ public class SensitiveDataConverter extends MessageConverter {
      * @param logMsg original log
      */
     private String passwordHandler(Pattern pwdPattern, String logMsg) {
-
         Matcher matcher = pwdPattern.matcher(logMsg);
 
         StringBuffer sb = new StringBuffer(logMsg.length());
@@ -85,6 +83,5 @@ public class SensitiveDataConverter extends MessageConverter {
 
         return sb.toString();
     }
-
 
 }
