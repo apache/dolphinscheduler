@@ -345,7 +345,7 @@ DROP TABLE IF EXISTS `t_ds_datasource`;
 CREATE TABLE `t_ds_datasource` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(64) NOT NULL COMMENT 'data source name',
-  `note` varchar(256) DEFAULT NULL COMMENT 'description',
+  `note` varchar(255) DEFAULT NULL COMMENT 'description',
   `type` tinyint(4) NOT NULL COMMENT 'data source type: 0:mysql,1:postgresql,2:hive,3:spark',
   `user_id` int(11) NOT NULL COMMENT 'the creator id',
   `connection_params` text NOT NULL COMMENT 'json connection params',
@@ -408,8 +408,9 @@ CREATE TABLE `t_ds_process_definition` (
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE,
+  UNIQUE KEY `code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -724,7 +725,7 @@ CREATE TABLE `t_ds_resources` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `alias` varchar(64) DEFAULT NULL COMMENT 'alias',
   `file_name` varchar(64) DEFAULT NULL COMMENT 'file name',
-  `description` varchar(256) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'user id',
   `type` tinyint(4) DEFAULT NULL COMMENT 'resource type,0:FILE，1:UDF',
   `size` bigint(20) DEFAULT NULL COMMENT 'resource size',
@@ -751,14 +752,14 @@ CREATE TABLE `t_ds_schedules` (
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'timezoneId',
-  `crontab` varchar(256) NOT NULL COMMENT 'crontab description',
+  `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',
   `warning_type` tinyint(4) NOT NULL COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(256) DEFAULT '' COMMENT 'worker group id',
+  `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
@@ -832,7 +833,7 @@ DROP TABLE IF EXISTS `t_ds_tenant`;
 CREATE TABLE `t_ds_tenant` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
-  `description` varchar(256) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `queue_id` int(11) DEFAULT NULL COMMENT 'queue id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
@@ -897,7 +898,7 @@ CREATE TABLE `t_ds_user` (
 DROP TABLE IF EXISTS `t_ds_worker_group`;
 CREATE TABLE `t_ds_worker_group` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `name` varchar(256) NOT NULL COMMENT 'worker group name',
+  `name` varchar(255) NOT NULL COMMENT 'worker group name',
   `addr_list` text NULL DEFAULT NULL COMMENT 'worker addr list. split by [,]',
   `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
