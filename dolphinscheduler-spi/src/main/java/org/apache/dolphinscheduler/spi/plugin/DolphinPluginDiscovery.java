@@ -145,3 +145,4 @@ final class DolphinPluginDiscovery {
         return binaryName.replace('/', '.');
     }
 }
+
