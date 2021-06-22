@@ -15,9 +15,13 @@
 # limitations under the License.
 #
 
-registry.plugin.name=${REGISTRY_PLUGIN_NAME}
+#registry.plugin.dir config the Registry Plugin dir.
 registry.plugin.dir=${REGISTRY_PLUGIN_DIR}
-#registry.plugin.binding=registry
+
+registry.plugin.name=${REGISTRY_PLUGIN_NAME}
 registry.servers=${REGISTRY_SERVERS}
 
+#maven.local.repository=/usr/local/localRepository
 
+#registry.plugin.binding config the Registry Plugin need be load when development and run in IDE
+#registry.plugin.binding=./dolphinscheduler-registry-plugin/dolphinscheduler-registry-zookeeper/pom.xml
