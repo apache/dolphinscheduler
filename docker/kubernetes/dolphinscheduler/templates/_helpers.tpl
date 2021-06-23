@@ -162,21 +162,27 @@ Create a database environment variables.
   {{- end }}
 {{- end -}}
 
-{{/* todo
-Create a rregistry environment variables.
+{{/*
+Create a registry environment variables.
 */}}
-{{- define "dolphinscheduler.zookeeper.env_vars" -}}
-- name: ZOOKEEPER_QUORUM
+{{- define "dolphinscheduler.registry.env_vars" -}}
+- name: REGISTRY_PLUGIN_DIR
+  {{- if .Values.zookeeper.enabled }}
+  value: "lib/plugin/registry"
+  {{- else }}
+  value: {{ .Values.externalRegistry.registryPluginDir }}
+  {{- end }}
+- name: REGISTRY_PLUGIN_NAME
+  {{- if .Values.zookeeper.enabled }}
+  value: "zookeeper"
+  {{- else }}
+  value: {{ .Values.externalRegistry.registryPluginName }}
+  {{- end }}
+- name: REGISTRY_SERVERS
   {{- if .Values.zookeeper.enabled }}
   value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
   {{- else }}
-  value: {{ .Values.externalZookeeper.zookeeperQuorum }}
-  {{- end }}
-- name: ZOOKEEPER_ROOT
-  {{- if .Values.zookeeper.enabled }}
-  value: {{ .Values.zookeeper.zookeeperRoot }}
-  {{- else }}
-  value: {{ .Values.externalZookeeper.zookeeperRoot }}
+  value: {{ .Values.externalRegistry.registryServers }}
   {{- end }}
 {{- end -}}
 
