@@ -110,9 +110,9 @@
           email: param.email,
           phone: param.phone
         })
-                this.getUserInfo().finally(() => {
-                    this.createUserDialog = false
-                })
+        this.getUserInfo().finally(() => {
+          this.createUserDialog = false
+        })
       },
 
       close () {
