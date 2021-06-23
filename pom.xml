@@ -1200,5 +1200,6 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
+        <module>dolphinscheduler-resource-plugin</module>
     </modules>
 </project>
