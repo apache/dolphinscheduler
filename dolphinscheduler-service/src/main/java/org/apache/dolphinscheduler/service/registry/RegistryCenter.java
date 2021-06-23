@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.service.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -57,16 +59,7 @@ public class RegistryCenter {
      */
     protected static String NODES;
 
-    /**
-     * master path
-     */
-    protected static String MASTER_PATH = "/nodes/master";
-
     private RegistryPluginManager registryPluginManager;
-    /**
-     * worker path
-     */
-    protected static String WORKER_PATH = "/nodes/worker";
 
     protected static final String EMPTY = "";
 
@@ -113,8 +106,9 @@ public class RegistryCenter {
      * init nodes
      */
     private void initNodes() {
-        persist(MASTER_PATH, EMPTY);
-        persist(WORKER_PATH, EMPTY);
+        persist(REGISTRY_DOLPHINSCHEDULER_MASTERS, EMPTY);
+        persist(REGISTRY_DOLPHINSCHEDULER_WORKERS, EMPTY);
+        persist(REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, EMPTY);
     }
 
     /**
@@ -209,31 +203,13 @@ public class RegistryCenter {
     }
 
     /**
-     * get master path
-     *
-     * @return master path
-     */
-    public String getMasterPath() {
-        return MASTER_PATH;
-    }
-
-    /**
      * whether master path
      *
      * @param path path
      * @return result
      */
     public boolean isMasterPath(String path) {
-        return path != null && path.contains(MASTER_PATH);
-    }
-
-    /**
-     * get worker path
-     *
-     * @return worker path
-     */
-    public String getWorkerPath() {
-        return WORKER_PATH;
+        return path != null && path.contains(REGISTRY_DOLPHINSCHEDULER_MASTERS);
     }
 
     /**
@@ -243,7 +219,7 @@ public class RegistryCenter {
      * @return worker group path
      */
     public String getWorkerGroupPath(String workerGroup) {
-        return WORKER_PATH + "/" + workerGroup;
+        return REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerGroup;
     }
 
     /**
@@ -253,7 +229,7 @@ public class RegistryCenter {
      * @return result
      */
     public boolean isWorkerPath(String path) {
-        return path != null && path.contains(WORKER_PATH);
+        return path != null && path.contains(REGISTRY_DOLPHINSCHEDULER_WORKERS);
     }
 
     /**
