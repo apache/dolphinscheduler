@@ -863,6 +863,7 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
     public static final String FLINK_PARALLELISM = "-p";
     public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
+    public static final String FLINK_PYTHON = "-py";
 
 
     public static final int[] NOT_TERMINATED_STATES = new int[] {
@@ -872,8 +873,8 @@ public final class Constants {
         ExecutionStatus.READY_PAUSE.ordinal(),
         ExecutionStatus.READY_STOP.ordinal(),
         ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-        ExecutionStatus.WAITTING_THREAD.ordinal(),
-        ExecutionStatus.WAITTING_DEPEND.ordinal()
+        ExecutionStatus.WAITING_THREAD.ordinal(),
+        ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
     /**
@@ -998,7 +999,7 @@ public final class Constants {
     /**
      * dataSource sensitive param
      */
-    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
 
     /**
      * default worker group

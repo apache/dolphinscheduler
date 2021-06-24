@@ -102,7 +102,7 @@ public class LoginController extends BaseController {
 
         // verify username and password
         Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
+        if (result.isFailed()) {
             return result;
         }
 
