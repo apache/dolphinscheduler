@@ -80,7 +80,7 @@
   </div>
 </template>
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapActions, mapState, mapMutations } from 'vuex'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 
@@ -95,6 +95,7 @@
     props: {},
     methods: {
       ...mapMutations('user', ['setUserInfo']),
+      ...mapActions('user', ['getUserInfo']),
       /**
        * edit
        */
@@ -109,7 +110,9 @@
           email: param.email,
           phone: param.phone
         })
-        this.createUserDialog = false
+        this.getUserInfo().finally(() => {
+          this.createUserDialog = false
+        })
       },
 
       close () {
