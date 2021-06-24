@@ -50,7 +50,7 @@ public class Result<T> {
     }
 
     private Result(T data) {
-        this.code  = 0;
+        this.code = 0;
         this.data = data;
     }
 
@@ -70,6 +70,18 @@ public class Result<T> {
      */
     public static <T> Result<T> success(T data) {
         return new Result<>(data);
+    }
+
+    public boolean isSuccess() {
+        return this.isStatus(Status.SUCCESS);
+    }
+
+    public boolean isFailed() {
+        return !this.isSuccess();
+    }
+
+    public boolean isStatus(Status status) {
+        return this.code != null && this.code.equals(status.getCode());
     }
 
     /**
@@ -120,10 +132,11 @@ public class Result<T> {
 
     @Override
     public String toString() {
-        return "Status{" +
-                "code='" + code + '\'' +
-                ", msg='" + msg + '\'' +
-                ", data=" + data +
-                '}';
+        return "Status{"
+                + "code='" + code
+                + '\'' + ", msg='"
+                + msg + '\''
+                + ", data=" + data
+                + '}';
     }
 }
