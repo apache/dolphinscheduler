@@ -83,6 +83,7 @@ final class DolphinPluginDiscovery {
 
         return listClasses(file.toPath()).stream()
                 .filter(name -> classInterfaces(name, classLoader).contains(DolphinSchedulerPlugin.class.getName()))
+                .map(plugin -> plugin.replace(File.separatorChar, '.'))
                 .collect(Collectors.toSet());
     }
 
@@ -141,7 +142,7 @@ final class DolphinPluginDiscovery {
     }
 
     private static String javaName(String binaryName) {
-        return binaryName.replace('/', '.').replace('\\', '.');
+        return binaryName.replace('/', '.');
     }
 }
 
