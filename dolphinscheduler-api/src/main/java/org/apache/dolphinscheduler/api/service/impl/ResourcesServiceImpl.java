@@ -311,8 +311,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        User user = getCurrentUser(resource.getUserId(), result);
+
+        if (result.isFailed()) {
+            return result;
+        }
+
         // query tenant by user id
-        String tenantCode = getTenantCode(resource.getUserId(),result);
+        String tenantCode = getTenantCode(user, result);
         if (StringUtils.isEmpty(tenantCode)) {
             return result;
         }
@@ -420,6 +426,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     resultMap.put(entry.getKey().toString(), entry.getValue());
                 }
             }
+            resultMap.put("userName", user.getUserName());
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
@@ -1279,14 +1286,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param result return result
      * @return tenant code
      */
-    private String getTenantCode(int userId,Result<Object> result) {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            logger.error("user {} not exists", userId);
-            putMsg(result, Status.USER_NOT_EXIST,userId);
-            return null;
-        }
-
+    private String getTenantCode(User user, Result<Object> result) {
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             logger.error("tenant not exists");
@@ -1294,6 +1294,31 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return null;
         }
         return tenant.getTenantCode();
+    }
+
+    private User getCurrentUser(int userId, Result<Object> result) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            logger.error("user {} not exists", userId);
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return null;
+        }
+        return user;
+    }
+
+    /**
+     * get tenantCode by UserId
+     *
+     * @param userId user id
+     * @param result return result
+     * @return tenant code
+     */
+    private String getTenantCode(int userId, Result<Object> result) {
+        User user = getCurrentUser(userId, result);
+        if (user == null) {
+            return null;
+        }
+        return getTenantCode(user, result);
     }
 
     /**
