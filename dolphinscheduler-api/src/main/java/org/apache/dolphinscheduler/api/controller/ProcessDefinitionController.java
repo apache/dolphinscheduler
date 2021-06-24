@@ -376,26 +376,25 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by id
+     * query detail of process definition by code
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param processId process definition id
+     * @param code process definition id
      * @return process definition detail
      */
-    @ApiOperation(value = "queryProcessDefinitionById", notes = "QUERY_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiOperation(value = "queryProcessDefinitionByCode", notes = "QUERY_PROCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789")
     })
-    @GetMapping(value = "/select-by-id")
+    @GetMapping(value = "/select-by-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryProcessDefinitionByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                             @RequestParam("processId") Integer processId
-    ) {
-        Map<String, Object> result = processDefinitionService.queryProcessDefinitionById(loginUser, projectName, processId);
+                                             @RequestParam(value = "code", required = true) long code) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionByCode(loginUser, projectName, code);
         return returnDataList(result);
     }
 
