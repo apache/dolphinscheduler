@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StreamUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -353,15 +354,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * query datail of process definition
+     * query detail of process definition
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param processId process definition id
+     * @param code process definition code
      * @return process definition detail
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
+    public Map<String, Object> queryProcessDefinitionByCode(User loginUser, String projectName, long code) {
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -372,14 +373,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processId);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
 
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
         } else {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-            result.put(Constants.DATA_LIST, processDefinition);
+            DagData dagData = processService.genDagData(processDefinition);
+            result.put(Constants.DATA_LIST, dagData);
             putMsg(result, Status.SUCCESS);
         }
         return result;

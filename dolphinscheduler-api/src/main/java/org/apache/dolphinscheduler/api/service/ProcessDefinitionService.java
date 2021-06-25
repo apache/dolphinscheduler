@@ -90,17 +90,17 @@ public interface ProcessDefinitionService {
                                                          Integer userId);
 
     /**
-     * query datail of process definition
+     * query detail of process definition
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param processId process definition id
+     * @param code process definition code
      * @return process definition detail
      */
 
-    Map<String, Object> queryProcessDefinitionById(User loginUser,
-                                                   String projectName,
-                                                   Integer processId);
+    Map<String, Object> queryProcessDefinitionByCode(User loginUser,
+                                                     String projectName,
+                                                     long code);
 
     /**
      * query datail of process definition
@@ -112,8 +112,8 @@ public interface ProcessDefinitionService {
      */
 
     Map<String, Object> queryProcessDefinitionByName(User loginUser,
-                                                   String projectName,
-                                                   String processDefinitionName);
+                                                     String projectName,
+                                                     String processDefinitionName);
 
     /**
      * batch copy process definition

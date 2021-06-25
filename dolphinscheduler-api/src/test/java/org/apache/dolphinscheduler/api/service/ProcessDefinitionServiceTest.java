@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -317,7 +318,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testQueryProcessDefinitionById() {
+    public void testQueryProcessDefinitionByCode() {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
@@ -332,33 +333,24 @@ public class ProcessDefinitionServiceTest {
 
         //project check auth fail
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Map<String, Object> map = processDefinitionService.queryProcessDefinitionById(loginUser,
-                "project_test1", 1);
+        Map<String, Object> map = processDefinitionService.queryProcessDefinitionByCode(loginUser,
+                "project_test1", 1L);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         //project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectName);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(processDefineMapper.selectById(1)).thenReturn(null);
+        DagData dagData = new DagData(getProcessDefinition(), null, null);
+        Mockito.when(processService.genDagData(Mockito.any())).thenReturn(dagData);
 
-        String processDefinitionJson = "{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
-                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
-                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
-                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
-                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
-                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
-                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}";
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-        Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(processData);
-
-        Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionById(loginUser,
-                "project_test1", 1);
+        Map<String, Object> instanceNotexitRes = processDefinitionService.queryProcessDefinitionByCode(loginUser,
+                "project_test1", 1L);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
 
         //instance exit
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
-        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionById(loginUser,
-                "project_test1", 46);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
+        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByCode(loginUser,
+                "project_test1", 46L);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -605,8 +597,6 @@ public class ProcessDefinitionServiceTest {
         // project check auth success, processs definition online
         ProcessDefinition processDefinition1 = getProcessDefinition();
         processDefinition1.setResourceIds("1,2");
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition1);
-        Mockito.when(processService.getUserById(1)).thenReturn(loginUser);
         Map<String, Object> onlineWithResourceRes = processDefinitionService.releaseProcessDefinition(
                 loginUser, "project_test1", 46, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
@@ -944,7 +934,6 @@ public class ProcessDefinitionServiceTest {
 
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
 
         String sqlDependentJson = "{\n"
                 + "    \"globalParams\": [\n"
