@@ -91,7 +91,23 @@ public class ParamUtils {
                 property.setValue(val);
             }
         }
-
+        
+        // set the schedule time
+        if (scheduleTime != null) {
+            if (globalParams == null) {
+                globalParams = new HashMap<>();
+            }
+            Date date = scheduleTime;
+            if (CommandType.COMPLEMENT_DATA.getCode() == commandType.getCode()) {
+                date = DateUtils.add(scheduleTime, DAY_OF_MONTH, 1);
+            }
+            String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
+            Property p = new Property();
+            p.setValue(dateTime);
+            p.setProp(Constants.PARAMETER_DATETIME);
+            globalParams.put(Constants.PARAMETER_DATETIME, p);
+        }
+        
         return globalParams;
     }
 
