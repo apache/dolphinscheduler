@@ -30,8 +30,6 @@
         </encoder>
     </appender>
 
-
-
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
         <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>

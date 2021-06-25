@@ -88,6 +88,7 @@ public class MapReduceTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
                 mapreduceParameters.getLocalParametersMap(),
+                mapreduceParameters.getVarPoolMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
 

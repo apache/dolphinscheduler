@@ -71,8 +71,6 @@ public class WorkerRegistryClientTest {
 
     @Before
     public void before() {
-
-        given(registryClient.getWorkerPath()).willReturn("/nodes/worker");
         given(workerConfig.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
         //given(heartBeatExecutor.getWorkerGroups()).willReturn(Sets.newHashSet("127.0.0.1"));
         //scheduleAtFixedRate
