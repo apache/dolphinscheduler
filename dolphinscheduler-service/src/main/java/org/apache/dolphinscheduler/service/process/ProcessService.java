@@ -65,6 +65,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CycleDependency;
+import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
@@ -2264,7 +2265,7 @@ public class ProcessService {
      * save task relations
      */
     public int saveTaskRelation(User operator, long projectCode, long processDefinitionCode, int processDefinitionVersion,
-                                 List<ProcessTaskRelationLog> taskRelationList) {
+                                List<ProcessTaskRelationLog> taskRelationList) {
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(projectCode, processDefinitionCode);
@@ -2489,8 +2490,28 @@ public class ProcessService {
     }
 
     /**
-     * generate ProcessData
+     * generate DagData
      */
+    public DagData genDagData(ProcessDefinition processDefinition) {
+        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
+        for (ProcessTaskRelationLog processTaskRelation : processTaskRelations) {
+            if (processTaskRelation.getPreTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(), processTaskRelation.getPreTaskVersion()));
+            }
+            if (processTaskRelation.getPostTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(), processTaskRelation.getPostTaskVersion()));
+            }
+        }
+        List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
+        return new DagData(processDefinition, processTaskRelations, taskDefinitionLogs);
+    }
+
+    /**
+     * generate ProcessData
+     * it will be replaced by genDagData method
+     */
+    @Deprecated
     public ProcessData genProcessData(ProcessDefinition processDefinition) {
         Map<String, String> locationMap = locationToMap(processDefinition.getLocations());
         List<TaskNode> taskNodes = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion(), locationMap);
@@ -2562,10 +2583,6 @@ public class ProcessService {
 
     /**
      * find task definition by code and version
-     *
-     * @param taskCode
-     * @param taskDefinitionVersion
-     * @return
      */
     public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
         return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
@@ -2573,10 +2590,6 @@ public class ProcessService {
 
     /**
      * query tasks definition list by process code and process version
-     *
-     * @param processCode
-     * @param processVersion
-     * @return
      */
     public List<TaskDefinitionLog> queryTaskDefinitionList(Long processCode, int processVersion) {
         List<ProcessTaskRelationLog> processTaskRelationLogs =
@@ -2617,7 +2630,7 @@ public class ProcessService {
      * add authorized resources
      *
      * @param ownResources own resources
-     * @param userId       userId
+     * @param userId userId
      */
     private void addAuthorizedResources(List<Resource> ownResources, int userId) {
         List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
