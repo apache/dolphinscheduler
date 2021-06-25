@@ -519,7 +519,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
-		
+        
         userMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
 
