@@ -47,6 +47,7 @@ public class ParamUtils {
     public static Map<String,Property> convert(Map<String,Property> globalParams,
                                                            Map<String,String> globalParamsMap,
                                                            Map<String,Property> localParams,
+                                                           Map<String,Property> varParams,
                                                            CommandType commandType,
                                                            Date scheduleTime) {
         if (globalParams == null && localParams == null) {
@@ -64,9 +65,14 @@ public class ParamUtils {
         }
 
         if (globalParams != null && localParams != null) {
-            globalParams.putAll(localParams);
+            localParams.putAll(globalParams);
+            globalParams = localParams;
         } else if (globalParams == null && localParams != null) {
             globalParams = localParams;
+        }
+        if (varParams != null) {
+            varParams.putAll(globalParams);
+            globalParams = varParams;
         }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {

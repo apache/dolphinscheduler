@@ -158,6 +158,7 @@ public class DataxTask extends AbstractTask {
             Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                     taskExecutionContext.getDefinedParams(),
                     dataXParameters.getLocalParametersMap(),
+                    dataXParameters.getVarPoolMap(),
                     CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                     taskExecutionContext.getScheduleTime());
 

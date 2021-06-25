@@ -133,7 +133,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cronutils.model.Cron;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -1584,71 +1583,51 @@ public class ProcessService {
                                 int processId,
                                 String appIds,
                                 int taskInstId,
-                                String varPool,
-                                String result) {
+                                String varPool) {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
         taskInstance.setVarPool(varPool);
-        changeOutParam(result, taskInstance);
+        changeOutParam(taskInstance);
         saveTaskInstance(taskInstance);
     }
 
-    public void changeOutParam(String result, TaskInstance taskInstance) {
-        if (StringUtils.isEmpty(result)) {
+    /**
+     * for show in page of taskInstance
+     * @param taskInstance
+     */
+    public void changeOutParam(TaskInstance taskInstance) {
+        if (StringUtils.isEmpty(taskInstance.getVarPool())) {
             return;
         }
-        List<Map<String, String>> workerResultParam = getListMapByString(result);
-        if (CollectionUtils.isEmpty(workerResultParam)) {
+        List<Property> properties = JSONUtils.toList(taskInstance.getVarPool(), Property.class);
+        if (CollectionUtils.isEmpty(properties)) {
             return;
         }
         //if the result more than one line,just get the first .
-        Map<String, String> row = workerResultParam.get(0);
-        if (row == null || row.size() == 0) {
-            return;
-        }
         Map<String, Object> taskParams = JSONUtils.toMap(taskInstance.getTaskParams(), String.class, Object.class);
         Object localParams = taskParams.get(LOCAL_PARAMS);
         if (localParams == null) {
             return;
         }
-        ProcessInstance processInstance = this.processInstanceMapper.queryDetailById(taskInstance.getProcessInstanceId());
-        List<Property> params4Property = JSONUtils.toList(processInstance.getGlobalParams(), Property.class);
-        Map<String, Property> allParamMap = params4Property.stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
-
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+        Map<String, String> outProperty = new HashMap<>();
+        for (Property info : properties) {
+            if (info.getDirect() == Direct.OUT) {
+                outProperty.put(info.getProp(), info.getValue());
+            }
+        }
         for (Property info : allParam) {
             if (info.getDirect() == Direct.OUT) {
                 String paramName = info.getProp();
-                Property property = allParamMap.get(paramName);
-                if (property == null) {
-                    continue;
-                }
-                String value = String.valueOf(row.get(paramName));
-                if (StringUtils.isNotEmpty(value)) {
-                    property.setValue(value);
-                    info.setValue(value);
-                }
+                info.setValue(outProperty.get(paramName));
             }
         }
         taskParams.put(LOCAL_PARAMS, allParam);
         taskInstance.setTaskParams(JSONUtils.toJsonString(taskParams));
-        String params4ProcessString = JSONUtils.toJsonString(params4Property);
-        int updateCount = this.processInstanceMapper.updateGlobalParamsById(params4ProcessString, processInstance.getId());
-        logger.info("updateCount:{}, params4Process:{}, processInstanceId:{}", updateCount, params4ProcessString, processInstance.getId());
     }
 
-    public List<Map<String, String>> getListMapByString(String json) {
-        List<Map<String, String>> allParams = new ArrayList<>();
-        ArrayNode paramsByJson = JSONUtils.parseArray(json);
-        Iterator<JsonNode> listIterator = paramsByJson.iterator();
-        while (listIterator.hasNext()) {
-            Map<String, String> param = JSONUtils.toMap(listIterator.next().toString(), String.class, String.class);
-            allParams.add(param);
-        }
-        return allParams;
-    }
 
     /**
      * convert integer list to string list
