@@ -68,10 +68,6 @@ public class TaskExecuteResponseCommand implements Serializable {
      * varPool string
      */
     private String varPool;
-    /**
-     * task return result
-     */
-    private String result;
 
     public void setVarPool(String varPool) {
         this.varPool = varPool;
@@ -142,13 +138,5 @@ public class TaskExecuteResponseCommand implements Serializable {
                 + ", processId=" + processId
                 + ", appIds='" + appIds + '\''
                 + '}';
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
     }
 }

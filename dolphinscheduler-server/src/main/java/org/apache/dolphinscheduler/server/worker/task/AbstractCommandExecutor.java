@@ -89,11 +89,6 @@ public abstract class AbstractCommandExecutor {
     protected boolean logOutputIsScuccess = false;
 
     /**
-     * SHELL result string
-     */
-    protected String taskResultString;
-
-    /**
      * taskExecutionContext
      */
     protected TaskExecutionContext taskExecutionContext;
@@ -365,7 +360,6 @@ public abstract class AbstractCommandExecutor {
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
-                        taskResultString = line;
                     }
                 }
             } catch (Exception e) {
@@ -593,11 +587,4 @@ public abstract class AbstractCommandExecutor {
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 
-    public String getTaskResultString() {
-        return taskResultString;
-    }
-
-    public void setTaskResultString(String taskResultString) {
-        this.taskResultString = taskResultString;
-    }
 }

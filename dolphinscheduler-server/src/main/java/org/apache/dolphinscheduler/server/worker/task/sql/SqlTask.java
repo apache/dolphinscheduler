@@ -111,8 +111,7 @@ public class SqlTask extends AbstractTask {
         Thread.currentThread().setName(threadLoggerInfoName);
 
         logger.info("Full sql parameters: {}", sqlParameters);
-        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {}, udfs : {},showType : {}, "
-                        + "connParams : {}, query max result limit : {}",
+        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
@@ -120,6 +119,7 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getUdfs(),
                 sqlParameters.getShowType(),
                 sqlParameters.getConnParams(),
+                sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
         try {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
@@ -171,6 +171,7 @@ public class SqlTask extends AbstractTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
                 sqlParameters.getLocalParametersMap(),
+                sqlParameters.getVarPoolMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
 
@@ -264,10 +265,9 @@ public class SqlTask extends AbstractTask {
                 String updateResult = String.valueOf(stmt.executeUpdate());
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
-
+            //deal out params
+            sqlParameters.dealOutParam(result);
             postSql(connection, postStatementsBinds);
-            this.setResultString(result);
-
         } catch (Exception e) {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;
@@ -275,6 +275,7 @@ public class SqlTask extends AbstractTask {
             close(resultSet, stmt, connection);
         }
     }
+
 
     public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
         String result = null;

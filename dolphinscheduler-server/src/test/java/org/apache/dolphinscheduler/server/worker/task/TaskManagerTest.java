@@ -164,11 +164,6 @@ public class TaskManagerTest {
         definedParams.put("time_gb", "2020-12-16 00:00:00");
         taskExecutionContext.setDefinedParams(definedParams);
         ShellTask shellTask = (ShellTask) TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
-        shellTask.setResultString("shell return");
-        String shellReturn = shellTask.getResultString();
-        shellTask.init();
-        shellTask.setResult(shellReturn);
-        Assert.assertSame(shellReturn, "shell return");
     }
 
     @Test
