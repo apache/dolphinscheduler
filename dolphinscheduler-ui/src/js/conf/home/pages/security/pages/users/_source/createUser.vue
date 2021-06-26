@@ -292,9 +292,8 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
-            this.state = this.item.state
             this.userState = this.item.state + '' || '1'
-            if (this.item.tenantId === 0 || this.item.tenantId) {
+            if (this.item.tenantId) {
               this.tenantId = this.item.tenantId
             }
             this.$nextTick(() => {
@@ -311,9 +310,8 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
-          this.state = this.item.state
           this.userState = this.state + '' || '1'
-          if (this.item.tenantId === 0 || this.item.tenantId) {
+          if (this.item.tenantId) {
             this.tenantId = this.item.tenantId
           }
           if (this.queueList.length > 0) {
