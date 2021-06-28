@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,12 +110,19 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Override
     public Map<String, Object> update(User loginUser, int pluginInstanceId, String instanceName, String pluginInstanceParams) {
 
-        AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
+        Map<String, Object> result = new HashMap<>();
+
+        AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.queryById(pluginInstanceId);
+
+        if (alertPluginInstance == null) {
+            putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL, pluginInstanceId);
+            return result;
+        }
+
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
         alertPluginInstance.setPluginInstanceParams(paramsMapJson);
         alertPluginInstance.setInstanceName(instanceName);
-        alertPluginInstance.setId(pluginInstanceId);
-        Map<String, Object> result = new HashMap<>();
+        alertPluginInstance.setUpdateTime(new Date());
         int i = alertPluginInstanceMapper.updateById(alertPluginInstance);
 
         if (i > 0) {
