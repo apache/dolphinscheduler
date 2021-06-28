@@ -253,7 +253,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     datanucleus-rdbms 4.1.7: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-rdbms/4.1.7, Apache 2.0
     derby 10.14.2.0: https://github.com/apache/derby, Apache 2.0
     druid 1.1.14: https://mvnrepository.com/artifact/com.alibaba/druid/1.1.14, Apache 2.0
-    fastjson 1.2.61: https://mvnrepository.com/artifact/com.alibaba/fastjson/1.2.61, Apache 2.0
+    fastjson 1.2.75: https://mvnrepository.com/artifact/com.alibaba/fastjson/1.2.75, Apache 2.0
     grpc-java 1.32.1: https://github.com/grpc/grpc-java, Apache 2.0
     gson 2.8.6: https://github.com/google/gson, Apache 2.0
     guava 20.0: https://mvnrepository.com/artifact/com.google.guava/guava/20.0, Apache 2.0
