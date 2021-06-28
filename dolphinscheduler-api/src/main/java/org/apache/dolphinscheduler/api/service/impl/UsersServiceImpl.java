@@ -486,6 +486,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception when operate hdfs
      */
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
