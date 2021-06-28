@@ -43,8 +43,8 @@ public class ListenerManager {
     /**
      * add listener(A node can only be monitored by one listener)
      */
-    public static void addListener(String path, SubscribeListener listener) {
-        List<SubscribeListener> subscribeListeners = listeners.computeIfAbsent(path, k -> new ArrayList<>());
+    public static void addListener(String key, SubscribeListener listener) {
+        List<SubscribeListener> subscribeListeners = listeners.computeIfAbsent(key, k -> new ArrayList<>());
         subscribeListeners.add(listener);
         subscribeListeners.sort(Comparator.reverseOrder());
     }

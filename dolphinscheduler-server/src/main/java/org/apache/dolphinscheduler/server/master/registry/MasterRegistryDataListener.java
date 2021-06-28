@@ -45,7 +45,6 @@ public class MasterRegistryDataListener implements SubscribeListener {
         this.order = order;
     }
 
-
     @Override
     public void notify(String path, DataChangeEvent event) {
         //monitor master
