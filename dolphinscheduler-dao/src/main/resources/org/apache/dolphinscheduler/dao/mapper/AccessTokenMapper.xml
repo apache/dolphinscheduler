@@ -31,4 +31,8 @@
         </if>
         order by t.update_time desc
     </select>
+    <delete id="deleteAccessTokenByUserId">
+        delete from t_ds_access_token
+        where user_id = #{userId}
+    </delete>
 </mapper>
