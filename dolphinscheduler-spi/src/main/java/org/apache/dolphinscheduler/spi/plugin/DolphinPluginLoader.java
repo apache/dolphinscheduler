@@ -104,7 +104,7 @@ public class DolphinPluginLoader {
     private void loadPlugin(URLClassLoader pluginClassLoader) {
         ServiceLoader<DolphinSchedulerPlugin> serviceLoader = ServiceLoader.load(DolphinSchedulerPlugin.class, pluginClassLoader);
         List<DolphinSchedulerPlugin> plugins = ImmutableList.copyOf(serviceLoader);
-        Preconditions.checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
+        Preconditions.checkState(!plugins.isEmpty(), "No service providers the plugin %s", DolphinSchedulerPlugin.class.getName());
         for (DolphinSchedulerPlugin plugin : plugins) {
             logger.info("Installing {}", plugin.getClass().getName());
             for (AbstractDolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
