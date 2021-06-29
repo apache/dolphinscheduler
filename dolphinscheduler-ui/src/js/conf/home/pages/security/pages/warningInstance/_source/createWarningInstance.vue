@@ -111,6 +111,10 @@
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
+        if (!this.pluginDefineId) {
+          this.$message.warning(`${i18n.$t('Select Alarm plugin')}`)
+          return false
+        }
         return true
       },
       // Select plugin
