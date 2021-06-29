@@ -72,7 +72,6 @@ public class AlertPluginInstanceMapperTest {
         AlertPluginInstance expectedAlertPlugin = createAlertPluginInstance();
         AlertPluginInstance realAlertedPlugin = alertPluginInstanceMapper.queryById(expectedAlertPlugin.getId());
         Assert.assertNotNull(realAlertedPlugin);
-        Assert.assertEquals(expectedAlertPlugin.getInstanceName(), realAlertedPlugin.getInstanceName());
         Assert.assertEquals(expectedAlertPlugin.getId(), realAlertedPlugin.getId());
     }
     
