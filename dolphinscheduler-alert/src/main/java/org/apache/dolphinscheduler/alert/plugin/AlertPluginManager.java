@@ -76,7 +76,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
-        checkState(alertChannelFactory != null, "Alert Plugin {} is not registered", name);
+        checkState(alertChannelFactory != null, "Alert Plugin %s is not registered", name);
 
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(alertChannelFactory.getClass().getClassLoader())) {
             AlertChannel alertChannel = alertChannelFactory.create();

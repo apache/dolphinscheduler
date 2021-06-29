@@ -89,11 +89,6 @@ public abstract class AbstractCommandExecutor {
     protected boolean logOutputIsScuccess = false;
 
     /**
-     * SHELL result string
-     */
-    protected String taskResultString;
-
-    /**
      * taskExecutionContext
      */
     protected TaskExecutionContext taskExecutionContext;
@@ -207,8 +202,8 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
-        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-            taskExecutionContext.getExecutePath(), processId, result.getExitStatusCode());
+        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+            taskExecutionContext.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
 
         // if SHELL task exit
         if (status) {
@@ -224,7 +219,8 @@ public abstract class AbstractCommandExecutor {
                 result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
             }
         } else {
-            logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
+            logger.error("process has failure , exitStatusCode:{}, processExitValue:{}, ready to kill ...",
+                 result.getExitStatusCode(), process.exitValue());
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
@@ -364,7 +360,6 @@ public abstract class AbstractCommandExecutor {
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
-                        taskResultString = line;
                     }
                 }
             } catch (Exception e) {
@@ -592,11 +587,4 @@ public abstract class AbstractCommandExecutor {
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 
-    public String getTaskResultString() {
-        return taskResultString;
-    }
-
-    public void setTaskResultString(String taskResultString) {
-        this.taskResultString = taskResultString;
-    }
 }

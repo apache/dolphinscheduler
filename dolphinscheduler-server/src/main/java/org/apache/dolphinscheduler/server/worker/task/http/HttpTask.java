@@ -135,6 +135,7 @@ public class HttpTask extends AbstractTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
                 httpParameters.getLocalParametersMap(),
+                httpParameters.getVarPoolMap(),
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
         List<HttpProperty> httpPropertyList = new ArrayList<>();

@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
@@ -52,6 +53,8 @@ import io.netty.channel.Channel;
 public class TaskKillProcessorTest {
 
     private TaskKillProcessor taskKillProcessor;
+
+    private WorkerManagerThread workerManager;
 
     private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
 
@@ -85,6 +88,8 @@ public class TaskKillProcessorTest {
         PowerMockito.mockStatic(LoggerUtils.class);
         PowerMockito.when(SpringApplicationContext.getBean(TaskCallbackService.class)).thenReturn(taskCallbackService);
         PowerMockito.when(SpringApplicationContext.getBean(WorkerConfig.class)).thenReturn(workerConfig);
+        WorkerManagerThread workerManager = PowerMockito.mock(WorkerManagerThread.class);
+        PowerMockito.when(SpringApplicationContext.getBean(WorkerManagerThread.class)).thenReturn(workerManager);
         PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class)).thenReturn(taskExecutionContextCacheManager);
         PowerMockito.doNothing().when(taskCallbackService).addRemoteChannel(anyInt(), any());
         PowerMockito.whenNew(NettyRemoteChannel.class).withAnyArguments().thenReturn(null);
@@ -102,7 +107,6 @@ public class TaskKillProcessorTest {
 
     @Test
     public void testProcess() {
-
         PowerMockito.when(taskExecutionContextCacheManager.getByTaskInstanceId(1)).thenReturn(taskExecutionContext);
         taskKillProcessor.process(channel, command);
 

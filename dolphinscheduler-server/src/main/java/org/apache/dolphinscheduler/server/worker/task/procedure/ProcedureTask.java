@@ -122,6 +122,7 @@ public class ProcedureTask extends AbstractTask {
             Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                     taskExecutionContext.getDefinedParams(),
                     procedureParameters.getLocalParametersMap(),
+                    procedureParameters.getVarPoolMap(),
                     CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                     taskExecutionContext.getScheduleTime());
 

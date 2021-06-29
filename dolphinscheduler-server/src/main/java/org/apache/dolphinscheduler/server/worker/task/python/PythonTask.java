@@ -92,7 +92,7 @@ public class PythonTask extends AbstractTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
-            setVarPool(pythonCommandExecutor.getVarPool());
+            pythonParameters.dealOutParam(pythonCommandExecutor.getVarPool());
         }
         catch (Exception e) {
             logger.error("python task failure", e);
@@ -119,6 +119,7 @@ public class PythonTask extends AbstractTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                         taskExecutionContext.getDefinedParams(),
                         pythonParameters.getLocalParametersMap(),
+                        pythonParameters.getVarPoolMap(),
                         CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                         taskExecutionContext.getScheduleTime());
         

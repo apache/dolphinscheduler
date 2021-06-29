@@ -36,11 +36,6 @@ import org.slf4j.Logger;
 public abstract class AbstractTask {
 
     /**
-     * varPool string
-     */
-    protected String varPool;
-
-    /**
      * taskExecutionContext
      **/
     TaskExecutionContext taskExecutionContext;
@@ -55,11 +50,6 @@ public abstract class AbstractTask {
      * SHELL process pid
      */
     protected int processId;
-
-    /**
-     * SHELL result string
-     */
-    protected String resultString;
 
     /**
      * other resource manager appId , for example : YARN etc
@@ -81,7 +71,7 @@ public abstract class AbstractTask {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger logger
+     * @param logger               logger
      */
     protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         this.taskExecutionContext = taskExecutionContext;
@@ -139,14 +129,6 @@ public abstract class AbstractTask {
         }
     }
 
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public String getVarPool() {
-        return varPool;
-    }
-
     /**
      * get exit status code
      *
@@ -174,14 +156,6 @@ public abstract class AbstractTask {
 
     public void setProcessId(int processId) {
         this.processId = processId;
-    }
-
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String resultString) {
-        this.resultString = resultString;
     }
 
     /**

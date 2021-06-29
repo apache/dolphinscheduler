@@ -217,6 +217,11 @@ public class TaskExecutionContext implements Serializable {
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
 
     /**
+     * taskInstance varPool
+     */
+    private String varPool;
+
+    /**
      * procedure TaskExecutionContext
      */
     private ProcedureTaskExecutionContext procedureTaskExecutionContext;
@@ -555,5 +560,13 @@ public class TaskExecutionContext implements Serializable {
                 + ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext
                 + ", procedureTaskExecutionContext=" + procedureTaskExecutionContext
                 + '}';
+    }
+
+    public String getVarPool() {
+        return varPool;
+    }
+
+    public void setVarPool(String varPool) {
+        this.varPool = varPool;
     }
 }

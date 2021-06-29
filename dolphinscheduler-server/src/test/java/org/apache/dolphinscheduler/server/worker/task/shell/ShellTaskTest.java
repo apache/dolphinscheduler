@@ -62,7 +62,6 @@ public class ShellTaskTest {
         System.setProperty("log4j2.disable.jmx", Boolean.TRUE.toString());
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
         PowerMockito.whenNew(ShellCommandExecutor.class).withAnyArguments().thenReturn(shellCommandExecutor);
-        shellCommandExecutor.setTaskResultString("shellReturn");
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
@@ -85,6 +84,7 @@ public class ShellTaskTest {
         taskExecutionContext.setTenantCode("roo");
         taskExecutionContext.setScheduleTime(new Date());
         taskExecutionContext.setQueue("default");
+        taskExecutionContext.setVarPool("[{\"direct\":\"IN\",\"prop\":\"test\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskExecutionContext.setTaskParams(
             "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
                 +
@@ -105,6 +105,7 @@ public class ShellTaskTest {
     public void testComplementData() throws Exception {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         shellCommandExecutor.isSuccessOfYarnState(new ArrayList<>());
         shellCommandExecutor.isSuccessOfYarnState(null);
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
@@ -116,16 +117,9 @@ public class ShellTaskTest {
         taskExecutionContext.setCmdTypeIfComplement(0);
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
-    }
-
-    @Test
-    public void testSetResult() {
-        shellTask = new ShellTask(taskExecutionContext, logger);
-        shellTask.init();
-        String r = "return";
-        shellTask.setResult(r);
     }
 
 }

@@ -89,6 +89,7 @@ public class SqlTaskTest {
         PowerMockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
         PowerMockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         PowerMockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
+        PowerMockito.when(taskExecutionContext.getVarPool()).thenReturn("[{\"direct\":\"IN\",\"prop\":\"test\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         sqlTaskExecutionContext.setConnectionParams(CONNECTION_PARAMS);
@@ -98,6 +99,7 @@ public class SqlTaskTest {
         PowerMockito.when(SpringApplicationContext.getBean(Mockito.any())).thenReturn(new AlertDao());
         alertClientService = PowerMockito.mock(AlertClientService.class);
         sqlTask = new SqlTask(taskExecutionContext, logger, alertClientService);
+        sqlTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         sqlTask.init();
     }
 

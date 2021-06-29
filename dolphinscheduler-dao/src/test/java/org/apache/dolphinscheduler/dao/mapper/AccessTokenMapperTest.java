@@ -16,12 +16,22 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,14 +41,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * AccessToken mapper test
@@ -57,8 +61,6 @@ public class AccessTokenMapperTest {
 
     /**
      * test insert
-     *
-     * @throws Exception
      */
     @Test
     public void testInsert() throws Exception {
@@ -66,6 +68,27 @@ public class AccessTokenMapperTest {
 
         AccessToken accessToken = createAccessToken(userId);
         assertThat(accessToken.getId(), greaterThan(0));
+    }
+
+    /**
+     * test delete AccessToken By UserId
+     */
+    @Test
+    public void testDeleteAccessTokenByUserId() throws Exception {
+        Integer userId = 1;
+        int insertCount = 0;
+
+        for (int i = 0; i < 10; i++) {
+            try {
+                createAccessToken(userId);
+                insertCount++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        int deleteCount = accessTokenMapper.deleteAccessTokenByUserId(userId);
+        Assert.assertEquals(insertCount, deleteCount);
     }
 
 
