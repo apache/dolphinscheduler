@@ -446,7 +446,7 @@ export default {
    */
   updateAlertPluginInstance ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get('alert-plugin-instance/update', payload, res => {
+      io.post('alert-plugin-instance/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

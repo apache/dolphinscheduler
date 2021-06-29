@@ -15,37 +15,34 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.task;
+package org.apache.dolphinscheduler.server.worker.task;
 
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SqlParametersTest {
-
-    private final String type = "MYSQL";
-    private final String sql = "select * from t_ds_user";
-    private final String udfs = "test-udfs-1.0.0-SNAPSHOT.jar";
-    private final int datasource = 1;
-    private final int sqlType = 0;
-    private final Boolean sendEmail = true;
-    private final int displayRows = 10;
-    private final String showType = "TABLE";
-    private final String title = "sql test";
-    private final int groupId = 0;
+/**
+ * shell task return test.
+ */
+@RunWith(PowerMockRunner.class)
+public class TaskParamsTest {
+    private static final Logger logger = LoggerFactory.getLogger(TaskParamsTest.class);
 
     @Test
-    public void testSqlParameters() {
+    public void testDealOutParam() {
         List<Property> properties = new ArrayList<>();
         Property property = new Property();
         property.setProp("test1");
@@ -54,32 +51,15 @@ public class SqlParametersTest {
         property.setValue("test1");
         properties.add(property);
 
-        SqlParameters sqlParameters = new SqlParameters();
-        Assert.assertTrue(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
-
-        sqlParameters.setType(type);
-        sqlParameters.setSql(sql);
-        sqlParameters.setUdfs(udfs);
-        sqlParameters.setDatasource(datasource);
-        sqlParameters.setSqlType(sqlType);
-        sqlParameters.setSendEmail(sendEmail);
-        sqlParameters.setDisplayRows(displayRows);
-        sqlParameters.setShowType(showType);
-        sqlParameters.setTitle(title);
-        sqlParameters.setGroupId(groupId);
-
-        Assert.assertEquals(type, sqlParameters.getType());
-        Assert.assertEquals(sql, sqlParameters.getSql());
-        Assert.assertEquals(udfs, sqlParameters.getUdfs());
-        Assert.assertEquals(datasource, sqlParameters.getDatasource());
-        Assert.assertEquals(sqlType, sqlParameters.getSqlType());
-        Assert.assertEquals(sendEmail, sqlParameters.getSendEmail());
-        Assert.assertEquals(displayRows, sqlParameters.getDisplayRows());
-        Assert.assertEquals(showType, sqlParameters.getShowType());
-        Assert.assertEquals(title, sqlParameters.getTitle());
-        Assert.assertEquals(groupId, sqlParameters.getGroupId());
+        ShellParameters shellParameters = new ShellParameters();
+        String resultShell = "key1=value1$VarPoolkey2=value2";
+        shellParameters.varPool = new ArrayList<>();
+        shellParameters.setLocalParams(properties);
+        shellParameters.dealOutParam(resultShell);
+        assertNotNull(shellParameters.getVarPool().get(0));
 
         String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
+        SqlParameters sqlParameters = new SqlParameters();
         String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
         sqlParameters.setLocalParams(properties);
         sqlParameters.varPool = new ArrayList<>();
@@ -93,4 +73,5 @@ public class SqlParametersTest {
         sqlParameters.dealOutParam(sqlResult);
         assertNotNull(sqlParameters.getVarPool().get(0));
     }
+
 }
