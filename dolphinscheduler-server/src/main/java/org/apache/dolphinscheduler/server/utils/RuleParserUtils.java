@@ -203,12 +203,12 @@ public class RuleParserUtils {
             DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DolphinException {
 
         List<WriterConfig> writerConfigList = new ArrayList<>();
-
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getWriterConnectorType())) {
             BaseDataSource writerDataSource = DataSourceFactory.getDatasource(DbType.of(dataQualityTaskExecutionContext.getWriterType()),
                     dataQualityTaskExecutionContext.getWriterConnectionParams());
             WriterConfig writerConfig = new WriterConfig();
             writerConfig.setType(dataQualityTaskExecutionContext.getWriterConnectorType());
+
             Map<String,Object> config = new HashMap<>();
             if (writerDataSource != null) {
                 config.put(DATABASE,writerDataSource.getDatabase());
@@ -220,12 +220,10 @@ public class RuleParserUtils {
                 config.put(SQL,sql);
             }
             writerConfig.setConfig(config);
-
             writerConfigList.add(writerConfig);
         }
 
         return writerConfigList;
-
     }
 
     public static String getOnClause(List<MappingColumn> mappingColumnList,Map<String,String> inputParameterValueResult) {

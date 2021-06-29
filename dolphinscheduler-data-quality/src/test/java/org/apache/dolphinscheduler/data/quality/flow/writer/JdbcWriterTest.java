@@ -49,6 +49,7 @@ public class JdbcWriterTest extends FlowTestBase {
 
     @Test
     public void testJdbcWriterExecute() {
+
         JdbcReader jdbcConnector = new JdbcReader(buildJdbcReaderConfig());
         JdbcWriter jdbcWriter = new JdbcWriter(buildJdbcConfig());
         jdbcWriter.write(jdbcConnector.read(sparkRuntimeEnvironment),sparkRuntimeEnvironment);

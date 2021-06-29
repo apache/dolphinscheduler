@@ -53,6 +53,7 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
         inputParameterValue.put(STATISTICS_TABLE,statisticsSql.getTableAlias());
 
         int index = 1;
+
         List<ReaderConfig> readerConfigList =
                 RuleParserUtils.getReaderConfigList(inputParameterValue,context);
         List<TransformerConfig> transformerConfigList = new ArrayList<>();
@@ -66,8 +67,8 @@ public class MultiTableAccuracyRuleParser implements IRuleParser {
 
         index = RuleParserUtils.replaceExecuteSqlPlaceholder(
                 context.getExecuteSqlList(),
-                                index,
-                                inputParameterValue,
+                index,
+                inputParameterValue,
                 transformerConfigList);
 
         List<WriterConfig> writerConfigList = RuleParserUtils.getWriterConfigList(

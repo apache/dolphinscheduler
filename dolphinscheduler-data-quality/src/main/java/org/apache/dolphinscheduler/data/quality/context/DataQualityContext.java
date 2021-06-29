@@ -64,5 +64,4 @@ public class DataQualityContext {
             throw new DataQualityException("stream mode is not supported now");
         }
     }
-
 }

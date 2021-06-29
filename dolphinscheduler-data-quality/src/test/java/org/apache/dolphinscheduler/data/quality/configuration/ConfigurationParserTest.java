@@ -49,6 +49,7 @@ public class ConfigurationParserTest {
                     + "80 as task_instance_id,miss_count.miss AS statistics_value, total_count.total AS comparison_value,2 as check_type,10 as"
                     + " threshold, 3 as operator, 0 as failure_strategy, '2021-06-29 10:18:59' as create_time,'2021-06-29 10:18:59' as update_time "
                     + "from miss_count FULL JOIN total_count\"} }]}";
+
             DataQualityConfiguration dataQualityConfiguration = JsonUtils.fromJson(parameterStr,DataQualityConfiguration.class);
             dataQualityConfiguration.validate();
         } catch (Exception e) {

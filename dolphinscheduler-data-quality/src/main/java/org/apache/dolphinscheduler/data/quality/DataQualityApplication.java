@@ -63,5 +63,4 @@ public class DataQualityApplication {
         DataQualityContext dataQualityContext = new DataQualityContext(sparkRuntimeEnvironment,dataQualityConfiguration);
         dataQualityContext.execute();
     }
-
 }

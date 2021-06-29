@@ -964,7 +964,6 @@ public final class Constants {
     public static final String OUTPUT_TABLE = "output_table";
     public static final String TMP_TABLE = "tmp_table";
 
-
     /**
      * session timeout
      */
