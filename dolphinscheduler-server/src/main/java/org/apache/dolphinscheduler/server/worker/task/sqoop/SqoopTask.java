@@ -76,6 +76,7 @@ public class SqoopTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(sqoopTaskExecutionContext.getDefinedParams()),
             sqoopTaskExecutionContext.getDefinedParams(),
             sqoopParameters.getLocalParametersMap(),
+            sqoopParameters.getVarPoolMap(),
             CommandType.of(sqoopTaskExecutionContext.getCmdTypeIfComplement()),
             sqoopTaskExecutionContext.getScheduleTime());
 

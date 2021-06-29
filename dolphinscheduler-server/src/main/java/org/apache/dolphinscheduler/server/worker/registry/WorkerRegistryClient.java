@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
 import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -130,7 +131,7 @@ public class WorkerRegistryClient {
     public Set<String> getWorkerZkPaths() {
         Set<String> workerPaths = Sets.newHashSet();
         String address = getLocalAddress();
-        String workerZkPathPrefix = registryClient.getWorkerPath();
+        String workerZkPathPrefix = REGISTRY_DOLPHINSCHEDULER_WORKERS;
 
         for (String workGroup : this.workerGroups) {
             StringJoiner workerPathJoiner = new StringJoiner(SLASH);
