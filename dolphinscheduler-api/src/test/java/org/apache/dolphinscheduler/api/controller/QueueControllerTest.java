@@ -54,7 +54,7 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -73,7 +73,7 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info("query list-paging queue return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
@@ -92,7 +92,7 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -111,7 +111,7 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -130,7 +130,7 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.QUEUE_VALUE_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.QUEUE_VALUE_EXIST));
 
         // success
         paramsMap.clear();
@@ -144,7 +144,7 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify queue return result:{}", mvcResult.getResponse().getContentAsString());
     }

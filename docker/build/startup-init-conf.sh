@@ -37,7 +37,7 @@ export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 #============================================================================
 # Registry
 #============================================================================
-export REGISTRY_PLUGIN_DIR=${REGISTRY_PLUGIN_DIR:-"lib/plugin/registry/zookeeper"}
+export REGISTRY_PLUGIN_DIR=${REGISTRY_PLUGIN_DIR:-"lib/plugin/registry"}
 export REGISTRY_PLUGIN_NAME=${REGISTRY_PLUGIN_NAME:-"zookeeper"}
 export REGISTRY_SERVERS=${REGISTRY_SERVERS:-"127.0.0.1:2181"}
 

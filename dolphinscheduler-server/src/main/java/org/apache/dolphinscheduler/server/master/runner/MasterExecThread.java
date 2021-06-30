@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_NAMES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -47,7 +46,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -60,7 +58,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -470,8 +467,6 @@ public class MasterExecThread implements Runnable {
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
-        //update processInstance for update the globalParams
-        this.processInstance = this.processService.findProcessInstanceById(this.processInstance.getId());
         TaskInstance taskInstance = findTaskIfExists(taskNode.getCode(), taskNode.getVersion());
         if (taskInstance == null) {
             taskInstance = new TaskInstance();
@@ -503,6 +498,9 @@ public class MasterExecThread implements Runnable {
             // retry task instance interval
             taskInstance.setRetryInterval(taskNode.getRetryInterval());
 
+            //set task param
+            taskInstance.setTaskParams(taskNode.getTaskParams());
+
             // task instance priority
             if (taskNode.getTaskInstancePriority() == null) {
                 taskInstance.setTaskInstancePriority(Priority.MEDIUM);
@@ -518,54 +516,74 @@ public class MasterExecThread implements Runnable {
             } else {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
-            taskInstance.setTaskParams(globalParamToTaskParams(taskNode.getTaskParams()));
             // delay execution time
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
+
+        //get pre task ,get all the task varPool to this task
+        Set<String> preTask =  dag.getPreviousNodes(taskInstance.getName());
+        getPreVarPool(taskInstance, preTask);
         return taskInstance;
     }
 
-    private String globalParamToTaskParams(String params) {
-        String globalParams = this.processInstance.getGlobalParams();
-        if (StringUtils.isBlank(globalParams)) {
-            return params;
-        }
-        Map<String, String> globalMap = processService.getGlobalParamMap(globalParams);
-        if (globalMap == null || globalMap.size() == 0) {
-            return params;
-        }
-        // the process global param save in localParams
-        Map<String, Object> result = JSONUtils.toMap(params, String.class, Object.class);
-        Object localParams = result.get(LOCAL_PARAMS);
-        if (localParams != null) {
-            List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
-            for (Property info : allParam) {
-                String paramName = info.getProp();
-                if (StringUtils.isNotEmpty(paramName) && propToValue.containsKey(paramName)) {
-                    info.setValue((String) propToValue.get(paramName));
+    public void getPreVarPool(TaskInstance taskInstance,  Set<String> preTask) {
+        Map<String,Property> allProperty = new HashMap<>();
+        Map<String,TaskInstance> allTaskInstance = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(preTask)) {
+            for (String preTaskName : preTask) {
+                TaskInstance preTaskInstance = completeTaskList.get(preTaskName);
+                if (preTaskInstance == null) {
+                    continue;
                 }
-                if (info.getDirect().equals(Direct.IN)) {
-                    String value = globalMap.get(paramName);
-                    if (StringUtils.isNotEmpty(value)) {
-                        info.setValue(value);
+                String preVarPool = preTaskInstance.getVarPool();
+                if (StringUtils.isNotEmpty(preVarPool)) {
+                    List<Property> properties = JSONUtils.toList(preVarPool, Property.class);
+                    for (Property info : properties) {
+                        setVarPoolValue(allProperty, allTaskInstance, preTaskInstance, info);
                     }
                 }
             }
-            result.put(LOCAL_PARAMS, allParam);
+            if (allProperty.size() > 0) {
+                taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
+            }
         }
-        return JSONUtils.toJsonString(result);
+    }
+
+    private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance, TaskInstance preTaskInstance, Property thisProperty) {
+        //for this taskInstance all the param in this part is IN.
+        thisProperty.setDirect(Direct.IN);
+        //get the pre taskInstance Property's name
+        String proName = thisProperty.getProp();
+        //if the Previous nodes have the Property of same name
+        if (allProperty.containsKey(proName)) {
+            //comparison the value of two Property
+            Property otherPro = allProperty.get(proName);
+            //if this property'value of loop is empty,use the other,whether the other's value is empty or not
+            if (StringUtils.isEmpty(thisProperty.getValue())) {
+                allProperty.put(proName, otherPro);
+                //if  property'value of loop is not empty,and the other's value is not empty too, use the earlier value
+            } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
+                TaskInstance otherTask = allTaskInstance.get(proName);
+                if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
+                    allProperty.put(proName, thisProperty);
+                    allTaskInstance.put(proName,preTaskInstance);
+                } else {
+                    allProperty.put(proName, otherPro);
+                }
+            } else {
+                allProperty.put(proName, thisProperty);
+                allTaskInstance.put(proName,preTaskInstance);
+            }
+        } else {
+            allProperty.put(proName, thisProperty);
+            allTaskInstance.put(proName,preTaskInstance);
+        }
     }
 
     private void submitPostNode(String parentNodeName) {
         Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
-            try {
-                VarPoolUtils.convertVarPoolToMap(propToValue, processInstance.getVarPool());
-            } catch (ParseException e) {
-                logger.error("parse {} exception", processInstance.getVarPool(), e);
-                throw new RuntimeException();
-            }
             TaskNode taskNodeObject = dag.getNode(taskNode);
             taskInstances.add(createTaskInstance(processInstance, taskNodeObject));
         }
@@ -673,7 +691,7 @@ public class MasterExecThread implements Runnable {
     private ExecutionStatus runningState(ExecutionStatus state) {
         if (state == ExecutionStatus.READY_STOP
                 || state == ExecutionStatus.READY_PAUSE
-                || state == ExecutionStatus.WAITTING_THREAD
+                || state == ExecutionStatus.WAITING_THREAD
                 || state == ExecutionStatus.DELAY_EXECUTION) {
             // if the running task is not completed, the state remains unchanged
             return state;
@@ -721,7 +739,7 @@ public class MasterExecThread implements Runnable {
      * @return Boolean whether has waiting thread task
      */
     private boolean hasWaitingThreadTask() {
-        List<TaskInstance> waitingList = getCompleteTaskByState(ExecutionStatus.WAITTING_THREAD);
+        List<TaskInstance> waitingList = getCompleteTaskByState(ExecutionStatus.WAITING_THREAD);
         return CollectionUtils.isNotEmpty(waitingList);
     }
 
@@ -768,7 +786,7 @@ public class MasterExecThread implements Runnable {
 
         // waiting thread
         if (hasWaitingThreadTask()) {
-            return ExecutionStatus.WAITTING_THREAD;
+            return ExecutionStatus.WAITING_THREAD;
         }
 
         // pause

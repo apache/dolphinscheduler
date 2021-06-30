@@ -21,8 +21,15 @@ import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UN
 
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.server.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 /**
  *  TaskExecutionContext builder
@@ -41,7 +48,7 @@ public class TaskExecutionContextBuilder {
      * @param taskInstance taskInstance
      * @return TaskExecutionContextBuilder
      */
-    public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance){
+    public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance) {
         taskExecutionContext.setTaskInstanceId(taskInstance.getId());
         taskExecutionContext.setTaskName(taskInstance.getName());
         taskExecutionContext.setFirstSubmitTime(taskInstance.getFirstSubmitTime());
@@ -52,6 +59,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setResources(taskInstance.getResources());
         taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
+        taskExecutionContext.setVarPool(taskInstance.getVarPool());
         return this;
     }
 
