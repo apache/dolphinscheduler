@@ -435,7 +435,6 @@ public class ResourceMapperTest {
     @Test
     public void testQueryResourceByResourceId() {
         Resource resource = insertOne();
-        System.out.println(resource.getId());
         Resource result = resourceMapper.queryResourceByResourceId(resource.getId());
         Assert.assertNotNull(result);
         Assert.assertEquals(resource.getUserName(), result.getUserName());
