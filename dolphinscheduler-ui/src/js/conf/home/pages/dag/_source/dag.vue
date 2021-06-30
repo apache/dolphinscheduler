@@ -529,34 +529,40 @@
         }
       },
       _verifConditions (value) {
-        let locations = this.store.state.dag.locations
-
-        let locationsArr = Object.keys(locations).map(key => {
-          return locations[key]
-        })
-
         let tasks = value
         let bool = true
-        let bool2 = false
+        let successFlag = true
         tasks.map(v => {
           if (v.type === 'CONDITIONS' && (v.conditionResult.successNode[0] === '' || v.conditionResult.successNode[0] === null || v.conditionResult.failedNode[0] === '' || v.conditionResult.failedNode[0] === null)) {
             bool = false
             return false
           }
 
-          locationsArr.map(item => {
-            if (v.type === 'CONDITIONS') {
-              let successNode = v.conditionResult.successNode[0]
-              if (successNode === item.name) {
-                bool2 = true
-              }
+          if (v.type === 'CONDITIONS') {
+            let rearNode = []
+            let rearList = []
+            $('div[data-targetarr*="' + v.id + '"]').each(function () {
+              rearNode.push($(this).attr('id'))
+            })
 
-              let failNode = v.conditionResult.failedNode[0]
-              if (failNode === item.name) {
-                bool2 = true
+            if (rearNode.length > 0) {
+              rearNode.forEach(item => {
+                let rearobj = {}
+                rearobj.value = $(`#${item}`).find('.name-p').text()
+                rearobj.label = $(`#${item}`).find('.name-p').text()
+                rearList.push(rearobj)
+              })
+            } else {
+              rearList = []
+            }
+
+            if (rearList.length > 0 && rearList.length === 2) {
+              if ((v.conditionResult.successNode[0] !== rearList[0].label && v.conditionResult.failedNode[0] !== rearList[1].label) || (v.conditionResult.failedNode[0] !== rearList[1].label && v.conditionResult.successNode[0] !== rearList[0].label)) {
+                successFlag = false
+                return false
               }
             }
-          })
+          }
         })
 
         if (!bool) {
@@ -565,11 +571,12 @@
           return false
         }
 
-        if (!bool2) {
+        if (!successFlag) {
           this.$message.warning(`${i18n.$t('Error branch')}`)
           this.spinnerLoading = false
           return false
         }
+
         return true
       },
       onUdpDialog () {
