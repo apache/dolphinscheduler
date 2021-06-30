@@ -20,19 +20,19 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -73,20 +73,19 @@ public class ParamsTest {
     }
 
     @Test
-    public void convertTest()throws Exception{
-        Map<String,Property> globalParams = new HashMap<>();
+    public void convertTest() throws Exception {
+        Map<String, Property> globalParams = new HashMap<>();
         Property property = new Property();
         property.setProp("global_param");
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("${system.biz.date}");
-        globalParams.put("global_param",property);
+        globalParams.put("global_param", property);
 
-        Map<String,String> globalParamsMap = new HashMap<>();
-        globalParamsMap.put("global_param","${system.biz.date}");
+        Map<String, String> globalParamsMap = new HashMap<>();
+        globalParamsMap.put("global_param", "${system.biz.date}");
 
-
-        Map<String,Property> localParams = new HashMap<>();
+        Map<String, Property> localParams = new HashMap<>();
         Property localProperty = new Property();
         localProperty.setProp("local_param");
         localProperty.setDirect(Direct.IN);
@@ -94,8 +93,16 @@ public class ParamsTest {
         localProperty.setValue("${global_param}");
         localParams.put("local_param", localProperty);
 
+        Map<String, Property> varPoolParams = new HashMap<>();
+        Property varProperty = new Property();
+        varProperty.setProp("local_param");
+        varProperty.setDirect(Direct.IN);
+        varProperty.setType(DataType.VARCHAR);
+        varProperty.setValue("${global_param}");
+        varPoolParams.put("varPool", varProperty);
+
         Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap,
-                localParams, CommandType.START_PROCESS, new Date());
+                localParams,varPoolParams, CommandType.START_PROCESS, new Date());
         logger.info(JSONUtils.toJsonString(paramsMap));
 
 
