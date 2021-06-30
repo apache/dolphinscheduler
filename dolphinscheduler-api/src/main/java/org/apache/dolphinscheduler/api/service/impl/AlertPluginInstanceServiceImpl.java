@@ -110,19 +110,10 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Override
     public Map<String, Object> update(User loginUser, int pluginInstanceId, String instanceName, String pluginInstanceParams) {
 
-        Map<String, Object> result = new HashMap<>();
-
-        AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.queryById(pluginInstanceId);
-
-        if (alertPluginInstance == null) {
-            putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL, pluginInstanceId);
-            return result;
-        }
-
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
-        alertPluginInstance.setPluginInstanceParams(paramsMapJson);
-        alertPluginInstance.setInstanceName(instanceName);
-        alertPluginInstance.setUpdateTime(new Date());
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(pluginInstanceId, paramsMapJson, instanceName, new Date());
+
+        Map<String, Object> result = new HashMap<>();
         int i = alertPluginInstanceMapper.updateById(alertPluginInstance);
 
         if (i > 0) {

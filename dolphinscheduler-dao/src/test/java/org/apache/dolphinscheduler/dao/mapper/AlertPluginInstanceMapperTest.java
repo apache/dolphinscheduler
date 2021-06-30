@@ -66,14 +66,6 @@ public class AlertPluginInstanceMapperTest {
         Assert.assertTrue(testAlertGroupList.size() > 0);
         AlertGroup alertGroup = testAlertGroupList.get(0);
     }
-
-    @Test
-    public void testQueryByAlertInstanceId() {
-        AlertPluginInstance expectedAlertPlugin = createAlertPluginInstance();
-        AlertPluginInstance realAlertedPlugin = alertPluginInstanceMapper.queryById(expectedAlertPlugin.getId());
-        Assert.assertNotNull(realAlertedPlugin);
-        Assert.assertEquals(expectedAlertPlugin.getId(), realAlertedPlugin.getId());
-    }
     
     @Test
     public void testExistInstanceName() {

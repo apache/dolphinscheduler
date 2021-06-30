@@ -36,13 +36,6 @@
         </foreach>
     </select>
 
-  
-    <select id="queryById" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
-        select id, plugin_define_id, plugin_instance_params, create_time, update_time, update_time
-        from t_ds_alert_plugin_instance
-        where id = #{id}
-    </select>
-  
     <select id="queryByInstanceName" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
         select
         *

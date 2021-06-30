@@ -179,7 +179,6 @@ public class AlertPluginInstanceServiceTest {
 
     @Test
     public void testUpdate() {
-        Mockito.when(alertPluginInstanceMapper.queryById(1)).thenReturn(new AlertPluginInstance(1, "testQuery", uiParams));
         Mockito.when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(0);
         Map<String, Object> result = alertPluginInstanceService.update(user, 1, "testUpdate", uiParams);
         Assert.assertEquals(Status.SAVE_ERROR, result.get(Constants.STATUS));
