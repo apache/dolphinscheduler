@@ -66,7 +66,6 @@ public class AlertPluginInstanceMapperTest {
         Assert.assertTrue(testAlertGroupList.size() > 0);
         AlertGroup alertGroup = testAlertGroupList.get(0);
     }
-    
     @Test
     public void testExistInstanceName() {
         String instanceName = "test_instance";
