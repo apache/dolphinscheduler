@@ -214,7 +214,6 @@ export default {
   'Please enter phone number': 'Please enter phone number',
   'Please enter email': 'Please enter email',
   'Please enter the correct email format': 'Please enter the correct email format',
-  'Email length is between 6 and 40': 'Email length is between 6 and 40',
   'Please enter the correct mobile phone format': 'Please enter the correct mobile phone format',
   Project: 'Project',
   Authorize: 'Authorize',
