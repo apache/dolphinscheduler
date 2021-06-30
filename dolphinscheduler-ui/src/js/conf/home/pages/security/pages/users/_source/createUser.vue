@@ -197,8 +197,8 @@
           return false
         }
         if (this.email.length <= 5 || this.email.length > 40) {
-           this.$message.warning(`${i18n.$t('Email length is between 6 and 40')}`)
-        return false
+          this.$message.warning(`${i18n.$t('Email length is between 6 and 40')}`)
+          return false
         }
         // Verify email
         if (!regEmail.test(this.email)) {
