@@ -113,6 +113,7 @@ public class SparkTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
             taskExecutionContext.getDefinedParams(),
             sparkParameters.getLocalParametersMap(),
+            sparkParameters.getVarPoolMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
 
