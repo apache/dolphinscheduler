@@ -110,17 +110,6 @@ public class ShellTaskReturnTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        shellTask.setResult("shell return string");
-        logger.info("shell return string:{}", shellTask.getResultString());
     }
 
-    @Test
-    public void testSetTaskResultString() {
-        shellCommandExecutor.setTaskResultString("shellReturn");
-    }
-
-    @Test
-    public void testGetTaskResultString() {
-        logger.info(shellCommandExecutor.getTaskResultString());
-    }
 }
