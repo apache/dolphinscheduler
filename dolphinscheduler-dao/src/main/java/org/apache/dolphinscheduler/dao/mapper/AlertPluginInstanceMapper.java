@@ -33,13 +33,6 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      * @return AlertPluginInstance list
      */
     List<AlertPluginInstance> queryAllAlertPluginInstanceList();
-    
-    /**
-     * query by alert group id
-     *
-     * @return AlertPluginInstance
-     */
-    AlertPluginInstance queryById(@Param("id") Integer id);
 
     /**
      * query by alert group id

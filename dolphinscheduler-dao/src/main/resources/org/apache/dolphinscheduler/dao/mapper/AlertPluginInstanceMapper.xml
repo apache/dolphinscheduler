@@ -48,5 +48,4 @@
         from t_ds_alert_plugin_instance
         where instance_name = #{instanceName} limit 1
     </select>
-
 </mapper>
