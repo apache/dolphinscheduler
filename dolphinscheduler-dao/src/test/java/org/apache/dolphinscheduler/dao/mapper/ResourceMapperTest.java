@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourceWrapper;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -82,6 +81,7 @@ public class ResourceMapperTest {
         resource.setDirectory(false);
         resource.setType(ResourceType.FILE);
         resource.setUserId(111);
+        resource.setUserName("test_user");
         int status = resourceMapper.insert(resource);
         if (status != 1) {
             Assert.fail("insert data error");
@@ -236,9 +236,9 @@ public class ResourceMapperTest {
         resourcesUser.setUserId(1110);
         resourceUserMapper.insert(resourcesUser);
 
-        Page<ResourceWrapper> page = new Page(1, 3);
+        Page<Resource> page = new Page(1, 3);
 
-        IPage<ResourceWrapper> resourceIPage = resourceMapper.queryResourcePaging(
+        IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
                 page,
                 0,
                 -1,
@@ -246,7 +246,7 @@ public class ResourceMapperTest {
                 "",
                 new ArrayList<>()
         );
-        IPage<ResourceWrapper> resourceIPage1 = resourceMapper.queryResourcePaging(
+        IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
                 1110,
                 -1,
@@ -430,6 +430,15 @@ public class ResourceMapperTest {
         Assert.assertNull(resourceMapper.existResource(fullName, userId, type));
         insertOne();
         Assert.assertTrue(resourceMapper.existResource(fullName, userId, type));
+    }
+
+    @Test
+    public void testQueryResourceByResourceId() {
+        Resource resource = insertOne();
+        System.out.println(resource.getId());
+        Resource result = resourceMapper.queryResourceByResourceId(resource.getId());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(resource.getUserName(), result.getUserName());
     }
 }
 

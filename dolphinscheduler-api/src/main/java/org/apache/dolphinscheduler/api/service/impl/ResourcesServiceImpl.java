@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourceWrapper;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -280,7 +279,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Resource resource = resourcesMapper.selectById(resourceId);
+        Resource resource = resourcesMapper.queryResourceByResourceId(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
@@ -311,14 +310,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        User user = getCurrentUser(resource.getUserId(), result);
-
-        if (result.isFailed()) {
-            return result;
-        }
-
         // query tenant by user id
-        String tenantCode = getTenantCode(user, result);
+        String tenantCode = getTenantCode(resource.getUserId(),result);
         if (StringUtils.isEmpty(tenantCode)) {
             return result;
         }
@@ -426,7 +419,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     resultMap.put(entry.getKey().toString(), entry.getValue());
                 }
             }
-            resultMap.put("userName", user.getUserName());
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
@@ -523,7 +515,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>();
-        Page<ResourceWrapper> page = new Page<>(pageNo, pageSize);
+        Page<Resource> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId = 0;
@@ -538,9 +530,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
 
-        IPage<ResourceWrapper> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal, resourcesIds);
-        PageInfo<ResourceWrapper> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) resourceIPage.getTotal());
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal,resourcesIds);
+
+        PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
+        pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result,Status.SUCCESS);
@@ -1286,7 +1279,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param result return result
      * @return tenant code
      */
-    private String getTenantCode(User user, Result<Object> result) {
+    private String getTenantCode(int userId,Result<Object> result) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            logger.error("user {} not exists", userId);
+            putMsg(result, Status.USER_NOT_EXIST,userId);
+            return null;
+        }
+
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             logger.error("tenant not exists");
@@ -1294,31 +1294,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return null;
         }
         return tenant.getTenantCode();
-    }
-
-    private User getCurrentUser(int userId, Result<Object> result) {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            logger.error("user {} not exists", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return null;
-        }
-        return user;
-    }
-
-    /**
-     * get tenantCode by UserId
-     *
-     * @param userId user id
-     * @param result return result
-     * @return tenant code
-     */
-    private String getTenantCode(int userId, Result<Object> result) {
-        User user = getCurrentUser(userId, result);
-        if (user == null) {
-            return null;
-        }
-        return getTenantCode(user, result);
     }
 
     /**

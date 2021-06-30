@@ -53,7 +53,7 @@
             and r.user_id=#{userId}
         </if>
     </select>
-    <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.ResourceWrapper">
+    <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="d"/>
@@ -75,6 +75,18 @@
         <if test="searchVal != null and searchVal != ''">
             and d.alias like concat('%', #{searchVal}, '%')
         </if>
+        order by d.update_time desc
+    </select>
+
+    <select id="queryResourceByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="d"/>
+        </include>
+        , u.user_name as user_name
+        from t_ds_resources d
+        join t_ds_user u on d.user_id = u.id
+        where d.id = #{id}
         order by d.update_time desc
     </select>
 

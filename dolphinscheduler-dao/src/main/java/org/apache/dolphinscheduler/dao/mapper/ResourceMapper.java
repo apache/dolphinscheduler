@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourceWrapper;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -62,12 +61,13 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @param resIds resIds
      * @return resource page
      */
-    IPage<ResourceWrapper> queryResourcePaging(IPage<ResourceWrapper> page,
-                                               @Param("userId") int userId,
-                                               @Param("id") int id,
-                                               @Param("type") int type,
-                                               @Param("searchVal") String searchVal,
-                                               @Param("resIds") List<Integer> resIds);
+    IPage<Resource> queryResourcePaging(IPage<Resource> page,
+                                        @Param("userId") int userId,
+                                        @Param("id") int id,
+                                        @Param("type") int type,
+                                        @Param("searchVal") String searchVal,
+                                        @Param("resIds") List<Integer> resIds);
+
 
     /**
      *  query resource except userId
@@ -129,6 +129,13 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return resource list
      */
     List<Resource> listResourceByIds(@Param("resIds")Integer[] resIds);
+
+    /**
+     * query resource by resourceId
+     * @param resourceId resource id
+     * @return resource
+     */
+    Resource queryResourceByResourceId(@Param("id")Integer resourceId);
 
     /**
      * update resource
