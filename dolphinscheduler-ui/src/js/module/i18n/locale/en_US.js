@@ -69,7 +69,7 @@ export default {
   Add: 'Add',
   'DAG graph name cannot be empty': 'DAG graph name cannot be empty',
   'Create Datasource': 'Create Datasource',
-  'Project Home': 'Project Home',
+  'Project Home': 'Workflow Monitor',
   'Project Manage': 'Project',
   'Create Project': 'Create Project',
   'Cron Manage': 'Cron Manage',
