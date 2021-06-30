@@ -255,20 +255,20 @@ public class Resource {
 
     @Override
     public String toString() {
-        return "Resource{" +
-                "id=" + id +
-                ", pid=" + pid +
-                ", alias='" + alias + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", isDirectory=" + isDirectory +
-                ", description='" + description + '\'' +
-                ", fileName='" + fileName + '\'' +
-                ", userId=" + userId +
-                ", type=" + type +
-                ", size=" + size +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return "Resource{"
+                + "id=" + id
+                + ", pid=" + pid
+                + ", alias='" + alias + '\''
+                + ", fullName='" + fullName + '\''
+                + ", isDirectory=" + isDirectory
+                + ", description='" + description + '\''
+                + ", fileName='" + fileName + '\''
+                + ", userId=" + userId
+                + ", type=" + type
+                + ", size=" + size
+                + ", createTime=" + createTime
+                + ", updateTime=" + updateTime
+                + '}';
     }
 
     @Override
