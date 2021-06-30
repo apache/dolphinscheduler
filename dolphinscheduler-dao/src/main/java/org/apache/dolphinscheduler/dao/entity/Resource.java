@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -42,6 +43,12 @@ public class Resource {
    * resource alias
    */
   private String alias;
+
+  /**
+   * user name
+   */
+  @TableField(exist = false)
+  private String userName;
 
   /**
    * full name
@@ -204,6 +211,13 @@ public class Resource {
     this.userId = userId;
   }
 
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
 
   public ResourceType getType() {
     return type;
