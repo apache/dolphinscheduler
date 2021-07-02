@@ -59,7 +59,7 @@
       tmp: Boolean
     },
     methods: {
-      _close() {
+      _close () {
         this.$emit('closeRelatedItems')
       },
       _ok () {
