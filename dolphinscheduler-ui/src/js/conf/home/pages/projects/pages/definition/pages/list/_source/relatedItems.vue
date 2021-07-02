@@ -19,6 +19,7 @@
           ref="popup"
           :ok-text="$t('Confirm')"
           :nameText="$t('Related items')"
+          @close="_close"
           @ok="_ok">
     <template slot="content">
       <div class="create-tenement-model">
@@ -58,6 +59,9 @@
       tmp: Boolean
     },
     methods: {
+      _close() {
+        this.$emit('closeRelatedItems')
+      },
       _ok () {
         if (this._verification()) {
           if (this.tmp) {
