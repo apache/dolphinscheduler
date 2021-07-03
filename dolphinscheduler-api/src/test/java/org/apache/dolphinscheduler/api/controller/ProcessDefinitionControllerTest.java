@@ -67,7 +67,6 @@ public class ProcessDefinitionControllerTest {
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setUserName("admin");
-
         user = loginUser;
     }
 
@@ -190,14 +189,14 @@ public class ProcessDefinitionControllerTest {
     public void testBatchCopyProcessDefinition() throws Exception {
 
         String projectName = "test";
-        int targetProjectId = 2;
-        String id = "1";
+        String targetProjectName = "test1";
+        String code = "1";
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user, projectName, id, targetProjectId)).thenReturn(result);
-        Result response = processDefinitionController.copyProcessDefinition(user, projectName, id, targetProjectId);
+        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user, projectName, code, targetProjectName)).thenReturn(result);
+        Result response = processDefinitionController.copyProcessDefinition(user, projectName, code, targetProjectName);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }

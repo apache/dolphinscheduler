@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE
 import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_PROJECT;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
@@ -73,7 +73,7 @@ public class ProjectController extends BaseController {
     /**
      * create project
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectName project name
      * @param description description
      * @return returns an error if it exists
@@ -97,8 +97,8 @@ public class ProjectController extends BaseController {
     /**
      * update project
      *
-     * @param loginUser   login user
-     * @param projectCode   project code
+     * @param loginUser login user
+     * @param projectCode project code
      * @param projectName project name
      * @param description description
      * @return update result code
@@ -136,10 +136,10 @@ public class ProjectController extends BaseController {
     })
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROJECT_DETAILS_BY_ID_ERROR)
+    @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam("projectCode") Long projectCode) {
+    public Result queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @RequestParam("projectCode") Long projectCode) {
         Map<String, Object> result = projectService.queryByCode(loginUser, projectCode);
         return returnDataList(result);
     }
@@ -149,8 +149,8 @@ public class ProjectController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize  page size
-     * @param pageNo    page number
+     * @param pageSize page size
+     * @param pageNo page number
      * @return project list which the login user have permission to see
      */
     @ApiOperation(value = "queryProjectListPaging", notes = "QUERY_PROJECT_LIST_PAGING_NOTES")
@@ -201,7 +201,7 @@ public class ProjectController extends BaseController {
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return the projects which user have not permission to see
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
@@ -223,7 +223,7 @@ public class ProjectController extends BaseController {
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     @ApiOperation(value = "queryAuthorizedProject", notes = "QUERY_AUTHORIZED_PROJECT_NOTES")
@@ -259,13 +259,13 @@ public class ProjectController extends BaseController {
     /**
      * import process definition
      *
-     * @param loginUser   login user
-     * @param file        resource file
+     * @param loginUser login user
+     * @param file resource file
      * @param projectName project name
      * @return import result code
      */
 
-    @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "importProcessDefinition", notes = "EXPORT_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })
