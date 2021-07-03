@@ -136,14 +136,14 @@ public class ProcessDefinitionController extends BaseController {
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param processDefinitionIds process definition ids
-     * @param targetProjectId target project id
+     * @param processDefinitionCodes process definition codes
+     * @param targetProjectName target project name
      * @return copy result code
      */
-    @ApiOperation(value = "copyProcessDefinition", notes = "COPY_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "copy", notes = "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
-            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, dataType = "Int", example = "10")
+            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "3,4"),
+            @ApiImplicitParam(name = "targetProjectName", value = "TARGET_PROJECT_NAME", required = true, dataType = "String", example = "ddd")
     })
     @PostMapping(value = "/copy")
     @ResponseStatus(HttpStatus.OK)
@@ -151,10 +151,10 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                        @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
-                                        @RequestParam(value = "targetProjectId", required = true) int targetProjectId) {
+                                        @RequestParam(value = "processDefinitionCodes", required = true) String processDefinitionCodes,
+                                        @RequestParam(value = "targetProjectName", required = true) String targetProjectName) {
         return returnDataList(
-                processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, processDefinitionIds, targetProjectId));
+                processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, processDefinitionCodes, targetProjectName));
     }
 
     /**

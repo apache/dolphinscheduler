@@ -387,6 +387,8 @@ public class ProcessDefinitionServiceTest {
 
         //instance exit
         Mockito.when(processDefineMapper.queryByDefineName(project.getCode(), "test")).thenReturn(getProcessDefinition());
+        putMsg(result, Status.SUCCESS, projectName);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByName(loginUser,
                 "project_test1", "test");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -398,30 +400,32 @@ public class ProcessDefinitionServiceTest {
         String projectName = "project_test1";
         Project project = getProject(projectName);
         User loginUser = new User();
-        loginUser.setId(-1);
+        loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectName);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
 
         // copy project definition ids empty test
-        Map<String, Object> map = processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, StringUtils.EMPTY, 0);
-        Assert.assertEquals(Status.PROCESS_DEFINITION_IDS_IS_EMPTY, map.get(Constants.STATUS));
+        Map<String, Object> map = processDefinitionService.batchCopyProcessDefinition(loginUser, projectName, StringUtils.EMPTY, "project_test2");
+        Assert.assertEquals(Status.PROCESS_DEFINITION_CODES_IS_EMPTY, map.get(Constants.STATUS));
 
-        Map<String, Object> result = new HashMap<>();
 
         // project check auth fail
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map1 = processDefinitionService.batchCopyProcessDefinition(
-                loginUser, projectName, String.valueOf(project.getId()), 0);
+                loginUser, projectName, String.valueOf(project.getId()), "project_test2");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map1.get(Constants.STATUS));
 
         // project check auth success, target project is null
-        putMsg(result, Status.SUCCESS, projectName);
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(projectMapper.queryDetailById(0)).thenReturn(null);
+        putMsg(result, Status.PROJECT_NOT_FOUNT, "project_test2");
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> map2 = processDefinitionService.batchCopyProcessDefinition(
-                loginUser, projectName, String.valueOf(project.getId()), 0);
+                loginUser, projectName, String.valueOf(project.getId()), "project_test2");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map2.get(Constants.STATUS));
 
         // project check auth success, target project name not equal project name, check auth target project fail
@@ -430,21 +434,13 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
 
         putMsg(result, Status.SUCCESS, projectName);
-        String projectName2 = "project_test2";
-        Project project2 = getProject(projectName2);
-        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(project2);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project2, projectName2)).thenReturn(result);
-        Mockito.when(projectMapper.queryDetailById(1)).thenReturn(project2);
         // instance exit
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
         definition.setConnects("[]");
 
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
-        Mockito.when(processService.genProcessData(Mockito.any())).thenReturn(getProcessData());
-
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
-                loginUser, projectName, "46", 1);
+                loginUser, projectName, "46", projectName);
         Assert.assertEquals(Status.COPY_PROCESS_DEFINITION_ERROR, map3.get(Constants.STATUS));
     }
 

@@ -74,7 +74,7 @@ public enum Status {
     LIST_WORKERS_ERROR(10044, "list workers error", "查询worker列表错误"),
     LIST_MASTERS_ERROR(10045, "list masters error", "查询master列表错误"),
     UPDATE_PROJECT_ERROR(10046, "update project error", "更新项目信息错误"),
-    QUERY_PROJECT_DETAILS_BY_ID_ERROR(10047, "query project details by id error", "查询项目详细信息错误"),
+    QUERY_PROJECT_DETAILS_BY_CODE_ERROR(10047, "query project details by code error", "查询项目详细信息错误"),
     CREATE_PROJECT_ERROR(10048, "create project error", "创建项目错误"),
     LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR(10049, "login user query project list paging error", "分页查询项目列表错误"),
     DELETE_PROJECT_ERROR(10050, "delete project error", "删除项目错误"),
@@ -189,7 +189,7 @@ public enum Status {
     DELETE_PROCESS_DEFINITION_VERSION_ERROR(10156, "delete process definition version error", "删除工作流历史版本出错"),
 
     QUERY_USER_CREATED_PROJECT_ERROR(10157, "query user created project error error", "查询用户创建的项目错误"),
-    PROCESS_DEFINITION_IDS_IS_EMPTY(10158, "process definition ids is empty", "工作流IDS不能为空"),
+    PROCESS_DEFINITION_CODES_IS_EMPTY(10158, "process definition codes is empty", "工作流CODES不能为空"),
     BATCH_COPY_PROCESS_DEFINITION_ERROR(10159, "batch copy process definition error", "复制工作流错误"),
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),

@@ -2205,36 +2205,20 @@ public class ProcessService {
     /**
      * save processDefinition (including create or update processDefinition)
      */
-    public int saveProcessDefine(User operator, Project project, String name, String description, String globalParams,
-                                 String locations, String connects, int timeout, int tenantId, long processDefinitionCode,
-                                 int processDefinitionId, Boolean isFromProcessDefine) {
-        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
-        Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
+    public int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean isFromProcessDefine) {
+        ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+        Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
         int insertVersion = version == null || version == 0 ? 1 : version + 1;
-        processDefinitionLog.setUserId(operator.getId());
-        processDefinitionLog.setCode(processDefinitionCode);
         processDefinitionLog.setVersion(insertVersion);
-        processDefinitionLog.setName(name);
-        processDefinitionLog.setFlag(Flag.YES);
         processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
-        processDefinitionLog.setProjectCode(project.getCode());
-        processDefinitionLog.setDescription(description);
-        processDefinitionLog.setGlobalParams(globalParams);
-        processDefinitionLog.setLocations(locations);
-        processDefinitionLog.setConnects(connects);
-        processDefinitionLog.setTimeout(timeout);
-        processDefinitionLog.setTenantId(tenantId);
         processDefinitionLog.setOperator(operator.getId());
-        Date now = new Date();
-        processDefinitionLog.setOperateTime(now);
-        processDefinitionLog.setUpdateTime(now);
-        processDefinitionLog.setCreateTime(now);
+        processDefinitionLog.setOperateTime(processDefinition.getUpdateTime());
         int insertLog = processDefineLogMapper.insert(processDefinitionLog);
         int result;
-        if (0 == processDefinitionId) {
+        if (0 == processDefinition.getId()) {
             result = processDefineMapper.insert(processDefinitionLog);
         } else {
-            processDefinitionLog.setId(processDefinitionId);
+            processDefinitionLog.setId(processDefinition.getId());
             result = processDefineMapper.updateById(processDefinitionLog);
         }
         return (insertLog & result) > 0 ? insertVersion : 0;

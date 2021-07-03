@@ -190,6 +190,43 @@ public class ProcessDefinition {
 
     public ProcessDefinition(){}
 
+    public ProcessDefinition(Long projectCode,
+                             String name,
+                             Long code,
+                             String description,
+                             String globalParams,
+                             String locations,
+                             String connects,
+                             int timeout,
+                             int userId,
+                             int tenantId) {
+        set(projectCode, name, description, globalParams, connects, locations, timeout, tenantId);
+        this.code = code;
+        this.userId = userId;
+        Date date = new Date();
+        this.createTime = date;
+        this.updateTime = date;
+    }
+
+    public void set(long projectCode,
+                    String name,
+                    String description,
+                    String globalParams,
+                    String connects,
+                    String locations,
+                    int timeout,
+                    int tenantId) {
+        this.projectCode = projectCode;
+        this.name = name;
+        this.description = description;
+        this.globalParams = globalParams;
+        this.locations = locations;
+        this.connects = connects;
+        this.timeout = timeout;
+        this.tenantId = tenantId;
+        this.flag = Flag.YES;
+    }
+
     public String getName() {
         return name;
     }
