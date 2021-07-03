@@ -120,13 +120,13 @@ public interface ProcessDefinitionService {
      *
      * @param loginUser loginUser
      * @param projectName projectName
-     * @param processDefinitionIds processDefinitionIds
-     * @param targetProjectId targetProjectId
+     * @param processDefinitionCodes processDefinitionCodes
+     * @param targetProjectName targetProjectName
      */
     Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                    String projectName,
-                                                   String processDefinitionIds,
-                                                   int targetProjectId);
+                                                   String processDefinitionCodes,
+                                                   String targetProjectName);
 
     /**
      * batch move process definition
