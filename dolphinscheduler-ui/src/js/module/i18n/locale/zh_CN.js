@@ -69,7 +69,7 @@ export default {
   Add: '添加',
   'DAG graph name cannot be empty': 'DAG图名称不能为空',
   'Create Datasource': '创建数据源',
-  'Project Home': '项目首页',
+  'Project Home': '工作流监控',
   'Project Manage': '项目管理',
   'Create Project': '创建项目',
   'Cron Manage': '定时管理',
