@@ -28,7 +28,11 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,8 +108,8 @@ public abstract class AbstractYarnTask extends AbstractTask {
                 while (Stopper.isRunning()) {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
                     logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
-                    if (ExecutionStatus.FAILURE.equals(applicationStatus) ||
-                            ExecutionStatus.KILL.equals(applicationStatus)) {
+                    if (ExecutionStatus.FAILURE.equals(applicationStatus)
+                            || ExecutionStatus.KILL.equals(applicationStatus)) {
                         return false;
                     }
                     if (ExecutionStatus.SUCCESS.equals(applicationStatus)) {
@@ -122,9 +126,8 @@ public abstract class AbstractYarnTask extends AbstractTask {
 
     }
 
-
     /**
-     * get app links
+     * parse yarn app id list from log
      *
      * @param logPath log path
      * @return app id list
