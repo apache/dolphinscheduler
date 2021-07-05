@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.IMPORT_PROCESS_DEFINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_PROJECT;
@@ -30,7 +29,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -48,7 +46,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -66,9 +63,6 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
 
     /**
      * create project
@@ -253,29 +247,6 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
-        return returnDataList(result);
-    }
-
-    /**
-     * import process definition
-     *
-     * @param loginUser login user
-     * @param file resource file
-     * @param projectName project name
-     * @return import result code
-     */
-
-    @ApiOperation(value = "importProcessDefinition", notes = "EXPORT_PROCESS_DEFINITION_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
-    })
-    @PostMapping(value = "/import-definition")
-    @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "file"})
-    public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam("file") MultipartFile file,
-                                          @RequestParam("projectName") String projectName) {
-        Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, file, projectName);
         return returnDataList(result);
     }
 
