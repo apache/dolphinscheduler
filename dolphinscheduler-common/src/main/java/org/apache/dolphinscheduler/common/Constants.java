@@ -710,10 +710,6 @@ public final class Constants {
      */
     public static final String PROJECT_ID = "projectId";
     /**
-     * projectCode
-     */
-    public static final String PROJECT_CODE = "projectCode";
-    /**
      * processId
      */
     public static final String SCHEDULE_ID = "scheduleId";
