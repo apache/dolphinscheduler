@@ -147,7 +147,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return true if the login user have permission to see the project
      */
     @Override
-    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
+    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {// TODO projectCode will be instead of projectName
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);

@@ -38,7 +38,7 @@ public interface ProcessDefinitionService {
      * create process definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param name process definition name
      * @param description description
      * @param globalParams global params
@@ -51,7 +51,7 @@ public interface ProcessDefinitionService {
      * @throws JsonProcessingException JsonProcessingException
      */
     Map<String, Object> createProcessDefinition(User loginUser,
-                                                String projectName,
+                                                long projectCode,
                                                 String name,
                                                 String description,
                                                 String globalParams,
@@ -65,17 +65,17 @@ public interface ProcessDefinitionService {
      * query process definition list
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @return definition list
      */
     Map<String, Object> queryProcessDefinitionList(User loginUser,
-                                                   String projectName);
+                                                   long projectCode);
 
     /**
      * query process definition list paging
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param searchVal search value
      * @param pageNo page number
      * @param pageSize page size
@@ -83,7 +83,7 @@ public interface ProcessDefinitionService {
      * @return process definition page
      */
     Map<String, Object> queryProcessDefinitionListPaging(User loginUser,
-                                                         String projectName,
+                                                         long projectCode,
                                                          String searchVal,
                                                          Integer pageNo,
                                                          Integer pageSize,
@@ -93,59 +93,59 @@ public interface ProcessDefinitionService {
      * query detail of process definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param code process definition code
      * @return process definition detail
      */
 
     Map<String, Object> queryProcessDefinitionByCode(User loginUser,
-                                                     String projectName,
+                                                     long projectCode,
                                                      long code);
 
     /**
      * query datail of process definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processDefinitionName process definition name
      * @return process definition detail
      */
 
     Map<String, Object> queryProcessDefinitionByName(User loginUser,
-                                                     String projectName,
+                                                     long projectCode,
                                                      String processDefinitionName);
 
     /**
      * batch copy process definition
      *
      * @param loginUser loginUser
-     * @param projectName projectName
+     * @param projectCode projectCode
      * @param processDefinitionCodes processDefinitionCodes
-     * @param targetProjectName targetProjectName
+     * @param targetProjectCode targetProjectCode
      */
     Map<String, Object> batchCopyProcessDefinition(User loginUser,
-                                                   String projectName,
+                                                   long projectCode,
                                                    String processDefinitionCodes,
-                                                   String targetProjectName);
+                                                   long targetProjectCode);
 
     /**
      * batch move process definition
      *
      * @param loginUser loginUser
-     * @param projectName projectName
-     * @param processDefinitionIds processDefinitionIds
-     * @param targetProjectId targetProjectId
+     * @param projectCode projectCode
+     * @param processDefinitionCodes processDefinitionCodes
+     * @param targetProjectCode targetProjectCode
      */
     Map<String, Object> batchMoveProcessDefinition(User loginUser,
-                                                   String projectName,
-                                                   String processDefinitionIds,
-                                                   int targetProjectId);
+                                                   long projectCode,
+                                                   String processDefinitionCodes,
+                                                   long targetProjectCode);
 
     /**
      * update  process definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param name process definition name
      * @param code process definition code
      * @param description description
@@ -158,7 +158,7 @@ public interface ProcessDefinitionService {
      * @return update result code
      */
     Map<String, Object> updateProcessDefinition(User loginUser,
-                                                String projectName,
+                                                long projectCode,
                                                 String name,
                                                 long code,
                                                 String description,
@@ -173,37 +173,37 @@ public interface ProcessDefinitionService {
      * verify process definition name unique
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param name name
      * @return true if process definition name not exists, otherwise false
      */
     Map<String, Object> verifyProcessDefinitionName(User loginUser,
-                                                    String projectName,
+                                                    long projectCode,
                                                     String name);
 
     /**
      * delete process definition by id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processDefinitionId process definition id
      * @return delete result code
      */
     Map<String, Object> deleteProcessDefinitionById(User loginUser,
-                                                    String projectName,
+                                                    long projectCode,
                                                     Integer processDefinitionId);
 
     /**
      * release process definition: online / offline
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param code process definition code
      * @param releaseState release state
      * @return release result code
      */
     Map<String, Object> releaseProcessDefinition(User loginUser,
-                                                 String projectName,
+                                                 long projectCode,
                                                  long code,
                                                  ReleaseState releaseState);
 
@@ -211,12 +211,12 @@ public interface ProcessDefinitionService {
      * batch export process definition by ids
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processDefinitionIds process definition ids
      * @param response http servlet response
      */
     void batchExportProcessDefinitionByIds(User loginUser,
-                                           String projectName,
+                                           long projectCode,
                                            String processDefinitionIds,
                                            HttpServletResponse response);
 
@@ -224,13 +224,13 @@ public interface ProcessDefinitionService {
      * import process definition
      *
      * @param loginUser login user
+     * @param projectCode project code
      * @param file process metadata json file
-     * @param currentProjectName current project name
      * @return import process
      */
     Map<String, Object> importProcessDefinition(User loginUser,
-                                                MultipartFile file,
-                                                String currentProjectName);
+                                                long projectCode,
+                                                MultipartFile file);
 
     /**
      * check the process definition node meets the specifications
@@ -259,12 +259,12 @@ public interface ProcessDefinitionService {
     Map<String, Object> getTaskNodeListByDefinitionCodeList(String defineCodeList);
 
     /**
-     * query process definition all by project id
+     * query process definition all by project code
      *
-     * @param projectId project id
+     * @param projectCode project code
      * @return process definitions in the project
      */
-    Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId);
+    Map<String, Object> queryAllProcessDefinitionByProjectCode(User loginUser, long projectCode);
 
     /**
      * Encapsulates the TreeView structure
@@ -281,38 +281,45 @@ public interface ProcessDefinitionService {
      * switch the defined process definition verison
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processDefinitionId process definition id
      * @param version the version user want to switch
      * @return switch process definition version result code
      */
-    Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
-            , int processDefinitionId, long version);
+    Map<String, Object> switchProcessDefinitionVersion(User loginUser,
+                                                       long projectCode,
+                                                       int processDefinitionId,
+                                                       long version);
 
     /**
      * query the pagination versions info by one certain process definition code
      *
      * @param loginUser login user info to check auth
-     * @param projectName process definition project name
+     * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
      * @param processDefinitionCode process definition code
      * @return the pagination process definition versions info of the certain process definition
      */
-    Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName,
-                                                       int pageNo, int pageSize, long processDefinitionCode);
+    Map<String, Object> queryProcessDefinitionVersions(User loginUser,
+                                                       long projectCode,
+                                                       int pageNo,
+                                                       int pageSize,
+                                                       long processDefinitionCode);
 
     /**
      * delete one certain process definition by version number and process definition id
      *
      * @param loginUser login user info to check auth
-     * @param projectName process definition project name
+     * @param projectCode project code
      * @param processDefinitionId process definition id
      * @param version version number
      * @return delele result code
      */
-    Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName,
-                                                              int processDefinitionId, long version);
+    Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser,
+                                                              long projectCode,
+                                                              int processDefinitionId,
+                                                              long version);
 
     /**
      * check has associated process definition
