@@ -144,7 +144,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiOperation(value = "copy", notes = "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "3,4"),
-            @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "String", example = "ddd")
+            @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "Long", example = "123")
     })
     @PostMapping(value = "/copy")
     @ResponseStatus(HttpStatus.OK)
@@ -169,7 +169,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiOperation(value = "moveProcessDefinition", notes = "MOVE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, dataType = "String", example = "3,4"),
-            @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "String", example = "ddd")
+            @ApiImplicitParam(name = "targetProjectCode", value = "TARGET_PROJECT_CODE", required = true, dataType = "Long", example = "123")
     })
     @PostMapping(value = "/move")
     @ResponseStatus(HttpStatus.OK)
@@ -403,7 +403,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "queryProcessDefinitionByName", notes = "QUERY_PROCESS_DEFINITION_BY_NAME_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionName", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
+            @ApiImplicitParam(name = "processDefinitionName", value = "PROCESS_DEFINITION_NAME", required = true, dataType = "String")
     })
     @GetMapping(value = "/select-by-name")
     @ResponseStatus(HttpStatus.OK)
