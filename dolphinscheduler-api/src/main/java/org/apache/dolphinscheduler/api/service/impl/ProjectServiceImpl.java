@@ -140,6 +140,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * check project and authorization
+     * // TODO projectCode will be instead of projectName
      *
      * @param loginUser login user
      * @param project project
