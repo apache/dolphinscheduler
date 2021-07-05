@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -78,6 +79,9 @@ public class UsersServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private AccessTokenMapper accessTokenMapper;
 
     @Mock
     private TenantMapper tenantMapper;
@@ -221,7 +225,6 @@ public class UsersServiceTest {
         Assert.assertEquals(user.getId(), userExistId);
     }
 
-
     @Test
     public void testQueryUserList() {
         User user = new User();
@@ -265,13 +268,13 @@ public class UsersServiceTest {
         String userPassword = "userTest0001";
         try {
             //user not exist
-            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0,userName,userPassword,"3443@qq.com",1,"13457864543","queue", 1);
+            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0, userName, userPassword, "3443@qq.com", 1, "13457864543", "queue", 1);
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
             logger.info(result.toString());
 
             //success
             when(userMapper.selectById(1)).thenReturn(getUser());
-            result = usersService.updateUser(getLoginUser(), 1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue", 1);
+            result = usersService.updateUser(getLoginUser(), 1, userName, userPassword, "32222s@qq.com", 1, "13457864543", "queue", 1);
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
@@ -286,7 +289,7 @@ public class UsersServiceTest {
         try {
             when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
             when(userMapper.selectById(1)).thenReturn(getUser());
-
+            when(accessTokenMapper.deleteAccessTokenByUserId(1)).thenReturn(0);
             //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
@@ -356,7 +359,6 @@ public class UsersServiceTest {
 
     }
 
-
     @Test
     public void testGrantUDFFunction() {
         String udfIds = "100000,120000";
@@ -398,7 +400,7 @@ public class UsersServiceTest {
 
     }
 
-    private User getLoginUser(){
+    private User getLoginUser() {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -430,7 +432,6 @@ public class UsersServiceTest {
         //check userName
         Assert.assertEquals("userTest0001", tempUser.getUserName());
     }
-
 
     @Test
     public void testQueryAllGeneralUsers() {
@@ -477,7 +478,6 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
-
 
     @Test
     public void testAuthorizedUser() {
@@ -534,7 +534,6 @@ public class UsersServiceTest {
             Assert.assertTrue(false);
         }
     }
-
 
     @Test
     public void testActivateUser() {
@@ -617,7 +616,6 @@ public class UsersServiceTest {
         user.setState(0);
         return user;
     }
-
 
     /**
      * get user
