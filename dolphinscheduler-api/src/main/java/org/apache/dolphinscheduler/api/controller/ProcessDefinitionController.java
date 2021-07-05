@@ -537,10 +537,9 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "get-task-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
-    public Result getNodeListByDefinitionCodeList(
-            @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-            @RequestParam("processDefinitionCodeList") String processDefinitionCodeList) {
+    public Result getNodeListByDefinitionCodeList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @RequestParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                  @RequestParam("processDefinitionCodeList") String processDefinitionCodeList) {
         Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCodeList(processDefinitionCodeList);
         return returnDataList(result);
     }
@@ -563,8 +562,7 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam("processDefinitionId") Integer processDefinitionId
-    ) {
+                                              @RequestParam("processDefinitionId") Integer processDefinitionId) {
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, processDefinitionId);
         return returnDataList(result);
     }
