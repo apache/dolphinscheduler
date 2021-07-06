@@ -86,7 +86,7 @@ public class DataSourceController extends BaseController {
     @ApiException(CREATE_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @ApiParam(name = "DATA_SOURCE_PARAM", required = true)
+                                   @ApiParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true)
                                    @RequestBody BaseDataSourceParamDTO dataSourceParam) {
         return dataSourceService.createDataSource(loginUser, dataSourceParam);
     }
@@ -101,7 +101,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO"),
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -167,7 +167,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
@@ -197,7 +197,7 @@ public class DataSourceController extends BaseController {
      */
     @ApiOperation(value = "connectDataSource", notes = "CONNECT_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "dataSourceParam", value = "DATA_SOURCE_PARAM", required = true, dataType = "BaseDataSourceParamDTO"),
     })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
@@ -237,7 +237,7 @@ public class DataSourceController extends BaseController {
      * @param id        datasource id
      * @return delete result
      */
-    @ApiOperation(value = "delete", notes = "DELETE_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "deleteDataSource", notes = "DELETE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
