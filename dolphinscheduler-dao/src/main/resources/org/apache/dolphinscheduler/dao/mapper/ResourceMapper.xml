@@ -78,7 +78,7 @@
         order by d.update_time desc
     </select>
 
-    <select id="queryResourceByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResourceAndOwnerByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select
         <include refid="baseSqlV2">
             <property name="alias" value="d"/>

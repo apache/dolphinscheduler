@@ -279,7 +279,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Resource resource = resourcesMapper.queryResourceByResourceId(resourceId);
+        Resource resource = resourcesMapper.queryResourceAndOwnerByResourceId(resourceId);
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;

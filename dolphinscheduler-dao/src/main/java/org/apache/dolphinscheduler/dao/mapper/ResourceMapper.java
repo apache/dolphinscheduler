@@ -135,7 +135,7 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @param resourceId resource id
      * @return resource
      */
-    Resource queryResourceByResourceId(@Param("id")Integer resourceId);
+    Resource queryResourceAndOwnerByResourceId(@Param("id") Integer resourceId);
 
     /**
      * update resource

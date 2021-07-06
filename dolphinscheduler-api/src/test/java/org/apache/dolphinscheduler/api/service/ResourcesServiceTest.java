@@ -187,7 +187,7 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
 
         //RESOURCE_NOT_EXIST
-        Mockito.when(resourcesMapper.queryResourceByResourceId(1)).thenReturn(getResource());
+        Mockito.when(resourcesMapper.queryResourceAndOwnerByResourceId(1)).thenReturn(getResource());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = resourcesService.updateResource(user, 0, "ResourcesServiceTest", "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
