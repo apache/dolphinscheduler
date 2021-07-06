@@ -129,7 +129,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         // check work flow define release state
-        ProcessDefinition processDefinition = processService.findProcessDefinition(processDefineCode);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
         result = executorService.checkProcessDefinitionValid(processDefinition, processDefineCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
