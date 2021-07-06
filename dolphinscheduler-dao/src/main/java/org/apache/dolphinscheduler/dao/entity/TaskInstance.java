@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -626,5 +627,9 @@ public class TaskInstance implements Serializable {
 
     public void setTaskParams(String taskParams) {
         this.taskParams = taskParams;
+    }
+
+    public boolean isFirstRun() {
+        return endTime == null;
     }
 }
