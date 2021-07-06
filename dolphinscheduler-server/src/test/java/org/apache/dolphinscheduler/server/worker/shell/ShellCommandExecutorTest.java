@@ -23,11 +23,14 @@ import java.lang.reflect.Method;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -37,6 +40,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mortbay.util.ajax.JSON;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -85,19 +89,20 @@ public class ShellCommandExecutorTest {
         taskProps.setTaskInstanceId(7657);
 
 
-        TaskInstance taskInstance = processService.findTaskInstanceById(7657);
-
+//        TaskInstance taskInstance = processService.findTaskInstanceById(7657);
+//
 //        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
 //        taskProps.setTaskParams(taskNode.getParams());
-
-
-        // custom logger
+//
+//
+//        // custom logger
 //        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-//                taskInstance.getProcessDefinitionId(),
+//                taskInstance.getProcessDefine().getCode(),
+//                taskInstance.getProcessDefine().getVersion(),
 //                taskInstance.getProcessInstanceId(),
 //                taskInstance.getId()));
-
-
+//
+//
 //        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
 
         AbstractTask task = null;
