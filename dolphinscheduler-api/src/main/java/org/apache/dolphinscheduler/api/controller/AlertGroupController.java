@@ -78,7 +78,7 @@ public class AlertGroupController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", dataType = "String")
+            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -121,8 +121,8 @@ public class AlertGroupController extends BaseController {
     @ApiOperation(value = "queryAlertGroupListPaging", notes = "QUERY_ALERT_GROUP_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -156,7 +156,7 @@ public class AlertGroupController extends BaseController {
             @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "DESC", dataType = "String"),
-            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", dataType = "String")
+            @ApiImplicitParam(name = "alertInstanceIds", value = "alertInstanceIds", required = true, dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)

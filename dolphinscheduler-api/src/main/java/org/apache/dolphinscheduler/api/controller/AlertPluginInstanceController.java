@@ -185,7 +185,7 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @ApiOperation(value = "verifyAlertInstanceName", notes = "VERIFY_ALERT_INSTANCE_NAME_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "alertInstanceName", value = "alertInstanceName", required = true, dataType = "String"),
     })
     @GetMapping(value = "/verify-alert-instance-name")
     @ResponseStatus(HttpStatus.OK)
@@ -216,8 +216,8 @@ public class AlertPluginInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryAlertPluginInstanceListPaging", notes = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
