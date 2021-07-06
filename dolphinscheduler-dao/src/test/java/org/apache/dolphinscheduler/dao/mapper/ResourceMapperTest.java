@@ -433,9 +433,9 @@ public class ResourceMapperTest {
     }
 
     @Test
-    public void testQueryResourceByResourceId() {
+    public void testQueryResourceAndOwnerByResourceId() {
         Resource resource = insertOne();
-        Resource result = resourceMapper.queryResourceByResourceId(resource.getId());
+        Resource result = resourceMapper.queryResourceAndOwnerByResourceId(resource.getId());
         Assert.assertNotNull(result);
         Assert.assertEquals(resource.getUserName(), result.getUserName());
     }
