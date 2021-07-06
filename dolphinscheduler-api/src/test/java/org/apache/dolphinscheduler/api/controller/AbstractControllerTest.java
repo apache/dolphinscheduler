@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.mockito.Mockito.doNothing;
 
+import java.text.MessageFormat;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
@@ -27,7 +30,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,9 +41,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.text.MessageFormat;
-import java.util.Map;
 
 /**
  * abstract controller test
