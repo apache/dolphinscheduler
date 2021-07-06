@@ -98,7 +98,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param processDefineId process definition id
+     * @param processDefineCode process definition code
      * @param schedule scheduler
      * @param warningType warning type
      * @param warningGroupId warning group id
@@ -110,7 +110,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName,
-                                              Integer processDefineId,
+                                              Long processDefineCode,
                                               String schedule,
                                               WarningType warningType,
                                               int warningGroupId,
@@ -129,8 +129,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         // check work flow define release state
-        ProcessDefinition processDefinition = processService.findProcessDefineById(processDefineId);
-        result = executorService.checkProcessDefinitionValid(processDefinition, processDefineId);
+        ProcessDefinition processDefinition = processService.findProcessDefinition(processDefineCode);
+        result = executorService.checkProcessDefinitionValid(processDefinition, processDefineCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

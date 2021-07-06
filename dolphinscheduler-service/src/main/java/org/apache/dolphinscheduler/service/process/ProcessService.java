@@ -387,6 +387,16 @@ public class ProcessService {
     }
 
     /**
+     * find process define by code.
+     *
+     * @param processDefinitionCode processDefinitionCode
+     * @return process definition
+     */
+    public ProcessDefinition findProcessDefinition(Long processDefinitionCode) {
+        return processDefineMapper.queryByCode(processDefinitionCode);
+    }
+
+    /**
      * find process define by code and version.
      *
      * @param processDefinitionCode processDefinitionCode
