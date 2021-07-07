@@ -110,8 +110,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> insertSchedule(User loginUser,
-                                              Long projectCode,
-                                              Long processDefineCode,
+                                              long projectCode,
+                                              long processDefineCode,
                                               String schedule,
                                               WarningType warningType,
                                               int warningGroupId,

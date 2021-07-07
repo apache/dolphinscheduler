@@ -45,8 +45,8 @@ public interface SchedulerService {
      * @return create result code
      */
     Map<String, Object> insertSchedule(User loginUser,
-                                       Long projectCode,
-                                       Long processDefineCode,
+                                       long projectCode,
+                                       long processDefineCode,
                                        String schedule,
                                        WarningType warningType,
                                        int warningGroupId,
