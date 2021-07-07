@@ -520,9 +520,6 @@ public class MasterExecThread implements Runnable {
             taskInstance.setDelayTime(taskNode.getDelayTime());
         }
 
-        //get pre task ,get all the task varPool to this task
-        Set<String> preTask =  dag.getPreviousNodes(taskInstance.getName());
-        getPreVarPool(taskInstance, preTask);
         return taskInstance;
     }
 
@@ -1153,6 +1150,12 @@ public class MasterExecThread implements Runnable {
                         submitPostNode(task.getName());
                         continue;
                     }
+                }
+                //init varPool only this task is the first time running
+                if (task.isFirstRun()) {
+                    //get pre task ,get all the task varPool to this task
+                    Set<String> preTask = dag.getPreviousNodes(task.getName());
+                    getPreVarPool(task, preTask);
                 }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
