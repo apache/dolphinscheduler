@@ -506,6 +506,7 @@ export default {
   'Query time': '当前查询时间',
   'Node self-test status': '节点自检状态',
   'Health status': '健康状态',
+  'Can not connect to zookeeper server:': 'zk节点连接失败:',
   'Max connections': '最大连接数',
   'Threads connections': '当前连接数',
   'Max used connections': '同时使用连接最大数',

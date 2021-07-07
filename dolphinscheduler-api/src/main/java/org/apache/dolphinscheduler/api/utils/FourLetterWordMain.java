@@ -25,10 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.util.Objects;
 
 public class FourLetterWordMain {
@@ -88,7 +85,7 @@ public class FourLetterWordMain {
                 }
                 return sb.toString();
             }
-        } catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException | ConnectException e ) {
             throw new IOException("Exception while executing four letter word: " + cmd, e);
         }
     }
