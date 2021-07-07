@@ -89,11 +89,13 @@
     },
     methods: {
       ...mapActions('projects', ['deleteProjects']),
-      ...mapMutations('dag', ['setProjectId', 'setProjectName']),
+      ...mapMutations('dag', ['setProjectId', 'setProjectCode', 'setProjectName']),
       _switchProjects (item) {
         this.setProjectId(item.id)
+        this.setProjectCode(item.code)
         this.setProjectName(item.name)
         localStore.setItem('projectId', item.id)
+        localStore.setItem('projectCode', item.code)
         localStore.setItem('projectName', item.name)
         this.$router.push({ path: `/projects/${item.id}/index` })
       },

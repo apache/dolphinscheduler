@@ -21,6 +21,9 @@ export default {
   setProjectId (state, payload) {
     state.projectId = payload
   },
+  setProjectCode (state, payload) {
+    state.projectCode = payload
+  },
   setProjectName (state, payload) {
     state.projectName = payload
   },

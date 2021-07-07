@@ -19,6 +19,7 @@ import localStore from '@/module/util/localStorage'
 
 // Get the project currently clicked
 const projectId = localStore.getItem('projectId')
+const projectCode = localStore.getItem('projectCode')
 const projectName = localStore.getItem('projectName')
 
 export default {
@@ -50,6 +51,8 @@ export default {
   isEditDag: false,
   // Current project id
   projectId: projectId,
+  // Current project code
+  projectCode: projectCode,
   // Current project name
   projectName: projectName || '',
   // Whether to go online the process definition
