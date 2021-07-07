@@ -37,12 +37,10 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -51,12 +49,11 @@ import org.springframework.util.MultiValueMap;
 /**
  * scheduler controller test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
 public class SchedulerControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
 
-    @Mock
+    @MockBean
     private SchedulerService schedulerService;
 
     @Test
@@ -80,7 +77,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class))).thenReturn(serviceResult);
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/create","123")
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/create",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())

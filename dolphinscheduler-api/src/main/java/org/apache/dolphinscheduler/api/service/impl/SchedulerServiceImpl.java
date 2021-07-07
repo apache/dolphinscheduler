@@ -139,7 +139,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
 
-        scheduleObj.setProjectName(projectCode);
+        scheduleObj.setProjectName(project.getName());
         scheduleObj.setProcessDefinitionId(processDefinition.getId());
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
