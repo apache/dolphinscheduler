@@ -139,12 +139,13 @@ Dag.prototype.backfill = function (arg) {
       dataObject[node.label] = obj
     })
     jsPlumb.ready(() => {
+      const self = this
       JSP.init({
         dag: this.dag,
         instance: this.instance,
         options: {
-          onRemoveNodes ($id) {
-            this.dag.removeEventModelById($id)
+          onRemoveNodes($id) {
+            self.dag.removeEventModelById($id)
           }
         }
       })
@@ -160,14 +161,15 @@ Dag.prototype.backfill = function (arg) {
     })
   } else {
     const plumbIns = jsPlumb.getInstance()
+    const self = this
     plumbIns.reset()
     plumbIns.ready(() => {
       JSP.init({
         dag: this.dag,
         instance: this.instance,
         options: {
-          onRemoveNodes ($id) {
-            this.dag.removeEventModelById($id)
+          onRemoveNodes($id) {
+            self.dag.removeEventModelById($id)
           }
         }
       })
