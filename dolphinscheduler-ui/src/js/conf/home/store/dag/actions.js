@@ -616,7 +616,7 @@ export default {
    */
   updateSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/schedule/update`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedule/update`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
