@@ -58,7 +58,7 @@ public interface SchedulerService {
      * updateProcessInstance schedule
      *
      * @param loginUser login user
-     * @param projectCode project
+     * @param projectCode project code
      * @param id scheduler id
      * @param scheduleExpression scheduler
      * @param warningType warning type
