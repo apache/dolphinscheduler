@@ -23,13 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -69,13 +65,9 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("workerGroupId","1");
         paramsMap.add("processInstancePriority",String.valueOf(Priority.HIGH));
 
-        Map<String, Object> serviceResult = new HashMap<>();
-        putMsg(serviceResult, Status.SUCCESS);
-        serviceResult.put(Constants.DATA_LIST, 1);
-
         Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
-                isA(Priority.class), isA(String.class))).thenReturn(serviceResult);
+                isA(Priority.class), isA(String.class))).thenReturn(successResult());
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/create",123)
                 .header(SESSION_ID, sessionId)
@@ -88,7 +80,6 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testUpdateSchedule() throws Exception {
@@ -103,7 +94,11 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("workerGroupId","1");
         paramsMap.add("processInstancePriority",String.valueOf(Priority.HIGH));
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/update","cxc_1113")
+        Mockito.when(schedulerService.updateSchedule(isA(User.class), isA(Long.class), isA(Integer.class),
+                isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
+                isA(Priority.class), isA(String.class))).thenReturn(successResult());
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/update",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

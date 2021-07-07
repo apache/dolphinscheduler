@@ -189,7 +189,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * updateProcessInstance schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id scheduler id
      * @param scheduleExpression scheduler
      * @param warningType warning type
@@ -203,18 +203,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> updateSchedule(User loginUser,
-                                              String projectName,
+                                              long projectCode,
                                               Integer id,
                                               String scheduleExpression,
                                               WarningType warningType,
                                               int warningGroupId,
                                               FailureStrategy failureStrategy,
-                                              ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
                                               String workerGroup) {
         Map<String, Object> result = new HashMap<>();
 
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
         boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
@@ -273,9 +272,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             schedule.setFailureStrategy(failureStrategy);
         }
 
-        if (scheduleStatus != null) {
-            schedule.setReleaseState(scheduleStatus);
-        }
         schedule.setWorkerGroup(workerGroup);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);

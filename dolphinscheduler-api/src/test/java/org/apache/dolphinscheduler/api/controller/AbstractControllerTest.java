@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.mockito.Mockito.doNothing;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
@@ -91,6 +92,13 @@ public class AbstractControllerTest {
         sessionId = session;
 
         Assert.assertTrue(StringUtils.isNotEmpty(session));
+    }
+
+    public Map<String, Object> successResult() {
+        Map<String, Object> serviceResult = new HashMap<>();
+        putMsg(serviceResult, Status.SUCCESS);
+        serviceResult.put(Constants.DATA_LIST, "{}");
+        return serviceResult;
     }
 
     public void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
