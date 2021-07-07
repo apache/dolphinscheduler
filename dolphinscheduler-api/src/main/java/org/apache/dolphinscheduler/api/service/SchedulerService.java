@@ -34,7 +34,7 @@ public interface SchedulerService {
      * save schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processDefineCode process definition code
      * @param schedule scheduler
      * @param warningType warning type
@@ -44,7 +44,8 @@ public interface SchedulerService {
      * @param workerGroup worker group
      * @return create result code
      */
-    Map<String, Object> insertSchedule(User loginUser, String projectName,
+    Map<String, Object> insertSchedule(User loginUser,
+                                       Long projectCode,
                                        Long processDefineCode,
                                        String schedule,
                                        WarningType warningType,

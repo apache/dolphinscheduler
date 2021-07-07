@@ -65,7 +65,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "SCHEDULER_TAG")
 @RestController
-@RequestMapping("/projects/{projectName}/schedule")
+@RequestMapping("/projects/{projectCode}/schedule")
 public class SchedulerController extends BaseController {
 
     public static final String DEFAULT_WARNING_TYPE = "NONE";
@@ -81,7 +81,7 @@ public class SchedulerController extends BaseController {
      * create schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processDefinitionCode process definition code
      * @param schedule scheduler
      * @param warningType warning type
@@ -107,7 +107,7 @@ public class SchedulerController extends BaseController {
     @ApiException(CREATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                 @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable Long projectCode,
                                  @RequestParam(value = "processDefinitionCode") Long processDefinitionCode,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
@@ -115,7 +115,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
-        Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionCode, schedule,
+        Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectCode, processDefinitionCode, schedule,
                 warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
 
         return returnDataList(result);

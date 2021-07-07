@@ -97,7 +97,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * save schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project name
      * @param processDefineCode process definition code
      * @param schedule scheduler
      * @param warningType warning type
@@ -109,7 +109,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> insertSchedule(User loginUser, String projectName,
+    public Map<String, Object> insertSchedule(User loginUser,
+                                              Long projectCode,
                                               Long processDefineCode,
                                               String schedule,
                                               WarningType warningType,
@@ -120,7 +121,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Map<String, Object> result = new HashMap<>();
 
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
         boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
@@ -138,7 +139,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
 
-        scheduleObj.setProjectName(projectName);
+        scheduleObj.setProjectName(projectCode);
         scheduleObj.setProcessDefinitionId(processDefinition.getId());
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 

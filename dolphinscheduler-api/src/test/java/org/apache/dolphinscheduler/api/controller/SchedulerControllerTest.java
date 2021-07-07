@@ -76,11 +76,11 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         putMsg(serviceResult, Status.SUCCESS);
         serviceResult.put(Constants.DATA_LIST, 1);
 
-        Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(String.class), isA(Long.class),
+        Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class))).thenReturn(serviceResult);
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/create","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/create","123")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
