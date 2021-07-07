@@ -58,7 +58,7 @@ public interface SchedulerService {
      * updateProcessInstance schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id scheduler id
      * @param scheduleExpression scheduler
      * @param warningType warning type
@@ -66,17 +66,15 @@ public interface SchedulerService {
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
      * @param processInstancePriority process instance priority
-     * @param scheduleStatus schedule status
      * @return update result code
      */
     Map<String, Object> updateSchedule(User loginUser,
-                                       String projectName,
+                                       long projectCode,
                                        Integer id,
                                        String scheduleExpression,
                                        WarningType warningType,
                                        int warningGroupId,
                                        FailureStrategy failureStrategy,
-                                       ReleaseState scheduleStatus,
                                        Priority processInstancePriority,
                                        String workerGroup);
 

@@ -76,7 +76,6 @@ public class SchedulerController extends BaseController {
     @Autowired
     private SchedulerService schedulerService;
 
-
     /**
      * create schedule
      *
@@ -125,7 +124,7 @@ public class SchedulerController extends BaseController {
      * updateProcessInstance schedule
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id scheduler id
      * @param schedule scheduler
      * @param warningType warning type
@@ -149,7 +148,7 @@ public class SchedulerController extends BaseController {
     @ApiException(UPDATE_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                 @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                 @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                  @RequestParam(value = "id") Integer id,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
@@ -158,8 +157,8 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
 
-        Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                warningType, warningGroupId, failureStrategy, null, processInstancePriority, workerGroup);
+        Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectCode, id, schedule,
+                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup);
         return returnDataList(result);
     }
 
