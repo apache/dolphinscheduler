@@ -555,7 +555,7 @@ export default {
    */
   createSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/schedule/create`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedule/create`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

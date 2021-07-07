@@ -76,15 +76,6 @@ public class WorkFlowLineageControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
-    }
-
     @Test
     public  void testQueryWorkFlowLineageByIds() {
         int projectId = 1;

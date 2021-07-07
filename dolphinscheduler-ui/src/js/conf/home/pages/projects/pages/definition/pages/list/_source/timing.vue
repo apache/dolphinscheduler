@@ -240,7 +240,7 @@
             msg = `${i18n.$t('Edit')}${i18n.$t('Success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
-            searchParams.processDefinitionId = this.timingData.item.id
+            searchParams.processDefinitionCode = this.timingData.item.code
             msg = `${i18n.$t('Create')}${i18n.$t('Success')}`
           }
 

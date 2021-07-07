@@ -17,22 +17,30 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.mockito.ArgumentMatchers.isA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -41,14 +49,17 @@ import org.springframework.util.MultiValueMap;
 /**
  * scheduler controller test
  */
-public class SchedulerControllerTest extends AbstractControllerTest{
+public class SchedulerControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
+
+    @MockBean
+    private SchedulerService schedulerService;
 
     @Test
     public void testCreateSchedule() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId","40");
+        paramsMap.add("processDefinitionCode","40");
         paramsMap.add("schedule","{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 6 * * ? *'}");
         paramsMap.add("warningType",String.valueOf(WarningType.NONE));
         paramsMap.add("warningGroupId","1");
@@ -58,7 +69,15 @@ public class SchedulerControllerTest extends AbstractControllerTest{
         paramsMap.add("workerGroupId","1");
         paramsMap.add("processInstancePriority",String.valueOf(Priority.HIGH));
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/create","cxc_1113")
+        Map<String, Object> serviceResult = new HashMap<>();
+        putMsg(serviceResult, Status.SUCCESS);
+        serviceResult.put(Constants.DATA_LIST, 1);
+
+        Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
+                isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
+                isA(Priority.class), isA(String.class))).thenReturn(serviceResult);
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/create",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
