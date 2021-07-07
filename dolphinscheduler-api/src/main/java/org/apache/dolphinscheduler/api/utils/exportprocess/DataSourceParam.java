@@ -16,16 +16,20 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+
+import java.util.List;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * task node add datasource param strategy
@@ -39,24 +43,31 @@ public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
 
     /**
      * add datasource params
+     *
      * @param taskNode task node json object
      * @return task node json object
      */
     @Override
     public JsonNode addExportSpecialParam(JsonNode taskNode) {
         // add sqlParameters
-        ObjectNode sqlParameters = (ObjectNode) taskNode.path(PARAMS);
-        DataSource dataSource = dataSourceMapper.selectById(sqlParameters.get("datasource").asInt());
-        if (null != dataSource) {
-            sqlParameters.put("datasourceName", dataSource.getName());
+        try {
+            ObjectNode node = (ObjectNode) new ObjectMapper().readTree(taskNode.path(PARAMS).toString());
+            ObjectNode sqlParameters = (ObjectNode) new ObjectMapper().readTree(node.toString());
+            DataSource dataSource = dataSourceMapper.selectById(sqlParameters.get("datasource").asInt());
+            if (null != dataSource) {
+                sqlParameters.put("datasourceName", dataSource.getName());
+            }
+            ((ObjectNode) taskNode).set(PARAMS, sqlParameters);
+            return taskNode;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
         }
-        ((ObjectNode)taskNode).set(PARAMS, sqlParameters);
-
-        return taskNode;
     }
 
     /**
      * import process add datasource params
+     *
      * @param taskNode task node json object
      * @return task node json object
      */
@@ -68,7 +79,7 @@ public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
             DataSource dataSource = dataSources.get(0);
             sqlParameters.put("datasource", dataSource.getId());
         }
-        ((ObjectNode)taskNode).set(PARAMS, sqlParameters);
+        ((ObjectNode) taskNode).set(PARAMS, sqlParameters);
         return taskNode;
     }
 
