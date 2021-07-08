@@ -293,7 +293,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * set schedule online or offline
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param id scheduler id
      * @param scheduleStatus schedule status
      * @return publish result code
@@ -301,12 +301,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> setScheduleState(User loginUser,
-                                                String projectName,
+                                                long projectCode,
                                                 Integer id,
                                                 ReleaseState scheduleStatus) {
         Map<String, Object> result = new HashMap<>();
 
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByCode(projectCode);
         // check project auth
         boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
         if (!hasProjectAndPerm) {
