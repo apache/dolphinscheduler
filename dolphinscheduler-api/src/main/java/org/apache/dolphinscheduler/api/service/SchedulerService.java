@@ -97,14 +97,15 @@ public interface SchedulerService {
      * query schedule
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param processDefineId process definition id
+     * @param projectCode project code
+     * @param processDefineCode process definition code
      * @param pageNo page number
      * @param pageSize page size
      * @param searchVal search value
      * @return schedule list page
      */
-    Map<String, Object> querySchedule(User loginUser, String projectName, Integer processDefineId, String searchVal, Integer pageNo, Integer pageSize);
+    Map<String, Object> querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
+                                      Integer pageNo, Integer pageSize);
 
     /**
      * query schedule list
