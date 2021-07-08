@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-
 package org.apache.dolphinscheduler.server.utils;
-
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
@@ -54,7 +52,8 @@ public class ParamUtils {
     public static Map<String, Property> convert(Map<String, Property> globalParams,
                                                 Map<String, String> globalParamsMap,
                                                 Map<String, Property> localParams,
-                                                Map<String,Property> varParams,CommandType commandType,
+                                                Map<String, Property> varParams,
+                                                CommandType commandType,
                                                 Date scheduleTime) {
         if (globalParams == null && localParams == null) {
             return null;
@@ -100,6 +99,7 @@ public class ParamUtils {
 
         // set the schedule time
         if (scheduleTime != null) {
+
             Date date = scheduleTime;
             if (CommandType.COMPLEMENT_DATA.getCode() == commandType.getCode()) {
                 date = DateUtils.add(scheduleTime, DAY_OF_MONTH, 1);
