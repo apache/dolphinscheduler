@@ -59,7 +59,7 @@
             <span>{{$t('Node self-test status')}}</span>
           </th>
         </tr>
-        <tr v-for="(item, $index) in list" :key="$index">
+        <tr v-for="(item, $index) in list" :key="$index" @mouseenter="_showErrorMessage(item)">
           <td>
             <span>{{$index + 1}}</span>
           </td>
@@ -97,7 +97,8 @@
           </td>
           <td>
             <span class="state">
-              <em class="ans-icon-success-solid success" v-if="item.state"></em>
+              <em class="ans-icon-success-solid success" v-if="item.state === 1"></em>
+              <em class="ans-icon-warn-solid warn" v-else-if="item.state === 0"></em>
               <em class="ans-icon-fail-solid error" v-else></em>
             </span>
           </td>
@@ -107,6 +108,10 @@
   </div>
 </template>
 <script>
+
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+
   export default {
     name: 'zookeeper-list',
     data () {
@@ -116,6 +121,15 @@
     },
     props: {
       list: Array
+    },
+    methods:{
+      _showErrorMessage:_.debounce(function (item){
+        const hostname = item.hostname
+        const state = item.state
+        if(state === -1){
+          this.$message.error(`${i18n.$t('Can not connect to zookeeper server:')}`+hostname)
+        }
+      },600)
     }
   }
 </script>
@@ -130,6 +144,9 @@
       }
       .success {
         color: #33cc00;
+      }
+      .warn {
+              color: #fabc05;
       }
       .error {
         color: #ff0000;

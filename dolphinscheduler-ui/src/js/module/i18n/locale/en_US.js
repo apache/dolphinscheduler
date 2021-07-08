@@ -506,6 +506,7 @@ export default {
   'Query time': 'Query time',
   'Node self-test status': 'Node self-test status',
   'Health status': 'Health status',
+  'Can not connect to zookeeper server:': 'Can not connect to zookeeper server:',
   'Max connections': 'Max connections',
   'Threads connections': 'Threads connections',
   'Max used connections': 'Max used connections',
