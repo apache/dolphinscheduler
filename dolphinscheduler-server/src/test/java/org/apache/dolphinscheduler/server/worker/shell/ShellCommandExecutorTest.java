@@ -14,33 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.shell;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
+import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.worker.task.AbstractCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
+import java.util.Date;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mortbay.util.ajax.JSON;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -48,9 +46,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * python shell command executor test
@@ -88,22 +83,21 @@ public class ShellCommandExecutorTest {
         taskProps.setTaskTimeout(360000);
         taskProps.setTaskInstanceId(7657);
 
-
-//        TaskInstance taskInstance = processService.findTaskInstanceById(7657);
-//
-//        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
-//        taskProps.setTaskParams(taskNode.getParams());
-//
-//
-//        // custom logger
-//        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-//                taskInstance.getProcessDefine().getCode(),
-//                taskInstance.getProcessDefine().getVersion(),
-//                taskInstance.getProcessInstanceId(),
-//                taskInstance.getId()));
-//
-//
-//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+        //        TaskInstance taskInstance = processService.findTaskInstanceById(7657);
+        //
+        //        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+        //        taskProps.setTaskParams(taskNode.getParams());
+        //
+        //
+        //        // custom logger
+        //        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+        //                taskInstance.getProcessDefine().getCode(),
+        //                taskInstance.getProcessDefine().getVersion(),
+        //                taskInstance.getProcessInstanceId(),
+        //                taskInstance.getId()));
+        //
+        //
+        //        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
 
         AbstractTask task = null;
 
