@@ -91,12 +91,12 @@ public class SchedulerServiceTest {
 
     @Test
     public void testSetScheduleState() {
-
         String projectName = "test";
+        long projectCode = 1L;
         User loginUser = new User();
         loginUser.setId(1);
         Map<String, Object> result = new HashMap<String, Object>();
-        Project project = getProject(projectName);
+        Project project = getProject(projectName, projectCode);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
 
@@ -110,6 +110,7 @@ public class SchedulerServiceTest {
 
         Mockito.when(scheduleMapper.selectById(1)).thenReturn(schedule);
 
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
 
         Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
@@ -174,9 +175,17 @@ public class SchedulerServiceTest {
     }
 
     private Project getProject(String name) {
-
         Project project = new Project();
         project.setName(name);
+        project.setUserId(1);
+
+        return project;
+    }
+
+    private Project getProject(String name, long code) {
+        Project project = new Project();
+        project.setName(name);
+        project.setCode(code);
         project.setUserId(1);
 
         return project;
