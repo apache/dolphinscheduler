@@ -91,12 +91,12 @@ public class SchedulerServiceTest {
 
     @Test
     public void testSetScheduleState() {
-
         String projectName = "test";
+        long projectCode = 1L;
         User loginUser = new User();
         loginUser.setId(1);
         Map<String, Object> result = new HashMap<String, Object>();
-        Project project = getProject(projectName);
+        Project project = getProject(projectName, projectCode);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
 
@@ -110,49 +110,50 @@ public class SchedulerServiceTest {
 
         Mockito.when(scheduleMapper.selectById(1)).thenReturn(schedule);
 
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
 
         Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
 
         //hash no auth
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
 
         Mockito.when(projectService.hasProjectAndPerm(loginUser, project, result)).thenReturn(true);
         //schedule not exists
-        result = schedulerService.setScheduleState(loginUser, projectName, 2, ReleaseState.ONLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 2, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));
 
         //SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.OFFLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
 
         //PROCESS_DEFINE_NOT_EXIST
         schedule.setProcessDefinitionId(2);
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
         schedule.setProcessDefinitionId(1);
 
         // PROCESS_DEFINE_NOT_RELEASE
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_RELEASE, result.get(Constants.STATUS));
 
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
 
         //MASTER_NOT_EXISTS
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.MASTER_NOT_EXISTS, result.get(Constants.STATUS));
 
         //set master
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(masterServers);
 
         //SUCCESS
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         //OFFLINE
         Mockito.when(quartzExecutors.deleteJob(null, null)).thenReturn(true);
-        result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.OFFLINE);
+        result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
     }
@@ -174,9 +175,17 @@ public class SchedulerServiceTest {
     }
 
     private Project getProject(String name) {
-
         Project project = new Project();
         project.setName(name);
+        project.setUserId(1);
+
+        return project;
+    }
+
+    private Project getProject(String name, long code) {
+        Project project = new Project();
+        project.setName(name);
+        project.setCode(code);
         project.setUserId(1);
 
         return project;
