@@ -44,7 +44,7 @@ public class ZooKeeperState {
 	private int watches = -1;
 	private int connections = -1;
 
-	private boolean flag = false;
+	private boolean healthFlag = false;
 
 	public ZooKeeperState(String connectionString) {
 		String host = connectionString.substring(0,
@@ -59,7 +59,7 @@ public class ZooKeeperState {
 		String content = cmd("srvr");
 		if (StringUtils.isNotBlank(content)) {
 			if(Constants.STRING_FALSE.equals(content)){
-				flag = true;
+				healthFlag = true;
 			}else {
 				try (Scanner scannerForStat = new Scanner(content))  {
 					while (scannerForStat.hasNext()) {
@@ -91,7 +91,7 @@ public class ZooKeeperState {
 		String wchsText = cmd("wchs");
 		if (StringUtils.isNotBlank(wchsText)) {
 			if(Constants.STRING_FALSE.equals(wchsText)){
-				flag = true;
+				healthFlag = true;
 			}else {
 				try (Scanner scannerForWchs = new Scanner(wchsText)) {
 					while (scannerForWchs.hasNext()) {
@@ -107,7 +107,7 @@ public class ZooKeeperState {
 		String consText = cmd("cons");
 		if (StringUtils.isNotBlank(consText)) {
 			if(Constants.STRING_FALSE.equals(consText)){
-				flag = true;
+				healthFlag = true;
 			}else {
 				Scanner scannerForCons = new Scanner(consText);
 				if (StringUtils.isNotBlank(consText)) {
@@ -225,8 +225,8 @@ public class ZooKeeperState {
 		return connections;
 	}
 
-	public boolean isFlag() {
-		return flag;
+	public boolean isHealthFlag() {
+		return healthFlag;
 	}
 
 	@Override
@@ -237,7 +237,7 @@ public class ZooKeeperState {
 				+ ", sent=" + sent + ", outStanding=" + outStanding + ", zxid="
 				+ zxid + ", mode=" + mode + ", nodeCount=" + nodeCount
 				+ ", watches=" + watches + ", connections="
-				+ connections + ",flag=" + flag + "]";
+				+ connections + ",healthFlag=" + healthFlag + "]";
 	}
 
 
