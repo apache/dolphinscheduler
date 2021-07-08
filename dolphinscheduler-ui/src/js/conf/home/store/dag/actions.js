@@ -592,7 +592,7 @@ export default {
    */
   scheduleOffline ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/schedule/offline`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedule/offline`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -604,7 +604,7 @@ export default {
    */
   scheduleOnline ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/schedule/online`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedule/online`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

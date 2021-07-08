@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -115,7 +116,10 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","37");
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/online","cxc_1113")
+        Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
+                isA(ReleaseState.class))).thenReturn(successResult());
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/online",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -127,13 +131,15 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testOffline() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","28");
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/offline","cxc_1113")
+        Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
+                isA(ReleaseState.class))).thenReturn(successResult());
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/offline",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
