@@ -144,7 +144,7 @@ Dag.prototype.backfill = function (arg) {
         dag: this.dag,
         instance: this.instance,
         options: {
-          onRemoveNodes($id) {
+          onRemoveNodes ($id) {
             that.dag.removeEventModelById($id)
           }
         }
@@ -167,7 +167,7 @@ Dag.prototype.backfill = function (arg) {
         dag: this.dag,
         instance: this.instance,
         options: {
-          onRemoveNodes($id) {
+          onRemoveNodes ($id) {
             that.dag.removeEventModelById($id)
           }
         }
