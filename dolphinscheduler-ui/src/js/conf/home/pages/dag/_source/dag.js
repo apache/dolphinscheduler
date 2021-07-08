@@ -110,6 +110,7 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
  * Echo data display
  */
 Dag.prototype.backfill = function (arg) {
+  const self = this
   if (arg) {
     const marginX = 100
     const g = new dagre.graphlib.Graph()
@@ -139,7 +140,6 @@ Dag.prototype.backfill = function (arg) {
       dataObject[node.label] = obj
     })
     jsPlumb.ready(() => {
-      const self = this
       JSP.init({
         dag: this.dag,
         instance: this.instance,
@@ -161,7 +161,6 @@ Dag.prototype.backfill = function (arg) {
     })
   } else {
     const plumbIns = jsPlumb.getInstance()
-    const self = this
     plumbIns.reset()
     plumbIns.ready(() => {
       JSP.init({
