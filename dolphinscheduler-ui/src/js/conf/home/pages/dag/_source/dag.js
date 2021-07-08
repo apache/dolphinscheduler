@@ -110,7 +110,7 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
  * Echo data display
  */
 Dag.prototype.backfill = function (arg) {
-  const self = this
+  const that = this
   if (arg) {
     const marginX = 100
     const g = new dagre.graphlib.Graph()
@@ -145,7 +145,7 @@ Dag.prototype.backfill = function (arg) {
         instance: this.instance,
         options: {
           onRemoveNodes($id) {
-            self.dag.removeEventModelById($id)
+            that.dag.removeEventModelById($id)
           }
         }
       })
@@ -168,7 +168,7 @@ Dag.prototype.backfill = function (arg) {
         instance: this.instance,
         options: {
           onRemoveNodes($id) {
-            self.dag.removeEventModelById($id)
+            that.dag.removeEventModelById($id)
           }
         }
       })
