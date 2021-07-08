@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphin
+r.server.utils;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
