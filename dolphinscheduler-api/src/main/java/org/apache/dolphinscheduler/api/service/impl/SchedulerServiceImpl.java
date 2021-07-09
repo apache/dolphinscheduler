@@ -446,13 +446,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * query schedule list
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @return schedule list
      */
     @Override
-    public Map<String, Object> queryScheduleList(User loginUser, String projectName) {
+    public Map<String, Object> queryScheduleList(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
         boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
@@ -460,7 +460,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(projectName);
+        List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(project.getName());
 
         result.put(Constants.DATA_LIST, schedules);
         putMsg(result, Status.SUCCESS);
@@ -516,17 +516,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * delete schedule by id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param scheduleId scheule id
      * @return delete result code
      */
     @Override
-    public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
+    public Map<String, Object> deleteScheduleById(User loginUser, long projectCode, Integer scheduleId) {
 
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, project.getName());
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
@@ -566,12 +566,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * preview schedule
      *
      * @param loginUser login user
-     * @param projectName project name
      * @param schedule schedule expression
      * @return the next five fire time
      */
     @Override
-    public Map<String, Object> previewSchedule(User loginUser, String projectName, String schedule) {
+    public Map<String, Object> previewSchedule(User loginUser, String schedule) {
         Map<String, Object> result = new HashMap<>();
         CronExpression cronExpression;
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
