@@ -148,7 +148,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/:projectId/definition/list/timing/:id',
+              path: '/projects/:projectId/definition/list/timing/:code',
               name: 'definition-timing-details',
               component: resolve => require(['../pages/projects/pages/definition/timing/index'], resolve),
               meta: {
