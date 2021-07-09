@@ -699,8 +699,10 @@ public final class Constants {
     /**
      * application regex
      */
-    public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
+//    public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
+    public static final String APPLICATION_REGEX = "http://([\\w-]+\\.*)+[\\w-]+(/[\\w-.*/?%&=]*)?:(\\d*)/(\\w*)/application_\\d+_\\d+";
     public static final String PID = OSUtils.isWindows() ? "handle" : "pid";
+
     /**
      * month_begin
      */

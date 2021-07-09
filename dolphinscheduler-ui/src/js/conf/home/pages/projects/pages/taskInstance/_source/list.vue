@@ -47,18 +47,23 @@
             <span>{{$t('End Time')}}</span>
           </th>
           <th scope="col" style="min-width: 250px">
-            <span>{{$t('host')}}</span>
+            <span>{{ $t('host') }}</span>
           </th>
           <th scope="col" style="min-width: 70px">
-            <span>{{$t('Duration')}}</span>
+            <span>{{ $t('Duration') }}</span>
           </th>
           <th scope="col" style="min-width: 60px">
             <div style="width: 50px">
-              <span>{{$t('Retry Count')}}</span>
+              <span>{{ $t('Retry Count') }}</span>
+            </div>
+          </th>
+          <th scope="col" style="min-width: 100px">
+            <div style="width: 50px">
+              <span>{{ $t('AppId') }}</span>
             </div>
           </th>
           <th scope="col" style="min-width: 60px">
-            <span>{{$t('Operation')}}</span>
+            <span>{{ $t('Operation') }}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -90,6 +95,7 @@
           <td style="min-width: 250px"><span style="padding-right: 10px">{{item.host || '-'}}</span></td>
           <td><span>{{item.duration || '-'}}</span></td>
           <td><span>{{item.retryTimes}}</span></td>
+          <td><span @click="handleJump(item)" class="ellipsis links jump" :title="item.appLink">{{ getAppid(item) }}</span></td>
           <td>
             <x-button
                     type="info"
@@ -127,11 +133,20 @@
       pageSize: Number
     },
     methods: {
-      _rtState (code) {
+      getAppid(item) {
+        //  http://cdh02.vision.com:8088/proxy/application_1624948206873_0693/
+        const appLink = item.appLink.split('/')[4]
+        return appLink
+      },
+      handleJump(item) {
+        const url = item.appLink
+        window.open(url)
+      },
+      _rtState(code) {
         let o = tasksState[code]
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
-      _refreshLog (item) {
+      _refreshLog(item) {
         let self = this
         let instance = this.$modal.dialog({
           closable: false,
@@ -139,12 +154,12 @@
           escClose: true,
           className: 'v-modal-custom',
           transitionName: 'opacityp',
-          render (h) {
+          render(h) {
             return h(mLog, {
               on: {
-                ok () {
+                ok() {
                 },
-                close () {
+                close() {
                   instance.remove()
                 }
               },
@@ -169,11 +184,16 @@
         })
       }
     },
-    created () {
+    created() {
     },
-    mounted () {
+    mounted() {
       this.list = this.taskInstanceList
     },
-    components: { }
+    components: {}
   }
 </script>
+<style lang="scss" rel="stylesheet/scss">
+.jump {
+  cursor: pointer;
+}
+</style>
