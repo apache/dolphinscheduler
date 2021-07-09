@@ -580,7 +580,7 @@ export default {
    */
   getScheduleList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/schedule/list-paging`, payload, res => {
+      io.get(`projects/${state.projectCode}/schedule/list-paging`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
