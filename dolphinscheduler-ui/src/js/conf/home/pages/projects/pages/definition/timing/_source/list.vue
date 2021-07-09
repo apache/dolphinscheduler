@@ -175,7 +175,7 @@
       _getScheduleList (flag) {
         this.isLoading = !flag
         this.getScheduleList({
-          processDefinitionId: this.$route.params.id,
+          processDefinitionCode: this.$route.params.code,
           searchVal: '',
           pageNo: this.pageNo,
           pageSize: this.pageSize

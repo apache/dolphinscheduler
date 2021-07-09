@@ -243,7 +243,7 @@
        * Timing manage
        */
       _timingManage (item) {
-        this.$router.push({ path: `/projects/${this.projectId}/definition/list/timing/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/timing/${item.code}` })
       },
       /**
        * delete

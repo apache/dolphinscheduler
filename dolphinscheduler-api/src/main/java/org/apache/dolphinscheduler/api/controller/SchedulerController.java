@@ -211,8 +211,8 @@ public class SchedulerController extends BaseController {
      * query schedule list paging
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process definition id
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
      * @param pageNo page number
      * @param pageSize page size
      * @param searchVal search value
@@ -230,8 +230,8 @@ public class SchedulerController extends BaseController {
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleListPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                          @RequestParam Integer processDefinitionId,
+                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @RequestParam long processDefinitionCode,
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize) {
@@ -241,7 +241,7 @@ public class SchedulerController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = schedulerService.querySchedule(loginUser, projectName, processDefinitionId, searchVal, pageNo, pageSize);
+        result = schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 

@@ -94,10 +94,9 @@ public class AbstractControllerTest {
         Assert.assertTrue(StringUtils.isNotEmpty(session));
     }
 
-    public Map<String, Object> successResult() {
+    public Map<String, Object> success() {
         Map<String, Object> serviceResult = new HashMap<>();
         putMsg(serviceResult, Status.SUCCESS);
-        serviceResult.put(Constants.DATA_LIST, "{}");
         return serviceResult;
     }
 
