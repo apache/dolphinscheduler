@@ -123,18 +123,18 @@ public class ParamUtils {
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
-        Map<String,String> timeParams = BusinessTimeUtils
+        Map<String,String> params = BusinessTimeUtils
                 .getBusinessTime(commandType,
                         scheduleTime);
 
         if (globalParamsMap != null) {
-            timeParams.putAll(globalParamsMap);
+            params.putAll(globalParamsMap);
         }
 
         if (Strings.isNotBlank(taskExecutionContext.getExecutePath())) {
-            timeParams.put(Constants.PARAMETER_TASK_EXECUTE_PATH,taskExecutionContext.getExecutePath());
+            params.put(Constants.PARAMETER_TASK_EXECUTE_PATH,taskExecutionContext.getExecutePath());
         }
-        timeParams.put(Constants.PARAMETER_TASK_INSTANCE_ID,Integer.toString(taskExecutionContext.getTaskInstanceId()));
+        params.put(Constants.PARAMETER_TASK_INSTANCE_ID,Integer.toString(taskExecutionContext.getTaskInstanceId()));
 
         if (globalParams != null && localParams != null) {
             globalParams.putAll(localParams);
@@ -154,7 +154,7 @@ public class ParamUtils {
                  *  and there are no variables in them.
                  */
                 String val = property.getValue();
-                val  = ParameterUtils.convertParameterPlaceholders(val, timeParams);
+                val  = ParameterUtils.convertParameterPlaceholders(val, params);
                 property.setValue(val);
             }
         }
