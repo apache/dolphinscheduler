@@ -44,11 +44,16 @@ public class DateUtilsTest {
 
     @Test
     public void testConvertTimeStampsToString() {
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        final TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        TimeZone.setDefault(timeZone);
+
         long timeMillis = 1625989249021L;
         Assert.assertEquals("2021-07-11 15:40:49", DateUtils.convertTimeStampsToString(timeMillis));
-
         DateTimeFormatter testFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         Assert.assertEquals("2021/07/11 15:40:49", DateUtils.convertTimeStampsToString(timeMillis, testFormatter));
+
+        TimeZone.setDefault(defaultTimeZone);
     }
 
     @Test
