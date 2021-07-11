@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -39,6 +40,15 @@ public class DateUtilsTest {
         String readableDate = DateUtils.format2Readable(endDate.getTime() - startDate.getTime());
 
         Assert.assertEquals("01 09:23:08", readableDate);
+    }
+
+    @Test
+    public void testConvertTimeStampsToString() {
+        long timeMillis = 1625989249021L;
+        Assert.assertEquals("2021-07-11 15:40:49", DateUtils.convertTimeStampsToString(timeMillis));
+
+        DateTimeFormatter testFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        Assert.assertEquals("2021/07/11 15:40:49", DateUtils.convertTimeStampsToString(timeMillis, testFormatter));
     }
 
     @Test
