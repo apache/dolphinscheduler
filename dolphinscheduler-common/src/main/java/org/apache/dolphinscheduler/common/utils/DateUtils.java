@@ -45,6 +45,9 @@ public class DateUtils {
     static final long C5 = C4 * 60L;
     static final long C6 = C5 * 24L;
 
+    /**
+     * a default datetime formatter for the timestamp
+     */
     private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);

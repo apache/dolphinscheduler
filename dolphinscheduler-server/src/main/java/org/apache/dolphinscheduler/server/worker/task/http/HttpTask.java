@@ -106,6 +106,7 @@ public class HttpTask extends AbstractTask {
         Thread.currentThread().setName(threadLoggerInfoName);
 
         long startTime = System.currentTimeMillis();
+        String formatTimeStamp = DateUtils.formatTimeStamp(startTime);
         String statusCode = null;
         String body = null;
 
@@ -116,7 +117,7 @@ public class HttpTask extends AbstractTask {
             exitStatusCode = validResponse(body, statusCode);
             long costTime = System.currentTimeMillis() - startTime;
             logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
-                    DateUtils.formatTimeStamp(startTime), httpParameters.getUrl(),
+                    formatTimeStamp, httpParameters.getUrl(),
                     httpParameters.getHttpMethod(), costTime, statusCode, body, output);
         } catch (Exception e) {
             appendMessage(e.toString());
