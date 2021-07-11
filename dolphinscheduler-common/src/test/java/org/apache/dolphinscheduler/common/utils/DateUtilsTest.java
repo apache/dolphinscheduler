@@ -49,9 +49,9 @@ public class DateUtilsTest {
         TimeZone.setDefault(timeZone);
 
         long timeMillis = 1625989249021L;
-        Assert.assertEquals("2021-07-11 15:40:49", DateUtils.convertTimeStampByFormatter(timeMillis));
+        Assert.assertEquals("2021-07-11 15:40:49", DateUtils.formatTimeStamp(timeMillis));
         DateTimeFormatter testFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        Assert.assertEquals("2021/07/11 15:40:49", DateUtils.convertTimeStampByFormatter(timeMillis, testFormatter));
+        Assert.assertEquals("2021/07/11 15:40:49", DateUtils.formatTimeStamp(timeMillis, testFormatter));
 
         TimeZone.setDefault(defaultTimeZone);
     }

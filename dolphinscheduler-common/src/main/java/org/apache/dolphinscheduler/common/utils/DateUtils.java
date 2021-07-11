@@ -57,8 +57,8 @@ public class DateUtils {
      * @param timeMillis timeMillis like System.currentTimeMillis()
      * @return string formatted as yyyy-MM-dd HH:mm:ss
      */
-    public static String convertTimeStampByFormatter(long timeMillis) {
-        return convertTimeStampByFormatter(timeMillis, DEFAULT_DATETIME_FORMATTER);
+    public static String formatTimeStamp(long timeMillis) {
+        return formatTimeStamp(timeMillis, DEFAULT_DATETIME_FORMATTER);
     }
 
     /**
@@ -66,7 +66,7 @@ public class DateUtils {
      * @param dateTimeFormatter expect formatter, like yyyy-MM-dd HH:mm:ss
      * @return formatted string
      */
-    public static String convertTimeStampByFormatter(long timeMillis, DateTimeFormatter dateTimeFormatter) {
+    public static String formatTimeStamp(long timeMillis, DateTimeFormatter dateTimeFormatter) {
         Objects.requireNonNull(dateTimeFormatter);
         return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
                 ZoneId.systemDefault()));
