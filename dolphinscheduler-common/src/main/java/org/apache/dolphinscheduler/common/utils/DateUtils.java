@@ -26,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -36,10 +37,39 @@ import org.slf4j.LoggerFactory;
  */
 public class DateUtils {
 
+    static final long C0 = 1L;
+    static final long C1 = C0 * 1000L;
+    static final long C2 = C1 * 1000L;
+    static final long C3 = C2 * 1000L;
+    static final long C4 = C3 * 60L;
+    static final long C5 = C4 * 60L;
+    static final long C6 = C5 * 24L;
+
+    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
+    }
+
+    /**
+     * @param timeMillis timeMillis like System.currentTimeMillis()
+     * @return string formatted as yyyy-MM-dd HH:mm:ss
+     */
+    public static String convertTimeStampsToString(long timeMillis) {
+        return convertTimeStampsToString(timeMillis, DEFAULT_DATETIME_FORMATTER);
+    }
+
+    /**
+     * @param timeMillis timeMillis like System.currentTimeMillis()
+     * @param dateTimeFormatter expect formatter, like yyyy-MM-dd HH:mm:ss
+     * @return formatted string
+     */
+    public static String convertTimeStampsToString(long timeMillis, DateTimeFormatter dateTimeFormatter) {
+        Objects.requireNonNull(dateTimeFormatter);
+        return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
+                ZoneId.systemDefault()));
     }
 
     /**
@@ -253,7 +283,6 @@ public class DateUtils {
     }
 
     /**
-     *
      * format time to duration
      *
      * @param d1 d1
@@ -522,14 +551,6 @@ public class DateUtils {
         return TimeZone.getTimeZone(timezoneId);
     }
 
-    static final long C0 = 1L;
-    static final long C1 = C0 * 1000L;
-    static final long C2 = C1 * 1000L;
-    static final long C3 = C2 * 1000L;
-    static final long C4 = C3 * 60L;
-    static final long C5 = C4 * 60L;
-    static final long C6 = C5 * 24L;
-
     /**
      * Time unit representing one thousandth of a second
      */
@@ -543,23 +564,23 @@ public class DateUtils {
             return d / (C4 / C2);
         }
 
-        public static long toHours(long d)   {
+        public static long toHours(long d) {
             return d / (C5 / C2);
         }
 
-        public static long toDays(long d)    {
+        public static long toDays(long d) {
             return d / (C6 / C2);
         }
 
-        public static long toDurationSeconds(long d)   {
+        public static long toDurationSeconds(long d) {
             return (d % (C4 / C2)) / (C3 / C2);
         }
 
-        public static long toDurationMinutes(long d)   {
+        public static long toDurationMinutes(long d) {
             return (d % (C5 / C2)) / (C4 / C2);
         }
 
-        public static long toDurationHours(long d)   {
+        public static long toDurationHours(long d) {
             return (d % (C6 / C2)) / (C5 / C2);
         }
 
