@@ -204,7 +204,7 @@
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
   import Clipboard from 'clipboard'
-  import {diGuiTree, searchTree} from './_source/resourceTree'
+  import { diGuiTree, searchTree } from './_source/resourceTree'
 
   export default {
     name: 'flink',

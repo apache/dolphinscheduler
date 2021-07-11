@@ -99,7 +99,7 @@
   import disabledState from '@/module/mixin/disabledState'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-  import {diGuiTree, searchTree} from './_source/resourceTree'
+  import { diGuiTree, searchTree } from './_source/resourceTree'
 
   export default {
     name: 'waterdrop',

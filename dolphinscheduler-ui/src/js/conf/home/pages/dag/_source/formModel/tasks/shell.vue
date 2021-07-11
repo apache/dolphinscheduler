@@ -69,7 +69,7 @@
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
   import Clipboard from 'clipboard'
-  import {diGuiTree, searchTree} from './_source/resourceTree'
+  import { diGuiTree, searchTree } from './_source/resourceTree'
 
   let editor
 
