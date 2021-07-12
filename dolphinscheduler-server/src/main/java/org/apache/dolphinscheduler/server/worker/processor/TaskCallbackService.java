@@ -134,7 +134,7 @@ public class TaskCallbackService {
             ThreadUtils.sleep(pause(ntries++));
         }
 
-        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
+        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: %s", masterNodes, taskInstanceId));
     }
 
     public int pause(int ntries) {

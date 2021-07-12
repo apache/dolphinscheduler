@@ -108,7 +108,7 @@ jobs:
           CHECKSTYLE_CONFIG: style/checkstyle.xml
           REVIEWDOG_VERSION: v0.10.2
         run: |
-          wget -O - -q https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.22/checkstyle-8.22-all.jar > /opt/checkstyle.jar
+          wget -O - -q https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.43/checkstyle-8.43-all.jar > /opt/checkstyle.jar
           wget -O - -q https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /opt ${REVIEWDOG_VERSION}
           java -jar /opt/checkstyle.jar "${WORKDIR}" -c "${CHECKSTYLE_CONFIG}"  -f xml \
                | /opt/reviewdog -f=checkstyle \
