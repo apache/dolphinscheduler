@@ -443,8 +443,8 @@ public class DataxTask extends AbstractTask {
     }
 
     public String loadJvmEnv(DataxParameters dataXParameters) {
-        int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
-        int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
         return String.format(JVM_PARAM, xms, xmx);
     }
 
