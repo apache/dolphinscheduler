@@ -393,9 +393,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
         } else {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-            result.put(Constants.DATA_LIST, processDefinition);
+            DagData dagData = processService.genDagData(processDefinition);
+            result.put(Constants.DATA_LIST, dagData);
             putMsg(result, Status.SUCCESS);
         }
         return result;
@@ -1256,12 +1255,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectCode);
-        resourceList.forEach(processDefinition -> {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-        });
-        result.put(Constants.DATA_LIST, resourceList);
+        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<DagData> dagDataList = processDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
+        result.put(Constants.DATA_LIST, dagDataList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
