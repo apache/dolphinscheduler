@@ -249,7 +249,7 @@ public class SchedulerController extends BaseController {
      * delete schedule by id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param scheduleId scheule id
      * @return delete result code
      */
@@ -262,10 +262,10 @@ public class SchedulerController extends BaseController {
     @ApiException(DELETE_SCHEDULE_CRON_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
-                                     @PathVariable String projectName,
+                                     @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                      @RequestParam("scheduleId") Integer scheduleId
     ) {
-        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
+        Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectCode, scheduleId);
         return returnDataList(result);
     }
 
@@ -273,7 +273,7 @@ public class SchedulerController extends BaseController {
      * query schedule list
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @return schedule list
      */
     @ApiOperation(value = "queryScheduleList", notes = "QUERY_SCHEDULE_LIST_NOTES")
@@ -281,8 +281,8 @@ public class SchedulerController extends BaseController {
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleList(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName) {
-        Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectName);
+                                    @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectCode);
         return returnDataList(result);
     }
 
@@ -290,7 +290,6 @@ public class SchedulerController extends BaseController {
      * preview schedule
      *
      * @param loginUser login user
-     * @param projectName project name
      * @param schedule schedule expression
      * @return the next five fire time
      */
@@ -303,10 +302,9 @@ public class SchedulerController extends BaseController {
     @ApiException(PREVIEW_SCHEDULE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result previewSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                   @RequestParam(value = "schedule") String schedule
     ) {
-        Map<String, Object> result = schedulerService.previewSchedule(loginUser, projectName, schedule);
+        Map<String, Object> result = schedulerService.previewSchedule(loginUser, schedule);
         return returnDataList(result);
     }
 }

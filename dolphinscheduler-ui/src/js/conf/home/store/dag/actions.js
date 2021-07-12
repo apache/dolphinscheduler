@@ -567,7 +567,7 @@ export default {
    */
   previewSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/schedule/preview`, payload, res => {
+      io.post(`projects/${state.projectCode}/schedule/preview`, payload, res => {
         resolve(res.data)
         // alert(res.data)
       }).catch(e => {
@@ -827,7 +827,7 @@ export default {
    */
   deleteTiming ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/schedule/delete`, payload, res => {
+      io.get(`projects/${state.projectCode}/schedule/delete`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
