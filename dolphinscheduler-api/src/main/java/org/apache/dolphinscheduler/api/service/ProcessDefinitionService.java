@@ -245,18 +245,26 @@ public interface ProcessDefinitionService {
     /**
      * get task node details based on process definition
      *
+     * @param loginUser loginUser
+     * @param projectCode project code
      * @param defineCode define code
      * @return task node list
      */
-    Map<String, Object> getTaskNodeListByDefinitionCode(Long defineCode);
+    Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser,
+                                                        long projectCode,
+                                                        long defineCode);
 
     /**
-     * get task node details based on process definition
+     * get task node details map based on process definition
      *
+     * @param loginUser loginUser
+     * @param projectCode project code
      * @param defineCodeList define code list
      * @return task node list
      */
-    Map<String, Object> getTaskNodeListByDefinitionCodeList(String defineCodeList);
+    Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser,
+                                                            long projectCode,
+                                                            String defineCodeList);
 
     /**
      * query process definition all by project code

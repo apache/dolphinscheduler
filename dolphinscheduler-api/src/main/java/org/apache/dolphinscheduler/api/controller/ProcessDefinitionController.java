@@ -516,32 +516,32 @@ public class ProcessDefinitionController extends BaseController {
     public Result getNodeListByDefinitionCode(
             @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-            @RequestParam("processDefinitionCode") Long processDefinitionCode) {
+            @RequestParam("processDefinitionCode") long processDefinitionCode) {
         logger.info("query task node name list by definitionCode, login user:{}, project name:{}, code : {}",
                 loginUser.getUserName(), projectCode, processDefinitionCode);
-        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCode(processDefinitionCode);
+        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, processDefinitionCode);
         return returnDataList(result);
     }
 
     /**
-     * get tasks list by process definition code list
+     * get tasks list map by process definition multiple code
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCodeList process definition code list
+     * @param processDefinitionCodes process definition codes
      * @return node list data
      */
-    @ApiOperation(value = "getNodeListByDefinitionCodeList", notes = "GET_NODE_LIST_BY_DEFINITION_CODE_NOTES")
+    @ApiOperation(value = "getNodeListByDefinitionCodes", notes = "GET_NODE_LIST_BY_DEFINITION_CODE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionCodeList", value = "PROCESS_DEFINITION_CODE_LIST", required = true, type = "String")
+            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", required = true, type = "String", example = "100,200,300")
     })
-    @GetMapping(value = "get-task-list")
+    @GetMapping(value = "gen-task-list-map")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
-    public Result getNodeListByDefinitionCodeList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result getNodeListMapByDefinitionCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @RequestParam("processDefinitionCodeList") String processDefinitionCodeList) {
-        Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionCodeList(processDefinitionCodeList);
+                                                  @RequestParam("processDefinitionCodes") String processDefinitionCodes) {
+        Map<String, Object> result = processDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, processDefinitionCodes);
         return returnDataList(result);
     }
 
