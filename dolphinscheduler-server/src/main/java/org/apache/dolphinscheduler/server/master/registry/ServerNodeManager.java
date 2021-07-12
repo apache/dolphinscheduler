@@ -378,7 +378,6 @@ public class ServerNodeManager implements InitializingBean {
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();
-        registryClient.close();
     }
 
 }
