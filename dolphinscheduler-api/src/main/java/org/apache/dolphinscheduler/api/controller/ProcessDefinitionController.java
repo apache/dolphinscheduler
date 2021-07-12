@@ -376,10 +376,10 @@ public class ProcessDefinitionController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param code process definition id
+     * @param code process definition code
      * @return process definition detail
      */
-    @ApiOperation(value = "queryProcessDefinitionByCode", notes = "QUERY_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiOperation(value = "queryProcessDefinitionByCode", notes = "QUERY_PROCESS_DEFINITION_BY_CODE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789")
     })
@@ -649,7 +649,7 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectCode project code
      * @return process definition list
      */
-    @ApiOperation(value = "queryAllByProjectCode", notes = "QUERY_PROCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
+    @ApiOperation(value = "queryAllByProjectCode", notes = "QUERY_PROCESS_DEFINITION_All_BY_PROJECT_CODE_NOTES")
     @GetMapping(value = "/queryAllByProjectCode")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
