@@ -111,10 +111,10 @@ public interface SchedulerService {
      * query schedule list
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @return schedule list
      */
-    Map<String, Object> queryScheduleList(User loginUser, String projectName);
+    Map<String, Object> queryScheduleList(User loginUser, long projectCode);
 
     /**
      * delete schedule
@@ -129,19 +129,18 @@ public interface SchedulerService {
      * delete schedule by id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param scheduleId scheule id
      * @return delete result code
      */
-    Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId);
+    Map<String, Object> deleteScheduleById(User loginUser, long projectCode, Integer scheduleId);
 
     /**
      * preview schedule
      *
      * @param loginUser login user
-     * @param projectName project name
      * @param schedule schedule expression
      * @return the next five fire time
      */
-    Map<String, Object> previewSchedule(User loginUser, String projectName, String schedule);
+    Map<String, Object> previewSchedule(User loginUser, String schedule);
 }

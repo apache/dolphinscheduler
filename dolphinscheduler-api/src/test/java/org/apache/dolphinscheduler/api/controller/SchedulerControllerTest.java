@@ -183,10 +183,11 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testQueryScheduleList() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/list","cxc_1113")
+        Mockito.when(schedulerService.queryScheduleList(isA(User.class), isA(Long.class))).thenReturn(success());
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/list",123)
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -197,10 +198,12 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testPreviewSchedule() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/preview","cxc_1113")
+        Mockito.when(schedulerService.previewSchedule(isA(User.class), isA(String.class)))
+                .thenReturn(success());
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedule/preview",123)
                 .header(SESSION_ID, sessionId)
                 .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"))
                 .andExpect(status().isCreated())
@@ -217,7 +220,10 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("scheduleId","37");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/schedule/delete","cxc_1113")
+        Mockito.when(schedulerService.deleteScheduleById(isA(User.class), isA(Long.class), isA(Integer.class)))
+                .thenReturn(success());
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/schedule/delete",123)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
