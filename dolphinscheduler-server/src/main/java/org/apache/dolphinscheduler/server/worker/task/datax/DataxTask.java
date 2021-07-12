@@ -554,7 +554,7 @@ public class DataxTask extends AbstractTask {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DatasourceUtil.getConnection(DbType.valueOf(dataXParameters.getDtType()), baseDataSource);
+                Connection connection = DatasourceUtil.getConnection(DbType.valueOf(dataXParameters.getDsType()), baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 
