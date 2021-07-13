@@ -284,22 +284,22 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionCode(code)).thenReturn(result);
+        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionCode(user, projectCode, code)).thenReturn(result);
         Result response = processDefinitionController.getNodeListByDefinitionCode(user, projectCode, code);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }
 
     @Test
-    public void testGetNodeListByDefinitionIdList() throws Exception {
+    public void testGetNodeListByDefinitionIdList() {
         long projectCode = 1L;
         String codeList = "1,2,3";
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.getTaskNodeListByDefinitionCodeList(codeList)).thenReturn(result);
-        Result response = processDefinitionController.getNodeListByDefinitionCodeList(user, projectCode, codeList);
+        Mockito.when(processDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, codeList)).thenReturn(result);
+        Result response = processDefinitionController.getNodeListMapByDefinitionCodes(user, projectCode, codeList);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }
