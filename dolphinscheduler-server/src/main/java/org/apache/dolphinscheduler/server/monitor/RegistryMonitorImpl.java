@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.server.monitor;
 
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.springframework.stereotype.Component;
+
 
 /**
  * zk monitor server impl
