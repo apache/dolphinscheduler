@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.service.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
-import static org.mockito.BDDMockito.given;
 
-import java.util.Arrays;
+import static org.mockito.BDDMockito.given;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.spi.register.Registry;
+
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;

@@ -22,9 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -33,6 +30,10 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -48,7 +49,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * worker group controller test
  */
-public class WorkerGroupControllerTest extends AbstractControllerTest{
+public class WorkerGroupControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
