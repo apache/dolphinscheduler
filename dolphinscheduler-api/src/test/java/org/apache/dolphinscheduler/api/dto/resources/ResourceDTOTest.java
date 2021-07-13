@@ -40,7 +40,6 @@ public class ResourceDTOTest {
     @Mock
     private UserMapper userMapper;
 
-
     private User getOwner() {
         User user = new User();
         user.setId(1);
