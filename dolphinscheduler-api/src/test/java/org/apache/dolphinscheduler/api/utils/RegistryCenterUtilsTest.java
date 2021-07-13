@@ -14,19 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.model.Server;
+
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import java.util.List;
 
 /**
  * zookeeper monitor utils test
  */
 @Ignore
-public class RegistryCenterUtilsUtilsTest {
+public class RegistryCenterUtilsTest {
 
     @Test
     public void testGetMasterList(){
