@@ -19,45 +19,37 @@ package org.apache.dolphinscheduler.service.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.ADD_OP;
 import static org.apache.dolphinscheduler.common.Constants.DELETE_OP;
-
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-
-import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.spi.register.Registry;
 
 import java.util.Arrays;
 
-import org.junit.Before;
+import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.spi.register.Registry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.Sets;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ RegistryClient.class })
 public class RegistryClientTest {
 
-    @InjectMocks
     private RegistryClient registryClient;
 
-    @Mock
-    private Registry registry;
-
-    @Before
-    public void before() {
-        //  registry=mock(Registry.class);
-    }
-
     @Test
-    public void te() throws Exception {
-        doNothing().when(registry).persist(Mockito.anyString(), Mockito.anyString());
-        doNothing().when(registry).update(Mockito.anyString(), Mockito.anyString());
-        given(registry.releaseLock(Mockito.anyString())).willReturn(true);
-        given(registry.getChildren("/dead-servers")).willReturn(Arrays.asList("worker_127.0.0.1:8089"));
+    public void test() throws Exception {
+        Registry registry = PowerMockito.mock(Registry.class);
+        PowerMockito.doNothing().when(registry).persist(Mockito.anyString(), Mockito.anyString());
+        PowerMockito.doNothing().when(registry).update(Mockito.anyString(), Mockito.anyString());
+        PowerMockito.when(registry.releaseLock(Mockito.anyString())).thenReturn(true);
+        PowerMockito.when(registry.getChildren("/dead-servers")).thenReturn(Arrays.asList("worker_127.0.0.1:8089"));
+
+        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
+        registryClient = PowerMockito.mock(RegistryClient.class);
         registryClient.persist("/key", "");
         registryClient.update("/key", "");
         registryClient.releaseLock("/key");

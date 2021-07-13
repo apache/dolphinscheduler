@@ -23,17 +23,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
+import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * worker group controller test
@@ -42,11 +58,22 @@ public class WorkerGroupControllerTest extends AbstractControllerTest{
 
     private static Logger logger = LoggerFactory.getLogger(WorkerGroupControllerTest.class);
 
+    @MockBean
+    private WorkerGroupMapper workerGroupMapper;
+
+    @MockBean
+    private ProcessInstanceMapper processInstanceMapper;
+
     @Test
     public void testSaveWorkerGroup() throws Exception {
+        Map<String, String> serverMaps = new HashMap<>();
+        serverMaps.put("192.168.0.1", "192.168.0.1");
+        serverMaps.put("192.168.0.2", "192.168.0.2");
+        PowerMockito.when(RegistryCenterUtils.getServerMaps(NodeType.WORKER, true)).thenReturn(serverMaps);
+
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","cxc_work_group");
-        paramsMap.add("ipList","192.16.12,192.168,10,12");
+        paramsMap.add("addrList","192.168.0.1,192.168.0.2");
         MvcResult mvcResult = mockMvc.perform(post("/worker-group/save")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -91,9 +118,17 @@ public class WorkerGroupControllerTest extends AbstractControllerTest{
 
     @Test
     public void testDeleteById() throws Exception {
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setId(12);
+        workerGroup.setName("测试");
+        Mockito.when(workerGroupMapper.selectById(12)).thenReturn(workerGroup);
+        Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus("测试", Constants.NOT_TERMINATED_STATES)).thenReturn(null);
+        Mockito.when(workerGroupMapper.deleteById(12)).thenReturn(1);
+        Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName("测试", "")).thenReturn(1);
+
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","12");
-        MvcResult mvcResult = mockMvc.perform(get("/worker-group/delete-by-id")
+        MvcResult mvcResult = mockMvc.perform(post("/worker-group/delete-by-id")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

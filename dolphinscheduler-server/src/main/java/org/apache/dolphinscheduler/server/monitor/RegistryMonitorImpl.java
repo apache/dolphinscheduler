@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.server.monitor;
 
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,9 +33,7 @@ public class RegistryMonitorImpl extends AbstractMonitor {
     /**
      * zookeeper operator
      */
-    @Autowired
-    private RegistryClient registryClient;
-
+    private RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
      * get active nodes map by path

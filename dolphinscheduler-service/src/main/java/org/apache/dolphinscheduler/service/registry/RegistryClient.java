@@ -28,12 +28,6 @@ import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 import static org.apache.dolphinscheduler.common.Constants.WORKER_TYPE;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.ResInfo;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,20 +36,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.ResInfo;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 /**
- * abstract registry client
+ * registry client singleton
  */
-@Service
 public class RegistryClient extends RegistryCenter {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
-    private void loadRegistry() {
-        init();
+    private static RegistryClient registryClient = new RegistryClient();
+
+    private RegistryClient() {
+        super.init();
+    }
+
+    public static RegistryClient getInstance() {
+        return registryClient;
     }
 
     /**

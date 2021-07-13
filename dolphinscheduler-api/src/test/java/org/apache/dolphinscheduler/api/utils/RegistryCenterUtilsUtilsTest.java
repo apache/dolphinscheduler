@@ -26,23 +26,15 @@ import java.util.List;
  * zookeeper monitor utils test
  */
 @Ignore
-public class RegistryMonitorUtilsTest {
-
+public class RegistryCenterUtilsUtilsTest {
 
     @Test
     public void testGetMasterList(){
-
-        RegistryMonitor registryMonitor = new RegistryMonitor();
-
-
-        List<Server> masterServerList = registryMonitor.getMasterServers();
-
-        List<Server> workerServerList = registryMonitor.getWorkerServers();
+        List<Server> masterServerList = RegistryCenterUtils.getMasterServers();
+        List<Server> workerServerList = RegistryCenterUtils.getWorkerServers();
 
         Assert.assertTrue(masterServerList.size() >= 0);
         Assert.assertTrue(workerServerList.size() >= 0);
-
-
     }
 
 }
