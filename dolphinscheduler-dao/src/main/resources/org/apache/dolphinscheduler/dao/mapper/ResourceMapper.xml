@@ -58,9 +58,7 @@
         <include refid="baseSqlV2">
             <property name="alias" value="d"/>
         </include>
-        , u.user_name as user_name
         from t_ds_resources d
-        join t_ds_user u on d.user_id = u.id
         where d.type=#{type} and d.pid=#{id}
         <if test="userId != 0">
             and (
@@ -76,17 +74,6 @@
             and d.alias like concat('%', #{searchVal}, '%')
         </if>
         order by d.update_time desc
-    </select>
-
-    <select id="queryResourceAndOwnerByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
-        select
-        <include refid="baseSqlV2">
-            <property name="alias" value="d"/>
-        </include>
-        , u.user_name as user_name
-        from t_ds_resources d
-        join t_ds_user u on d.user_id = u.id
-        where d.id = #{id}
     </select>
 
     <select id="queryResourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">

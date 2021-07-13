@@ -81,7 +81,6 @@ public class ResourceMapperTest {
         resource.setDirectory(false);
         resource.setType(ResourceType.FILE);
         resource.setUserId(111);
-        resource.setUserName("test_user");
         int status = resourceMapper.insert(resource);
         if (status != 1) {
             Assert.fail("insert data error");
@@ -430,14 +429,6 @@ public class ResourceMapperTest {
         Assert.assertNull(resourceMapper.existResource(fullName, userId, type));
         insertOne();
         Assert.assertTrue(resourceMapper.existResource(fullName, userId, type));
-    }
-
-    @Test
-    public void testQueryResourceAndOwnerByResourceId() {
-        Resource resource = insertOne();
-        Resource result = resourceMapper.queryResourceAndOwnerByResourceId(resource.getId());
-        Assert.assertNotNull(result);
-        Assert.assertEquals(resource.getUserName(), result.getUserName());
     }
 }
 

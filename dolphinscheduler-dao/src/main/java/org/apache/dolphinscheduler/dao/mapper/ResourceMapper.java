@@ -68,7 +68,6 @@ public interface ResourceMapper extends BaseMapper<Resource> {
                                         @Param("searchVal") String searchVal,
                                         @Param("resIds") List<Integer> resIds);
 
-
     /**
      *  query resource except userId
      * @param userId userId
@@ -129,13 +128,6 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return resource list
      */
     List<Resource> listResourceByIds(@Param("resIds")Integer[] resIds);
-
-    /**
-     * query resource by resourceId
-     * @param resourceId resource id
-     * @return resource
-     */
-    Resource queryResourceAndOwnerByResourceId(@Param("id") Integer resourceId);
 
     /**
      * update resource
