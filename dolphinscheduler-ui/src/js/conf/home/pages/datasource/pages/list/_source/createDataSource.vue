@@ -21,7 +21,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content" size="small">
-              <el-select style="width: 100%;" v-model="type":disabled="this.item.id">
+              <el-select style="width: 100%;" v-model="type" :disabled="this.item.id">
                 <el-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
                 </el-option>
               </el-select>
