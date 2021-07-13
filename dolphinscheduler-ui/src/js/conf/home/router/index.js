@@ -59,8 +59,10 @@ const router = new Router({
             projectId: to.params.projectId
           }).then(res => {
             store.commit('dag/setProjectId', res.id)
+            store.commit('dag/setProjectCode', res.code)
             store.commit('dag/setProjectName', res.name)
             localStore.setItem('projectId', res.id)
+            localStore.setItem('projectCode', res.code)
             localStore.setItem('projectName', res.name)
             next()
           }).catch(e => {
@@ -146,7 +148,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/:projectId/definition/list/timing/:id',
+              path: '/projects/:projectId/definition/list/timing/:code',
               name: 'definition-timing-details',
               component: resolve => require(['../pages/projects/pages/definition/timing/index'], resolve),
               meta: {

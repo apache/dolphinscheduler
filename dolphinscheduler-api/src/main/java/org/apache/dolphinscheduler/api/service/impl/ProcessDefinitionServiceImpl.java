@@ -112,6 +112,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * process definition service impl
@@ -200,6 +201,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
+
+        // check whether the new process define name exist
+        ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
+        if (definition != null) {
+            putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
             return result;
         }
 
@@ -296,13 +304,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectCode);
-
-        resourceList.forEach(processDefinition -> {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-        });
-
-        result.put(Constants.DATA_LIST, resourceList);
+        List<DagData> dagDataList = resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
+        result.put(Constants.DATA_LIST, dagDataList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -393,9 +396,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
         } else {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-            result.put(Constants.DATA_LIST, processDefinition);
+            DagData dagData = processService.genDagData(processDefinition);
+            result.put(Constants.DATA_LIST, dagData);
             putMsg(result, Status.SUCCESS);
         }
         return result;
@@ -458,6 +460,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // online can not permit edit
             putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefinition.getName());
             return result;
+        }
+        if (!name.equals(processDefinition.getName())) {
+            // check whether the new process define name exist
+            ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(project.getCode(), name);
+            if (definition != null) {
+                putMsg(result, Status.PROCESS_DEFINITION_NAME_EXIST, name);
+                return result;
+            }
         }
 
         processDefinition.set(projectCode, name, description, globalParams, locations, connects, timeout, tenant.getId());
@@ -1175,63 +1185,59 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * get task node details based on process definition
      *
+     * @param loginUser loginUser
+     * @param projectCode project code
      * @param defineCode define code
      * @return task node list
      */
-    public Map<String, Object> getTaskNodeListByDefinitionCode(Long defineCode) {
-        Map<String, Object> result = new HashMap<>();
-
+    public Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser, long projectCode, long defineCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(defineCode);
         if (processDefinition == null) {
             logger.info("process define not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineCode);
             return result;
         }
-        ProcessData processData = processService.genProcessData(processDefinition);
-
-        //process data check
-        if (null == processData) {
-            logger.error("process data is null");
-            putMsg(result, Status.DATA_IS_NOT_VALID, JSONUtils.toJsonString(processData));
-            return result;
-        }
-
-        List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-
-        result.put(Constants.DATA_LIST, taskNodeList);
+        DagData dagData = processService.genDagData(processDefinition);
+        result.put(Constants.DATA_LIST, dagData.getTaskDefinitionList());
         putMsg(result, Status.SUCCESS);
 
         return result;
-
     }
 
     /**
-     * get task node details based on process definition
+     * get task node details map based on process definition
      *
-     * @param defineCodeList define code list
+     * @param loginUser loginUser
+     * @param projectCode project code
+     * @param defineCodes define codes
      * @return task node list
      */
     @Override
-    public Map<String, Object> getTaskNodeListByDefinitionCodeList(String defineCodeList) {
-        Map<String, Object> result = new HashMap<>();
-
-        Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
-        String[] codeArr = defineCodeList.split(",");
-        List<Long> codeList = new ArrayList<>();
-        for (String definitionCode : codeArr) {
-            codeList.add(Long.parseLong(definitionCode));
-        }
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codeList);
-        if (CollectionUtils.isEmpty(processDefinitionList)) {
-            logger.info("process definition not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineCodeList);
+    public Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser, long projectCode, String defineCodes) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
+        Set<Long> defineCodeSet = Lists.newArrayList(defineCodes.split(Constants.COMMA)).stream().map(Long::parseLong).collect(Collectors.toSet());
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(defineCodeSet);
+        if (CollectionUtils.isEmpty(processDefinitionList)) {
+            logger.info("process definition not exists");
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineCodes);
+            return result;
+        }
+        Map<Long, List<TaskDefinitionLog>> taskNodeMap = new HashMap<>();
         for (ProcessDefinition processDefinition : processDefinitionList) {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
-            taskNodeMap.put(processDefinition.getId(), taskNodeList);
+            DagData dagData = processService.genDagData(processDefinition);
+            taskNodeMap.put(processDefinition.getCode(), dagData.getTaskDefinitionList());
         }
 
         result.put(Constants.DATA_LIST, taskNodeMap);
@@ -1256,12 +1262,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        List<ProcessDefinition> resourceList = processDefinitionMapper.queryAllDefinitionList(projectCode);
-        resourceList.forEach(processDefinition -> {
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-        });
-        result.put(Constants.DATA_LIST, resourceList);
+        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<DagData> dagDataList = processDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
+        result.put(Constants.DATA_LIST, dagDataList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -1639,10 +1642,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check the if pageNo or pageSize less than 1
         if (pageNo <= 0 || pageSize <= 0) {
-            putMsg(result
-                    , Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR
-                    , pageNo
-                    , pageSize);
+            putMsg(result, Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR, pageNo, pageSize);
             return result;
         }
 
@@ -1660,8 +1660,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, processDefinition.getCode());
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
 
-        ProcessData processData = processService.genProcessData(processDefinition);
-        processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
         pageInfo.setLists(processDefinitionLogs);
         pageInfo.setTotalCount((int) processDefinitionVersionsPaging.getTotal());
         return ImmutableMap.of(

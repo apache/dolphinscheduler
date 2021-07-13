@@ -835,6 +835,7 @@
                         <include>**/api/configuration/TrafficConfigurationTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/controller/TenantControllerTest.java</include>
+                        <include>**/api/controller/SchedulerControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <includeDataxTaskTest>**/api/enums/testGetEnum.java</includeDataxTaskTest>
