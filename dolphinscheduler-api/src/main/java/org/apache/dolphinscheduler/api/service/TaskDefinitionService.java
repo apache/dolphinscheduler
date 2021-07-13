@@ -30,45 +30,45 @@ public interface TaskDefinitionService {
      * create task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskDefinitionJson task definition json
      */
     Map<String, Object> createTaskDefinition(User loginUser,
-                                             String projectName,
+                                             long projectCode,
                                              String taskDefinitionJson);
 
     /**
      * query task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskName task name
      */
     Map<String, Object> queryTaskDefinitionByName(User loginUser,
-                                                  String projectName,
+                                                  long projectCode,
                                                   String taskName);
 
     /**
      * delete task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      */
     Map<String, Object> deleteTaskDefinitionByCode(User loginUser,
-                                                   String projectName,
+                                                   long projectCode,
                                                    long taskCode);
 
     /**
      * update task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      * @param taskDefinitionJson task definition json
      */
     Map<String, Object> updateTaskDefinition(User loginUser,
-                                             String projectName,
+                                             long projectCode,
                                              long taskCode,
                                              String taskDefinitionJson);
 
@@ -76,12 +76,12 @@ public interface TaskDefinitionService {
      * update task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      * @param version the version user want to switch
      */
     Map<String, Object> switchVersion(User loginUser,
-                                      String projectName,
+                                      long projectCode,
                                       long taskCode,
                                       int version);
 
@@ -89,14 +89,14 @@ public interface TaskDefinitionService {
      * query the pagination versions info by one certain task definition code
      *
      * @param loginUser login user info to check auth
-     * @param projectName project name
+     * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
      * @param taskCode task definition code
      * @return the pagination task definition versions info of the certain task definition
      */
     Map<String, Object> queryTaskDefinitionVersions(User loginUser,
-                                                    String projectName,
+                                                    long projectCode,
                                                     int pageNo,
                                                     int pageSize,
                                                     long taskCode);
@@ -105,13 +105,13 @@ public interface TaskDefinitionService {
      * delete the certain task definition version by version and code
      *
      * @param loginUser login user info
-     * @param projectName the task definition project name
+     * @param projectCode project code
      * @param taskCode the task definition code
      * @param version the task definition version user want to delete
      * @return delete version result code
      */
     Map<String, Object> deleteByCodeAndVersion(User loginUser,
-                                               String projectName,
+                                               long projectCode,
                                                long taskCode,
                                                int version);
 
@@ -119,19 +119,19 @@ public interface TaskDefinitionService {
      * query detail of task definition by code
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode the task definition code
      * @return task definition detail
      */
     Map<String, Object> queryTaskDefinitionDetail(User loginUser,
-                                                  String projectName,
+                                                  long projectCode,
                                                   long taskCode);
 
     /**
      * query task definition list paging
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param searchVal search value
      * @param pageNo page number
      * @param pageSize page size
@@ -139,7 +139,7 @@ public interface TaskDefinitionService {
      * @return task definition page
      */
     Map<String, Object> queryTaskDefinitionListPaging(User loginUser,
-                                                      String projectName,
+                                                      long projectCode,
                                                       String searchVal,
                                                       Integer pageNo,
                                                       Integer pageSize,
