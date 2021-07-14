@@ -451,23 +451,23 @@ public class DataxTask extends AbstractTask {
     /**
      * parsing synchronized column names in SQL statements
      *
-     * @param dsType the database type of the data source
-     * @param dtType the database type of the data target
+     * @param sourceType the database type of the data source
+     * @param targetType the database type of the data target
      * @param dataSourceCfg the database connection parameters of the data source
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseConnectionParam dataSourceCfg, String sql) {
-        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
+    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
             logger.info("try to execute sql analysis query column name");
-            columnNames = tryExecuteSqlResolveColumnNames(dataSourceCfg, sql);
+            columnNames = tryExecuteSqlResolveColumnNames(sourceType, dataSourceCfg, sql);
         }
 
         notNull(columnNames, String.format("parsing sql columns failed : %s", sql));
 
-        return DataxUtils.convertKeywordsColumns(dtType, columnNames);
+        return DataxUtils.convertKeywordsColumns(targetType, columnNames);
     }
 
     /**
@@ -548,13 +548,13 @@ public class DataxTask extends AbstractTask {
      * @param sql sql for data synchronization
      * @return column name array
      */
-    public String[] tryExecuteSqlResolveColumnNames(BaseConnectionParam baseDataSource, String sql) {
+    public String[] tryExecuteSqlResolveColumnNames(DbType sourceType, BaseConnectionParam baseDataSource, String sql) {
         String[] columnNames;
         sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DatasourceUtil.getConnection(DbType.valueOf(dataXParameters.getDsType()), baseDataSource);
+                Connection connection = DatasourceUtil.getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 
