@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,22 +82,19 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * create task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskDefinitionJson task definition json
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
     public Map<String, Object> createTaskDefinition(User loginUser,
-                                                    String projectName,
+                                                    long projectCode,
                                                     String taskDefinitionJson) {
-
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
-        // check project auth
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return checkResult;
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
@@ -130,18 +126,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * query task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskName task name
      */
     @Override
-    public Map<String, Object> queryTaskDefinitionByName(User loginUser, String projectName, String taskName) {
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return checkResult;
+    public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, String taskName) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByDefinitionName(project.getCode(), taskName);
@@ -158,19 +152,17 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * delete task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, String projectName, long taskCode) {
-        Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
+    public Map<String, Object> deleteTaskDefinitionByCode(User loginUser, long projectCode, long taskCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper.queryByTaskCode(taskCode);
         if (!processTaskRelationList.isEmpty()) {
@@ -194,20 +186,18 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * update task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      * @param taskDefinitionJson task definition json
      */
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public Map<String, Object> updateTaskDefinition(User loginUser, String projectName, long taskCode, String taskDefinitionJson) {
-        Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
+    public Map<String, Object> updateTaskDefinition(User loginUser, long projectCode, long taskCode, String taskDefinitionJson) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
         if (processService.isTaskOnline(taskCode)) {
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
@@ -246,19 +236,17 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * update task definition
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskCode task code
      * @param version the version user want to switch
      */
     @Override
-    public Map<String, Object> switchVersion(User loginUser, String projectName, long taskCode, int version) {
-        Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
+    public Map<String, Object> switchVersion(User loginUser, long projectCode, long taskCode, int version) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
         if (processService.isTaskOnline(taskCode)) {
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE);
@@ -279,23 +267,23 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Map<String, Object> queryTaskDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, long taskCode) {
+    public Map<String, Object> queryTaskDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize, long taskCode) {
         return null;
     }
 
     @Override
-    public Map<String, Object> deleteByCodeAndVersion(User loginUser, String projectName, long taskCode, int version) {
+    public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         return null;
     }
 
     @Override
-    public Map<String, Object> queryTaskDefinitionDetail(User loginUser, String projectName, long taskCode) {
+    public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
         return null;
     }
 
     @Override
     public Map<String, Object> queryTaskDefinitionListPaging(User loginUser,
-                                                             String projectName,
+                                                             long projectCode,
                                                              String searchVal,
                                                              Integer pageNo,
                                                              Integer pageSize,
