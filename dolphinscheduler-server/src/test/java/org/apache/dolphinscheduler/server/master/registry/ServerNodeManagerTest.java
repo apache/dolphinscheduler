@@ -21,29 +21,36 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * server node manager test
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ RegistryClient.class })
+@PowerMockIgnore({"javax.management.*"})
 public class ServerNodeManagerTest {
 
-    @InjectMocks
-    ServerNodeManager serverNodeManager;
-
-    @Mock
-    private RegistryClient registryClient;
+    private ServerNodeManager serverNodeManager;
 
     @Mock
     private WorkerGroupMapper workerGroupMapper;
 
     @Mock
     private AlertDao alertDao;
+
+    @Before
+    public void before() {
+        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
+        serverNodeManager = PowerMockito.mock(ServerNodeManager.class);
+    }
 
     @Test
     public void test(){
