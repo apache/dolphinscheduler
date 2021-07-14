@@ -26,23 +26,30 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * worker group service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ RegistryClient.class })
+@PowerMockIgnore({"javax.management.*"})
 public class WorkerGroupServiceTest {
 
 
@@ -119,6 +126,12 @@ public class WorkerGroupServiceTest {
         PageInfo<WorkerGroup> pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
         Assert.assertEquals(pageInfo.getLists().size(), 1);
     }*/
+
+    @Before
+    public void before() {
+        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
+    }
+
     @Test
     public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup();
