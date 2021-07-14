@@ -119,20 +119,18 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void createTaskDefinition() {
-        String projectName = "project_test1";
+        long projectCode = 1L;
 
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -143,7 +141,7 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
-                .createTaskDefinition(loginUser, projectName, taskDefinitionJson);
+                .createTaskDefinition(loginUser, projectCode, taskDefinitionJson);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
@@ -151,20 +149,19 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void queryTaskDefinitionByName() {
-        String projectName = "project_test1";
         String taskName = "task";
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        long projectCode = 1L;
+
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -172,27 +169,25 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinition());
 
         Map<String, Object> relation = taskDefinitionService
-                .queryTaskDefinitionByName(loginUser, projectName, taskName);
+                .queryTaskDefinitionByName(loginUser, projectCode, taskName);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     @Test
     public void deleteTaskDefinitionByCode() {
-        String projectName = "project_test1";
+        long projectCode = 1L;
 
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -200,7 +195,7 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(1);
 
         Map<String, Object> relation = taskDefinitionService
-                .deleteTaskDefinitionByCode(loginUser, projectName, 11L);
+                .deleteTaskDefinitionByCode(loginUser, projectCode, 11L);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
@@ -208,20 +203,18 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void updateTaskDefinition() {
-        String projectName = "project_test1";
+        long projectCode = 1L;
 
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -235,28 +228,27 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinition());
 
         Map<String, Object> relation = taskDefinitionService
-                .updateTaskDefinition(loginUser, projectName, 11L, taskDefinitionJson);
+                .updateTaskDefinition(loginUser, projectCode, 11L, taskDefinitionJson);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
     @Test
     public void switchVersion() {
-        String projectName = "project_test1";
         int version = 1;
-        Long taskCode = 11L;
-        Project project = getProject(projectName);
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        long taskCode = 11L;
+        long projectCode = 1L;
+
+        Project project = getProject(projectCode);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectName);
-
-        //project check auth fail
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
         TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
 
@@ -267,7 +259,7 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinition());
         
         Map<String, Object> relation = taskDefinitionService
-                .switchVersion(loginUser, projectName, taskCode, version);
+                .switchVersion(loginUser, projectCode, taskCode, version);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
@@ -284,13 +276,14 @@ public class TaskDefinitionServiceImplTest {
     /**
      * get mock Project
      *
-     * @param projectName projectName
+     * @param projectCode projectCode
      * @return Project
      */
-    private Project getProject(String projectName) {
+    private Project getProject(long projectCode) {
         Project project = new Project();
         project.setId(1);
-        project.setName(projectName);
+        project.setCode(projectCode);
+        project.setName("test");
         project.setUserId(1);
         return project;
     }
