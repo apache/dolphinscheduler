@@ -26,11 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  * monitor zookeeper info todo registry-spi
  * fixme Some of the information obtained in the api belongs to the unique information of zk.
@@ -107,15 +102,15 @@ public class RegistryCenterUtils {
         return registryClient.getServerNodeList(nodeType, hostOnly);
     }
 
-    public static boolean isExisted(String key) {
+    public static boolean isNodeExisted(String key) {
         return registryClient.isExisted(key);
     }
 
-    public static List<String> getChildrenKeys(final String key) {
+    public static List<String> getChildrenNodes(final String key) {
         return registryClient.getChildrenKeys(key);
     }
 
-    public static String getValue(String key) {
+    public static String getNodeData(String key) {
         return registryClient.get(key);
     }
 }
