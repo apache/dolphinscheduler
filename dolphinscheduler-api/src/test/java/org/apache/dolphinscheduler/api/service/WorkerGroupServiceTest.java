@@ -26,23 +26,30 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * worker group service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ RegistryClient.class })
+@PowerMockIgnore({"javax.management.*"})
 public class WorkerGroupServiceTest {
 
 
@@ -69,13 +76,13 @@ public class WorkerGroupServiceTest {
         List<String> workerGroupStrList = new ArrayList<>();
         workerGroupStrList.add("default");
         workerGroupStrList.add("test");
-        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenReturn(workerGroupStrList);
+        Mockito.when(zookeeperCachedOperator.getChildrenNodes(workerPath)).thenReturn(workerGroupStrList);
 
         List<String> defaultAddressList = new ArrayList<>();
         defaultAddressList.add("192.168.220.188:1234");
         defaultAddressList.add("192.168.220.189:1234");
 
-        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultAddressList);
+        Mockito.when(zookeeperCachedOperator.getChildrenNodes(workerPath + "/default")).thenReturn(defaultAddressList);
 
         Mockito.when(zookeeperCachedOperator.get(workerPath + "/default" + "/" + defaultAddressList.get(0))).thenReturn("0.01,0.17,0.03,25.83,8.0,1.0,2020-07-21 11:17:59,2020-07-21 14:39:20,0,13238");
     }
@@ -119,6 +126,12 @@ public class WorkerGroupServiceTest {
         PageInfo<WorkerGroup> pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
         Assert.assertEquals(pageInfo.getLists().size(), 1);
     }*/
+
+    @Before
+    public void before() {
+        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
+    }
+
     @Test
     public void testQueryAllGroup() {
         Map<String, Object> result = workerGroupService.queryAllGroup();

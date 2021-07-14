@@ -100,8 +100,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * zk client
      */
-    @Autowired
-    private RegistryClient registryClient;
+    private RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
      * worker group mapper
