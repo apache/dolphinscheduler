@@ -14,8 +14,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-export function diGuiTree (item) { // Recursive convenience tree structure
-  item.forEach(item => {
+export function diGuiTree (items) { // Recursive convenience tree structure
+  items.forEach(item => {
     item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
       ? operationTree(item) : diGuiTree(item.children)
   })
