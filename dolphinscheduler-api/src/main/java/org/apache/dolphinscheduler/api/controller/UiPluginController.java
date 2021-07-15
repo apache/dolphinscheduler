@@ -60,7 +60,7 @@ public class UiPluginController extends BaseController {
 
     @ApiOperation(value = "queryUiPluginsByType", notes = "QUERY_UI_PLUGINS_BY_TYPE")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "pluginType", value = "pluginType", required = true, dataType = "PluginType"),
+            @ApiImplicitParam(name = "pluginType", value = "pluginType", required = true, dataType = "PluginType"),
     })
     @PostMapping(value = "/queryUiPluginsByType")
     @ResponseStatus(HttpStatus.CREATED)

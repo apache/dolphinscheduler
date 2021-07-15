@@ -65,17 +65,17 @@ public class TaskInstanceController extends BaseController {
     /**
      * query task list paging
      *
-     * @param loginUser         login user
-     * @param projectName       project name
+     * @param loginUser login user
+     * @param projectName project name
      * @param processInstanceId process instance id
-     * @param searchVal         search value
-     * @param taskName          task name
-     * @param stateType         state type
-     * @param host              host
-     * @param startTime         start time
-     * @param endTime           end time
-     * @param pageNo            page number
-     * @param pageSize          page size
+     * @param searchVal search value
+     * @param taskName task name
+     * @param stateType state type
+     * @param host host
+     * @param startTime start time
+     * @param endTime end time
+     * @param pageNo page number
+     * @param pageSize page size
      * @return task list page
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
@@ -124,8 +124,8 @@ public class TaskInstanceController extends BaseController {
     /**
      * change one task instance's state from FAILURE to FORCED_SUCCESS
      *
-     * @param loginUser      login user
-     * @param projectName    project name
+     * @param loginUser login user
+     * @param projectName project name
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */

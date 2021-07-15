@@ -70,10 +70,10 @@ public class WorkFlowLineageController extends BaseController {
                                                                     @ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal) {
         try {
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,projectId);
+            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal, projectId);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }
@@ -98,7 +98,7 @@ public class WorkFlowLineageController extends BaseController {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(idsSet, projectId);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }

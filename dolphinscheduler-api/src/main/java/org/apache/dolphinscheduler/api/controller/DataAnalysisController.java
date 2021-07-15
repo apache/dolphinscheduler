@@ -63,7 +63,7 @@ public class DataAnalysisController extends BaseController {
      *
      * @param loginUser login user
      * @param startDate count start date
-     * @param endDate   count end date
+     * @param endDate count end date
      * @param projectId project id
      * @return task instance count data
      */
@@ -91,7 +91,7 @@ public class DataAnalysisController extends BaseController {
      *
      * @param loginUser login user
      * @param startDate start date
-     * @param endDate   end date
+     * @param endDate end date
      * @param projectId project id
      * @return process instance data
      */
@@ -142,7 +142,7 @@ public class DataAnalysisController extends BaseController {
      *
      * @param loginUser login user
      * @param startDate start date
-     * @param endDate   end date
+     * @param endDate end date
      * @param projectId project id
      * @return command state in project id
      */

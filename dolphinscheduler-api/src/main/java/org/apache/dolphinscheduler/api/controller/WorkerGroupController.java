@@ -64,9 +64,9 @@ public class WorkerGroupController extends BaseController {
      * create or update a worker group
      *
      * @param loginUser login user
-     * @param id        worker group id
-     * @param name      worker group name
-     * @param addrList  addr list
+     * @param id worker group id
+     * @param name worker group name
+     * @param addrList addr list
      * @return create or update result code
      */
     @ApiOperation(value = "saveWorkerGroup", notes = "CREATE_WORKER_GROUP_NOTES")
@@ -92,9 +92,9 @@ public class WorkerGroupController extends BaseController {
      * query worker groups paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return worker group list page
      */
     @ApiOperation(value = "queryAllWorkerGroupsPaging", notes = "QUERY_WORKER_GROUP_PAGING_NOTES")
@@ -141,7 +141,7 @@ public class WorkerGroupController extends BaseController {
      * delete worker group by id
      *
      * @param loginUser login user
-     * @param id        group id
+     * @param id group id
      * @return delete result code
      */
     @ApiOperation(value = "deleteById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")

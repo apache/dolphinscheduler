@@ -96,13 +96,12 @@ public class ResourcesController extends BaseController {
     private UdfFuncService udfFuncService;
 
     /**
-     *
-     * @param loginUser   login user
-     * @param type        type
-     * @param alias       alias
+     * @param loginUser login user
+     * @param type type
+     * @param alias alias
      * @param description description
-     * @param pid         parent id
-     * @param currentDir  current directory
+     * @param pid parent id
+     * @param currentDir current directory
      * @return create result code
      */
     @ApiOperation(value = "createDirctory", notes = "CREATE_RESOURCE_NOTES")
@@ -127,13 +126,7 @@ public class ResourcesController extends BaseController {
 
     /**
      * create resource
-     * @param loginUser
-     * @param type
-     * @param alias
-     * @param description
-     * @param file
-     * @param pid
-     * @param currentDir
+     *
      * @return create result code
      */
     @ApiOperation(value = "createResource", notes = "CREATE_RESOURCE_NOTES")
@@ -166,7 +159,7 @@ public class ResourcesController extends BaseController {
      * @param resourceId resource id
      * @param type resource type
      * @param description description
-     * @param file        resource file
+     * @param file resource file
      * @return update result code
      */
     @ApiOperation(value = "updateResource", notes = "UPDATE_RESOURCE_NOTES")
@@ -185,7 +178,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value = "name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
-                                 @RequestParam(value = "file" ,required = false) MultipartFile file) {
+                                 @RequestParam(value = "file", required = false) MultipartFile file) {
         return resourceService.updateResource(loginUser, resourceId, alias, description, type, file);
     }
 
@@ -314,9 +307,9 @@ public class ResourcesController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryResourceJarList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "type") ResourceType type,
-                                       @RequestParam(value = "programType",required = false) ProgramType programType
+                                       @RequestParam(value = "programType", required = false) ProgramType programType
     ) {
-        Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type,programType);
+        Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type, programType);
         return returnDataList(result);
     }
 
@@ -376,14 +369,7 @@ public class ResourcesController extends BaseController {
 
     /**
      * create resource file online
-     * @param loginUser
-     * @param type
-     * @param fileName
-     * @param fileSuffix
-     * @param description
-     * @param content
-     * @param pid
-     * @param currentDir
+     *
      * @return create result code
      */
     @ApiOperation(value = "onlineCreateResource", notes = "ONLINE_CREATE_RESOURCE_NOTES")
@@ -593,9 +579,9 @@ public class ResourcesController extends BaseController {
     @ApiException(QUERY_UDF_FUNCTION_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryUdfFuncListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam("pageNo") Integer pageNo,
-                                   @RequestParam(value = "searchVal", required = false) String searchVal,
-                                   @RequestParam("pageSize") Integer pageSize
+                                                 @RequestParam("pageNo") Integer pageNo,
+                                                 @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                 @RequestParam("pageSize") Integer pageSize
     ) {
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
@@ -622,7 +608,7 @@ public class ResourcesController extends BaseController {
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam("type") UdfType type) {
+                                           @RequestParam("type") UdfType type) {
         Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
     }

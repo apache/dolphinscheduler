@@ -79,13 +79,13 @@ public class UsersController extends BaseController {
     /**
      * create user
      *
-     * @param loginUser    login user
-     * @param userName     user name
+     * @param loginUser login user
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tenant id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tenant id
+     * @param phone phone
+     * @param queue queue
      * @return create result code
      */
     @ApiOperation(value = "createUser", notes = "CREATE_USER_NOTES")
@@ -118,9 +118,9 @@ public class UsersController extends BaseController {
      * query user list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search avlue
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return user list page
      */
     @ApiOperation(value = "queryUserList", notes = "QUERY_USER_LIST_NOTES")
@@ -150,14 +150,14 @@ public class UsersController extends BaseController {
     /**
      * update user
      *
-     * @param loginUser    login user
-     * @param id           user id
-     * @param userName     user name
+     * @param loginUser login user
+     * @param id user id
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tennat id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tennat id
+     * @param phone phone
+     * @param queue queue
      * @return update result code
      */
     @ApiOperation(value = "updateUser", notes = "UPDATE_USER_NOTES")
@@ -192,7 +192,7 @@ public class UsersController extends BaseController {
      * delete user by id
      *
      * @param loginUser login user
-     * @param id        user id
+     * @param id user id
      * @return delete result code
      */
     @ApiOperation(value = "delUserById", notes = "DELETE_USER_BY_ID_NOTES")
@@ -212,8 +212,8 @@ public class UsersController extends BaseController {
     /**
      * grant project
      *
-     * @param loginUser  login user
-     * @param userId     user id
+     * @param loginUser login user
+     * @param userId user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -236,8 +236,8 @@ public class UsersController extends BaseController {
     /**
      * grant resource
      *
-     * @param loginUser   login user
-     * @param userId      user id
+     * @param loginUser login user
+     * @param userId user id
      * @param resourceIds resource id array
      * @return grant result code
      */
@@ -262,8 +262,8 @@ public class UsersController extends BaseController {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
+     * @param userId user id
+     * @param udfIds udf id array
      * @return grant result code
      */
     @ApiOperation(value = "grantUDFFunc", notes = "GRANT_UDF_FUNC_NOTES")
@@ -286,8 +286,8 @@ public class UsersController extends BaseController {
     /**
      * grant datasource
      *
-     * @param loginUser     login user
-     * @param userId        user id
+     * @param loginUser login user
+     * @param userId user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
@@ -361,7 +361,7 @@ public class UsersController extends BaseController {
      * verify username
      *
      * @param loginUser login user
-     * @param userName  user name
+     * @param userName user name
      * @return true if user name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyUserName", notes = "VERIFY_USER_NAME_NOTES")
@@ -382,7 +382,7 @@ public class UsersController extends BaseController {
     /**
      * unauthorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -404,7 +404,7 @@ public class UsersController extends BaseController {
     /**
      * authorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return authorized result code
      */
@@ -430,12 +430,12 @@ public class UsersController extends BaseController {
     /**
      * user registry
      *
-     * @param userName       user name
-     * @param userPassword   user password
+     * @param userName user name
+     * @param userPassword user password
      * @param repeatPassword repeat password
-     * @param email          user email
+     * @param email user email
      */
-    @ApiOperation(value="registerUser",notes = "REGISTER_USER_NOTES")
+    @ApiOperation(value = "registerUser", notes = "REGISTER_USER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type = "String"),
@@ -447,9 +447,9 @@ public class UsersController extends BaseController {
     @ApiException(CREATE_USER_ERROR)
     @AccessLogAnnotation
     public Result<Object> registerUser(@RequestParam(value = "userName") String userName,
-                               @RequestParam(value = "userPassword") String userPassword,
-                               @RequestParam(value = "repeatPassword") String repeatPassword,
-                               @RequestParam(value = "email") String email) throws Exception {
+                                       @RequestParam(value = "userPassword") String userPassword,
+                                       @RequestParam(value = "repeatPassword") String repeatPassword,
+                                       @RequestParam(value = "email") String email) throws Exception {
         userName = ParameterUtils.handleEscapes(userName);
         userPassword = ParameterUtils.handleEscapes(userPassword);
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
@@ -461,9 +461,9 @@ public class UsersController extends BaseController {
     /**
      * user activate
      *
-     * @param userName       user name
+     * @param userName user name
      */
-    @ApiOperation(value="activateUser",notes = "ACTIVATE_USER_NOTES")
+    @ApiOperation(value = "activateUser", notes = "ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
     })
@@ -481,9 +481,9 @@ public class UsersController extends BaseController {
     /**
      * user batch activate
      *
-     * @param  userNames       user names
+     * @param userNames user names
      */
-    @ApiOperation(value = "batchActivateUser",notes = "BATCH_ACTIVATE_USER_NOTES")
+    @ApiOperation(value = "batchActivateUser", notes = "BATCH_ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userNames", value = "USER_NAMES", required = true, type = "String"),
     })
@@ -492,7 +492,7 @@ public class UsersController extends BaseController {
     @ApiException(UPDATE_USER_ERROR)
     @AccessLogAnnotation
     public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestBody List<String> userNames) {
+                                            @RequestBody List<String> userNames) {
         List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
