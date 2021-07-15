@@ -661,6 +661,16 @@ public final class Constants {
     public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
 
     /**
+     * the absolute path of current executing task
+     */
+    public static final String PARAMETER_TASK_EXECUTE_PATH = "system.task.execute.path";
+
+    /**
+     * the instance id of current task
+     */
+    public static final String PARAMETER_TASK_INSTANCE_ID = "system.task.instance.id";
+
+    /**
      * ACCEPTED
      */
     public static final String ACCEPTED = "ACCEPTED";

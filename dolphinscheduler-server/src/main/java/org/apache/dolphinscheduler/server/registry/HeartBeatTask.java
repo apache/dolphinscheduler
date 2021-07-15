@@ -19,15 +19,13 @@ package org.apache.dolphinscheduler.server.registry;
 
 import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
 import java.util.Date;
 import java.util.Set;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +43,6 @@ public class HeartBeatTask implements Runnable {
     private Set<String> heartBeatPaths;
     private String serverType;
     private RegistryClient registryClient;
-
-    // server stop or not
-    protected IStoppable stoppable = null;
 
     public HeartBeatTask(String startTime,
                          double maxCpuloadAvg,
@@ -124,12 +119,4 @@ public class HeartBeatTask implements Runnable {
         }
     }
 
-    /**
-     * for stop server
-     *
-     * @param serverStoppable server stoppable interface
-     */
-    public void setStoppable(IStoppable serverStoppable) {
-        this.stoppable = serverStoppable;
-    }
 }

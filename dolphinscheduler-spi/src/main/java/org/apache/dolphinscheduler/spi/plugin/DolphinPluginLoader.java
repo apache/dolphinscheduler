@@ -30,8 +30,10 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +82,7 @@ public class DolphinPluginLoader {
 
     public void loadPlugins()
             throws Exception {
-        for (File file : listPluginDirs(installedPluginsDir)) {
+        for (File file : listPluginInstanceDirs(installedPluginsDir)) {
             if (file.isDirectory()) {
                 loadPlugin(file.getAbsolutePath());
             }
@@ -145,7 +147,7 @@ public class DolphinPluginLoader {
             throws Exception {
         logger.info("Classpath for {}:", dir.getName());
         List<URL> urls = new ArrayList<>();
-        for (File file : listPluginDirs(dir)) {
+        for (File file : listPluginInstanceJars(dir)) {
             logger.info("   {}", file);
             urls.add(file.toURI().toURL());
         }
@@ -172,12 +174,28 @@ public class DolphinPluginLoader {
         return new DolphinPluginClassLoader(urls, parent, DOLPHIN_SPI_PACKAGES);
     }
 
-    private static List<File> listPluginDirs(File installedPluginsDir) {
+    private static List<File> listPluginInstanceDirs(File installedPluginsDir) {
         if (installedPluginsDir != null && installedPluginsDir.isDirectory()) {
             File[] files = installedPluginsDir.listFiles();
             if (files != null) {
-                Arrays.sort(files);
-                return ImmutableList.copyOf(files);
+                Optional<File> isNotDir = Arrays.stream(files).filter(file -> !file.isDirectory()).findAny();
+                if (isNotDir.isPresent()) {
+                    return ImmutableList.of(installedPluginsDir);
+                } else {
+                    Arrays.sort(files);
+                    return ImmutableList.copyOf(files);
+                }
+            }
+        }
+        return ImmutableList.of();
+    }
+
+    private static List<File> listPluginInstanceJars(File installedPluginsDir) {
+        if (installedPluginsDir != null && installedPluginsDir.isDirectory()) {
+            File[] files = installedPluginsDir.listFiles();
+            if (files != null) {
+                return ImmutableList.copyOf(Arrays.stream(files).filter(file -> file.isFile() && file.getName().endsWith(".jar"))
+                        .collect(Collectors.toList()));
             }
         }
         return ImmutableList.of();

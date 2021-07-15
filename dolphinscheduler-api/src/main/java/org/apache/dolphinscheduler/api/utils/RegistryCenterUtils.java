@@ -26,31 +26,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  * monitor zookeeper info todo registry-spi
  * fixme Some of the information obtained in the api belongs to the unique information of zk.
  * I am not sure whether there is a good abstraction method. This is related to whether the specific plug-in is provided.
  */
-@Component
-public class RegistryMonitor {
+public class RegistryCenterUtils {
 
-    @Autowired
-    RegistryClient registryClient;
-
-    @PostConstruct
-    public void initRegistry() {
-        registryClient.init();
-    }
+    private static RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
      * @return zookeeper info list
      */
-    public List<ZookeeperRecord> zookeeperInfoList() {
+    public static List<ZookeeperRecord> zookeeperInfoList() {
         return null;
     }
 
@@ -59,7 +47,7 @@ public class RegistryMonitor {
      *
      * @return master server information
      */
-    public List<Server> getMasterServers() {
+    public static List<Server> getMasterServers() {
         return registryClient.getServerList(NodeType.MASTER);
     }
 
@@ -68,7 +56,7 @@ public class RegistryMonitor {
      *
      * @return worker server informations
      */
-    public List<Server> getWorkerServers() {
+    public static List<Server> getWorkerServers() {
         return registryClient.getServerList(NodeType.WORKER);
     }
 
@@ -106,11 +94,23 @@ public class RegistryMonitor {
         return list;
     }
 
-    public Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
+    public static Map<String, String> getServerMaps(NodeType nodeType, boolean hostOnly) {
         return registryClient.getServerMaps(nodeType, hostOnly);
     }
 
-    public List<String> getServerNodeList(NodeType nodeType, boolean hostOnly) {
+    public static List<String> getServerNodeList(NodeType nodeType, boolean hostOnly) {
         return registryClient.getServerNodeList(nodeType, hostOnly);
+    }
+
+    public static boolean isNodeExisted(String key) {
+        return registryClient.isExisted(key);
+    }
+
+    public static List<String> getChildrenNodes(final String key) {
+        return registryClient.getChildrenKeys(key);
+    }
+
+    public static String getNodeData(String key) {
+        return registryClient.get(key);
     }
 }
