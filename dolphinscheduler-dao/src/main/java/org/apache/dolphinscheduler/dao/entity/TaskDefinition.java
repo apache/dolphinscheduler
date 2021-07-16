@@ -395,6 +395,10 @@ public class TaskDefinition {
         this.delayTime = delayTime;
     }
 
+    public String getDependence() {
+        return JSONUtils.getNodeString(this.taskParams, "dependence");
+    }
+
     @Override
     public String toString() {
         return "TaskDefinition{"

@@ -67,4 +67,12 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      */
     List<TaskDefinitionLog> queryByTaskDefinitions(@Param("taskDefinitions") Collection<TaskDefinition> taskDefinitions);
 
+    /**
+     * batch insert task definition logs
+     *
+     * @param taskDefinitionLogs taskDefinitionLogs
+     * @return int
+     */
+    int batchInsert(@Param("taskDefinitionLogs") List<TaskDefinitionLog> taskDefinitionLogs);
+
 }
