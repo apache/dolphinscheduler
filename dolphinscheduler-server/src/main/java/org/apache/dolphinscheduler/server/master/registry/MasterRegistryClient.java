@@ -76,7 +76,7 @@ public class MasterRegistryClient {
      */
     @Autowired
     private ProcessService processService;
-    @Autowired
+
     private RegistryClient registryClient;
 
     /**
@@ -327,8 +327,8 @@ public class MasterRegistryClient {
     @PostConstruct
     public void init() {
         this.startTime = DateUtils.dateToString(new Date());
+        this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-        registryClient.init();
     }
 
     /**

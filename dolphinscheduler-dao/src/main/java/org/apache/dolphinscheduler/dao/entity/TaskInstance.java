@@ -627,4 +627,8 @@ public class TaskInstance implements Serializable {
     public void setTaskParams(String taskParams) {
         this.taskParams = taskParams;
     }
+
+    public boolean isFirstRun() {
+        return endTime == null;
+    }
 }

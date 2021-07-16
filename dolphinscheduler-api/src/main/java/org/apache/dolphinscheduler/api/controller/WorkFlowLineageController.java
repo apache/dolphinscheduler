@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -60,6 +61,7 @@ public class WorkFlowLineageController extends BaseController {
     @Autowired
     private WorkFlowLineageService workFlowLineageService;
 
+    @ApiOperation(value = "queryWorkFlowLineageByName", notes = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/list-name")
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
@@ -76,6 +78,7 @@ public class WorkFlowLineageController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "queryWorkFlowLineageByIds", notes = "QUERY_WORKFLOW_LINEAGE_BY_IDS_NOTES")
     @GetMapping(value = "/list-ids")
     @ResponseStatus(HttpStatus.OK)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

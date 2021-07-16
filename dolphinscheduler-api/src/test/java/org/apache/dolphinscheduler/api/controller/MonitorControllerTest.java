@@ -56,7 +56,6 @@ public class MonitorControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testListWorker() throws Exception {
 
@@ -74,7 +73,6 @@ public class MonitorControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testQueryDatabaseState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/monitor/database")
@@ -90,7 +88,6 @@ public class MonitorControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testQueryZookeeperState() throws Exception {

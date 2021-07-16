@@ -67,9 +67,9 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "queryLog", notes = "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
@@ -92,7 +92,7 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "downloadTaskLog", notes = "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/download-log")
     @ResponseBody

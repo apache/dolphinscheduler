@@ -109,7 +109,7 @@
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
-        if (this.alertInstanceIds) {
+        if (this.alertInstanceIds.length === 0) {
           this.$message.warning(`${i18n.$t('Select Alarm plugin instance')}`)
           return false
         }

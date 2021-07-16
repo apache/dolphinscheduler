@@ -22,10 +22,9 @@ import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHED
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.SubscribeListener;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,12 @@ public class MasterRegistryDataListener implements SubscribeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterRegistryDataListener.class);
 
-    @Resource
-    MasterRegistryClient masterRegistryClient;
+    private MasterRegistryClient masterRegistryClient;
+
+    public MasterRegistryDataListener() {
+        masterRegistryClient = SpringApplicationContext.getBean(MasterRegistryClient.class);
+    }
+
 
     @Override
     public void notify(String path, DataChangeEvent event) {

@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 
 /**
  * zk monitor server impl
@@ -35,9 +35,7 @@ public class RegistryMonitorImpl extends AbstractMonitor {
     /**
      * zookeeper operator
      */
-    @Autowired
-    private RegistryClient registryClient;
-
+    private RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
      * get active nodes map by path

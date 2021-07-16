@@ -258,8 +258,8 @@ public class ProcessService {
      * @return process instance
      */
     private ProcessInstance setWaitingThreadProcess(Command command, ProcessInstance processInstance) {
-        processInstance.setState(ExecutionStatus.WAITTING_THREAD);
-        if (command.getCommandType() != CommandType.RECOVER_WAITTING_THREAD) {
+        processInstance.setState(ExecutionStatus.WAITING_THREAD);
+        if (command.getCommandType() != CommandType.RECOVER_WAITING_THREAD) {
             processInstance.addHistoryCmd(command.getCommandType());
         }
         saveProcessInstance(processInstance);
@@ -522,7 +522,7 @@ public class ProcessService {
         // process instance quit by "waiting thread" state
         if (originCommand == null) {
             Command command = new Command(
-                    CommandType.RECOVER_WAITTING_THREAD,
+                    CommandType.RECOVER_WAITING_THREAD,
                     processInstance.getTaskDependType(),
                     processInstance.getFailureStrategy(),
                     processInstance.getExecutorId(),
@@ -539,14 +539,14 @@ public class ProcessService {
         }
 
         // update the command time if current command if recover from waiting
-        if (originCommand.getCommandType() == CommandType.RECOVER_WAITTING_THREAD) {
+        if (originCommand.getCommandType() == CommandType.RECOVER_WAITING_THREAD) {
             originCommand.setUpdateTime(new Date());
             saveCommand(originCommand);
         } else {
             // delete old command and create new waiting thread command
             commandMapper.deleteById(originCommand.getId());
             originCommand.setId(0);
-            originCommand.setCommandType(CommandType.RECOVER_WAITTING_THREAD);
+            originCommand.setCommandType(CommandType.RECOVER_WAITING_THREAD);
             originCommand.setUpdateTime(new Date());
             originCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
             originCommand.setProcessInstancePriority(processInstance.getProcessInstancePriority());
@@ -809,7 +809,7 @@ public class ProcessService {
                 break;
             case START_CURRENT_TASK_PROCESS:
                 break;
-            case RECOVER_WAITTING_THREAD:
+            case RECOVER_WAITING_THREAD:
                 break;
             case RECOVER_SUSPENDED_PROCESS:
                 // find pause tasks and init task's state
