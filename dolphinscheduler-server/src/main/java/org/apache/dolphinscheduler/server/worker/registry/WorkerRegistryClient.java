@@ -67,8 +67,7 @@ public class WorkerRegistryClient {
      */
     private ScheduledExecutorService heartBeatExecutor;
 
-    @Autowired
-    RegistryClient registryClient;
+    private RegistryClient registryClient;
 
     /**
      * worker start time
@@ -81,8 +80,8 @@ public class WorkerRegistryClient {
     public void initWorkRegistry() {
         this.workerGroups = workerConfig.getWorkerGroups();
         this.startTime = DateUtils.dateToString(new Date());
+        this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-        registryClient.init();
     }
 
     /**
@@ -160,10 +159,6 @@ public class WorkerRegistryClient {
 
     public void setRegistryStoppable(IStoppable stoppable) {
         registryClient.setStoppable(stoppable);
-    }
-
-    public void closeRegistry() {
-        unRegistry();
     }
 
 }
