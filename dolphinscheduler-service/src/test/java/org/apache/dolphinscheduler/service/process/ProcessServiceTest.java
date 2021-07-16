@@ -206,7 +206,7 @@ public class ProcessServiceTest {
         processService.createRecoveryWaitingThreadCommand(null, subProcessInstance);
 
         Command recoverCommand = new Command();
-        recoverCommand.setCommandType(CommandType.RECOVER_WAITTING_THREAD);
+        recoverCommand.setCommandType(CommandType.RECOVER_WAITING_THREAD);
         processService.createRecoveryWaitingThreadCommand(recoverCommand, subProcessInstance);
 
         Command repeatRunningCommand = new Command();
