@@ -41,7 +41,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -95,13 +100,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
 
-
         List<TaskDefinition> taskDefinitions = JSONUtils.toList(taskDefinitionJson, TaskDefinition.class);
         int totalSuccessNumber = 0;
         List<Long> totalSuccessCode = new ArrayList<>();
         List<TaskDefinition> taskDefinitionList = new ArrayList<>();
         List<TaskDefinitionLog> taskDefinitionLogsList = new ArrayList<>();
-        for(TaskDefinition taskDefinition : taskDefinitions) {
+        for (TaskDefinition taskDefinition : taskDefinitions) {
             checkTaskDefinition(result, taskDefinition, taskDefinitionJson);
             if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
                     || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
@@ -135,8 +139,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogsList);
         if ((logInsert & insert) == 0) {
-                putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-                return result;
+            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            return result;
         }
         Map<String, Object> resData = new HashMap<>();
         resData.put("total", totalSuccessNumber);
