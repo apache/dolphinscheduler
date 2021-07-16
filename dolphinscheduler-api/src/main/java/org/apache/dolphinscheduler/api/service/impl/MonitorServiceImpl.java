@@ -17,27 +17,22 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
-
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.api.utils.RegistryMonitor;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.WorkerServerModel;
-import org.apache.dolphinscheduler.dao.MonitorDBDao;
-import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.MonitorService;
+import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.WorkerServerModel;
+import org.apache.dolphinscheduler.dao.MonitorDBDao;
+import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,12 +43,6 @@ import com.google.common.collect.Sets;
  */
 @Service
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
-
-    @Autowired
-    private RegistryMonitor registryMonitor;
-
-    @Autowired
-    private RegistryClient registryClient;
 
     @Autowired
     private MonitorDBDao monitorDBDao;
@@ -105,7 +94,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     public Map<String,Object> queryZookeeperState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
-        List<ZookeeperRecord> zookeeperRecordList = registryMonitor.zookeeperInfoList();
+        List<ZookeeperRecord> zookeeperRecordList = RegistryCenterUtils.zookeeperInfoList();
 
         result.put(Constants.DATA_LIST, zookeeperRecordList);
         putMsg(result, Status.SUCCESS);
@@ -160,10 +149,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
 
     @Override
     public List<Server> getServerListFromRegistry(boolean isMaster) {
-
-        checkNotNull(registryMonitor);
-        NodeType nodeType = isMaster ? NodeType.MASTER : NodeType.WORKER;
-        return registryClient.getServerList(nodeType);
+        return isMaster ? RegistryCenterUtils.getMasterServers() : RegistryCenterUtils.getWorkerServers();
     }
 
 }

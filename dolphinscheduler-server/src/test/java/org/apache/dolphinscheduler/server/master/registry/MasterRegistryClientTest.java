@@ -20,6 +20,10 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -28,23 +32,24 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * MasterRegistryClientTest
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ RegistryClient.class })
+@PowerMockIgnore({"javax.management.*"})
 public class MasterRegistryClientTest {
 
     @InjectMocks
@@ -53,21 +58,25 @@ public class MasterRegistryClientTest {
     @Mock
     private MasterConfig masterConfig;
 
-    @Mock
     private RegistryClient registryClient;
 
     @Mock
     private ScheduledExecutorService heartBeatExecutor;
+
     @Mock
     private ProcessService processService;
 
     @Before
     public void before() throws Exception {
+        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
+        registryClient = PowerMockito.mock(RegistryClient.class);
         given(registryClient.getLock(Mockito.anyString())).willReturn(true);
         given(registryClient.getMasterFailoverLockPath()).willReturn("/path");
         given(registryClient.releaseLock(Mockito.anyString())).willReturn(true);
         given(registryClient.getHostByEventDataPath(Mockito.anyString())).willReturn("127.0.0.1:8080");
         doNothing().when(registryClient).handleDeadServer(Mockito.anyString(), Mockito.any(NodeType.class), Mockito.anyString());
+        ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
+
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setHost("127.0.0.1:8080");
@@ -96,7 +105,6 @@ public class MasterRegistryClientTest {
 
     @Test
     public void removeNodePathTest() {
-
         masterRegistryClient.removeNodePath("/path", NodeType.MASTER, false);
         masterRegistryClient.removeNodePath("/path", NodeType.MASTER, true);
         //Cannot mock static methods
