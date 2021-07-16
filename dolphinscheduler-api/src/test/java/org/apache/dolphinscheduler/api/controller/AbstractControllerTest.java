@@ -18,12 +18,19 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -91,6 +98,20 @@ public class AbstractControllerTest {
         sessionId = session;
 
         Assert.assertTrue(StringUtils.isNotEmpty(session));
+    }
 
+    public Map<String, Object> success() {
+        Map<String, Object> serviceResult = new HashMap<>();
+        putMsg(serviceResult, Status.SUCCESS);
+        return serviceResult;
+    }
+
+    public void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
     }
 }
