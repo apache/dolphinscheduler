@@ -23,11 +23,14 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
+import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
+import org.apache.dolphinscheduler.server.master.runner.StateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PostConstruct;
@@ -68,7 +71,15 @@ public class TaskResponseService {
      */
     private Thread taskResponseWorker;
 
-    @PostConstruct
+    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceMapper;
+    public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceMapper) {
+        if (this.processInstanceMapper == null) {
+            this.processInstanceMapper = processInstanceMapper;
+        }
+    }
+
+
+        @PostConstruct
     public void start() {
         this.taskResponseWorker = new TaskResponseWorker();
         this.taskResponseWorker.setName("TaskResponseWorker");
@@ -134,10 +145,10 @@ public class TaskResponseService {
         Event event = taskResponseEvent.getEvent();
         Channel channel = taskResponseEvent.getChannel();
 
+        TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
         switch (event) {
             case ACK:
                 try {
-                    TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
                     if (taskInstance != null) {
                         ExecutionStatus status = taskInstance.getState().typeIsFinished() ? taskInstance.getState() : taskResponseEvent.getState();
                         processService.changeTaskState(taskInstance, status,
@@ -158,7 +169,6 @@ public class TaskResponseService {
                 break;
             case RESULT:
                 try {
-                    TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
                     if (taskInstance != null) {
                         processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
                             taskResponseEvent.getEndTime(),
@@ -179,6 +189,17 @@ public class TaskResponseService {
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
+        }
+        //TODO...
+        //补数完毕，process instance id就变成新的了，所以这个地方判断多线程处理的时候可能有问题
+        MasterExecThread masterExecThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
+        if(masterExecThread != null){
+            StateEvent stateEvent = new StateEvent();
+            stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
+            stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
+            stateEvent.setExecutionStatus(taskResponseEvent.getState());
+            stateEvent.setType("task");
+            masterExecThread.addStateEvent(stateEvent);
         }
     }
 

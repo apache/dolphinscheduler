@@ -22,7 +22,10 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,6 +159,31 @@ public class CronUtils {
     }
 
     return dateList;
+  }
+
+
+  /**
+   *  gets all scheduled times for a period of time based on self dependency
+   *  if schedulers is empty then default scheduler = 1 day
+   * @param startTime
+   * @param endTime
+   * @param schedules
+   * @return
+   */
+  public static List<Date> getSelfFireDateList(Date startTime, Date endTime, List<Schedule> schedules) {
+    List<Date> result = new ArrayList<>();
+    if (!CollectionUtils.isEmpty(schedules)) {
+      for (Schedule schedule : schedules) {
+        result.addAll(CronUtils.getSelfFireDateList(startTime, endTime, schedule.getCrontab()));
+      }
+    } else {
+      Date start = startTime;
+      for (int i = 0; start.before(endTime); i++) {
+        start = DateUtils.getSomeDay(startTime, i);
+        result.add(start);
+      }
+    }
+    return result;
   }
 
   /**

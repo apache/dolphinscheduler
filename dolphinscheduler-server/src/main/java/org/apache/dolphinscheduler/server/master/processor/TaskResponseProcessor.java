@@ -28,7 +28,10 @@ import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
+import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +60,10 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
+    public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps){
+        this.taskResponseService.init(processInstanceExecMaps);
+    }
+
     /**
      * task final result response
      * need master process , state persistence
@@ -80,7 +87,8 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
                 responseCommand.getAppIds(),
                 responseCommand.getTaskInstanceId(),
                 responseCommand.getVarPool(),
-                channel
+                channel,
+                responseCommand.getProcessInstanceId()
                 );
         taskResponseService.addResponse(taskResponseEvent);
     }

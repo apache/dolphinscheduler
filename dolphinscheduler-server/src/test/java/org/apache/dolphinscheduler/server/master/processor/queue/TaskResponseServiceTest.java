@@ -62,7 +62,8 @@ public class TaskResponseServiceTest {
             "path",
             "logPath",
             22,
-            channel);
+            channel,
+                1);
 
         resultEvent = TaskResponseEvent.newResult(ExecutionStatus.SUCCESS,
             new Date(),
@@ -70,7 +71,8 @@ public class TaskResponseServiceTest {
             "ids",
             22,
             "varPol",
-            channel);
+            channel,
+                1);
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);

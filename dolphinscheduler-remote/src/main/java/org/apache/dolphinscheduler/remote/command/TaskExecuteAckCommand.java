@@ -35,6 +35,11 @@ public class TaskExecuteAckCommand implements Serializable {
     private int taskInstanceId;
 
     /**
+     *  process instance id
+     */
+    private int processInstanceId;
+
+    /**
      * startTime
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
@@ -130,6 +135,15 @@ public class TaskExecuteAckCommand implements Serializable {
                 + ", status=" + status
                 + ", logPath='" + logPath + '\''
                 + ", executePath='" + executePath + '\''
+                + ", processInstanceId='" + processInstanceId + '\''
                 + '}';
+    }
+
+    public int getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(int processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 }

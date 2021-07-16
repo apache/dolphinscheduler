@@ -89,7 +89,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/exec/process/1/2/3/4");
 
         ackCommand = new TaskExecuteAckCommand().convert2Command();
-        responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId()).convert2Command();
+        responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getProcessInstanceId()).convert2Command();
 
         taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(
                 LoggerUtils.TASK_LOGGER_INFO_PREFIX,

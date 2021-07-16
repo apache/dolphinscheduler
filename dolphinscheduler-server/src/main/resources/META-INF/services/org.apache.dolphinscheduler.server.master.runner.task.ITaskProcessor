@@ -1,0 +1,4 @@
+org.apache.dolphinscheduler.server.master.runner.task.CommonTaskProcessor
+org.apache.dolphinscheduler.server.master.runner.task.ConditionTaskProcessor
+org.apache.dolphinscheduler.server.master.runner.task.DependentTaskProcessor
+org.apache.dolphinscheduler.server.master.runner.task.SubTaskProcessor

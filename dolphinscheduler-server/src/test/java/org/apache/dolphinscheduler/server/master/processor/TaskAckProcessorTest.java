@@ -81,6 +81,7 @@ public class TaskAckProcessorTest {
         taskExecuteAckCommand.setLogPath("/temp/worker.log");
         taskExecuteAckCommand.setStartTime(new Date());
         taskExecuteAckCommand.setTaskInstanceId(1);
+        taskExecuteAckCommand.setProcessInstanceId(1);
     }
 
     @Test

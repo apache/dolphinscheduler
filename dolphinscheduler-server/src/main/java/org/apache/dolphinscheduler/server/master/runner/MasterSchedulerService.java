@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -31,6 +32,8 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +43,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
 /**
  *  master scheduler thread
@@ -86,15 +95,21 @@ public class MasterSchedulerService extends Thread {
      */
     private ThreadPoolExecutor masterExecService;
 
+    private ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps ;
+    private ConcurrentHashMap<String, MasterExecThread> eventHandlerMap = new ConcurrentHashMap();
+    ListeningExecutorService listeningExecutorService;
 
     /**
      * constructor of MasterSchedulerService
      */
-    @PostConstruct
-    public void init() {
+//    @PostConstruct
+    public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps) {
+        this.processInstanceExecMaps = processInstanceExecMaps;
         this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        ExecutorService eventService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
+        listeningExecutorService = MoreExecutors.listeningDecorator(eventService);
     }
 
     @Override
@@ -136,16 +151,52 @@ public class MasterSchedulerService extends Thread {
                     scheduleProcess();
                 }*/
                 scheduleProcess();
+                eventHandler();
             } catch (Exception e) {
                 logger.error("master scheduler thread error", e);
             }
+        }
+    }
+    private void eventHandler() {
+        for (MasterExecThread masterExecThread : this.processInstanceExecMaps.values()) {
+            if (masterExecThread.eventSize() == 0
+                    || StringUtils.isEmpty(masterExecThread.getKey())
+                    || eventHandlerMap.containsKey(masterExecThread.getKey())) {
+                continue;
+            }
+            int processInstanceId = masterExecThread.getProcessInstance().getId();
+            logger.info("handle process instance : {} events, count:{}",
+                    processInstanceId,
+                    masterExecThread.eventSize());
+            logger.info("already exists handler process size:{}", this.eventHandlerMap.size());
+            eventHandlerMap.put(masterExecThread.getKey(), masterExecThread);
+            ListenableFuture future = this.listeningExecutorService.submit(masterExecThread);
+            FutureCallback futureCallback = new FutureCallback() {
+                @Override
+                public void onSuccess(Object o) {
+                    if (masterExecThread.workFlowFinish()) {
+                        processInstanceExecMaps.remove(processInstanceId);
+                        logger.info("process instance {} finished.", processInstanceId);
+                    }
+                    if(masterExecThread.getProcessInstance().getId() != processInstanceId){
+                        processInstanceExecMaps.remove(processInstanceId);
+                        processInstanceExecMaps.put(masterExecThread.getProcessInstance().getId(), masterExecThread);
+                    }
+                    eventHandlerMap.remove(masterExecThread.getKey());
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                }
+            };
+            Futures.addCallback(future, futureCallback, this.listeningExecutorService);
         }
     }
 
     private void scheduleProcess() throws Exception {
 
         try {
-            masterRegistryClient.blockAcquireMutex();
+//            masterRegistryClient.blockAcquireMutex();
 
             int activeCount = masterExecService.getActiveCount();
             // make sure to scan and delete command  table in one transaction
@@ -159,14 +210,15 @@ public class MasterSchedulerService extends Thread {
                             getLocalAddress(),
                             this.masterConfig.getMasterExecThreads() - activeCount, command);
                     if (processInstance != null) {
-                        logger.info("start master exec thread , split DAG ...");
-                        masterExecService.execute(
-                                new MasterExecThread(
-                                        processInstance
-                                        , processService
-                                        , nettyRemotingClient
-                                        , processAlertManager
-                                        , masterConfig));
+                        MasterExecThread masterExecThread = new MasterExecThread(
+                                processInstance
+                                , processService
+                                , nettyRemotingClient
+                                , processAlertManager
+                                , masterConfig);
+
+                        this.processInstanceExecMaps.put(processInstance.getId(), masterExecThread);
+                        masterExecService.execute(masterExecThread);
                     }
                 } catch (Exception e) {
                     logger.error("scan command error ", e);
@@ -177,7 +229,7 @@ public class MasterSchedulerService extends Thread {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } finally {
-            masterRegistryClient.releaseLock();
+//            masterRegistryClient.releaseLock();
         }
     }
 
