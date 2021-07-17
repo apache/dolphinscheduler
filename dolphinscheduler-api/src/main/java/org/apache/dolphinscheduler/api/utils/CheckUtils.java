@@ -148,9 +148,6 @@ public class CheckUtils {
     public static boolean checkTaskDefinitionParameters(TaskDefinition taskDefinition) {
         AbstractParameters abstractParameters;
         String taskType = taskDefinition.getTaskType();
-        if (taskType == null) {
-            return false;
-        }
         if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
             abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskDefinition.getDependence());
         } else {

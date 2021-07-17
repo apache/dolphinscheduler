@@ -100,43 +100,38 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
 
-        List<TaskDefinition> taskDefinitions = JSONUtils.toList(taskDefinitionJson, TaskDefinition.class);
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         int totalSuccessNumber = 0;
         List<Long> totalSuccessCode = new ArrayList<>();
-        List<TaskDefinition> taskDefinitionList = new ArrayList<>();
         List<TaskDefinitionLog> taskDefinitionLogsList = new ArrayList<>();
-        for (TaskDefinition taskDefinition : taskDefinitions) {
-            checkTaskDefinition(result, taskDefinition, taskDefinitionJson);
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            checkTaskDefinition(result, taskDefinitionLog);
             if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
                     || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
                 return result;
             }
-            taskDefinition.setProjectCode(projectCode);
-            taskDefinition.setUserId(loginUser.getId());
-            taskDefinition.setVersion(1);
+            taskDefinitionLog.setProjectCode(projectCode);
+            taskDefinitionLog.setUserId(loginUser.getId());
+            taskDefinitionLog.setVersion(1);
             Date now = new Date();
-            taskDefinition.setCreateTime(now);
-            taskDefinition.setUpdateTime(now);
+            taskDefinitionLog.setCreateTime(now);
+            taskDefinitionLog.setUpdateTime(now);
             long code = 0L;
             try {
                 code = SnowFlakeUtils.getInstance().nextId();
-                taskDefinition.setCode(code);
+                taskDefinitionLog.setCode(code);
             } catch (SnowFlakeException e) {
                 logger.error("Task code get error, ", e);
-            }
-            if (code == 0L) {
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return result;
             }
-            taskDefinitionList.add(taskDefinition);
-            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLogsList.add(taskDefinitionLog);
             totalSuccessCode.add(code);
             totalSuccessNumber++;
         }
-        int insert = taskDefinitionMapper.batchInsert(taskDefinitionList);
+        int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogsList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogsList);
         if ((logInsert & insert) == 0) {
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
@@ -260,12 +255,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
     }
 
-    public void checkTaskDefinition(Map<String, Object> result, TaskDefinition taskDefinition, String taskDefinitionJson) {
-        if (taskDefinition == null) {
-            logger.error("taskDefinitionJson is not valid json");
-            putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
-            return;
-        }
+    private void checkTaskDefinition(Map<String, Object> result, TaskDefinition taskDefinition) {
         if (!CheckUtils.checkTaskDefinitionParameters(taskDefinition)) {
             logger.error("task definition {} parameter invalid", taskDefinition.getName());
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinition.getName());

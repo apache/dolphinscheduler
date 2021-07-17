@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -396,7 +397,7 @@ public class TaskDefinition {
     }
 
     public String getDependence() {
-        return JSONUtils.getNodeString(this.taskParams, "dependence");
+        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
     }
 
     @Override
