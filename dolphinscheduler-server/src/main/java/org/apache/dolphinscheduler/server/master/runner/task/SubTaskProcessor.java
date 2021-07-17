@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -32,8 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SubTaskProcessor extends BaseTaskProcessor{
 
-    @Autowired
-    ProcessService processService;
 
     @Autowired
     MasterConfig masterConfig;
@@ -41,6 +40,8 @@ public class SubTaskProcessor extends BaseTaskProcessor{
     ProcessInstance processInstance;
 
     ProcessInstance subProcessInstance = null;
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
 
     @Override
     public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int masterTaskCommitRetryTimes, int masterTaskCommitInterval) {

@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -43,9 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class DependentTaskProcessor extends BaseTaskProcessor {
-
-    @Autowired
-    ProcessService processService;
 
     @Autowired
     MasterConfig masterConfig;
@@ -71,6 +69,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     private Date dependentDate;
 
     ProcessInstance processInstance;
+    protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
 
     boolean allDependentItemFinished;
 
