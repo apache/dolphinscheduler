@@ -50,30 +50,48 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaskDefinitionServiceImplTest {
-
-    String taskDefinitionJson = "[{\n"
-            +   "\"name\": \"test12111\",\n"
-            +   "\"description\": \"test\",\n"
-            +   "\"taskType\": \"SHELL\",\n"
-            +   "\"flag\": 0,\n"
-            +   "\"taskParams\": \n"
-            +   "\"{\\\"resourceList\\\":[],\n"
-            +   "\\\"localParams\\\":[],\n"
-            +   "\\\"rawScript\\\":\\\"echo 11\\\",\n"
-            +   "\\\"conditionResult\\\":\n"
-            +   "{\\\"successNode\\\":[\\\"\\\"],\n"
-            +   "\\\"failedNode\\\":[\\\"\\\"]},\n"
-            +   "\\\"dependence\\\":{}}\",\n"
-            +   "\"taskPriority\": 0,\n"
-            +   "\"workerGroup\": \"default\",\n"
-            +   "\"failRetryTimes\": 0,\n"
-            +   "\"failRetryInterval\": 1,\n"
-            +   "\"timeoutFlag\": 1, \n"
-            +   "\"timeoutNotifyStrategy\": 0,\n"
-            +   "\"timeout\": 0, \n"
-            +   "\"delayTime\": 0,\n"
-            +   "\"resourceIds\":\"\" \n"
-            +   "}] ";
+    String taskDefinitionJson = "{\n"
+                    + "    \"type\": \"SQL\",\n"
+                    + "    \"id\": \"tasks-27297\",\n"
+                    + "    \"name\": \"SQL\",\n"
+                    + "    \"params\": {\n"
+                    + "    \"type\": \"MYSQL\",\n"
+                    + "    \"datasource\": 1,\n"
+                    + "    \"sql\": \"select * from test\",\n"
+                    + "    \"udfs\": \"\",\n"
+                    + "    \"sqlType\": \"1\",\n"
+                    + "    \"title\": \"\",\n"
+                    + "    \"receivers\": \"\",\n"
+                    + "    \"receiversCc\": \"\",\n"
+                    + "    \"showType\": \"TABLE\",\n"
+                    + "    \"localParams\": [\n"
+                    + "            \n"
+                    + "        ],\n"
+                    + "    \"connParams\": \"\",\n"
+                    + "    \"preStatements\": [\n"
+                    + "            \n"
+                    + "        ],\n"
+                    + "    \"postStatements\": [\n"
+                    + "            \n"
+                    + "        ]\n"
+                    + "    },\n"
+                    + "    \"description\": \"\",\n"
+                    + "    \"runFlag\": \"NORMAL\",\n"
+                    + "    \"dependence\": {\n"
+                    + "        \n"
+                    + "    },\n"
+                    + "    \"maxRetryTimes\": \"0\",\n"
+                    + "    \"retryInterval\": \"1\",\n"
+                    + "    \"timeout\": {\n"
+                    + "        \"strategy\": \"\",\n"
+                    + "        \"enable\": false\n"
+                    + "    },\n"
+                    + "    \"taskInstancePriority\": \"MEDIUM\",\n"
+                    + "    \"workerGroupId\": -1,\n"
+                    + "    \"preTasks\": [\n"
+                    + "        \"dependent\"\n"
+                    + "    ]\n"
+                    + "}\n";
 
     @InjectMocks
     private TaskDefinitionServiceImpl taskDefinitionService;
@@ -114,12 +132,34 @@ public class TaskDefinitionServiceImplTest {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
-
-        List<TaskDefinition> taskDefinitions = JSONUtils.toList(taskDefinitionJson, TaskDefinition.class);
+        String createTaskDefinitionJson = "[{\n"
+                +   "\"name\": \"test12111\",\n"
+                +   "\"description\": \"test\",\n"
+                +   "\"taskType\": \"SHELL\",\n"
+                +   "\"flag\": 0,\n"
+                +   "\"taskParams\": \n"
+                +   "\"{\\\"resourceList\\\":[],\n"
+                +   "\\\"localParams\\\":[],\n"
+                +   "\\\"rawScript\\\":\\\"echo 11\\\",\n"
+                +   "\\\"conditionResult\\\":\n"
+                +   "{\\\"successNode\\\":[\\\"\\\"],\n"
+                +   "\\\"failedNode\\\":[\\\"\\\"]},\n"
+                +   "\\\"dependence\\\":{}}\",\n"
+                +   "\"taskPriority\": 0,\n"
+                +   "\"workerGroup\": \"default\",\n"
+                +   "\"failRetryTimes\": 0,\n"
+                +   "\"failRetryInterval\": 1,\n"
+                +   "\"timeoutFlag\": 1, \n"
+                +   "\"timeoutNotifyStrategy\": 0,\n"
+                +   "\"timeout\": 0, \n"
+                +   "\"delayTime\": 0,\n"
+                +   "\"resourceIds\":\"\" \n"
+                +   "}] ";
+        List<TaskDefinition> taskDefinitions = JSONUtils.toList(createTaskDefinitionJson, TaskDefinition.class);
         Mockito.when(taskDefinitionMapper.batchInsert(Mockito.anyList())).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.batchInsert(Mockito.anyList())).thenReturn(1);
         Map<String, Object> relation = taskDefinitionService
-                .createTaskDefinition(loginUser, projectCode, taskDefinitionJson);
+                .createTaskDefinition(loginUser, projectCode, createTaskDefinitionJson);
 
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
@@ -178,39 +218,6 @@ public class TaskDefinitionServiceImplTest {
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
 
     }
-
-    /*
-    @Test
-    public void updateTaskDefinition() {
-        long projectCode = 1L;
-
-        Project project = getProject(projectCode);
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-
-        User loginUser = new User();
-        loginUser.setId(-1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
-
-        TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
-
-        Mockito.when(processService.updateTaskDefinition(Mockito.eq(loginUser)
-                , Mockito.eq(project.getCode())
-                , Mockito.eq(taskNode)
-                , Mockito.any(TaskDefinition.class)))
-                .thenReturn(1);
-
-        Mockito.when(taskDefinitionMapper.queryByDefinitionCode(11L))
-                .thenReturn(new TaskDefinition());
-
-        Map<String, Object> relation = taskDefinitionService
-                .updateTaskDefinition(loginUser, projectCode, 11L, taskDefinitionJson);
-
-        Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
-    }*/
 
     @Test
     public void switchVersion() {
