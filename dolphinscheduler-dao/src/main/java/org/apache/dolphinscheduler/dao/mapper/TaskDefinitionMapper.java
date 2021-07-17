@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
