@@ -45,9 +45,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class DependentTaskProcessor extends BaseTaskProcessor {
 
-    @Autowired
-    MasterConfig masterConfig;
-
     private DependentParameters dependentParameters;
 
     /**
@@ -70,6 +67,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
 
     ProcessInstance processInstance;
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+
 
 
     boolean allDependentItemFinished;

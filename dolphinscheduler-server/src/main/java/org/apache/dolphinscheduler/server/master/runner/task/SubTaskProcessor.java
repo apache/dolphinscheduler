@@ -34,13 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SubTaskProcessor extends BaseTaskProcessor{
 
 
-    @Autowired
-    MasterConfig masterConfig;
 
     ProcessInstance processInstance;
 
     ProcessInstance subProcessInstance = null;
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
 
 
     @Override

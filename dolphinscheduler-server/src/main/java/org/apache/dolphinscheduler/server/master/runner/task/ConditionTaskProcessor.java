@@ -44,8 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class ConditionTaskProcessor extends BaseTaskProcessor{
 
-    @Autowired
-    MasterConfig masterConfig;
 
     /**
      * dependent parameters
@@ -65,6 +63,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
     private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    MasterConfig masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
 
 
     @Override
