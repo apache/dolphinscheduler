@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_DEFINITION;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_DEFINE_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
@@ -55,6 +55,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+
+
 /**
  * task definition controller
  */
@@ -81,7 +83,7 @@ public class TaskDefinitionController extends BaseController {
     })
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_TASK_DEFINITION)
+    @ApiException(CREATE_TASK_DEFINITION_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createTaskDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
