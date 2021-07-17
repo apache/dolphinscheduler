@@ -92,6 +92,7 @@ public class TaskDefinitionServiceImplTest {
             + "        \"dependent\"\n"
             + "    ]\n"
             + "}\n";
+
     @InjectMocks
     private TaskDefinitionServiceImpl taskDefinitionService;
 
