@@ -94,7 +94,7 @@
         <oshi.core.version>3.9.1</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
-        <jsp-2.1.version>6.1.14</jsp-2.1.version>
+        <jsp-2.1.version>7.5.4.v20111024</jsp-2.1.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
         <apache.rat.version>0.13</apache.rat.version>
@@ -512,8 +512,8 @@
 
             <!-- for api module -->
             <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jsp-2.1</artifactId>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-jsp-2.1</artifactId>
                 <version>${jsp-2.1.version}</version>
             </dependency>
 
