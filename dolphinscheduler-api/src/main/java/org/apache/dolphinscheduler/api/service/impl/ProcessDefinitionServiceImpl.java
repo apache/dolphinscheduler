@@ -723,7 +723,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * correct task param which has datasource or dependent for export
+     * Injecting parameters into export process definition
+     * Because the import and export environment resource IDs may be inconsistent，So inject the resource name
+     *
+     * SQL and PROCEDURE node, inject datasourceName
+     * DEPENDENT node, inject projectName and definitionName
      *
      * @param processData process data
      */
@@ -967,9 +971,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * correct task param which has datasource or dependent for import
+     * Replace the injecting parameters in import process definition
      *
-     * @param jsonArray Array Node
+     * SQL and PROCEDURE node, inject datasource by datasourceName
+     * DEPENDENT node, inject projectId and definitionId by projectName and definitionName
+     *
+     * @param jsonArray array node
      */
     private void addImportTaskNodeSpecialParam(ArrayNode jsonArray) {
         // add sql and dependent param
