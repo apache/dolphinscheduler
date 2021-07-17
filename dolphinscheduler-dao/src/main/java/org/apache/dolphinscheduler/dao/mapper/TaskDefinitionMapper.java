@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
@@ -106,4 +106,12 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return int
      */
     int deleteByCode(@Param("code") Long code);
+
+    /**
+     * batch insert task definitions
+     *
+     * @param taskDefinitions taskDefinitions
+     * @return int
+     */
+    int batchInsert(@Param("taskDefinitions") List<TaskDefinitionLog> taskDefinitions);
 }
