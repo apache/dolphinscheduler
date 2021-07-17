@@ -270,7 +270,7 @@ public enum Status {
     PROCESS_TASK_RELATION_EXIST(50034, "process task relation is already exist, processCode:[{0}]", "工作流任务关系已存在, processCode:[{0}]"),
     PROCESS_DAG_IS_EMPTY(50035, "process dag can not be empty", "工作流dag不能为空"),
     CHECK_PROCESS_TASK_RELATION_ERROR(50036, "check process task relation error", "工作流任务关系参数错误"),
-    CREATE_TASK_DEFINITION(50037, "create task definition", "创建任务错误"),
+    CREATE_TASK_DEFINITION_ERROR(50037, "create task definition error", "创建任务错误"),
     UPDATE_TASK_DEFINITION_ERROR(50038, "update task definition error", "更新任务定义错误"),
     QUERY_TASK_DEFINITION_VERSIONS_ERROR(50039, "query task definition versions error", "查询任务历史版本信息出错"),
     SWITCH_TASK_DEFINITION_VERSION_ERROR(50040, "Switch task definition version error", "切换任务版本出错"),
