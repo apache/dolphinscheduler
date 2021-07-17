@@ -75,8 +75,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 
-import javax.xml.ws.Endpoint;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,15 +215,18 @@ public class MasterExecThread implements Runnable {
     public void run() {
         try {
             startProcess();
-            while(this.stateEvents.size() > 0){
-                StateEvent stateEvent = this.stateEvents.peek();
-                this.stateEventHandler(stateEvent);
-                this.stateEvents.remove(stateEvent);
-            }
+            handleEvents();
         } catch (Exception e) {
             logger.error("handler error:",e);
         }
 
+    }
+    private void handleEvents(){
+        while(this.stateEvents.size() > 0){
+            StateEvent stateEvent = this.stateEvents.peek();
+            this.stateEventHandler(stateEvent);
+            this.stateEvents.remove(stateEvent);
+        }
     }
 
     public String getKey(){
@@ -303,7 +304,7 @@ public class MasterExecThread implements Runnable {
                 } else {
                     errorTaskList.put(task.getName(), task);
                     if (processInstance.getFailureStrategy() == FailureStrategy.END) {
-                        killTheOtherTasks();
+                        killAllTasks();
                     }
                 }
             }
@@ -341,6 +342,9 @@ public class MasterExecThread implements Runnable {
             }
             if (stateEvent.getExecutionStatus().typeIsFinished()) {
                 endProcess();
+            }
+            if(stateEvent.getExecutionStatus() == ExecutionStatus.READY_STOP){
+                killAllTasks();
             }
             //TODO...
             //send event to dependent tasks/process
@@ -1210,7 +1214,7 @@ public class MasterExecThread implements Runnable {
 //                        } else {
 //                            errorTaskList.put(task.getName(), task);
 //                            if (processInstance.getFailureStrategy() == FailureStrategy.END) {
-//                                killTheOtherTasks();
+//                                killAllTasks();
 //                            }
 //                        }
 //                    }
@@ -1298,7 +1302,7 @@ public class MasterExecThread implements Runnable {
     /**
      * close the on going tasks
      */
-    private void killTheOtherTasks() {
+    private void killAllTasks() {
         logger.info("kill called on process instance id: {}, num: {}", processInstance.getId(),
                 activeTaskNode.size());
         for(int taskId : activeTaskNode.keySet()) {
@@ -1306,9 +1310,16 @@ public class MasterExecThread implements Runnable {
             if (taskInstance == null || taskInstance.getState().typeIsFinished()) {
                 continue;
             }
-
             ITaskProcessor taskProcessor = activeTaskNode.get(taskId);
             taskProcessor.action(TaskAction.STOP);
+            if(taskProcessor.taskState().typeIsFinished()){
+                StateEvent stateEvent = new StateEvent();
+                stateEvent.setType("task");
+                stateEvent.setProcessInstanceId(this.processInstance.getId());
+                stateEvent.setTaskInstanceId(taskInstance.getId());
+                stateEvent.setExecutionStatus(taskProcessor.taskState());
+                this.addStateEvent(stateEvent);
+            }
         }
 
     }
