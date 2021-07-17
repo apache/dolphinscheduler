@@ -20,6 +20,7 @@ import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
@@ -187,5 +188,10 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
         processService.saveTaskInstance(taskInstance);
+    }
+
+    @Override
+    public String getType() {
+        return TaskType.DEPENDENT.getDesc();
     }
 }

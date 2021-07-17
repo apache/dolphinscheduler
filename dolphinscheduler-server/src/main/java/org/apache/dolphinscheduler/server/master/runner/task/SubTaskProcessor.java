@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -122,6 +123,6 @@ public class SubTaskProcessor extends BaseTaskProcessor{
 
     @Override
     public String getType() {
-        return "subtask";
+        return TaskType.SUB_PROCESS.getDesc();
     }
 }

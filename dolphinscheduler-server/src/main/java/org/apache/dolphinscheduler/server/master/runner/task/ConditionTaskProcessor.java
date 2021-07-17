@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
@@ -114,7 +115,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
 
     @Override
     public String getType() {
-        return "condition";
+        return TaskType.CONDITIONS.getDesc();
     }
 
     private void initTaskParameters() {
