@@ -77,9 +77,9 @@ public class WorkFlowLineageServiceTest {
     public void testQueryWorkFlowLineageByName() {
         Project project = getProject("test");
         String searchVal = "test";
-        when(projectMapper.selectById(1)).thenReturn(project);
+        when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workFlowLineageMapper.queryByName(Mockito.any(), Mockito.any())).thenReturn(getWorkFlowLineages());
-        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal, 1);
+        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal, 1L);
         List<WorkFlowLineage> workFlowLineageList = (List<WorkFlowLineage>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(workFlowLineageList.size() > 0);
     }
@@ -106,7 +106,7 @@ public class WorkFlowLineageServiceTest {
         WorkFlowLineage workFlowLineage = new WorkFlowLineage();
         workFlowLineage.setSourceWorkFlowId("");
 
-        when(projectMapper.selectById(1)).thenReturn(project);
+        when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workFlowLineageMapper.queryRelationByIds(ids, project.getCode())).thenReturn(processLineages);
         when(workFlowLineageMapper.queryCodeRelation(processLineage.getPostTaskCode()
                 , processLineage.getPreTaskVersion()
@@ -117,7 +117,7 @@ public class WorkFlowLineageServiceTest {
                 .queryWorkFlowLineageByCode(processLineage.getProcessDefinitionCode(), processLineage.getProjectCode()))
                 .thenReturn(workFlowLineage);
 
-        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(ids, 1);
+        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(ids, 1L);
 
         Map<String, Object> workFlowLists = (Map<String, Object>) result.get(Constants.DATA_LIST);
         Collection<WorkFlowLineage> workFlowLineages = (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
