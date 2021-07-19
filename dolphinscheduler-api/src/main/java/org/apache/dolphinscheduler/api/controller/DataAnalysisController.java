@@ -69,9 +69,9 @@ public class DataAnalysisController extends BaseController {
      */
     @ApiOperation(value = "countTaskState", notes = "COUNT_TASK_STATE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
     })
     @GetMapping(value = "/task-state-count")
     @ResponseStatus(HttpStatus.OK)
@@ -97,9 +97,9 @@ public class DataAnalysisController extends BaseController {
      */
     @ApiOperation(value = "countProcessInstanceState", notes = "COUNT_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
+        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
     })
     @GetMapping(value = "/process-state-count")
     @ResponseStatus(HttpStatus.OK)
