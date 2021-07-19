@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="searchParams.projectId ? `${$t('Project Home')} - ${projectName}` : $t('Home')">
+  <m-list-construction :title="searchParams.projectCode ? `${$t('Project Home')} - ${projectName}` : $t('Home')">
     <template slot="content">
       <div class="perject-home-content">
         <div class="time-model">
@@ -80,6 +80,7 @@
       return {
         searchParams: {
           projectId: null,
+          projectCode: null,
           startDate: '',
           endDate: ''
         },
@@ -97,6 +98,7 @@
     },
     created () {
       this.searchParams.projectId = this.id === 0 ? 0 : localStore.getItem('projectId')
+      this.searchParams.projectCode = this.id === 0 ? 0 : localStore.getItem('projectCode')
       this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
       this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
       this.searchParams.startDate = this.dataTime[0]

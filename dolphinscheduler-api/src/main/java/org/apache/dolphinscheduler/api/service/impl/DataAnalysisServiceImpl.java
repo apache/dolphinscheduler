@@ -90,17 +90,17 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical task instance status data
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param startDate start date
      * @param endDate end date
      * @return task state count data
      */
     @Override
-    public Map<String, Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
+    public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
 
         return countStateByProject(
                 loginUser,
-                projectId,
+                projectCode,
                 startDate,
                 endDate,
             (start, end, projectCodes) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectCodes));
@@ -110,16 +110,16 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical process instance status data
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param startDate start date
      * @param endDate end date
      * @return process instance state count data
      */
     @Override
-    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
+    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate, String endDate) {
         Map<String, Object> result =  this.countStateByProject(
                 loginUser,
-                projectId,
+                projectCode,
                 startDate,
                 endDate,
             (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectCodes));
@@ -130,11 +130,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         return result;
     }
 
-    private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
+    private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate
             , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>();
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
+        Project project = projectMapper.queryByCode(projectCode);
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
 
@@ -149,8 +149,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectMapper.selectById(projectId).getCode() };
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectCode };
         List<ExecuteStatusCount> processInstanceStateCounts =
                 instanceStateCounter.apply(start, end, projectCodeArray);
 
@@ -280,7 +280,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return result;
         }
 
-        //TODO need to add detail data info 
+        //TODO need to add detail data info
         Map<String, Integer> dataMap = new HashMap<>();
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
