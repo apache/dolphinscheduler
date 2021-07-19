@@ -118,21 +118,21 @@ public class DataAnalysisController extends BaseController {
      * statistics the process definition quantities of certain person
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return definition count in project id
      */
     @ApiOperation(value = "countDefinitionByUser", notes = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
     })
     @GetMapping(value = "/define-user-count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+                                        @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectId);
+        Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectCode);
         return returnDataList(result);
     }
 

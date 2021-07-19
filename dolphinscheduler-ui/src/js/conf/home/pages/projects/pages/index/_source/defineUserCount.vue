@@ -38,11 +38,11 @@
       return {
         isSpin: true,
         msg: true,
-        parameter: { projectId: 0 }
+        parameter: { projectCode: 0 }
       }
     },
     props: {
-      projectId: Number
+      projectCode: Number
     },
     methods: {
       ...mapActions('projects', ['getDefineUserCount']),
@@ -57,7 +57,7 @@
         const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
         myChart.echart.setOption(bar)
         // Jump not allowed on home page
-        if (this.projectId) {
+        if (this.projectCode) {
           myChart.echart.on('click', e => {
             this.$router.push({
               name: 'projects-definition-list',
@@ -71,7 +71,7 @@
     },
     created () {
       this.isSpin = true
-      this.parameter.projectId = this.projectId
+      this.parameter.projectCode = this.projectCode
       this.getDefineUserCount(this.parameter).then(res => {
         this.msg = res.data.count > 0
         this.defineUserList = []
