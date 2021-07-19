@@ -102,18 +102,16 @@ public class DataSourceServiceTest {
     @Test
     public void buildParameterWithDecodePassword() {
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
-        String other = "{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}";
+        String other = "{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\",\"serverTimezone\":\"Asia/Shanghai\",\"queryTimeout\":\"-1\",\"characterEncoding\":\"utf8\"}";
         String param = dataSourceService.buildParameter("root","test",DbType.MYSQL, "192.168.9.1", "1521", "im"
                 , "", "test", "123456", null, other);
-        String expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
-                + "\"user\":\"test\",\"password\":\"123456\"}";
+        String expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"123456\",\"other\":\"serverTimezone=Asia/Shanghai&queryTimeout=-1&characterEncoding=utf8\"}";
         Assert.assertEquals(expected, param);
 
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
         param = dataSourceService.buildParameter("root","test",DbType.MYSQL, "192.168.9.1", "1521", "im"
                 , "", "test", "123456", null, other);
-        expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\","
-                + "\"user\":\"test\",\"password\":\"123456\"}";
+        expected = "{\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"123456\",\"other\":\"serverTimezone=Asia/Shanghai&queryTimeout=-1&characterEncoding=utf8\"}";
         Assert.assertEquals(expected, param);
     }
 
