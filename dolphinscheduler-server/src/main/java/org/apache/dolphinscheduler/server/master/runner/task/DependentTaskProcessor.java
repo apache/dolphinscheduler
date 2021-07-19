@@ -101,7 +101,6 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     public void run() {
         if (!allDependentItemFinished) {
             allDependentItemFinished = allDependentTaskFinish();
-            return;
         }
         updateTaskState();
     }

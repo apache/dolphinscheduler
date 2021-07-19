@@ -96,6 +96,8 @@ public class ConditionTaskProcessor extends BaseTaskProcessor{
     public void run() {
         if(conditionResult.equals(DependResult.WAITING)){
             setConditionResult();
+        }else{
+            updateTaskState();
         }
     }
 

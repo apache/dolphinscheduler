@@ -638,6 +638,14 @@ public class MasterExecThread implements Runnable {
                 this.taskInstanceHashMap.put(taskInstance.getId(), taskInstance.getTaskCode(), taskInstance);
                 activeTaskNode.put(taskInstance.getId(), taskProcessor);
                 taskProcessor.run();
+                if(taskProcessor.getType() != "default" && taskProcessor.taskState().typeIsFinished()){
+                    StateEvent stateEvent = new StateEvent();
+                    stateEvent.setProcessInstanceId(this.processInstance.getId());
+                    stateEvent.setTaskInstanceId(taskInstance.getId());
+                    stateEvent.setExecutionStatus(taskProcessor.taskState());
+                    stateEvent.setType("task");
+                    this.stateEvents.add(stateEvent);
+                }
                 return taskInstance;
             } else {
                 logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
