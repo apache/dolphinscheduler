@@ -90,7 +90,7 @@
         })
         const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
         myChart.echart.setOption(pie)
-        // 首页不允许跳转
+        // Jump not allowed on home page
         if (this.searchParams.projectCode) {
           myChart.echart.on('click', e => {
             this._goProcess(e.data.name)
