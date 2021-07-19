@@ -92,7 +92,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCountDefinitionByUser() throws Exception {
-        PowerMockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
+        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId","16");
