@@ -119,7 +119,7 @@ public class DataAnalysisController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @return definition count in project id
+     * @return definition count in project code
      */
     @ApiOperation(value = "countDefinitionByUser", notes = "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
     @ApiImplicitParams({
