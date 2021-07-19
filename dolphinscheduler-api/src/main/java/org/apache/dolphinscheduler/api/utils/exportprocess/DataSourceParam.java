@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 
@@ -26,9 +28,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -49,20 +49,13 @@ public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
      */
     @Override
     public JsonNode addExportSpecialParam(JsonNode taskNode) {
-        // add sqlParameters
-        try {
-            ObjectNode node = (ObjectNode) new ObjectMapper().readTree(taskNode.path(PARAMS).toString());
-            ObjectNode sqlParameters = (ObjectNode) new ObjectMapper().readTree(node.toString());
-            DataSource dataSource = dataSourceMapper.selectById(sqlParameters.get("datasource").asInt());
-            if (null != dataSource) {
-                sqlParameters.put("datasourceName", dataSource.getName());
-            }
-            ((ObjectNode) taskNode).set(PARAMS, sqlParameters);
-            return taskNode;
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
+        ObjectNode sqlParameters = JSONUtils.parseObject(taskNode.path(PARAMS).toString());
+        DataSource dataSource = dataSourceMapper.selectById(sqlParameters.get("datasource").asInt());
+        if (null != dataSource) {
+            sqlParameters.put("datasourceName", dataSource.getName());
         }
+        ((ObjectNode) taskNode).set(PARAMS, sqlParameters);
+        return taskNode;
     }
 
     /**
