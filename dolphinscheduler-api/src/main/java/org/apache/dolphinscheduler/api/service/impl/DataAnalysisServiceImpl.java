@@ -150,7 +150,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { project.getCode() };
+                : new Long[] { projectCode };
         List<ExecuteStatusCount> processInstanceStateCounts =
                 instanceStateCounter.apply(start, end, projectCodeArray);
 
