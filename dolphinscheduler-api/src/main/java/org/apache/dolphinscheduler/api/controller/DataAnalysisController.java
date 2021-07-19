@@ -187,5 +187,4 @@ public class DataAnalysisController extends BaseController {
         return returnDataList(result);
     }
 
-
 }
