@@ -80,7 +80,7 @@ public class DataSourceService extends BaseService{
 
     private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
 
-    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9]+$");
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/]+$");
 
 
     @Autowired
