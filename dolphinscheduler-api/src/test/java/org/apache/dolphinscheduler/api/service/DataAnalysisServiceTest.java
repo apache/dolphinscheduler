@@ -237,10 +237,15 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountDefinitionByUser() {
-        Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, null);
+        Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
+
         Mockito.when(processDefinitionMapper.countDefinitionGroupByUser(Mockito.anyInt(), Mockito.any(Long[].class),
             Mockito.anyBoolean())).thenReturn(new ArrayList<DefinitionGroupByUser>());
-        Map<String, Object> result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
+        result = dataAnalysisServiceImpl.countDefinitionByUser(user, 0);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 

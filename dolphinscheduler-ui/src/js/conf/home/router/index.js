@@ -83,7 +83,7 @@ const router = new Router({
           }
         },
         {
-          path: '/projects/:projectId/index',
+          path: '/projects/:projectCode/index',
           name: 'projects-index',
           component: resolve => require(['../pages/projects/pages/index/index'], resolve),
           meta: {

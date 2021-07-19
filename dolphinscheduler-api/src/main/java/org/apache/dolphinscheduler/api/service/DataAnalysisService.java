@@ -52,10 +52,10 @@ public interface DataAnalysisService {
      * statistics the process definition quantities of certain person
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return definition count data
      */
-    Map<String, Object> countDefinitionByUser(User loginUser, int projectId);
+    Map<String, Object> countDefinitionByUser(User loginUser, long projectCode);
 
     /**
      * statistical command status data

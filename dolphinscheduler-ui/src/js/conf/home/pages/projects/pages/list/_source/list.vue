@@ -97,7 +97,7 @@
         localStore.setItem('projectId', item.id)
         localStore.setItem('projectCode', item.code)
         localStore.setItem('projectName', item.name)
-        this.$router.push({ path: `/projects/${item.id}/index` })
+        this.$router.push({ path: `/projects/${item.code}/index` })
       },
       /**
        * Delete Project
