@@ -132,6 +132,27 @@ public class FileUtils {
     }
 
     /**
+     * create directory if absent
+     *
+     * @param execLocalPath execute local path
+     * @throws IOException errors
+     */
+    public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
+        //if work dir exists, first delete
+        File execLocalPathFile = new File(execLocalPath);
+
+        if (execLocalPathFile.exists()) {
+            org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
+        }
+
+        //create work dir
+        org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
+        String mkdirLog = "create dir success " + execLocalPath;
+        LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
+        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
+    }
+
+    /**
      * create directory and user
      * @param execLocalPath execute local path
      * @param userName user name
