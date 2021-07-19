@@ -1994,21 +1994,6 @@ public class ProcessService {
     }
 
     /**
-     * get have perm project ids
-     *
-     * @param userId userId
-     * @return project codes
-     */
-    public List<Long> getProjectIdListHavePerm(int userId) {
-
-        List<Long> projectCodeList = new ArrayList<>();
-        for (Project project : getProjectListHavePerm(userId)) {
-            projectCodeList.add(project.getCode());
-        }
-        return projectCodeList;
-    }
-
-    /**
      * list unauthorized udf function
      *
      * @param userId user id

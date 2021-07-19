@@ -33,7 +33,7 @@
                 <td><span>{{$index+1}}</span></td>
                 <td>
                   <span>
-                    <a href="javascript:" @click="searchParams.projectId && _goTask(item.key)" :class="searchParams.projectId ?'links':''">{{item.value}}</a>
+                    <a href="javascript:" @click="searchParams.projectCode && _goTask(item.key)" :class="searchParams.projectCode ?'links':''">{{item.value}}</a>
                   </span>
                 </td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
@@ -94,7 +94,7 @@
         myChart.echart.setOption(pie)
 
         // Jump forbidden in index page
-        if (this.searchParams.projectId) {
+        if (this.searchParams.projectCode) {
           myChart.echart.on('click', e => {
             this._goTask(e.data.name)
           })
