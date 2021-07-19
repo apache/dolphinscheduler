@@ -132,10 +132,14 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate
             , TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Project project = projectMapper.queryByCode(projectCode);
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
+        Map<String, Object> result = new HashMap<>();
+
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
 
         Date start = null;
@@ -167,18 +171,23 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistics the process definition quantities of certain person
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUser(User loginUser, int projectId) {
+    public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
         Map<String, Object> result = new HashMap<>();
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
+
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
-        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectMapper.selectById(projectId).getCode() };
+
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectCode };
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
                 loginUser.getId(), projectCodeArray, isAdmin(loginUser));
 
