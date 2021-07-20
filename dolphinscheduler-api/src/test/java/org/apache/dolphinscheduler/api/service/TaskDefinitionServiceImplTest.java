@@ -166,22 +166,22 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void updateTaskDefinition () {
-        String updateTaskDefinitionJson = "{\n" +
-                "\"name\": \"test12111\",\n" +
-                "\"description\": \"test\",\n" +
-                "\"taskType\": \"SHELL\",\n" +
-                "\"flag\": 0,\n" +
-                "\"taskParams\": \"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo 11\\\",\\\"conditionResult\\\": {\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]},\\\"dependence\\\":{}}\",\n" +
-                "\"taskPriority\": 0,\n" +
-                "\"workerGroup\": \"default\",\n" +
-                "\"failRetryTimes\": 0,\n" +
-                "\"failRetryInterval\": 1,\n" +
-                "\"timeoutFlag\": 1,\n" +
-                "\"timeoutNotifyStrategy\": 0,\n" +
-                "\"timeout\": 0,\n" +
-                "\"delayTime\": 0,\n" +
-                "\"resourceIds\": \"\"\n" +
-                "}";
+        String updateTaskDefinitionJson = "{\n"
+                +   "\"name\": \"test12111\",\n"
+                +   "\"description\": \"test\",\n"
+                +   "\"taskType\": \"SHELL\",\n"
+                +   "\"flag\": 0,\n"
+                +   "\"taskParams\": \"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo 11\\\",\\\"conditionResult\\\": {\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]},\\\"dependence\\\":{}}\",\n"
+                +   "\"taskPriority\": 0,\n"
+                +   "\"workerGroup\": \"default\",\n"
+                +   "\"failRetryTimes\": 0,\n"
+                +   "\"failRetryInterval\": 1,\n"
+                +   "\"timeoutFlag\": 1,\n"
+                +   "\"timeoutNotifyStrategy\": 0,\n"
+                +   "\"timeout\": 0,\n"
+                +   "\"delayTime\": 0,\n"
+                +   "\"resourceIds\": \"\"\n"
+                +   "}";
         long projectCode = 1L;
         long taskCode = 1L;
 
