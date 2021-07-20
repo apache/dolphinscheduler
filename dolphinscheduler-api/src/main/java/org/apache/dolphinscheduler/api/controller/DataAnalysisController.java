@@ -140,7 +140,7 @@ public class DataAnalysisController extends BaseController {
      * statistical command status data
      *
      * @param loginUser login user
-     * @return command state of user project
+     * @return command state of user projects
      */
     @ApiOperation(value = "countCommandState", notes = "COUNT_COMMAND_STATE_NOTES")
     @GetMapping(value = "/command-state-count")
@@ -156,6 +156,7 @@ public class DataAnalysisController extends BaseController {
     /**
      * queue count
      *
+     * @param loginUser login user
      * @return queue state count
      */
     @ApiOperation(value = "countQueueState", notes = "COUNT_QUEUE_STATE_NOTES")
