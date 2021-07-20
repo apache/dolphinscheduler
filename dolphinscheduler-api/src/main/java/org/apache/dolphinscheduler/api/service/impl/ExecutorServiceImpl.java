@@ -445,6 +445,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (processDefinition == null) {
             logger.error("process definition is not found");
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "processDefinitionCode");
+            return result;
         }
 
         List<Integer> ids = new ArrayList<>();
