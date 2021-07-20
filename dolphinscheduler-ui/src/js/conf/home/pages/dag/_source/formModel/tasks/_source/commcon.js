@@ -251,6 +251,81 @@ const nodeStatusList = [
   }
 ]
 
+/**
+ * column type
+ */
+const columnTypeList = [
+  {
+    id: 1,
+    code: 'VARCHAR',
+    disabled: false
+  },
+  {
+    id: 2,
+    code: 'STRING',
+    disabled: false
+  },
+  {
+    id: 3,
+    code: 'BIT',
+    disabled: false
+  },
+  {
+    id: 4,
+    code: 'INT',
+    disabled: false
+  },
+  {
+    id: 5,
+    code: 'BIGINT',
+    disabled: false
+  },
+  {
+    id: 6,
+    code: 'LONG',
+    disabled: false
+  },
+  {
+    id: 7,
+    code: 'FLOAT',
+    disabled: false
+  },
+  {
+    id: 8,
+    code: 'DOUBLE',
+    disabled: false
+  },
+  {
+    id: 9,
+    code: 'DATE',
+    disabled: false
+  },
+  {
+    id: 10,
+    code: 'DATETIME',
+    disabled: false
+  },
+  {
+    id: 11,
+    code: 'TIMESTAMP',
+    disabled: false
+  },
+  {
+    id: 12,
+    code: 'BOOLEAN',
+    disabled: false
+  },
+  {
+    id: 13,
+    code: 'BOOL',
+    disabled: false
+  },
+]
+
+const integralType = [
+  'BIGINT','INT','LONG'
+]
+
 export {
   cycleList,
   dateValueList,
@@ -258,5 +333,7 @@ export {
   directList,
   sqlTypeList,
   positionList,
-  nodeStatusList
+  nodeStatusList,
+  columnTypeList,
+  integralType
 }

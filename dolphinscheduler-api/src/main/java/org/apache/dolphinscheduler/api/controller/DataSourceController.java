@@ -425,4 +425,26 @@ public class DataSourceController extends BaseController {
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
+
+    /**
+     * query data source columns
+     * @param loginUser loginUser
+     * @param id id
+     * @return data source columns
+     */
+    @ApiOperation(value = "queryDatasourceColumnsByTable",notes = "QUERY_DATASOURCE_COLUMNS_BY_TABLE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "table", value = "DATA_SOURCE_TABLE", required = true, dataType = "String", example = "t_ds_project")
+    })
+    @PostMapping(value="/list-columns")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_DATASOURCE_ERROR)
+    public Result queryDatasourceColumnsByTable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam("id") int id,
+                                                @RequestParam(value = "table") String table){
+        logger.info("query datasource columns,login user:{},type:{},table:{}",loginUser,id,table);
+        Map<String,Object> result = dataSourceService.queryDatasourceColumnsByTable(id,table);
+        return returnDataList(result);
+    }
 }

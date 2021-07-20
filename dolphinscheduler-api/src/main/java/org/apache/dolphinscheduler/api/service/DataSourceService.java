@@ -47,10 +47,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
@@ -763,5 +762,69 @@ public class DataSourceService extends BaseService{
             }
         }
         return true;
+    }
+
+    public Map<String, Object> queryDatasourceColumnsByTable(int id, String table) {
+        Map<String, Object> result = new HashMap<>(5);
+        DataSource dataSource = dataSourceMapper.selectById(id);
+        if(dataSource ==null){
+            putMsg(result,Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        List<JSONObject> columns  = new ArrayList<>();
+        try{
+            //parameter
+            String parameter = dataSource.getConnectionParams();
+            String sql = String.format("SELECT * from %s WHERE 0 = 1",table);
+            connection = getConnection(dataSource.getType(), parameter);
+
+            stmt = connection.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            ResultSetMetaData md = rs.getMetaData();
+            int num = md.getColumnCount();
+            for (int i = 1; i<=num; i++){
+                JSONObject column = new JSONObject();
+                column.put("name",md.getColumnName(i));
+                column.put("type",md.getColumnTypeName(i));
+                columns.add(column);
+            }
+        }catch (Exception e){
+            logger.error("query table metadata error",e);
+            throw new RuntimeException("query table metadata error");
+        }finally {
+            close(stmt,connection);
+        }
+
+        result.put(Constants.DATA_LIST, columns);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * close jdbc resource
+     *
+     * @param stmt stmt
+     * @param connection connection
+     */
+    private void close(PreparedStatement stmt,
+                       Connection connection){
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+
+            }
+        }
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+            }
+        }
     }
 }

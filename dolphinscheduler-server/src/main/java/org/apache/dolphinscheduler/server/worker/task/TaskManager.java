@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
+import org.apache.dolphinscheduler.server.worker.task.flinkx.FlinkxTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
 import org.apache.dolphinscheduler.server.worker.task.mr.MapReduceTask;
 import org.apache.dolphinscheduler.server.worker.task.processdure.ProcedureTask;
@@ -68,6 +69,8 @@ public class TaskManager {
         return new DataxTask(taskExecutionContext, logger);
       case SQOOP:
         return new SqoopTask(taskExecutionContext, logger);
+      case FLINKX:
+        return new FlinkxTask(taskExecutionContext, logger);
       default:
         logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
         throw new IllegalArgumentException("not support task type");

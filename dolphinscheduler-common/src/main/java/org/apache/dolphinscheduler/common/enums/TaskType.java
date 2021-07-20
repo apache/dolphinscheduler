@@ -36,6 +36,7 @@ public enum TaskType {
      * 10 DATAX
      * 11 CONDITIONS
      * 12 SQOOP
+     * 13 FLINKX
      */
     SHELL(0, "shell"),
     SQL(1, "sql"),
@@ -49,7 +50,8 @@ public enum TaskType {
     HTTP(9, "http"),
     DATAX(10, "datax"),
     CONDITIONS(11, "conditions"),
-    SQOOP(12, "sqoop");
+    SQOOP(12, "sqoop"),
+    FLINKX(13, "flinkx");
 
     TaskType(int code, String descp){
         this.code = code;

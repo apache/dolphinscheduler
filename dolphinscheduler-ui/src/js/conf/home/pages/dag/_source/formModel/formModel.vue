@@ -256,6 +256,15 @@
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
+
+        <m-flinkx
+          v-if="taskType === 'FLINKX'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="FLINKX"
+          :backfill-item="backfillItem">
+        </m-flinkx>
+
       </div>
     </div>
     <div class="bottom-box">
@@ -285,6 +294,7 @@
   import mConditions from './tasks/conditions'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
+  import mFlinkx from './tasks/flinkx'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mWorkerGroups from './_source/workerGroups'
@@ -726,6 +736,7 @@
       mDatax,
       mSqoop,
       mConditions,
+      mFlinkx,
       mSelectInput,
       mTimeoutAlarm,
       mPriority,

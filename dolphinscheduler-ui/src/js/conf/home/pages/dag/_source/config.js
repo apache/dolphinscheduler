@@ -290,7 +290,11 @@ const tasksType = {
   CONDITIONS: {
     desc: 'CONDITIONS',
     color: '#E46F13'
-  }
+  },
+  FLINKX: {
+    desc: 'FlinkX',
+    color: '#1fc747'
+  },
 }
 
 export {

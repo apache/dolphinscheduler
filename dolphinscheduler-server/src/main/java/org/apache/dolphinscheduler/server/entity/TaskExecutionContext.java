@@ -196,6 +196,11 @@ public class TaskExecutionContext implements Serializable{
      */
     private ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
+    /**
+     * flinkx TaskExecutionContext
+     */
+    private FlinkxTaskExecutionContext flinkxTaskExecutionContext;
+
     public int getTaskInstanceId() {
         return taskInstanceId;
     }
@@ -458,6 +463,12 @@ public class TaskExecutionContext implements Serializable{
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
     }
 
+    public FlinkxTaskExecutionContext getFlinkxTaskExecutionContext(){return flinkxTaskExecutionContext;}
+
+    public void setFlinkxTaskExecutionContext(FlinkxTaskExecutionContext flinkxTaskExecutionContext){
+        this.flinkxTaskExecutionContext = flinkxTaskExecutionContext;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{" +
@@ -493,6 +504,7 @@ public class TaskExecutionContext implements Serializable{
                 ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext +
                 ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext +
                 ", procedureTaskExecutionContext=" + procedureTaskExecutionContext +
+                ", flinkxTaskExecutionContext=" + flinkxTaskExecutionContext +
                 '}';
     }
 }

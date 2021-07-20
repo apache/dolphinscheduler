@@ -126,6 +126,16 @@ public class TaskExecutionContextBuilder {
         return this;
     }
 
+    /**
+     * build FlinkxTask related info
+     * @param flinkxTaskExecutionContext flinkxTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildFlinkxTaskRelatedInfo(FlinkxTaskExecutionContext flinkxTaskExecutionContext){
+        taskExecutionContext.setFlinkxTaskExecutionContext(flinkxTaskExecutionContext);
+        return this;
+    }
+
 
     /**
      * create

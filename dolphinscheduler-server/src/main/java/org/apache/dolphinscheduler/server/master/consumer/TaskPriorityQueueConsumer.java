@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.task.flinkx.FlinkxParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
@@ -206,7 +207,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
         SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
-
+        FlinkxTaskExecutionContext flinkxTaskExecutionContext = new FlinkxTaskExecutionContext();
 
         // SQL task
         if (taskType == TaskType.SQL){
@@ -229,6 +230,11 @@ public class TaskPriorityQueueConsumer extends Thread{
             setSqoopTaskRelation(sqoopTaskExecutionContext,taskNode);
         }
 
+        // FLINKX task
+        if (taskType == TaskType.FLINKX){
+            setFlinkxTaskRelation(flinkxTaskExecutionContext,taskNode);
+        }
+
 
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
@@ -238,6 +244,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
                 .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
+                .buildFlinkxTaskRelatedInfo(flinkxTaskExecutionContext)
                 .create();
     }
 
@@ -339,6 +346,28 @@ public class TaskPriorityQueueConsumer extends Thread{
             }
 
             sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
+        }
+    }
+
+    /**
+     * set flinkx task relation
+     * @param flinkxTaskExecutionContext flinkxTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    protected void setFlinkxTaskRelation(FlinkxTaskExecutionContext flinkxTaskExecutionContext,TaskNode taskNode){
+        FlinkxParameters flinkxParameters = JSONUtils.parseObject(taskNode.getParams(),FlinkxParameters.class);
+        DataSource dataSource = processService.findDataSourceById(flinkxParameters.getDataSource());
+        DataSource dataTarget = processService.findDataSourceById(flinkxParameters.getDataTarget());
+        if (dataSource != null){
+            flinkxTaskExecutionContext.setDataSourceId(flinkxParameters.getDataSource());
+            flinkxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+            flinkxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        }
+
+        if (dataTarget != null){
+            flinkxTaskExecutionContext.setDataTargetId(flinkxParameters.getDataTarget());
+            flinkxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            flinkxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
         }
     }
 
