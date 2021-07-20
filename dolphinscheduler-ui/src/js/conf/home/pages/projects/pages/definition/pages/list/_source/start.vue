@@ -121,12 +121,15 @@
             <el-radio :label="'RUN_MODE_PARALLEL'">{{$t('Parallel execution')}}</el-radio>
           </el-radio-group>
         </div>
-        <div class="cont">
-          <div style="padding-top: 6px;">
-            <el-checkbox size="small" v-model="threadCount">≤¢––÷¥––œﬂ≥Ã ˝:
+      </div>
+      <div class="clearfix list" v-if="runMode === 'RUN_MODE_PARALLEL'" style="margin-top: -8px;">
+        <div class="text" style="padding-top: 8px;">
+          Âπ∂Ë°åÂ∫¶
+        </div>
+        <div class="cont" style="padding-top: 4px;">
+          <el-checkbox size="small" v-model="threadCount">ÈÖçÁΩÆÂπ∂Ë°åÂ∫¶
               <el-input></el-input>
             </el-checkbox>
-          </div>
         </div>
       </div>
       <div class="clearfix list">
@@ -242,7 +245,8 @@
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
           workerGroup: this.workerGroup,
-          startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : ''
+          startParams: !_.isEmpty(startParams) ? JSON.stringify(startParams) : '',
+          threadCount: this.threadCount
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {

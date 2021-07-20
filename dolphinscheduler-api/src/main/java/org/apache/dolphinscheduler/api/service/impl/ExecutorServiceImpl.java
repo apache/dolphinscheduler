@@ -70,8 +70,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Lists;
-
 /**
  * executor service impl
  */
@@ -159,6 +157,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
+        expectedCount = 4;
         /**
          * create command
          */
@@ -556,7 +555,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     if (!CollectionUtils.isEmpty(listDate)) {
 
                         int effectThreadsCount = expectParallelNumber == null ? 1 : Math.min(listDate.size(), expectParallelNumber);
-                        List<List<Date>> partitionList = Lists.partition(listDate, effectThreadsCount);
+                        List<List<Date>> partitionList = new ArrayList<>(effectThreadsCount);
+                        int average = listDate.size() / effectThreadsCount;
+                        for (int i = 0; i < effectThreadsCount; i++) {
+                            partitionList.add(listDate.subList(i * average, Math.min((i + 1) * average, listDate.size())));
+                        }
                         for (List<Date> currentPartition : partitionList) {
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(currentPartition.get(0)));
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(currentPartition.get(currentPartition.size() - 1)));
