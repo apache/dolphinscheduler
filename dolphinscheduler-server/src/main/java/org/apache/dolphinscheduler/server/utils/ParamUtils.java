@@ -118,6 +118,8 @@ public class ParamUtils {
         // combining local and global parameters
         Map<String,Property> localParams = parameters.getLocalParametersMap();
 
+        Map<String,Property> varParams = parameters.getVarPoolMap();
+
         if (globalParams == null && localParams == null) {
             return null;
         }
@@ -141,6 +143,10 @@ public class ParamUtils {
             globalParams.putAll(localParams);
         } else if (globalParams == null && localParams != null) {
             globalParams = localParams;
+        }
+        if (varParams != null) {
+            varParams.putAll(globalParams);
+            globalParams = varParams;
         }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
