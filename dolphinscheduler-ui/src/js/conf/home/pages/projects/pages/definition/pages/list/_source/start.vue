@@ -121,6 +121,13 @@
             <el-radio :label="'RUN_MODE_PARALLEL'">{{$t('Parallel execution')}}</el-radio>
           </el-radio-group>
         </div>
+        <div class="cont">
+          <div style="padding-top: 6px;">
+            <el-checkbox size="small" v-model="threadCount">并行执行线程数:
+              <el-input></el-input>
+            </el-checkbox>
+          </div>
+        </div>
       </div>
       <div class="clearfix list">
         <div class="text">
@@ -188,6 +195,7 @@
         scheduleTime: '',
         spinnerLoading: false,
         execType: false,
+        threadCount: null,
         taskDependType: 'TASK_POST',
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
