@@ -215,6 +215,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = null;
         Date end = null;
         Long[] projectCodeArray = getProjectCodesArrays(loginUser);
+
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectCodeArray)
                 .stream()
