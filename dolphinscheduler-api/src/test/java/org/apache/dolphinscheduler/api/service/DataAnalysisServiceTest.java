@@ -251,12 +251,18 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountCommandState() {
-
         String startDate = "2020-02-11 16:02:18";
         String endDate = "2020-02-11 16:03:18";
+
+        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+
         //checkProject false
         Map<String, Object> result = dataAnalysisServiceImpl.countCommandState(user, 2, startDate, endDate);
         Assert.assertTrue(result.isEmpty());
+
+        putMsg(result, Status.SUCCESS, null);
+        Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
+
         List<CommandCount> commandCounts = new ArrayList<>(1);
         CommandCount commandCount = new CommandCount();
         commandCount.setCommandType(CommandType.START_PROCESS);
@@ -266,7 +272,6 @@ public class DataAnalysisServiceTest {
 
         Mockito.when(errorCommandMapper.countCommandState(DateUtils.getScheduleDate(startDate),
                 DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(commandCounts);
-        Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
         Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(true);
 
         result = dataAnalysisServiceImpl.countCommandState(user, 1, startDate, endDate);
