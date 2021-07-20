@@ -104,11 +104,6 @@ public final class Constants {
     public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
 
     /**
-     * yarn.job.history.status.address
-     */
-    public static final String YARN_JOB_HISTORY_STATUS_ADDRESS = "yarn.job.history.status.address";
-
-    /**
      * hdfs configuration
      * hdfs.root.user
      */
@@ -797,10 +792,6 @@ public final class Constants {
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
-    /**
-     * com.amazonaws.services.s3.enableV4
-     */
-    public static final String AWS_S3_V4 = "com.amazonaws.services.s3.enableV4";
 
     /**
      * loginUserFromKeytab user
