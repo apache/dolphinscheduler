@@ -430,6 +430,7 @@ public class DataSourceController extends BaseController {
      * query data source columns
      * @param loginUser loginUser
      * @param id id
+     * @param table table
      * @return data source columns
      */
     @ApiOperation(value = "queryDatasourceColumnsByTable",notes = "QUERY_DATASOURCE_COLUMNS_BY_TABLE_NOTES")
