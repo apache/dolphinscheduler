@@ -61,12 +61,12 @@ public interface DataAnalysisService {
      * statistical command status data
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param startDate start date
      * @param endDate end date
      * @return command state count data
      */
-    Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate);
+    Map<String, Object> countCommandState(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
      * count queue state

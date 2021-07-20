@@ -136,21 +136,20 @@ public class DataAnalysisController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * statistical command status data
      *
      * @param loginUser login user
      * @param startDate start date
      * @param endDate   end date
-     * @param projectId project id
-     * @return command state in project id
+     * @param projectCode project code
+     * @return command state in project code
      */
     @ApiOperation(value = "countCommandState", notes = "COUNT_COMMAND_STATE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
     })
     @GetMapping(value = "/command-state-count")
     @ResponseStatus(HttpStatus.OK)
@@ -159,9 +158,9 @@ public class DataAnalysisController extends BaseController {
     public Result countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "startDate", required = false) String startDate,
                                     @RequestParam(value = "endDate", required = false) String endDate,
-                                    @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+                                    @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
 
-        Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectId, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectCode, startDate, endDate);
         return returnDataList(result);
     }
 
