@@ -202,18 +202,21 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical command status data
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param startDate start date
      * @param endDate end date
      * @return command state count data
      */
     @Override
-    public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
-
+    public Map<String, Object> countCommandState(User loginUser, long projectCode, String startDate, String endDate) {
         Map<String, Object> result = new HashMap<>();
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
+
+        if (projectCode != 0) {
+            Project project = projectMapper.queryByCode(projectCode);
+            result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
 
         /**
@@ -237,8 +240,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             }
         }
 
-        Long[] projectCodeArray = projectId == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectMapper.selectById(projectId).getCode() };
+        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
+                : new Long[] { projectCode };
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectCodeArray)
                 .stream()
