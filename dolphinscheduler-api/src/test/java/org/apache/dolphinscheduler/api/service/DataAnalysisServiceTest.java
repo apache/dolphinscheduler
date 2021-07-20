@@ -251,54 +251,20 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountCommandState() {
-        String startDate = "2020-02-11 16:02:18";
-        String endDate = "2020-02-11 16:03:18";
-
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
-
-        //checkProject false
-        Map<String, Object> result = dataAnalysisServiceImpl.countCommandState(user, 2, startDate, endDate);
-        Assert.assertTrue(result.isEmpty());
-
-        putMsg(result, Status.SUCCESS, null);
-        Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
-
         List<CommandCount> commandCounts = new ArrayList<>(1);
         CommandCount commandCount = new CommandCount();
         commandCount.setCommandType(CommandType.START_PROCESS);
         commandCounts.add(commandCount);
-        Mockito.when(commandMapper.countCommandState(0, DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(commandCounts);
+        Mockito.when(commandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
+        Mockito.when(errorCommandMapper.countCommandState(null, null, new Long[]{1L})).thenReturn(commandCounts);
 
-        Mockito.when(errorCommandMapper.countCommandState(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(commandCounts);
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(true);
-
-        result = dataAnalysisServiceImpl.countCommandState(user, 1, startDate, endDate);
+        Map<String, Object> result = dataAnalysisServiceImpl.countCommandState(user);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-        // when all date in illegal format then return error message
-        String startDate2 = "illegalDateString";
-        String endDate2 = "illegalDateString";
-        Map<String, Object> result2 = dataAnalysisServiceImpl.countCommandState(user, 0, startDate2, endDate2);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result2.get(Constants.STATUS));
-
-        // when one of date in illegal format then return error message
-        String startDate3 = "2020-08-22 09:23:10";
-        String endDate3 = "illegalDateString";
-        Map<String, Object> result3 = dataAnalysisServiceImpl.countCommandState(user, 0, startDate3, endDate3);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result3.get(Constants.STATUS));
-
-        // when one of date in illegal format then return error message
-        String startDate4 = "illegalDateString";
-        String endDate4 = "2020-08-22 09:23:10";
-        Map<String, Object> result4 = dataAnalysisServiceImpl.countCommandState(user, 0, startDate4, endDate4);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result4.get(Constants.STATUS));
 
         // when no command found then return all count are 0
         Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
         Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());
-        Map<String, Object> result5 = dataAnalysisServiceImpl.countCommandState(user, 0, startDate, null);
+        Map<String, Object> result5 = dataAnalysisServiceImpl.countCommandState(user);
         assertThat(result5).containsEntry(Constants.STATUS, Status.SUCCESS);
         assertThat(result5.get(Constants.DATA_LIST)).asList().extracting("errorCount").allMatch(count -> count.equals(0));
         assertThat(result5.get(Constants.DATA_LIST)).asList().extracting("normalCount").allMatch(count -> count.equals(0));
@@ -313,7 +279,7 @@ public class DataAnalysisServiceTest {
         Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.singletonList(normalCommandCount));
         Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.singletonList(errorCommandCount));
 
-        Map<String, Object> result6 = dataAnalysisServiceImpl.countCommandState(user, 0, null, null);
+        Map<String, Object> result6 = dataAnalysisServiceImpl.countCommandState(user);
 
         assertThat(result6).containsEntry(Constants.STATUS, Status.SUCCESS);
         CommandStateCount commandStateCount = new CommandStateCount();
@@ -325,12 +291,8 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountQueueState() {
-        // when project check fail then return nothing
-        Map<String, Object> result1 = dataAnalysisServiceImpl.countQueueState(user, 2);
-        Assert.assertTrue(result1.isEmpty());
-
         // when project check success when return all count are 0
-        Map<String, Object> result2 = dataAnalysisServiceImpl.countQueueState(user, 1);
+        Map<String, Object> result2 = dataAnalysisServiceImpl.countQueueState(user);
         assertThat(result2.get(Constants.DATA_LIST)).extracting("taskQueue", "taskKill")
                 .isNotEmpty()
                 .allMatch(count -> count.equals(0));
@@ -340,7 +302,6 @@ public class DataAnalysisServiceTest {
      * get list
      */
     private List<ExecuteStatusCount> getTaskInstanceStateCounts() {
-
         List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>(1);
         ExecuteStatusCount executeStatusCount = new ExecuteStatusCount();
         executeStatusCount.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);

@@ -110,15 +110,8 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     @Test
     public void testCountCommandState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-12-01 00:00:00");
-        paramsMap.add("endDate","2019-12-15 23:59:59");
-        paramsMap.add("projectId","16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/command-state-count")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
@@ -127,16 +120,10 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testCountQueueState() throws Exception {
-        PowerMockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId","16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/queue-count")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
+                .header("sessionId", sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
