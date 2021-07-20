@@ -115,6 +115,7 @@ public class ParamUtils {
         CommandType commandType = CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
         Date scheduleTime = taskExecutionContext.getScheduleTime();
 
+        // combining local and global parameters
         Map<String,Property> localParams = parameters.getLocalParametersMap();
 
         if (globalParams == null && localParams == null) {
