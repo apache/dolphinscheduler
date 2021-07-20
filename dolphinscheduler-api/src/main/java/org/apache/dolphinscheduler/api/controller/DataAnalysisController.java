@@ -140,27 +140,16 @@ public class DataAnalysisController extends BaseController {
      * statistical command status data
      *
      * @param loginUser login user
-     * @param startDate start date
-     * @param endDate   end date
-     * @param projectCode project code
-     * @return command state in project code
+     * @return command state of user projects
      */
     @ApiOperation(value = "countCommandState", notes = "COUNT_COMMAND_STATE_NOTES")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-        @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType = "String"),
-        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", dataType = "Long", example = "100")
-    })
     @GetMapping(value = "/command-state-count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(COMMAND_STATE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam(value = "startDate", required = false) String startDate,
-                                    @RequestParam(value = "endDate", required = false) String endDate,
-                                    @RequestParam(value = "projectCode", required = false, defaultValue = "0") long projectCode) {
+    public Result countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectCode, startDate, endDate);
+        Map<String, Object> result = dataAnalysisService.countCommandState(loginUser);
         return returnDataList(result);
     }
 
@@ -168,21 +157,16 @@ public class DataAnalysisController extends BaseController {
      * queue count
      *
      * @param loginUser login user
-     * @param projectId project id
      * @return queue state count
      */
     @ApiOperation(value = "countQueueState", notes = "COUNT_QUEUE_STATE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType = "Int", example = "100")
-    })
     @GetMapping(value = "/queue-count")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUEUE_COUNT_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+    public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = dataAnalysisService.countQueueState(loginUser, projectId);
+        Map<String, Object> result = dataAnalysisService.countQueueState(loginUser);
         return returnDataList(result);
     }
 
