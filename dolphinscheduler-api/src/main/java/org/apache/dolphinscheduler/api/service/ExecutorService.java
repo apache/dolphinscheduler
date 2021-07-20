@@ -60,7 +60,7 @@ public interface ExecutorService {
                                             TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                             RunMode runMode,
                                             Priority processInstancePriority, String workerGroup, Integer timeout,
-                                            Map<String, String> startParams);
+                                            Map<String, String> startParams, Integer expectedCount);
 
     /**
      * check whether the process definition can be executed

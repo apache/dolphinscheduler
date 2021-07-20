@@ -70,6 +70,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Lists;
+
 /**
  * executor service impl
  */
@@ -125,7 +127,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout,
-                                                   Map<String, String> startParams) {
+                                                   Map<String, String> startParams, Integer expectedCount) {
         Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
@@ -162,7 +164,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, startParams);
+                warningGroupId, runMode, processInstancePriority, workerGroup, startParams, expectedCount);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
@@ -392,10 +394,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * insert command, used in the implementation of the page, re run, recovery (pause / failure) execution
      *
-     * @param loginUser           login user
-     * @param instanceId          instance id
+     * @param loginUser login user
+     * @param instanceId instance id
      * @param processDefinitionId process definition id
-     * @param commandType         command type
+     * @param commandType command type
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType, String startParams) {
@@ -489,7 +491,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
                               RunMode runMode, Priority processInstancePriority, String workerGroup,
-                              Map<String, String> startParams) {
+                              Map<String, String> startParams, Integer expectParallelNumber) {
 
         /**
          * instantiate command schedule instance
@@ -534,7 +536,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 end = DateUtils.getScheduleDate(interval[1]);
             }
         }
-
         // determine whether to complement
         if (commandType == CommandType.COMPLEMENT_DATA) {
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
@@ -553,14 +554,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         }
                     }
                     if (!CollectionUtils.isEmpty(listDate)) {
-                        // loop by schedule date
-                        for (Date date : listDate) {
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
-                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
+
+                        int effectThreadsCount = expectParallelNumber == null ? 1 : Math.min(listDate.size(), expectParallelNumber);
+                        List<List<Date>> partitionList = Lists.partition(listDate, effectThreadsCount);
+                        for (List<Date> currentPartition : partitionList) {
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(currentPartition.get(0)));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(currentPartition.get(currentPartition.size() - 1)));
                             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
                         }
-                        return listDate.size();
+                        return partitionList.size();
                     } else {
                         // loop by day
                         int runCunt = 0;
