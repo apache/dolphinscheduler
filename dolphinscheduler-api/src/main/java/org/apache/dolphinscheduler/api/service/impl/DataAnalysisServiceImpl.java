@@ -202,46 +202,19 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * statistical command status data
      *
      * @param loginUser login user
-     * @param projectCode project code
-     * @param startDate start date
-     * @param endDate end date
      * @return command state count data
      */
     @Override
-    public Map<String, Object> countCommandState(User loginUser, long projectCode, String startDate, String endDate) {
+    public Map<String, Object> countCommandState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
-        if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
-        }
 
         /**
          * find all the task lists in the project under the user
          * statistics based on task status execution, failure, completion, wait, total
          */
         Date start = null;
-        if (StringUtils.isNotEmpty(startDate)) {
-            start = DateUtils.getScheduleDate(startDate);
-            if (Objects.isNull(start)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
         Date end = null;
-        if (StringUtils.isNotEmpty(endDate)) {
-            end = DateUtils.getScheduleDate(endDate);
-            if (Objects.isNull(end)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
-
-        Long[] projectCodeArray = projectCode == 0 ? getProjectCodesArrays(loginUser)
-                : new Long[] { projectCode };
+        Long[] projectCodeArray = getProjectCodesArrays(loginUser);
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectCodeArray)
                 .stream()
@@ -279,18 +252,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     /**
      * count queue state
      *
-     * @param loginUser login user
-     * @param projectId project id
      * @return queue state count data
      */
     @Override
-    public Map<String, Object> countQueueState(User loginUser, int projectId) {
+    public Map<String, Object> countQueueState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
-        }
 
         //TODO need to add detail data info
         Map<String, Integer> dataMap = new HashMap<>();
@@ -299,14 +265,6 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         result.put(Constants.DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    private boolean checkProject(User loginUser, int projectId, Map<String, Object> result) {
-        if (projectId != 0) {
-            Project project = projectMapper.selectById(projectId);
-            return projectService.hasProjectAndPerm(loginUser, project, result);
-        }
-        return true;
     }
 
 }
