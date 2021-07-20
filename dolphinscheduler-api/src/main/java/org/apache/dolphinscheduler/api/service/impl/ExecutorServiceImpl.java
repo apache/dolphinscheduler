@@ -102,8 +102,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * execute process instance
      *
      * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process Definition Id
+     * @param projectCode project code
+     * @param processDefinitionCode process definition code
      * @param cronTime cron time
      * @param commandType command type
      * @param failureStrategy failuer strategy
@@ -119,8 +119,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return execute process instance code
      */
     @Override
-    public Map<String, Object> execProcessInstance(User loginUser, String projectName,
-                                                   int processDefinitionId, String cronTime, CommandType commandType,
+    public Map<String, Object> execProcessInstance(User loginUser, long projectCode,
+                                                   long processDefinitionCode, String cronTime, CommandType commandType,
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
@@ -132,15 +132,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
-        Project project = projectMapper.queryByName(projectName);
-        Map<String, Object> checkResultAndAuth = checkResultAndAuth(loginUser, projectName, project);
+        Project project = projectMapper.queryByCode(projectCode);
+        Map<String, Object> checkResultAndAuth = checkResultAndAuth(loginUser, project.getName(), project);
         if (checkResultAndAuth != null) {
             return checkResultAndAuth;
         }
 
         // check process define release state
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processDefinitionId);
-        result = checkProcessDefinitionValid(processDefinition, processDefinitionId);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        result = checkProcessDefinitionValid(processDefinition, processDefinitionCode);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -160,7 +160,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         /**
          * create command
          */
-        int create = this.createCommand(commandType, processDefinitionId,
+        int create = this.createCommand(commandType, processDefinition.getId(),
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
                 warningGroupId, runMode, processInstancePriority, workerGroup, startParams);
 
@@ -218,17 +218,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @param executeType execute type
      * @return execute result code
      */
     @Override
-    public Map<String, Object> execute(User loginUser, String projectName, Integer processInstanceId, ExecuteType executeType) {
+    public Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType) {
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByCode(projectCode);
 
-        Map<String, Object> checkResult = checkResultAndAuth(loginUser, projectName, project);
+        Map<String, Object> checkResult = checkResultAndAuth(loginUser, project.getName(), project);
         if (checkResult != null) {
             return checkResult;
         }
@@ -433,31 +433,34 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * check if sub processes are offline before starting process definition
      *
-     * @param processDefineId process definition id
+     * @param processDefinitionCode process definition code
      * @return check result code
      */
     @Override
-    public Map<String, Object> startCheckByProcessDefinedId(int processDefineId) {
+    public Map<String, Object> startCheckByProcessDefinedCode(long processDefinitionCode) {
         Map<String, Object> result = new HashMap<>();
 
-        if (processDefineId == 0) {
-            logger.error("process definition id is null");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "process definition id");
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+
+        if (processDefinition == null) {
+            logger.error("process definition is not found");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "processDefinitionCode");
         }
+
         List<Integer> ids = new ArrayList<>();
-        processService.recurseFindSubProcessId(processDefineId, ids);
+        processService.recurseFindSubProcessId(processDefinition.getId(), ids);
         Integer[] idArray = ids.toArray(new Integer[ids.size()]);
         if (!ids.isEmpty()) {
             List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
             if (processDefinitionList != null) {
-                for (ProcessDefinition processDefinition : processDefinitionList) {
+                for (ProcessDefinition processDefinitionTmp : processDefinitionList) {
                     /**
                      * if there is no online process, exit directly
                      */
-                    if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-                        putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
+                    if (processDefinitionTmp.getReleaseState() != ReleaseState.ONLINE) {
+                        putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinitionTmp.getName());
                         logger.info("not release process definition id: {} , name : {}",
-                                processDefinition.getId(), processDefinition.getName());
+                                processDefinitionTmp.getId(), processDefinitionTmp.getName());
                         return result;
                     }
                 }
