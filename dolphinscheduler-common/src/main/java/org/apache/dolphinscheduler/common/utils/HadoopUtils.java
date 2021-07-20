@@ -210,7 +210,7 @@ public class HadoopUtils implements Closeable {
         if (logger.isDebugEnabled()) {
             logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         }
-        String activeResourceManagerPort = String.valueOf(PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088));
+        String activeResourceManagerPort = PropertyUtils.getString(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, "8088");
         return String.format(appUrl, activeResourceManagerPort, applicationId);
     }
 
