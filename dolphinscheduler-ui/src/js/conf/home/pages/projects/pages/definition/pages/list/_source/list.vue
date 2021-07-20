@@ -210,7 +210,7 @@
        */
       _start (item) {
         this.getWorkerGroupsAll()
-        this.getStartCheck({ processDefinitionId: item.id }).then(res => {
+        this.getStartCheck({ processDefinitionCode: item.code }).then(res => {
           this.startData = item
           this.startDialog = true
         }).catch(e => {
