@@ -78,7 +78,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "save", notes = "CREATE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
             @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", required = true, type = "String")
     })
     @PostMapping(value = "/save")
@@ -103,7 +103,7 @@ public class TaskDefinitionController extends BaseController {
      */
     @ApiOperation(value = "update", notes = "UPDATE_TASK_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", required = true, type = "String"),
+            @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, type = "Long"),
             @ApiImplicitParam(name = "code", value = "TASK_DEFINITION_CODE", required = true, dataType = "Long", example = "1"),
             @ApiImplicitParam(name = "taskDefinitionJson", value = "TASK_DEFINITION_JSON", required = true, type = "String")
     })
