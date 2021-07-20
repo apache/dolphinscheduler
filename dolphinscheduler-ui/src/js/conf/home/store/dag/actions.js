@@ -124,7 +124,7 @@ export default {
    */
   editExecutorsState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/executors/execute`, {
+      io.post(`projects/${state.projectCode}/executors/execute`, {
         processInstanceId: payload.processInstanceId,
         executeType: payload.executeType
       }, res => {
@@ -506,7 +506,7 @@ export default {
    */
   processStart ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/executors/start-process-instance`, payload, res => {
+      io.post(`projects/${state.projectCode}/executors/start-process-instance`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -543,7 +543,7 @@ export default {
    */
   getStartCheck ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`projects/${state.projectName}/executors/start-check`, payload, res => {
+      io.post(`projects/${state.projectCode}/executors/start-check`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
