@@ -132,12 +132,12 @@ public class FileUtils {
     }
 
     /**
-     * create directory if absent
+     * Create a new work dir, if it exists, delete it and create it again
      *
      * @param execLocalPath execute local path
      * @throws IOException errors
      */
-    public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
+    public static void createWorkDir(String execLocalPath) throws IOException {
         //if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
