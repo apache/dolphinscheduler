@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -85,7 +84,7 @@ public class ParamUtilsTest {
         localParams.put("local_param", localProperty);
 
         Property varProperty = new Property();
-        varProperty.setProp("local_param");
+        varProperty.setProp("varPool");
         varProperty.setDirect(Direct.IN);
         varProperty.setType(DataType.VARCHAR);
         varProperty.setValue("${global_param}");
@@ -93,42 +92,72 @@ public class ParamUtilsTest {
     }
 
     /**
-     * Test convert
+     * This is basic test case for ParamUtils.convert.
+     * Warning:
+     *   As you can see,this case invokes the function of convert in different situations. When you first invoke the function of convert,
+     *   the variables of localParams and varPool in the ShellParameters will be modified. But in the whole system the variables of localParams
+     *   and varPool have been used in other functions. I'm not sure if this current situation is wrong. So I cannot modify the original logic.
      */
     @Test
     public void testConvert() {
         //The expected value
-        String expected = "{\"varPool\":{\"prop\":\"local_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"},"
+        String expected = "{\"varPool\":{\"prop\":\"varPool\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"},"
                 + "\"global_param\":{\"prop\":\"global_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"},"
                 + "\"local_param\":{\"prop\":\"local_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"}}";
+
         //The expected value when globalParams is null but localParams is not null
-        String expected1 = "{\"varPool\":{\"prop\":\"local_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"},"
-                + "\"global_param\":{\"prop\":\"global_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"},"
+        String expected1 = "{\"varPool\":{\"prop\":\"varPool\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"},"
                 + "\"local_param\":{\"prop\":\"local_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"}}";
         //Define expected date , the month is 0-base
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, 11, 30);
         Date date = calendar.getTime();
 
+        List<Property> globalParamList = globalParams.values().stream().collect(Collectors.toList());
+        List<Property> localParamList = localParams.values().stream().collect(Collectors.toList());
+        List<Property> varPoolParamList = varPoolParams.values().stream().collect(Collectors.toList());
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(1);
+        taskExecutionContext.setTaskName("params test");
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
+        taskExecutionContext.setHost("127.0.0.1:1234");
+        taskExecutionContext.setExecutePath("/tmp/test");
+        taskExecutionContext.setLogPath("/log");
+        taskExecutionContext.setProcessInstanceId(1);
+        taskExecutionContext.setExecutorId(1);
+        taskExecutionContext.setCmdTypeIfComplement(0);
+        taskExecutionContext.setScheduleTime(date);
+        taskExecutionContext.setGlobalParams(JSONUtils.toJsonString(globalParamList));
+        taskExecutionContext.setDefinedParams(globalParamsMap);
+        taskExecutionContext.setVarPool("[{\"prop\":\"varPool\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${global_param}\"}]");
+        taskExecutionContext.setTaskParams(
+                "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss]\\necho \\\" ${task_execution_id} \\\"\\necho \\\" ${task_execution_path}\\\"\\n\","
+                        + "\"localParams\":"
+                        + "[],\"resourceList\":[]}");
+
+        ShellParameters shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
+        shellParameters.setLocalParams(localParamList);
+
+        String varPoolParamsJson = JSONUtils.toJsonString(varPoolParams,SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        shellParameters.setVarPool(taskExecutionContext.getVarPool());
+        shellParameters.dealOutParam(varPoolParamsJson);
+
         //Invoke convert
-        Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap, localParams, varPoolParams,CommandType.START_PROCESS, date);
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, shellParameters);
         String result = JSONUtils.toJsonString(paramsMap);
         assertEquals(expected, result);
 
-        for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
-
-            String key = entry.getKey();
-            Property prop = entry.getValue();
-            logger.info(key + " : " + prop.getValue());
-        }
-
         //Invoke convert with null globalParams
-        Map<String, Property> paramsMap1 = ParamUtils.convert(null, globalParamsMap, localParams,varPoolParams, CommandType.START_PROCESS, date);
+        taskExecutionContext.setDefinedParams(null);
+        Map<String, Property> paramsMap1 = ParamUtils.convert(taskExecutionContext, shellParameters);
+
         String result1 = JSONUtils.toJsonString(paramsMap1);
         assertEquals(expected1, result1);
 
-        //Null check, invoke convert with null globalParams and null localParams
-        Map<String, Property> paramsMap2 = ParamUtils.convert(null, globalParamsMap, null, varPoolParams,CommandType.START_PROCESS, date);
+        // Null check, invoke convert with null globalParams and null localParams
+        shellParameters.setLocalParams(null);
+        Map<String, Property> paramsMap2 = ParamUtils.convert(taskExecutionContext, shellParameters);
         assertNull(paramsMap2);
     }
 
