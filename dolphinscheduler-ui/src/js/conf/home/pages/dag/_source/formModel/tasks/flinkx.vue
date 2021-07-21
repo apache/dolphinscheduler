@@ -294,6 +294,17 @@
 
       <m-list-box>
         <div slot="text">
+          <span>{{$t('Batch Size')}}</span>
+        </div>
+        <div slot="content">
+          <m-select-input v-model="batchSize" :list="[1,1024,2048,4096,8192,16394]">
+          </m-select-input>
+          <span>({{$t('1 means unlimited')}})</span>
+        </div>
+      </m-list-box>
+
+      <m-list-box>
+        <div slot="text">
           <span>{{$t('SpeedByte')}}</span>
         </div>
         <div slot="content">
@@ -458,6 +469,8 @@
         rtDatatarget: '',
         //write mode
         writeMode: 'INSERT',
+        //batch size
+        batchSize: 1024,
         //write mode list  unuse { code: 'REPLACE' }
         writeModeList: [{ code: 'INSERT' }, { code: 'UPDATE' }],
         //update key (unique key)
@@ -826,6 +839,7 @@
             jobSpeedChannel:this.jobSpeedChannel,
             isSqlStatement:this.isSqlStatement,
             customSql:editor?editor.getValue():'',
+            batchSize:this.batchSize
           })
           return true
         }
@@ -917,6 +931,7 @@
           jobSpeedChannel:this.jobSpeedChannel,
           isSqlStatement: this.isSqlStatement,
           customSql: editor?editor.getValue():'',
+          batchSize:this.batchSize
         });
       },
 
@@ -974,6 +989,7 @@
           this.jobSpeedChannel = o.params.jobSpeedChannel || 1
           this.isSqlStatement = o.params.isSqlStatement || false
           this.customSql = o.params.customSql || ''
+          this.batchSize = o.params.batchSize || 1024
         } else {
           this.customConfig = 1
           this.enable = true
@@ -1048,7 +1064,8 @@
           splitPk: this.splitPk,
           jobSpeedChannel: this.jobSpeedChannel,
           isSqlStatement: this.isSqlStatement,
-          customSql: this.customSql
+          customSql: this.customSql,
+          batchSize:this.batchSize
         }
       }
     },

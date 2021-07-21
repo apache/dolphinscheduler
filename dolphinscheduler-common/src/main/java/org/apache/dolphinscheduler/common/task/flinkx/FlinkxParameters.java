@@ -168,6 +168,7 @@ public class FlinkxParameters extends AbstractParameters {
      */
     private String customSql;
 
+    private int batchSize;
 
     public int getCustomConfig() {
         return customConfig;
@@ -417,6 +418,14 @@ public class FlinkxParameters extends AbstractParameters {
         this.customSql = customSql;
     }
 
+    public int getBatchSize() {
+        return batchSize;
+    }
+
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
     @Override
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
@@ -478,6 +487,7 @@ public class FlinkxParameters extends AbstractParameters {
                 ", jobSpeedChannel=" + jobSpeedChannel + '\'' +
                 ", isSqlStatement=" + isSqlStatement + '\'' +
                 ", customSql=" + customSql + '\'' +
+                ", batchSize=" + batchSize + '\'' +
                 '}';
     }
 }

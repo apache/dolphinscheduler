@@ -265,6 +265,8 @@ public class FlinkxTask extends AbstractYarnTask {
         writerParam.put("connection",writerConnArr);
         writerParam.put("column",flinkxParameters.getTargetColumns());
         writerParam.put("writeMode",flinkxParameters.getWriteMode());
+        writerParam.put("batchSize",flinkxParameters.getBatchSize());
+
         WriteMode writeMode = flinkxParameters.getWriteMode();
         if(writeMode!=null && writeMode == WriteMode.INSERT){
             if(targetDBType !=null && targetDBType == DbType.POSTGRESQL){
