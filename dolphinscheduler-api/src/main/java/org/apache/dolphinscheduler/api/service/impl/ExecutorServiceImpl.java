@@ -127,7 +127,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout,
-                                                   Map<String, String> startParams, Integer expectedCount) {
+                                                   Map<String, String> startParams, Integer expectedParallelismNumber) {
         Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
@@ -159,13 +159,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        expectedCount = 4;
         /**
          * create command
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, startParams, expectedCount);
+                warningGroupId, runMode, processInstancePriority, workerGroup, startParams, expectedParallelismNumber);
 
         if (create > 0) {
             processDefinition.setWarningGroupId(warningGroupId);
