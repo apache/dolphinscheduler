@@ -242,7 +242,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setCode(taskDefinition.getCode());
         taskDefinitionToUpdate.setId(taskDefinition.getId());
         taskDefinitionToUpdate.setProjectCode(projectCode);
-        taskDefinitionToUpdate.setUserId(loginUser.getId());
+        taskDefinitionToUpdate.setUserId(taskDefinition.getUserId());
         taskDefinitionToUpdate.setVersion(version == null || version == 0 ? 1 : version + 1);
         taskDefinitionToUpdate.setTaskType(taskDefinitionToUpdate.getTaskType().toUpperCase());
         taskDefinitionToUpdate.setResourceIds(processService.getResourceIds(taskDefinitionToUpdate));
