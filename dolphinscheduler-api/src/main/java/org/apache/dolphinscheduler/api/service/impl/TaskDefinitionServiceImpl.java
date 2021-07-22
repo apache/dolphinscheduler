@@ -231,13 +231,31 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskCode);
             return result;
         }
-        TaskNode taskNode = JSONUtils.parseObject(taskDefinitionJson, TaskNode.class);
-        checkTaskNode(result, taskNode, taskDefinitionJson);
+        TaskDefinitionLog taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJson, TaskDefinitionLog.class);
+        checkTaskDefinition(result, taskDefinitionToUpdate);
         if (result.get(Constants.STATUS) == DATA_IS_NOT_VALID
                 || result.get(Constants.STATUS) == Status.PROCESS_NODE_S_PARAMETER_INVALID) {
             return result;
         }
-        int update = processService.updateTaskDefinition(loginUser, project.getCode(), taskNode, taskDefinition);
+        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode);
+        Date now = new Date();
+        taskDefinitionToUpdate.setCode(taskDefinition.getCode());
+        taskDefinitionToUpdate.setId(taskDefinition.getId());
+        taskDefinitionToUpdate.setProjectCode(projectCode);
+        taskDefinitionToUpdate.setUserId(taskDefinition.getUserId());
+        taskDefinitionToUpdate.setVersion(version == null || version == 0 ? 1 : version + 1);
+        taskDefinitionToUpdate.setTaskType(taskDefinitionToUpdate.getTaskType().toUpperCase());
+        taskDefinitionToUpdate.setResourceIds(processService.getResourceIds(taskDefinitionToUpdate));
+        taskDefinitionToUpdate.setUpdateTime(now);
+        int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+        taskDefinitionToUpdate.setOperator(loginUser.getId());
+        taskDefinitionToUpdate.setOperateTime(now);
+        taskDefinitionToUpdate.setCreateTime(now);
+        int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
+        if ((update & insert) != 1) {
+            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
+            return result;
+        }
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS, update);
         return result;
