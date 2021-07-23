@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.model;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,7 +33,6 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 
 public class TaskNode {
 
@@ -363,6 +363,10 @@ public class TaskNode {
 
     public boolean isConditionsTask() {
         return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.getType());
+    }
+
+    public boolean isSwitchTask() {
+        return TaskType.SWITCH.toString().equalsIgnoreCase(this.getType());
     }
 
     public List<PreviousTaskNode> getPreTaskNodeList() {
