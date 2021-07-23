@@ -256,14 +256,6 @@
         background: #409EFF ;
         color: white;
       }
-      ::-moz-selection {
-        background: #409EFF;
-        color: white;
-      }
-      ::-webkit-selection {
-        background: #409EFF;
-        color: white;
-      }
     }
     .title {
       line-height: 36px;
