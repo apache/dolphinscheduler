@@ -185,13 +185,10 @@ public class ZookeeperOperator implements InitializingBean {
     public void persistEphemeral(final String key, final String value) {
         try {
             if (isExisted(key)) {
-                try {
-                    zkClient.delete().deletingChildrenIfNeeded().forPath(key);
-                } catch (NoNodeException ignore) {
-                    //NOP
-                }
+                update(key, value);
+            } else {
+                zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
             }
-            zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
         } catch (final Exception ex) {
             logger.error("persistEphemeral key : {} , value : {}", key, value, ex);
         }
