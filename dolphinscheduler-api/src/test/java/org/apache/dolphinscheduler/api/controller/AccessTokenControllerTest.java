@@ -38,7 +38,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * access token controller test
  */
-public class AccessTokenControllerTest extends AbstractControllerTest{
+public class AccessTokenControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(AccessTokenControllerTest.class);
 

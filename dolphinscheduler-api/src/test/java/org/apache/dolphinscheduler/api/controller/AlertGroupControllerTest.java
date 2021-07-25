@@ -39,7 +39,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * alert group controller test
  */
-public class AlertGroupControllerTest extends AbstractControllerTest{
+public class AlertGroupControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
@@ -109,7 +109,6 @@ public class AlertGroupControllerTest extends AbstractControllerTest{
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testVerifyGroupName() throws Exception {

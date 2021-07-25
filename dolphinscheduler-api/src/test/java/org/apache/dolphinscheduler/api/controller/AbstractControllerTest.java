@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

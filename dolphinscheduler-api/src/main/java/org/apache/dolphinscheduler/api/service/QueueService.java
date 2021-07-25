@@ -44,7 +44,7 @@ public interface QueueService {
      * @param pageSize page size
      * @return queue list
      */
-    Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * create queue

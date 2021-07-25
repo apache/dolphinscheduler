@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -57,6 +58,8 @@ public interface ProjectService {
 
     boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result);
 
+    boolean hasProjectAndPerm(User loginUser, Project project, Result result);
+
     /**
      * admin can view all projects
      *
@@ -66,7 +69,7 @@ public interface ProjectService {
      * @param pageNo page number
      * @return project list which the login user have permission to see
      */
-    Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
+    Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
 
     /**
      * delete project by id

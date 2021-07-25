@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -66,18 +67,16 @@ public class AccessTokenServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testQueryAccessTokenList() {
-
         IPage<AccessToken> tokenPage = new Page<>();
         tokenPage.setRecords(getList());
         tokenPage.setTotal(1L);
         when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
 
         User user = new User();
-        Map<String, Object> result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
+        Result result = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
+        PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.getData();
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(pageInfo.getTotalCount() > 0);
+        Assert.assertTrue(pageInfo.getTotal() > 0);
     }
 
     @Test
@@ -134,8 +133,7 @@ public class AccessTokenServiceTest {
 
     }
 
-
-    private User getLoginUser(){
+    private User getLoginUser() {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -164,7 +162,6 @@ public class AccessTokenServiceTest {
         list.add(getEntity());
         return list;
     }
-
 
     /**
      * get dateStr

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -85,5 +86,5 @@ public interface AlertPluginInstanceService {
      * @param pageSize  page size
      * @return plugins
      */
-    Map<String, Object> queryPluginPage(int pageIndex,int pageSize);
+    Result queryPluginPage(int pageIndex, int pageSize);
 }

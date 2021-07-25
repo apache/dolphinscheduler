@@ -89,7 +89,7 @@ public interface UdfFuncService {
      * @param searchVal search value
      * @return udf function list page
      */
-    Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query udf list

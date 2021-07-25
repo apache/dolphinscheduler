@@ -85,6 +85,7 @@ public class QueueServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(queueList));
 
     }
+
     @Test
     public void testQueryListPage() {
 
@@ -92,11 +93,12 @@ public class QueueServiceTest {
         page.setTotal(1L);
         page.setRecords(getQueueList());
         Mockito.when(queueMapper.queryQueuePaging(Mockito.any(Page.class), Mockito.eq(queueName))).thenReturn(page);
-        Map<String, Object> result = queueService.queryList(getLoginUser(),queueName,1,10);
+        Result result = queueService.queryList(getLoginUser(),queueName,1,10);
         logger.info(result.toString());
-        PageInfo<Queue>  pageInfo = (PageInfo<Queue>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        PageInfo<Queue>  pageInfo = (PageInfo<Queue>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
+
     @Test
     public void testCreateQueue() {
 
@@ -195,7 +197,6 @@ public class QueueServiceTest {
         list.add(getLoginUser());
         return list;
     }
-
 
     /**
      * get queue

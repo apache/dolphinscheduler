@@ -86,9 +86,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+    public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -98,9 +99,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Integer count = (int) queueList.getTotal();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(queueList.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal(count);
+        pageInfo.setTotalList(queueList.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;

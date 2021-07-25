@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -43,10 +44,10 @@ public interface TaskInstanceService {
      * @param pageSize page size
      * @return task list page
      */
-    Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
-                                            Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
-                                            String endDate, String searchVal, ExecutionStatus stateType, String host,
-                                            Integer pageNo, Integer pageSize);
+    Result queryTaskListPaging(User loginUser, String projectName,
+                               Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
+                               String endDate, String searchVal, ExecutionStatus stateType, String host,
+                               Integer pageNo, Integer pageSize);
 
     /**
      * change one task instance's state from failure to forced success

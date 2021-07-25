@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -76,12 +77,12 @@ public interface ProcessDefinitionService {
      * @param userId user id
      * @return process definition page
      */
-    Map<String, Object> queryProcessDefinitionListPaging(User loginUser,
-                                                         String projectName,
-                                                         String searchVal,
-                                                         Integer pageNo,
-                                                         Integer pageSize,
-                                                         Integer userId);
+    Result queryProcessDefinitionListPaging(User loginUser,
+                                            String projectName,
+                                            String searchVal,
+                                            Integer pageNo,
+                                            Integer pageSize,
+                                            Integer userId);
 
     /**
      * query datail of process definition
@@ -285,7 +286,7 @@ public interface ProcessDefinitionService {
      * @param processDefinitionCode process definition code
      * @return the pagination process definition versions info of the certain process definition
      */
-    Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName,
+    Result queryProcessDefinitionVersions(User loginUser, String projectName,
                                                        int pageNo, int pageSize, long processDefinitionCode);
 
     /**
@@ -299,6 +300,7 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, String projectName,
                                                               int processDefinitionId, long version);
+
     /**
      * check has associated process definition
      *

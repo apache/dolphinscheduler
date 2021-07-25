@@ -217,8 +217,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source list page
      */
     @Override
-    public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
         IPage<DataSource> dataSourceList;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
 
@@ -231,9 +231,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
-        pageInfo.setLists(dataSources);
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
+        pageInfo.setTotalList(dataSources);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -308,7 +308,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * check connection
      *
      * @param type data source type
-     * @param parameter data source parameters
+     * @param connectionParam data source parameters
      * @return true if connect successfully, otherwise false
      */
     @Override

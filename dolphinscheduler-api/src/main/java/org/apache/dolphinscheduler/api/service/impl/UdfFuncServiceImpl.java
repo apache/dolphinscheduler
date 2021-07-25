@@ -246,13 +246,13 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function list page
      */
     @Override
-    public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
-        pageInfo.setTotalCount((int)udfFuncList.getTotal());
-        pageInfo.setLists(udfFuncList.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int)udfFuncList.getTotal());
+        pageInfo.setTotalList(udfFuncList.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

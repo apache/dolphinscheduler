@@ -66,7 +66,7 @@ public interface DataSourceService {
      * @param pageSize  page size
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query data resource list
