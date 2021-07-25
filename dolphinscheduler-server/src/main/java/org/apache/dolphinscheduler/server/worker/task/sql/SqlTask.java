@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -166,14 +165,8 @@ public class SqlTask extends AbstractTask {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
 
-        // find process instance by task id
-
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                taskExecutionContext.getDefinedParams(),
-                sqlParameters.getLocalParametersMap(),
-                sqlParameters.getVarPoolMap(),
-                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                taskExecutionContext.getScheduleTime());
+        // combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -275,7 +268,6 @@ public class SqlTask extends AbstractTask {
             close(resultSet, stmt, connection);
         }
     }
-
 
     public String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
         String result = null;
