@@ -473,17 +473,17 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * encapsulation treeview structure
+     * encapsulation tree view structure
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param id process definition id
+     * @param code process definition code
      * @param limit limit
      * @return tree view json data
      */
     @ApiOperation(value = "viewTree", notes = "VIEW_TREE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "100"),
             @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/view-tree")
@@ -492,9 +492,9 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                           @RequestParam("processId") Integer id,
+                           @RequestParam("code") long code,
                            @RequestParam("limit") Integer limit) throws Exception {
-        Map<String, Object> result = processDefinitionService.viewTree(id, limit);
+        Map<String, Object> result = processDefinitionService.viewTree(code, limit);
         return returnDataList(result);
     }
 
