@@ -95,7 +95,7 @@ You are very welcome to communicate with the developers and users of Dolphin Sch
 
 ### Contributor over time
   
-[![Contributor over time](https://contributor-graph-api.apiseven.com/contributors-svg?chart=contributorOverTime&repo=apache/dolphinscheduler)](https://www.apiseven.com/en/contributor-graph?chart=contributorOverTime&repo=apache/dolphinscheduler)
+[![Contributor over time](https://contributor-graph-api.apiseven.com/contributors-svg?chart=contributorOverTime&repo=apache/dolphinscheduler)](https://www.apiseven.com/en/contributor-graph?chart=contributorOverTime&repo=apache/dolphinscheduler) [![Join the chat at https://gitter.im/apache-dolphinscheduler/community](https://badges.gitter.im/apache-dolphinscheduler/community.svg)](https://gitter.im/apache-dolphinscheduler/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## How to Contribute
 
