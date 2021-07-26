@@ -1272,43 +1272,32 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     /**
      * Encapsulates the TreeView structure
      *
-     * @param processId process definition id
+     * @param code process definition code
      * @param limit limit
      * @return tree view json data
      */
     @Override
-    public Map<String, Object> viewTree(Integer processId, Integer limit) {
+    public Map<String, Object> viewTree(long code, Integer limit) {
         Map<String, Object> result = new HashMap<>();
-
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processId);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (null == processDefinition) {
             logger.info("process define not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
             return result;
         }
         DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
-        /**
-         * nodes that is running
-         */
+        // nodes that is running
         Map<String, List<TreeViewDto>> runningNodeMap = new ConcurrentHashMap<>();
 
-        /**
-         * nodes that is waiting torun
-         */
+        //nodes that is waiting to run
         Map<String, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
 
-        /**
-         * List of process instances
-         */
-        List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(processDefinition.getCode(), limit);
-        List<TaskDefinitionLog> taskDefinitionList = processService.queryTaskDefinitionList(processDefinition.getCode(),
-                processDefinition.getVersion());
-        Map<Long, TaskDefinition> taskDefinitionMap = new HashedMap();
-        taskDefinitionList.forEach(taskDefinitionLog -> taskDefinitionMap.put(taskDefinitionLog.getCode(), taskDefinitionLog));
-
-        for (ProcessInstance processInstance : processInstanceList) {
-            processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime()));
-        }
+        // List of process instances
+        List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
+        processInstanceList.forEach(processInstance -> processInstance.setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
+        List<TaskDefinitionLog> taskDefinitionList = processService.queryTaskDefinitionListByProcess(code, processDefinition.getVersion());
+        Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
+                .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
 
         if (limit > processInstanceList.size()) {
             limit = processInstanceList.size();
@@ -1318,13 +1307,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         parentTreeViewDto.setName("DAG");
         parentTreeViewDto.setType("");
         // Specify the process definition, because it is a TreeView for a process definition
-
         for (int i = limit - 1; i >= 0; i--) {
             ProcessInstance processInstance = processInstanceList.get(i);
-
             Date endTime = processInstance.getEndTime() == null ? new Date() : processInstance.getEndTime();
-            parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), "", processInstance.getState().toString()
-                    , processInstance.getStartTime(), endTime, processInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
+            parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), "",
+                    processInstance.getState().toString(), processInstance.getStartTime(), endTime, processInstance.getHost(),
+                    DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
         }
 
         List<TreeViewDto> parentTreeViewDtoList = new ArrayList<>();
@@ -1335,7 +1323,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         while (Stopper.isRunning()) {
-            Set<String> postNodeList = null;
+            Set<String> postNodeList;
             Iterator<Map.Entry<String, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, List<TreeViewDto>> en = iter.next();
@@ -1358,16 +1346,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
 
                         int subProcessId = 0;
-                        /**
-                         * if process is sub process, the return sub id, or sub id=0
-                         */
+                        // if process is sub process, the return sub id, or sub id=0
                         if (taskInstance.isSubProcess()) {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
                             subProcessId = Integer.parseInt(JSONUtils.parseObject(
                                     taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_ID).asText());
                         }
-                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
-                                , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
+                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(),
+                                taskInstance.getState().toString(), taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(),
+                                DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
                     }
                 }
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {

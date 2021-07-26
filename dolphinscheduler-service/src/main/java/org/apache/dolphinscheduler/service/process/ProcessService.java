@@ -2428,6 +2428,7 @@ public class ProcessService {
      * @param processDefinition process definition
      * @return dag graph
      */
+    @Deprecated
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
         Map<String, String> locationMap = locationToMap(processDefinition.getLocations());
         List<TaskNode> taskNodeList = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion(), locationMap);
@@ -2539,19 +2540,19 @@ public class ProcessService {
     /**
      * query tasks definition list by process code and process version
      */
-    public List<TaskDefinitionLog> queryTaskDefinitionList(Long processCode, int processVersion) {
+    public List<TaskDefinitionLog> queryTaskDefinitionListByProcess(long processCode, int processVersion) {
         List<ProcessTaskRelationLog> processTaskRelationLogs =
                 processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
-        Map<Long, TaskDefinition> postTaskDefinitionMap = new HashMap<>();
-        processTaskRelationLogs.forEach(processTaskRelationLog -> {
-            Long code = processTaskRelationLog.getPostTaskCode();
-            int version = processTaskRelationLog.getPostTaskVersion();
-            if (postTaskDefinitionMap.containsKey(code)) {
-                TaskDefinition taskDefinition = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
-                postTaskDefinitionMap.putIfAbsent(code, taskDefinition);
+        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
+        for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogs) {
+            if (processTaskRelationLog.getPreTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelationLog.getPreTaskCode(), processTaskRelationLog.getPreTaskVersion()));
             }
-        });
-        return new ArrayList(postTaskDefinitionMap.values());
+            if (processTaskRelationLog.getPostTaskCode() > 0) {
+                taskDefinitionSet.add(new TaskDefinition(processTaskRelationLog.getPostTaskCode(), processTaskRelationLog.getPostTaskVersion()));
+            }
+        }
+        return taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionSet);
     }
 
     /**
