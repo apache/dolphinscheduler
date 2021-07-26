@@ -30,7 +30,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>worker execute thread number to limit task instances</description>
+		<description>worker execute thread number to limit task instances in parallel</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
