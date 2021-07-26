@@ -64,7 +64,7 @@ jobs:
       - name: Compile
         run: |
           export MAVEN_OPTS='-Dmaven.repo.local=.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx5g'
-          mvn test -B -Dmaven.test.skip=false
+          mvn clean verify -B -Dmaven.test.skip=false
       - name: Upload coverage report to codecov
         run: |
           CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
