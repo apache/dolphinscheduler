@@ -78,7 +78,7 @@ public class NetUtils {
         if (inetAddress != null) {
             if (Constants.KUBERNETES_MODE) {
                 String canonicalHost = inetAddress.getCanonicalHostName();
-                    String[] items = canonicalHost.split("\\.");
+                String[] items = canonicalHost.split("\\.");
                 if (items.length == 6 && "svc".equals(items[3])) {
                     return String.format("%s.%s", items[0], items[1]);
                 }

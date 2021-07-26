@@ -989,7 +989,7 @@ public final class Constants {
     public static final String START_END_DATE = "startDate,endDate";
 
     /**
-     * Network system properties
+     * network interface preferred
      */
     public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED = "dolphin.scheduler.network.interface.preferred";
 
