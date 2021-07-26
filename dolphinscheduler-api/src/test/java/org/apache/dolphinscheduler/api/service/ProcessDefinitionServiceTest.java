@@ -747,7 +747,6 @@ public class ProcessDefinitionServiceTest {
         //process definition not exist
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setProcessDefinitionJson(SHELL_JSON);
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(null);
         Map<String, Object> processDefinitionNullRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
@@ -771,7 +770,7 @@ public class ProcessDefinitionServiceTest {
         taskInstance.setHost("192.168.xx.xx");
 
         //task instance not exist
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNullRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNullRes.get(Constants.STATUS));
@@ -783,7 +782,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testSubProcessViewTree() throws Exception {
+    public void testSubProcessViewTree() {
 
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setProcessDefinitionJson(SHELL_JSON);
@@ -806,7 +805,7 @@ public class ProcessDefinitionServiceTest {
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setHost("192.168.xx.xx");
         taskInstance.setTaskParams("\"processDefinitionId\": \"222\",\n");
-        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Mockito.when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         Mockito.when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
