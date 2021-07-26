@@ -277,12 +277,12 @@ public interface ProcessDefinitionService {
     /**
      * Encapsulates the TreeView structure
      *
-     * @param processId process definition id
+     * @param code process definition code
      * @param limit limit
      * @return tree view json data
      * @throws Exception exception
      */
-    Map<String, Object> viewTree(Integer processId,
+    Map<String, Object> viewTree(long code,
                                  Integer limit) throws Exception;
 
     /**
