@@ -62,7 +62,7 @@ RUN sed -i 's/*.conf$/*.ini/' /etc/supervisor/supervisord.conf && \
     rm -f /bin/sh && \
     ln -s /bin/bash /bin/sh && \
     mkdir -p /tmp/xls && \
-    echo PS1=\'\\w \\$ \' >> ~/.bashrc && \
+    echo PS1=\"\\w \\$ \" >> ~/.bashrc && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
 # 4. expose port
