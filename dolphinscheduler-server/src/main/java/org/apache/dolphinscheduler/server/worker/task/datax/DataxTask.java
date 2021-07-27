@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.datax;
 
+package org.apache.dolphinscheduler.server.worker.task.datax;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
@@ -58,6 +60,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
@@ -72,7 +76,6 @@ import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.alibaba.fastjson.JSONObject;
 
-
 /**
  * DataX task
  */
@@ -82,6 +85,7 @@ public class DataxTask extends AbstractTask {
      * python process(datax only supports version 2.7 by default)
      */
     private static final String DATAX_PYTHON = "python2.7";
+    private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
 
     /**
      * datax path
@@ -366,7 +370,7 @@ public class DataxTask extends AbstractTask {
 
         // datax python command
         StringBuilder sbr = new StringBuilder();
-        sbr.append(DATAX_PYTHON);
+        sbr.append(getPythonCommand());
         sbr.append(" ");
         sbr.append(DATAX_PATH);
         sbr.append(" ");
@@ -390,6 +394,23 @@ public class DataxTask extends AbstractTask {
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
+    }
+
+    public String getPythonCommand() {
+        String pythonHome = System.getenv("PYTHON_HOME");
+        return getPythonCommand(pythonHome);
+    }
+
+    public String getPythonCommand(String pythonHome) {
+        if (StringUtils.isEmpty(pythonHome)) {
+            return DATAX_PYTHON;
+        }
+        String pythonBinPath = "/bin/" + DATAX_PYTHON;
+        Matcher matcher = PYTHON_PATH_PATTERN.matcher(pythonHome);
+        if (matcher.find()) {
+            return matcher.replaceAll(pythonBinPath);
+        }
+        return Paths.get(pythonHome, pythonBinPath).toString();
     }
 
     /**

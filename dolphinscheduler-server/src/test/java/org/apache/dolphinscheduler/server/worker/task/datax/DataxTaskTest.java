@@ -14,16 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
+import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -36,6 +31,13 @@ import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,7 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * DataxTask Tester.
@@ -391,6 +393,22 @@ public class DataxTaskTest {
         catch (Exception e) {
             Assert.fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testGetPythonCommand()   {
+        String pythonCommand = dataxTask.getPythonCommand();
+        Assert.assertEquals("python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("");
+        Assert.assertEquals("python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/usr/bin/python");
+        Assert.assertEquals("/usr/bin/python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/usr/local/bin/python2");
+        Assert.assertEquals("/usr/local/bin/python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/opt/python/bin/python3.8");
+        Assert.assertEquals("/opt/python/bin/python2.7", pythonCommand);
+        pythonCommand = dataxTask.getPythonCommand("/opt/soft/python");
+        Assert.assertEquals("/opt/soft/python/bin/python2.7", pythonCommand);
     }
 
 }
