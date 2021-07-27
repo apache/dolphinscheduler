@@ -37,6 +37,7 @@ public enum TaskType {
      * 11 CONDITIONS
      * 12 SQOOP
      * 13 WATERDROP
+     * 14 BLOCKING_TASK
      */
     SHELL(0, "SHELL"),
     SQL(1, "SQL"),
@@ -51,7 +52,8 @@ public enum TaskType {
     DATAX(10, "DATAX"),
     CONDITIONS(11, "CONDITIONS"),
     SQOOP(12, "SQOOP"),
-    WATERDROP(13, "WATERDROP");
+    WATERDROP(13, "WATERDROP"),
+    BLOCKING_TASK(14,"BLOCKING_TASK");
 
     TaskType(int code, String desc) {
         this.code = code;
