@@ -131,8 +131,7 @@ spec:
         name: {{ include "dolphinscheduler.fullname" . }}-worker-data
         labels:
           app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-data
-          app.kubernetes.io/instance: {{ .Release.Name }}
-          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:
         {{- range .Values.worker.persistentVolumeClaim.dataPersistentVolume.accessModes }}
@@ -148,8 +147,7 @@ spec:
         name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
         labels:
           app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-          app.kubernetes.io/instance: {{ .Release.Name }}
-          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:
         {{- range .Values.worker.persistentVolumeClaim.logsPersistentVolume.accessModes }}
