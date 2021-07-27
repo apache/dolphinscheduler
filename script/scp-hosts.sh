@@ -58,7 +58,7 @@ do
   do
     # if worker in workersGroupMap
     if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
-      sed -i ${txt} "s#worker.groups.*#worker.groups=${workersGroupMap[${host}]}#g" ${dsDir}/worker.properties
+      sed -i ${txt} "s@^#\?worker.groups=.*@worker.groups=${workersGroupMap[${host}]}@g" ${dsDir}/worker.properties
     fi
 
     echo "start to scp $dsDir to $host/$installPath"
