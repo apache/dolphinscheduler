@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.sql;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sql/Hql parameter
+ * Sql/Hql parameter.
  */
 public class SqlParameters extends AbstractParameters {
     /**
@@ -102,6 +103,19 @@ public class SqlParameters extends AbstractParameters {
      * receivers cc
      */
     private String receiversCc;
+
+    /**
+     * query result limit
+     */
+    private int limit;
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 
     public String getType() {
         return type;
@@ -226,21 +240,22 @@ public class SqlParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "SqlParameters{" +
-                "type='" + type + '\'' +
-                ", datasource=" + datasource +
-                ", sql='" + sql + '\'' +
-                ", sqlType=" + sqlType +
-                ", sendEmail=" + sendEmail +
-                ", displayRows=" + displayRows +
-                ", udfs='" + udfs + '\'' +
-                ", showType='" + showType + '\'' +
-                ", connParams='" + connParams + '\'' +
-                ", title='" + title + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", preStatements=" + preStatements +
-                ", postStatements=" + postStatements +
-                '}';
+        return "SqlParameters{"
+                + "type='" + type + '\''
+                + ", datasource=" + datasource
+                + ", sql='" + sql + '\''
+                + ", sqlType=" + sqlType
+                + ", sendEmail=" + sendEmail
+                + ", displayRows=" + displayRows
+                + ", limit=" + limit
+                + ", udfs='" + udfs + '\''
+                + ", showType='" + showType + '\''
+                + ", connParams='" + connParams + '\''
+                + ", title='" + title + '\''
+                + ", receivers='" + receivers + '\''
+                + ", receiversCc='" + receiversCc + '\''
+                + ", preStatements=" + preStatements
+                + ", postStatements=" + postStatements
+                + '}';
     }
 }
