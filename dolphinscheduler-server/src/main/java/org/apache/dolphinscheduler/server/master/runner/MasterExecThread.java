@@ -974,7 +974,9 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
+                    ProcessDefinition relatedProcessDefinition = processInstance.getProcessDefinition();
                     processInstance = processService.findProcessInstanceById(processInstance.getId());
+                    processInstance.setProcessDefinition(relatedProcessDefinition);
                     processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
