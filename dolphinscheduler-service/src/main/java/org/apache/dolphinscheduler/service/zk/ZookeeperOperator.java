@@ -182,7 +182,7 @@ public class ZookeeperOperator implements InitializingBean {
         }
     }
 
-    public void persistEphemeral(final String path, final String value) {
+    public void persistEphemeral(final String key, final String value) {
         try {
             if (isExisted(key)) {
                 update(key, value);
@@ -190,7 +190,7 @@ public class ZookeeperOperator implements InitializingBean {
                 zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
             }
         } catch (final Exception ex) {
-            logger.error("persistEphemeral path : {} , value : {}", path, value, ex);
+            logger.error("persistEphemeral path : {} , value : {}", key, value, ex);
         }
     }
 
