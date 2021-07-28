@@ -811,43 +811,6 @@ public class ProcessDefinitionServiceTest {
 
     }
 
-//    @Test
-//    public void importProcessDefinition() throws IOException {
-//        FileUtils.writeStringToFile(new File("/tmp/task.json"), processJson);
-//
-//        File file = new File("/tmp/task.json");
-//
-//        FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");
-//
-//        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
-//                ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
-//
-//        User loginUser = new User();
-//        loginUser.setId(1);
-//        loginUser.setUserType(UserType.ADMIN_USER);
-//
-//        long currentProjectCode = 1L;
-//        Map<String, Object> result = new HashMap<>();
-//        putMsg(result, Status.SUCCESS, currentProjectCode);
-//
-//        ProcessDefinition shellDefinition2 = new ProcessDefinition();
-//        shellDefinition2.setId(46);
-//        shellDefinition2.setName("shell-5");
-//        shellDefinition2.setProjectId(2);
-//        shellDefinition2.setProcessDefinitionJson(subProcessJson);
-//
-//        Mockito.when(projectMapper.queryByCode(currentProjectCode)).thenReturn(getProject(currentProjectCode));
-//        Mockito.when(projectService.checkProjectAndAuth(loginUser, getProject(currentProjectCode), "test")).thenReturn(result);
-//
-//        Map<String, Object> importProcessResult = processDefinitionService.importProcessDefinition(loginUser, currentProjectCode, multipartFile);
-//
-//        Assert.assertEquals(Status.SUCCESS, importProcessResult.get(Constants.STATUS));
-//
-//        boolean delete = file.delete();
-//
-//        Assert.assertTrue(delete);
-//    }
-
     @Test
     public void testUpdateProcessDefinition() {
         User loginUser = new User();
