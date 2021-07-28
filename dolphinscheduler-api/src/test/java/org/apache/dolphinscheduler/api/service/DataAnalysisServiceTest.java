@@ -126,12 +126,12 @@ public class DataAnalysisServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         // SUCCESS
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(DateUtils.getScheduleDate(startDate),
                 DateUtils.getScheduleDate(endDate), new Long[] {1L})).thenReturn(getTaskInstanceStateCounts());
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -154,7 +154,7 @@ public class DataAnalysisServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         // when date in illegal format then return error message
         String startDate2 = "illegalDateString";
@@ -180,7 +180,7 @@ public class DataAnalysisServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         // when general user doesn't have any task then return all count are 0
         user.setUserType(UserType.GENERAL_USER);
@@ -199,7 +199,7 @@ public class DataAnalysisServiceTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         // when instanceStateCounter return null, then return nothing
         user.setUserType(UserType.GENERAL_USER);
@@ -213,13 +213,13 @@ public class DataAnalysisServiceTest {
         String startDate = "2020-02-11 16:02:18";
         String endDate = "2020-02-11 16:03:18";
 
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         //checkProject false
         Map<String, Object> failResult = new HashMap<>();
         putMsg(failResult, Status.PROJECT_NOT_FOUNT, 1);
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(failResult);
-        failResult = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 2, startDate, endDate);
+        failResult = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, failResult.get(Constants.STATUS));
 
         Map<String, Object> result = new HashMap<>();
@@ -237,7 +237,7 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountDefinitionByUser() {
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
@@ -318,7 +318,7 @@ public class DataAnalysisServiceTest {
      */
     private Project getProject(String projectName) {
         Project project = new Project();
-        project.setCode(11L);
+        project.setCode(1L);
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);
