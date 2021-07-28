@@ -625,6 +625,11 @@ public class ResourcesService extends BaseService {
             org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
+            try {
+                FileUtils.deleteFile(localFilename);
+            } catch (IOException ex) {
+                logger.error("delete local tmp file:{} error", localFilename, ex);
+            }
             logger.error(e.getMessage(), e);
             return false;
         }

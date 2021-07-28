@@ -184,16 +184,11 @@ public class ZookeeperOperator implements InitializingBean {
 
     public void persistEphemeral(final String path, final String value) {
         try {
-            // If the ephemeral node exist and the data is not equals to the given value
-            // delete the old node
-            if (isExisted(path) && !value.equals(get(path))) {
-                try {
-                    zkClient.delete().deletingChildrenIfNeeded().forPath(path);
-                } catch (NoNodeException ignore) {
-                    //NOP
-                }
+            if (isExisted(key)) {
+                update(key, value);
+            } else {
+                zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
             }
-            zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, value.getBytes(StandardCharsets.UTF_8));
         } catch (final Exception ex) {
             logger.error("persistEphemeral path : {} , value : {}", path, value, ex);
         }

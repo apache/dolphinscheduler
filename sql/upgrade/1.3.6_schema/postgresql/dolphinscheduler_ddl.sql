@@ -25,7 +25,7 @@ BEGIN
     THEN
         ALTER TABLE t_ds_worker_group RENAME ip_list TO addr_list;
         ALTER TABLE t_ds_worker_group ALTER COLUMN addr_list type text;
-        ALTER TABLE t_ds_worker_group ALTER COLUMN name type varchar(256), ALTER COLUMN name SET NOT NULL;
+        ALTER TABLE t_ds_worker_group ALTER COLUMN name type varchar(255), ALTER COLUMN name SET NOT NULL;
         ALTER TABLE t_ds_worker_group ADD CONSTRAINT name_unique UNIQUE (name);
     END IF;
 END;
