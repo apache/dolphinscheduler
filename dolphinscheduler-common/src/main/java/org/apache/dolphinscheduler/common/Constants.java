@@ -636,6 +636,11 @@ public final class Constants {
     public static final int DEFINITION_FAILURE = -1;
 
     /**
+     * process or task definition first version
+     */
+    public static final int VERSION_FIRST  = 1;
+
+    /**
      * date format of yyyyMMdd
      */
     public static final String PARAMETER_FORMAT_DATE = "yyyyMMdd";

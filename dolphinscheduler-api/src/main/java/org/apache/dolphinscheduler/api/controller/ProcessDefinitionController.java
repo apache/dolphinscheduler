@@ -620,23 +620,23 @@ public class ProcessDefinitionController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionIds process definition ids
+     * @param processDefinitionCodes process definition codes
      * @param response response
      */
 
-    @ApiOperation(value = "batchExportByCodes", notes = "BATCH_EXPORT_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiOperation(value = "batchExportByCodes", notes = "BATCH_EXPORT_PROCESS_DEFINITION_BY_CODES_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
+            @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "String")
     })
     @GetMapping(value = "/export")
     @ResponseBody
     @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "response"})
-    public void batchExportProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public void batchExportProcessDefinitionByCodes(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @RequestParam("processDefinitionIds") String processDefinitionIds,
+                                                  @RequestParam("processDefinitionCodes") String processDefinitionCodes,
                                                   HttpServletResponse response) {
         try {
-            processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectCode, processDefinitionIds, response);
+            processDefinitionService.batchExportProcessDefinitionByCodes(loginUser, projectCode, processDefinitionCodes, response);
         } catch (Exception e) {
             logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
         }

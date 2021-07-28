@@ -2193,7 +2193,7 @@ public class ProcessService {
     public int saveProcessDefine(User operator, ProcessDefinition processDefinition, Boolean isFromProcessDefine) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinition.getCode());
-        int insertVersion = version == null || version == 0 ? 1 : version + 1;
+        int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
         processDefinitionLog.setVersion(insertVersion);
         processDefinitionLog.setReleaseState(isFromProcessDefine ? ReleaseState.OFFLINE : ReleaseState.ONLINE);
         processDefinitionLog.setOperator(operator.getId());

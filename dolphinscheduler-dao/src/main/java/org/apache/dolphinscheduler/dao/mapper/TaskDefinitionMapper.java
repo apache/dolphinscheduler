@@ -40,7 +40,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param name name
      * @return task definition
      */
-    TaskDefinition queryByDefinitionName(@Param("projectCode") Long projectCode,
+    TaskDefinition queryByDefinitionName(@Param("projectCode") long projectCode,
                                       @Param("taskDefinitionName") String name);
 
     /**
@@ -57,7 +57,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param taskDefinitionCode taskDefinitionCode
      * @return task definition
      */
-    TaskDefinition queryByDefinitionCode(@Param("taskDefinitionCode") Long taskDefinitionCode);
+    TaskDefinition queryByDefinitionCode(@Param("taskDefinitionCode") long taskDefinitionCode);
 
     /**
      * query all task definition list
@@ -65,7 +65,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param projectCode projectCode
      * @return task definition list
      */
-    List<TaskDefinition> queryAllDefinitionList(@Param("projectCode") Long projectCode);
+    List<TaskDefinition> queryAllDefinitionList(@Param("projectCode") long projectCode);
 
     /**
      * query task definition by ids
@@ -105,7 +105,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param code code
      * @return int
      */
-    int deleteByCode(@Param("code") Long code);
+    int deleteByCode(@Param("code") long code);
 
     /**
      * batch insert task definitions

@@ -369,17 +369,6 @@ public class ProcessDefinitionMapperTest {
     }
 
     @Test
-    public void testUpdateVersionByProcessDefinitionId() {
-        int expectedVersion = 10;
-        ProcessDefinition processDefinition = insertOne();
-        processDefinition.setVersion(expectedVersion);
-        processDefinitionMapper.updateVersionByProcessDefinitionId(
-                processDefinition.getId(), processDefinition.getVersion());
-        ProcessDefinition processDefinition1 = processDefinitionMapper.selectById(processDefinition.getId());
-        Assert.assertEquals(expectedVersion, processDefinition1.getVersion());
-    }
-
-    @Test
     public void listProjectIds() {
         ProcessDefinition processDefinition = insertOne();
         List<Integer> projectIds = processDefinitionMapper.listProjectIds();
