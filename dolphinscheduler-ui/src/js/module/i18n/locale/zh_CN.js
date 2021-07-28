@@ -550,6 +550,7 @@ export default {
   'There is no data for this period of time': '该时间段无数据',
   'Worker addresses cannot be empty': 'Worker地址不能为空',
   'Please generate token': '请生成Token',
+  'Please Select token': '请选择Token失效时间',
   'Spark Version': 'Spark版本',
   TargetDataBase: '目标库',
   TargetTable: '目标表',
