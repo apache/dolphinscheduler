@@ -42,8 +42,9 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 
@@ -58,13 +59,13 @@ public abstract class AbstractTask {
     TaskExecutionContext taskExecutionContext;
 
     /**
-     *  log record
+     * log record
      */
     protected Logger logger;
 
 
     /**
-     *  SHELL process pid
+     * SHELL process pid
      */
     protected int processId;
 
@@ -80,14 +81,15 @@ public abstract class AbstractTask {
     protected volatile boolean cancel = false;
 
     /**
-     *  exit code
+     * exit code
      */
     protected volatile int exitStatusCode = -1;
 
     /**
      * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger    logger
+     * @param logger               logger
      */
     protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         this.taskExecutionContext = taskExecutionContext;
@@ -96,6 +98,7 @@ public abstract class AbstractTask {
 
     /**
      * init task
+     *
      * @throws Exception exception
      */
     public void init() throws Exception {
@@ -103,13 +106,14 @@ public abstract class AbstractTask {
 
     /**
      * task handle
+     *
      * @throws Exception exception
      */
     public abstract void handle() throws Exception;
 
-
     /**
      * cancel application
+     *
      * @param status status
      * @throws Exception exception
      */
@@ -119,14 +123,19 @@ public abstract class AbstractTask {
 
     /**
      * log handle
+     *
      * @param logs log list
      */
-    public void logHandle(List<String> logs) {
+    public void logHandle(LinkedBlockingQueue<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
         if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
             logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         } else {
-            logger.info(" -> {}", String.join("\n\t", logs));
+            StringJoiner joiner = new StringJoiner("\n\t");
+            while (!logs.isEmpty()) {
+                joiner.add(logs.poll());
+            }
+            logger.info(" -> {}", joiner);
         }
     }
 
