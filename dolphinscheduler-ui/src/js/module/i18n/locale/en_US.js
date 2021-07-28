@@ -547,6 +547,7 @@ export default {
   'There is no data for this period of time': 'There is no data for this period of time',
   'Worker addresses cannot be empty': 'Worker addresses cannot be empty',
   'Please generate token': 'Please generate token',
+  'Please Select token': 'Please select the expiration time of token',
   'Spark Version': 'Spark Version',
   TargetDataBase: 'target database',
   TargetTable: 'target table',
