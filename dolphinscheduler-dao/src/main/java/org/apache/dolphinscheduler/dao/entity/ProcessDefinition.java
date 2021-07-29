@@ -51,7 +51,7 @@ public class ProcessDefinition {
     /**
      * code
      */
-    private Long code;
+    private long code;
 
     /**
      * name
@@ -78,7 +78,7 @@ public class ProcessDefinition {
     /**
      * project code
      */
-    private Long projectCode;
+    private long projectCode;
 
     /**
      * definition json string
@@ -190,9 +190,9 @@ public class ProcessDefinition {
 
     public ProcessDefinition(){}
 
-    public ProcessDefinition(Long projectCode,
+    public ProcessDefinition(long projectCode,
                              String name,
-                             Long code,
+                             long code,
                              String description,
                              String globalParams,
                              String locations,
@@ -422,19 +422,19 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
-    public Long getCode() {
+    public long getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(long code) {
         this.code = code;
     }
 
-    public Long getProjectCode() {
+    public long getProjectCode() {
         return projectCode;
     }
 
-    public void setProjectCode(Long projectCode) {
+    public void setProjectCode(long projectCode) {
         this.projectCode = projectCode;
     }
 

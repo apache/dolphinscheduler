@@ -58,39 +58,38 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/projects/{projectName}/task-instance")
 public class TaskInstanceController extends BaseController {
 
-
     @Autowired
     TaskInstanceService taskInstanceService;
 
     /**
      * query task list paging
      *
-     * @param loginUser         login user
-     * @param projectName       project name
+     * @param loginUser login user
+     * @param projectName project name
      * @param processInstanceId process instance id
-     * @param searchVal         search value
-     * @param taskName          task name
-     * @param stateType         state type
-     * @param host              host
-     * @param startTime         start time
-     * @param endTime           end time
-     * @param pageNo            page number
-     * @param pageSize          page size
+     * @param searchVal search value
+     * @param taskName task name
+     * @param stateType state type
+     * @param host host
+     * @param startTime start time
+     * @param endTime end time
+     * @param pageNo page number
+     * @param pageSize page size
      * @return task list page
      */
     @ApiOperation(value = "queryTaskListPaging", notes = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, type = "String"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-            @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type = "String"),
-            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
-            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
-            @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = false, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "processInstanceName", value = "PROCESS_INSTANCE_NAME", required = false, type = "String"),
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
+        @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type = "String"),
+        @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
+        @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
+        @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
+        @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
+        @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -117,21 +116,21 @@ public class TaskInstanceController extends BaseController {
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = taskInstanceService.queryTaskListPaging(
-                loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+            loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
     /**
      * change one task instance's state from FAILURE to FORCED_SUCCESS
      *
-     * @param loginUser      login user
-     * @param projectName    project name
+     * @param loginUser login user
+     * @param projectName project name
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
     @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
     })
     @PostMapping(value = "/force-success")
     @ResponseStatus(HttpStatus.OK)

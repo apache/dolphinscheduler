@@ -167,13 +167,6 @@
         FROM t_ds_project
     </select>
 
-
-    <update id="updateVersionByProcessDefinitionId">
-        update  t_ds_process_definition
-        set version = #{version}
-        where id = #{processDefinitionId}
-    </update>
-
     <select id="queryHasAssociatedDefinitionByIdAndVersion" resultType="java.lang.Integer">
         select id
         from t_ds_process_definition
