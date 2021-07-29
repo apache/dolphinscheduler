@@ -230,19 +230,19 @@
     },
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
-      _showParallelismInfo() {
+      _showParallelismInfo () {
         this.$message.warning({
           dangerouslyUseHTMLString: true,
           message: `<p style='font-size: 14px;'>${i18n.$t('Parallelism tip')}</p>`
         })
       },
-      _onLocalParams(a) {
+      _onLocalParams (a) {
         this.udpList = a
       },
       _datepicker (val) {
         this.scheduleTime = val
       },
-      _verification() {
+      _verification () {
         if (this.enableCustomParallelism && !this.parallismNumber) {
           this.$message.warning(`${i18n.$t('Parallelism number should be positive integer')}`)
           return false
@@ -253,7 +253,7 @@
         }
         return true
       },
-      _start() {
+      _start () {
         if (!this._verification()) {
           return
         }
@@ -305,7 +305,7 @@
           })
         })
       },
-      _updateParallelStatus() {
+      _updateParallelStatus () {
         this.enableCustomParallelism = false
         this.parallismNumber = null
       },
