@@ -39,7 +39,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param name name
      * @return task definition log list
      */
-    List<TaskDefinitionLog> queryByDefinitionName(@Param("projectCode") Long projectCode,
+    List<TaskDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode,
                                                   @Param("taskDefinitionName") String name);
 
     /**

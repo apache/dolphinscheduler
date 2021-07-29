@@ -81,16 +81,16 @@ public class QueueController extends BaseController {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search value
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return queue list
      */
     @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
+        @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
+        @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+        @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -114,14 +114,14 @@ public class QueueController extends BaseController {
      * create queue
      *
      * @param loginUser login user
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return create result
      */
     @ApiOperation(value = "createQueue", notes = "CREATE_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -138,16 +138,16 @@ public class QueueController extends BaseController {
      * update queue
      *
      * @param loginUser login user
-     * @param queue     queue
-     * @param id        queue id
+     * @param queue queue
+     * @param id queue id
      * @param queueName queue name
      * @return update result code
      */
     @ApiOperation(value = "updateQueue", notes = "UPDATE_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.CREATED)
@@ -165,14 +165,14 @@ public class QueueController extends BaseController {
      * verify queue and queue name
      *
      * @param loginUser login user
-     * @param queue     queue
+     * @param queue queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyQueue", notes = "VERIFY_QUEUE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+        @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
+        @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
     })
     @PostMapping(value = "/verify-queue")
     @ResponseStatus(HttpStatus.OK)

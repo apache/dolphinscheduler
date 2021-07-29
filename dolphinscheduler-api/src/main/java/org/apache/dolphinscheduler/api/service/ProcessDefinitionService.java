@@ -208,17 +208,17 @@ public interface ProcessDefinitionService {
                                                  ReleaseState releaseState);
 
     /**
-     * batch export process definition by ids
+     * batch export process definition by codes
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionIds process definition ids
+     * @param processDefinitionCodes process definition codes
      * @param response http servlet response
      */
-    void batchExportProcessDefinitionByIds(User loginUser,
-                                           long projectCode,
-                                           String processDefinitionIds,
-                                           HttpServletResponse response);
+    void batchExportProcessDefinitionByCodes(User loginUser,
+                                             long projectCode,
+                                             String processDefinitionCodes,
+                                             HttpServletResponse response);
 
     /**
      * import process definition
@@ -263,8 +263,8 @@ public interface ProcessDefinitionService {
      * @return task node list
      */
     Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser,
-                                                            long projectCode,
-                                                            String defineCodeList);
+                                                        long projectCode,
+                                                        String defineCodeList);
 
     /**
      * query process definition all by project code

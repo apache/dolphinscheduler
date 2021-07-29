@@ -128,8 +128,8 @@ public class ExecutorController extends BaseController {
             startParamMap = JSONUtils.toMap(startParams);
         }
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, execType, failureStrategy,
-                startNodeList, taskDependType, warningType,
-                warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
+            startNodeList, taskDependType, warningType,
+            warningGroupId, runMode, processInstancePriority, workerGroup, timeout, startParamMap);
         return returnDataList(result);
     }
 
