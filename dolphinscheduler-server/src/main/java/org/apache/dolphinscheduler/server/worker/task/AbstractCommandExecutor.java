@@ -392,9 +392,10 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
+                logger.info("check yarn application status, appId:{}", appId);
                 while(Stopper.isRunning()){
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    logger.debug("check yarn application status, appId:{}, final state:{}", appId, applicationStatus.name());
                     if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
                             applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
@@ -407,7 +408,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
+            logger.error("yarn applications: {} , query status failed, exception:{}", StringUtils.join(appIds, ","), e);
             result = false;
         }
         return result;
