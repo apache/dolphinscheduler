@@ -30,7 +30,7 @@
 		<value-attributes>
 			<type>int</type>
 		</value-attributes>
-		<description>master execute thread number to limit process instances</description>
+		<description>master execute thread number to limit process instances in parallel</description>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
