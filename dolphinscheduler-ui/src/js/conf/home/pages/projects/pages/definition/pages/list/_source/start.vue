@@ -309,7 +309,7 @@
         this.enableCustomParallelism = false
         this.parallismNumber = null
       },
-      _updateEnableCustomParallel() {
+      _updateEnableCustomParallel () {
         if (!this.enableCustomParallelism) {
           this.parallismNumber = null
         } else {
