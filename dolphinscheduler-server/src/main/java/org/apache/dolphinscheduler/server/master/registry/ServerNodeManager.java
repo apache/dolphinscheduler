@@ -139,11 +139,11 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init MasterNodeListener listener
          */
-        registryCenter.getRegisterOperator().addListener(new MasterNodeListener());
+        registryCenter.getRegisterOperator().registerListener(new MasterNodeListener(Integer.MAX_VALUE));
         /**
          * init WorkerNodeListener listener
          */
-        registryCenter.getRegisterOperator().addListener(new WorkerGroupNodeListener());
+        registryCenter.getRegisterOperator().registerListener(new WorkerGroupNodeListener(Integer.MAX_VALUE));
     }
 
     /**
@@ -207,6 +207,10 @@ public class ServerNodeManager implements InitializingBean {
      */
     class WorkerGroupNodeListener extends AbstractListener {
 
+        public WorkerGroupNodeListener(int order) {
+            super(order);
+        }
+
         @Override
         protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
             if (registryCenter.isWorkerPath(path)) {
@@ -245,6 +249,10 @@ public class ServerNodeManager implements InitializingBean {
      *  master node listener
      */
     class MasterNodeListener extends AbstractListener {
+
+        public MasterNodeListener(int order) {
+            super(order);
+        }
 
         @Override
         protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {

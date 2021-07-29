@@ -19,32 +19,30 @@ package org.apache.dolphinscheduler.service.zk;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 
-public abstract class AbstractListener implements TreeCacheListener, Comparable<AbstractListener> {
+import org.junit.Assert;
+import org.junit.Test;
 
-    /**
-     * The order is represent as prioritization, the high order will be executed first
-     */
-    private final int order;
+public class ZookeeperCachedOperatorTest {
 
-    public AbstractListener(int order) {
-        this.order = order;
-    }
+    private ZookeeperCachedOperator zookeeperCachedOperator = new ZookeeperCachedOperator();
 
-    @Override
-    public final void childEvent(final CuratorFramework client, final TreeCacheEvent event) throws Exception {
-        String path = null == event.getData() ? "" : event.getData().getPath();
-        if (path.isEmpty()) {
-            return;
-        }
-        dataChanged(client, event, path);
-    }
-
-    protected abstract void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path);
-
-    @Override
-    public int compareTo(AbstractListener o) {
-        return order - o.order;
+    @Test
+    public void testRegisterListener() {
+        AbstractListener abstractListener1 = new AbstractListener(1) {
+            @Override
+            protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+                // ignore
+            }
+        };
+        AbstractListener abstractListener2 = new AbstractListener(2) {
+            @Override
+            protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+                // ignore
+            }
+        };
+        zookeeperCachedOperator.registerListener(abstractListener2);
+        zookeeperCachedOperator.registerListener(abstractListener1);
+        Assert.assertTrue(true);
     }
 }

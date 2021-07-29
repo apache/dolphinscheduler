@@ -16,37 +16,35 @@
  */
 package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class ZookeeperCachedOperator extends ZookeeperOperator {
 
     private final Logger logger = LoggerFactory.getLogger(ZookeeperCachedOperator.class);
 
-
     private TreeCache treeCache;
+
+    /**
+     * The main point to define a listener list here is to execute the listener at customize order.
+     */
+    private List<AbstractListener> listenerList = new CopyOnWriteArrayList<>();
+
     /**
      * register a unified listener of /${dsRoot},
      */
     @Override
-    protected void registerListener() {
-
-        treeCache.getListenable().addListener((client, event) -> {
-            String path = null == event.getData() ? "" : event.getData().getPath();
-            if (path.isEmpty()) {
-                return;
-            }
-            dataChanged(client, event, path);
-        });
+    public void registerListener(AbstractListener abstractListener) {
+        logger.info("register zookeeper listener: {}", abstractListener.getClass().getName());
+        listenerList.add(abstractListener);
+        listenerList.sort(AbstractListener::compareTo);
     }
 
     @Override
@@ -59,25 +57,12 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
             logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
             throw new RuntimeException(e);
         }
-    }
-
-    //for sub class
-    protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path){}
-
-    public String getFromCache(final String cachePath, final String key) {
-        ChildData resultInCache = treeCache.getCurrentData(key);
-        if (null != resultInCache) {
-            return null == resultInCache.getData() ? null : new String(resultInCache.getData(), StandardCharsets.UTF_8);
-        }
-        return null;
-    }
-
-    public TreeCache getTreeCache(final String cachePath) {
-        return treeCache;
-    }
-
-    public void addListener(TreeCacheListener listener){
-        this.treeCache.getListenable().addListener(listener);
+        treeCache.getListenable().addListener(((client, event) -> {
+            for (AbstractListener abstractListener : listenerList) {
+                logger.debug("zookeeperListener:{} triggered", abstractListener.getClass().getName());
+                abstractListener.childEvent(client, event);
+            }
+        }));
     }
 
     @Override
