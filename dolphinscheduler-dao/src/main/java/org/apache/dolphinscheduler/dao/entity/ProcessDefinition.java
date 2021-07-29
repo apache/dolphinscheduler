@@ -149,12 +149,6 @@ public class ProcessDefinition {
     private String locations;
 
     /**
-     * connects array for web
-     * TODO: delete
-     */
-    private String connects;
-
-    /**
      * schedule release state : online/offline
      */
     @TableField(exist = false)
@@ -196,11 +190,10 @@ public class ProcessDefinition {
                              String description,
                              String globalParams,
                              String locations,
-                             String connects,
                              int timeout,
                              int userId,
                              int tenantId) {
-        set(projectCode, name, description, globalParams, connects, locations, timeout, tenantId);
+        set(projectCode, name, description, globalParams, locations, timeout, tenantId);
         this.code = code;
         this.userId = userId;
         Date date = new Date();
@@ -212,7 +205,6 @@ public class ProcessDefinition {
                     String name,
                     String description,
                     String globalParams,
-                    String connects,
                     String locations,
                     int timeout,
                     int tenantId) {
@@ -221,7 +213,6 @@ public class ProcessDefinition {
         this.description = description;
         this.globalParams = globalParams;
         this.locations = locations;
-        this.connects = connects;
         this.timeout = timeout;
         this.tenantId = tenantId;
         this.flag = Flag.YES;
@@ -366,14 +357,6 @@ public class ProcessDefinition {
         this.locations = locations;
     }
 
-    public String getConnects() {
-        return connects;
-    }
-
-    public void setConnects(String connects) {
-        this.connects = connects;
-    }
-
     public ReleaseState getScheduleReleaseState() {
         return scheduleReleaseState;
     }
@@ -468,7 +451,6 @@ public class ProcessDefinition {
             + ", userName='" + userName + '\''
             + ", projectName='" + projectName + '\''
             + ", locations='" + locations + '\''
-            + ", connects='" + connects + '\''
             + ", scheduleReleaseState=" + scheduleReleaseState
             + ", timeout=" + timeout
             + ", warningGroupId=" + warningGroupId

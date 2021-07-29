@@ -832,7 +832,7 @@ public class ProcessDefinitionServiceTest {
                 + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}},{\"name\":\"\",\"preTaskCode\":123456789,"
                 + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}}]";
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
-                "", "", "", "", 0, "root", taskRelationJson);
+                "", "", "", 0, "root", taskRelationJson);
 
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
     }
