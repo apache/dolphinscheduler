@@ -51,7 +51,6 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -303,7 +302,7 @@ public class HttpTask extends AbstractTask {
      * @return RequestConfig
      */
     private RequestConfig requestConfig() {
-        return RequestConfig.custom().setSocketTimeout(MAX_CONNECTION_MILLISECONDS).setConnectTimeout(MAX_CONNECTION_MILLISECONDS).build();
+        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout()).setConnectTimeout(httpParameters.getConnectTimeout()).build();
     }
 
     /**
