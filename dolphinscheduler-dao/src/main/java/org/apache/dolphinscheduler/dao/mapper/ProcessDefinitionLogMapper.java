@@ -39,7 +39,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param name process name
      * @return process definition log list
      */
-    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") Long projectCode,
+    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode,
                                                      @Param("processDefinitionName") String name);
 
     /**
@@ -67,7 +67,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param version version number
      * @return the process definition version info
      */
-    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("processDefinitionCode") Long processDefinitionCode,
+    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("processDefinitionCode") long processDefinitionCode,
                                                          @Param("version") long version);
     
     /**
@@ -78,7 +78,7 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @return the paging process definition version list
      */
     IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
-                                                                         @Param("processDefinitionCode") Long processDefinitionCode);
+                                                                         @Param("processDefinitionCode") long processDefinitionCode);
 
     /**
      * delete the certain process definition version by process definition id and version number
@@ -87,5 +87,5 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param version version number
      * @return delete result
      */
-    int deleteByProcessDefinitionCodeAndVersion(@Param("processDefinitionCode") Long processDefinitionCode, @Param("version") long version);
+    int deleteByProcessDefinitionCodeAndVersion(@Param("processDefinitionCode") long processDefinitionCode, @Param("version") long version);
 }

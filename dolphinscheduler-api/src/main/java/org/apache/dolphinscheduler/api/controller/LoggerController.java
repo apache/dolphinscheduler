@@ -59,26 +59,26 @@ public class LoggerController extends BaseController {
     /**
      * query task log
      *
-     * @param loginUser      login user
+     * @param loginUser login user
      * @param taskInstanceId task instance id
-     * @param skipNum        skip number
-     * @param limit          limit
+     * @param skipNum skip number
+     * @param limit limit
      * @return task log content
      */
     @ApiOperation(value = "queryLog", notes = "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", required = true, dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<String> queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                           @RequestParam(value = "taskInstanceId") int taskInstanceId,
-                           @RequestParam(value = "skipLineNum") int skipNum,
-                           @RequestParam(value = "limit") int limit) {
+                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                   @RequestParam(value = "skipLineNum") int skipNum,
+                                   @RequestParam(value = "limit") int limit) {
         return loggerService.queryLog(taskInstanceId, skipNum, limit);
     }
 
@@ -86,13 +86,13 @@ public class LoggerController extends BaseController {
     /**
      * download log file
      *
-     * @param loginUser      login user
+     * @param loginUser login user
      * @param taskInstanceId task instance id
      * @return log file content
      */
     @ApiOperation(value = "downloadTaskLog", notes = "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/download-log")
     @ResponseBody
@@ -102,9 +102,9 @@ public class LoggerController extends BaseController {
                                           @RequestParam(value = "taskInstanceId") int taskInstanceId) {
         byte[] logBytes = loggerService.getLogBytes(taskInstanceId);
         return ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
-                .body(logBytes);
+            .ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+            .body(logBytes);
     }
 
 }

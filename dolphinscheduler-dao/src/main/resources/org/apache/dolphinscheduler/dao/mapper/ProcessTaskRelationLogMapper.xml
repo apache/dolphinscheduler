@@ -29,15 +29,6 @@
         WHERE process_definition_code = #{processCode}
         and process_definition_version = #{processVersion}
     </select>
-    <select id="queryByTaskRelationList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog">
-        select
-        <include refid="baseSql"/>
-        from t_ds_process_task_relation_log
-        WHERE process_definition_code = #{processCode}
-        and process_definition_version = #{processVersion}
-        and post_task_code = #{taskCode}
-        and post_task_version = #{taskVersion}
-    </select>
     <insert id="batchInsert">
         insert into t_ds_process_task_relation_log (`name`, process_definition_version, project_code, process_definition_code,
         pre_task_code, pre_task_version, post_task_code, post_task_version, condition_type, condition_params, operator, operate_time,

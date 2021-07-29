@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -813,110 +812,6 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testImportProcessDefinitionById() throws IOException {
-
-        String processJson = "[\n"
-                + "    {\n"
-                + "        \"projectName\": \"testProject\",\n"
-                + "        \"processDefinitionName\": \"shell-4\",\n"
-                + "        \"processDefinitionJson\": \"{\\\"tenantId\\\":1"
-                + ",\\\"globalParams\\\":[],\\\"tasks\\\":[{\\\"workerGroupId\\\":\\\"3\\\",\\\"description\\\""
-                + ":\\\"\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SHELL\\\",\\\"params\\\":{\\\"rawScript\\\""
-                + ":\\\"#!/bin/bash\\\\necho \\\\\\\"shell-4\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}"
-                + ",\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"},\\\"maxRetryTimes\\\":\\\"0\\\""
-                + ",\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-4\\\",\\\"dependence\\\":{}"
-                + ",\\\"retryInterval\\\":\\\"1\\\",\\\"preTasks\\\":[],\\\"id\\\":\\\"tasks-84090\\\"}"
-                + ",{\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-5\\\",\\\"workerGroupId\\\""
-                + ":\\\"3\\\",\\\"description\\\":\\\"\\\",\\\"dependence\\\":{},\\\"preTasks\\\":[\\\"shell-4\\\"]"
-                + ",\\\"id\\\":\\\"tasks-87364\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SUB_PROCESS\\\""
-                + ",\\\"params\\\":{\\\"processDefinitionId\\\":46},\\\"timeout\\\":{\\\"enable\\\":false"
-                + ",\\\"strategy\\\":\\\"\\\"}}],\\\"timeout\\\":0}\",\n"
-                + "        \"processDefinitionDescription\": \"\",\n"
-                + "        \"processDefinitionLocations\": \"{\\\"tasks-84090\\\":{\\\"name\\\":\\\"shell-4\\\""
-                + ",\\\"targetarr\\\":\\\"\\\",\\\"x\\\":128,\\\"y\\\":114},\\\"tasks-87364\\\":{\\\"name\\\""
-                + ":\\\"shell-5\\\",\\\"targetarr\\\":\\\"tasks-84090\\\",\\\"x\\\":266,\\\"y\\\":115}}\",\n"
-                + "        \"processDefinitionConnects\": \"[{\\\"endPointSourceId\\\":\\\"tasks-84090\\\""
-                + ",\\\"endPointTargetId\\\":\\\"tasks-87364\\\"}]\"\n"
-                + "    }\n"
-                + "]";
-
-        String subProcessJson = "{\n"
-                + "    \"globalParams\": [\n"
-                + "        \n"
-                + "    ],\n"
-                + "    \"tasks\": [\n"
-                + "        {\n"
-                + "            \"type\": \"SHELL\",\n"
-                + "            \"id\": \"tasks-52423\",\n"
-                + "            \"name\": \"shell-5\",\n"
-                + "            \"params\": {\n"
-                + "                \"resourceList\": [\n"
-                + "                    \n"
-                + "                ],\n"
-                + "                \"localParams\": [\n"
-                + "                    \n"
-                + "                ],\n"
-                + "                \"rawScript\": \"echo \\\"shell-5\\\"\"\n"
-                + "            },\n"
-                + "            \"description\": \"\",\n"
-                + "            \"runFlag\": \"NORMAL\",\n"
-                + "            \"dependence\": {\n"
-                + "                \n"
-                + "            },\n"
-                + "            \"maxRetryTimes\": \"0\",\n"
-                + "            \"retryInterval\": \"1\",\n"
-                + "            \"timeout\": {\n"
-                + "                \"strategy\": \"\",\n"
-                + "                \"interval\": null,\n"
-                + "                \"enable\": false\n"
-                + "            },\n"
-                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
-                + "            \"workerGroupId\": \"3\",\n"
-                + "            \"preTasks\": [\n"
-                + "                \n"
-                + "            ]\n"
-                + "        }\n"
-                + "    ],\n"
-                + "    \"tenantId\": 1,\n"
-                + "    \"timeout\": 0\n"
-                + "}";
-
-        FileUtils.writeStringToFile(new File("/tmp/task.json"), processJson);
-
-        File file = new File("/tmp/task.json");
-
-        FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");
-
-        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
-                ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
-
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-
-        long currentProjectCode = 1L;
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, currentProjectCode);
-
-        ProcessDefinition shellDefinition2 = new ProcessDefinition();
-        shellDefinition2.setId(46);
-        shellDefinition2.setName("shell-5");
-        shellDefinition2.setProjectId(2);
-        shellDefinition2.setProcessDefinitionJson(subProcessJson);
-
-        Mockito.when(projectMapper.queryByCode(currentProjectCode)).thenReturn(getProject(currentProjectCode));
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, getProject(currentProjectCode), "test")).thenReturn(result);
-
-        Map<String, Object> importProcessResult = processDefinitionService.importProcessDefinition(loginUser, currentProjectCode, multipartFile);
-
-        Assert.assertEquals(Status.SUCCESS, importProcessResult.get(Constants.STATUS));
-
-        boolean delete = file.delete();
-
-        Assert.assertTrue(delete);
-    }
-
-    @Test
     public void testUpdateProcessDefinition() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -933,113 +828,20 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
-        String sqlDependentJson = "{\n"
-                + "    \"globalParams\": [\n"
-                + "        \n"
-                + "    ],\n"
-                + "    \"tasks\": [\n"
-                + "        {\n"
-                + "            \"type\": \"SQL\",\n"
-                + "            \"id\": \"tasks-27297\",\n"
-                + "            \"name\": \"sql\",\n"
-                + "            \"params\": {\n"
-                + "                \"type\": \"MYSQL\",\n"
-                + "                \"datasource\": 1,\n"
-                + "                \"sql\": \"select * from test\",\n"
-                + "                \"udfs\": \"\",\n"
-                + "                \"sqlType\": \"1\",\n"
-                + "                \"title\": \"\",\n"
-                + "                \"receivers\": \"\",\n"
-                + "                \"receiversCc\": \"\",\n"
-                + "                \"showType\": \"TABLE\",\n"
-                + "                \"localParams\": [\n"
-                + "                    \n"
-                + "                ],\n"
-                + "                \"connParams\": \"\",\n"
-                + "                \"preStatements\": [\n"
-                + "                    \n"
-                + "                ],\n"
-                + "                \"postStatements\": [\n"
-                + "                    \n"
-                + "                ]\n"
-                + "            },\n"
-                + "            \"description\": \"\",\n"
-                + "            \"runFlag\": \"NORMAL\",\n"
-                + "            \"dependence\": {\n"
-                + "                \n"
-                + "            },\n"
-                + "            \"maxRetryTimes\": \"0\",\n"
-                + "            \"retryInterval\": \"1\",\n"
-                + "            \"timeout\": {\n"
-                + "                \"strategy\": \"\",\n"
-                + "                \"enable\": false\n"
-                + "            },\n"
-                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
-                + "            \"workerGroupId\": -1,\n"
-                + "            \"preTasks\": [\n"
-                + "                \"dependent\"\n"
-                + "            ]\n"
-                + "        },\n"
-                + "        {\n"
-                + "            \"type\": \"DEPENDENT\",\n"
-                + "            \"id\": \"tasks-33787\",\n"
-                + "            \"name\": \"dependent\",\n"
-                + "            \"params\": {\n"
-                + "                \n"
-                + "            },\n"
-                + "            \"description\": \"\",\n"
-                + "            \"runFlag\": \"NORMAL\",\n"
-                + "            \"dependence\": {\n"
-                + "                \"relation\": \"AND\",\n"
-                + "                \"dependTaskList\": [\n"
-                + "                    {\n"
-                + "                        \"relation\": \"AND\",\n"
-                + "                        \"dependItemList\": [\n"
-                + "                            {\n"
-                + "                                \"projectId\": 2,\n"
-                + "                                \"definitionId\": 46,\n"
-                + "                                \"depTasks\": \"ALL\",\n"
-                + "                                \"cycle\": \"day\",\n"
-                + "                                \"dateValue\": \"today\"\n"
-                + "                            }\n"
-                + "                        ]\n"
-                + "                    }\n"
-                + "                ]\n"
-                + "            },\n"
-                + "            \"maxRetryTimes\": \"0\",\n"
-                + "            \"retryInterval\": \"1\",\n"
-                + "            \"timeout\": {\n"
-                + "                \"strategy\": \"\",\n"
-                + "                \"enable\": false\n"
-                + "            },\n"
-                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
-                + "            \"workerGroupId\": -1,\n"
-                + "            \"preTasks\": [\n"
-                + "                \n"
-                + "            ]\n"
-                + "        }\n"
-                + "    ],\n"
-                + "    \"tenantId\": 1,\n"
-                + "    \"timeout\": 0\n"
-                + "}";
+        String taskRelationJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
+                + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}},{\"name\":\"\",\"preTaskCode\":123456789,"
+                + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":{}}]";
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectCode, "test", 1,
-                "", "", "", "", 0, "root", sqlDependentJson);
+                "", "", "", "", 0, "root", taskRelationJson);
 
         Assert.assertEquals(Status.DATA_IS_NOT_VALID, updateResult.get(Constants.STATUS));
     }
 
     @Test
-    public void testBatchExportProcessDefinitionByIds() throws IOException {
-        processDefinitionService.batchExportProcessDefinitionByIds(
+    public void testBatchExportProcessDefinitionByCodes() throws IOException {
+        processDefinitionService.batchExportProcessDefinitionByCodes(
                 null, 1L, null, null);
 
-        String processDefinitionJson = "{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
-                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
-                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
-                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
-                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
-                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
-                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}";
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -1052,27 +854,22 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
 
-        processDefinitionService.batchExportProcessDefinitionByIds(
+        processDefinitionService.batchExportProcessDefinitionByCodes(
                 loginUser, projectCode, "1", null);
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(1);
-        processDefinition.setProcessDefinitionJson(processDefinitionJson);
         Map<String, Object> checkResult = new HashMap<>();
         checkResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(checkResult);
-        Mockito.when(processDefineMapper.queryByDefineId(1)).thenReturn(processDefinition);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-        Mockito.when(processService.genProcessData(processDefinition)).thenReturn(processData);
-
-        ServletOutputStream outputStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outputStream);
-        processDefinitionService.batchExportProcessDefinitionByIds(
+        DagData dagData = new DagData(getProcessDefinition(), null, null);
+        Mockito.when(processService.genDagData(Mockito.any())).thenReturn(dagData);
+        processDefinitionService.batchExportProcessDefinitionByCodes(
                 loginUser, projectCode, "1", response);
-        Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinition));
+        Assert.assertNotNull(processDefinitionService.exportProcessDagData(processDefinition));
     }
 
     /**
@@ -1167,26 +964,6 @@ public class ProcessDefinitionServiceTest {
         return schedule;
     }
 
-    /**
-     * get mock processMeta
-     *
-     * @return processMeta
-     */
-    private ProcessMeta getProcessMeta() {
-        ProcessMeta processMeta = new ProcessMeta();
-        Schedule schedule = getSchedule();
-        processMeta.setScheduleCrontab(schedule.getCrontab());
-        processMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
-        processMeta.setScheduleEndTime(DateUtils.dateToString(schedule.getEndTime()));
-        processMeta.setScheduleWarningType(String.valueOf(schedule.getWarningType()));
-        processMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
-        processMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
-        processMeta.setScheduleReleaseState(String.valueOf(schedule.getReleaseState()));
-        processMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
-        processMeta.setScheduleWorkerGroupName("workgroup1");
-        return processMeta;
-    }
-
     private List<Schedule> getSchedulerList() {
         List<Schedule> scheduleList = new ArrayList<>();
         scheduleList.add(getSchedule());
@@ -1201,19 +978,4 @@ public class ProcessDefinitionServiceTest {
             result.put(Constants.MSG, status.getMsg());
         }
     }
-
-    @Test
-    public void testImportProcessSchedule() {
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Integer processDefinitionId = 111;
-        String processDefinitionName = "testProcessDefinition";
-        String projectName = "project_test1";
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUNT);
-        ProcessMeta processMeta = new ProcessMeta();
-        Assert.assertEquals(0, processDefinitionService.importProcessSchedule(loginUser, projectName, processMeta, processDefinitionName, processDefinitionId));
-    }
-
 }

@@ -359,6 +359,7 @@ public class ProcessServiceTest {
     public void testSwitchVersion() {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
+        processDefinition.setProjectCode(1L);
         processDefinition.setId(123);
         processDefinition.setName("test");
         processDefinition.setVersion(1);
