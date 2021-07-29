@@ -14,26 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.utils.ParamUtils;
 
-import org.apache.commons.lang.StringUtils;
-
-import java.util.List;
-import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 
@@ -41,11 +34,6 @@ import org.slf4j.Logger;
  * executive task
  */
 public abstract class AbstractTask {
-
-    /**
-     * varPool string
-     */
-    protected String varPool;
 
     /**
      * taskExecutionContext
@@ -83,7 +71,7 @@ public abstract class AbstractTask {
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger logger
+     * @param logger               logger
      */
     protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         this.taskExecutionContext = taskExecutionContext;
@@ -105,6 +93,13 @@ public abstract class AbstractTask {
      */
     public abstract void handle() throws Exception;
 
+    /**
+     * result processing
+     *
+     * @throws Exception exception
+     */
+    public void after() throws Exception {
+    }
 
     /**
      * cancel application
@@ -121,21 +116,17 @@ public abstract class AbstractTask {
      *
      * @param logs log list
      */
-    public void logHandle(List<String> logs) {
+    public void logHandle(LinkedBlockingQueue<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
         if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
             logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         } else {
-            logger.info(" -> {}", String.join("\n\t", logs));
+            StringJoiner joiner = new StringJoiner("\n\t");
+            while (!logs.isEmpty()) {
+                joiner.add(logs.poll());
+            }
+            logger.info(" -> {}", joiner);
         }
-    }
-
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public String getVarPool() {
-        return varPool;
     }
 
     /**
@@ -174,43 +165,9 @@ public abstract class AbstractTask {
      */
     public abstract AbstractParameters getParameters();
 
-
-    /**
-     * result processing
-     */
-    public void after() {
-        if (getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
-            // task recor flat : if true , start up qianfan
-            if (TaskRecordDao.getTaskRecordFlag()
-                    && TaskType.typeIsNormalTask(taskExecutionContext.getTaskType())) {
-                AbstractParameters params = TaskParametersUtils.getParameters(taskExecutionContext.getTaskType(), taskExecutionContext.getTaskParams());
-
-                // replace placeholder
-                Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                        taskExecutionContext.getDefinedParams(),
-                        params.getLocalParametersMap(),
-                        CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                        taskExecutionContext.getScheduleTime());
-                if (paramsMap != null && !paramsMap.isEmpty()
-                        && paramsMap.containsKey("v_proc_date")) {
-                    String vProcDate = paramsMap.get("v_proc_date").getValue();
-                    if (!StringUtils.isEmpty(vProcDate)) {
-                        TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskExecutionContext.getTaskName(), vProcDate);
-                        logger.info("task record status : {}", taskRecordState);
-                        if (taskRecordState == TaskRecordStatus.FAILURE) {
-                            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-                        }
-                    }
-                }
-            }
-
-        } else if (getExitStatusCode() == Constants.EXIT_CODE_KILL) {
-            setExitStatusCode(Constants.EXIT_CODE_KILL);
-        } else {
-            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-        }
+    private boolean typeIsNormalTask(String taskType) {
+        return !(TaskType.SUB_PROCESS.getDesc().equalsIgnoreCase(taskType) || TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType));
     }
-
 
     /**
      * get exit status according to exitCode

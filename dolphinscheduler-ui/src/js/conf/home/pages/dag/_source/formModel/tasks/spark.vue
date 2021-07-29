@@ -80,6 +80,18 @@
         </el-radio-group>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('App Name')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="appName"
+          :placeholder="$t('Please enter app name(optional)')">
+        </el-input>
+      </div>
+    </m-list-box>
     <m-list-4-box>
       <div slot="text">{{$t('Driver Cores')}}</div>
       <div slot="content">
@@ -166,7 +178,7 @@
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <treeselect v-model="resourceList" :multiple="true" maxHeight="200" :options="mainJarList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}<span  class="copy-path" @mousedown="_copyPath($event, node)" >&nbsp; <em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy path')" ></em> &nbsp;  </span></div>
         </treeselect>
       </div>
     </m-list-box>
@@ -192,6 +204,8 @@
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
+  import Clipboard from 'clipboard'
+  import { diGuiTree, searchTree } from './_source/resourceTree'
 
   export default {
     name: 'spark',
@@ -223,6 +237,8 @@
         executorMemory: '2G',
         // Executor cores
         executorCores: 2,
+        // Spark app name
+        appName: '',
         // Main arguments
         mainArgs: '',
         // Option parameters
@@ -249,6 +265,25 @@
     },
     mixins: [disabledState],
     methods: {
+      _copyPath (e, node) {
+        e.stopPropagation()
+        let clipboard = new Clipboard('.copy-path', {
+          text: function () {
+            return node.raw.fullName
+          }
+        })
+        clipboard.on('success', handler => {
+          this.$message.success(`${i18n.$t('Copy success')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+        clipboard.on('error', handler => {
+          // Copy is not supported
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+      },
       /**
        * getResourceId
        */
@@ -280,40 +315,14 @@
       _onCacheResourcesData (a) {
         this.cacheResourceList = a
       },
-      diGuiTree (item) { // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
-            ? this.operationTree(item) : this.diGuiTree(item.children)
-        })
-      },
-      operationTree (item) {
-        if (item.dirctory) {
-          item.isDisabled = true
-        }
-        delete item.children
-      },
-      searchTree (element, id) {
-        // 根据id查找节点
-        if (element.id === id) {
-          return element
-        } else if (element.children !== null) {
-          let i
-          let result = null
-          for (i = 0; result === null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id)
-          }
-          return result
-        }
-        return null
-      },
       dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
             this.mainJarList.forEach(v1 => {
-              if (this.searchTree(v1, v)) {
-                isResourceId.push(this.searchTree(v1, v))
+              if (searchTree(v1, v)) {
+                isResourceId.push(searchTree(v1, v))
               }
             })
           })
@@ -448,6 +457,7 @@
           numExecutors: this.numExecutors,
           executorMemory: this.executorMemory,
           executorCores: this.executorCores,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType,
@@ -487,8 +497,8 @@
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
             this.mainJarList.forEach(v1 => {
-              if (this.searchTree(v1, v)) {
-                isResourceId.push(this.searchTree(v1, v))
+              if (searchTree(v1, v)) {
+                isResourceId.push(searchTree(v1, v))
               }
             })
           })
@@ -512,6 +522,7 @@
           numExecutors: this.numExecutors,
           executorMemory: this.executorMemory,
           executorCores: this.executorCores,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType,
@@ -522,8 +533,8 @@
     created () {
       let item = this.store.state.dag.resourcesListS
       let items = this.store.state.dag.resourcesListJar
-      this.diGuiTree(item)
-      this.diGuiTree(items)
+      diGuiTree(item)
+      diGuiTree(items)
       this.mainJarList = item
       this.mainJarLists = items
       let o = this.backfillItem
@@ -544,6 +555,7 @@
         this.numExecutors = o.params.numExecutors || 2
         this.executorMemory = o.params.executorMemory || '2G'
         this.executorCores = o.params.executorCores || 2
+        this.appName = o.params.appName || ''
         this.mainArgs = o.params.mainArgs || ''
         this.others = o.params.others
         this.programType = o.params.programType || 'SCALA'

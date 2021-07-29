@@ -14,15 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -33,9 +27,15 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.utils.AlertManager;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class MasterSchedulerService extends Thread {
      * zookeeper master client
      */
     @Autowired
-    private ZKMasterClient zkMasterClient;
+    private MasterRegistryClient masterRegistryClient;
 
     /**
      * master config
@@ -73,7 +73,8 @@ public class MasterSchedulerService extends Thread {
     /**
      * alert manager
      */
-    private AlertManager alertManager = new AlertManager();
+    @Autowired
+    private ProcessAlertManager processAlertManager;
 
     /**
      *  netty remoting client
@@ -90,14 +91,14 @@ public class MasterSchedulerService extends Thread {
      * constructor of MasterSchedulerService
      */
     @PostConstruct
-    public void init(){
+    public void init() {
         this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     @Override
-    public synchronized void start(){
+    public synchronized void start() {
         super.setName("MasterSchedulerService");
         super.start();
     }
@@ -110,7 +111,7 @@ public class MasterSchedulerService extends Thread {
         } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
-        if(!terminated){
+        if (!terminated) {
             logger.warn("masterExecService shutdown without terminated, increase await time");
         }
         nettyRemotingClient.close();
@@ -123,16 +124,18 @@ public class MasterSchedulerService extends Thread {
     @Override
     public void run() {
         logger.info("master scheduler started");
-        while (Stopper.isRunning()){
+        while (Stopper.isRunning()) {
             try {
                 boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
                 if (!runCheckFlag) {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
-                if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
+                // todo 串行执行 为何还需要判断状态？
+                /* if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
                     scheduleProcess();
-                }
+                }*/
+                scheduleProcess();
             } catch (Exception e) {
                 logger.error("master scheduler thread error", e);
             }
@@ -140,9 +143,9 @@ public class MasterSchedulerService extends Thread {
     }
 
     private void scheduleProcess() throws Exception {
-        InterProcessMutex mutex = null;
+
         try {
-            mutex = zkMasterClient.blockAcquireMutex();
+            masterRegistryClient.blockAcquireMutex();
 
             int activeCount = masterExecService.getActiveCount();
             // make sure to scan and delete command  table in one transaction
@@ -162,7 +165,7 @@ public class MasterSchedulerService extends Thread {
                                         processInstance
                                         , processService
                                         , nettyRemotingClient
-                                        , alertManager
+                                        , processAlertManager
                                         , masterConfig));
                     }
                 } catch (Exception e) {
@@ -174,7 +177,7 @@ public class MasterSchedulerService extends Thread {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
         } finally {
-            zkMasterClient.releaseMutex(mutex);
+            masterRegistryClient.releaseLock();
         }
     }
 

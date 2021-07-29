@@ -226,4 +226,5 @@ public class TaskResponseEvent {
     public void setChannel(Channel channel) {
         this.channel = channel;
     }
+
 }

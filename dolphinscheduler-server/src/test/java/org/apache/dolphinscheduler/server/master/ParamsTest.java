@@ -14,26 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  *  user define param
@@ -42,9 +36,8 @@ public class ParamsTest {
 
     private static  final Logger logger = LoggerFactory.getLogger(ParamsTest.class);
 
-
     @Test
-    public void systemParamsTest()throws Exception{
+    public void systemParamsTest() throws Exception {
         String command = "${system.biz.date}";
 
         // start process
@@ -56,11 +49,9 @@ public class ParamsTest {
 
         logger.info("start process : {}",command);
 
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.DAY_OF_MONTH, -5);
-
 
         command = "${system.biz.date}";
         // complement data
@@ -69,35 +60,6 @@ public class ParamsTest {
                         calendar.getTime());
         command = ParameterUtils.convertParameterPlaceholders(command, timeParams);
         logger.info("complement data : {}",command);
-
-    }
-
-    @Test
-    public void convertTest()throws Exception{
-        Map<String,Property> globalParams = new HashMap<>();
-        Property property = new Property();
-        property.setProp("global_param");
-        property.setDirect(Direct.IN);
-        property.setType(DataType.VARCHAR);
-        property.setValue("${system.biz.date}");
-        globalParams.put("global_param",property);
-
-        Map<String,String> globalParamsMap = new HashMap<>();
-        globalParamsMap.put("global_param","${system.biz.date}");
-
-
-        Map<String,Property> localParams = new HashMap<>();
-        Property localProperty = new Property();
-        localProperty.setProp("local_param");
-        localProperty.setDirect(Direct.IN);
-        localProperty.setType(DataType.VARCHAR);
-        localProperty.setValue("${global_param}");
-        localParams.put("local_param", localProperty);
-
-        Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap,
-                localParams, CommandType.START_PROCESS, new Date());
-        logger.info(JSONUtils.toJsonString(paramsMap));
-
 
     }
 }

@@ -94,10 +94,18 @@ public final class Constants {
 
 
     /**
+     * hadoop configuration
+     */
+    public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
+
+    public static final String HADOOP_RM_STATE_STANDBY = "STANDBY";
+
+    public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
+
+    /**
      * yarn.resourcemanager.ha.rm.ids
      */
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
-    public static final String YARN_RESOURCEMANAGER_HA_XX = "xx";
 
 
     /**
@@ -153,7 +161,11 @@ public final class Constants {
      * development.state
      */
     public static final String DEVELOPMENT_STATE = "development.state";
-    public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
+
+    /**
+     * sudo enable
+     */
+    public static final String SUDO_ENABLE = "sudo.enable";
 
     /**
      * string true
@@ -173,38 +185,43 @@ public final class Constants {
     /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
+    public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
+    public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
 
     /**
      * all servers directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
+    public static final String REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
+
+    /**
+     * registry node prefix
+     */
+    public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
 
     /**
      * MasterServer lock directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
 
 
     /**
      * MasterServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
     /**
      * WorkerServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
 
     /**
      * MasterServer startup  failover runing and fault tolerance process
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
+    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
 
     /**
@@ -259,15 +276,6 @@ public final class Constants {
      * AT SIGN
      */
     public static final String AT_SIGN = "@";
-
-
-    public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
-
-    public static final String WORKER_RESERVED_MEMORY = "worker.reserved.memory";
-
-    public static final String MASTER_MAX_CPULOAD_AVG = "master.max.cpuload.avg";
-
-    public static final String MASTER_RESERVED_MEMORY = "master.reserved.memory";
 
 
     /**
@@ -332,6 +340,11 @@ public final class Constants {
     public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[_|\\-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
+     * default display rows
+     */
+    public static final int DEFAULT_DISPLAY_ROWS = 10;
+
+    /**
      * read permission
      */
     public static final int READ_PERMISSION = 2 * 1;
@@ -371,20 +384,14 @@ public final class Constants {
     public static final int DEFAULT_MASTER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
-     * master reserved memory
-     */
-    public static final double DEFAULT_MASTER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
-
-    /**
      * worker cpu load
      */
     public static final int DEFAULT_WORKER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
-     * worker reserved memory
+     * worker host weight
      */
-    public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
-
+    public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
      * default log cache rows num,output when reach the number
@@ -419,17 +426,14 @@ public final class Constants {
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
 
     /**
+     * normal running task
+     */
+    public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
+
+    /**
      * datasource configuration path
      */
     public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
-
-    public static final String TASK_RECORD_URL = "task.record.datasource.url";
-
-    public static final String TASK_RECORD_FLAG = "task.record.flag";
-
-    public static final String TASK_RECORD_USER = "task.record.datasource.username";
-
-    public static final String TASK_RECORD_PWD = "task.record.datasource.password";
 
     public static final String DEFAULT = "Default";
     public static final String USER = "user";
@@ -438,11 +442,6 @@ public final class Constants {
     public static final String NULL = "NULL";
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
-
-    public static final String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
-
-    public static final String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
-
 
     /**
      * command parameter keys
@@ -465,6 +464,8 @@ public final class Constants {
 
     public static final String CMD_PARAM_START_PARAMS = "StartParams";
 
+    public static final String CMD_PARAM_FATHER_PARAMS = "fatherParams";
+
     /**
      * complement data start date
      */
@@ -474,15 +475,6 @@ public final class Constants {
      * complement data end date
      */
     public static final String CMDPARAM_COMPLEMENT_DATA_END_DATE = "complementEndDate";
-
-    /**
-     * hadoop configuration
-     */
-    public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
-
-    public static final String HADOOP_RM_STATE_STANDBY = "STANDBY";
-
-    public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
 
 
     /**
@@ -539,14 +531,17 @@ public final class Constants {
     public static final int SLEEP_TIME_MILLIS = 1000;
 
     /**
+     * master task instance cache-database refresh interval
+     */
+    public static final int CACHE_REFRESH_TIME_MILLIS = 20 * 1000;
+
+    /**
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
-
-
+    public static final int HEARTBEAT_WITH_WEIGHT_FOR_ZOOKEEPER_INFO_LENGTH = 11;
 
     /**
-     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -557,12 +552,17 @@ public final class Constants {
     public static final String HADOOP = "hadoop";
 
     /**
-     * -D parameter
+     * -D <property>=<value>
      */
     public static final String D = "-D";
 
     /**
-     * -D mapreduce.job.queuename=ququename
+     * -D mapreduce.job.name=name
+     */
+    public static final String MR_NAME = "mapreduce.job.name";
+
+    /**
+     * -D mapreduce.job.queuename=queuename
      */
     public static final String MR_QUEUE = "mapreduce.job.queuename";
 
@@ -604,6 +604,10 @@ public final class Constants {
      */
     public static final String EXECUTOR_MEMORY = "--executor-memory";
 
+    /**
+     * --name NAME
+     */
+    public static final String SPARK_NAME = "--name";
 
     /**
      * --queue QUEUE
@@ -625,6 +629,11 @@ public final class Constants {
      * exit code failure
      */
     public static final int EXIT_CODE_FAILURE = -1;
+
+    /**
+     * process or task definition failure
+     */
+    public static final int DEFINITION_FAILURE = -1;
 
     /**
      * date format of yyyyMMdd
@@ -650,6 +659,16 @@ public final class Constants {
      * system date(yyyymmdd) yesterday
      */
     public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
+
+    /**
+     * the absolute path of current executing task
+     */
+    public static final String PARAMETER_TASK_EXECUTE_PATH = "system.task.execute.path";
+
+    /**
+     * the instance id of current task
+     */
+    public static final String PARAMETER_TASK_INSTANCE_ID = "system.task.instance.id";
 
     /**
      * ACCEPTED
@@ -752,17 +771,27 @@ public final class Constants {
     public static final String SUBTRACT_STRING = "-";
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
+    public static final String LOCAL_PARAMS_LIST = "localParamsList";
+    public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
     public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
+    public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
+    public static final String CONDITION_RESULT = "conditionResult";
+    public static final String DEPENDENCE = "dependence";
+    public static final String TASK_TYPE = "taskType";
     public static final String TASK_LIST = "taskList";
     public static final String RWXR_XR_X = "rwxr-xr-x";
+    public static final String QUEUE = "queue";
+    public static final String QUEUE_NAME = "queueName";
+    public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
+    public static final int LOG_QUERY_LIMIT = 4096;
 
     /**
      * master/worker server use for zk
      */
-    public static final String MASTER_PREFIX = "master";
-    public static final String WORKER_PREFIX = "worker";
-    public static final String DELETE_ZK_OP = "delete";
-    public static final String ADD_ZK_OP = "add";
+    public static final String MASTER_TYPE = "master";
+    public static final String WORKER_TYPE = "worker";
+    public static final String DELETE_OP = "delete";
+    public static final String ADD_OP = "add";
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
@@ -815,11 +844,6 @@ public final class Constants {
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
 
     /**
-     * default worker group id
-     */
-    public static final int DEFAULT_WORKER_ID = -1;
-
-    /**
      * loginUserFromKeytab path
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
@@ -834,7 +858,9 @@ public final class Constants {
      */
     public static final String HIVE_CONF = "hiveconf:";
 
-    //flink ??
+    /**
+     * flink
+     */
     public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
@@ -844,8 +870,10 @@ public final class Constants {
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
-    public static final String FLINK_DETACH = "-d";
     public static final String FLINK_MAIN_CLASS = "-c";
+    public static final String FLINK_PARALLELISM = "-p";
+    public static final String FLINK_SHUTDOWN_ON_ATTACHED_EXIT = "-sae";
+    public static final String FLINK_PYTHON = "-py";
 
 
     public static final int[] NOT_TERMINATED_STATES = new int[] {
@@ -855,8 +883,8 @@ public final class Constants {
         ExecutionStatus.READY_PAUSE.ordinal(),
         ExecutionStatus.READY_STOP.ordinal(),
         ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-        ExecutionStatus.WAITTING_THREAD.ordinal(),
-        ExecutionStatus.WAITTING_DEPEND.ordinal()
+        ExecutionStatus.WAITING_THREAD.ordinal(),
+        ExecutionStatus.WAITING_DEPEND.ordinal()
     };
 
     /**
@@ -897,6 +925,12 @@ public final class Constants {
     public static final String TOTAL_PAGE = "totalPage";
 
     public static final String TOTAL = "total";
+
+    /**
+     * workflow
+     */
+    public static final String WORKFLOW_LIST = "workFlowList";
+    public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
 
     /**
      * session user
@@ -975,7 +1009,7 @@ public final class Constants {
     /**
      * dataSource sensitive param
      */
-    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=((?i)password((\\\\\":\\\\\")|(=')))).*?(?=((\\\\\")|(')))";
 
     /**
      * default worker group
@@ -1004,20 +1038,17 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
-    public static final int NORAML_NODE_STATUS = 0;
+    public static final int NORMAL_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
+    public static final String START_END_DATE = "startDate,endDate";
+
     /**
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-    /**
-     * net system properties
-     */
-    public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
 
     public static final String EXCEL_SUFFIX_XLS = ".xls";
@@ -1030,9 +1061,14 @@ public final class Constants {
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
     /**
-     * Network IP gets priority, default inner outer
+     * network interface preferred
      */
-    public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED = "dolphin.scheduler.network.interface.preferred";
+
+    /**
+     * network IP gets priority, default inner outer
+     */
+    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -1045,9 +1081,27 @@ public final class Constants {
     public static final String PSTREE = "pstree";
 
     /**
+     * snow flake, data center id, this id must be greater than 0 and less than 32
+     */
+    public static final String SNOW_FLAKE_DATA_CENTER_ID = "data.center.id";
+
+    /**
      * docker & kubernetes
      */
     public static final boolean DOCKER_MODE = StringUtils.isNotEmpty(System.getenv("DOCKER"));
     public static final boolean KUBERNETES_MODE = StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_HOST")) && StringUtils.isNotEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
 
+    /**
+     * task parameter keys
+     */
+    public static final String TASK_PARAMS = "params";
+    public static final String TASK_PARAMS_DATASOURCE = "datasource";
+    public static final String TASK_PARAMS_DATASOURCE_NAME = "datasourceName";
+    public static final String TASK_DEPENDENCE = "dependence";
+    public static final String TASK_DEPENDENCE_DEPEND_TASK_LIST = "dependTaskList";
+    public static final String TASK_DEPENDENCE_DEPEND_ITEM_LIST = "dependItemList";
+    public static final String TASK_DEPENDENCE_PROJECT_ID = "projectId";
+    public static final String TASK_DEPENDENCE_PROJECT_NAME = "projectName";
+    public static final String TASK_DEPENDENCE_DEFINITION_ID = "definitionId";
+    public static final String TASK_DEPENDENCE_DEFINITION_NAME = "definitionName";
 }

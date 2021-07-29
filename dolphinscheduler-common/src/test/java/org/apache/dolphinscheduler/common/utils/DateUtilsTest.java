@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,6 +40,20 @@ public class DateUtilsTest {
         String readableDate = DateUtils.format2Readable(endDate.getTime() - startDate.getTime());
 
         Assert.assertEquals("01 09:23:08", readableDate);
+    }
+
+    @Test
+    public void testConvertTimeStampsToString() {
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        final TimeZone timeZone = TimeZone.getTimeZone("Asia/Shanghai");
+        TimeZone.setDefault(timeZone);
+
+        long timeMillis = 1625989249021L;
+        Assert.assertEquals("2021-07-11 15:40:49", DateUtils.formatTimeStamp(timeMillis));
+        DateTimeFormatter testFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        Assert.assertEquals("2021/07/11 15:40:49", DateUtils.formatTimeStamp(timeMillis, testFormatter));
+
+        TimeZone.setDefault(defaultTimeZone);
     }
 
     @Test
@@ -153,7 +169,7 @@ public class DateUtilsTest {
 
     @Test
     public void getCurrentTimeStamp() {
-        String timeStamp =  DateUtils.getCurrentTimeStamp();
+        String timeStamp = DateUtils.getCurrentTimeStamp();
         Assert.assertNotNull(timeStamp);
     }
 
@@ -196,4 +212,24 @@ public class DateUtilsTest {
 
     }
 
+    @Test
+    public void testNullDuration() {
+        // days hours minutes seconds
+        Date d1 = DateUtils.stringToDate("2020-01-20 11:00:00");
+        Date d2 = null;
+        Assert.assertNull(DateUtils.format2Duration(d1, d2));
+    }
+
+    @Test
+    public void testTransformToTimezone() {
+        Date date = new Date();
+        Date mst = DateUtils.getTimezoneDate(date, TimeZone.getDefault().getID());
+        Assert.assertEquals(DateUtils.dateToString(date), DateUtils.dateToString(mst));
+    }
+
+    @Test
+    public void testGetTimezone() {
+        Assert.assertNull(DateUtils.getTimezone(null));
+        Assert.assertEquals(TimeZone.getTimeZone("MST"), DateUtils.getTimezone("MST"));
+    }
 }

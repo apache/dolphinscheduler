@@ -25,7 +25,11 @@ import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGe
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,7 +40,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
 
 /**
  * sqoop task test
@@ -97,7 +100,8 @@ public class SqoopTaskTest {
         SqoopJobGenerator generator = new SqoopJobGenerator();
         String mysqlToHdfsScript = generator.generateSqoopJob(mysqlToHdfsParams, mysqlTaskExecutionContext);
         String mysqlToHdfsExpected =
-            "sqoop import -D mapred.job.name=sqoop_import -D mapreduce.map.memory.mb=4096 --direct  -m 1 --connect \"jdbc:mysql://192.168.0.111:3306/test\" "
+            "sqoop import -D mapred.job.name=sqoop_import -D mapreduce.map.memory.mb=4096 --direct  -m 1 --connect "
+                    + "\"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" "
                 + "--username kylo --password \"123456\" --table person_2 --target-dir /ods/tmp/test/person7 --as-textfile "
                 + "--delete-target-dir --fields-terminated-by '@' --lines-terminated-by '\\n' --null-non-string 'NULL' --null-string 'NULL'";
         Assert.assertEquals(mysqlToHdfsExpected, mysqlToHdfsScript);
@@ -111,7 +115,8 @@ public class SqoopTaskTest {
         SqoopParameters hdfsToMysqlParams = JSONUtils.parseObject(hdfsToMysql, SqoopParameters.class);
         String hdfsToMysqlScript = generator.generateSqoopJob(hdfsToMysqlParams, mysqlTaskExecutionContext);
         String hdfsToMysqlScriptExpected =
-            "sqoop export -D mapred.job.name=sqoop_import -m 1 --export-dir /ods/tmp/test/person7 --connect \"jdbc:mysql://192.168.0.111:3306/test\" "
+            "sqoop export -D mapred.job.name=sqoop_import -m 1 --export-dir /ods/tmp/test/person7 --connect "
+                    + "\"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" "
                 + "--username kylo --password \"123456\" --table person_3 --columns id,name,age,sex,create_time --fields-terminated-by '@' "
                 + "--lines-terminated-by '\\n' --update-key id --update-mode allowinsert";
         Assert.assertEquals(hdfsToMysqlScriptExpected, hdfsToMysqlScript);
@@ -128,7 +133,8 @@ public class SqoopTaskTest {
         String hiveToMysqlScript = generator.generateSqoopJob(hiveToMysqlParams, mysqlTaskExecutionContext);
         String hiveToMysqlExpected =
             "sqoop export -D mapred.job.name=sqoop_import -m 1 --hcatalog-database stg --hcatalog-table person_internal --hcatalog-partition-keys date "
-                + "--hcatalog-partition-values 2020-02-17 --connect \"jdbc:mysql://192.168.0.111:3306/test\" --username kylo --password \"123456\" --table person_3 "
+                + "--hcatalog-partition-values 2020-02-17 --connect \"jdbc:mysql://192.168.0.111:3306/test?allowLoadLocalInfile="
+                    + "false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" --username kylo --password \"123456\" --table person_3 "
                 + "--fields-terminated-by '@' --lines-terminated-by '\\n'";
         Assert.assertEquals(hiveToMysqlExpected, hiveToMysqlScript);
 
@@ -143,7 +149,9 @@ public class SqoopTaskTest {
         SqoopParameters mysqlToHiveParams = JSONUtils.parseObject(mysqlToHive, SqoopParameters.class);
         String mysqlToHiveScript = generator.generateSqoopJob(mysqlToHiveParams, mysqlTaskExecutionContext);
         String mysqlToHiveExpected =
-            "sqoop import -D mapred.job.name=sqoop_import -m 1 --connect \"jdbc:mysql://192.168.0.111:3306/test\" --username kylo --password \"123456\" "
+            "sqoop import -D mapred.job.name=sqoop_import -m 1 --connect \"jdbc:mysql://192.168.0.111:3306/"
+                    + "test?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false\" "
+                    + "--username kylo --password \"123456\" "
                 + "--query \"SELECT * FROM person_2 WHERE \\$CONDITIONS\" --map-column-java id=Integer --hive-import --hive-database stg --hive-table person_internal_2 "
                 + "--create-hive-table --hive-overwrite --delete-target-dir --hive-partition-key date --hive-partition-value 2020-02-16";
         Assert.assertEquals(mysqlToHiveExpected, mysqlToHiveScript);
@@ -194,6 +202,27 @@ public class SqoopTaskTest {
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testLogHandler() throws InterruptedException {
+        LinkedBlockingQueue<String> loggerBuffer = new LinkedBlockingQueue<>();
+        Thread thread1 = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                loggerBuffer.add("test add log");
+            }
+        });
+        Thread thread2 = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                sqoopTask.logHandle(loggerBuffer);
+            }
+        });
+        thread1.start();
+        thread2.start();
+        thread1.join();
+        thread2.join();
+        // if no exception throw, assert true
+        Assert.assertTrue(true);
     }
 
 }

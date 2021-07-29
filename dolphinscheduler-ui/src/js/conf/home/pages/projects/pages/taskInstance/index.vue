@@ -48,7 +48,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
@@ -114,7 +114,7 @@
       _getList (flag) {
         this.isLoading = !flag
         if (this.searchParams.pageNo === undefined) {
-          this.$router.push({ path: '/projects/index' })
+          this.$router.push({ path: `/projects/${this.projectId}/index` })
           return false
         }
         this.getTaskInstanceList(this.searchParams).then(res => {
@@ -165,6 +165,9 @@
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
       }, 90000)
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     beforeDestroy () {
       // Destruction wheel

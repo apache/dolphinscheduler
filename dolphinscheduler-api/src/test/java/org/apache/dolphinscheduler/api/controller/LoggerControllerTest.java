@@ -14,11 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,15 +34,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
 
 /**
  * logger controller test
  */
-
 @Ignore
 public class LoggerControllerTest extends AbstractControllerTest {
 
@@ -58,7 +59,7 @@ public class LoggerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -77,7 +78,7 @@ public class LoggerControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

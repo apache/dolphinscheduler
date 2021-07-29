@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -35,6 +36,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * logger service test
+ */
 @RunWith(MockitoJUnitRunner.class)
 @PrepareForTest({LoggerServiceImpl.class})
 public class LoggerServiceTest {
@@ -43,6 +47,7 @@ public class LoggerServiceTest {
 
     @InjectMocks
     private LoggerServiceImpl loggerService;
+
     @Mock
     private ProcessService processService;
 
@@ -51,7 +56,6 @@ public class LoggerServiceTest {
         this.loggerService.init();
     }
 
-
     @Test
     public void testQueryDataSourceList() {
 
@@ -59,7 +63,7 @@ public class LoggerServiceTest {
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(2, 1, 1);
         //TASK_INSTANCE_NOT_FOUND
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.TASK_INSTANCE_NOT_FOUND));
 
         try {
             //HOST NOT FOUND OR ILLEGAL
@@ -68,14 +72,14 @@ public class LoggerServiceTest {
             Assert.assertTrue(true);
             logger.error("testQueryDataSourceList error {}", e.getMessage());
         }
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.TASK_INSTANCE_NOT_FOUND));
 
         //SUCCESS
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
         Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         result = loggerService.queryLog(1, 1, 1);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test

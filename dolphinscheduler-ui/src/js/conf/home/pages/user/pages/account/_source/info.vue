@@ -73,14 +73,14 @@
           v-if="createUserDialog"
           :visible.sync="createUserDialog"
           width="auto">
-          <m-create-user :item="item" @onUpdate="onUpdate" @close="close"></m-create-user>
+          <m-create-user :item="item" :from-user-info="true" @onUpdate="onUpdate" @close="close"></m-create-user>
         </el-dialog>
       </template>
     </m-list-box-f>
   </div>
 </template>
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapActions, mapState, mapMutations } from 'vuex'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 
@@ -95,6 +95,7 @@
     props: {},
     methods: {
       ...mapMutations('user', ['setUserInfo']),
+      ...mapActions('user', ['getUserInfo']),
       /**
        * edit
        */
@@ -103,13 +104,10 @@
         this.createUserDialog = true
       },
       onUpdate (param) {
-        this.setUserInfo({
-          userName: param.userName,
-          userPassword: param.userPassword,
-          email: param.email,
-          phone: param.phone
+        this.setUserInfo(param)
+        this.getUserInfo().finally(() => {
+          this.createUserDialog = false
         })
-        this.createUserDialog = false
       },
 
       close () {

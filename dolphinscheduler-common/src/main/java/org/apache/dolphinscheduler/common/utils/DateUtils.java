@@ -22,9 +22,12 @@ import org.apache.dolphinscheduler.common.Constants;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +37,42 @@ import org.slf4j.LoggerFactory;
  */
 public class DateUtils {
 
+    static final long C0 = 1L;
+    static final long C1 = C0 * 1000L;
+    static final long C2 = C1 * 1000L;
+    static final long C3 = C2 * 1000L;
+    static final long C4 = C3 * 60L;
+    static final long C5 = C4 * 60L;
+    static final long C6 = C5 * 24L;
+
+    /**
+     * a default datetime formatter for the timestamp
+     */
+    private static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     private DateUtils() {
         throw new UnsupportedOperationException("Construct DateUtils");
+    }
+
+    /**
+     * @param timeMillis timeMillis like System.currentTimeMillis()
+     * @return string formatted as yyyy-MM-dd HH:mm:ss
+     */
+    public static String formatTimeStamp(long timeMillis) {
+        return formatTimeStamp(timeMillis, DEFAULT_DATETIME_FORMATTER);
+    }
+
+    /**
+     * @param timeMillis timeMillis like System.currentTimeMillis()
+     * @param dateTimeFormatter expect formatter, like yyyy-MM-dd HH:mm:ss
+     * @return formatted string
+     */
+    public static String formatTimeStamp(long timeMillis, DateTimeFormatter dateTimeFormatter) {
+        Objects.requireNonNull(dateTimeFormatter);
+        return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
+                ZoneId.systemDefault()));
     }
 
     /**
@@ -251,7 +286,6 @@ public class DateUtils {
     }
 
     /**
-     *
      * format time to duration
      *
      * @param d1 d1
@@ -259,6 +293,9 @@ public class DateUtils {
      * @return format time
      */
     public static String format2Duration(Date d1, Date d2) {
+        if (d1 == null || d2 == null) {
+            return null;
+        }
         return format2Duration(differMs(d1, d2));
     }
 
@@ -489,13 +526,33 @@ public class DateUtils {
         return getCurrentTime(Constants.YYYYMMDDHHMMSSSSS);
     }
 
-    static final long C0 = 1L;
-    static final long C1 = C0 * 1000L;
-    static final long C2 = C1 * 1000L;
-    static final long C3 = C2 * 1000L;
-    static final long C4 = C3 * 60L;
-    static final long C5 = C4 * 60L;
-    static final long C6 = C5 * 24L;
+    /**
+     * transform date to target timezone date
+     * <p>e.g.
+     * <p> if input date is 2020-01-01 00:00:00 current timezone is CST
+     * <p>targetTimezoneId is MST
+     * <p>this method will return 2020-01-01 15:00:00
+     */
+    public static Date getTimezoneDate(Date date, String targetTimezoneId) {
+        if (StringUtils.isEmpty(targetTimezoneId)) {
+            return date;
+        }
+
+        String dateToString = dateToString(date);
+        LocalDateTime localDateTime = LocalDateTime.parse(dateToString, DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, TimeZone.getTimeZone(targetTimezoneId).toZoneId());
+        return Date.from(zonedDateTime.toInstant());
+    }
+
+    /**
+     * get timezone by timezoneId
+     */
+    public static TimeZone getTimezone(String timezoneId) {
+        if (StringUtils.isEmpty(timezoneId)) {
+            return null;
+        }
+        return TimeZone.getTimeZone(timezoneId);
+    }
 
     /**
      * Time unit representing one thousandth of a second
@@ -510,23 +567,23 @@ public class DateUtils {
             return d / (C4 / C2);
         }
 
-        public static long toHours(long d)   {
+        public static long toHours(long d) {
             return d / (C5 / C2);
         }
 
-        public static long toDays(long d)    {
+        public static long toDays(long d) {
             return d / (C6 / C2);
         }
 
-        public static long toDurationSeconds(long d)   {
+        public static long toDurationSeconds(long d) {
             return (d % (C4 / C2)) / (C3 / C2);
         }
 
-        public static long toDurationMinutes(long d)   {
+        public static long toDurationMinutes(long d) {
             return (d % (C5 / C2)) / (C4 / C2);
         }
 
-        public static long toDurationHours(long d)   {
+        public static long toDurationHours(long d) {
             return (d % (C6 / C2)) / (C5 / C2);
         }
 

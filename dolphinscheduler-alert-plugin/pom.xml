@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.3.4-SNAPSHOT</version>
+        <version>1.3.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,7 +36,16 @@
         <module>dolphinscheduler-alert-script</module>
         <module>dolphinscheduler-alert-http</module>
         <module>dolphinscheduler-alert-feishu</module>
+        <module>dolphinscheduler-alert-slack</module>
     </modules>
 
+    <dependencies>
+        <!-- dolphinscheduler -->
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>

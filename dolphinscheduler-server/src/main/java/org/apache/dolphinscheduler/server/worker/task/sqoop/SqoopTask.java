@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
@@ -73,11 +72,8 @@ public class SqoopTask extends AbstractYarnTask {
         SqoopJobGenerator generator = new SqoopJobGenerator();
         String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(sqoopTaskExecutionContext.getDefinedParams()),
-            sqoopTaskExecutionContext.getDefinedParams(),
-            sqoopParameters.getLocalParametersMap(),
-            CommandType.of(sqoopTaskExecutionContext.getCmdTypeIfComplement()),
-            sqoopTaskExecutionContext.getScheduleTime());
+        // combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(sqoopTaskExecutionContext,getParameters());
 
         if (paramsMap != null) {
             String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));

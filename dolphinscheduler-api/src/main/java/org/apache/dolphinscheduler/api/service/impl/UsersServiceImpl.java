@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -37,15 +36,18 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
@@ -78,9 +80,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * users service impl
  */
 @Service
-public class UsersServiceImpl extends BaseService implements UsersService {
+public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceImpl.class);
+
+    @Autowired
+    private AccessTokenMapper accessTokenMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -92,7 +97,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
     private ProjectUserMapper projectUserMapper;
 
     @Autowired
-    private ResourceUserMapper resourcesUserMapper;
+    private ResourceUserMapper resourceUserMapper;
 
     @Autowired
     private ResourceMapper resourceMapper;
@@ -109,6 +114,9 @@ public class UsersServiceImpl extends BaseService implements UsersService {
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
 
     /**
      * create user, only system admin have permission
@@ -123,6 +131,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @return create result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createUser(User loginUser,
                                           String userName,
@@ -132,8 +141,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
                                           String phone,
                                           String queue,
                                           int state) throws IOException {
-
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
@@ -170,6 +178,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
 
     }
 
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public User createUser(String userName,
                            String userPassword,
@@ -204,6 +213,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
     /***
      * create User for ldap login
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public User createUser(UserType userType, String userId, String email) {
         User user = new User();
@@ -228,6 +238,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param userName user name
      * @return exist user or null
      */
+    @Override
     public User getUserByUserName(String userName) {
         return userMapper.queryByUserNameAccurately(userName);
     }
@@ -238,8 +249,17 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param id id
      * @return user info
      */
+    @Override
     public User queryUser(int id) {
         return userMapper.selectById(id);
+    }
+
+    @Override
+    public List<User> queryUser(List<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new ArrayList<>();
+        }
+        return userMapper.selectByIds(ids);
     }
 
     /**
@@ -248,6 +268,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param name name
      * @return user info
      */
+    @Override
     public User queryUser(String name) {
         return userMapper.queryByUserNameAccurately(name);
     }
@@ -259,6 +280,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param password password
      * @return user info
      */
+    @Override
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
         return userMapper.queryUserByNamePassword(name, md5);
@@ -270,6 +292,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param name user name
      * @return if name empty 0, user not exists -1, user exist user id
      */
+    @Override
     public int getUserIdByName(String name) {
         //executor name query
         int executorId = 0;
@@ -294,8 +317,9 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param pageSize page size
      * @return user list page
      */
+    @Override
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -329,6 +353,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @return update result code
      * @throws Exception exception
      */
+    @Override
     public Map<String, Object> updateUser(User loginUser, int userId,
                                           String userName,
                                           String userPassword,
@@ -337,7 +362,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
                                           String phone,
                                           String queue,
                                           int state) throws IOException {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
@@ -460,8 +485,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
@@ -471,6 +498,13 @@ public class UsersServiceImpl extends BaseService implements UsersService {
         User tempUser = userMapper.selectById(id);
         if (tempUser == null) {
             putMsg(result, Status.USER_NOT_EXIST, id);
+            return result;
+        }
+        // check if is a project owner
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(id);
+        if (CollectionUtils.isNotEmpty(projects)) {
+            String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
+            putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
             return result;
         }
         // delete user
@@ -485,6 +519,8 @@ public class UsersServiceImpl extends BaseService implements UsersService {
             }
         }
 
+        accessTokenMapper.deleteAccessTokenByUserId(id);
+        
         userMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
 
@@ -499,9 +535,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param projectIds project id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -515,10 +552,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-        //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteProjectRelation(0, userId);
 
+        //if the selected projectIds are empty, delete all items associated with the user
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            projectUserMapper.deleteProjectRelation(0, userId);
             return result;
         }
 
@@ -548,9 +585,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param resourceIds resource id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -575,7 +613,8 @@ public class UsersServiceImpl extends BaseService implements UsersService {
         }
 
         //get the authorized resource id list by user id
-        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> oldAuthorizedRes = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
         //if resource type is UDF,need check whether it is bound by UDF function
         Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 
@@ -586,7 +625,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
 
             // get all resource id of process definitions those is released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);
@@ -601,7 +640,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
 
         }
 
-        resourcesUserMapper.deleteResourceUser(userId, 0);
+        resourceUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
@@ -626,7 +665,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
 
             resourcesUser.setCreateTime(now);
             resourcesUser.setUpdateTime(now);
-            resourcesUserMapper.insert(resourcesUser);
+            resourceUserMapper.insert(resourcesUser);
 
         }
 
@@ -643,9 +682,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param udfIds udf id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
@@ -689,9 +729,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param datasourceIds data source id array
      * @return grant result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -735,6 +776,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param loginUser login user
      * @return user info
      */
+    @Override
     public Map<String, Object> getUserInfo(User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
@@ -770,8 +812,9 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param loginUser login user
      * @return user list
      */
+    @Override
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -790,8 +833,9 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param loginUser login user
      * @return user list
      */
+    @Override
     public Map<String, Object> queryUserList(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -810,6 +854,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param userName user name
      * @return true if user name not exists, otherwise return false
      */
+    @Override
     public Result<Object> verifyUserName(String userName) {
 
         Result<Object> result = new Result<>();
@@ -830,9 +875,10 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
+    @Override
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -866,8 +912,9 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param alertgroupId alert group id
      * @return authorized result code
      */
+    @Override
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -948,15 +995,16 @@ public class UsersServiceImpl extends BaseService implements UsersService {
     }
 
     /**
-     * register user, default state is 0, default tenant_id is 1, no phone, no queue
+     * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
      * @param userName user name
      * @param userPassword user password
      * @param repeatPassword repeat password
      * @param email email
-     * @return register result code
+     * @return registry result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
         Map<String, Object> result = new HashMap<>();
@@ -986,6 +1034,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param userName user name
      * @return create result code
      */
+    @Override
     public Map<String, Object> activateUser(User loginUser, String userName) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -1029,6 +1078,7 @@ public class UsersServiceImpl extends BaseService implements UsersService {
      * @param userNames user name
      * @return create result code
      */
+    @Override
     public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
         Map<String, Object> result = new HashMap<>();
 

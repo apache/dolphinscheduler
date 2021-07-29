@@ -45,7 +45,7 @@ public class HostManagerConfig {
         String hostSelector = masterConfig.getHostSelector();
         HostSelector selector = HostSelector.of(hostSelector);
         HostManager hostManager;
-        switch (selector){
+        switch (selector) {
             case RANDOM:
                 hostManager = new RandomHostManager();
                 break;

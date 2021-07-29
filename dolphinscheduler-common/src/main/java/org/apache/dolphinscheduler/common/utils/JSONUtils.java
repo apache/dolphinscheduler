@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -206,7 +207,7 @@ public class JSONUtils {
             return null;
         }
 
-        return node.toString();
+        return node.asText();
     }
 
     /**
@@ -220,6 +221,21 @@ public class JSONUtils {
         return parseObject(json, new TypeReference<Map<String, String>>() {});
     }
 
+    /**
+     * from the key-value generated json  to get the str value no matter the real type of value
+     * @param json the json str
+     * @param nodeName key
+     * @return the str value of key
+     */
+    public static String getNodeString(String json, String nodeName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            return rootNode.has(nodeName) ? rootNode.get(nodeName).toString() : "";
+        } catch (JsonProcessingException e) {
+            return "";
+        }
+    }
+    
     /**
      * json to map
      *

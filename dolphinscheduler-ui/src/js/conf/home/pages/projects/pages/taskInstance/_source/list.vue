@@ -53,9 +53,17 @@
             <span>{{scope.row.endTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
-        <el-table-column prop="duration" :label="$t('Duration')"></el-table-column>
+        <el-table-column :label="$t('Duration')">
+          <template slot-scope="scope">
+            <span>{{scope.row.duration | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="retryTimes" :label="$t('Retry Count')"></el-table-column>
+        <el-table-column :label="$t('host')" min-width="210">
+          <template slot-scope="scope">
+            <span>{{scope.row.host | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Operation')" width="80" fixed="right">
           <template slot-scope="scope">
             <div>
@@ -81,10 +89,10 @@
   </div>
 </template>
 <script>
+  import { mapActions, mapState } from 'vuex'
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
-  import { mapActions } from 'vuex'
 
   export default {
     name: 'list',
@@ -136,7 +144,7 @@
         this.$emit('on-update')
       },
       _go (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
+        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.processInstanceId}` })
       }
     },
     watch: {
@@ -151,6 +159,9 @@
     },
     mounted () {
       this.list = this.taskInstanceList
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     components: { mLog }
   }

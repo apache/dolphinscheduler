@@ -19,20 +19,20 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,26 +40,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *  round robin host manager
+ *  lower weight host manager
  */
 public class LowerWeightHostManager extends CommonHostManager {
 
     private final Logger logger = LoggerFactory.getLogger(LowerWeightHostManager.class);
-
-    /**
-     * zookeeper registry center
-     */
-    @Autowired
-    private ZookeeperRegistryCenter registryCenter;
-
-    /**
-     * round robin host manager
-     */
-    private RoundRobinHostManager roundRobinHostManager;
 
     /**
      * selector
@@ -82,18 +74,16 @@ public class LowerWeightHostManager extends CommonHostManager {
     private ScheduledExecutorService executorService;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         this.selector = new LowerWeightRoundRobin();
         this.workerHostWeightsMap = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
         this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),0, 5, TimeUnit.SECONDS);
-        this.roundRobinHostManager = new RoundRobinHostManager();
-        this.roundRobinHostManager.setZookeeperNodeManager(getZookeeperNodeManager());
     }
 
     @PreDestroy
-    public void close(){
+    public void close() {
         this.executorService.shutdownNow();
     }
 
@@ -103,20 +93,20 @@ public class LowerWeightHostManager extends CommonHostManager {
      * @return host
      */
     @Override
-    public Host select(ExecutionContext context){
+    public Host select(ExecutionContext context) {
         Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
-        if(CollectionUtils.isNotEmpty(workerHostWeights)){
+        if (CollectionUtils.isNotEmpty(workerHostWeights)) {
             return selector.select(workerHostWeights).getHost();
         }
         return new Host();
     }
 
     @Override
-    public Host select(Collection<Host> nodes) {
+    public HostWorker select(Collection<HostWorker> nodes) {
         throw new UnsupportedOperationException("not support");
     }
 
-    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights){
+    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
         lock.lock();
         try {
             workerHostWeightsMap.clear();
@@ -126,7 +116,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    private Set<HostWeight> getWorkerHostWeights(String workerGroup){
+    private Set<HostWeight> getWorkerHostWeights(String workerGroup) {
         lock.lock();
         try {
             return workerHostWeightsMap.get(workerGroup);
@@ -135,45 +125,51 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    class RefreshResourceTask implements Runnable{
+    class RefreshResourceTask implements Runnable {
 
         @Override
         public void run() {
             try {
-                Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
-                Set<Map.Entry<String, Set<String>>> entries = workerGroupNodes.entrySet();
                 Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
-                for(Map.Entry<String, Set<String>> entry : entries){
+                Map<String, Set<String>> workerGroupNodes = serverNodeManager.getWorkerGroupNodes();
+                for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
                     String workerGroup = entry.getKey();
                     Set<String> nodes = entry.getValue();
-                    String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
-                    for(String node : nodes){
-                        String heartbeat = registryCenter.getZookeeperCachedOperator().get(workerGroupPath + "/" + node);
-                        if(StringUtils.isNotEmpty(heartbeat)
-                                && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
-                            String[] parts = heartbeat.split(COMMA);
-
-                            int status = Integer.parseInt(parts[8]);
-                            if (status == Constants.ABNORMAL_NODE_STATUS){
-                                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
-                                        Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
-                                continue;
-                            }
-
-                            double cpu = Double.parseDouble(parts[0]);
-                            double memory = Double.parseDouble(parts[1]);
-                            double loadAverage = Double.parseDouble(parts[2]);
-                            HostWeight hostWeight = new HostWeight(Host.of(node), cpu, memory, loadAverage);
+                    for (String node : nodes) {
+                        String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
+                        HostWeight hostWeight = getHostWeight(node, workerGroup, heartbeat);
+                        if (hostWeight != null) {
                             hostWeights.add(hostWeight);
                         }
                     }
-                    workerHostWeights.put(workerGroup, hostWeights);
+                    if (!hostWeights.isEmpty()) {
+                        workerHostWeights.put(workerGroup, hostWeights);
+                    }
                 }
                 syncWorkerHostWeight(workerHostWeights);
-            } catch (Throwable ex){
+            } catch (Throwable ex) {
                 logger.error("RefreshResourceTask error", ex);
             }
+        }
+
+        public HostWeight getHostWeight(String addr, String workerGroup, String heartbeat) {
+            if (ResInfo.isValidHeartbeatForRegistryInfo(heartbeat)) {
+                String[] parts = heartbeat.split(Constants.COMMA);
+                int status = Integer.parseInt(parts[8]);
+                if (status == Constants.ABNORMAL_NODE_STATUS) {
+                    logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+                            addr, Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
+                    return null;
+                }
+                double cpu = Double.parseDouble(parts[0]);
+                double memory = Double.parseDouble(parts[1]);
+                double loadAverage = Double.parseDouble(parts[2]);
+                long startTime = DateUtils.stringToDate(parts[6]).getTime();
+                int weight = getWorkerHostWeightFromHeartbeat(heartbeat);
+                return new HostWeight(HostWorker.of(addr, weight, workerGroup), cpu, memory, loadAverage, startTime);
+            }
+            return null;
         }
     }
 

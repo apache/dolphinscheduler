@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -27,10 +29,13 @@ import org.apache.dolphinscheduler.server.worker.processor.DBTaskAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.DBTaskResponseProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
-import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -40,12 +45,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- *  worker server
+ * worker server
  */
-@ComponentScan("org.apache.dolphinscheduler")
-public class WorkerServer {
+@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.server.master.*",
+                "org.apache.dolphinscheduler.server.monitor.*",
+                "org.apache.dolphinscheduler.server.log.*"
+        })
+})
+@EnableTransactionManagement
+public class WorkerServer implements IStoppable {
 
     /**
      * logger
@@ -53,41 +67,43 @@ public class WorkerServer {
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
     /**
-     *  netty remote server
+     * netty remote server
      */
     private NettyRemotingServer nettyRemotingServer;
 
     /**
-     *  worker registry
+     * worker registry
      */
     @Autowired
-    private WorkerRegistry workerRegistry;
+    private WorkerRegistryClient workerRegistryClient;
 
     /**
-     *  worker config
+     * worker config
      */
     @Autowired
     private WorkerConfig workerConfig;
 
     /**
-     *  spring application context
-     *  only use it for initialization
+     * spring application context
+     * only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
     /**
-     *  alert model netty remote server
+     * alert model netty remote server
      */
     private AlertClientService alertClientService;
 
     @Autowired
     private RetryReportTaskStatusThread retryReportTaskStatusThread;
 
+    @Autowired
+    private WorkerManagerThread workerManagerThread;
+
     /**
-     * worker server startup
+     * worker server startup, not use web service
      *
-     * worker server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
@@ -95,18 +111,15 @@ public class WorkerServer {
         new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
     }
 
-
     /**
      * worker server run
      */
     @PostConstruct
     public void run() {
-        logger.info("start worker server...");
+        // alert-server client registry
+        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(), Constants.ALERT_RPC_PORT);
 
-        //alert-server client registry
-        alertClientService = new AlertClientService(workerConfig.getAlertListenHost(),Constants.ALERT_RPC_PORT);
-
-        //init remoting server
+        // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -117,17 +130,28 @@ public class WorkerServer {
         this.nettyRemotingServer.start();
 
         // worker registry
-        this.workerRegistry.registry();
+        try {
+            this.workerRegistryClient.registry();
+            this.workerRegistryClient.setRegistryStoppable(this);
+            Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
+
+            this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+
+        // task execute manager
+        this.workerManagerThread.start();
 
         // retry report task status
         this.retryReportTaskStatusThread.start();
 
         /**
-         * register hooks, which are called before the process exits
+         * registry hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Stopper.isRunning()) {
                 close("shutdownHook");
             }
         }));
@@ -136,7 +160,7 @@ public class WorkerServer {
     public void close(String cause) {
 
         try {
-            //execute only once
+            // execute only once
             if (Stopper.isStopped()) {
                 return;
             }
@@ -147,21 +171,23 @@ public class WorkerServer {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quitely stop
+                // thread sleep 3 seconds for thread quitely stop
                 Thread.sleep(3000L);
             } catch (Exception e) {
                 logger.warn("thread sleep exception", e);
             }
 
+            // close
             this.nettyRemotingServer.close();
-            this.workerRegistry.unRegistry();
-
+            this.workerRegistryClient.unRegistry();
             this.alertClientService.close();
-
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
-            System.exit(-1);
         }
     }
 
+    @Override
+    public void stop(String cause) {
+        close(cause);
+    }
 }

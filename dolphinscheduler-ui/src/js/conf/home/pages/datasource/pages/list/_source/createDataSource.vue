@@ -21,7 +21,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content" size="small">
-              <el-select style="width: 100%;" v-model="type">
+              <el-select style="width: 100%;" v-model="type" :disabled="this.item.id">
                 <el-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
                 </el-option>
               </el-select>
@@ -312,7 +312,7 @@
           userName: this.userName,
           password: this.password,
           connectType: this.connectType,
-          other: this.other
+          other: this.other === '' ? null : JSON.parse(this.other)
         }
       },
       /**
@@ -424,7 +424,7 @@
           this.userName = res.userName
           this.password = res.password
           this.connectType = res.connectType
-          this.other = JSON.stringify(res.other) === '{}' ? '' : JSON.stringify(res.other)
+          this.other = res.other === null ? '' : JSON.stringify(res.other)
         }).catch(e => {
           this.$message.error(e.msg || '')
         })

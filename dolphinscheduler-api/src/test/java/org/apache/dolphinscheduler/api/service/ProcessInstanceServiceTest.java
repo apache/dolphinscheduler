@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProcessInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -31,14 +32,19 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -47,7 +53,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,11 +69,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+/**
+ * process instance service test
+ */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ProcessInstanceServiceTest {
 
     @InjectMocks
-    ProcessInstanceService processInstanceService;
+    ProcessInstanceServiceImpl processInstanceService;
 
     @Mock
     ProjectMapper projectMapper;
@@ -83,16 +91,13 @@ public class ProcessInstanceServiceTest {
     ProcessInstanceMapper processInstanceMapper;
 
     @Mock
+    ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Mock
     ProcessDefinitionMapper processDefineMapper;
 
     @Mock
     ProcessDefinitionService processDefinitionService;
-
-    @Mock
-    ProcessDefinitionVersionService processDefinitionVersionService;
-
-    @Mock
-    ExecutorService execService;
 
     @Mock
     TaskInstanceMapper taskInstanceMapper;
@@ -124,9 +129,6 @@ public class ProcessInstanceServiceTest {
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
-        //project auth success
-        putMsg(result, Status.SUCCESS, projectName);
-        Project project = getProject(projectName);
         Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
         Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
         ProcessInstance processInstance = getProcessInstance();
@@ -134,15 +136,42 @@ public class ProcessInstanceServiceTest {
         Page<ProcessInstance> pageReturn = new Page<>(1, 10);
         processInstanceList.add(processInstance);
         pageReturn.setRecords(processInstanceList);
+
+        // data parameter check
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        when(processDefineMapper.selectById(Mockito.anyInt())).thenReturn(getProcessDefinition());
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class)
+                , Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                eq("192.168.xx.xx"), Mockito.any(), Mockito.any())).thenReturn(pageReturn);
+
+        Map<String, Object> dataParameterRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "20200101 00:00:00",
+                "20200102 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
+                "192.168.xx.xx", 1, 10);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, dataParameterRes.get(Constants.STATUS));
+
+        //project auth success
+        putMsg(result, Status.SUCCESS, projectName);
+
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(-1), Mockito.any(),
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1L), eq(""), eq(-1), Mockito.any(),
                 eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
         Map<String, Object> successRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
                 "2020-01-02 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
+                "192.168.xx.xx", 1, 10);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        // data parameter empty
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1L), eq(""), eq(-1), Mockito.any(),
+                eq("192.168.xx.xx"), eq(null), eq(null))).thenReturn(pageReturn);
+        successRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "",
+                "", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
@@ -155,7 +184,7 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.SUCCESS, executorExistRes.get(Constants.STATUS));
 
         //executor name empty
-        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(0), Mockito.any(),
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1L), eq(""), eq(0), Mockito.any(),
                 eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         Map<String, Object> executorEmptyRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
                 "2020-01-02 00:00:00", "", "", ExecutionStatus.SUBMITTED_SUCCESS,
@@ -211,14 +240,14 @@ public class ProcessInstanceServiceTest {
 
         //project auth success
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setProcessDefinitionId(46);
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);
         ProcessDefinition processDefinition = getProcessDefinition();
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
-        when(processService.findProcessDefineById(processInstance.getProcessDefinitionId())).thenReturn(processDefinition);
+        when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
         Map<String, Object> successRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
@@ -251,7 +280,7 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setState(ExecutionStatus.SUCCESS);
         TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskType(TaskType.SHELL.getDescp());
+        taskInstance.setTaskType(TaskType.SHELL.getDesc());
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
         Result res = new Result();
@@ -302,7 +331,7 @@ public class ProcessInstanceServiceTest {
 
         //task not sub process
         TaskInstance taskInstance = getTaskInstance();
-        taskInstance.setTaskType(TaskType.HTTP.toString());
+        taskInstance.setTaskType(TaskType.HTTP.getDesc());
         taskInstance.setProcessInstanceId(1);
         when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Map<String, Object> notSubprocessRes = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectName, 1);
@@ -310,7 +339,7 @@ public class ProcessInstanceServiceTest {
 
         //sub process not exist
         TaskInstance subTask = getTaskInstance();
-        subTask.setTaskType(TaskType.SUB_PROCESS.toString());
+        subTask.setTaskType(TaskType.SUB_PROCESS.getDesc());
         subTask.setProcessInstanceId(1);
         when(processService.findTaskInstanceById(subTask.getId())).thenReturn(subTask);
         when(processService.findSubProcessInstance(subTask.getProcessInstanceId(), subTask.getId())).thenReturn(null);
@@ -325,7 +354,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testUpdateProcessInstance() throws ParseException {
+    public void testUpdateProcessInstance() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>();
@@ -360,22 +389,32 @@ public class ProcessInstanceServiceTest {
         processInstance.setState(ExecutionStatus.SUCCESS);
         processInstance.setTimeout(3000);
         processInstance.setCommandType(CommandType.STOP);
+        processInstance.setProcessDefinitionCode(46L);
+        processInstance.setProcessDefinitionVersion(1);
         ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setId(1);
         processDefinition.setUserId(1);
         Tenant tenant = new Tenant();
         tenant.setId(1);
         tenant.setTenantCode("test_tenant");
-        when(processService.findProcessDefineById(processInstance.getProcessDefinitionId())).thenReturn(processDefinition);
+        when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
-        when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1L);
+        when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
+
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
-        when(processDefineMapper.updateById(processDefinition)).thenReturn(1);
+        when(processService.saveProcessDefinition(Mockito.any(), Mockito.any(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyBoolean())).thenReturn(1);
+        when(processService.findProcessDefinition(46L, 0)).thenReturn(processDefinition);
+        putMsg(result, Status.SUCCESS, projectName);
+
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -443,7 +482,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testViewVariables() throws Exception {
+    public void testViewVariables() {
         //process instance not null
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setCommandType(CommandType.SCHEDULER);
@@ -463,7 +502,20 @@ public class ProcessInstanceServiceTest {
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
+        when(processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion()
+        )).thenReturn(new ProcessDefinitionLog());
+        when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
         when(taskInstanceMapper.queryByInstanceIdAndName(Mockito.anyInt(), Mockito.any())).thenReturn(taskInstance);
+        DAG<String, TaskNode, TaskNodeRelation> graph = new DAG<>();
+        for (int i = 1; i <= 7; ++i) {
+            graph.addNode(i + "", new TaskNode());
+        }
+
+        when(processService.genDagGraph(Mockito.any(ProcessDefinition.class)))
+                .thenReturn(graph);
+
         Map<String, Object> successRes = processInstanceService.viewGantt(1);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -489,6 +541,7 @@ public class ProcessInstanceServiceTest {
      */
     private Project getProject(String projectName) {
         Project project = new Project();
+        project.setCode(1L);
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);
@@ -504,6 +557,8 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
         processInstance.setName("test_process_instance");
+        processInstance.setProcessDefinitionCode(46L);
+        processInstance.setProcessDefinitionVersion(1);
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
         return processInstance;
@@ -516,9 +571,12 @@ public class ProcessInstanceServiceTest {
      */
     private ProcessDefinition getProcessDefinition() {
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(46L);
+        processDefinition.setVersion(1);
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectId(2);
+        processDefinition.setProjectCode(2L);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         return processDefinition;

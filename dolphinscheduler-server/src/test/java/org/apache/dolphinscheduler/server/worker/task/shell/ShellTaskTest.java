@@ -19,12 +19,17 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * shell task test.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ShellTask.class})
+@PrepareForTest(value = {ShellTask.class, DriverManager.class, SpringApplicationContext.class, ParameterUtils.class})
 public class ShellTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellTaskTest.class);
@@ -60,7 +65,7 @@ public class ShellTaskTest {
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
-        taskExecutionContext.setTaskType("SHELL");
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setHost("127.0.0.1:1234");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");
@@ -68,7 +73,7 @@ public class ShellTaskTest {
             "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\",\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,\"id\":\""
                 +
                 "tasks-16849\",\"maxRetryTimes\":0,\"name\":\"shell test 001\",\"params\":\"{\\\"rawScript\\\":\\\"#!/bin/sh\\\\necho $[yyyy-MM-dd HH:mm:ss +3]\\\\necho \\\\\\\" ?? "
-                + "${time1} \\\\\\\"\\\\necho \\\\\\\" ????? ${time2}\\\\\\\"\\\\n\\\",\\\"localParams\\\":[{\\\"prop\\\":\\\"time1\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":"
+                + "${time1} \\\\\\\"\\\\necho \\\\\\\" ????? ${time2}\\\\\\\"\\\\n\\\",\\\"localParams\\\":[{\\\"prop\\\":\\\"time1\\\",\\\"direct\\\":\\\"OUT\\\",\\\"type\\\":"
                 + "\\\"VARCHAR\\\",\\\"value\\\":\\\"$[yyyy-MM-dd HH:mm:ss]\\\"},{\\\"prop\\\":\\\"time2\\\",\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${time_gb}\\\"}"
                 + "],\\\"resourceList\\\":[]}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\",\"taskTimeoutParameter\":"
                 + "{\"enable\":false,\"interval\":0},\"timeout\":\"{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}");
@@ -79,10 +84,11 @@ public class ShellTaskTest {
         taskExecutionContext.setTenantCode("roo");
         taskExecutionContext.setScheduleTime(new Date());
         taskExecutionContext.setQueue("default");
+        taskExecutionContext.setVarPool("[{\"direct\":\"IN\",\"prop\":\"test\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskExecutionContext.setTaskParams(
             "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
                 +
-                "[{\"prop\":\"time1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"$[yyyy-MM-dd HH:mm:ss]\"},{\"prop\":\"time2\",\"direct\":\"IN\",\"type\":\"VARCHAR"
+                "[{\"prop\":\"time1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"$[yyyy-MM-dd HH:mm:ss]\"},{\"prop\":\"time2\",\"direct\":\"IN\",\"type\":\"VARCHAR"
                 + "\",\"value\":\"${time_gb}\"}],\"resourceList\":[]}");
         Map<String, String> definedParams = new HashMap<>();
         definedParams.put("time_gb", "2020-12-16 00:00:00");
@@ -99,6 +105,9 @@ public class ShellTaskTest {
     public void testComplementData() throws Exception {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
+        shellCommandExecutor.isSuccessOfYarnState(new ArrayList<>());
+        shellCommandExecutor.isSuccessOfYarnState(null);
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
     }
@@ -108,7 +117,9 @@ public class ShellTaskTest {
         taskExecutionContext.setCmdTypeIfComplement(0);
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
     }
+
 }

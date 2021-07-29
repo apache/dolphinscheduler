@@ -14,23 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Map;
 
 /**
  * base service
  */
-public class BaseService {
+public interface BaseService {
 
     /**
      * check admin
@@ -38,9 +35,7 @@ public class BaseService {
      * @param user input user
      * @return ture if administrator, otherwise return false
      */
-    protected boolean isAdmin(User user) {
-        return user.getUserType() == UserType.ADMIN_USER;
-    }
+    boolean isAdmin(User user);
 
     /**
      * isNotAdmin
@@ -49,14 +44,7 @@ public class BaseService {
      * @param result result code
      * @return true if not administrator, otherwise false
      */
-    protected boolean isNotAdmin(User loginUser, Map<String, Object> result) {
-        //only admin can operate
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return true;
-        }
-        return false;
-    }
+    boolean isNotAdmin(User loginUser, Map<String, Object> result);
 
     /**
      * put message to map
@@ -65,14 +53,7 @@ public class BaseService {
      * @param status status
      * @param statusParams status message
      */
-    protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
-    }
+    void putMsg(Map<String, Object> result, Status status, Object... statusParams);
 
     /**
      * put message to result object
@@ -81,16 +62,7 @@ public class BaseService {
      * @param status status
      * @param statusParams status message
      */
-    protected void putMsg(Result result, Status status, Object... statusParams) {
-        result.setCode(status.getCode());
-
-        if (statusParams != null && statusParams.length > 0) {
-            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.setMsg(status.getMsg());
-        }
-
-    }
+    void putMsg(Result<Object> result, Status status, Object... statusParams);
 
     /**
      * check
@@ -100,15 +72,7 @@ public class BaseService {
      * @param userNoOperationPerm status
      * @return check result
      */
-    protected boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
-        //only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(Constants.MSG, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
-    }
+    boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm);
 
     /**
      * create tenant dir if not exists
@@ -116,18 +80,22 @@ public class BaseService {
      * @param tenantCode tenant code
      * @throws IOException if hdfs operation exception
      */
-    protected void createTenantDirIfNotExists(String tenantCode) throws IOException {
+    void createTenantDirIfNotExists(String tenantCode) throws IOException;
 
-        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-        /**
-         * init resource path and udf path
-         */
-        HadoopUtils.getInstance().mkdir(resourcePath);
-        HadoopUtils.getInstance().mkdir(udfsPath);
-    }
+    /**
+     * has perm
+     *
+     * @param operateUser operate user
+     * @param createUserId create user id
+     */
+    boolean hasPerm(User operateUser, int createUserId);
 
-    protected boolean hasPerm(User operateUser, int createUserId) {
-        return operateUser.getId() == createUserId || isAdmin(operateUser);
-    }
+    /**
+     * check and parse date parameters
+     *
+     * @param startDateStr start date string
+     * @param endDateStr end date string
+     * @return map<status,startDate,endDate>
+     */
+    Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
 }

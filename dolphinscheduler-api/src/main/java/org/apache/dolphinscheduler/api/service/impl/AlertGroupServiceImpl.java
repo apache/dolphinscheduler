@@ -19,10 +19,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
-import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -33,7 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +46,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * alert group service impl
  */
 @Service
-public class AlertGroupServiceImpl extends BaseService implements AlertGroupService {
+public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroupService {
+
+    private Logger logger = LoggerFactory.getLogger(AlertGroupServiceImpl.class);
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
@@ -54,6 +58,7 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
      *
      * @return alert group list
      */
+    @Override
     public Map<String, Object> queryAlertgroup() {
 
         HashMap<String, Object> result = new HashMap<>();
@@ -73,6 +78,7 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
      * @param pageSize page size
      * @return alert group list page
      */
+    @Override
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
@@ -101,6 +107,7 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
      * @param alertInstanceIds alertInstanceIds
      * @return create result code
      */
+    @Override
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -119,13 +126,14 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
         alertGroup.setCreateUserId(loginUser.getId());
 
         // insert
-        int insert = alertGroupMapper.insert(alertGroup);
-
-        if (insert > 0) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
+        try {
+            int insert = alertGroupMapper.insert(alertGroup);
+            putMsg(result, insert > 0 ? Status.SUCCESS : Status.CREATE_ALERT_GROUP_ERROR);
+        } catch (DuplicateKeyException ex) {
+            logger.error("Create alert group error.", ex);
+            putMsg(result, Status.ALERT_GROUP_EXIST);
         }
+
         return result;
     }
 
@@ -139,6 +147,7 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
+    @Override
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
@@ -163,8 +172,13 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
         alertGroup.setUpdateTime(now);
         alertGroup.setCreateUserId(loginUser.getId());
         alertGroup.setAlertInstanceIds(alertInstanceIds);
-        alertGroupMapper.updateById(alertGroup);
-        putMsg(result, Status.SUCCESS);
+        try {
+            alertGroupMapper.updateById(alertGroup);
+            putMsg(result, Status.SUCCESS);
+        } catch (DuplicateKeyException ex) {
+            logger.error("Update alert group error.", ex);
+            putMsg(result, Status.ALERT_GROUP_EXIST);
+        }
         return result;
     }
 
@@ -175,6 +189,7 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
      * @param id alert group id
      * @return delete result code
      */
+    @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
@@ -201,8 +216,8 @@ public class AlertGroupServiceImpl extends BaseService implements AlertGroupServ
      * @param groupName group name
      * @return check result code
      */
+    @Override
     public boolean existGroupName(String groupName) {
-        List<AlertGroup> alertGroup = alertGroupMapper.queryByGroupName(groupName);
-        return CollectionUtils.isNotEmpty(alertGroup);
+        return BooleanUtils.isTrue(alertGroupMapper.existGroupName(groupName));
     }
 }

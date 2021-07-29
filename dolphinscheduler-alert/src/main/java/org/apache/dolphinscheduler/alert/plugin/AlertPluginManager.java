@@ -23,6 +23,9 @@ import static java.util.Objects.requireNonNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
+import org.apache.dolphinscheduler.dao.DaoFactory;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
@@ -53,25 +56,27 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
      */
     private final Map<Integer, String> pluginDefineMap = new HashMap<>();
 
-    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+
+    private void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
 
         if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getName(), alertChannelFactory) != null) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is already registered", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '%s' is already registered", alertChannelFactory.getName()));
         }
 
         try {
             loadAlertChannel(alertChannelFactory.getName());
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load .", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '%s' is can not load .", alertChannelFactory.getName()));
         }
     }
 
-    protected void loadAlertChannel(String name) {
+    private void loadAlertChannel(String name) {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
-        checkState(alertChannelFactory != null, "Alert Plugin {} is not registered", name);
+        checkState(alertChannelFactory != null, "Alert Plugin %s is not registered", name);
 
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(alertChannelFactory.getClass().getClassLoader())) {
             AlertChannel alertChannel = alertChannelFactory.create();
@@ -81,7 +86,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
         logger.info("-- Loaded Alert Plugin {} --", name);
     }
 
-    public Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {
+    Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {
         return alertChannelFactoryMap;
     }
 

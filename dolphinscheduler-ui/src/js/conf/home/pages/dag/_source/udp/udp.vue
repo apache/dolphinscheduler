@@ -142,7 +142,12 @@
         return true
       },
       _accuStore () {
-        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        const udp = _.cloneDeep(this.udpList)
+        udp.forEach(u => {
+          delete u.ifFixed
+        })
+        this.store.commit('dag/setGlobalParams', udp)
+
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
@@ -191,6 +196,16 @@
        */
       close () {
         this.$emit('close')
+      },
+      /**
+       * reload localParam
+       */
+      reloadParam () {
+        const dag = _.cloneDeep(this.store.state.dag)
+        let globalParams = _.cloneDeep(dag.globalParams)
+        let udpList = [...globalParams]
+        this.udpList = udpList
+        this.udpListCache = udpList
       }
     },
     watch: {
@@ -203,8 +218,7 @@
     },
     created () {
       const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
+
       this.name = dag.name
       this.originalName = dag.name
       this.description = dag.description
@@ -237,6 +251,11 @@
       max-height: 600px;
       overflow-y: scroll;
       padding:0 20px;
+
+      ::selection {
+        background: #409EFF ;
+        color: white;
+      }
     }
     .title {
       line-height: 36px;

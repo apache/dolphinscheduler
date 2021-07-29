@@ -184,9 +184,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             Command heartBeat = new Command();
             heartBeat.setType(CommandType.HEART_BEAT);
             heartBeat.setBody(heartBeatData);
-            ctx.writeAndFlush(heartBeat)
+            ctx.channel().writeAndFlush(heartBeat)
                     .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-
+            if (logger.isDebugEnabled()) {
+                logger.debug("Client send heart beat to: {}", ChannelUtils.getRemoteAddress(ctx.channel()));
+            }
         } else {
             super.userEventTriggered(ctx, evt);
         }

@@ -209,6 +209,11 @@ const typeList = [
     id: 9,
     code: 'BOOLEAN',
     disabled: false
+  },
+  {
+    id: 10,
+    code: 'LIST',
+    disabled: false
   }
 ]
 
@@ -243,11 +248,11 @@ const positionList = [
 const nodeStatusList = [
   {
     value: 'SUCCESS',
-    label: `${i18n.$t('success')}`
+    label: `${i18n.$t('Success')}`
   },
   {
     value: 'FAILURE',
-    label: `${i18n.$t('failed')}`
+    label: `${i18n.$t('Failed')}`
   }
 ]
 

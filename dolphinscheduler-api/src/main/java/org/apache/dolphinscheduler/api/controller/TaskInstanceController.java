@@ -20,19 +20,18 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 
+import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,16 +53,14 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * task instance controller
  */
-@Api(tags = "TASK_INSTANCE_TAG", position = 11)
+@Api(tags = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/task-instance")
 public class TaskInstanceController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceController.class);
 
     @Autowired
     TaskInstanceService taskInstanceService;
-
 
     /**
      * query task list paging
@@ -92,12 +89,13 @@ public class TaskInstanceController extends BaseController {
             @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
             @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
             @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
@@ -112,19 +110,13 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
 
-        logger.info("query task instance list, projectName:{}, processInstanceId:{}, processInstanceName:{}, search value:{}, taskName:{}, executorName: {}, stateType:{}, host:{}, start:{}, end:{}",
-                StringUtils.replaceNRTtoUnderline(projectName),
-                processInstanceId,
-                StringUtils.replaceNRTtoUnderline(processInstanceName),
-                StringUtils.replaceNRTtoUnderline(searchVal),
-                StringUtils.replaceNRTtoUnderline(taskName),
-                StringUtils.replaceNRTtoUnderline(executorName),
-                stateType,
-                StringUtils.replaceNRTtoUnderline(host),
-                StringUtils.replaceNRTtoUnderline(startTime),
-                StringUtils.replaceNRTtoUnderline(endTime));
+
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return returnDataListPaging(result);
+        }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        Map<String, Object> result = taskInstanceService.queryTaskListPaging(
+        result = taskInstanceService.queryTaskListPaging(
                 loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
@@ -144,10 +136,10 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> forceTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
-        logger.info("force task success, project: {}, task instance id: {}", projectName, taskInstanceId);
         Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectName, taskInstanceId);
         return returnDataList(result);
     }

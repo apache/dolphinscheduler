@@ -42,6 +42,7 @@ import org.springframework.util.MultiValueMap;
  * executor controller test
  */
 public class ExecutorControllerTest extends AbstractControllerTest {
+
     private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
 
     @Ignore
@@ -70,7 +71,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -88,7 +89,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -102,7 +103,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
