@@ -225,7 +225,7 @@ public class ExecutorService2Test {
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null, 4);
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null, null);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(31)).createCommand(any(Command.class));
 
@@ -245,7 +245,7 @@ public class ExecutorService2Test {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110, null, 4);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(processService, times(15)).createCommand(any(Command.class));
+        verify(processService, times(4)).createCommand(any(Command.class));
 
     }
 

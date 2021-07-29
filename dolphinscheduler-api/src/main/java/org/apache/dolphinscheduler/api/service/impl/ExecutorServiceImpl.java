@@ -118,6 +118,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param runMode run mode
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
+     * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @return execute process instance code
      */
     @Override
@@ -556,6 +557,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     if (!CollectionUtils.isEmpty(listDate)) {
 
                         int effectThreadsCount = expectedParallelismNumber == null ? 1 : Math.min(listDate.size(), expectedParallelismNumber);
+                        logger.info("In parallel mode, current expectedParallelismNumber:{}", expectedParallelismNumber);
+
                         int average = listDate.size() / effectThreadsCount;
                         int slice = listDate.size() % effectThreadsCount == 0 ? average : average + 1;
 
