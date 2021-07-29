@@ -50,6 +50,7 @@
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import switchProject from '@/module/mixin/switchProject'
 
   export default {
     name: 'instance-gantt-index',
@@ -68,6 +69,7 @@
       }
     },
     props: {},
+    mixins: [switchProject],
     methods: {
       ...mapActions('dag', ['getViewGantt']),
       /**

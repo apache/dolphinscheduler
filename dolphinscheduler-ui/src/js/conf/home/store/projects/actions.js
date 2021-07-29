@@ -31,6 +31,18 @@ export default {
     })
   },
   /**
+   * Get project by id
+   */
+  getProjectById ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get('projects/query-by-id', payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Create project
    */
   createProjects ({ state }, payload) {

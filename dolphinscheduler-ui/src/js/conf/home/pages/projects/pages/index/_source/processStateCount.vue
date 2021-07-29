@@ -49,7 +49,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
   import echarts from 'echarts'
@@ -74,6 +74,7 @@
       _goProcess (name) {
         this.$router.push({
           name: 'projects-instance-list',
+          params: { projectId: this.projectId },
           query: {
             stateType: _.find(stateType, ['label', name])['code'],
             startDate: this.searchParams.startDate,
@@ -136,7 +137,9 @@
     },
     destroyed () {
     },
-    computed: {},
+    computed: {
+      ...mapState('dag', ['projectId'])
+    },
     components: { mNoData }
   }
 </script>

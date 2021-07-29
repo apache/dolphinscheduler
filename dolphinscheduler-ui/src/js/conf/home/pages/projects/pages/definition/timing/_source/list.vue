@@ -156,6 +156,7 @@
   import mSpin from '@/module/components/spin/spin'
   import mTiming from '../../pages/list/_source/timing'
   import mNoData from '@/module/components/noData/noData'
+  import switchProject from '@/module/mixin/switchProject'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
 
   export default {
@@ -171,6 +172,7 @@
     },
     props: {
     },
+    mixins: [switchProject],
     methods: {
       ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver','deleteTiming']),
       /**
@@ -182,7 +184,7 @@
         }).then(res => {
           this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.success(res.msg)
-          this.$router.push({ name: 'projects-definition-list' })
+          this.$router.push({ name: 'projects-definition-list', params: { projectId: this.projectId } })
         }).catch(e => {
           this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
@@ -209,6 +211,9 @@
       },
       _pageSize (val) {
         this.pageSize = val
+        this._getScheduleList()
+      },
+      _updateProject () {
         this._getScheduleList()
       },
       /**

@@ -59,7 +59,7 @@
           </td>
           <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis">
-              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links" :title="item.name">
+              <router-link :to="{ path: `/projects/${projectId}/definition/list/${item.id}` }" tag="a" class="links" :title="item.name">
                 {{item.name}}
               </router-link>
             </span>
@@ -148,6 +148,7 @@
   import mTiming from './timing'
   import { mapActions } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
+  import switchProject from '@/module/mixin/switchProject'
 
   export default {
     name: 'definition-list',
@@ -163,6 +164,7 @@
       pageNo: Number,
       pageSize: Number
     },
+    mixins: [switchProject],
     methods: {
       ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition','copyProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
@@ -170,7 +172,7 @@
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
-        this.$router.push({ path: `/projects/definition/tree/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${item.id}` })
       },
       /**
        * Start
@@ -257,7 +259,7 @@
        * Timing manage
        */
       _timingManage (item) {
-        this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/timing/${item.id}` })
       },
       /**
        * Close the delete layer
@@ -296,7 +298,7 @@
        * edit
        */
       _edit (item) {
-        this.$router.push({ path: `/projects/definition/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/list/${item.id}` })
       },
       /**
        * Offline

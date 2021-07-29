@@ -268,7 +268,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -394,6 +394,7 @@
       _seeHistory () {
         this.self.$router.push({
           name: 'task-instance',
+          params: { projectId: this.projectId },
           query: {
             processInstanceId: this.self.$route.params.id,
             taskName: this.backfillItem.name
@@ -686,6 +687,7 @@
     destroyed () {
     },
     computed: {
+      ...mapState('dag', ['projectId']),
       /**
        * Child workflow entry show/hide
        */

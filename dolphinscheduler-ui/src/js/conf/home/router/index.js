@@ -17,6 +17,7 @@
 
 import Vue from 'vue'
 import i18n from '@/module/i18n/index.js'
+import { beforeProjectRoute } from '@/module/project/router'
 import Router from 'vue-router'
 
 Vue.use(Router)
@@ -48,15 +49,10 @@ const router = new Router({
       redirect: {
         name: 'projects-list'
       },
+      beforeEnter: (to, from, next) => {
+        beforeProjectRoute(to, from, next)
+      },
       children: [
-        {
-          path: '/projects/index',
-          name: 'projects-index',
-          component: resolve => require(['../pages/projects/pages/index/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Project Home')}`
-          }
-        },
         {
           path: '/projects/list',
           name: 'projects-list',
@@ -66,7 +62,15 @@ const router = new Router({
           }
         },
         {
-          path: '/projects/definition',
+          path: '/projects/:projectId/index',
+          name: 'projects-index',
+          component: resolve => require(['../pages/projects/pages/index/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Project Home')}`
+          }
+        },
+        {
+          path: '/projects/:projectId/definition',
           name: 'definition',
           component: resolve => require(['../pages/projects/pages/definition/index'], resolve),
           meta: {
@@ -77,7 +81,7 @@ const router = new Router({
           },
           children: [
             {
-              path: '/projects/definition/list',
+              path: '/projects/:projectId/definition/list',
               name: 'projects-definition-list',
               component: resolve => require(['../pages/projects/pages/definition/pages/list/index'], resolve),
               meta: {
@@ -85,7 +89,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/definition/list/:id',
+              path: '/projects/:projectId/definition/list/:id',
               name: 'projects-definition-details',
               component: resolve => require(['../pages/projects/pages/definition/pages/details/index'], resolve),
               meta: {
@@ -93,7 +97,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/definition/create',
+              path: '/projects/:projectId/definition/create',
               name: 'definition-create',
               component: resolve => require(['../pages/projects/pages/definition/pages/create/index'], resolve),
               meta: {
@@ -101,7 +105,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/definition/tree/:id',
+              path: '/projects/:projectId/definition/tree/:id',
               name: 'definition-tree-view-index',
               component: resolve => require(['../pages/projects/pages/definition/pages/tree/index'], resolve),
               meta: {
@@ -109,7 +113,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/definition/list/timing/:id',
+              path: '/projects/:projectId/definition/list/timing/:id',
               name: 'definition-timing-details',
               component: resolve => require(['../pages/projects/pages/definition/timing/index'], resolve),
               meta: {
@@ -119,7 +123,7 @@ const router = new Router({
           ]
         },
         {
-          path: '/projects/instance',
+          path: '/projects/:projectId/instance',
           name: 'instance',
           component: resolve => require(['../pages/projects/pages/instance/index'], resolve),
           meta: {
@@ -130,7 +134,7 @@ const router = new Router({
           },
           children: [
             {
-              path: '/projects/instance/list',
+              path: '/projects/:projectId/instance/list',
               name: 'projects-instance-list',
               component: resolve => require(['../pages/projects/pages/instance/pages/list/index'], resolve),
               meta: {
@@ -138,7 +142,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/instance/list/:id',
+              path: '/projects/:projectId/instance/list/:id',
               name: 'projects-instance-details',
               component: resolve => require(['../pages/projects/pages/instance/pages/details/index'], resolve),
               meta: {
@@ -146,7 +150,7 @@ const router = new Router({
               }
             },
             {
-              path: '/projects/instance/gantt/:id',
+              path: '/projects/:projectId/instance/gantt/:id',
               name: 'instance-gantt-index',
               component: resolve => require(['../pages/projects/pages/instance/pages/gantt/index'], resolve),
               meta: {
@@ -156,7 +160,7 @@ const router = new Router({
           ]
         },
         {
-          path: '/projects/task-instance',
+          path: '/projects/:projectId/task-instance',
           name: 'task-instance',
           component: resolve => require(['../pages/projects/pages/taskInstance'], resolve),
           meta: {
@@ -165,7 +169,7 @@ const router = new Router({
 
         },
         {
-          path: '/projects/task-record',
+          path: '/projects/:projectId/task-record',
           name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),
           meta: {
@@ -173,7 +177,7 @@ const router = new Router({
           }
         },
         {
-          path: '/projects/history-task-record',
+          path: '/projects/:projectId/history-task-record',
           name: 'history-task-record',
           component: resolve => require(['../pages/projects/pages/historyTaskRecord'], resolve),
           meta: {

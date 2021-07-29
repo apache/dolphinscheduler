@@ -68,7 +68,7 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
-            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id , query:{id: item.processDefinitionId}}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
+            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: `/projects/${projectId}/instance/list/${item.id}` , query:{id: item.processDefinitionId}}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
           </td>
           <td>
             <span v-html="_rtState(item.state)" style="cursor: pointer;"></span>
@@ -302,6 +302,7 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import { tasksState, runningType } from '@/conf/home/pages/dag/_source/config'
+  import switchProject from '@/module/mixin/switchProject'
 
   export default {
     name: 'list',
@@ -320,6 +321,7 @@
       pageNo: Number,
       pageSize: Number
     },
+    mixins: [switchProject],
     methods: {
       ...mapActions('dag', ['editExecutorsState', 'deleteInstance', 'batchDeleteInstance']),
       /**
@@ -372,7 +374,7 @@
        * edit
        */
       _reEdit (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/instance/list/${item.id}` })
       },
       /**
        * Rerun
@@ -513,7 +515,7 @@
         }
       },
       _gantt (item) {
-        this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
+        this.$router.push({ path: `/projects/${this.projectId}/instance/gantt/${item.id}` })
       },
 
       _topCheckBoxClick (is) {

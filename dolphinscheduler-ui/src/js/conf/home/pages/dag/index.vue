@@ -26,6 +26,7 @@
   import mSpin from '@/module/components/spin/spin'
   import Affirm from './_source/jumpAffirm'
   import disabledState from '@/module/mixin/disabledState'
+  import switchProject from '@/module/mixin/switchProject'
 
   export default {
     name: 'create-index',
@@ -36,7 +37,7 @@
       }
     },
     // mixins
-    mixins: [disabledState],
+    mixins: [disabledState, switchProject],
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams']),

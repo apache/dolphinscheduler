@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="searchParams.projectId ? $t('Project Home') : $t('Home')">
+  <m-list-construction :title="searchParams.projectId ? `${$t('Project Home')} - ${projectName}` : $t('Home')">
     <template slot="content">
       <div class="perject-home-content">
         <div class="time-model">
@@ -71,7 +71,7 @@
   import mTaskCtatusCount from './_source/taskCtatusCount'
   import mProcessStateCount from './_source/processStateCount'
   import mQueueCount from './_source/queueCount'
-  import localStore from '@/module/util/localStorage'
+  import switchProject from '@/module/mixin/switchProject'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
@@ -89,14 +89,18 @@
     props: {
       id: Number
     },
+    mixins: [switchProject],
     methods: {
       _datepicker (val) {
         this.searchParams.startDate = val[0]
         this.searchParams.endDate = val[1]
+      },
+      _updateProject () {
+        this.searchParams.projectId = this.id === 0 ? 0 : this.projectId
       }
     },
     created () {
-      this.searchParams.projectId = this.id === 0 ? 0 : localStore.getItem('projectId')
+      this.searchParams.projectId = this.id === 0 ? 0 : this.projectId
       this.searchParams.startDate = dayjs().format('YYYY-MM-DD 00:00:00')
       this.searchParams.endDate = dayjs().format('YYYY-MM-DD HH:mm:ss')
     },

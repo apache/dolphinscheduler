@@ -43,6 +43,7 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import switchProject from '@/module/mixin/switchProject'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/instanceConditions'
@@ -77,7 +78,7 @@
         isLeft: true
       }
     },
-    mixins: [listUrlParamHandle],
+    mixins: [listUrlParamHandle, switchProject],
     props: {},
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
@@ -104,7 +105,7 @@
       _getList (flag) {
         this.isLoading = !flag
         if(this.searchParams.pageNo == undefined) {
-          this.$router.push({ path: `/projects/index` })
+          this.$router.push({ path: `/projects/${this.projectId}/index` })
           return false
         }
         this.getTaskInstanceList(this.searchParams).then(res => {
@@ -130,7 +131,10 @@
       }, 100, {
         'leading': false,
         'trailing': true
-      })
+      }),
+      _updateProject () {
+        this._debounceGET()
+      }
     },
     watch: {
       // router

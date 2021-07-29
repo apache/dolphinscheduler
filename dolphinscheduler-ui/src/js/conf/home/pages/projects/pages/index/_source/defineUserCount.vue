@@ -28,7 +28,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { bar } from './chartConfig'
   import Chart from '@/module/ana-charts'
   import mNoData from '@/module/components/noData/noData'
@@ -61,6 +61,7 @@
           myChart.echart.on('click', e => {
             this.$router.push({
               name: 'projects-definition-list',
+              params: { projectId: this.projectId },
               query: {
                 userId: e.name.split(',')[1]
               }
@@ -82,6 +83,9 @@
       })
     },
     mounted () {
+    },
+    computed: {
+      ...mapState('dag', ['projectId'])
     },
     components: { mNoData }
   }

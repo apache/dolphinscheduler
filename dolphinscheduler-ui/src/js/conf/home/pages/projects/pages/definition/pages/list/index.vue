@@ -20,7 +20,7 @@
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
-            <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
+            <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create', params: { projectId }})">{{$t('Create process')}}</x-button>
             <x-button type="ghost" size="small"  @click="_uploading">{{$t('Import process')}}</x-button>
           </template>
         </m-conditions>
@@ -48,6 +48,7 @@
   import localStore from '@/module/util/localStorage'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import switchProject from '@/module/mixin/switchProject'
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
@@ -69,7 +70,7 @@
         isLeft: true
       }
     },
-    mixins: [listUrlParamHandle],
+    mixins: [listUrlParamHandle, switchProject],
     props: {
     },
     methods: {
@@ -125,6 +126,9 @@
       _updateList () {
         this.searchParams.pageNo = 1
         this.searchParams.searchVal = ''
+        this._debounceGET()
+      },
+      _updateProject () {
         this._debounceGET()
       }
     },
