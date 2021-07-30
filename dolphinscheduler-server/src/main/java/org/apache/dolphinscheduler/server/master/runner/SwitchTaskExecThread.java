@@ -31,8 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
-import org.apache.commons.lang.math.NumberUtils;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -180,7 +178,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
                 return "";
             }
             String value = property.getValue();
-            if (!NumberUtils.isNumber(value)) {
+            if (!org.apache.commons.lang.math.NumberUtils.isNumber(value)) {
                 value = "\"" + value + "\"";
             }
             logger.info("paramName：{}，paramValue{}", paramName, value);
