@@ -170,7 +170,6 @@ public class ProcessInstanceController extends BaseController {
      * @param syncDefine sync define
      * @param flag flag
      * @param locations locations
-     * @param connects connects
      * @return update result code
      */
     @ApiOperation(value = "updateProcessInstance", notes = "UPDATE_PROCESS_INSTANCE_NOTES")
@@ -180,7 +179,6 @@ public class ProcessInstanceController extends BaseController {
         @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
         @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, type = "Boolean"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
-        @ApiImplicitParam(name = "connects", value = "PROCESS_INSTANCE_CONNECTS", type = "String"),
         @ApiImplicitParam(name = "flag", value = "RECOVERY_PROCESS_INSTANCE_FLAG", type = "Flag"),
     })
     @PostMapping(value = "/update")
@@ -194,11 +192,10 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
                                         @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "connects", required = false) String connects,
                                         @RequestParam(value = "flag", required = false) Flag flag
     ) throws ParseException {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
-            processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
+            processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations);
         return returnDataList(result);
     }
 

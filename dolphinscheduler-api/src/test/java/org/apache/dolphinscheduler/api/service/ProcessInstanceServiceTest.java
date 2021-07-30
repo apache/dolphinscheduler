@@ -364,7 +364,7 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByName(projectName)).thenReturn(null);
         when(projectService.checkProjectAndAuth(loginUser, null, projectName)).thenReturn(result);
         Map<String, Object> proejctAuthFailRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
-                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
+                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
         //process instance null
@@ -375,14 +375,14 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
         Map<String, Object> processInstanceNullRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
-                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
+                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
 
         //process instance not finish
         when(processService.findProcessInstanceDetailById(1)).thenReturn(processInstance);
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         Map<String, Object> processInstanceNotFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
-                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
+                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstanceNotFinishRes.get(Constants.STATUS));
 
         //process instance finish
@@ -405,18 +405,18 @@ public class ProcessInstanceServiceTest {
                 processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
 
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
-                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
+                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
         Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
         when(processService.saveProcessDefinition(Mockito.any(), Mockito.any(),
                 Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-                Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.anyBoolean())).thenReturn(1);
+                Mockito.any(), Mockito.any(), Mockito.anyBoolean())).thenReturn(1);
         when(processService.findProcessDefinition(46L, 0)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectName);
 
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
-                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
+                shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 

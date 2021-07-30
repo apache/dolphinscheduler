@@ -207,7 +207,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
             processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
-            processInstance.setConnects(processDefinition.getConnects());
             processInstance.setLocations(processDefinition.getLocations());
 
             ProcessData processData = processService.genProcessData(processDefinition);
@@ -421,14 +420,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param syncDefine sync define
      * @param flag flag
      * @param locations locations
-     * @param connects connects
      * @return update result code
      */
     @Transactional
     @Override
     public Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
                                                      String processInstanceJson, String scheduleTime, Boolean syncDefine,
-                                                     Flag flag, String locations, String connects) {
+                                                     Flag flag, String locations) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
         //check project permission
@@ -463,8 +461,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine)) {
             processDefinition.setId(processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode()).getId());
-            updateDefine = syncDefinition(loginUser, project, locations, connects,
-                    processInstance, processDefinition, processData);
+            updateDefine = syncDefinition(loginUser, project, locations, processInstance, processDefinition, processData);
 
             processInstance.setProcessDefinitionVersion(processDefinitionLogMapper.
                     queryMaxVersionForDefinition(processInstance.getProcessDefinitionCode()));
@@ -482,20 +479,17 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * sync definition according process instance
      */
-    private int syncDefinition(User loginUser, Project project, String locations, String connects,
-                               ProcessInstance processInstance, ProcessDefinition processDefinition,
-                               ProcessData processData) {
+    private int syncDefinition(User loginUser, Project project, String locations, ProcessInstance processInstance,
+                               ProcessDefinition processDefinition, ProcessData processData) {
 
         String originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
         processDefinition.setGlobalParams(originDefParams);
         processDefinition.setLocations(locations);
-        processDefinition.setConnects(connects);
         processDefinition.setTimeout(processInstance.getTimeout());
         processDefinition.setUpdateTime(new Date());
 
         return processService.saveProcessDefinition(loginUser, project, processDefinition.getName(),
-                processDefinition.getDescription(), locations, connects,
-                processData, processDefinition, false);
+                processDefinition.getDescription(), locations, processData, processDefinition, false);
     }
 
     /**

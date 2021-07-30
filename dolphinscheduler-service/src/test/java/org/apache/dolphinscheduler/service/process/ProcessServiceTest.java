@@ -351,8 +351,7 @@ public class ProcessServiceTest {
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
         Assert.assertEquals(-1, processService.saveProcessDefinition(user, project, "name",
-                "desc", "locations", "connects", processData,
-                processDefinition, true));
+                "desc", "locations", processData, processDefinition, true));
     }
 
     @Test

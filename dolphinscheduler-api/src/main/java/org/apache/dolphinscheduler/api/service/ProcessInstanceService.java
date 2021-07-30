@@ -104,13 +104,12 @@ public interface ProcessInstanceService {
      * @param syncDefine sync define
      * @param flag flag
      * @param locations locations
-     * @param connects connects
      * @return update result code
      * @throws ParseException parse exception for json parse
      */
     Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
                                               String processInstanceJson, String scheduleTime, Boolean syncDefine,
-                                              Flag flag, String locations, String connects) throws ParseException;
+                                              Flag flag, String locations) throws ParseException;
 
     /**
      * query parent process instance detail info by sub process instance id

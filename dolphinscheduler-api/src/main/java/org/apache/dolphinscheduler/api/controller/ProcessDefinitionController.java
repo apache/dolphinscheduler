@@ -99,7 +99,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param name process definition name
      * @param description description
      * @param globalParams globalParams
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -110,7 +109,6 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
-        @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type = "String"),
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String")
     })
     @PostMapping(value = "/save")
@@ -122,14 +120,13 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "name", required = true) String name,
                                           @RequestParam(value = "description", required = false) String description,
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
-                                          @RequestParam(value = "connects", required = false) String connects,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                           @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson) throws JsonProcessingException {
 
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectCode, name, description, globalParams,
-            connects, locations, timeout, tenantCode, taskRelationJson);
+            locations, timeout, tenantCode, taskRelationJson);
         return returnDataList(result);
     }
 
@@ -215,7 +212,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param code process definition code
      * @param description description
      * @param globalParams globalParams
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -228,7 +224,6 @@ public class ProcessDefinitionController extends BaseController {
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type = "String"),
-        @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type = "String"),
         @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type = "String"),
         @ApiImplicitParam(name = "releaseState", value = "RELEASE_PROCESS_DEFINITION_NOTES", required = false, dataType = "ReleaseState")
     })
@@ -242,7 +237,6 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "code", required = true) long code,
                                           @RequestParam(value = "description", required = false) String description,
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
-                                          @RequestParam(value = "connects", required = false) String connects,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
                                           @RequestParam(value = "tenantCode", required = true) String tenantCode,
@@ -250,7 +244,7 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name, code, description, globalParams,
-            connects, locations, timeout, tenantCode, taskRelationJson);
+            locations, timeout, tenantCode, taskRelationJson);
         //  If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -357,7 +351,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
         @ApiImplicitParam(name = "code", value = "PROCESS_DEFINITION_CODE", required = true, dataType = "Long", example = "123456789"),
-        @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, dataType = "ReleaseState"),
+        @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_RELEASE", required = true, dataType = "ReleaseState"),
     })
     @PostMapping(value = "/release")
     @ResponseStatus(HttpStatus.OK)

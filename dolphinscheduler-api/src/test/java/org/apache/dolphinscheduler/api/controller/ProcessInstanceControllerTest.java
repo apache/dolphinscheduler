@@ -87,7 +87,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("scheduleTime", "2019-12-15 00:00:00");
         paramsMap.add("syncDefine", "false");
         paramsMap.add("locations", locations);
-        paramsMap.add("connects", "[]");
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/instance/update", "cxc_1113")
                 .header("sessionId", sessionId)

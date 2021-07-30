@@ -170,7 +170,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param name process definition name
      * @param description description
      * @param globalParams global params
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -184,7 +183,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String name,
                                                        String description,
                                                        String globalParams,
-                                                       String connects,
                                                        String locations,
                                                        int timeout,
                                                        String tenantCode,
@@ -223,7 +221,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         ProcessDefinition processDefinition = new ProcessDefinition(projectCode, name, processDefinitionCode, description,
-                globalParams, locations, connects, timeout, loginUser.getId(), tenant.getId());
+                globalParams, locations, timeout, loginUser.getId(), tenant.getId());
 
         return createProcessDefine(loginUser, result, taskRelationList, processDefinition);
     }
@@ -404,7 +402,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param code process definition code
      * @param description description
      * @param globalParams global params
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -418,7 +415,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        long code,
                                                        String description,
                                                        String globalParams,
-                                                       String connects,
                                                        String locations,
                                                        int timeout,
                                                        String tenantCode,
@@ -462,7 +458,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        processDefinition.set(projectCode, name, description, globalParams, locations, connects, timeout, tenant.getId());
+        processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenant.getId());
         return updateProcessDefine(loginUser, result, taskRelationList, processDefinition);
     }
 
