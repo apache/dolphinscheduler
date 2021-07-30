@@ -383,7 +383,9 @@ public class DagHelper {
         return conditionTaskList;
     }
 
-    private static List<String> skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList, Map<String, TaskInstance> completeTaskList, DAG<String, TaskNode, TaskNodeRelation> dag) {
+    private static List<String> skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList,
+                                                    Map<String, TaskInstance> completeTaskList,
+                                                    DAG<String, TaskNode, TaskNodeRelation> dag) {
         SwitchParameters switchParameters = completeTaskList.get(taskNode.getName()).getSwitchDependency();
         int resultConditionLocation = switchParameters.getResultConditionLocation();
         List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();

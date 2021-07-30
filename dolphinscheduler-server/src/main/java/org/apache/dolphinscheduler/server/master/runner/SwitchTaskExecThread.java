@@ -20,16 +20,13 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
-import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
@@ -37,7 +34,6 @@ import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,11 +44,6 @@ import java.util.stream.Collectors;
 import org.slf4j.LoggerFactory;
 
 public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
-
-    /**
-     * dependent parameters
-     */
-    private DependentParameters dependentParameters;
 
     protected final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
@@ -176,8 +167,8 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
     public String setTaskParams(String content, String rgex) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
-        Map<String,Property> globalParams = JSONUtils.toList(processInstance.getGlobalParams(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
-        Map<String,Property> varParams = JSONUtils.toList(taskInstance.getVarPool(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String, Property> globalParams = JSONUtils.toList(processInstance.getGlobalParams(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String, Property> varParams = JSONUtils.toList(taskInstance.getVarPool(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
         if (varParams.size() > 0) {
             varParams.putAll(globalParams);
             globalParams = varParams;

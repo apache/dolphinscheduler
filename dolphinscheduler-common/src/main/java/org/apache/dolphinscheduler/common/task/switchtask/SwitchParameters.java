@@ -80,12 +80,12 @@ public class SwitchParameters extends AbstractParameters {
     }
 
     public void setNextNode(Object nextNode) {
-        if(nextNode instanceof  String){
+        if (nextNode instanceof String) {
             List<String> nextNodeList = new ArrayList<>();
             nextNodeList.add(String.valueOf(nextNode));
             this.nextNode = nextNodeList;
-        }else{
-            this.nextNode = (ArrayList)nextNode;
+        } else {
+            this.nextNode = (ArrayList) nextNode;
         }
     }
 }
