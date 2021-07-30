@@ -34,24 +34,27 @@ datasourceDriverClassname="com.mysql.jdbc.Driver"
 if [ $dbtype == "postgresql" ];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
-sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=${datasourceDriverClassname}#g" conf/datasource.properties
-sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true#g" conf/datasource.properties
-sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/datasource.properties
-sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${password}#g" conf/datasource.properties
+sed -i ${txt} "s#^spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=${datasourceDriverClassname}#g" conf/datasource.properties
+sed -i ${txt} "s#^spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true#g" conf/datasource.properties
+sed -i ${txt} "s#^spring.datasource.username.*#spring.datasource.username=${username}#g" conf/datasource.properties
+sed -i ${txt} "s#^spring.datasource.password.*#spring.datasource.password=${password}#g" conf/datasource.properties
 
 sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common.properties
+sed -i ${txt} "s#resource.manager.httpaddress.port.*#resource.manager.httpaddress.port=${resourceManagerHttpAddressPort}#g" conf/common.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common.properties
-sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common.properties
+sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:%s/ws/v1/cluster/apps/%s#g" conf/common.properties
 sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common.properties
 sed -i ${txt} "s#resource.upload.path.*#resource.upload.path=${resourceUploadPath}#g" conf/common.properties
+sed -i ${txt} "s#data.basedir.path=.*#data.basedir.path=${dataBasedirPath}#g" conf/common.properties
 sed -i ${txt} "s#resource.storage.type.*#resource.storage.type=${resourceStorageType}#g" conf/common.properties
 sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common.properties
 sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common.properties
+sed -i ${txt} "s#kerberos.expire.time=.*#kerberos.expire.time=${kerberosExpireTime}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
 sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/alert.properties
