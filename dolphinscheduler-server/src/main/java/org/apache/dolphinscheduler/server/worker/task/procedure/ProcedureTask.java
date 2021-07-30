@@ -30,7 +30,6 @@ import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Direct;
@@ -119,12 +118,7 @@ public class ProcedureTask extends AbstractTask {
             connection = DatasourceUtil.getConnection(dbType, connectionParam);
 
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                    taskExecutionContext.getDefinedParams(),
-                    procedureParameters.getLocalParametersMap(),
-                    procedureParameters.getVarPoolMap(),
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    taskExecutionContext.getScheduleTime());
+            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
             // call method
             stmt = connection.prepareCall(procedureParameters.getMethod());
