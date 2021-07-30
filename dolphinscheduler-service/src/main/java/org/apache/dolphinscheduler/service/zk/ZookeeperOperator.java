@@ -30,7 +30,6 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Stat;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -65,7 +64,8 @@ public class ZookeeperOperator implements InitializingBean {
     /**
      * this method is for sub class,
      */
-    protected void registerListener(){}
+    protected void registerListener(AbstractListener abstractListener) {
+    }
 
     protected void treeCacheStart(){}
 
@@ -143,16 +143,6 @@ public class ZookeeperOperator implements InitializingBean {
         }
     }
 
-    public boolean hasChildren(final String key) {
-        Stat stat;
-        try {
-            stat = zkClient.checkExists().forPath(key);
-            return stat.getNumChildren() >= 1;
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-    }
-
     public boolean isExisted(final String key) {
         try {
             return zkClient.checkExists().forPath(key) != null;
@@ -191,28 +181,6 @@ public class ZookeeperOperator implements InitializingBean {
             }
         } catch (final Exception ex) {
             logger.error("persistEphemeral key : {} , value : {}", key, value, ex);
-        }
-    }
-
-    public void persistEphemeral(String key, String value, boolean overwrite) {
-        try {
-            if (overwrite) {
-                persistEphemeral(key, value);
-            } else {
-                if (!isExisted(key)) {
-                    zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
-                }
-            }
-        } catch (final Exception ex) {
-            logger.error("persistEphemeral key : {} , value : {}, overwrite : {}", key, value, overwrite, ex);
-        }
-    }
-
-    public void persistEphemeralSequential(final String key, String value) {
-        try {
-            zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(key, value.getBytes(StandardCharsets.UTF_8));
-        } catch (final Exception ex) {
-            logger.error("persistEphemeralSequential key : {}", key, ex);
         }
     }
 
