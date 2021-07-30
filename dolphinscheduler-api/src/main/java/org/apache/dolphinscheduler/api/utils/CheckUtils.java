@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
@@ -133,6 +134,8 @@ public class CheckUtils {
         }
         if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
             abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getDependence());
+        }else if (TaskType.SWITCH.getDesc().equalsIgnoreCase(taskType)) {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getSwitchResult());
         } else {
             abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getParams());
         }

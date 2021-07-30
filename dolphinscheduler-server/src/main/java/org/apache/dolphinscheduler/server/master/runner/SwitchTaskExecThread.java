@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -119,7 +120,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
                 finalConditionLocation = i;
                 break;
             }
-            String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex, processInstance);
+            String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
             logger.info("format condition sentence：：{}", content);
             Boolean result = null;
             try {
@@ -172,12 +173,18 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
         this.processService.saveTaskInstance(taskInstance);
     }
 
-    public String setTaskParams(String content, String rgex, ProcessInstance processInstance) {
+    public String setTaskParams(String content, String rgex) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
+        Map<String,Property> globalParams = JSONUtils.toList(processInstance.getGlobalParams(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String,Property> varParams = JSONUtils.toList(taskInstance.getVarPool(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property));
+        if (varParams.size() > 0) {
+            varParams.putAll(globalParams);
+            globalParams = varParams;
+        }
         while (m.find()) {
             String paramName = m.group(1);
-            Property property = JSONUtils.toList(processInstance.getGlobalParams(), Property.class).stream().collect(Collectors.toMap(Property::getProp, Property -> Property)).get(paramName);
+            Property property = globalParams.get(paramName);
             if (property == null) {
                 return "";
             }

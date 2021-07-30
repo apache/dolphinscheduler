@@ -379,13 +379,12 @@ public class DagHelper {
         if (!completeTaskList.containsKey(nodeName)) {
             return conditionTaskList;
         }
-        skipTaskNode4Condition(taskNode, skipTaskNodeList, completeTaskList, dag);
+        conditionTaskList = skipTaskNode4Switch(taskNode, skipTaskNodeList, completeTaskList, dag);
         return conditionTaskList;
     }
 
-    private static List<String> skipTaskNode4Condition(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList, Map<String, TaskInstance> completeTaskList, DAG<String, TaskNode, TaskNodeRelation> dag) {
-        SwitchParameters switchParameters =
-                JSONUtils.parseObject(taskNode.getDependence(), SwitchParameters.class);
+    private static List<String> skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList, Map<String, TaskInstance> completeTaskList, DAG<String, TaskNode, TaskNodeRelation> dag) {
+        SwitchParameters switchParameters = completeTaskList.get(taskNode.getName()).getSwitchDependency();
         int resultConditionLocation = switchParameters.getResultConditionLocation();
         List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
         List<String> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();

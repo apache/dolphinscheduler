@@ -79,7 +79,13 @@ public class SwitchParameters extends AbstractParameters {
         return nextNode;
     }
 
-    public void setNextNode(List<String> nextNode) {
-        this.nextNode = nextNode;
+    public void setNextNode(Object nextNode) {
+        if(nextNode instanceof  String){
+            List<String> nextNodeList = new ArrayList<>();
+            nextNodeList.add(String.valueOf(nextNode));
+            this.nextNode = nextNodeList;
+        }else{
+            this.nextNode = (ArrayList)nextNode;
+        }
     }
 }

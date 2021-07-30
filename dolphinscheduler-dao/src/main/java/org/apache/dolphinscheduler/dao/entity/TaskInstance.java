@@ -436,13 +436,15 @@ public class TaskInstance implements Serializable {
     public SwitchParameters getSwitchDependency() {
         if (this.switchDependency == null) {
             Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
-            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_DEPENDENCE), SwitchParameters.class);
+            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
         }
         return this.switchDependency;
     }
 
     public void setSwitchDependency(SwitchParameters switchDependency) {
-        this.switchDependency = switchDependency;
+        Map<String, Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, Object.class);
+        taskParamsMap.put(Constants.SWITCH_RESULT,JSONUtils.toJsonString(switchDependency));
+        this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 
     public Flag getFlag() {
@@ -653,4 +655,5 @@ public class TaskInstance implements Serializable {
 
     public boolean isFirstRun() {
         return endTime == null;
-    }}
+    }
+}
