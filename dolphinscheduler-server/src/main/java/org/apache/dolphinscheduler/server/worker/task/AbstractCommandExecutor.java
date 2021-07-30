@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -67,7 +68,7 @@ public abstract class AbstractCommandExecutor {
     /**
      *  log handler
      */
-    protected Consumer<List<String>> logHandler;
+    protected Consumer<LinkedBlockingQueue<String>> logHandler;
 
     /**
      *  logger
@@ -75,9 +76,9 @@ public abstract class AbstractCommandExecutor {
     protected Logger logger;
 
     /**
-     *  log list
+     * log collection
      */
-    protected final List<String> logBuffer;
+    protected final LinkedBlockingQueue<String> logBuffer;
 
     /**
      * taskExecutionContext
@@ -92,13 +93,13 @@ public abstract class AbstractCommandExecutor {
      */
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
-    public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   TaskExecutionContext taskExecutionContext ,
-                                   Logger logger){
+    public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
+                                   TaskExecutionContext taskExecutionContext,
+                                   Logger logger) {
         this.logHandler = logHandler;
         this.taskExecutionContext = taskExecutionContext;
         this.logger = logger;
-        this.logBuffer = Collections.synchronizedList(new ArrayList<>());
+        this.logBuffer = new LinkedBlockingQueue<>(Constants.DEFAULT_LOG_BUFFER_SIZE);
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
     }
 
@@ -213,12 +214,6 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
-
-        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-                taskExecutionContext.getExecutePath(),
-                processId
-                , result.getExitStatusCode());
-
         // if SHELL task exit
         if (status) {
             // set appIds
@@ -238,6 +233,8 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
+        logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+            taskExecutionContext.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
 
         return result;
     }
@@ -335,15 +332,14 @@ public abstract class AbstractCommandExecutor {
      */
     private void clear() {
 
-        List<String> markerList = new ArrayList<>();
-        markerList.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
+        LinkedBlockingQueue<String> markerLog = new LinkedBlockingQueue<>(1);
+        markerLog.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
 
         if (!logBuffer.isEmpty()) {
             // log handle
             logHandler.accept(logBuffer);
-            logBuffer.clear();
         }
-        logHandler.accept(markerList);
+        logHandler.accept(markerLog);
     }
 
     /**
@@ -354,9 +350,7 @@ public abstract class AbstractCommandExecutor {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
         ExecutorService getOutputLogService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName + "-" + "getOutputLogService");
         getOutputLogService.submit(() -> {
-            BufferedReader inReader = null;
-            try {
-                inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = inReader.readLine()) != null) {
                     logBuffer.add(line);
@@ -365,7 +359,6 @@ public abstract class AbstractCommandExecutor {
                 logger.error(e.getMessage(), e);
             } finally {
                 logOutputIsSuccess = true;
-                close(inReader);
             }
         });
         getOutputLogService.shutdown();
@@ -399,9 +392,10 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
+                logger.info("check yarn application status, appId:{}", appId);
                 while(Stopper.isRunning()){
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    logger.debug("check yarn application status, appId:{}, final state:{}", appId, applicationStatus.name());
                     if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
                             applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
@@ -414,7 +408,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
+            logger.error("yarn applications: {} , query status failed, exception:{}", StringUtils.join(appIds, ","), e);
             result = false;
         }
         return result;
@@ -454,31 +448,20 @@ public abstract class AbstractCommandExecutor {
      * @return line list
      */
     private List<String> convertFile2List(String filename) {
-        List lineList = new ArrayList<String>(100);
-        File file=new File(filename);
+        List<String> lineList = new ArrayList<>(100);
+        File file = new File(filename);
 
         if (!file.exists()){
             return lineList;
         }
 
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
             String line = null;
             while ((line = br.readLine()) != null) {
                 lineList.add(line);
             }
         } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ",filename),e);
-        } finally {
-            if(br != null){
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(),e);
-                }
-            }
-
+            logger.error(String.format("read file: %s failed : ", filename), e);
         }
         return lineList;
     }
@@ -555,25 +538,8 @@ public abstract class AbstractCommandExecutor {
             lastFlushTime = now;
             /** log handle */
             logHandler.accept(logBuffer);
-
-            logBuffer.clear();
         }
         return lastFlushTime;
-    }
-
-    /**
-     * close buffer reader
-     *
-     * @param inReader in reader
-     */
-    private void close(BufferedReader inReader) {
-        if (inReader != null) {
-            try {
-                inReader.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
     }
 
     protected List<String> commandOptions() {

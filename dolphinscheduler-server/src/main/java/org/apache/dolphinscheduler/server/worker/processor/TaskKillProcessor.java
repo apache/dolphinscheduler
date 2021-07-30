@@ -115,11 +115,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 return Pair.of(true, appIds);
             }
 
-            String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(taskExecutionContext.getProcessId()));
-
-            logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
-
-            OSUtils.exeCmd(cmd);
+            String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
+            if (StringUtils.isNotEmpty(pidsStr)) {
+                String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(taskExecutionContext.getProcessId()));
+                logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
+                OSUtils.exeCmd(cmd);
+            }
 
         } catch (Exception e) {
             processFlag = false;

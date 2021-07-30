@@ -38,8 +38,8 @@ public class OSUtilsTest {
     public void testOSMetric(){
         double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
         Assert.assertTrue(availablePhysicalMemorySize > 0.0f);
-        double totalMemorySize = OSUtils.totalMemorySize();
-        Assert.assertTrue(totalMemorySize > 0.0f);
+        double totalPhysicalMemorySize = OSUtils.totalPhysicalMemorySize();
+        Assert.assertTrue(totalPhysicalMemorySize > 0.0f);
         double loadAverage = OSUtils.loadAverage();
         logger.info("loadAverage {}", loadAverage);
         double memoryUsage = OSUtils.memoryUsage();

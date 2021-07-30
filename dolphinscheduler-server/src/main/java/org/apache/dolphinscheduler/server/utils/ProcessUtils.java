@@ -18,17 +18,10 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -368,11 +362,12 @@ public class ProcessUtils {
                 return;
             }
 
-            String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
-
-            logger.info("process id:{}, cmd:{}", processId, cmd);
-
-            OSUtils.exeCmd(cmd);
+            String pidsStr = getPidsStr(processId);
+            if (StringUtils.isNotEmpty(pidsStr)) {
+                String cmd = String.format("sudo kill -9 %s", pidsStr);
+                logger.info("process id:{}, cmd:{}", processId, cmd);
+                OSUtils.exeCmd(cmd);
+            }
 
         } catch (Exception e) {
             logger.error("kill task failed", e);
@@ -417,8 +412,9 @@ public class ProcessUtils {
      * find logs and kill yarn tasks
      *
      * @param taskExecutionContext taskExecutionContext
+     * @return yarn application ids
      */
-    public static void killYarnJob(TaskExecutionContext taskExecutionContext) {
+    public static List<String> killYarnJob(TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             LogClientService logClient = null;
@@ -434,19 +430,23 @@ public class ProcessUtils {
                 }
             }
             if (StringUtils.isNotEmpty(log)) {
-                List<String> appIds = LoggerUtils.getAppIds(log, logger);
-                String workerDir = taskExecutionContext.getExecutePath();
-                if (StringUtils.isEmpty(workerDir)) {
-                    logger.error("task instance work dir is empty");
-                    throw new RuntimeException("task instance work dir is empty");
+                if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
+                    taskExecutionContext.setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
+                            taskExecutionContext.getProcessDefineId(),
+                            taskExecutionContext.getProcessInstanceId(),
+                            taskExecutionContext.getTaskInstanceId()));
                 }
+                FileUtils.createWorkDir(taskExecutionContext.getExecutePath());
+                List<String> appIds = LoggerUtils.getAppIds(log, logger);
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+                    return appIds;
                 }
             }
 
         } catch (Exception e) {
             logger.error("kill yarn job failure", e);
         }
+        return Collections.emptyList();
     }
 }

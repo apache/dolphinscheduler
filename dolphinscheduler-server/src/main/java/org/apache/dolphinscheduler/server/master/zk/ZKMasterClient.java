@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.zk.AbstractListener;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 
 import org.apache.commons.lang.StringUtils;
@@ -97,7 +98,7 @@ public class ZKMasterClient extends AbstractZKClient {
                 removeZKNodePath(null, ZKNodeType.MASTER, true);
                 removeZKNodePath(null, ZKNodeType.WORKER, true);
             }
-            registerListener();
+            registerListener(new NodeChangeListener(Integer.MIN_VALUE));
         } catch (Exception e) {
             logger.error("master start up exception", e);
         } finally {
@@ -115,21 +116,28 @@ public class ZKMasterClient extends AbstractZKClient {
         super.close();
     }
 
-    /**
-     * handle path events that this class cares about
-     *
-     * @param client zkClient
-     * @param event path event
-     * @param path zk path
-     */
-    @Override
-    protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-        //monitor master
-        if (path.startsWith(getZNodeParentPath(ZKNodeType.MASTER) + Constants.SINGLE_SLASH)) {
-            handleMasterEvent(event, path);
-        } else if (path.startsWith(getZNodeParentPath(ZKNodeType.WORKER) + Constants.SINGLE_SLASH)) {
-            //monitor worker
-            handleWorkerEvent(event, path);
+    class NodeChangeListener extends AbstractListener {
+
+        public NodeChangeListener(int order) {
+            super(order);
+        }
+
+        /**
+         * handle path events that this class cares about
+         *
+         * @param client zkClient
+         * @param event path event
+         * @param path zk path
+         */
+        @Override
+        protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+            //monitor master
+            if (path.startsWith(getZNodeParentPath(ZKNodeType.MASTER) + Constants.SINGLE_SLASH)) {
+                handleMasterEvent(event, path);
+            } else if (path.startsWith(getZNodeParentPath(ZKNodeType.WORKER) + Constants.SINGLE_SLASH)) {
+                //monitor worker
+                handleWorkerEvent(event, path);
+            }
         }
     }
 

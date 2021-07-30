@@ -28,7 +28,7 @@ BEGIN
         AND COLUMN_NAME ='ip_list')
     THEN
         ALTER TABLE t_ds_worker_group CHANGE COLUMN `ip_list` `addr_list` text;
-        ALTER TABLE t_ds_worker_group MODIFY COLUMN `name` varchar(256) NOT NULL;
+        ALTER TABLE t_ds_worker_group MODIFY COLUMN `name` varchar(255) NOT NULL;
         ALTER TABLE t_ds_worker_group ADD UNIQUE KEY `name_unique` (`name`);
     END IF;
 END;

@@ -88,7 +88,7 @@ public class OSUtils {
    */
   public static double availablePhysicalMemorySize() {
     GlobalMemory memory = hal.getMemory();
-    double  availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
+    double availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
     df.setRoundingMode(RoundingMode.HALF_UP);
@@ -101,9 +101,9 @@ public class OSUtils {
    * Keep 2 decimal
    * @return  available Physical Memory Size, unit: G
    */
-  public static double totalMemorySize() {
+  public static double totalPhysicalMemorySize() {
     GlobalMemory memory = hal.getMemory();
-    double  totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
+    double totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
     df.setRoundingMode(RoundingMode.HALF_UP);

@@ -757,6 +757,7 @@
                         <include>**/common/shell/ShellExecutorTest.java</include>
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
+                        <include>**/common/task/HttpParametersTest.java</include>
                         <include>**/common/task/SqlParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
@@ -839,11 +840,14 @@
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/task/EnvFileTest.java</include>
+                        <include>**/server/worker/task/http/HttpTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
+                        <include>**/service/zk/ZookeeperCachedOperatorTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>
                         <include>**/service/zk/RegisterOperatorTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
