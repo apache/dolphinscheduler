@@ -607,7 +607,6 @@ public class ProcessService {
         }
         processInstance.setCommandStartTime(command.getStartTime());
         processInstance.setLocations(processDefinition.getLocations());
-        processInstance.setConnects(processDefinition.getConnects());
 
         // reset global params while there are start parameters
         setGlobalParamIfCommanded(processDefinition, cmdParam);
@@ -2238,10 +2237,9 @@ public class ProcessService {
      */
     @Deprecated
     public int saveProcessDefinition(User operator, Project project, String name, String desc, String locations,
-                                     String connects, ProcessData processData, ProcessDefinition processDefinition,
-                                     Boolean isFromProcessDefine) {
+                                     ProcessData processData, ProcessDefinition processDefinition, Boolean isFromProcessDefine) {
         ProcessDefinitionLog processDefinitionLog = insertProcessDefinitionLog(operator, processDefinition.getCode(),
-                name, processData, project, desc, locations, connects);
+                name, processData, project, desc, locations);
         Map<String, TaskDefinition> taskDefinitionMap = handleTaskDefinition(operator, project.getCode(), processData.getTasks(), isFromProcessDefine);
         if (Constants.DEFINITION_FAILURE == handleTaskRelation(operator, project.getCode(), processDefinitionLog, processData.getTasks(), taskDefinitionMap)) {
             return Constants.DEFINITION_FAILURE;
@@ -2254,8 +2252,7 @@ public class ProcessService {
      */
     @Deprecated
     public ProcessDefinitionLog insertProcessDefinitionLog(User operator, Long processDefinitionCode, String processDefinitionName,
-                                                           ProcessData processData, Project project,
-                                                           String desc, String locations, String connects) {
+                                                           ProcessData processData, Project project, String desc, String locations) {
         ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog();
         Integer version = processDefineLogMapper.queryMaxVersionForDefinition(processDefinitionCode);
         processDefinitionLog.setUserId(operator.getId());
@@ -2266,7 +2263,6 @@ public class ProcessService {
         processDefinitionLog.setProjectCode(project.getCode());
         processDefinitionLog.setDescription(desc);
         processDefinitionLog.setLocations(locations);
-        processDefinitionLog.setConnects(connects);
         processDefinitionLog.setTimeout(processData.getTimeout());
         processDefinitionLog.setTenantId(processData.getTenantId());
         processDefinitionLog.setOperator(operator.getId());
