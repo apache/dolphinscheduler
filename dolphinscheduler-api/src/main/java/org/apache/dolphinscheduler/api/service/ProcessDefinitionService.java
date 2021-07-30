@@ -42,7 +42,6 @@ public interface ProcessDefinitionService {
      * @param name process definition name
      * @param description description
      * @param globalParams global params
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -55,7 +54,6 @@ public interface ProcessDefinitionService {
                                                 String name,
                                                 String description,
                                                 String globalParams,
-                                                String connects,
                                                 String locations,
                                                 int timeout,
                                                 String tenantCode,
@@ -150,7 +148,6 @@ public interface ProcessDefinitionService {
      * @param code process definition code
      * @param description description
      * @param globalParams global params
-     * @param connects connects for nodes
      * @param locations locations for nodes
      * @param timeout timeout
      * @param tenantCode tenantCode
@@ -163,7 +160,6 @@ public interface ProcessDefinitionService {
                                                 long code,
                                                 String description,
                                                 String globalParams,
-                                                String connects,
                                                 String locations,
                                                 int timeout,
                                                 String tenantCode,
