@@ -255,8 +255,8 @@ public class MasterExecThread implements Runnable {
         processService.saveProcessInstance(processInstance);
 
         // get schedules
-        int processDefinitionId = processInstance.getProcessDefinition().getId();
-        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId);
+        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                processInstance.getProcessDefinitionCode());
         List<Date> listDate = Lists.newLinkedList();
         if (!CollectionUtils.isEmpty(schedules)) {
             for (Schedule schedule : schedules) {

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -71,6 +72,9 @@ public class SchedulerServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Mock
     private ProjectServiceImpl projectService;
 
     @Mock
@@ -102,7 +106,7 @@ public class SchedulerServiceTest {
 
         Schedule schedule = new Schedule();
         schedule.setId(1);
-        schedule.setProcessDefinitionId(1);
+        schedule.setProcessDefinitionCode(1);
         schedule.setReleaseState(ReleaseState.OFFLINE);
 
         List<Server> masterServers = new ArrayList<>();
@@ -113,7 +117,7 @@ public class SchedulerServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
 
-        Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionMapper.queryByCode(1)).thenReturn(processDefinition);
 
         //hash no auth
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
@@ -128,10 +132,10 @@ public class SchedulerServiceTest {
         Assert.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
 
         //PROCESS_DEFINE_NOT_EXIST
-        schedule.setProcessDefinitionId(2);
+        schedule.setProcessDefinitionCode(2);
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);
         Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
-        schedule.setProcessDefinitionId(1);
+        schedule.setProcessDefinitionCode(1);
 
         // PROCESS_DEFINE_NOT_RELEASE
         result = schedulerService.setScheduleState(loginUser, project.getCode(), 1, ReleaseState.ONLINE);

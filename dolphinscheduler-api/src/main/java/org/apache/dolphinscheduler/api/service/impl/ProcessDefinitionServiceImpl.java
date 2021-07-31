@@ -509,16 +509,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * delete process definition by id
+     * delete process definition by code
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionId process definition id
+     * @param processDefinitionCode process definition code
      * @return delete result code
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> deleteProcessDefinitionById(User loginUser, long projectCode, Integer processDefinitionId) {
+    public Map<String, Object> deleteProcessDefinitionByCode(User loginUser, long projectCode, long processDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
@@ -526,13 +526,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processDefinitionId);
-
-        // TODO: replace id to code
-        // ProcessDefinition processDefinition = processDefineMapper.selectByCode(processDefinitionCode);
-
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
             return result;
         }
 
@@ -544,7 +540,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinitionId);
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinitionCode);
             return result;
         }
         // check process instances is already running
@@ -555,10 +551,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         // get the timing according to the process definition
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinitionCode);
         if (!schedules.isEmpty() && schedules.size() > 1) {
             logger.warn("scheduler num is {},Greater than 1", schedules.size());
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
             return result;
         } else if (schedules.size() == 1) {
             Schedule schedule = schedules.get(0);
@@ -570,12 +566,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        int delete = processDefinitionMapper.deleteById(processDefinitionId);
+        int delete = processDefinitionMapper.deleteByCode(processDefinitionCode);
         processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
         }
         return result;
     }
@@ -630,8 +626,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
-                        new int[]{processDefinition.getId()}
-                );
+                        new long[]{processDefinition.getCode()});
 
                 for (Schedule schedule : scheduleList) {
                     logger.info("set schedule offline, project id: {}, schedule id: {}, process definition code: {}", project.getId(), schedule.getId(), code);
@@ -712,7 +707,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return DagDataSchedule
      */
     public DagDataSchedule exportProcessDagData(ProcessDefinition processDefinition) {
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinition.getId());
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode());
         DagDataSchedule dagDataSchedule = new DagDataSchedule(processService.genDagData(processDefinition));
         if (!schedules.isEmpty()) {
             Schedule schedule = schedules.get(0);
@@ -820,8 +815,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         Schedule schedule = dagDataSchedule.getSchedule();
         if (null != schedule) {
-            ProcessDefinition newProcessDefinition = processDefinitionMapper.queryByCode(processDefinition.getCode());
-            schedule.setProcessDefinitionId(newProcessDefinition.getId());
+            schedule.setProcessDefinitionCode(processDefinition.getCode());
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);

@@ -263,7 +263,7 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.deleteProcessDefinitionById(user, projectCode, id)).thenReturn(result);
+        Mockito.when(processDefinitionService.deleteProcessDefinitionByCode(user, projectCode, id)).thenReturn(result);
         Result response = processDefinitionController.deleteProcessDefinitionById(user, projectCode, id);
 
         Assert.assertTrue(response != null && response.isSuccess());

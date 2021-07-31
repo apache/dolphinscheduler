@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_COPY_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_MOVE_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
@@ -540,25 +540,25 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * delete process definition by id
+     * delete process definition by code
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionId process definition id
+     * @param processDefinitionCode process definition code
      * @return delete result code
      */
-    @ApiOperation(value = "deleteByCode", notes = "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiOperation(value = "deleteByCode", notes = "DELETE_PROCESS_DEFINITION_BY_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100")
     })
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROCESS_DEFINE_BY_ID_ERROR)
+    @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @RequestParam("processDefinitionId") Integer processDefinitionId) {
-        Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, processDefinitionId);
+                                              @RequestParam("processDefinitionCode") long processDefinitionCode) {
+        Map<String, Object> result = processDefinitionService.deleteProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
         return returnDataList(result);
     }
 
@@ -567,41 +567,41 @@ public class ProcessDefinitionController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionIds process definition id list
+     * @param processDefinitionCodes process definition code list
      * @return delete result code
      */
-    @ApiOperation(value = "batchDeleteByCodes", notes = "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiOperation(value = "batchDeleteByCodes", notes = "BATCH_DELETE_PROCESS_DEFINITION_BY_CODES_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", type = "String")
+        @ApiImplicitParam(name = "processDefinitionCodes", value = "PROCESS_DEFINITION_CODES", type = "String")
     })
     @GetMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR)
+    @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchDeleteProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                    @RequestParam("processDefinitionIds") String processDefinitionIds
+                                                    @RequestParam("processDefinitionCodes") String processDefinitionCodes
     ) {
         Map<String, Object> result = new HashMap<>();
-        List<String> deleteFailedIdList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(processDefinitionIds)) {
-            String[] processDefinitionIdArray = processDefinitionIds.split(",");
-            for (String strProcessDefinitionId : processDefinitionIdArray) {
-                int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+        List<String> deleteFailedCodeList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(processDefinitionCodes)) {
+            String[] processDefinitionCodeArray = processDefinitionCodes.split(",");
+            for (String strProcessDefinitionCode : processDefinitionCodeArray) {
                 try {
-                    Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, processDefinitionId);
+                    Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
+                            projectCode, Long.parseLong(strProcessDefinitionCode));
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedIdList.add(strProcessDefinitionId);
+                        deleteFailedCodeList.add(strProcessDefinitionCode);
                         logger.error((String) deleteResult.get(Constants.MSG));
                     }
                 } catch (Exception e) {
-                    deleteFailedIdList.add(strProcessDefinitionId);
+                    deleteFailedCodeList.add(strProcessDefinitionCode);
                 }
             }
         }
 
-        if (!deleteFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
+        if (!deleteFailedCodeList.isEmpty()) {
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR, String.join(",", deleteFailedCodeList));
         } else {
             putMsg(result, Status.SUCCESS);
         }
