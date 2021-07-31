@@ -477,8 +477,6 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
             Constants.NOT_TERMINATED_STATES)).thenReturn(null);
 
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode())).thenReturn(schedules);
-
         Mockito.when(processDefineMapper.deleteByCode(processDefinitionCode)).thenReturn(1);
 
         Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode())).thenReturn(
@@ -585,9 +583,6 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
                 Constants.NOT_TERMINATED_STATES)).thenReturn(null);
 
-        schedules.add(getSchedule());
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode())).thenReturn(schedules);
-
         Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
                 projectCode, processDefinitionCode);
 
@@ -643,8 +638,6 @@ public class ProcessDefinitionServiceTest {
 
         Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
                 Constants.NOT_TERMINATED_STATES)).thenReturn(null);
-
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode())).thenReturn(schedules);
 
         Mockito.when(processDefineMapper.deleteByCode(processDefinitionCode)).thenReturn(0);
 

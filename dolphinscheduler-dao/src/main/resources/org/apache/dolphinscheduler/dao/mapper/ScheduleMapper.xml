@@ -23,8 +23,10 @@
         warning_type, warning_group_id, process_instance_priority, worker_group, create_time, update_time
     </sql>
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.process_definition_code, ${alias}.start_time, ${alias}.end_time, ${alias}.timezone_id, ${alias}.crontab, ${alias}.failure_strategy, ${alias}.user_id, ${alias}.release_state,
-        ${alias}.warning_type, ${alias}.warning_group_id, ${alias}.process_instance_priority, ${alias}.worker_group, ${alias}.create_time, ${alias}.update_time
+        ${alias}.id, ${alias}.process_definition_code, ${alias}.start_time, ${alias}.end_time, ${alias}.timezone_id,
+        ${alias}.crontab, ${alias}.failure_strategy, ${alias}.user_id, ${alias}.release_state, ${alias}.warning_type,
+        ${alias}.warning_group_id, ${alias}.process_instance_priority, ${alias}.worker_group, ${alias}.create_time,
+        ${alias}.update_time
     </sql>
     <select id="queryByProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select p_f.name as process_definition_name, p.name as project_name,u.user_name,
