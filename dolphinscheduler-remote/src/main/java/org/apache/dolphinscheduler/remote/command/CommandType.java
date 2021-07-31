@@ -121,5 +121,10 @@ public enum CommandType {
     /**
      *  alert send response
      */
-    ALERT_SEND_RESPONSE;
+    ALERT_SEND_RESPONSE,
+
+    /**
+     * state event request
+     */
+    STATE_EVENT_REQUEST;
 }

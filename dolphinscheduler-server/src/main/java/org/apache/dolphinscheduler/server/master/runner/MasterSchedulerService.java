@@ -25,13 +25,20 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.StateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -95,6 +102,11 @@ public class MasterSchedulerService extends Thread {
      */
     private ThreadPoolExecutor masterExecService;
 
+    /**
+     *
+     */
+    private StateEventCallbackService stateEventCallbackService;
+
     private ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps ;
     private ConcurrentHashMap<String, MasterExecThread> eventHandlerMap = new ConcurrentHashMap();
     ListeningExecutorService listeningExecutorService;
@@ -106,6 +118,7 @@ public class MasterSchedulerService extends Thread {
     public void init(ConcurrentHashMap<Integer, MasterExecThread> processInstanceExecMaps) {
         this.processInstanceExecMaps = processInstanceExecMaps;
         this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
+        this.stateEventCallbackService = SpringApplicationContext.getBean(StateEventCallbackService.class);
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
         ExecutorService eventService = ThreadUtils.newDaemonFixedThreadExecutor("MasterEventExecution", masterConfig.getMasterExecThreads());
@@ -176,6 +189,7 @@ public class MasterSchedulerService extends Thread {
                 public void onSuccess(Object o) {
                     if (masterExecThread.workFlowFinish()) {
                         processInstanceExecMaps.remove(processInstanceId);
+                        notifyProcessChanged();
                         logger.info("process instance {} finished.", processInstanceId);
                     }
                     if(masterExecThread.getProcessInstance().getId() != processInstanceId){
@@ -183,6 +197,37 @@ public class MasterSchedulerService extends Thread {
                         processInstanceExecMaps.put(masterExecThread.getProcessInstance().getId(), masterExecThread);
                     }
                     eventHandlerMap.remove(masterExecThread.getKey());
+                }
+
+                private void notifyProcessChanged() {
+                    List<ProcessInstance> processInstances  = processService.notifyProcessList(processInstanceId, 0);
+
+                    for(ProcessInstance processInstance : processInstances){
+                        if(processInstance.getHost() == NetUtils.getHost()){
+                            notifyMyself(processInstance);
+                        } else{
+                            notifyProcess(processInstance);
+                        }
+                    }
+                }
+
+                private void notifyMyself(ProcessInstance processInstance){
+                    MasterExecThread masterExecThreadNotify = processInstanceExecMaps.get(processInstance.getId());
+                    StateEvent stateEvent = new StateEvent();
+                    stateEvent.setType("process");
+                    stateEvent.setProcessInstanceId(processInstanceId);
+                    stateEvent.setExecutionStatus(processInstance.getState());
+                    masterExecThreadNotify.addStateEvent(stateEvent);
+                }
+
+                private void notifyProcess(ProcessInstance processInstance){
+                    String host = processInstance.getHost();
+                    StateEventChangeCommand stateEventChangeCommand = new StateEventChangeCommand(
+                            processInstanceId, 0, masterExecThread.getProcessInstance().getState(), processInstance.getId(), 0
+                    );
+
+                    stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());
+
                 }
 
                 @Override

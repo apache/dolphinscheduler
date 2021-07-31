@@ -57,8 +57,7 @@ public class TaskResponseService {
     /**
      * attemptQueue
      */
-    private final BlockingQueue<TaskResponseEvent> eventQueue = new LinkedBlockingQueue<>(5000);
-
+    private final BlockingQueue<TaskResponseEvent> eventQueue = new LinkedBlockingQueue<>();
 
     /**
      * process service
@@ -79,10 +78,10 @@ public class TaskResponseService {
     }
 
 
-        @PostConstruct
+    @PostConstruct
     public void start() {
         this.taskResponseWorker = new TaskResponseWorker();
-        this.taskResponseWorker.setName("TaskResponseWorker");
+        this.taskResponseWorker.setName("StateEventResponseWorker");
         this.taskResponseWorker.start();
     }
 
@@ -132,7 +131,7 @@ public class TaskResponseService {
                     logger.error("persist task error", e);
                 }
             }
-            logger.info("TaskResponseWorker stopped");
+            logger.info("StateEventResponseWorker stopped");
         }
     }
 

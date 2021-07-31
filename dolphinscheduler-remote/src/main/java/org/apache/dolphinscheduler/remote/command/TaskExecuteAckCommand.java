@@ -55,7 +55,7 @@ public class TaskExecuteAckCommand implements Serializable {
      */
     private int status;
 
-    /**
+     /**
      * logPath
      */
     private String logPath;

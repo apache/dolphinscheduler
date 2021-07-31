@@ -2574,4 +2574,15 @@ public class ProcessService {
         List<Resource> relationResources = CollectionUtils.isNotEmpty(relationResourceIds) ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
         ownResources.addAll(relationResources);
     }
+
+    public List<ProcessInstance> notifyProcessList(int processId, int taskId) {
+        List<ProcessInstance> processInstances = new ArrayList<>();
+        //find sub tasks
+        ProcessInstance fatherProcess = this.findParentProcessInstance(processId);
+        if(fatherProcess != null){
+            processInstances.add(fatherProcess);
+        }
+        return processInstances;
+    }
+
 }

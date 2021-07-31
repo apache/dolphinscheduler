@@ -60,8 +60,6 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
-    protected RegistryClient registryClient = SpringApplicationContext.getBean(RegistryClient .class);
-
 
     @Override
     public boolean submit(TaskInstance taskInstance, ProcessInstance processInstance, int maxRetryTimes, int commitInterval) {

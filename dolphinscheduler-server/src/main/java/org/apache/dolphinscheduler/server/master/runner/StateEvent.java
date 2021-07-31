@@ -16,9 +16,16 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import io.netty.channel.Channel;
+
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
 public class StateEvent {
+
+    /**
+     * origin_pid-origin_task_id-process_instance_id-task_instance_id
+     */
+    private String key;
 
     private String type;
 
@@ -29,6 +36,8 @@ public class StateEvent {
     private int processInstanceId;
 
     private String context;
+
+    private Channel channel;
 
     public ExecutionStatus getExecutionStatus() {
         return executionStatus;
@@ -70,9 +79,16 @@ public class StateEvent {
         this.taskInstanceId = taskInstanceId;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "State Event :" +
                 " type" + type +
                 " executeStatus:" + executionStatus +
@@ -81,5 +97,13 @@ public class StateEvent {
                 " context: " + context
                 ;
 
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
