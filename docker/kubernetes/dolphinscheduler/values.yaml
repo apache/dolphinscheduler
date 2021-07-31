@@ -23,7 +23,7 @@ timezone: "Asia/Shanghai"
 
 image:
   repository: "apache/dolphinscheduler"
-  tag: "latest"
+  tag: "1.3.7-SNAPSHOT"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
 
@@ -83,6 +83,7 @@ common:
     LOGIN_USER_KEYTAB_PATH: "/opt/hdfs.keytab"
     KERBEROS_EXPIRE_TIME: "2"
     HDFS_ROOT_USER: "hdfs"
+    RESOURCE_MANAGER_HTTPADDRESS_PORT: "8088"
     YARN_RESOURCEMANAGER_HA_RM_IDS: ""
     YARN_APPLICATION_STATUS_ADDRESS: "http://ds1:8088/ws/v1/cluster/apps/%s"
     # skywalking

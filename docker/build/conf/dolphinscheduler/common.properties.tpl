@@ -57,6 +57,9 @@ fs.s3a.access.key=${FS_S3A_ACCESS_KEY}
 # if resource.storage.type=S3, s3 secret key
 fs.s3a.secret.key=${FS_S3A_SECRET_KEY}
 
+# resourcemanager port, the default value is 8088 if not specified
+resource.manager.httpaddress.port=${RESOURCE_MANAGER_HTTPADDRESS_PORT}
+
 # if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty
 yarn.resourcemanager.ha.rm.ids=${YARN_RESOURCEMANAGER_HA_RM_IDS}
 

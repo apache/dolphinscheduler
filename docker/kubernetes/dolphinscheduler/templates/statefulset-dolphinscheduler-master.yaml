@@ -115,13 +115,12 @@ spec:
         name: {{ include "dolphinscheduler.fullname" . }}-master
         labels:
           app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-          app.kubernetes.io/instance: {{ .Release.Name }}
-          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:
-          {{- range .Values.master.persistentVolumeClaim.accessModes }}
-            - {{ . | quote }}
-          {{- end }}
+        {{- range .Values.master.persistentVolumeClaim.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
         storageClassName: {{ .Values.master.persistentVolumeClaim.storageClassName | quote }}
         resources:
           requests:
