@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.task.mr;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
@@ -84,13 +83,8 @@ public class MapReduceTask extends AbstractYarnTask {
         mapreduceParameters.setQueue(taskExecutionContext.getQueue());
         setMainJarName();
 
-        // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                taskExecutionContext.getDefinedParams(),
-                mapreduceParameters.getLocalParametersMap(),
-                mapreduceParameters.getVarPoolMap(),
-                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                taskExecutionContext.getScheduleTime());
+        // replace placeholder,and combine local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
         if (paramsMap != null) {
             String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));

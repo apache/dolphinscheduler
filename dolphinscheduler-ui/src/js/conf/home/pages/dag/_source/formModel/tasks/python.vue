@@ -66,6 +66,8 @@
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
   import Clipboard from 'clipboard'
+  import { diGuiTree, searchTree } from './_source/resourceTree'
+
   let editor
 
   export default {
@@ -198,40 +200,14 @@
 
         return editor
       },
-      diGuiTree (item) { // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
-            ? this.operationTree(item) : this.diGuiTree(item.children)
-        })
-      },
-      operationTree (item) {
-        if (item.dirctory) {
-          item.isDisabled = true
-        }
-        delete item.children
-      },
-      searchTree (element, id) {
-        // 根据id查找节点
-        if (element.id === id) {
-          return element
-        } else if (element.children !== null) {
-          let i
-          let result = null
-          for (i = 0; result === null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id)
-          }
-          return result
-        }
-        return null
-      },
       dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
             this.resourceOptions.forEach(v1 => {
-              if (this.searchTree(v1, v)) {
-                isResourceId.push(this.searchTree(v1, v))
+              if (searchTree(v1, v)) {
+                isResourceId.push(searchTree(v1, v))
               }
             })
           })
@@ -297,8 +273,8 @@
         if (this.resourceList.length > 0) {
           this.resourceList.forEach(v => {
             this.resourceOptions.forEach(v1 => {
-              if (this.searchTree(v1, v)) {
-                isResourceId.push(this.searchTree(v1, v))
+              if (searchTree(v1, v)) {
+                isResourceId.push(searchTree(v1, v))
               }
             })
           })
@@ -317,7 +293,7 @@
     },
     created () {
       let item = this.store.state.dag.resourcesListS
-      this.diGuiTree(item)
+      diGuiTree(item)
       this.resourceOptions = item
       let o = this.backfillItem
 

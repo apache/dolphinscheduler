@@ -281,6 +281,11 @@
       max-height: 600px;
       overflow-y: scroll;
       padding:0 20px;
+
+      ::selection {
+        background: #409EFF ;
+        color: white;
+      }
     }
     .title {
       line-height: 36px;
