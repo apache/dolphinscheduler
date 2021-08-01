@@ -16,5 +16,31 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-public class BlockingTaskExecThread {
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+
+import java.util.Date;
+
+public class BlockingTaskExecThread extends MasterBaseTaskExecThread{
+
+    public BlockingTaskExecThread(TaskInstance taskInstance){
+        super(taskInstance);
+    }
+
+    /**
+    * For test use, test process run properly
+    * set start time, end time
+    * set task task status SUCCESS
+    * the piece of code copy from ConditionExecThread.java
+    */
+    @Override
+    protected Boolean submitWaitComplete() {
+        taskInstance.setStartTime(new Date());
+        this.taskInstance = submit();
+        ExecutionStatus status = ExecutionStatus.SUCCESS;
+        taskInstance.setState(status);
+        taskInstance.setEndTime(new Date());
+        processService.updateTaskInstance(taskInstance);
+        return true;
+    }
 }
