@@ -511,7 +511,7 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isBlockingTask(){
-        return TaskType.BLOCKING_TASK.getDesc().equalsIgnoreCase(this.taskType);
+        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.taskType);
     }
 
     /**
