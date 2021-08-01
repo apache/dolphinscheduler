@@ -88,4 +88,11 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId,@Param("dataSourceIds")T[] dataSourceIds);
 
 
+    /**
+     *
+     * @param name datasource name
+     * @return if exist return true else return null
+     */
+    Boolean existDataSourceByName(@Param("name") String name);
+
 }

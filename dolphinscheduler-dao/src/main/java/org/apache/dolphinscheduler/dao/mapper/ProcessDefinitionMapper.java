@@ -189,4 +189,12 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return definition id
      */
     Integer queryHasAssociatedDefinitionByIdAndVersion(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
+
+    /**
+     *
+     * @param projectCode projectCode
+     * @param name name
+     * @return if exist return true else return null
+     */
+    Boolean existDefByProjectCodeAndDefineName(@Param("projectCode") Long projectCode, @Param("processDefinitionName") String name);
 }

@@ -386,4 +386,46 @@ public class ProcessDefinitionMapperTest {
         Assert.assertNotNull(projectIds);
     }
 
+    @Test
+    public void existByDefineName() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setCode(1L);
+        project.setUserId(4);
+        project.setCreateTime(new Date());
+        projectMapper.insert(project);
+
+        Queue queue = new Queue();
+        queue.setQueue("queue");
+        queue.setQueueName("queue name");
+        queueMapper.insert(queue);
+
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("tenant");
+        tenant.setQueueId(queue.getId());
+        tenant.setDescription("t");
+        tenantMapper.insert(tenant);
+
+        User user = new User();
+        user.setUserName("hello");
+        user.setUserPassword("pwd");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setTenantId(tenant.getId());
+        userMapper.insert(user);
+
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setName("def 1");
+        processDefinition.setProjectCode(project.getCode());
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(tenant.getId());
+        processDefinition.setUserId(user.getId());
+        processDefinitionMapper.insert(processDefinition);
+
+        Assert.assertTrue(processDefinitionMapper.existDefByProjectCodeAndDefineName(project.getCode(), "def 1"));
+        Assert.assertNull(processDefinitionMapper.existDefByProjectCodeAndDefineName(project.getCode(), "def 2"));
+    }
+
 }
