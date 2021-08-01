@@ -148,6 +148,7 @@ public class TenantMapperTest {
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }
 
+    @Test
     public void testExistTenant() {
         String tenantCode = "test_code";
         Assert.assertNull(tenantMapper.existTenant(tenantCode));

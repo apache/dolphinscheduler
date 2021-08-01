@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.common.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -176,8 +177,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     private boolean checkName(String name) {
-        List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
-        return queryDataSource != null && !queryDataSource.isEmpty();
+        return BooleanUtils.isTrue(dataSourceMapper.existDataSourceByName(name.trim()));
     }
 
     /**

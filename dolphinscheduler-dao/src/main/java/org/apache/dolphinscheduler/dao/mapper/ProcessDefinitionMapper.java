@@ -164,4 +164,30 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return project ids list
      */
     List<Integer> listProjectIds();
+
+    /**
+     * query the paging process definition version list by pagination info
+     *
+     * @param page pagination info
+     * @param processDefinitionCode process definition code
+     * @return the paging process definition version list
+     */
+    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
+                                                                         @Param("processDefinitionCode") Long processDefinitionCode);
+    /**
+     * query has associated definition by id and version
+     * @param processDefinitionId process definition id
+     * @param version version
+     * @return definition id
+     */
+    Integer queryHasAssociatedDefinitionByIdAndVersion(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
+
+    /**
+     *
+     * @param projectCode projectCode
+     * @param name name
+     * @return if exist return true else return null
+     */
+    Boolean existDefByProjectCodeAndDefineName(@Param("projectCode") Long projectCode, @Param("processDefinitionName") String name);
+
 }
