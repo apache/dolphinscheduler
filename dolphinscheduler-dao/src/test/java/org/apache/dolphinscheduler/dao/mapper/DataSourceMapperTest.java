@@ -286,6 +286,14 @@ public class DataSourceMapperTest {
         Assert.assertTrue(authorizedDataSource.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(dataSourceIds)));
     }
 
+    @Test
+    public void testExistDataSource() {
+        String name = "test";
+        createDataSource(name);
+        Assert.assertTrue(dataSourceMapper.existDataSourceByName(name));
+        Assert.assertNull(dataSourceMapper.existDataSourceByName("does not exist"));
+    }
+
     /**
      * create datasource relation
      * @param userId

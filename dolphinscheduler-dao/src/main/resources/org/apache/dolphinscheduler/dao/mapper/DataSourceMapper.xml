@@ -98,4 +98,10 @@
             </foreach>
         </if>
     </select>
+
+    <select id="existDataSourceByName" resultType="java.lang.Boolean">
+        select 1
+        from t_ds_datasource
+        where name=#{name}
+    </select>
 </mapper>

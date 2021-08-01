@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -1111,9 +1112,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             String subProcessJson = JSONUtils.toJsonString(processService.genProcessData(subProcess));
             //check current project has sub process
-            ProcessDefinition currentProjectSubProcess = processDefinitionMapper.queryByDefineName(targetProject.getCode(), subProcess.getName());
+            boolean definitionExists = BooleanUtils.isTrue(
+                    processDefinitionMapper.existByDefineName(targetProject.getCode(), subProcess.getName()));
 
-            if (null == currentProjectSubProcess) {
+            if (!definitionExists) {
                 ArrayNode subJsonArray = (ArrayNode) JSONUtils.parseObject(subProcessJson).get(TASKS);
 
                 List<Object> subProcessList = StreamUtils.asStream(subJsonArray.elements())
