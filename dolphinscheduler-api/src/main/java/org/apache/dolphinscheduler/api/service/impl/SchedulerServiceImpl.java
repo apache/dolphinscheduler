@@ -140,7 +140,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         scheduleObj.setProjectName(project.getName());
-        scheduleObj.setProcessDefinitionId(processDefinition.getId());
+        scheduleObj.setProcessDefinitionCode(processDefineCode);
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
@@ -228,9 +228,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        ProcessDefinition processDefinition = processService.findProcessDefineById(schedule.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, schedule.getProcessDefinitionId());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, schedule.getProcessDefinitionCode());
             return result;
         }
 
@@ -326,9 +326,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             putMsg(result, Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
             return result;
         }
-        ProcessDefinition processDefinition = processService.findProcessDefineById(scheduleObj.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, scheduleObj.getProcessDefinitionId());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, scheduleObj.getProcessDefinitionCode());
             return result;
         }
 
@@ -342,7 +342,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             }
             // check sub process definition release state
             List<Integer> subProcessDefineIds = new ArrayList<>();
-            processService.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
+            processService.recurseFindSubProcessId(processDefinition.getId(), subProcessDefineIds);
             Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
             if (!subProcessDefineIds.isEmpty()) {
                 List<ProcessDefinition> subProcessDefinitionList =
@@ -430,7 +430,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         Page<Schedule> page = new Page<>(pageNo, pageSize);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineIdPaging(page, processDefinition.getId(),
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode,
             searchVal);
 
         PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);

@@ -611,7 +611,7 @@ CREATE TABLE t_ds_resources (
 DROP TABLE IF EXISTS t_ds_schedules;
 CREATE TABLE t_ds_schedules (
   id int NOT NULL  ,
-  process_definition_id int NOT NULL ,
+  process_definition_code bigint NOT NULL ,
   start_time timestamp NOT NULL ,
   end_time timestamp NOT NULL ,
   timezone_id varchar(40) default NULL ,
