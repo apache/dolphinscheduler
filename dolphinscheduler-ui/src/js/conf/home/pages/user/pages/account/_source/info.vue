@@ -73,7 +73,7 @@
   </div>
 </template>
 <script>
-  import { mapState, mapMutations } from 'vuex'
+  import { mapActions, mapState, mapMutations } from 'vuex'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 
@@ -85,6 +85,7 @@
     props: {},
     methods: {
       ...mapMutations('user', ['setUserInfo']),
+      ...mapActions('user', ['getUserInfo']),
       /**
        * edit
        */
@@ -101,19 +102,17 @@
             return h(mCreateUser, {
               on: {
                 onUpdate (param) {
-                  self.setUserInfo({
-                    userName: param.userName,
-                    userPassword: param.userPassword,
-                    email: param.email,
-                    phone: param.phone
+                  self.setUserInfo(param)
+                  self.getUserInfo().finally(() => {
+                    modal.remove()
                   })
-                  modal.remove()
                 },
                 close () {
                 }
               },
               props: {
-                item: item
+                item: item,
+                fromUserInfo: true
               }
             })
           }

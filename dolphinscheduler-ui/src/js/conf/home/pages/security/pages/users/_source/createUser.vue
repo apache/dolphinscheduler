@@ -124,7 +124,8 @@
       }
     },
     props: {
-      item: Object
+      item: Object,
+      fromUserInfo: Boolean
     },
     methods: {
       _ok () {
@@ -277,7 +278,7 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
-            if (this.item.tenantId) {
+            if (this.fromUserInfo || this.item.tenantId) {
               this.tenantId = this.item.tenantId
             }
             this.$nextTick(() => {
@@ -294,7 +295,7 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
-          if (this.item.tenantId) {
+          if (this.fromUserInfo || this.item.tenantId) {
             this.tenantId = this.item.tenantId
           }
           if (this.queueList.length > 0) {
