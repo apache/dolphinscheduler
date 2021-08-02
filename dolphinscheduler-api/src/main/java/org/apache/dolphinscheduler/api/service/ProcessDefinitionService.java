@@ -178,16 +178,16 @@ public interface ProcessDefinitionService {
                                                     String name);
 
     /**
-     * delete process definition by code
+     * delete process definition by id
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionCode process definition code
+     * @param processDefinitionId process definition id
      * @return delete result code
      */
-    Map<String, Object> deleteProcessDefinitionByCode(User loginUser,
-                                                      long projectCode,
-                                                      long processDefinitionCode);
+    Map<String, Object> deleteProcessDefinitionById(User loginUser,
+                                                    long projectCode,
+                                                    Integer processDefinitionId);
 
     /**
      * release process definition: online / offline
