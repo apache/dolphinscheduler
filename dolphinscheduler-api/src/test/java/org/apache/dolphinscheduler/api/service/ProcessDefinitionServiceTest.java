@@ -457,197 +457,87 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testDeleteProcessDefinitionByCode_success() {
+    public void deleteProcessDefinitionByIdTest() {
         long projectCode = 1L;
-        long processDefinitionCode = 1L;
-
-        User loginUser = getUser();
-        Project project = getProject(projectCode);
-        ProcessDefinition processDefinition = getProcessDefinition();
-        List<Schedule> schedules = getSchedulerList();
-
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
-
-        Mockito.when(processDefineMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
-
-        Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
-            Constants.NOT_TERMINATED_STATES)).thenReturn(null);
-
-        Mockito.when(processDefineMapper.deleteByCode(processDefinitionCode)).thenReturn(1);
-
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode())).thenReturn(
-            1);
-
-        Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-            projectCode, processDefinitionCode);
-
-        Assert.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testDeleteProcessDefinitionByCode_PROCESS_DEFINE_NOT_EXIST() {
-        long projectCode = 1L;
-        long processDefinitionCode = 1L;
-
-        User loginUser = getUser();
         Project project = getProject(projectCode);
-        List<Schedule> schedules = getSchedulerList();
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
-
-        Mockito.when(processDefineMapper.queryByCode(processDefinitionCode)).thenReturn(null);
-
-        Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-                projectCode, processDefinitionCode);
-
-        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, deleteResult.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testDeleteProcessDefinitionByCode_USER_NO_OPERATION_PERM() {
-        long projectCode = 1L;
-        long processDefinitionCode = 1L;
-
-        User loginUser = getUser();
-        Project project = getProject(projectCode);
-        ProcessDefinition processDefinition = getProcessDefinition();
-        List<Schedule> schedules = getSchedulerList();
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
-
-        Mockito.when(processDefineMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
-
-        loginUser.setId(1);
+        User loginUser = new User();
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-                projectCode, processDefinitionCode);
 
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, deleteResult.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testDeleteProcessDefinitionByCode_PROCESS_DEFINE_STATE_ONLINE() {
-        long projectCode = 1L;
-        long processDefinitionCode = 1L;
-
-        User loginUser = getUser();
-        Project project = getProject(projectCode);
-        ProcessDefinition processDefinition = getProcessDefinition();
-        List<Schedule> schedules = getSchedulerList();
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
+        //project check auth fail
         Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        Map<String, Object> map = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 6);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
+
+        //project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        Mockito.when(processDefineMapper.selectById(1)).thenReturn(null);
+        Map<String, Object> instanceNotExitRes = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 1);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotExitRes.get(Constants.STATUS));
 
+        ProcessDefinition processDefinition = getProcessDefinition();
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        //user no auth
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Map<String, Object> userNoAuthRes = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 46);
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, userNoAuthRes.get(Constants.STATUS));
+
+        //process definition online
+        loginUser.setUserType(UserType.ADMIN_USER);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
-        Mockito.when(processDefineMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Map<String, Object> dfOnlineRes = processDefinitionService.deleteProcessDefinitionById(loginUser,projectCode, 46);
+        Assert.assertEquals(Status.PROCESS_DEFINE_STATE_ONLINE, dfOnlineRes.get(Constants.STATUS));
 
-        Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-                projectCode, processDefinitionCode);
-
-        Assert.assertEquals(Status.PROCESS_DEFINE_STATE_ONLINE, deleteResult.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testDeleteProcessDefinitionByCode_DELETE_PROCESS_DEFINE_BY_CODE_ERROR() {
-        long projectCode = 1L;
-        long processDefinitionCode = 1L;
-
-        User loginUser = getUser();
-        Project project = getProject(projectCode);
-        ProcessDefinition processDefinition = getProcessDefinition();
-        List<Schedule> schedules = new ArrayList<>(Arrays.asList(getSchedule()));
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        Map<String, Object> result = new HashMap<>();
+        //scheduler list elements > 1
+        processDefinition.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        List<Schedule> schedules = new ArrayList<>();
+        schedules.add(getSchedule());
+        schedules.add(getSchedule());
+        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46)).thenReturn(schedules);
+        Map<String, Object> schedulerGreaterThanOneRes = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 46);
+        Assert.assertEquals(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR, schedulerGreaterThanOneRes.get(Constants.STATUS));
 
-        Mockito.when(processDefineMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
-
-        Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
-                Constants.NOT_TERMINATED_STATES)).thenReturn(null);
-
-        Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-                projectCode, processDefinitionCode);
-
-        Assert.assertEquals(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR, deleteSuccess.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testDeleteProcessDefinitionByCode_SCHEDULE_CRON_STATE_ONLINE() {
-        long projectCode = 1L;
-
-        User loginUser = getUser();
-        Project project = getProject(projectCode);
-        ProcessDefinition processDefinition = getProcessDefinition();
-        List<Schedule> schedules = getSchedulerList();
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        Map<String, Object> result = new HashMap<>();
+        //scheduler online
+        schedules.clear();
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        schedules.add(schedule);
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46)).thenReturn(schedules);
+        Map<String, Object> schedulerOnlineRes = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 46);
+        Assert.assertEquals(Status.SCHEDULE_CRON_STATE_ONLINE, schedulerOnlineRes.get(Constants.STATUS));
 
-        Mockito.when(processDefineMapper.queryByCode(processDefinition.getCode())).thenReturn(processDefinition);
-
-        Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
-                Constants.NOT_TERMINATED_STATES)).thenReturn(null);
-
-        schedules.get(0).setReleaseState(ReleaseState.ONLINE);
-        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(processDefinition.getCode())).thenReturn(schedules);
-
-        Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-                projectCode, processDefinition.getCode());
-
-        Assert.assertEquals(Status.SCHEDULE_CRON_STATE_ONLINE, deleteSuccess.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testDeleteProcessDefinitionByCode_DELETE_PROCESS_DEFINE_BY_CODE_ERROR2() {
-        long projectCode = 1L;
-        long processDefinitionCode = 1L;
-
-        User loginUser = getUser();
-        Project project = getProject(projectCode);
-        ProcessDefinition processDefinition = getProcessDefinition();
-        List<Schedule> schedules = getSchedulerList();
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        Map<String, Object> result = new HashMap<>();
+        //delete fail
+        schedules.clear();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedules.add(schedule);
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46)).thenReturn(schedules);
+        Mockito.when(processDefineMapper.deleteById(46)).thenReturn(0);
+        Map<String, Object> deleteFail = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 46);
+        Assert.assertEquals(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR, deleteFail.get(Constants.STATUS));
 
-        Mockito.when(processDefineMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
-
-        Mockito.when(processInstanceService.queryByProcessDefineCodeAndStatus(processDefinition.getCode(),
-                Constants.NOT_TERMINATED_STATES)).thenReturn(null);
-
-        Mockito.when(processDefineMapper.deleteByCode(processDefinitionCode)).thenReturn(0);
-
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode())).thenReturn(
-                0);
-
-        Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionByCode(loginUser,
-                projectCode, processDefinitionCode);
-
-        Assert.assertEquals(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR, deleteSuccess.get(Constants.STATUS));
+        //delete success
+        Mockito.when(processDefineMapper.deleteById(46)).thenReturn(1);
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
+        Map<String, Object> deleteSuccess = processDefinitionService.deleteProcessDefinitionById(loginUser, projectCode, 46);
+        Assert.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
     }
 
     @Test
@@ -998,7 +888,6 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(46L);
-        processDefinition.setUserId(-1);
 
         return processDefinition;
     }
@@ -1069,13 +958,6 @@ public class ProcessDefinitionServiceTest {
         List<Schedule> scheduleList = new ArrayList<>();
         scheduleList.add(getSchedule());
         return scheduleList;
-    }
-
-    private User getUser() {
-        User loginUser = new User();
-        loginUser.setId(-1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        return loginUser;
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
