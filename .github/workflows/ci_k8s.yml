@@ -26,25 +26,31 @@ on:
     paths:
      - '.github/workflows/ci_k8s.yml'
      - 'dolphinscheduler/docker/kubernetes/**'
-
+     
+# 后续可能用到的常量
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
 jobs:
 
+# 此处的build是job_id
+# 在此个jobs中，没有设置needs字段，所以执行顺序是没有确定的
+
   build:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # runs-on 是必填字段
     steps:
       - uses: actions/checkout@v2
         with:
           submodule: true
       - name: Check License Header
         uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
+
+      # TODO: 
   
   lint:
-    runs-on: ubuntu-test
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -69,7 +75,7 @@ jobs:
       
 
   test:
-    runs-on: ubuntu-test
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -95,3 +101,7 @@ jobs:
 
       - name: Run chart-testing (install)
         run: ct install
+
+  check: 
+
+  # TODO:
