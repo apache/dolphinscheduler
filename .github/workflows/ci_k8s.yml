@@ -26,7 +26,7 @@ on:
     paths:
      - '.github/workflows/ci_k8s.yml'
      - 'dolphinscheduler/docker/kubernetes/**'
-     
+
 # 后续可能用到的常量
 env:
   DOCKER_DIR: ./docker
@@ -102,6 +102,8 @@ jobs:
       - name: Run chart-testing (install)
         run: ct install
 
-  check: 
+  # check: 
+  #   runs-on: ubuntu-latest
+  #     steps:
 
   # TODO:
