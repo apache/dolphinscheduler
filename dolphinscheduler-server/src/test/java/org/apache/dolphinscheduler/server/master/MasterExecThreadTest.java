@@ -76,7 +76,7 @@ public class MasterExecThreadTest {
 
     private ProcessService processService;
 
-    private int processDefinitionId = 1;
+    private long processDefinitionCode = 1L;
 
     private MasterConfig config;
 
@@ -104,6 +104,7 @@ public class MasterExecThreadTest {
         processDefinition.setGlobalParamMap(Collections.EMPTY_MAP);
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
+        Mockito.when(processInstance.getProcessDefinitionCode()).thenReturn(processDefinitionCode);
 
         masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService, null, null, config));
         // prepareProcess init dag
@@ -120,9 +121,9 @@ public class MasterExecThreadTest {
      * without schedule
      */
     @Test
-    public void testParallelWithOutSchedule() throws ParseException {
+    public void testParallelWithOutSchedule() {
         try {
-            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
             method.invoke(masterExecThread);
@@ -140,12 +141,12 @@ public class MasterExecThreadTest {
     @Test
     public void testParallelWithSchedule() {
         try {
-            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(oneSchedulerList());
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
             method.invoke(masterExecThread);
             // one create save, and 9(1 to 20 step 2) for next save, and last day 31 no save
-            verify(processService, times(20)).saveProcessInstance(processInstance);
+            verify(processService, times(9)).saveProcessInstance(processInstance);
         } catch (Exception e) {
             Assert.fail();
         }

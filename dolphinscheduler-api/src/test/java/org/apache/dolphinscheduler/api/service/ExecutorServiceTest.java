@@ -152,7 +152,7 @@ public class ExecutorServiceTest {
     @Test
     public void testNoComplement() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode, cronTime, CommandType.START_PROCESS,
                 null, null,
@@ -170,7 +170,7 @@ public class ExecutorServiceTest {
     @Test
     public void testComplementWithStartNodeList() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode, cronTime, CommandType.START_PROCESS,
                 null, "n1,n2",
@@ -188,7 +188,7 @@ public class ExecutorServiceTest {
     @Test
     public void testDateError() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode, "2020-01-31 23:00:00,2020-01-01 00:00:00", CommandType.COMPLEMENT_DATA,
                 null, null,
@@ -205,7 +205,7 @@ public class ExecutorServiceTest {
     @Test
     public void testSerial() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode, cronTime, CommandType.COMPLEMENT_DATA,
                 null, null,
@@ -222,7 +222,7 @@ public class ExecutorServiceTest {
     @Test
     public void testParallelWithOutSchedule() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(zeroSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode, cronTime, CommandType.COMPLEMENT_DATA,
                 null, null,
@@ -240,7 +240,7 @@ public class ExecutorServiceTest {
     @Test
     public void testParallelWithSchedule() {
 
-        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode)).thenReturn(oneSchedulerList());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode, cronTime, CommandType.COMPLEMENT_DATA,
                 null, null,
