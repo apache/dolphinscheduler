@@ -126,6 +126,9 @@ public class ProcessServiceTest {
         //father history: start; child null == command type: start
         parentInstance.setHistoryCmd("START_PROCESS");
         parentInstance.setCommandType(CommandType.START_PROCESS);
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        Mockito.when(processDefineMapper.queryByDefineId(100)).thenReturn(processDefinition);
         command = processService.createSubProcessCommand(parentInstance, childInstance, instanceMap, task);
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
 
@@ -227,16 +230,15 @@ public class ProcessServiceTest {
         String host = "127.0.0.1";
         int validThreadNum = 1;
         Command command = new Command();
-        command.setProcessDefinitionId(222);
+        command.setProcessDefinitionCode(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
                 + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
-        Mockito.when(processDefineMapper.selectById(command.getProcessDefinitionId())).thenReturn(null);
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
         //there is not enough thread for this command
         Command command1 = new Command();
-        command1.setProcessDefinitionId(123);
+        command1.setProcessDefinitionCode(123);
         command1.setCommandParam("{\"ProcessInstanceId\":222}");
         command1.setCommandType(CommandType.START_PROCESS);
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -254,31 +256,35 @@ public class ProcessServiceTest {
         processDefinition.setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
-        Mockito.when(processDefineMapper.selectById(command1.getProcessDefinitionId())).thenReturn(processDefinition);
+        processInstance.setProcessDefinitionCode(11L);
+        processInstance.setProcessDefinitionVersion(1);
+        Mockito.when(processDefineMapper.queryByCode(command1.getProcessDefinitionCode())).thenReturn(processDefinition);
+        Mockito.when(processDefineLogMapper.queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog(processDefinition));
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
         Command command2 = new Command();
         command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
-        command2.setProcessDefinitionId(123);
+        command2.setProcessDefinitionCode(123);
         command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
 
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command2));
 
         Command command3 = new Command();
-        command3.setProcessDefinitionId(123);
+        command3.setProcessDefinitionCode(123);
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
         command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command3));
 
         Command command4 = new Command();
-        command4.setProcessDefinitionId(123);
+        command4.setProcessDefinitionCode(123);
         command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
         command4.setCommandType(CommandType.REPEAT_RUNNING);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command4));
 
         Command command5 = new Command();
-        command5.setProcessDefinitionId(123);
+        command5.setProcessDefinitionCode(123);
         HashMap<String, String> startParams = new HashMap<>();
         startParams.put("startParam1", "testStartParam1");
         HashMap<String, String> commandParams = new HashMap<>();
@@ -317,20 +323,36 @@ public class ProcessServiceTest {
 
     @Test
     public void testRecurseFindSubProcessId() {
+        int parentProcessDefineId = 1;
+        long parentProcessDefineCode = 1L;
+        int parentProcessDefineVersion = 1;
+
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(10L);
-        int parentId = 111;
-        List<Integer> ids = new ArrayList<>();
-        ProcessDefinition processDefinition2 = new ProcessDefinition();
-        processDefinition2.setCode(11L);
-        Mockito.when(processDefineMapper.selectById(parentId)).thenReturn(processDefinition);
+        processDefinition.setCode(parentProcessDefineCode);
+        processDefinition.setVersion(parentProcessDefineVersion);
+        Mockito.when(processDefineMapper.selectById(parentProcessDefineId)).thenReturn(processDefinition);
+
+        long postTaskCode = 2L;
+        int postTaskVersion = 2;
+
         List<ProcessTaskRelationLog> relationLogList = new ArrayList<>();
-        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong()
-                , Mockito.anyInt()))
-                .thenReturn(relationLogList);
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setPostTaskCode(postTaskCode);
+        processTaskRelationLog.setPostTaskVersion(postTaskVersion);
+        relationLogList.add(processTaskRelationLog);
+        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(parentProcessDefineCode
+                , parentProcessDefineVersion)).thenReturn(relationLogList);
 
-        processService.recurseFindSubProcessId(parentId, ids);
+        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        TaskDefinitionLog taskDefinitionLog1 = new TaskDefinitionLog();
+        taskDefinitionLog1.setTaskParams("{\"processDefinitionId\": 123}");
+        taskDefinitionLogs.add(taskDefinitionLog1);
+        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(Mockito.anySet())).thenReturn(taskDefinitionLogs);
 
+        List<Integer> ids = new ArrayList<>();
+        processService.recurseFindSubProcessId(parentProcessDefineId, ids);
+
+        Assert.assertEquals(1, ids.size());
     }
 
     @Test
@@ -499,7 +521,7 @@ public class ProcessServiceTest {
     @Test
     public void testCreateCommand() {
         Command command = new Command();
-        command.setProcessDefinitionId(123);
+        command.setProcessDefinitionCode(123);
         command.setCommandParam("{\"ProcessInstanceId\":222}");
         command.setCommandType(CommandType.START_PROCESS);
         int mockResult = 1;

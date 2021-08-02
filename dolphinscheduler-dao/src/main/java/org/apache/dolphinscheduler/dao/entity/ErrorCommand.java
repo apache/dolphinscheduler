@@ -16,13 +16,18 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.common.enums.*;
-
-import java.util.Date;
 
 /**
  * command
@@ -42,9 +47,9 @@ public class ErrorCommand {
     private CommandType commandType;
 
     /**
-     * process definition id
+     * process definition code
      */
-    private int processDefinitionId;
+    private long processDefinitionCode;
 
     /**
      * executor id
@@ -115,7 +120,7 @@ public class ErrorCommand {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
-        this.processDefinitionId = command.getProcessDefinitionId();
+        this.processDefinitionCode = command.getProcessDefinitionCode();
         this.commandParam = command.getCommandParam();
         this.warningType = command.getWarningType();
         this.warningGroupId = command.getWarningGroupId();
@@ -133,7 +138,7 @@ public class ErrorCommand {
             TaskDependType taskDependType,
             FailureStrategy failureStrategy,
             int executorId,
-            int processDefinitionId,
+            long processDefinitionCode,
             String commandParam,
             WarningType warningType,
             int warningGroupId,
@@ -142,7 +147,7 @@ public class ErrorCommand {
             String message){
         this.commandType = commandType;
         this.executorId = executorId;
-        this.processDefinitionId = processDefinitionId;
+        this.processDefinitionCode = processDefinitionCode;
         this.commandParam = commandParam;
         this.warningType = warningType;
         this.warningGroupId = warningGroupId;
@@ -180,14 +185,13 @@ public class ErrorCommand {
         this.commandType = commandType;
     }
 
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
+    public long getProcessDefinitionCode() {
+        return processDefinitionCode;
     }
 
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
+    public void setProcessDefinitionCode(long processDefinitionCode) {
+        this.processDefinitionCode = processDefinitionCode;
     }
-
 
     public FailureStrategy getFailureStrategy() {
         return failureStrategy;
@@ -282,7 +286,7 @@ public class ErrorCommand {
         return "ErrorCommand{" +
                 "id=" + id +
                 ", commandType=" + commandType +
-                ", processDefinitionId=" + processDefinitionId +
+                ", processDefinitionCode=" + processDefinitionCode +
                 ", executorId=" + executorId +
                 ", commandParam='" + commandParam + '\'' +
                 ", taskDependType=" + taskDependType +
