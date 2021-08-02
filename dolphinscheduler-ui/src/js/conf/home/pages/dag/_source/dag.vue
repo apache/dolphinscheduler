@@ -366,7 +366,7 @@
                   // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
                   if (sourceType !== 'affirm') {
                     // Jump process definition
-                    this.$router.push({ name: 'projects-definition-list' })
+                    this.$router.push({ name: 'projects-definition-list', params: { projectId: this.projectId } })
                   }
                   resolve()
                 }).catch(e => {
@@ -652,7 +652,7 @@
       }
     },
     computed: {
-      ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
+      ...mapState('dag', ['projectId', 'tasks', 'locations', 'connects', 'isEditDag', 'name'])
     },
     components: {}
   }

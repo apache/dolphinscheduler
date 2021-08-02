@@ -25,6 +25,7 @@
   import mSpin from '@/module/components/spin/spin'
   import Affirm from './_source/jumpAffirm'
   import disabledState from '@/module/mixin/disabledState'
+  import switchProject from '@/module/mixin/switchProject'
   import { mapActions, mapMutations } from 'vuex'
 
   export default {
@@ -37,7 +38,7 @@
         releaseState: ''
       }
     },
-    mixins: [disabledState],
+    mixins: [disabledState, switchProject],
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams', 'setIsDetails']),

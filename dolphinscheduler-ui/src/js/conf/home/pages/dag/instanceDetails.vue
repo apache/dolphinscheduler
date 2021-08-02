@@ -30,6 +30,7 @@
   import mStartingParam from './_source/startingParam'
   import Affirm from './_source/jumpAffirm'
   import disabledState from '@/module/mixin/disabledState'
+  import switchProject from '@/module/mixin/switchProject'
 
   export default {
     name: 'instance-details',
@@ -39,7 +40,7 @@
         isLoading: true
       }
     },
-    mixins: [disabledState],
+    mixins: [disabledState, switchProject],
     props: {},
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),

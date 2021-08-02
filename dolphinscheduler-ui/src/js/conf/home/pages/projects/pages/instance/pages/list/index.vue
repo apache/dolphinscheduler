@@ -43,6 +43,7 @@
   import mSpin from '@/module/components/spin/spin'
   import localStore from '@/module/util/localStorage'
   import { setUrlParams } from '@/module/util/routerUtil'
+  import switchProject from '@/module/mixin/switchProject'
   import mNoData from '@/module/components/noData/noData'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
@@ -81,6 +82,7 @@
       }
     },
     props: {},
+    mixins: [switchProject],
     methods: {
       ...mapActions('dag', ['getProcessInstance']),
       /**
@@ -127,6 +129,9 @@
        * update
        */
       _onUpdate () {
+        this._debounceGET()
+      },
+      _updateProject () {
         this._debounceGET()
       },
       /**

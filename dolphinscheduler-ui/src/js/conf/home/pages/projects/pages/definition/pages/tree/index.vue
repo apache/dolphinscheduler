@@ -79,6 +79,7 @@
   import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import switchProject from '@/module/mixin/switchProject'
 
   export default {
     name: 'tree-view-index-index',
@@ -99,6 +100,7 @@
       }
     },
     props: {},
+    mixins: [switchProject],
     methods: {
       ...mapActions('dag', ['getViewTree']),
       /**
@@ -162,7 +164,7 @@
         if (id !== idsArr[0]) {
           query = { subProcessIds: ids.join(',') }
         }
-        this.$router.push({ path: `/projects/definition/tree/${id}`, query: query })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${id}`, query: query })
       },
       /**
        * Subprocess processing
@@ -178,10 +180,13 @@
         } else {
           subProcessIds.push(this.$route.params.id)
         }
-        this.$router.push({ path: `/projects/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
+        this.$router.push({ path: `/projects/${this.projectId}/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
       },
       _onChangeSelect (o) {
         this.limit = o.value
+        this._getViewTree()
+      },
+      _updateProject () {
         this._getViewTree()
       }
     },

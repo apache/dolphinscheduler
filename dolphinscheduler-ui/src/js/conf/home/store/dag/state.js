@@ -17,7 +17,8 @@
 
 import localStore from '@/module/util/localStorage'
 
-// Get the name of the item currently clicked
+// Get the project currently clicked
+const projectId = localStore.getItem('projectId')
 const projectName = localStore.getItem('projectName')
 
 export default {
@@ -43,7 +44,9 @@ export default {
   runFlag: '',
   // Whether to edit
   isEditDag: false,
-  // Current project
+  // Current project id
+  projectId: projectId,
+  // Current project name
   projectName: projectName || '',
   // Whether to update the process definition
   syncDefine: true,

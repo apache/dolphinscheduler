@@ -42,6 +42,7 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import switchProject from '@/module/mixin/switchProject'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
@@ -66,7 +67,7 @@
         }
       }
     },
-    mixins: [listUrlParamHandle],
+    mixins: [listUrlParamHandle, switchProject],
     props: {
       config: String
     },
@@ -93,6 +94,9 @@
         })
       },
       _onUpdate () {
+        this._debounceGET()
+      },
+      _updateProject () {
         this._debounceGET()
       }
     },
