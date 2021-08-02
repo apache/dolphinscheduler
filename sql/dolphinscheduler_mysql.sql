@@ -747,7 +747,7 @@ CREATE TABLE `t_ds_resources` (
 DROP TABLE IF EXISTS `t_ds_schedules`;
 CREATE TABLE `t_ds_schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
+  `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `start_time` datetime NOT NULL COMMENT 'start time',
   `end_time` datetime NOT NULL COMMENT 'end time',
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'timezoneId',

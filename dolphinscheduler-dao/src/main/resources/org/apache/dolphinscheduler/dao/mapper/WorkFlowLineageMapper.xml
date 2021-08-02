@@ -22,7 +22,7 @@
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
         select tepd.id as work_flow_id,tepd.name as work_flow_name
         from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
         where tepd.project_code = #{projectCode}
         <if test="searchVal != null and searchVal != ''">
             and tepd.name like concat('%', #{searchVal}, '%')
@@ -74,7 +74,7 @@
                 tes.crontab as crontab,
                 tes.release_state as schedule_publish_status
         from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
         where tepd.project_code = #{projectCode} and tepd.code = #{processDefinitionCode}
     </select>
 
