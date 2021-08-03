@@ -134,33 +134,6 @@ public class ErrorCommand {
         this.message = message;
     }
 
-    public ErrorCommand(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            long processDefinitionCode,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            Priority processInstancePriority,
-            String message) {
-        this.commandType = commandType;
-        this.executorId = executorId;
-        this.processDefinitionCode = processDefinitionCode;
-        this.commandParam = commandParam;
-        this.warningType = warningType;
-        this.warningGroupId = warningGroupId;
-        this.scheduleTime = scheduleTime;
-        this.taskDependType = taskDependType;
-        this.failureStrategy = failureStrategy;
-        this.startTime = new Date();
-        this.updateTime = new Date();
-        this.processInstancePriority = processInstancePriority;
-        this.message = message;
-    }
-
     public TaskDependType getTaskDependType() {
         return taskDependType;
     }
