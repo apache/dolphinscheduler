@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import java.util.List;
@@ -26,13 +27,17 @@ import java.util.List;
 public class PageInfo<T> {
 
     /**
-     * list
+     * totalList
      */
-    private List<T> lists;
+    private List<T> totalList;
     /**
-     * total count
+     * total
      */
-    private Integer totalCount = 0;
+    private Integer total = 0;
+    /**
+     * total Page
+     */
+    private Integer totalPage;
     /**
      * page size
      */
@@ -46,13 +51,13 @@ public class PageInfo<T> {
      */
     private Integer pageNo;
 
-    public PageInfo(Integer currentPage,Integer pageSize){
-        if(currentPage==null){
-            currentPage=1;
+    public PageInfo(Integer currentPage, Integer pageSize) {
+        if (currentPage == null) {
+            currentPage = 1;
         }
-        this.pageNo=(currentPage-1)*pageSize;
-        this.pageSize=pageSize;
-        this.currentPage=currentPage;
+        this.pageNo = (currentPage - 1) * pageSize;
+        this.pageSize = pageSize;
+        this.currentPage = currentPage;
     }
 
     public Integer getStart() {
@@ -63,37 +68,42 @@ public class PageInfo<T> {
         this.pageNo = start;
     }
 
+    public List<T> getTotalList() {
+        return totalList;
+    }
+
+    public void setTotalList(List<T> totalList) {
+        this.totalList = totalList;
+    }
+
+    public Integer getTotal() {
+        if (total == null) {
+            total = 0;
+        }
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
     public Integer getTotalPage() {
-        if (pageSize==null||pageSize == 0) {
+        if (pageSize == null || pageSize == 0) {
             pageSize = 7;
         }
-        if (this.totalCount % this.pageSize == 0) {
-            return (this.totalCount / this.pageSize)==0?1:(this.totalCount / this.pageSize);
-        }
-        return (this.totalCount / this.pageSize + 1);
+        this.totalPage =
+                (this.total % this.pageSize) == 0
+                        ? ((this.total / this.pageSize) == 0 ? 1 : (this.total / this.pageSize))
+                        : (this.total / this.pageSize + 1);
+        return this.totalPage;
     }
 
-    public List<T> getLists() {
-        return lists;
-    }
-
-    public void setLists(List<T> lists) {
-        this.lists = lists;
-    }
-
-    public Integer getTotalCount() {
-        if (totalCount==null) {
-            totalCount = 0;
-        }
-        return totalCount;
-    }
-
-    public void setTotalCount(Integer totalCount) {
-        this.totalCount = totalCount;
+    public void setTotalPage(Integer totalPage) {
+        this.totalPage = totalPage;
     }
 
     public Integer getPageSize() {
-        if (pageSize==null||pageSize == 0) {
+        if (pageSize == null || pageSize == 0) {
             pageSize = 7;
         }
         return pageSize;
@@ -103,15 +113,14 @@ public class PageInfo<T> {
         this.pageSize = pageSize;
     }
 
+    public Integer getCurrentPage() {
+        if (currentPage == null || currentPage <= 0) {
+            this.currentPage = 1;
+        }
+        return currentPage;
+    }
+
     public void setCurrentPage(Integer currentPage) {
         this.currentPage = currentPage;
     }
-
-    public Integer getCurrentPage() {
-        if (currentPage==null||currentPage <= 0) {
-            this.currentPage = 1;
-        }
-        return this.currentPage;
-    }
-
 }

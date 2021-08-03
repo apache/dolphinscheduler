@@ -78,7 +78,9 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUpdateProcessInstance() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":"
+                + "\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\","
+                + "\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -115,7 +117,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assert.assertTrue(result.isSuccess());
     }
 
-
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
 
@@ -146,7 +147,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assert.assertTrue(result.isStatus(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE));
     }
 
-
     @Test
     public void testViewVariables() throws Exception {
 
@@ -161,7 +161,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assert.assertNotNull(result);
         Assert.assertTrue(result.isSuccess());
     }
-
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {
