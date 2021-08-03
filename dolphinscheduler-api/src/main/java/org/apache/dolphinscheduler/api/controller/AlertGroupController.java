@@ -151,7 +151,7 @@ public class AlertGroupController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", dataType = "Int", example = "1")
     })
-    @GetMapping(value = "/query")
+    @PostMapping(value = "/query")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALERT_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")

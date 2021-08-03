@@ -93,6 +93,21 @@ public class AlertGroupControllerTest extends AbstractControllerTest{
     }
 
     @Test
+    public void testQueryAlertgroup() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id","22");
+        MvcResult mvcResult = mockMvc.perform(post("/alert-group/query")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertTrue(result != null && result.isSuccess());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testUpdateAlertgroup() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","22");
