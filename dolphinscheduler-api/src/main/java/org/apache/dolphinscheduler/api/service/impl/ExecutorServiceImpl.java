@@ -580,7 +580,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     }
                 }
             } else {
-                logger.error("there is not valid schedule date for the process definition: id:{}", processDefineCode);
+                logger.error("there is not valid schedule date for the process definition code:{}", processDefineCode);
             }
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
