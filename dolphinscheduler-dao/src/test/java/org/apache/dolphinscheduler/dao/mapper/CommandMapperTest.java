@@ -14,15 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.common.enums.*;
-import org.junit.Assert;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +49,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 /**
  *  command mapper test
@@ -48,23 +59,20 @@ import static org.junit.Assert.*;
 @Rollback(true)
 public class CommandMapperTest {
 
-
     @Autowired
     CommandMapper commandMapper;
 
     @Autowired
     ProcessDefinitionMapper processDefinitionMapper;
 
-
     /**
      * test insert
      */
     @Test
-    public void testInsert(){
+    public void testInsert() {
         Command command = createCommand();
         assertThat(command.getId(),greaterThan(0));
     }
-
 
     /**
      * test select by id
@@ -76,14 +84,14 @@ public class CommandMapperTest {
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
         assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getProcessDefinitionId(), actualCommand.getProcessDefinitionId());
+        assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
     }
 
     /**
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
 
         Command expectedCommand = createCommand();
 
@@ -103,7 +111,7 @@ public class CommandMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Command expectedCommand = createCommand();
 
         commandMapper.deleteById(expectedCommand.getId());
@@ -124,7 +132,6 @@ public class CommandMapperTest {
 
         Map<Integer, Command> commandMap = createCommandMap(count);
 
-
         List<Command> actualCommands = commandMapper.selectList(null);
 
         assertThat(actualCommands.size(), greaterThanOrEqualTo(count));
@@ -138,7 +145,7 @@ public class CommandMapperTest {
 
         ProcessDefinition processDefinition = createProcessDefinition();
 
-        Command expectedCommand = createCommand(CommandType.START_PROCESS,processDefinition.getId());
+        createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
         Command actualCommand = commandMapper.getOneToRun();
 
@@ -154,7 +161,7 @@ public class CommandMapperTest {
 
         ProcessDefinition processDefinition = createProcessDefinition();
 
-        CommandCount expectedCommandCount = createCommandMap(count, CommandType.START_PROCESS, processDefinition.getId());
+        createCommandMap(count, CommandType.START_PROCESS, processDefinition.getCode());
 
         Long[] projectCodeArray = {processDefinition.getProjectCode()};
 
@@ -167,23 +174,22 @@ public class CommandMapperTest {
         assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
     }
 
-
     /**
      * create command map
      * @param count map count
      * @param commandType comman type
-     * @param processDefinitionId process definition id
+     * @param processDefinitionCode process definition code
      * @return command map
      */
     private CommandCount createCommandMap(
             Integer count,
             CommandType commandType,
-            Integer processDefinitionId){
+            long processDefinitionCode) {
 
         CommandCount commandCount = new CommandCount();
 
-        for (int i = 0 ;i < count ;i++){
-            createCommand(commandType,processDefinitionId);
+        for (int i = 0;i < count;i++) {
+            createCommand(commandType, processDefinitionCode);
         }
         commandCount.setCommandType(commandType);
         commandCount.setCount(count);
@@ -195,7 +201,7 @@ public class CommandMapperTest {
      *  create process definition
      * @return process definition
      */
-    private ProcessDefinition createProcessDefinition(){
+    private ProcessDefinition createProcessDefinition() {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
@@ -215,22 +221,21 @@ public class CommandMapperTest {
      * @param count map count
      * @return command map
      */
-    private Map<Integer,Command> createCommandMap(Integer count){
+    private Map<Integer,Command> createCommandMap(Integer count) {
         Map<Integer,Command> commandMap = new HashMap<>();
 
-        for (int i = 0; i < count ;i++){
+        for (int i = 0;i < count;i++) {
             Command command = createCommand();
             commandMap.put(command.getId(),command);
         }
         return commandMap;
     }
 
-
     /**
      * create command
      * @return
      */
-    private Command createCommand(){
+    private Command createCommand() {
         return createCommand(CommandType.START_PROCESS,1);
     }
 
@@ -238,11 +243,11 @@ public class CommandMapperTest {
      * create command
      * @return Command
      */
-    private Command createCommand(CommandType commandType,Integer processDefinitionId){
+    private Command createCommand(CommandType commandType, long processDefinitionCode) {
 
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionId(processDefinitionId);
+        command.setProcessDefinitionCode(processDefinitionCode);
         command.setExecutorId(4);
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
@@ -258,7 +263,5 @@ public class CommandMapperTest {
 
         return command;
     }
-
-
 
 }

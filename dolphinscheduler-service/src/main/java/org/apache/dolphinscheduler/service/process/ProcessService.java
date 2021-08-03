@@ -270,7 +270,7 @@ public class ProcessService {
      * @return if thread is enough
      */
     private boolean checkThreadNum(Command command, int validThreadNum) {
-        int commandThreadCount = this.workProcessThreadNumCount(command.getProcessDefinitionId());
+        int commandThreadCount = this.workProcessThreadNumCount(command.getProcessDefinitionCode());
         return validThreadNum >= commandThreadCount;
     }
 
@@ -469,12 +469,14 @@ public class ProcessService {
     /**
      * calculate sub process number in the process define.
      *
-     * @param processDefinitionId processDefinitionId
+     * @param processDefinitionCode processDefinitionCode
      * @return process thread num count
      */
-    private Integer workProcessThreadNumCount(Integer processDefinitionId) {
+    private Integer workProcessThreadNumCount(long processDefinitionCode) {
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processDefinitionCode);
+
         List<Integer> ids = new ArrayList<>();
-        recurseFindSubProcessId(processDefinitionId, ids);
+        recurseFindSubProcessId(processDefinition.getId(), ids);
         return ids.size() + 1;
     }
 
@@ -497,7 +499,6 @@ public class ProcessService {
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(), ids);
                 }
-
             }
         }
     }
@@ -529,7 +530,7 @@ public class ProcessService {
                     processInstance.getTaskDependType(),
                     processInstance.getFailureStrategy(),
                     processInstance.getExecutorId(),
-                    processInstance.getProcessDefinition().getId(),
+                    processInstance.getProcessDefinition().getCode(),
                     JSONUtils.toJsonString(cmdParam),
                     processInstance.getWarningType(),
                     processInstance.getWarningGroupId(),
@@ -713,13 +714,10 @@ public class ProcessService {
         CommandType commandType = command.getCommandType();
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
 
-        ProcessDefinition processDefinition = null;
-        if (command.getProcessDefinitionId() != 0) {
-            processDefinition = processDefineMapper.selectById(command.getProcessDefinitionId());
-            if (processDefinition == null) {
-                logger.error("cannot find the work process define! define id : {}", command.getProcessDefinitionId());
-                return null;
-            }
+        ProcessDefinition processDefinition = getProcessDefinitionByCommand(command.getProcessDefinitionCode(), cmdParam);
+        if (processDefinition == null) {
+            logger.error("cannot find the work process define! define code : {}", command.getProcessDefinitionCode());
+            return null;
         }
 
         if (cmdParam != null) {
@@ -741,6 +739,7 @@ public class ProcessService {
                 String pId = cmdParam.get(Constants.CMD_PARAM_RECOVERY_WAITING_THREAD);
                 processInstanceId = Integer.parseInt(pId);
             }
+
             if (processInstanceId == 0) {
                 processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
             } else {
@@ -866,6 +865,40 @@ public class ProcessService {
         }
         processInstance.setState(runStatus);
         return processInstance;
+    }
+
+    /**
+     * get process definition by command
+     * If it is a fault-tolerant command, get the specified version of ProcessDefinition through ProcessInstance
+     * Otherwise, get the latest version of ProcessDefinition
+     *
+     * @param processDefinitionCode
+     * @param cmdParam
+     * @return ProcessDefinition
+     */
+    private ProcessDefinition getProcessDefinitionByCommand(long processDefinitionCode, Map<String, String> cmdParam) {
+        if (cmdParam != null) {
+            int processInstanceId = 0;
+            if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING)) {
+                processInstanceId = Integer.parseInt(cmdParam.get(Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING));
+            } else if (cmdParam.containsKey(Constants.CMD_PARAM_SUB_PROCESS)) {
+                processInstanceId = Integer.parseInt(cmdParam.get(Constants.CMD_PARAM_SUB_PROCESS));
+            } else if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_WAITING_THREAD)) {
+                processInstanceId = Integer.parseInt(cmdParam.get(Constants.CMD_PARAM_RECOVERY_WAITING_THREAD));
+            }
+
+            if (processInstanceId != 0) {
+                ProcessInstance processInstance = this.findProcessInstanceDetailById(processInstanceId);
+                if (processInstance == null) {
+                    return null;
+                }
+
+                return processDefineLogMapper.queryByDefinitionCodeAndVersion(
+                        processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+            }
+        }
+
+        return processDefineMapper.queryByCode(processDefinitionCode);
     }
 
     /**
@@ -1103,7 +1136,7 @@ public class ProcessService {
             childInstance = findProcessInstanceById(instanceMap.getProcessInstanceId());
         }
         Command subProcessCommand = createSubProcessCommand(parentProcessInstance, childInstance, instanceMap, task);
-        updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionId());
+        updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionCode());
         initSubInstanceState(childInstance);
         createCommand(subProcessCommand);
         logger.info("sub process command created: {} ", subProcessCommand);
@@ -1152,6 +1185,7 @@ public class ProcessService {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
         Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
         int childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(childDefineId);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
@@ -1169,7 +1203,7 @@ public class ProcessService {
                 TaskDependType.TASK_POST,
                 parentProcessInstance.getFailureStrategy(),
                 parentProcessInstance.getExecutorId(),
-                childDefineId,
+                processDefinition.getCode(),
                 processParam,
                 parentProcessInstance.getWarningType(),
                 parentProcessInstance.getWarningGroupId(),
@@ -1208,12 +1242,12 @@ public class ProcessService {
      * update sub process definition
      *
      * @param parentProcessInstance parentProcessInstance
-     * @param childDefinitionId childDefinitionId
+     * @param childDefinitionCode childDefinitionId
      */
-    private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
+    private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, long childDefinitionCode) {
         ProcessDefinition fatherDefinition = this.findProcessDefinition(parentProcessInstance.getProcessDefinitionCode(),
                 parentProcessInstance.getProcessDefinitionVersion());
-        ProcessDefinition childDefinition = this.findProcessDefineById(childDefinitionId);
+        ProcessDefinition childDefinition = this.findProcessDefinitionByCode(childDefinitionCode);
         if (childDefinition != null && fatherDefinition != null) {
             childDefinition.setWarningGroupId(fatherDefinition.getWarningGroupId());
             processDefineMapper.updateById(childDefinition);
@@ -1693,7 +1727,7 @@ public class ProcessService {
 
         //2 insert into recover command
         Command cmd = new Command();
-        cmd.setProcessDefinitionId(processDefinition.getId());
+        cmd.setProcessDefinitionCode(processDefinition.getCode());
         cmd.setCommandParam(String.format("{\"%s\":%d}", Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);

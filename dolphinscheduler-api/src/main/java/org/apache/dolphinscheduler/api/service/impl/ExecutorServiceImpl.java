@@ -160,7 +160,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         /**
          * create command
          */
-        int create = this.createCommand(commandType, processDefinition.getId(),
+        int create = this.createCommand(commandType, processDefinition.getCode(),
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
                 warningGroupId, runMode, processInstancePriority, workerGroup, startParams);
 
@@ -276,13 +276,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         switch (executeType) {
             case REPEAT_RUNNING:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.REPEAT_RUNNING, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.REPEAT_RUNNING, startParams);
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);
                 break;
             case START_FAILURE_TASK_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), CommandType.START_FAILURE_TASK_PROCESS, startParams);
                 break;
             case STOP:
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
@@ -394,11 +394,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      *
      * @param loginUser           login user
      * @param instanceId          instance id
-     * @param processDefinitionId process definition id
+     * @param processDefinitionCode process definition code
      * @param commandType         command type
      * @return insert result code
      */
-    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType, String startParams) {
+    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode, CommandType commandType, String startParams) {
         Map<String, Object> result = new HashMap<>();
 
         //To add startParams only when repeat running is needed
@@ -410,12 +410,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionId(processDefinitionId);
+        command.setProcessDefinitionCode(processDefinitionCode);
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(loginUser.getId());
 
         if (!processService.verifyIsNeedCreateCommand(command)) {
-            putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, processDefinitionId);
+            putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, processDefinitionCode);
             return result;
         }
 
@@ -475,7 +475,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * create command
      *
      * @param commandType commandType
-     * @param processDefineId processDefineId
+     * @param processDefineCode processDefineCode
      * @param nodeDep nodeDep
      * @param failureStrategy failureStrategy
      * @param startNodeList startNodeList
@@ -488,7 +488,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param workerGroup workerGroup
      * @return command id
      */
-    private int createCommand(CommandType commandType, int processDefineId,
+    private int createCommand(CommandType commandType, long processDefineCode,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int executorId, int warningGroupId,
@@ -506,7 +506,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         } else {
             command.setCommandType(commandType);
         }
-        command.setProcessDefinitionId(processDefineId);
+        command.setProcessDefinitionCode(processDefineCode);
         if (nodeDep != null) {
             command.setTaskDependType(nodeDep);
         }
@@ -549,7 +549,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     return processService.createCommand(command);
                 } else if (runMode == RunMode.RUN_MODE_PARALLEL) {
-                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefineId); // TODO: next pr change to code
+                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefineCode);
                     List<Date> listDate = new LinkedList<>();
                     if (!CollectionUtils.isEmpty(schedules)) {
                         for (Schedule item : schedules) {
@@ -580,7 +580,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     }
                 }
             } else {
-                logger.error("there is not valid schedule date for the process definition: id:{}", processDefineId);
+                logger.error("there is not valid schedule date for the process definition code:{}", processDefineCode);
             }
         } else {
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
