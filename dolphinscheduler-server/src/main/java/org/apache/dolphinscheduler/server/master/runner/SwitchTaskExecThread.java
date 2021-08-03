@@ -51,7 +51,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
     private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
     /**
-     * condition result
+     * switch result
      */
     private DependResult conditionResult;
 
@@ -69,6 +69,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean submitWaitComplete() {
         try {
             this.taskInstance = submit();
+            logger.info("taskInstance submit end");
             logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                     processInstance.getProcessDefinitionCode(),
                     processInstance.getProcessDefinitionVersion(),
@@ -77,7 +78,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
             String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
             Thread.currentThread().setName(threadLoggerInfoName);
             initTaskParameters();
-            logger.info("dependent task start");
+            logger.info("switch task start");
             waitTaskQuit();
             updateTaskState();
         } catch (Exception e) {
@@ -133,11 +134,11 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
         taskInstance.setSwitchDependency(switchParameters);
 
         //conditionResult = DependResult.SUCCESS;
-        logger.info("the conditions task depend result : {}", conditionResult);
+        logger.info("the switch task depend result : {}", conditionResult);
     }
 
     /**
-     *
+     * update task state
      */
     private void updateTaskState() {
         ExecutionStatus status;
@@ -146,8 +147,8 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
         } else {
             status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         }
-        taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
+        taskInstance.setState(status);
         processService.updateTaskInstance(taskInstance);
     }
 
@@ -156,9 +157,9 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
+        this.taskInstance.setStartTime(new Date());
         this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        taskInstance.setStartTime(new Date());
+        this.taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         this.processService.saveTaskInstance(taskInstance);
     }
 
