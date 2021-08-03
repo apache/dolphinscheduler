@@ -220,7 +220,7 @@ DROP TABLE IF EXISTS t_ds_command;
 CREATE TABLE t_ds_command (
   id int NOT NULL  ,
   command_type int DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_code bigint NOT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
   failure_strategy int DEFAULT '0' ,
@@ -262,7 +262,7 @@ CREATE TABLE t_ds_error_command (
   id int NOT NULL ,
   command_type int DEFAULT NULL ,
   executor_id int DEFAULT NULL ,
-  process_definition_id int DEFAULT NULL ,
+  process_definition_code bigint NOT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,
   failure_strategy int DEFAULT '0' ,
