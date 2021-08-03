@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
 import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -38,8 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.slf4j.LoggerFactory;
 
 public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
 
@@ -70,13 +66,7 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
         try {
             this.taskInstance = submit();
             logger.info("taskInstance submit end");
-            logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion(),
-                    taskInstance.getProcessInstanceId(),
-                    taskInstance.getId()));
-            String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
-            Thread.currentThread().setName(threadLoggerInfoName);
+            Thread.currentThread().setName(getThreadName());
             initTaskParameters();
             logger.info("switch task start");
             waitTaskQuit();
