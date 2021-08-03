@@ -105,6 +105,15 @@ public class ProcessDefinitionControllerTest {
         }
     }
 
+    public void putMsg(Result result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
+        }
+    }
+
     @Test
     public void testVerifyProcessDefinitionName() throws Exception {
 
@@ -355,9 +364,9 @@ public class ProcessDefinitionControllerTest {
         String searchVal = "";
         int userId = 1;
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, new PageInfo<Resource>(1, 10));
+        result.setData(new PageInfo<Resource>(1, 10));
 
         Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user, projectName, searchVal, pageNo, pageSize, userId)).thenReturn(result);
         Result response = processDefinitionController.queryProcessDefinitionListPaging(user, projectName, pageNo, searchVal, userId, pageSize);
@@ -378,9 +387,9 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testQueryProcessDefinitionVersions() {
         String projectName = "test";
-        Map<String, Object> resultMap = new HashMap<>();
+        Result resultMap = new Result();
         putMsg(resultMap, Status.SUCCESS);
-        resultMap.put(Constants.DATA_LIST, new PageInfo<ProcessDefinitionLog>(1, 10));
+        resultMap.setData(new PageInfo<ProcessDefinitionLog>(1, 10));
         Mockito.when(processDefinitionService.queryProcessDefinitionVersions(
                 user
                 , projectName

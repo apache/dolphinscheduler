@@ -51,7 +51,7 @@ public interface TenantService {
      * @param pageSize page size
      * @return tenant list page
      */
-    Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * updateProcessInstance tenant

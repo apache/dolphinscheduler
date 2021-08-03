@@ -235,18 +235,19 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return process instance list
      */
     @Override
-    public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
+    public Result queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
                                                         String startDate, String endDate,
                                                         String searchVal, String executorName, ExecutionStatus stateType, String host,
                                                         Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultEnum = (Status) checkResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
-            return checkResult;
+            putMsg(result,resultEnum);
+            return result;
         }
 
         int[] statusArray = null;
@@ -256,8 +257,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkAndParseDateResult;
+        resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            putMsg(result,resultEnum);
+            return result;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
         Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
@@ -269,8 +272,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefineId);
 
         IPage<ProcessInstance> processInstanceList = processInstanceMapper.queryProcessInstanceListPaging(page,
-                        project.getCode(), processDefinition == null ? 0L : processDefinition.getCode(), searchVal,
-                        executorId, statusArray, host, start, end);
+                project.getCode(), processDefinition == null ? 0L : processDefinition.getCode(), searchVal,
+                executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
         List<Integer> userIds = CollectionUtils.transformToList(processInstances, ProcessInstance::getExecutorId);
@@ -284,9 +287,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             }
         }
 
-        pageInfo.setTotalCount((int) processInstanceList.getTotal());
-        pageInfo.setLists(processInstances);
-        result.put(DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) processInstanceList.getTotal());
+        pageInfo.setTotalList(processInstances);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

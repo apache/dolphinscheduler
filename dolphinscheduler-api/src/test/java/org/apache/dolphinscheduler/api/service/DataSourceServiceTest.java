@@ -180,8 +180,8 @@ public class DataSourceServiceTest {
         String searchVal = "";
         int pageNo = 1;
         int pageSize = 10;
-        Map<String, Object> success = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
-        Assert.assertEquals(Status.SUCCESS, success.get(Constants.STATUS));
+        Result result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
+        Assert.assertEquals(Status.SUCCESS.getCode(),(int)result.getCode());
     }
 
     @Test

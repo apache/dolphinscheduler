@@ -97,7 +97,7 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query resource list

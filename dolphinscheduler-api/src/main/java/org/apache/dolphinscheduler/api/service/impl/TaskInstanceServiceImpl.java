@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -88,35 +89,33 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @return task list page
      */
     @Override
-    public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
-                                                   Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
-                                                   String endDate, String searchVal, ExecutionStatus stateType, String host,
-                                                   Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryTaskListPaging(User loginUser, String projectName,
+                                      Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
+                                      String endDate, String searchVal, ExecutionStatus stateType, String host,
+                                      Integer pageNo, Integer pageSize) {
+        Result result = new Result();
         Project project = projectMapper.queryByName(projectName);
-
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
-            return checkResult;
+            putMsg(result,status);
+            return result;
         }
-
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.ordinal()};
         }
-
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkAndParseDateResult;
+        status = (Status) checkAndParseDateResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            putMsg(result,status);
+            return result;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
         Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
-
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
-
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                 page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
         );
@@ -132,11 +131,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 taskInstance.setExecutorName(executor.getUserName());
             }
         }
-        pageInfo.setTotalCount((int) taskInstanceIPage.getTotal());
-        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) taskInstanceIPage.getTotal());
+        pageInfo.setTotalList(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

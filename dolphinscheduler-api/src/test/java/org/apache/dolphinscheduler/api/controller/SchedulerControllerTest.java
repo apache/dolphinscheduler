@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -41,7 +40,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * scheduler controller test
  */
-public class SchedulerControllerTest extends AbstractControllerTest{
+public class SchedulerControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
 
@@ -69,7 +68,6 @@ public class SchedulerControllerTest extends AbstractControllerTest{
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testUpdateSchedule() throws Exception {
@@ -113,7 +111,6 @@ public class SchedulerControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testOffline() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -130,7 +127,6 @@ public class SchedulerControllerTest extends AbstractControllerTest{
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testQueryScheduleListPaging() throws Exception {
@@ -152,7 +148,6 @@ public class SchedulerControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testQueryScheduleList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/list","cxc_1113")
@@ -165,7 +160,6 @@ public class SchedulerControllerTest extends AbstractControllerTest{
         Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testPreviewSchedule() throws Exception {

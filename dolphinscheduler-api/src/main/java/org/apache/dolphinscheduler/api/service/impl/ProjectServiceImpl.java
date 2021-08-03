@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
@@ -97,7 +98,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Date now = new Date();
 
         try {
-        project = Project
+            project = Project
                 .newBuilder()
                 .name(name)
                 .code(SnowFlakeUtils.getInstance().nextId())
@@ -177,6 +178,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return checkResult;
     }
 
+    @Override
+    public boolean hasProjectAndPerm(User loginUser, Project project, Result result) {
+        boolean checkResult = false;
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
+        } else if (!checkReadPermission(loginUser, project)) {
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
+        } else {
+            checkResult = true;
+        }
+        return checkResult;
+    }
+
     /**
      * admin can view all projects
      *
@@ -187,8 +201,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return project list which the login user have permission to see
      */
     @Override
-    public Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
+        Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
 
         Page<Project> page = new Page<>(pageNo, pageSize);
@@ -202,12 +216,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
         }
-        pageInfo.setTotalCount((int) projectIPage.getTotal());
-        pageInfo.setLists(projectList);
-        result.put(Constants.COUNT, (int) projectIPage.getTotal());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) projectIPage.getTotal());
+        pageInfo.setTotalList(projectList);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
