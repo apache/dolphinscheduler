@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.facebook.presto.jdbc.internal.guava.base.Strings;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -31,21 +33,14 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.facebook.presto.jdbc.internal.guava.base.Strings;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * worker group service impl
@@ -169,14 +164,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return worker group list page
      */
     @Override
-    public Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+    public Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
         // list to index
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -205,10 +201,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount(resultDataList.size());
-        pageInfo.setLists(resultDataList);
+        pageInfo.setTotal(resultDataList.size());
+        pageInfo.setTotalList(resultDataList);
 
-        result.put(Constants.DATA_LIST, pageInfo);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

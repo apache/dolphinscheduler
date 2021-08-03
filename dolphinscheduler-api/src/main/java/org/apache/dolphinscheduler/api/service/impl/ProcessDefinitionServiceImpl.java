@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -100,6 +101,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -311,11 +313,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return process definition page
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionListPaging(User loginUser, long projectCode, String searchVal, Integer pageNo, Integer pageSize, Integer userId) {
+    public Result queryProcessDefinitionListPaging(User loginUser, long projectCode, String searchVal, Integer pageNo, Integer pageSize, Integer userId) {
+        Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            putMsg(result,resultStatus);
             return result;
         }
 
@@ -330,11 +335,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             pd.setModifyBy(user.getUserName());
         }
         processDefinitionIPage.setRecords(records);
-
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) processDefinitionIPage.getTotal());
-        pageInfo.setLists(records);
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) processDefinitionIPage.getTotal());
+        pageInfo.setTotalList(processDefinitionIPage.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -923,6 +927,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param defineCode define code
      * @return task node list
      */
+    @Override
     public Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser, long projectCode, long defineCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
@@ -1328,20 +1333,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return the pagination process definition versions info of the certain process definition
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize, long processDefinitionCode) {
+    public Result queryProcessDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize, long processDefinitionCode) {
 
-        Map<String, Object> result = new HashMap<>();
-
-        // check the if pageNo or pageSize less than 1
-        if (pageNo <= 0 || pageSize <= 0) {
-            putMsg(result, Status.QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR, pageNo, pageSize);
-            return result;
-        }
-
+        Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
-        //check user access for project
-        result.putAll(projectService.checkProjectAndAuth(loginUser, project, projectCode));
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        // check user access for project
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            putMsg(result,resultStatus);
             return result;
         }
 
@@ -1352,12 +1352,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         IPage<ProcessDefinitionLog> processDefinitionVersionsPaging = processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, processDefinition.getCode());
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionVersionsPaging.getRecords();
 
-        pageInfo.setLists(processDefinitionLogs);
-        pageInfo.setTotalCount((int) processDefinitionVersionsPaging.getTotal());
-        return ImmutableMap.of(
-                Constants.MSG, Status.SUCCESS.getMsg()
-                , Constants.STATUS, Status.SUCCESS
-                , Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotalList(processDefinitionLogs);
+        pageInfo.setTotal((int) processDefinitionVersionsPaging.getTotal());
+        result.setData(pageInfo);
+        putMsg(result,Status.SUCCESS);
+        return result;
     }
 
 

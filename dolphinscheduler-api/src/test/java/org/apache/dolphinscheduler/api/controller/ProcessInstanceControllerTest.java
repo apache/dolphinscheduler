@@ -81,6 +81,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         String json = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
             + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
             + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
+
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -115,7 +116,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
-
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/select-sub-process", "cxc_1113")
@@ -144,7 +144,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(), result.getCode().intValue());
     }
 
-
     @Test
     public void testViewVariables() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/view-variables", "cxc_1113")
@@ -158,7 +157,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
-
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {

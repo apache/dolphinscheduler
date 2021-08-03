@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ER
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -108,14 +107,15 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "endDate", required = false) String endTime,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
-            taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
-        return returnDataListPaging(result);
+                taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+        return result;
     }
 
     /**

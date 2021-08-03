@@ -17,17 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.BooleanUtils;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -36,18 +34,14 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * tenant service impl
@@ -131,19 +125,20 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return tenant list page
      */
     @Override
-    public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         Page<Tenant> page = new Page<>(pageNo, pageSize);
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
         PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) tenantIPage.getTotal());
-        pageInfo.setLists(tenantIPage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) tenantIPage.getTotal());
+        pageInfo.setTotalList(tenantIPage.getRecords());
+        result.setData(pageInfo);
 
         putMsg(result, Status.SUCCESS);
 

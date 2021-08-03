@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,20 +33,16 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * udf func service impl
@@ -246,13 +244,13 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function list page
      */
     @Override
-    public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
-        pageInfo.setTotalCount((int)udfFuncList.getTotal());
-        pageInfo.setLists(udfFuncList.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int)udfFuncList.getTotal());
+        pageInfo.setTotalList(udfFuncList.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

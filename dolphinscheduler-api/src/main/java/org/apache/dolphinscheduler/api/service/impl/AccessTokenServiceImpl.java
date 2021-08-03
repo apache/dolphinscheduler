@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -27,18 +30,14 @@ import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * access token service impl
@@ -61,9 +60,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @return token list for page number and page size
      */
     @Override
-    public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-
+    public Result queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
@@ -71,11 +69,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             userId = 0;
         }
         IPage<AccessToken> accessTokenList = accessTokenMapper.selectAccessTokenPage(page, searchVal, userId);
-        pageInfo.setTotalCount((int) accessTokenList.getTotal());
-        pageInfo.setLists(accessTokenList.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) accessTokenList.getTotal());
+        pageInfo.setTotalList(accessTokenList.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -87,11 +84,12 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * @param token token string
      * @return create result code
      */
+    @SuppressWarnings("checkstyle:WhitespaceAround")
     @Override
     public Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!hasPerm(loginUser,userId)){
+        if (!hasPerm(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -128,7 +126,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>();
-        if (!hasPerm(loginUser,userId)){
+        if (!hasPerm(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -156,9 +154,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
-
-
-        if (!hasPerm(loginUser,accessToken.getUserId())){
+        if (!hasPerm(loginUser,accessToken.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -180,7 +176,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>();
-        if (!hasPerm(loginUser,userId)){
+        if (!hasPerm(loginUser,userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
