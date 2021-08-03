@@ -107,7 +107,6 @@ public class SwitchTaskExecThread extends MasterBaseTaskExecThread {
                 result = SwitchTaskUtils.evaluate(content);
             } catch (Exception e) {
                 logger.info("error sentence : {}", content);
-                e.printStackTrace();
                 conditionResult = DependResult.FAILED;
                 //result = false;
                 break;
