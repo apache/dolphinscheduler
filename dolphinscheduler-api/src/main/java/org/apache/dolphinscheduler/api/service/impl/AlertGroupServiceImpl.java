@@ -70,6 +70,33 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     }
 
     /**
+     * query alert group by id
+     *
+     * @param loginUser login user
+     * @param id alert group id
+     * @return one alert group
+     */
+    @Override
+    public Map<String, Object> queryAlertGroupById(User loginUser, Integer id) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        //only admin can operate
+        if (isNotAdmin(loginUser, result)) {
+            return result;
+        }
+        //check if exist
+        AlertGroup alertGroup = alertGroupMapper.selectById(id);
+        if (alertGroup == null) {
+            putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
+            return result;
+        }
+        result.put("data", alertGroup);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * paging query alarm group list
      *
      * @param loginUser login user
@@ -86,10 +113,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return result;
         }
 
-        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
-        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
-                page, searchVal);
-        PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<Map<String, Object>> page = new Page<>(pageNo, pageSize);
+        IPage<Map<String, Object>> alertGroupIPage = alertGroupMapper.queryAlertGroup(page, searchVal);
+
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) alertGroupIPage.getTotal());
         pageInfo.setLists(alertGroupIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);

@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -82,4 +83,13 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @return
      */
     String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
+
+    /**
+     * alert group page
+     * @param page page
+     * @param groupName groupName
+     * @return map IPage
+     */
+    IPage<Map<String, Object>> queryAlertGroup(Page<Map<String, Object>> page,
+                                               @Param("groupName") String groupName);
 }
