@@ -358,7 +358,7 @@ CREATE TABLE `t_ds_task_definition` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `task_unique` (`name`,`project_code`) USING BTREE
+  UNIQUE KEY `task_unique` (`code`,`project_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 create index task_definition_index on t_ds_task_definition (project_code,id);
 

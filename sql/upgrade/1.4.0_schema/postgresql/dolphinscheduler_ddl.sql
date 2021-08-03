@@ -339,7 +339,7 @@ BEGIN
         create_time timestamp DEFAULT NULL ,
         update_time timestamp DEFAULT NULL ,
         PRIMARY KEY (id) ,
-        CONSTRAINT task_definition_unique UNIQUE (name, project_code)
+        CONSTRAINT task_definition_unique UNIQUE (code, project_code)
     ) ;
     create index task_definition_index on t_ds_task_definition (project_code,id);
     DROP SEQUENCE IF EXISTS t_ds_task_definition_id_sequence;
