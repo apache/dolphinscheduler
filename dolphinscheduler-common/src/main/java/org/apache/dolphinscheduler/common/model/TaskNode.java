@@ -365,6 +365,10 @@ public class TaskNode {
         return TaskType.CONDITIONS.getDesc().equalsIgnoreCase(this.getType());
     }
 
+    public boolean isBlockingTask(){
+        return TaskType.BLOCKING.getDesc().equalsIgnoreCase(this.getType());
+    }
+
     public List<PreviousTaskNode> getPreTaskNodeList() {
         return preTaskNodeList;
     }
