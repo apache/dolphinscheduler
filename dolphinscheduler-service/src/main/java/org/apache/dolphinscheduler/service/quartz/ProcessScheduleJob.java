@@ -93,7 +93,7 @@ public class ProcessScheduleJob implements Job {
         command.setCommandType(CommandType.SCHEDULER);
         command.setExecutorId(schedule.getUserId());
         command.setFailureStrategy(schedule.getFailureStrategy());
-        //command.setProcessDefinitionId(schedule.getProcessDefinitionCode()); TODO next pr
+        command.setProcessDefinitionCode(schedule.getProcessDefinitionCode());
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
