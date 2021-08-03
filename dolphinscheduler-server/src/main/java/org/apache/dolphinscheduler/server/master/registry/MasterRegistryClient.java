@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
 import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_NODE;
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
@@ -75,7 +76,7 @@ public class MasterRegistryClient {
      */
     @Autowired
     private ProcessService processService;
-    @Autowired
+
     private RegistryClient registryClient;
 
     /**
@@ -132,18 +133,6 @@ public class MasterRegistryClient {
 
     public void closeRegistry() {
         unRegistry();
-    }
-
-    /**
-     * init system node
-     */
-    private void initMasterSystemNode() {
-        try {
-            registryClient.persist(Constants.REGISTRY_DOLPHINSCHEDULER_DEAD_SERVERS, "");
-            logger.info("initialize master server nodes success.");
-        } catch (Exception e) {
-            logger.error("init system node failed", e);
-        }
     }
 
     /**
@@ -338,15 +327,14 @@ public class MasterRegistryClient {
     @PostConstruct
     public void init() {
         this.startTime = DateUtils.dateToString(new Date());
+        this.registryClient = RegistryClient.getInstance();
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
-        registryClient.init();
     }
 
     /**
      * registry
      */
     public void registry() {
-        initMasterSystemNode();
         String address = NetUtils.getAddr(masterConfig.getListenPort());
         localNodePath = getMasterPath();
         registryClient.persistEphemeral(localNodePath, "");
@@ -395,7 +383,7 @@ public class MasterRegistryClient {
      */
     public String getMasterPath() {
         String address = getLocalAddress();
-        return registryClient.getMasterPath() + "/" + address;
+        return REGISTRY_DOLPHINSCHEDULER_MASTERS + "/" + address;
     }
 
     /**

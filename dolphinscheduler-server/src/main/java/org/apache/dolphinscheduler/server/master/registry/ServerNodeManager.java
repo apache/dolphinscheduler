@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
+import static org.apache.dolphinscheduler.common.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -97,8 +100,7 @@ public class ServerNodeManager implements InitializingBean {
     /**
      * zk client
      */
-    @Autowired
-    private RegistryClient registryClient;
+    private RegistryClient registryClient = RegistryClient.getInstance();
 
     /**
      * worker group mapper
@@ -131,11 +133,11 @@ public class ServerNodeManager implements InitializingBean {
         /**
          * init MasterNodeListener listener
          */
-        registryClient.subscribe(registryClient.getMasterPath(), new MasterDataListener());
+        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
         /**
          * init WorkerNodeListener listener
          */
-        registryClient.subscribe(registryClient.getWorkerPath(), new MasterDataListener());
+        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new MasterDataListener());
     }
 
     /**
@@ -375,7 +377,6 @@ public class ServerNodeManager implements InitializingBean {
     @PreDestroy
     public void destroy() {
         executorService.shutdownNow();
-        registryClient.close();
     }
 
 }

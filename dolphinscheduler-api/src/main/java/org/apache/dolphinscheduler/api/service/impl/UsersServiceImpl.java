@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -82,6 +83,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceImpl.class);
+
+    @Autowired
+    private AccessTokenMapper accessTokenMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -482,6 +486,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception when operate hdfs
      */
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
         //only admin can operate
@@ -514,6 +519,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
+        accessTokenMapper.deleteAccessTokenByUserId(id);
+        
         userMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
 

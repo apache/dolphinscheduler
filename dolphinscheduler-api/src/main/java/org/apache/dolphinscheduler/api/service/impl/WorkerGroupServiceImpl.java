@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.RegistryMonitor;
+import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,15 +58,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Autowired
     WorkerGroupMapper workerGroupMapper;
 
-
-    @Autowired
-    private RegistryMonitor registryMonitor;
-
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
-
-    @Resource
-    RegistryClient registryClient;
 
     /**
      * create or update a worker group
@@ -147,7 +137,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         // check zookeeper
         String workerGroupPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SLASH + workerGroup.getName();
-        return registryClient.isExisted(workerGroupPath);
+        return RegistryCenterUtils.isNodeExisted(workerGroupPath);
     }
 
     /**
@@ -157,7 +147,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
-        Map<String, String> serverMaps = registryMonitor.getServerMaps(NodeType.WORKER, true);
+        Map<String, String> serverMaps = RegistryCenterUtils.getServerMaps(NodeType.WORKER, true);
         if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
             return null;
         }
@@ -258,7 +248,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         String workerPath = Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
         List<String> workerGroupList = null;
         try {
-            workerGroupList = registryClient.getChildrenKeys(workerPath);
+            workerGroupList = RegistryCenterUtils.getChildrenNodes(workerPath);
         } catch (Exception e) {
             logger.error("getWorkerGroups exception: {}, workerPath: {}, isPaging: {}", e.getMessage(), workerPath, isPaging);
         }
@@ -276,7 +266,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             String workerGroupPath = workerPath + Constants.SLASH + workerGroup;
             List<String> childrenNodes = null;
             try {
-                childrenNodes = registryClient.getChildrenKeys(workerGroupPath);
+                childrenNodes = RegistryCenterUtils.getChildrenNodes(workerGroupPath);
             } catch (Exception e) {
                 logger.error("getChildrenNodes exception: {}, workerGroupPath: {}", e.getMessage(), workerGroupPath);
             }
@@ -287,7 +277,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             wg.setName(workerGroup);
             if (isPaging) {
                 wg.setAddrList(String.join(Constants.COMMA, childrenNodes));
-                String registeredValue = registryClient.get(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
+                String registeredValue = RegistryCenterUtils.getNodeData(workerGroupPath + Constants.SLASH + childrenNodes.get(0));
                 wg.setCreateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[6]));
                 wg.setUpdateTime(DateUtils.stringToDate(registeredValue.split(Constants.COMMA)[7]));
                 wg.setSystemDefault(true);
@@ -334,7 +324,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> getWorkerAddressList() {
         Map<String, Object> result = new HashMap<>();
-        List<String> serverNodeList = registryMonitor.getServerNodeList(NodeType.WORKER, true);
+        List<String> serverNodeList = RegistryCenterUtils.getServerNodeList(NodeType.WORKER, true);
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;

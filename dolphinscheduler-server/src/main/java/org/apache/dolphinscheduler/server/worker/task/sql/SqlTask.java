@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -111,8 +110,7 @@ public class SqlTask extends AbstractTask {
         Thread.currentThread().setName(threadLoggerInfoName);
 
         logger.info("Full sql parameters: {}", sqlParameters);
-        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {}, udfs : {},showType : {}, "
-                        + "connParams : {}, query max result limit : {}",
+        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
@@ -120,6 +118,7 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getUdfs(),
                 sqlParameters.getShowType(),
                 sqlParameters.getConnParams(),
+                sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
         try {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
@@ -166,13 +165,8 @@ public class SqlTask extends AbstractTask {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
 
-        // find process instance by task id
-
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                taskExecutionContext.getDefinedParams(),
-                sqlParameters.getLocalParametersMap(),
-                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                taskExecutionContext.getScheduleTime());
+        // combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -264,10 +258,9 @@ public class SqlTask extends AbstractTask {
                 String updateResult = String.valueOf(stmt.executeUpdate());
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
-
+            //deal out params
+            sqlParameters.dealOutParam(result);
             postSql(connection, postStatementsBinds);
-            this.setResultString(result);
-
         } catch (Exception e) {
             logger.error("execute sql error: {}", e.getMessage());
             throw e;

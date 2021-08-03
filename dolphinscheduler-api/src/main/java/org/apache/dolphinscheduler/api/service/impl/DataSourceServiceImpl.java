@@ -119,10 +119,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param desc data source description
-     * @param type data source type
-     * @param parameter datasource parameters
      * @param id data source id
      * @return update result code
      */
@@ -163,7 +159,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         Date now = new Date();
 
-        dataSource.setName(dataSource.getName().trim());
+        dataSource.setName(dataSourceParam.getName().trim());
         dataSource.setNote(dataSourceParam.getNote());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(dataSource.getType());
