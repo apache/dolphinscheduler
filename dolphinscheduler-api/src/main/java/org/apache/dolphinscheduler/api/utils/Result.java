@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -129,7 +130,6 @@ public class Result<T> {
         this.data = data;
     }
 
-
     @Override
     public String toString() {
         return "Status{"
@@ -138,5 +138,9 @@ public class Result<T> {
                 + msg + '\''
                 + ", data=" + data
                 + '}';
+    }
+
+    public Boolean checkResult() {
+        return this.code == Status.SUCCESS.getCode();
     }
 }

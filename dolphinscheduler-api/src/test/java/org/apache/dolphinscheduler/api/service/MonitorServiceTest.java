@@ -55,7 +55,7 @@ public class MonitorServiceTest {
     private MonitorDBDao monitorDBDao;
 
     @Test
-    public  void testQueryDatabaseState(){
+    public  void testQueryDatabaseState() {
 
         Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
         Map<String,Object> result = monitorService.queryDatabaseState(null);
@@ -64,41 +64,43 @@ public class MonitorServiceTest {
         List<MonitorRecord> monitorRecordList = (List<MonitorRecord>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
     }
+
     @Test
-    public  void testQueryMaster(){
+    public  void testQueryMaster() {
         //TODO need zk
-//        Map<String,Object> result = monitorService.queryMaster(null);
-//        logger.info(result.toString());
-//        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-    }
-    @Test
-    public  void testQueryZookeeperState(){
-        //TODO need zk
-//        Map<String,Object> result = monitorService.queryZookeeperState(null);
-//        logger.info(result.toString());
-//        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        /*Map<String,Object> result = monitorService.queryMaster(null);*/
+        /*logger.info(result.toString());*/
+        /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
     }
 
     @Test
-    public  void testGetServerListFromZK(){
+    public  void testQueryZookeeperState() {
         //TODO need zk
-//        List<Server> serverList = monitorService.getServerListFromZK(true);
-//        logger.info(serverList.toString());
+        /*Map<String,Object> result = monitorService.queryZookeeperState(null);*/
+        /*logger.info(result.toString());*/
+        /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
     }
 
-    private List<MonitorRecord> getList(){
+    @Test
+    public  void testGetServerListFromZK() {
+        //TODO need zk
+        /*List<Server> serverList = monitorService.getServerListFromZK(true);*/
+        /*logger.info(serverList.toString());*/
+    }
+
+    private List<MonitorRecord> getList() {
         List<MonitorRecord> monitorRecordList = new ArrayList<>();
         monitorRecordList.add(getEntity());
         return monitorRecordList;
     }
 
-    private MonitorRecord getEntity(){
+    private MonitorRecord getEntity() {
         MonitorRecord monitorRecord = new  MonitorRecord();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
     }
 
-    private List<Server> getServerList(){
+    private List<Server> getServerList() {
         List<Server> servers = new ArrayList<>();
         servers.add(new Server());
         return servers;

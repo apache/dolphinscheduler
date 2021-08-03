@@ -61,12 +61,12 @@ public class BaseServiceTest {
     }
 
     @Test
-    public void testIsAdmin(){
+    public void testIsAdmin() {
 
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         //ADMIN_USER
-         boolean isAdmin = baseService.isAdmin(user);
+        boolean isAdmin = baseService.isAdmin(user);
         Assert.assertTrue(isAdmin);
         //GENERAL_USER
         user.setUserType(UserType.GENERAL_USER);
@@ -75,10 +75,8 @@ public class BaseServiceTest {
 
     }
 
-
-
     @Test
-    public void testPutMsg(){
+    public void testPutMsg() {
 
         Map<String, Object> result = new HashMap<>();
         baseService.putMsg(result, Status.SUCCESS);
@@ -87,8 +85,9 @@ public class BaseServiceTest {
         baseService.putMsg(result, Status.PROJECT_NOT_FOUNT,"test");
 
     }
+
     @Test
-    public void testPutMsgTwo(){
+    public void testPutMsgTwo() {
 
         Result result = new Result();
         baseService.putMsg(result, Status.SUCCESS);
@@ -96,8 +95,9 @@ public class BaseServiceTest {
         //has params
         baseService.putMsg(result,Status.PROJECT_NOT_FOUNT,"test");
     }
+
     @Test
-    public void testCreateTenantDirIfNotExists(){
+    public void testCreateTenantDirIfNotExists() {
 
         PowerMockito.mockStatic(HadoopUtils.class);
         PowerMockito.when(HadoopUtils.getInstance()).thenReturn(hadoopUtils);
@@ -111,8 +111,9 @@ public class BaseServiceTest {
         }
 
     }
+
     @Test
-    public void testHasPerm(){
+    public void testHasPerm() {
 
         User user = new User();
         user.setId(1);
