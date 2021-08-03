@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -38,7 +39,7 @@ public class ErrorCommand {
     /**
      * id
      */
-    @TableId(value="id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private int id;
 
     /**
@@ -84,13 +85,13 @@ public class ErrorCommand {
     /**
      * schedule time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date scheduleTime;
 
     /**
      * start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date startTime;
 
     /**
@@ -101,7 +102,7 @@ public class ErrorCommand {
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date updateTime;
 
     /**
@@ -116,7 +117,7 @@ public class ErrorCommand {
 
     public ErrorCommand(){}
 
-    public ErrorCommand(Command command, String message){
+    public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
@@ -144,7 +145,7 @@ public class ErrorCommand {
             int warningGroupId,
             Date scheduleTime,
             Priority processInstancePriority,
-            String message){
+            String message) {
         this.commandType = commandType;
         this.executorId = executorId;
         this.processDefinitionCode = processDefinitionCode;
@@ -159,7 +160,6 @@ public class ErrorCommand {
         this.processInstancePriority = processInstancePriority;
         this.message = message;
     }
-
 
     public TaskDependType getTaskDependType() {
         return taskDependType;
@@ -283,22 +283,22 @@ public class ErrorCommand {
 
     @Override
     public String toString() {
-        return "ErrorCommand{" +
-                "id=" + id +
-                ", commandType=" + commandType +
-                ", processDefinitionCode=" + processDefinitionCode +
-                ", executorId=" + executorId +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", startTime=" + startTime +
-                ", processInstancePriority=" + processInstancePriority +
-                ", updateTime=" + updateTime +
-                ", message='" + message + '\'' +
-                ", workerGroup='" + workerGroup + '\'' +
-                '}';
+        return "ErrorCommand{"
+                + "id=" + id
+                + ", commandType=" + commandType
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", executorId=" + executorId
+                + ", commandParam='" + commandParam + '\''
+                + ", taskDependType=" + taskDependType
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", warningGroupId=" + warningGroupId
+                + ", scheduleTime=" + scheduleTime
+                + ", startTime=" + startTime
+                + ", processInstancePriority=" + processInstancePriority
+                + ", updateTime=" + updateTime
+                + ", message='" + message + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + '}';
     }
 }

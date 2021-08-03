@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -38,7 +39,7 @@ public class Command {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -152,7 +153,6 @@ public class Command {
         this.workerGroup = workerGroup;
         this.processInstancePriority = processInstancePriority;
     }
-
 
     public TaskDependType getTaskDependType() {
         return taskDependType;
@@ -338,24 +338,25 @@ public class Command {
         result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
         return result;
     }
+
     @Override
     public String toString() {
-        return "Command{" +
-                "id=" + id +
-                ", commandType=" + commandType +
-                ", processDefinitionCode=" + processDefinitionCode +
-                ", executorId=" + executorId +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", startTime=" + startTime +
-                ", processInstancePriority=" + processInstancePriority +
-                ", updateTime=" + updateTime +
-                ", workerGroup='" + workerGroup + '\'' +
-                '}';
+        return "Command{"
+                + "id=" + id
+                + ", commandType=" + commandType
+                + ", processDefinitionCode=" + processDefinitionCode
+                + ", executorId=" + executorId
+                + ", commandParam='" + commandParam + '\''
+                + ", taskDependType=" + taskDependType
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", warningGroupId=" + warningGroupId
+                + ", scheduleTime=" + scheduleTime
+                + ", startTime=" + startTime
+                + ", processInstancePriority=" + processInstancePriority
+                + ", updateTime=" + updateTime
+                + ", workerGroup='" + workerGroup + '\''
+                + '}';
     }
 }
 
