@@ -691,5 +691,7 @@ export default {
   'The workflow canvas is abnormal and cannot be saved, please recreate': 'The workflow canvas is abnormal and cannot be saved, please recreate',
   Info: 'Info',
   'Datasource userName': 'owner',
-  'Resource userName': 'owner'
+  'Resource userName': 'owner',
+  condition: 'condition',
+  'The condition content cannot be empty': 'The condition content cannot be empty'
 }
