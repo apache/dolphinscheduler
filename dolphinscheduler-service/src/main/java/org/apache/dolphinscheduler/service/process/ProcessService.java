@@ -2371,11 +2371,9 @@ public class ProcessService {
      * @param processDefinition process definition
      * @return dag graph
      */
-    @Deprecated
     public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
-        Map<String, String> locationMap = locationToMap(processDefinition.getLocations());
-        List<TaskNode> taskNodeList = genTaskNodeList(processDefinition.getCode(), processDefinition.getVersion(), locationMap);
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskNode> taskNodeList = transformTask(processTaskRelations);
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList, new ArrayList<>(processTaskRelations));
         // Generate concrete Dag to be executed
         return DagHelper.buildDagGraph(processDag);
@@ -2418,6 +2416,7 @@ public class ProcessService {
         return processData;
     }
 
+    @Deprecated
     public List<TaskNode> genTaskNodeList(Long processCode, int processVersion, Map<String, String> locationMap) {
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(processCode, processVersion);
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();

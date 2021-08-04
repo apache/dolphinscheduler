@@ -400,7 +400,7 @@ public class ProcessInstanceServiceTest {
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
-        when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
+        when(processDefinitionService.checkProcessNodeList(shellJson)).thenReturn(result);
         when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
 
