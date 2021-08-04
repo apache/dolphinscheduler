@@ -324,14 +324,5 @@ public interface ProcessDefinitionService {
                                                               long projectCode,
                                                               int processDefinitionId,
                                                               long version);
-
-    /**
-     * check has associated process definition
-     *
-     * @param processDefinitionId process definition id
-     * @param version version
-     * @return The query result has a specific process definition return true
-     */
-    boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version);
 }
 

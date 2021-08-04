@@ -255,12 +255,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return result;
             }
 
-            // TODO check has cycle
-            // if (graphHasCycle(taskRelationList)) {
-            //  logger.error("process DAG has cycle");
-            //   putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
-            //   return result;
-            // }
+            if (graphHasCycle(processService.transformTask(taskRelationList))) {
+                logger.error("process DAG has cycle");
+                putMsg(result, Status.PROCESS_NODE_HAS_CYCLE);
+                return result;
+            }
 
             // check whether the task relation json is normal
             for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
@@ -1321,19 +1320,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         } else {
             putMsg(result, Status.SUCCESS);
         }
-    }
-
-    /**
-     * check has associated process definition
-     *
-     * @param processDefinitionId process definition id
-     * @param version version
-     * @return The query result has a specific process definition return true
-     */
-    @Override
-    public boolean checkHasAssociatedProcessDefinition(int processDefinitionId, long version) {
-        Integer hasAssociatedDefinitionId = processDefinitionMapper.queryHasAssociatedDefinitionByIdAndVersion(processDefinitionId, version);
-        return Objects.nonNull(hasAssociatedDefinitionId);
     }
 
     /**
