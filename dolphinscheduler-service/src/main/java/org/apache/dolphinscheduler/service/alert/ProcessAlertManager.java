@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.service.alert;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -29,9 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,5 +252,72 @@ public class ProcessAlertManager {
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    }
+
+
+    /**
+     * When process is going to block, get the direct successor nodes after the blocking node.
+     * If the successor node status is pause, that means the process is blocked.
+     * This method is only called when the process blocked and user wants to send alert at that time.
+     *
+     * @param processInstance process instance
+     * @param taskInstances task instance list
+     * @param dag the process DAG definition
+     * @param projectUser the project owner
+     */
+    public void sendProcessBlockingAlert(ProcessInstance processInstance,
+                                         List<TaskInstance> taskInstances,
+                                         DAG<String, TaskNode, TaskNodeRelation> dag,
+                                         ProjectUser projectUser){
+
+        Map<String,TaskInstance> taskInstanceMap = new HashMap<>();
+        TaskInstance blockingNode = null;
+        for(TaskInstance task : taskInstances){
+            if(task.isBlockingTask()){
+                blockingNode = task;
+            }
+            taskInstanceMap.put(task.getName(),task);
+        }
+        if(blockingNode == null){
+            logger.info("There is no blocking node in this process");
+            return;
+        }
+
+        Set<String> nodesAfterBlockingNode = dag.getSubsequentNodes(blockingNode.getName());
+        int nodeCount = 0;
+        for(String nodeName : nodesAfterBlockingNode){
+            TaskInstance task = taskInstanceMap.get(nodeName);
+            if(task.getState().typeIsPause()){
+                nodeCount++;
+            }
+        }
+
+        // If all direct successor nodes are paused, send alert
+        if(nodeCount == nodesAfterBlockingNode.size()){
+            Alert alert = new Alert();
+            String cmdName = getCommandCnName(processInstance.getCommandType());
+            List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
+            ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                    .projectId(projectUser.getProjectId())
+                    .projectName(projectUser.getProjectName())
+                    .owner(projectUser.getUserName())
+                    .processId(processInstance.getId())
+                    .processName(processInstance.getName())
+                    .processType(processInstance.getCommandType())
+                    .processState(processInstance.getState())
+                    .runTimes(processInstance.getRunTimes())
+                    .processStartTime(processInstance.getStartTime())
+                    .processEndTime(processInstance.getEndTime())
+                    .processHost(processInstance.getHost())
+                    .build();
+            blockingNodeList.add(processAlertContent);
+            String content = JSONUtils.toJsonString(blockingNodeList);
+            alert.setTitle(cmdName + " Blocked");
+            alert.setContent(content);
+            alert.setAlertGroupId(processInstance.getWarningGroupId());
+            alert.setCreateTime(new Date());
+            alertDao.addAlert(alert);
+            logger.info("add alert to db, alert: {}",alert);
+        }
     }
 }
