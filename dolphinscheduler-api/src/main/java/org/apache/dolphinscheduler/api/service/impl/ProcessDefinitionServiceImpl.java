@@ -868,25 +868,24 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * check the process definition node meets the specifications
+     * check the process task relation json
      *
-     * @param processData process data
-     * @param processDefinitionJson process definition json
+     * @param processTaskRelationJson process task relation json
      * @return check result code
      */
     @Override
-    public Map<String, Object> checkProcessNodeList(ProcessData processData, String processDefinitionJson) {
-
+    public Map<String, Object> checkProcessNodeList(String processTaskRelationJson) {
         Map<String, Object> result = new HashMap<>();
         try {
-            if (processData == null) {
+            if (processTaskRelationJson == null) {
                 logger.error("process data is null");
-                putMsg(result, Status.DATA_IS_NOT_VALID, processDefinitionJson);
+                putMsg(result, Status.DATA_IS_NOT_VALID, processTaskRelationJson);
                 return result;
             }
 
+            List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(processTaskRelationJson, ProcessTaskRelationLog.class);
             // Check whether the task node is normal
-            List<TaskNode> taskNodes = processData.getTasks();
+            List<TaskNode> taskNodes = processService.transformTask(taskRelationList);
 
             if (CollectionUtils.isEmpty(taskNodes)) {
                 logger.error("process node info is empty");
