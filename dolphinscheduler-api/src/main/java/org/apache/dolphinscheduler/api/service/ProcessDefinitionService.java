@@ -229,14 +229,12 @@ public interface ProcessDefinitionService {
                                                 MultipartFile file);
 
     /**
-     * check the process definition node meets the specifications
+     * check the process task relation json
      *
-     * @param processData process data
-     * @param processDefinitionJson process definition json
+     * @param processTaskRelationJson process task relation json
      * @return check result code
      */
-    Map<String, Object> checkProcessNodeList(ProcessData processData,
-                                             String processDefinitionJson);
+    Map<String, Object> checkProcessNodeList(String processTaskRelationJson);
 
     /**
      * get task node details based on process definition
