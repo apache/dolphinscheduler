@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +74,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @param searchVal search value
      * @param taskName task name
@@ -88,17 +87,24 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @return task list page
      */
     @Override
-    public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
-                                                   Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
-                                                   String endDate, String searchVal, ExecutionStatus stateType, String host,
-                                                   Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            return checkResult;
+    public Map<String, Object> queryTaskListPaging(User loginUser,
+                                                   long projectCode,
+                                                   Integer processInstanceId,
+                                                   String processInstanceName,
+                                                   String taskName,
+                                                   String executorName,
+                                                   String startDate,
+                                                   String endDate,
+                                                   String searchVal,
+                                                   ExecutionStatus stateType,
+                                                   String host,
+                                                   Integer pageNo,
+                                                   Integer pageSize) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
 
         int[] statusArray = null;
@@ -118,7 +124,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
+            page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
         );
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
@@ -143,21 +149,18 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     /**
      * change one task instance's state from failure to forced success
      *
-     * @param loginUser      login user
-     * @param projectName    project name
+     * @param loginUser login user
+     * @param projectCode project code
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
     @Override
-    public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByName(projectName);
-
-        // check user auth
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            return checkResult;
+    public Map<String, Object> forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
 
         // check whether the task instance can be found
@@ -181,7 +184,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         } else {
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
-
         return result;
     }
 }
