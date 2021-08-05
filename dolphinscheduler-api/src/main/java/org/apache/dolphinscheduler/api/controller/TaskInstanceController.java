@@ -55,7 +55,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "TASK_INSTANCE_TAG")
 @RestController
-@RequestMapping("/projects/{projectName}/task-instance")
+@RequestMapping("/projects/{projectCode}/task-instance")
 public class TaskInstanceController extends BaseController {
 
     @Autowired
@@ -65,7 +65,7 @@ public class TaskInstanceController extends BaseController {
      * query task list paging
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @param searchVal search value
      * @param taskName task name
@@ -96,7 +96,7 @@ public class TaskInstanceController extends BaseController {
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                      @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
                                       @RequestParam(value = "processInstanceName", required = false) String processInstanceName,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -108,15 +108,13 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "endDate", required = false) String endTime,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-
-
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(
-            loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
+            taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -124,7 +122,7 @@ public class TaskInstanceController extends BaseController {
      * change one task instance's state from FAILURE to FORCED_SUCCESS
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
@@ -137,9 +135,9 @@ public class TaskInstanceController extends BaseController {
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> forceTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
-        Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectName, taskInstanceId);
+        Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectCode, taskInstanceId);
         return returnDataList(result);
     }
 
