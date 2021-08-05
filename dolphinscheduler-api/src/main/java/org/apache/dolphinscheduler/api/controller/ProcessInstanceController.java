@@ -73,11 +73,10 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @Api(tags = "PROCESS_INSTANCE_TAG")
 @RestController
-@RequestMapping("projects/{projectName}/instance")
+@RequestMapping("projects/{projectCode}/instance")
 public class ProcessInstanceController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
-
 
     @Autowired
     ProcessInstanceService processInstanceService;
@@ -86,7 +85,7 @@ public class ProcessInstanceController extends BaseController {
      * query process instance list paging
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
      * @param processDefinitionId process definition id
@@ -114,7 +113,7 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessInstanceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @RequestParam(value = "processDefinitionId", required = false, defaultValue = "0") Integer processDefinitionId,
                                            @RequestParam(value = "searchVal", required = false) String searchVal,
                                            @RequestParam(value = "executorName", required = false) String executorName,
@@ -124,14 +123,13 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "endDate", required = false) String endTime,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
-
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processInstanceService.queryProcessInstanceList(
-            loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
+        result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefinitionId, startTime, endTime,
+            searchVal, executorName, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
 
@@ -139,7 +137,7 @@ public class ProcessInstanceController extends BaseController {
      * query task list by process instance id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @return task list for the process instance
      */
@@ -152,10 +150,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskListByProcessId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                           @RequestParam("processInstanceId") Integer processInstanceId
-    ) throws IOException {
-        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectName, processInstanceId);
+                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                           @RequestParam("processInstanceId") Integer processInstanceId) throws IOException {
+        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
         return returnDataList(result);
     }
 
@@ -163,7 +160,7 @@ public class ProcessInstanceController extends BaseController {
      * update process instance
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceJson process instance json
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
@@ -186,16 +183,15 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(UPDATE_PROCESS_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "processInstanceJson", required = false) String processInstanceJson,
                                         @RequestParam(value = "processInstanceId") Integer processInstanceId,
                                         @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
                                         @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "flag", required = false) Flag flag
-    ) throws ParseException {
-        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
-            processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations);
+                                        @RequestParam(value = "flag", required = false) Flag flag) throws ParseException {
+        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, processInstanceId,
+            processInstanceJson, scheduleTime, syncDefine, flag, locations);
         return returnDataList(result);
     }
 
@@ -203,7 +199,7 @@ public class ProcessInstanceController extends BaseController {
      * query process instance by id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @return process instance detail
      */
@@ -216,10 +212,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                           @RequestParam("processInstanceId") Integer processInstanceId
-    ) {
-        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectName, processInstanceId);
+                                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                           @RequestParam("processInstanceId") Integer processInstanceId) {
+        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
         return returnDataList(result);
     }
 
@@ -227,7 +222,7 @@ public class ProcessInstanceController extends BaseController {
      * query top n process instance order by running duration
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param size number of process instance
      * @param startTime start time
      * @param endTime end time
@@ -244,14 +239,11 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                                          @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                           @RequestParam("size") Integer size,
                                                                           @RequestParam(value = "startTime", required = true) String startTime,
-                                                                          @RequestParam(value = "endTime", required = true) String endTime
-
-    ) {
-        projectName = ParameterUtils.handleEscapes(projectName);
-        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+                                                                          @RequestParam(value = "endTime", required = true) String endTime) {
+        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectCode, size, startTime, endTime);
         return returnDataList(result);
     }
 
@@ -260,7 +252,7 @@ public class ProcessInstanceController extends BaseController {
      * delete task instance and their mapping relation data
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @return delete result code
      */
@@ -273,11 +265,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<ProcessInstance> deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                                             @RequestParam("processInstanceId") Integer processInstanceId
-    ) {
-        // task queue
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+                                                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                             @RequestParam("processInstanceId") Integer processInstanceId) {
+        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
         return returnDataList(result);
     }
 
@@ -285,7 +275,7 @@ public class ProcessInstanceController extends BaseController {
      * query sub process instance detail info by task id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskId task id
      * @return sub process instance detail
      */
@@ -298,9 +288,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result querySubProcessInstanceByTaskId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                   @RequestParam("taskId") Integer taskId) {
-        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectName, taskId);
+        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, taskId);
         return returnDataList(result);
     }
 
@@ -308,7 +298,7 @@ public class ProcessInstanceController extends BaseController {
      * query parent process instance detail info by sub process instance id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param subId sub process id
      * @return parent instance detail
      */
@@ -321,9 +311,9 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR)
     @AccessLogAnnotation
     public Result queryParentInstanceBySubId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                             @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @RequestParam("subId") Integer subId) {
-        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectName, subId);
+        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, subId);
         return returnDataList(result);
     }
 
@@ -352,7 +342,7 @@ public class ProcessInstanceController extends BaseController {
      * encapsulation gantt structure
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @return gantt tree data
      */
@@ -365,7 +355,7 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR)
     @AccessLogAnnotation
     public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                           @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @RequestParam("processInstanceId") Integer processInstanceId) throws Exception {
         Map<String, Object> result = processInstanceService.viewGantt(processInstanceId);
         return returnDataList(result);
@@ -376,7 +366,7 @@ public class ProcessInstanceController extends BaseController {
      * delete task instance and their mapping relation data
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceIds process instance id
      * @return delete result code
      */
@@ -390,9 +380,8 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
     @AccessLogAnnotation
     public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @PathVariable String projectName,
-                                                  @RequestParam("processInstanceIds") String processInstanceIds
-    ) {
+                                                  @PathVariable long projectCode,
+                                                  @RequestParam("processInstanceIds") String processInstanceIds) {
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
@@ -402,7 +391,7 @@ public class ProcessInstanceController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                         deleteFailedIdList.add(strProcessInstanceId);
                         logger.error((String) deleteResult.get(Constants.MSG));
@@ -417,7 +406,6 @@ public class ProcessInstanceController extends BaseController {
         } else {
             putMsg(result, Status.SUCCESS);
         }
-
         return returnDataList(result);
     }
 }
