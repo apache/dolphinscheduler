@@ -1113,7 +1113,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             String subProcessJson = JSONUtils.toJsonString(processService.genProcessData(subProcess));
             //check current project has sub process
             boolean definitionExists = BooleanUtils.isTrue(
-                    processDefinitionMapper.existByDefineName(targetProject.getCode(), subProcess.getName()));
+                    processDefinitionMapper.existDefByProjectCodeAndDefineName(targetProject.getCode(), subProcess.getName()));
 
             if (!definitionExists) {
                 ArrayNode subJsonArray = (ArrayNode) JSONUtils.parseObject(subProcessJson).get(TASKS);

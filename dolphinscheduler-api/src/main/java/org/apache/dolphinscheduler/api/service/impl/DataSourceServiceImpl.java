@@ -81,7 +81,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         DatasourceUtil.checkDatasourceParam(datasourceParam);
         Result<Object> result = new Result<>();
         // check name can use or not
-        if (checkName(datasourceParam.getName())) {
+        if (checkDatasourceNameExist(datasourceParam.getName())) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
@@ -140,7 +140,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         //check name can use or not
-        if (!dataSource.getName().trim().equals(dataSource.getName()) && checkName(dataSource.getName())) {
+        if (!dataSource.getName().trim().equals(dataSource.getName()) && checkDatasourceNameExist(dataSource.getName())) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
@@ -176,7 +176,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return result;
     }
 
-    private boolean checkName(String name) {
+    private boolean checkDatasourceNameExist(String name) {
         return BooleanUtils.isTrue(dataSourceMapper.existDataSourceByName(name.trim()));
     }
 
