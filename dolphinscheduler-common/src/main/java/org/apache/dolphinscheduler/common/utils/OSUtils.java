@@ -17,17 +17,14 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
-import org.apache.commons.configuration.Configuration;
-
-import java.lang.management.OperatingSystemMXBean;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -85,7 +82,7 @@ public class OSUtils {
      */
     public static double memoryUsage() {
         GlobalMemory memory = hal.getMemory();
-        double memoryUsage = (memory.getTotal() - memory.getAvailable() - memory.getSwapUsed()) * 0.1 / memory.getTotal() * 10;
+        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 1.0 / memory.getTotal();
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
@@ -101,12 +98,11 @@ public class OSUtils {
      */
     public static double availablePhysicalMemorySize() {
         GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = (memory.getAvailable() + memory.getSwapUsed()) / 1024.0 / 1024 / 1024;
+        double availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(availablePhysicalMemorySize));
-
     }
 
     /**
@@ -116,13 +112,13 @@ public class OSUtils {
      *
      * @return available Physical Memory Size, unit: G
      */
-    public static double totalMemorySize() {
+    public static double totalPhysicalMemorySize() {
         GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
+        double totalPhysicalMemorySize = memory.getTotal() / 1024.0 / 1024 / 1024;
 
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(availablePhysicalMemorySize));
+        return Double.parseDouble(df.format(totalPhysicalMemorySize));
     }
 
     /**
@@ -261,11 +257,28 @@ public class OSUtils {
      * create user
      *
      * @param userName user name
+     */
+    public static void createUserIfAbsent(String userName) {
+        // if not exists this user, then create
+        taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
+        if (!getUserList().contains(userName)) {
+            boolean isSuccess = createUser(userName);
+            String infoLog = String.format("create user %s %s", userName, isSuccess ? "success" : "fail");
+            LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
+            LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
+        }
+        taskLoggerThreadLocal.remove();
+    }
+
+    /**
+     * create user
+     *
+     * @param userName user name
      * @return true if creation was successful, otherwise false
      */
     public static boolean createUser(String userName) {
         try {
-            String userGroup = OSUtils.getGroup();
+            String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
                 String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
                 LoggerUtils.logError(Optional.ofNullable(logger), errorLog);
@@ -304,7 +317,7 @@ public class OSUtils {
         String infoLog2 = String.format("execute cmd : %s", cmd);
         LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
-        OSUtils.exeCmd(cmd);
+        exeCmd(cmd);
     }
 
     /**
@@ -315,7 +328,6 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createMacUser(String userName, String userGroup) throws IOException {
-
         Optional<Logger> optionalLogger = Optional.ofNullable(logger);
         Optional<Logger> optionalTaskLogger = Optional.ofNullable(taskLoggerThreadLocal.get());
 
@@ -327,13 +339,13 @@ public class OSUtils {
         String infoLog2 = String.format("create user command : %s", createUserCmd);
         LoggerUtils.logInfo(optionalLogger, infoLog2);
         LoggerUtils.logInfo(optionalTaskLogger, infoLog2);
-        OSUtils.exeCmd(createUserCmd);
+        exeCmd(createUserCmd);
 
         String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
         String infoLog3 = String.format("append user to group : %s", appendGroupCmd);
         LoggerUtils.logInfo(optionalLogger, infoLog3);
         LoggerUtils.logInfo(optionalTaskLogger, infoLog3);
-        OSUtils.exeCmd(appendGroupCmd);
+        exeCmd(appendGroupCmd);
     }
 
     /**
@@ -352,13 +364,13 @@ public class OSUtils {
         String infoLog2 = String.format("execute create user command : %s", userCreateCmd);
         LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
-        OSUtils.exeCmd(userCreateCmd);
+        exeCmd(userCreateCmd);
 
         String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
         String infoLog3 = String.format("execute append user to group : %s", appendGroupCmd);
         LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog3);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog3);
-        OSUtils.exeCmd(appendGroupCmd);
+        exeCmd(appendGroupCmd);
     }
 
     /**
@@ -390,13 +402,17 @@ public class OSUtils {
     }
 
     /**
-     *  get sudo command
+     * get sudo command
+     *
      * @param tenantCode tenantCode
      * @param command command
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
-        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
+        if (!CommonUtils.isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
+            return command;
+        }
+        return String.format("sudo -u %s %s", tenantCode, command);
     }
 
     /**
@@ -466,43 +482,22 @@ public class OSUtils {
     /**
      * check memory and cpu usage
      *
-     * @param systemCpuLoad systemCpuLoad
-     * @param systemReservedMemory systemReservedMemory
+     * @param maxCpuloadAvg maxCpuloadAvg
+     * @param reservedMemory reservedMemory
      * @return check memory and cpu usage
      */
-    public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory) {
+    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
         // system load average
-        double loadAverage = OSUtils.loadAverage();
+        double loadAverage = loadAverage();
         // system available physical memory
-        double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
-
-        if (loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory) {
-            logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize, loadAverage);
+        double availablePhysicalMemorySize = availablePhysicalMemorySize();
+        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
+                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
             return false;
         } else {
             return true;
         }
-    }
-
-    /**
-     * check memory and cpu usage
-     *
-     * @param conf conf
-     * @param isMaster is master
-     * @return check memory and cpu usage
-     */
-    public static Boolean checkResource(Configuration conf, Boolean isMaster) {
-        double systemCpuLoad;
-        double systemReservedMemory;
-
-        if (Boolean.TRUE.equals(isMaster)) {
-            systemCpuLoad = conf.getDouble(Constants.MASTER_MAX_CPULOAD_AVG, Constants.DEFAULT_MASTER_CPU_LOAD);
-            systemReservedMemory = conf.getDouble(Constants.MASTER_RESERVED_MEMORY, Constants.DEFAULT_MASTER_RESERVED_MEMORY);
-        } else {
-            systemCpuLoad = conf.getDouble(Constants.WORKER_MAX_CPULOAD_AVG, Constants.DEFAULT_WORKER_CPU_LOAD);
-            systemReservedMemory = conf.getDouble(Constants.WORKER_RESERVED_MEMORY, Constants.DEFAULT_WORKER_RESERVED_MEMORY);
-        }
-        return checkResource(systemCpuLoad, systemReservedMemory);
     }
 
 }

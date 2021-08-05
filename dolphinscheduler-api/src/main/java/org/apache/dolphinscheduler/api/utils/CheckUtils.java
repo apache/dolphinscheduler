@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
+
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -51,7 +54,8 @@ public class CheckUtils {
     /**
      * check email
      *
-     * @param email email
+     * @param email
+     *            email
      * @return true if email regex valid, otherwise return false
      */
     public static boolean checkEmail(String email) {
@@ -65,14 +69,16 @@ public class CheckUtils {
     /**
      * check project description
      *
-     * @param desc desc
+     * @param desc
+     *            desc
      * @return true if description regex valid, otherwise return false
      */
     public static Map<String, Object> checkDesc(String desc) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isNotEmpty(desc) && desc.length() > 200) {
             result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+            result.put(Constants.MSG,
+                MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
@@ -82,7 +88,8 @@ public class CheckUtils {
     /**
      * check extra info
      *
-     * @param otherParams other parames
+     * @param otherParams
+     *            other parames
      * @return true if other parameters are valid, otherwise return false
      */
     public static boolean checkOtherParams(String otherParams) {
@@ -92,7 +99,8 @@ public class CheckUtils {
     /**
      * check password
      *
-     * @param password password
+     * @param password
+     *            password
      * @return true if password regex valid, otherwise return false
      */
     public static boolean checkPassword(String password) {
@@ -100,10 +108,10 @@ public class CheckUtils {
     }
 
     /**
-     * check phone
-     * phone can be empty.
+     * check phone phone can be empty.
      *
-     * @param phone phone
+     * @param phone
+     *            phone
      * @return true if phone regex valid, otherwise return false
      */
     public static boolean checkPhone(String phone) {
@@ -113,12 +121,21 @@ public class CheckUtils {
     /**
      * check task node parameter
      *
-     * @param parameter parameter
-     * @param taskType task type
+     * @param taskNode
+     *            TaskNode
      * @return true if task node parameters are valid, otherwise return false
      */
-    public static boolean checkTaskNodeParameters(String parameter, String taskType) {
-        AbstractParameters abstractParameters = TaskParametersUtils.getParameters(taskType, parameter);
+    public static boolean checkTaskNodeParameters(TaskNode taskNode) {
+        AbstractParameters abstractParameters;
+        String taskType = taskNode.getType();
+        if (taskType == null) {
+            return false;
+        }
+        if (TaskType.DEPENDENT.getDesc().equalsIgnoreCase(taskType)) {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getDependence());
+        } else {
+            abstractParameters = TaskParametersUtils.getParameters(taskType.toUpperCase(), taskNode.getParams());
+        }
 
         if (abstractParameters != null) {
             return abstractParameters.checkParameters();
@@ -130,17 +147,19 @@ public class CheckUtils {
     /**
      * check params
      *
-     * @param userName user name
-     * @param password password
-     * @param email email
-     * @param phone phone
+     * @param userName
+     *            user name
+     * @param password
+     *            password
+     * @param email
+     *            email
+     * @param phone
+     *            phone
      * @return true if user parameters are valid, other return false
      */
     public static boolean checkUserParams(String userName, String password, String email, String phone) {
-        return CheckUtils.checkUserName(userName)
-                && CheckUtils.checkEmail(email)
-                && CheckUtils.checkPassword(password)
-                && CheckUtils.checkPhone(phone);
+        return CheckUtils.checkUserName(userName) && CheckUtils.checkEmail(email) && CheckUtils.checkPassword(password)
+               && CheckUtils.checkPhone(phone);
     }
 
     /**

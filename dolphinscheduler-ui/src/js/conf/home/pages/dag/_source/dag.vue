@@ -137,6 +137,7 @@
               size="mini"
               :loading="spinnerLoading"
               @click="_version"
+              :disabled="$route.params.id == null"
               icon="el-icon-info">
               {{spinnerLoading ? 'Loading...' : $t('Version Info')}}
             </el-button>
@@ -152,7 +153,7 @@
         :visible.sync="drawer"
         size=""
         :with-header="false">
-        <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
+        <m-versions :versionData = versionData :isInstance="type === 'instance'" @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
       </el-drawer>
       <el-drawer
         :visible.sync="nodeDrawer"
@@ -230,7 +231,7 @@
           processDefinition: {
             id: null,
             version: '',
-            state: ''
+            releaseState: ''
           },
           processDefinitionVersions: [],
           total: null,
@@ -387,7 +388,7 @@
                   taskList.forEach(item => {
                     if (item.name === v1.name) {
                       depState = item.state
-                      const params = item.taskJson ? JSON.parse(item.taskJson).params : ''
+                      const params = item.taskParams ? JSON.parse(item.taskParams) : ''
                       let localParam = params.localParams || []
                       newTask.push({
                         id: v2.id,
@@ -487,9 +488,9 @@
                   this.spinnerLoading = false
                   // Jump process definition
                   if (this.type === 'instance') {
-                    this.$router.push({ path: `/projects/instance/list/${this.urlParam.id}?_t=${new Date().getTime()}` })
+                    this.$router.push({ path: `/projects/${this.projectId}/instance/list/${this.urlParam.id}` })
                   } else {
-                    this.$router.push({ path: `/projects/definition/list/${this.urlParam.id}?_t=${new Date().getTime()}` })
+                    this.$router.push({ path: `/projects/${this.projectId}/definition/list/${this.urlParam.id}` })
                   }
                   resolve()
                 }).catch(e => {
@@ -737,7 +738,7 @@
           processDefinitionId: processDefinitionId
         }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
-          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}?_t=${new Date().getTime()}` })
+          this.$router.push({ path: `/projects/${this.projectId}/definition/list/${processDefinitionId}` })
         }).catch(e => {
           this.$store.state.dag.isSwitchVersion = false
           this.$message.error(e.msg || '')
@@ -752,14 +753,14 @@
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionCode, fromThis }) {
         this.getProcessDefinitionVersionsPage({
           pageNo: pageNo,
           pageSize: pageSize,
-          processDefinitionId: processDefinitionId
+          processDefinitionCode: processDefinitionCode
         }).then(res => {
-          this.versionData.processDefinitionVersions = res.data.lists
-          this.versionData.total = res.data.totalCount
+          this.versionData.processDefinitionVersions = res.data.totalList
+          this.versionData.total = res.data.total
           this.versionData.pageSize = res.data.pageSize
           this.versionData.pageNo = res.data.currentPage
         }).catch(e => {
@@ -774,7 +775,7 @@
        * @param processDefinitionId the process definition id user want to delete
        * @param fromThis fromThis
        */
-      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, processDefinitionCode, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
@@ -783,7 +784,7 @@
           this.mVersionGetProcessDefinitionVersionsPage({
             pageNo: 1,
             pageSize: 10,
-            processDefinitionId: processDefinitionId,
+            processDefinitionCode: processDefinitionCode,
             fromThis: fromThis
           })
         }).catch(e => {
@@ -797,15 +798,16 @@
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
-          processDefinitionId: this.urlParam.id
+          processDefinitionCode: this.store.state.dag.code
         }).then(res => {
-          let processDefinitionVersions = res.data.lists
-          let total = res.data.totalCount
+          let processDefinitionVersions = res.data.totalList
+          let total = res.data.total
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
           this.versionData.processDefinition.id = this.urlParam.id
+          this.versionData.processDefinition.code = this.store.state.dag.code
           this.versionData.processDefinition.version = this.$store.state.dag.version
-          this.versionData.processDefinition.state = this.releaseState
+          this.versionData.processDefinition.releaseState = this.releaseState
           this.versionData.processDefinitionVersions = processDefinitionVersions
           this.versionData.total = total
           this.versionData.pageNo = pageNo
@@ -880,7 +882,7 @@
       }
     },
     computed: {
-      ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
+      ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name', 'projectId'])
     },
     components: { mVersions, mFormModel, mFormLineModel, mUdp, mStart }
   }
@@ -891,4 +893,12 @@
   .operBtn {
     padding: 8px 6px;
   }
+
+  .el-drawer__body {
+    ::selection {
+      background: #409EFF;
+      color: white;
+    }
+  }
+
 </style>

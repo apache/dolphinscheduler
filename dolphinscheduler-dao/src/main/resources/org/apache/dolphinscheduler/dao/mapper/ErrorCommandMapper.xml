@@ -22,14 +22,14 @@
         select cmd.command_type as command_type, count(1) as count
         from t_ds_error_command cmd, t_ds_process_definition process
         where cmd.process_definition_id = process.id
-        <if test="projectIdArray != null and projectIdArray.length != 0">
-            and process.project_id in
-            <foreach collection="projectIdArray" index="index" item="i" open="(" close=")" separator=",">
+        <if test="projectCodeArray != null and projectCodeArray.length != 0">
+            and process.project_code in
+            <foreach collection="projectCodeArray" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
         <if test="startTime != null and endTime != null">
-            and cmd.startTime <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
+            and cmd.start_time <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
         </if>
         group by cmd.command_type
     </select>

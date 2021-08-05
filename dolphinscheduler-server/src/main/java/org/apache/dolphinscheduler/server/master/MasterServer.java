@@ -27,9 +27,8 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
-import org.apache.dolphinscheduler.server.worker.WorkerServer;
-import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 
@@ -43,10 +42,19 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ *  master server
+ */
 @ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.server.worker.*",
+                "org.apache.dolphinscheduler.server.monitor.*",
+                "org.apache.dolphinscheduler.server.log.*"
+        })
 })
+@EnableTransactionManagement
 public class MasterServer implements IStoppable {
 
     /**
@@ -76,7 +84,7 @@ public class MasterServer implements IStoppable {
      * zk master client
      */
     @Autowired
-    private ZKMasterClient zkMasterClient;
+    private MasterRegistryClient masterRegistryClient;
 
     /**
      * scheduler service
@@ -109,7 +117,8 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         // self tolerant
-        this.zkMasterClient.start(this);
+        this.masterRegistryClient.start();
+        this.masterRegistryClient.setRegistryStoppable(this);
 
         // scheduler start
         this.masterSchedulerService.start();
@@ -166,7 +175,7 @@ public class MasterServer implements IStoppable {
             // close
             this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
-            this.zkMasterClient.close();
+            this.masterRegistryClient.closeRegistry();
             // close quartz
             try {
                 QuartzExecutors.getInstance().shutdown();
@@ -174,6 +183,8 @@ public class MasterServer implements IStoppable {
             } catch (Exception e) {
                 logger.warn("Quartz service stopped exception:{}", e.getMessage());
             }
+            // close spring Context and will invoke method with @PreDestroy annotation to destory beans. like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
+            springApplicationContext.close();
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
         }

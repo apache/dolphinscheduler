@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -27,6 +28,17 @@ import java.util.Map;
 public interface WorkerGroupService {
 
     /**
+     * create or update a worker group
+     *
+     * @param loginUser login user
+     * @param id worker group id
+     * @param name worker group name
+     * @param addrList addr list
+     * @return create or update result code
+     */
+    Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList);
+
+    /**
      * query worker group paging
      *
      * @param loginUser login user
@@ -35,7 +47,7 @@ public interface WorkerGroupService {
      * @param pageSize page size
      * @return worker group list page
      */
-    Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
+    Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
 
     /**
      * query all worker group
@@ -43,5 +55,19 @@ public interface WorkerGroupService {
      * @return all worker group list
      */
     Map<String, Object> queryAllGroup();
+
+    /**
+     * delete worker group by id
+     * @param id worker group id
+     * @return delete result code
+     */
+    Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id);
+
+    /**
+     * query all worker address list
+     *
+     * @return all worker address list
+     */
+    Map<String, Object> getWorkerAddressList();
 
 }

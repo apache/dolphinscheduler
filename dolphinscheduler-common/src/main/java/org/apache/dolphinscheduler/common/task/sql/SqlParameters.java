@@ -17,12 +17,19 @@
 
 package org.apache.dolphinscheduler.common.task.sql;
 
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Sql/Hql parameter
@@ -49,6 +56,16 @@ public class SqlParameters extends AbstractParameters {
      * 1 NON_QUERY
      */
     private int sqlType;
+
+    /**
+     * send email
+     */
+    private Boolean sendEmail;
+
+    /**
+     * display rows
+     */
+    private int displayRows;
 
     /**
      * udf list
@@ -83,6 +100,16 @@ public class SqlParameters extends AbstractParameters {
      * title
      */
     private String title;
+
+    private int limit;
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
 
     public String getType() {
         return type;
@@ -122,6 +149,22 @@ public class SqlParameters extends AbstractParameters {
 
     public void setSqlType(int sqlType) {
         this.sqlType = sqlType;
+    }
+
+    public Boolean getSendEmail() {
+        return sendEmail;
+    }
+
+    public void setSendEmail(Boolean sendEmail) {
+        this.sendEmail = sendEmail;
+    }
+
+    public int getDisplayRows() {
+        return displayRows;
+    }
+
+    public void setDisplayRows(int displayRows) {
+        this.displayRows = displayRows;
     }
 
     public String getShowType() {
@@ -183,12 +226,62 @@ public class SqlParameters extends AbstractParameters {
     }
 
     @Override
+    public void dealOutParam(String result) {
+        if (CollectionUtils.isEmpty(localParams)) {
+            return;
+        }
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        if (StringUtils.isEmpty(result)) {
+            varPool.addAll(outProperty);
+            return;
+        }
+        List<Map<String, String>> sqlResult = getListMapByString(result);
+        if (CollectionUtils.isEmpty(sqlResult)) {
+            return;
+        }
+        //if sql return more than one line
+        if (sqlResult.size() > 1) {
+            Map<String, List<String>> sqlResultFormat = new HashMap<>();
+            //init sqlResultFormat
+            Set<String> keySet = sqlResult.get(0).keySet();
+            for (String key : keySet) {
+                sqlResultFormat.put(key, new ArrayList<>());
+            }
+            for (Map<String, String> info : sqlResult) {
+                for (String key : info.keySet()) {
+                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
+                }
+            }
+            for (Property info : outProperty) {
+                if (info.getType() == DataType.LIST) {
+                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    varPool.add(info);
+                }
+            }
+        } else {
+            //result only one line
+            Map<String, String> firstRow = sqlResult.get(0);
+            for (Property info : outProperty) {
+                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+                varPool.add(info);
+            }
+        }
+
+    }
+
+    @Override
     public String toString() {
         return "SqlParameters{"
                 + "type='" + type + '\''
                 + ", datasource=" + datasource
                 + ", sql='" + sql + '\''
                 + ", sqlType=" + sqlType
+                + ", sendEmail=" + sendEmail
+                + ", displayRows=" + displayRows
+                + ", limit=" + limit
                 + ", udfs='" + udfs + '\''
                 + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''

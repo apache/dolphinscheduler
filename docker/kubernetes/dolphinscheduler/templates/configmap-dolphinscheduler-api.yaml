@@ -21,8 +21,9 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-api
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
-  DOLPHINSCHEDULER_OPTS: {{ .Values.api.configmap.DOLPHINSCHEDULER_OPTS | quote }}
+  {{- range $key, $value := .Values.api.configmap }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
 {{- end }}

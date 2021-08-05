@@ -48,7 +48,7 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="120" fixed="right">
+        <el-table-column :label="$t('Operation')" width="100" fixed="right">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Authorize')" placement="top">
               <el-dropdown trigger="click">

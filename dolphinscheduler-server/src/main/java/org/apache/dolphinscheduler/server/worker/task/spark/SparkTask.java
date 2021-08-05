@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.spark;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.SparkVersion;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
@@ -109,12 +108,8 @@ public class SparkTask extends AbstractYarnTask {
         // other parameters
         args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
 
-        // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-            taskExecutionContext.getDefinedParams(),
-            sparkParameters.getLocalParametersMap(),
-            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-            taskExecutionContext.getScheduleTime());
+        // replace placeholder, and combining local and global parameters
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
         String command = null;
 

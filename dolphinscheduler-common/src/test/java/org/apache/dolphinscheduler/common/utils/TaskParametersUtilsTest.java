@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.enums.TaskType;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,17 +31,15 @@ public class TaskParametersUtilsTest {
 
     @Test
     public void testGetParameters() {
-        Assert.assertNull(TaskParametersUtils.getParameters("xx", "ttt"));
-        Assert.assertNull(TaskParametersUtils.getParameters("SHELL", "ttt"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SHELL", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SQL", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SUB_PROCESS", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("PROCEDURE", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("MR", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("SPARK", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("PYTHON", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("DEPENDENT", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("FLINK", "{}"));
-        Assert.assertNotNull(TaskParametersUtils.getParameters("HTTP", "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SHELL.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SQL.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SUB_PROCESS.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.PROCEDURE.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.MR.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.SPARK.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.PYTHON.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.DEPENDENT.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.FLINK.getDesc(), "{}"));
+        Assert.assertNotNull(TaskParametersUtils.getParameters(TaskType.HTTP.getDesc(), "{}"));
     }
 }

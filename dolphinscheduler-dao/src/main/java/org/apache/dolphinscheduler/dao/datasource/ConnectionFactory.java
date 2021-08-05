@@ -26,12 +26,14 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.mybatis.spring.SqlSessionTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * not spring manager connection, only use for init db, and alert module for non-spring application
@@ -81,7 +83,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
      *
      * @return druid dataSource
      */
-    private DataSource buildDataSource() {
+    private DataSource buildDataSource() throws SQLException {
 
         DruidDataSource druidDataSource = dataSource();
         return druidDataSource;

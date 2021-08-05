@@ -20,8 +20,7 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-alert
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   ports:
     - port: 50052
@@ -29,7 +28,4 @@ spec:
       protocol: TCP
       name: alert-port
   selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: alert
+    {{- include "dolphinscheduler.alert.labels" . | nindent 4 }}

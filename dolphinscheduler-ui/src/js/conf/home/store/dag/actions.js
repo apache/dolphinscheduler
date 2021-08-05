@@ -158,6 +158,10 @@ export default {
       io.get(`projects/${state.projectName}/process/select-by-id`, {
         processId: payload
       }, res => {
+        // process definition code
+        state.code = res.data.code
+        // version
+        state.version = res.data.version
         // name
         state.name = res.data.name
         // description
@@ -166,8 +170,6 @@ export default {
         state.connects = JSON.parse(res.data.connects)
         // locations
         state.locations = JSON.parse(res.data.locations)
-        // version
-        state.version = res.data.version
         // Process definition
         const processDefinitionJson = JSON.parse(res.data.processDefinitionJson)
         // tasks info
@@ -243,6 +245,10 @@ export default {
       io.get(`projects/${state.projectName}/instance/select-by-id`, {
         processInstanceId: payload
       }, res => {
+        // code
+        state.code = res.data.processDefinitionCode
+        // version
+        state.version = res.data.processDefinitionVersion
         // name
         state.name = res.data.name
         // desc

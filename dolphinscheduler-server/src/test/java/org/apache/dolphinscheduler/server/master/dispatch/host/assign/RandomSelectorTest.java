@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * random selector
@@ -39,15 +36,14 @@ public class RandomSelectorTest {
     @Test
     public void testSelect1() {
         RandomSelector selector = new RandomSelector();
-        Host result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 100, System.currentTimeMillis()), new Host("192.168.1.2", 80, 20, System.currentTimeMillis())));
+        HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1:11", 100, "default"), new HostWorker("192.168.1.2:22", 80, "default")));
         Assert.assertNotNull(result);
     }
 
     @Test
     public void testSelect() {
         RandomSelector selector = new RandomSelector();
-        Host result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 100, System.currentTimeMillis()), new Host("192.168.1.1", 80, 20, System.currentTimeMillis())));
+        HostWorker result = selector.select(Arrays.asList(new HostWorker("192.168.1.1", 11, 100, "default"), new HostWorker("192.168.1.2:", 22, 20, "default")));
         Assert.assertNotNull(result);
-
     }
 }

@@ -19,15 +19,9 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -36,8 +30,8 @@ import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheMan
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.Date;
 import java.util.Set;
@@ -61,7 +55,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * zookeeper register center
      */
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+    private RegistryClient registryClient;
 
     /**
      * constructor of MasterTaskExecThread
@@ -72,7 +66,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         super(taskInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
-        this.zookeeperRegistryCenter = SpringApplicationContext.getBean(ZookeeperRegistryCenter.class);
+        this.registryClient = RegistryClient.getInstance();
     }
 
     /**
@@ -149,7 +143,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     this.checkTimeoutFlag = !alertTimeout();
                 }
                 // updateProcessInstance task instance
-                taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+                //issue#5539 Check status of taskInstance from cache
+                taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
@@ -215,7 +210,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * @return whether exists
      */
     public Boolean existsValidWorkerGroup(String taskInstanceWorkerGroup) {
-        Set<String> workerGroups = zookeeperRegistryCenter.getWorkerGroupDirectly();
+        Set<String> workerGroups = registryClient.getWorkerGroupDirectly();
         // not worker group
         if (CollectionUtils.isEmpty(workerGroups)) {
             return false;
@@ -225,7 +220,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         if (!workerGroups.contains(taskInstanceWorkerGroup)) {
             return false;
         }
-        Set<String> workers = zookeeperRegistryCenter.getWorkerGroupNodesDirectly(taskInstanceWorkerGroup);
+        Set<String> workers = registryClient.getWorkerGroupNodesDirectly(taskInstanceWorkerGroup);
         if (CollectionUtils.isEmpty(workers)) {
             return false;
         }

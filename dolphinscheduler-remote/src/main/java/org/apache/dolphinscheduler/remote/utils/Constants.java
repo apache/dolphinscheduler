@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -48,7 +50,7 @@ public class Constants {
     public static final int CPUS = Runtime.getRuntime().availableProcessors();
 
 
-    public static final String LOCAL_ADDRESS = IPUtils.getFirstNoLoopbackIP4Address();
+    public static final String LOCAL_ADDRESS = NetUtils.getHost();
 
     /**
      * netty epoll enable switch

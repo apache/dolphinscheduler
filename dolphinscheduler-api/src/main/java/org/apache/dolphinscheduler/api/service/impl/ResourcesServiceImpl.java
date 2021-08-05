@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
@@ -127,12 +128,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           int pid,
                                           String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -192,17 +193,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          int pid,
                                          String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
         result = verifyPid(loginUser, pid);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
         result = verifyFile(name, type, file);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -251,8 +252,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return true if resource exists
      */
     private boolean checkResourceExists(String fullName, int userId, int type) {
-        List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        return resources != null && !resources.isEmpty();
+        Boolean existResource = resourcesMapper.existResource(fullName, userId, type);
+        return BooleanUtils.isTrue(existResource);
     }
 
     /**
@@ -274,7 +275,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -305,7 +306,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         result = verifyFile(name, type, file);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -361,11 +362,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Date now = new Date();
 
         resource.setAlias(name);
+        resource.setFileName(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
         if (file != null) {
-            resource.setFileName(file.getOriginalFilename());
             resource.setSize(file.getSize());
         }
 
@@ -511,9 +512,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Map<String, Object> queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result queryResourceListPaging(User loginUser, int directoryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
-        HashMap<String, Object> result = new HashMap<>();
+        Result result = new Result();
         Page<Resource> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
@@ -527,12 +528,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
-        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
-                userId,directoryId, type.ordinal(), searchVal);
+        List<Integer> resourcesIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
+
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page, userId, directoryId, type.ordinal(), searchVal,resourcesIds);
+
         PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int)resourceIPage.getTotal());
-        pageInfo.setLists(resourceIPage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int)resourceIPage.getTotal());
+        pageInfo.setTotalList(resourceIPage.getRecords());
+        result.setData(pageInfo);
         putMsg(result,Status.SUCCESS);
         return result;
     }
@@ -597,6 +600,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             org.apache.dolphinscheduler.api.utils.FileUtils.copyFile(file, localFilename);
             HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
+            try {
+                FileUtils.deleteFile(localFilename);
+            } catch (IOException ex) {
+                logger.error("delete local tmp file:{} error", localFilename, ex);
+            }
             logger.error(e.getMessage(), e);
             return false;
         }
@@ -613,15 +621,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
         Map<String, Object> result = new HashMap<>();
-
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
+        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }
@@ -636,11 +639,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Map<String, Object> result = new HashMap<>();
+
+        List<Resource> allResourceList = queryAuthoredResourceList(loginUser, type);
+
         String suffix = ".jar";
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
         if (programType != null) {
             switch (programType) {
                 case JAVA:
@@ -652,11 +654,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 default:
             }
         }
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
-        List<Resource> resources = new ResourceFilter(suffix,new ArrayList<>(allResourceList)).filter();
+        List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
-        putMsg(result,Status.SUCCESS);
+        putMsg(result, Status.SUCCESS);
 
         return result;
     }
@@ -673,7 +674,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> delete(User loginUser, int resourceId) throws IOException {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -695,7 +696,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // get all resource id of process definitions those is released
         List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+        Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource,true);
@@ -829,7 +830,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> readResource(int resourceId, int skipLineNum, int limit) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -898,7 +899,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDir) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -917,7 +918,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String name = fileName.trim() + "." + nameSuffix;
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name) : String.format("%s/%s",currentDir,name);
         result = verifyResource(loginUser, type, fullName, pid);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -940,7 +941,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
         result = uploadContentToHdfs(fullName, tenantCode, content);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             throw new ServiceException(result.getMsg());
         }
         return result;
@@ -960,7 +961,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private Result<Object> verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
         Result<Object> result = verifyResourceName(fullName, type, loginUser);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
         return verifyPid(loginUser, pid);
@@ -994,7 +995,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> updateResourceContent(int resourceId, String content) {
         Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             return result;
         }
 
@@ -1025,7 +1026,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resourcesMapper.updateById(resource);
 
         result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (result.isFailed()) {
             throw new ServiceException(result.getMsg());
         }
         return result;
@@ -1171,8 +1172,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<Resource> list;
         if (resourceList != null && !resourceList.isEmpty()) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
-            List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
-
+            List<Resource> authedResourceList = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
             getAuthorizedResourceList(resourceSet, authedResourceList);
             list = new ArrayList<>(resourceSet);
         } else {
@@ -1247,7 +1247,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (isNotAdmin(loginUser, result)) {
             return result;
         }
-        List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
+        List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
         String visit = JSONUtils.toJsonString(visitor.visit(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         logger.info(visit);
@@ -1325,6 +1325,40 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             childList.add(childId);
             listAllChildren(childId, childList);
         }
+    }
+
+    /**
+     *  query authored resource list (own and authorized)
+     * @param loginUser login user
+     * @param type ResourceType
+     * @return all authored resource list
+     */
+    private List<Resource> queryAuthoredResourceList(User loginUser, ResourceType type) {
+        List<Resource> relationResources;
+        int userId = loginUser.getId();
+        if (isAdmin(loginUser)) {
+            userId = 0;
+            relationResources = new ArrayList<>();
+        } else {
+            // query resource relation
+            relationResources = queryResourceList(userId, 0);
+        }
+
+        List<Resource> ownResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        ownResourceList.addAll(relationResources);
+
+        return ownResourceList;
+    }
+
+    /**
+     *  query resource list by userId and perm
+     * @param userId userId
+     * @param perm perm
+     * @return resource list
+     */
+    private List<Resource> queryResourceList(Integer userId, int perm) {
+        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
+        return CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
     }
 
 }

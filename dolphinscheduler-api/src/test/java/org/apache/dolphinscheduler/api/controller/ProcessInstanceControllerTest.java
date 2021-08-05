@@ -59,12 +59,11 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
-
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id", "cxc_1113")
                 .header(SESSION_ID, sessionId)
                 .param("processInstanceId", "1203"))
@@ -74,12 +73,14 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.PROJECT_NOT_FOUNT));
     }
 
     @Test
     public void testUpdateProcessInstance() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":"
+                + "\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\","
+                + "\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -98,7 +99,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test
@@ -113,9 +114,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
-
 
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
@@ -129,7 +129,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.TASK_INSTANCE_NOT_EXISTS));
     }
 
     @Test
@@ -144,9 +144,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE));
     }
-
 
     @Test
     public void testViewVariables() throws Exception {
@@ -160,9 +159,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
-
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {
@@ -176,7 +174,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isSuccess());
     }
 
     @Test
@@ -191,6 +189,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
-        Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR));
     }
 }

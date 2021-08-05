@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -17,6 +18,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -31,6 +33,7 @@ import java.util.Map;
 /**
  * process instance service
  */
+
 public interface ProcessInstanceService {
 
     /**
@@ -63,10 +66,10 @@ public interface ProcessInstanceService {
      * @param endDate end time
      * @return process instance list
      */
-    Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
-                                                 String startDate, String endDate,
-                                                 String searchVal, String executorName, ExecutionStatus stateType, String host,
-                                                 Integer pageNo, Integer pageSize);
+    Result queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
+                                    String startDate, String endDate,
+                                    String searchVal, String executorName, ExecutionStatus stateType, String host,
+                                    Integer pageNo, Integer pageSize);
 
     /**
      * query task list by process instance id
@@ -148,19 +151,21 @@ public interface ProcessInstanceService {
     Map<String, Object> viewGantt(Integer processInstanceId) throws Exception;
 
     /**
-     * query process instance by processDefinitionId and stateArray
-     * @param processDefinitionId processDefinitionId
+     * query process instance by processDefinitionCode and stateArray
+     *
+     * @param processDefinitionCode processDefinitionCode
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states);
+    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states);
 
     /**
-     * query process instance by processDefinitionId
-     * @param processDefinitionId processDefinitionId
+     * query process instance by processDefinitionCode
+     *
+     * @param processDefinitionCode processDefinitionCode
      * @param size size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size);
+    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,int size);
 
 }

@@ -22,9 +22,11 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -32,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +66,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    private Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     /**
      * create project
@@ -87,15 +97,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Date now = new Date();
 
-        project = Project
+        try {
+            project = Project
                 .newBuilder()
                 .name(name)
+                .code(SnowFlakeUtils.getInstance().nextId())
                 .description(desc)
                 .userId(loginUser.getId())
                 .userName(loginUser.getUserName())
                 .createTime(now)
                 .updateTime(now)
                 .build();
+        } catch (SnowFlakeException e) {
+            putMsg(result, Status.CREATE_PROJECT_ERROR);
+            return result;
+        }
 
         if (projectMapper.insert(project) > 0) {
             result.put(Constants.DATA_LIST, project.getId());
@@ -162,6 +178,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return checkResult;
     }
 
+    @Override
+    public boolean hasProjectAndPerm(User loginUser, Project project, Result result) {
+        boolean checkResult = false;
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
+        } else if (!checkReadPermission(loginUser, project)) {
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
+        } else {
+            checkResult = true;
+        }
+        return checkResult;
+    }
+
     /**
      * admin can view all projects
      *
@@ -172,8 +201,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return project list which the login user have permission to see
      */
     @Override
-    public Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
+        Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
 
         Page<Project> page = new Page<>(pageNo, pageSize);
@@ -187,12 +216,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
         }
-        pageInfo.setTotalCount((int) projectIPage.getTotal());
-        pageInfo.setLists(projectList);
-        result.put(Constants.COUNT, (int) projectIPage.getTotal());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) projectIPage.getTotal());
+        pageInfo.setTotalList(projectList);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -217,7 +244,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
 
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
         if (!processDefinitionList.isEmpty()) {
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
@@ -256,10 +283,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param projectId project id
      * @param projectName project name
      * @param desc description
+     * @param userName project owner
      * @return update result code
      */
     @Override
-    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
+    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc, String userName) {
         Map<String, Object> result = new HashMap<>();
 
         Map<String, Object> descCheck = checkDesc(desc);
@@ -277,10 +305,15 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
+        User user = userMapper.queryByUserNameAccurately(userName);
+        if (user == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userName);
+            return result;
+        }
         project.setName(projectName);
         project.setDescription(desc);
         project.setUpdateTime(new Date());
-
+        project.setUserId(user.getId());
         int update = projectMapper.updateById(project);
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
@@ -301,7 +334,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
         /**
@@ -353,7 +386,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (isNotAdmin(loginUser, result)) {
+        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
             return result;
         }
 
@@ -373,10 +406,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-
-        if (isNotAdmin(loginUser, result)) {
-            return result;
-        }
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
@@ -447,19 +476,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query all project list that have one or more process definitions.
+     * query all project list
      *
      * @return project list
      */
     @Override
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = new ArrayList<>();
-
-        List<Integer> projectIds = processDefinitionMapper.listProjectIds();
-        if (CollectionUtils.isNotEmpty(projectIds)) {
-            projects = projectMapper.selectBatchIds(projectIds);
-        }
+        List<Project> projects = projectMapper.queryAllProject();
 
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);

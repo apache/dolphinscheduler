@@ -38,14 +38,14 @@ import org.springframework.util.MultiValueMap;
 /**
  * tenant controller test
  */
-public class TenantControllerTest extends AbstractControllerTest{
+public class TenantControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
 
     @Test
     public void testCreateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode","tenantCode");
+        paramsMap.add("tenantCode","hayden");
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
@@ -57,7 +57,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -77,7 +77,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -97,11 +97,10 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
-
 
     @Test
     public void testVerifyTenantCode() throws Exception {
@@ -116,7 +115,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -124,7 +123,7 @@ public class TenantControllerTest extends AbstractControllerTest{
     @Test
     public void testVerifyTenantCodeExists() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tenantCode", "tenantCode");
+        paramsMap.add("tenantCode", "hayden");
 
         MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
                 .header(SESSION_ID, sessionId)
@@ -134,7 +133,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.OS_TENANT_CODE_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -149,7 +148,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isSuccess());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
@@ -166,7 +165,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        Assert.assertTrue(result != null && result.isStatus(Status.TENANT_NOT_EXIST));
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

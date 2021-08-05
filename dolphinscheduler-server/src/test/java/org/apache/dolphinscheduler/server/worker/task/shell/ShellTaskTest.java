@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
@@ -27,11 +28,12 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,11 +62,10 @@ public class ShellTaskTest {
         System.setProperty("log4j2.disable.jmx", Boolean.TRUE.toString());
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
         PowerMockito.whenNew(ShellCommandExecutor.class).withAnyArguments().thenReturn(shellCommandExecutor);
-        shellCommandExecutor.setTaskResultString("shellReturn");
         taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(1);
         taskExecutionContext.setTaskName("kris test");
-        taskExecutionContext.setTaskType("SHELL");
+        taskExecutionContext.setTaskType(TaskType.SHELL.getDesc());
         taskExecutionContext.setHost("127.0.0.1:1234");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setLogPath("/log");
@@ -83,6 +84,7 @@ public class ShellTaskTest {
         taskExecutionContext.setTenantCode("roo");
         taskExecutionContext.setScheduleTime(new Date());
         taskExecutionContext.setQueue("default");
+        taskExecutionContext.setVarPool("[{\"direct\":\"IN\",\"prop\":\"test\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskExecutionContext.setTaskParams(
             "{\"rawScript\":\"#!/bin/sh\\necho $[yyyy-MM-dd HH:mm:ss +3]\\necho \\\" ?? ${time1} \\\"\\necho \\\" ????? ${time2}\\\"\\n\",\"localParams\":"
                 +
@@ -103,6 +105,7 @@ public class ShellTaskTest {
     public void testComplementData() throws Exception {
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         shellCommandExecutor.isSuccessOfYarnState(new ArrayList<>());
         shellCommandExecutor.isSuccessOfYarnState(null);
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
@@ -114,16 +117,9 @@ public class ShellTaskTest {
         taskExecutionContext.setCmdTypeIfComplement(0);
         shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
+        shellTask.getParameters().setVarPool(taskExecutionContext.getVarPool());
         PowerMockito.when(shellCommandExecutor.run(anyString())).thenReturn(commandExecuteResult);
         shellTask.handle();
-    }
-
-    @Test
-    public void testSetResult() {
-        shellTask = new ShellTask(taskExecutionContext, logger);
-        shellTask.init();
-        String r = "return";
-        shellTask.setResult(r);
     }
 
 }

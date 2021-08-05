@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,10 +88,10 @@ public class AlertGroupMapperTest {
 
         String groupName = "testGroup";
 
-        Integer count = 4;
+        Integer count = 1;
 
-        Integer offset = 2;
-        Integer size = 2;
+        Integer offset = 0;
+        Integer size = 1;
 
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count, groupName);
 
@@ -151,7 +152,7 @@ public class AlertGroupMapperTest {
      */
     @Test
     public void testQueryByGroupName() {
-        Integer count = 4;
+        Integer count = 1;
         String groupName = "testGroup";
 
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count, groupName);
@@ -161,12 +162,20 @@ public class AlertGroupMapperTest {
         compareAlertGroups(alertGroupMap, alertGroupList);
     }
 
+    @Test
+    public void testExistGroupName() {
+        String groupName = "testGroup";
+        createAlertGroups(1, groupName);
+
+        Assert.assertTrue(alertGroupMapper.existGroupName(groupName));
+    }
+
     /**
      * test query all group list
      */
     @Test
     public void testQueryAllGroupList() {
-        Integer count = 4;
+        Integer count = 1;
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count);
 
         List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();

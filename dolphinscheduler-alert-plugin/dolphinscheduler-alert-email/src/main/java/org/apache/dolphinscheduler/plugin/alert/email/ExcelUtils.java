@@ -21,16 +21,15 @@ import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailExcept
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,6 +49,8 @@ public class ExcelUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
+    private static final int XLSX_WINDOW_ROW = 10000;
+
     /**
      * generate excel file
      *
@@ -58,10 +59,13 @@ public class ExcelUtils {
      * @param xlsFilePath the xls path
      */
     public static void genExcelFile(String content, String title, String xlsFilePath) {
-        List<LinkedHashMap> itemsList;
+        File file = new File(xlsFilePath);
+        if (!file.exists() && !file.mkdirs()) {
+            logger.error("Create xlsx directory error, path:{}", xlsFilePath);
+            throw new AlertEmailException("Create xlsx directory error");
+        }
 
-        //The JSONUtils.toList has been try catch ex
-        itemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        List<LinkedHashMap> itemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
         if (CollectionUtils.isEmpty(itemsList)) {
             logger.error("itemsList is null");
@@ -75,15 +79,12 @@ public class ExcelUtils {
         for (Map.Entry<String, Object> en : headerMap.entrySet()) {
             headerList.add(en.getKey());
         }
-
-        HSSFWorkbook wb = null;
-        FileOutputStream fos = null;
-        try {
+        try (SXSSFWorkbook wb = new SXSSFWorkbook(XLSX_WINDOW_ROW);
+             FileOutputStream fos = new FileOutputStream(String.format("%s/%s.xlsx", xlsFilePath, title))) {
             // declare a workbook
-            wb = new HSSFWorkbook();
             // generate a table
-            HSSFSheet sheet = wb.createSheet();
-            HSSFRow row = sheet.createRow(0);
+            Sheet sheet = wb.createSheet();
+            Row row = sheet.createRow(0);
             //set the height of the first line
             row.setHeight((short) 500);
 
@@ -93,7 +94,7 @@ public class ExcelUtils {
 
             //setting excel headers
             for (int i = 0; i < headerList.size(); i++) {
-                HSSFCell cell = row.createCell(i);
+                Cell cell = row.createCell(i);
                 cell.setCellStyle(cellStyle);
                 cell.setCellValue(headerList.get(i));
             }
@@ -107,9 +108,13 @@ public class ExcelUtils {
                 row.setHeight((short) 500);
                 rowIndex++;
                 for (int j = 0; j < values.length; j++) {
-                    HSSFCell cell1 = row.createCell(j);
+                    Cell cell1 = row.createCell(j);
                     cell1.setCellStyle(cellStyle);
-                    cell1.setCellValue(String.valueOf(values[j]));
+                    if (values[j] instanceof Number) {
+                        cell1.setCellValue(Double.parseDouble(String.valueOf(values[j])));
+                    } else {
+                        cell1.setCellValue(String.valueOf(values[j]));
+                    }
                 }
             }
 
@@ -117,33 +122,11 @@ public class ExcelUtils {
                 sheet.setColumnWidth(i, headerList.get(i).length() * 800);
             }
 
-            File file = new File(xlsFilePath);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-
             //setting file output
-            fos = new FileOutputStream(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLS);
-
             wb.write(fos);
-
+            wb.dispose();
         } catch (Exception e) {
             throw new AlertEmailException("generate excel error", e);
-        } finally {
-            if (wb != null) {
-                try {
-                    wb.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
         }
     }
 

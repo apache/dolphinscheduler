@@ -23,7 +23,7 @@ import i18n from '@/module/i18n'
 const stateType = [
   {
     code: '',
-    label: `${i18n.$t('None')}`
+    label: `${i18n.$t('AllStatus')}`
   }, {
     code: 'SUBMITTED_SUCCESS',
     label: `${i18n.$t('Submitted successfully')}`
@@ -55,10 +55,10 @@ const stateType = [
     code: 'KILL',
     label: `${i18n.$t('Kill')}`
   }, {
-    code: 'WAITTING_THREAD',
+    code: 'WAITING_THREAD',
     label: `${i18n.$t('Waiting for thread')}`
   }, {
-    code: 'WAITTING_DEPEND',
+    code: 'WAITING_DEPEND',
     label: `${i18n.$t('Waiting for dependency to complete')}`
   }, {
     code: 'DELAY_EXECUTION',

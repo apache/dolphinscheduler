@@ -147,6 +147,14 @@ public class JSONUtilsTest {
     }
 
     @Test
+    public void testNodeString() {
+        Assert.assertEquals("", JSONUtils.getNodeString("", "key"));
+        Assert.assertEquals("", JSONUtils.getNodeString("abc", "key"));
+        Assert.assertEquals("", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "key"));
+        Assert.assertEquals("\"foo\"", JSONUtils.getNodeString("{\"bar\":\"foo\"}", "bar"));
+    }
+    
+    @Test
     public void testJsonByteArray() {
         String str = "foo";
         byte[] serializeByte = JSONUtils.toJsonByteArray(str);

@@ -73,24 +73,24 @@ public class TenantServiceTest {
     @Mock
     private UserMapper userMapper;
 
-    private static final String tenantCode = "TenantServiceTest";
+    private static final String tenantCode = "hayden";
 
     @Test
     public void testCreateTenant() {
 
         User loginUser = getLoginUser();
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         try {
             //check tenantCode
             Map<String, Object> result =
                 tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.VERIFY_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.OS_TENANT_CODE_EXIST, result.get(Constants.STATUS));
 
             // success
             result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
@@ -112,10 +112,10 @@ public class TenantServiceTest {
         page.setTotal(1L);
         Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq("TenantServiceTest")))
             .thenReturn(page);
-        Map<String, Object> result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
+        Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
-        PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
     }
 
@@ -186,14 +186,14 @@ public class TenantServiceTest {
     @Test
     public void testVerifyTenantCode() {
 
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
+        Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         // tenantCode not exist
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         // tenantCode  exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
-        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
+        Assert.assertTrue(result.isStatus(Status.OS_TENANT_CODE_EXIST));
     }
 
     /**

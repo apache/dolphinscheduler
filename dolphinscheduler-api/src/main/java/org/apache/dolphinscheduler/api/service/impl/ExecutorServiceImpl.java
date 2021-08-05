@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODE_
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -56,6 +55,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
+
+import org.apache.commons.collections.MapUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -181,7 +182,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     private boolean checkMasterExists(Map<String, Object> result) {
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromZK(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         // no master
         if (masterServers.isEmpty()) {
@@ -195,18 +196,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * check whether the process definition can be executed
      *
      * @param processDefinition process definition
-     * @param processDefineId process definition id
+     * @param processDefineCode process definition code
      * @return check result code
      */
     @Override
-    public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId) {
+    public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, long processDefineCode) {
         Map<String, Object> result = new HashMap<>();
         if (processDefinition == null) {
             // check process definition exists
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineCode);
         } else if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
             // check process definition online
-            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefineId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefineCode);
         } else {
             result.put(Constants.STATUS, Status.SUCCESS);
         }
@@ -243,9 +244,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion());
         if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
-            result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
+            result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionCode());
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -266,7 +268,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> commandMap = JSONUtils.toMap(processInstance.getCommandParam(), String.class, Object.class);
         String startParams = null;
         if (MapUtils.isNotEmpty(commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
-            startParams = (commandMap.get(Constants.CMD_PARAM_START_PARAMS)).toString();
+            Object startParamsJson = commandMap.get(Constants.CMD_PARAM_START_PARAMS);
+            if (startParamsJson != null) {
+                startParams = startParamsJson.toString();
+            }
         }
 
         switch (executeType) {

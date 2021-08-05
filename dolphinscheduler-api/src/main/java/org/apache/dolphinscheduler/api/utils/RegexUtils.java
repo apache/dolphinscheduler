@@ -30,6 +30,8 @@ public class RegexUtils {
      */
     private static final String CHECK_NUMBER = "^-?\\d+(\\.\\d+)?$";
 
+    private static final String LINUX_USERNAME_PATTERN = "[a-z_][a-z\\d_]{0,30}";
+
     private RegexUtils() {
     }
 
@@ -43,6 +45,16 @@ public class RegexUtils {
         Pattern pattern = Pattern.compile(CHECK_NUMBER);
         Matcher isNum = pattern.matcher(str);
         return isNum.matches();
+    }
+
+    /**
+     * check if the input is a valid linux username
+     * @param str input
+     * @return boolean
+     */
+    public static boolean isValidLinuxUserName(String str) {
+        Pattern pattern = Pattern.compile(LINUX_USERNAME_PATTERN);
+        return pattern.matcher(str).matches();
     }
 
     public static String escapeNRT(String str) {

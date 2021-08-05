@@ -20,7 +20,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>${revision}</version>
+        <version>1.3.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -41,6 +41,11 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -60,7 +65,7 @@
 
                                 <configuration>
                                     <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-binary.xml</descriptor>
+                                        <descriptor>src/main/assembly/dolphinscheduler-bin.xml</descriptor>
                                     </descriptors>
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
@@ -96,63 +101,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>nginx</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>dolphinscheduler-nginx</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-nginx.xml</descriptor>
-                                    </descriptors>
-                                    <appendAssemblyId>true</appendAssemblyId>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>src</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
-                                    </descriptors>
-                                    <appendAssemblyId>true</appendAssemblyId>
-                                </configuration>
-                            </execution>
-
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                 </plugins>
             </build>
         </profile>
@@ -196,9 +144,9 @@
                         </executions>
 
                         <configuration>
-                            <name>apache-dolphinscheduler-incubating</name>
+                            <name>apache-dolphinscheduler</name>
                             <release>1</release>
-                            <distribution>apache dolphinscheduler incubating rpm</distribution>
+                            <distribution>apache dolphinscheduler rpm</distribution>
                             <group>apache</group>
                             <packager>dolphinscheduler</packager>
                             <!-- <version>${project.version}</version> -->
@@ -415,10 +363,10 @@
                                 <script>mkdir -p /opt/soft</script>
                             </preinstallScriptlet>
                             <postinstallScriptlet>
-                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-incubating-${project.version} /opt/soft/dolphinscheduler</script>
+                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-${project.version} /opt/soft/dolphinscheduler</script>
                             </postinstallScriptlet>
                             <postremoveScriptlet>
-                                <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
+                                <script>rm -rf /opt/soft/apache-dolphinscheduler-${project.version}</script>
                             </postremoveScriptlet>
                         </configuration>
                     </plugin>
@@ -428,6 +376,5 @@
         </profile>
 
     </profiles>
-
 
 </project>

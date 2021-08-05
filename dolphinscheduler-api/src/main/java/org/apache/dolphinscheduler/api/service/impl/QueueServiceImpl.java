@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -86,9 +86,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+    public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -98,9 +99,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Integer count = (int) queueList.getTotal();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(queueList.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal(count);
+        pageInfo.setTotalList(queueList.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -270,7 +271,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return CollectionUtils.isNotEmpty(queueMapper.queryAllQueueList(queue, null));
+        return BooleanUtils.isTrue(queueMapper.existQueue(queue, null));
     }
 
     /**
@@ -281,7 +282,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return CollectionUtils.isNotEmpty(queueMapper.queryAllQueueList(null, queueName));
+        return BooleanUtils.isTrue(queueMapper.existQueue(null, queueName));
     }
 
     /**
@@ -293,7 +294,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if need to update user
      */
     private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
-        return !oldQueue.equals(newQueue) && CollectionUtils.isNotEmpty(userMapper.queryUserListByQueue(oldQueue));
+        return !oldQueue.equals(newQueue) && BooleanUtils.isTrue(userMapper.existUser(oldQueue));
     }
 
 }

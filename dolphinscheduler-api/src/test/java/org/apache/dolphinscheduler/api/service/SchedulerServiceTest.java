@@ -92,13 +92,11 @@ public class SchedulerServiceTest {
     @Test
     public void testSetScheduleState() {
 
-
         String projectName = "test";
         User loginUser = new User();
         loginUser.setId(1);
         Map<String, Object> result = new HashMap<String, Object>();
         Project project = getProject(projectName);
-
 
         ProcessDefinition processDefinition = new ProcessDefinition();
 
@@ -146,7 +144,7 @@ public class SchedulerServiceTest {
         Assert.assertEquals(Status.MASTER_NOT_EXISTS, result.get(Constants.STATUS));
 
         //set master
-        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(masterServers);
+        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(masterServers);
 
         //SUCCESS
         result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.ONLINE);

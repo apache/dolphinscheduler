@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -157,6 +158,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
+        scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
         scheduleObj.setFailureStrategy(failureStrategy);
@@ -258,6 +260,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 return result;
             }
             schedule.setCrontab(scheduleParam.getCrontab());
+            schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
         if (warningType != null) {
@@ -366,7 +369,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromZK(true);
+        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
@@ -413,9 +416,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return schedule list page
      */
     @Override
-    public Map<String, Object> querySchedule(User loginUser, String projectName, Integer processDefineId, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result querySchedule(User loginUser, String projectName, Integer processDefineId, String searchVal, Integer pageNo, Integer pageSize) {
 
-        HashMap<String, Object> result = new HashMap<>();
+        Result result = new Result();
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -436,11 +439,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         );
 
         PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) scheduleIPage.getTotal());
-        pageInfo.setLists(scheduleIPage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) scheduleIPage.getTotal());
+        pageInfo.setTotalList(scheduleIPage.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -471,20 +473,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     public void setSchedule(int projectId, Schedule schedule) {
-        int scheduleId = schedule.getId();
-        logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
+        logger.info("set schedule, project id: {}, scheduleId: {}", projectId, schedule.getId());
 
-        Date startDate = schedule.getStartTime();
-        Date endDate = schedule.getEndTime();
-
-        String jobName = QuartzExecutors.buildJobName(scheduleId);
-        String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
-
-        Map<String, Object> dataMap = QuartzExecutors.buildDataMap(projectId, scheduleId, schedule);
-
-        QuartzExecutors.getInstance().addJob(ProcessScheduleJob.class, jobName, jobGroupName, startDate, endDate,
-                schedule.getCrontab(), dataMap);
-
+        QuartzExecutors.getInstance().addJob(ProcessScheduleJob.class, projectId, schedule);
     }
 
     /**

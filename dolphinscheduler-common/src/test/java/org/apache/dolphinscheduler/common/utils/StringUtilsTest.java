@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -79,5 +82,15 @@ public class StringUtilsTest {
 
         defaultStr = StringUtils.defaultIfBlank("test", "defaultStr");
         Assert.assertEquals("test", defaultStr);
+    }
+
+    @Test
+    public void testJoin() {
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("3");
+        list.add("4");
+        String join = StringUtils.join(list,  ",");
+        Assert.assertEquals("1,3,4", join);
     }
 }

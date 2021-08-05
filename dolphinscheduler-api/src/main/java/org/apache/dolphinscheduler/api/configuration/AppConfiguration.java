@@ -19,17 +19,23 @@ package org.apache.dolphinscheduler.api.configuration;
 
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
+import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
 
+import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-
-import java.util.Locale;
 
 /**
  * application configuration
@@ -39,9 +45,12 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
     public static final String LOGIN_PATH_PATTERN = "/login";
-    public static final String REGISTER_PATH_PATTERN = "/users/register";
+    public static final String REGISTER_PATH_PATTERN = "/users/registry";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
+
+    @Autowired
+    private TrafficConfiguration trafficConfiguration;
 
     @Bean
     public CorsFilter corsFilter() {
@@ -79,10 +88,18 @@ public class AppConfiguration implements WebMvcConfigurer {
         return new LocaleChangeInterceptor();
     }
 
+    @Bean
+    public RateLimitInterceptor createRateLimitInterceptor() {
+        return new RateLimitInterceptor(trafficConfiguration);
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // i18n
         registry.addInterceptor(localeChangeInterceptor());
+        if (trafficConfiguration.isTrafficGlobalControlSwitch() || trafficConfiguration.isTrafficTenantControlSwitch()) {
+            registry.addInterceptor(createRateLimitInterceptor());
+        }
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
