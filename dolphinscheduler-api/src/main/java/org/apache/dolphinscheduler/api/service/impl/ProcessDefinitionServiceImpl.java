@@ -30,8 +30,7 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.exportprocess.ProcessAddTaskParam;
-import org.apache.dolphinscheduler.api.utils.exportprocess.TaskNodeParamFactory;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -51,6 +50,7 @@ import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
 import org.apache.dolphinscheduler.common.utils.StreamUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -62,6 +62,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
@@ -107,7 +108,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.ImmutableMap;
+
 
 /**
  * process definition service impl
@@ -158,6 +159,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private SchedulerService schedulerService;
+
+    @Autowired
+    private DataSourceMapper dataSourceMapper;
 
     /**
      * create process definition
@@ -264,15 +268,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return process definition page
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionListPaging(User loginUser, String projectName, String searchVal, Integer pageNo, Integer pageSize, Integer userId) {
+    public Result queryProcessDefinitionListPaging(User loginUser, String projectName, String searchVal, Integer pageNo, Integer pageSize, Integer userId) {
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
-            return checkResult;
+            putMsg(result,resultStatus);
+            return result;
         }
 
         Page<ProcessDefinition> page = new Page<>(pageNo, pageSize);
@@ -290,11 +295,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         processDefinitionIPage.setRecords(records);
-
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) processDefinitionIPage.getTotal());
-        pageInfo.setLists(records);
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) processDefinitionIPage.getTotal());
+        pageInfo.setTotalList(processDefinitionIPage.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -720,23 +724,54 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * correct task param which has datasource or dependent
+     * Injecting parameters into export process definition
+     * Because the import and export environment resource IDs may be inconsistent，So inject the resource name
+     *
+     * SQL and PROCEDURE node, inject datasourceName
+     * DEPENDENT node, inject projectName and definitionName
      *
      * @param processData process data
-     * @return correct processDefinitionJson
      */
     private void addExportTaskNodeSpecialParam(ProcessData processData) {
-        List<TaskNode> taskNodeList = processData.getTasks();
-        List<TaskNode> tmpNodeList = new ArrayList<>();
-        for (TaskNode taskNode : taskNodeList) {
-            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskNode.getType());
-            JsonNode jsonNode = JSONUtils.toJsonNode(taskNode);
-            if (null != addTaskParam) {
-                addTaskParam.addExportSpecialParam(jsonNode);
+        for (TaskNode taskNode : processData.getTasks()) {
+            if (TaskType.SQL.getDesc().equals(taskNode.getType())
+                || TaskType.PROCEDURE.getDesc().equals(taskNode.getType())) {
+                ObjectNode sqlParameters = JSONUtils.parseObject(taskNode.getParams());
+
+                DataSource dataSource = dataSourceMapper.selectById(
+                        sqlParameters.path(Constants.TASK_PARAMS_DATASOURCE).asInt());
+
+                if (dataSource != null) {
+                    sqlParameters.put(Constants.TASK_PARAMS_DATASOURCE_NAME, dataSource.getName());
+                    taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
+                }
             }
-            tmpNodeList.add(JSONUtils.parseObject(jsonNode.toString(), TaskNode.class));
+
+            if (TaskType.DEPENDENT.getDesc().equals(taskNode.getType())) {
+                ObjectNode dependentParameters = JSONUtils.parseObject(taskNode.getDependence());
+
+                if (dependentParameters != null) {
+                    ArrayNode dependTaskList = (ArrayNode)dependentParameters.get(
+                        Constants.TASK_DEPENDENCE_DEPEND_TASK_LIST);
+                    for (int j = 0; j < dependTaskList.size(); j++) {
+                        JsonNode dependentTaskModel = dependTaskList.path(j);
+                        ArrayNode dependItemList = (ArrayNode)dependentTaskModel.get(
+                            Constants.TASK_DEPENDENCE_DEPEND_ITEM_LIST);
+                        for (int k = 0; k < dependItemList.size(); k++) {
+                            ObjectNode dependentItem = (ObjectNode)dependItemList.path(k);
+                            int definitionId = dependentItem.path(Constants.TASK_DEPENDENCE_DEFINITION_ID).asInt();
+                            ProcessDefinition definition = processDefinitionMapper.queryByDefineId(definitionId);
+                            if (definition != null) {
+                                dependentItem.put(Constants.TASK_DEPENDENCE_PROJECT_NAME, definition.getProjectName());
+                                dependentItem.put(Constants.TASK_DEPENDENCE_DEFINITION_NAME, definition.getName());
+                            }
+                        }
+                    }
+
+                    taskNode.setDependence(dependentParameters.toString());
+                }
+            }
         }
-        processData.setTasks(tmpNodeList);
     }
 
     /**
@@ -918,15 +953,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private String addImportTaskNodeParam(User loginUser, String processDefinitionJson, Project targetProject) {
         ObjectNode jsonObject = JSONUtils.parseObject(processDefinitionJson);
         ArrayNode jsonArray = (ArrayNode) jsonObject.get(TASKS);
-        //add sql and dependent param
-        for (int i = 0; i < jsonArray.size(); i++) {
-            JsonNode taskNode = jsonArray.path(i);
-            String taskType = taskNode.path("type").asText();
-            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
-            if (null != addTaskParam) {
-                addTaskParam.addImportSpecialParam(taskNode);
-            }
-        }
+
+        addImportTaskNodeSpecialParam(jsonArray);
 
         //recursive sub-process parameter correction map key for old process code value for new process code
         Map<Long, Long> subProcessCodeMap = new HashMap<>();
@@ -941,6 +969,65 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         jsonObject.set(TASKS, jsonArray);
         return jsonObject.toString();
+    }
+
+    /**
+     * Replace the injecting parameters in import process definition
+     *
+     * SQL and PROCEDURE node, inject datasource by datasourceName
+     * DEPENDENT node, inject projectId and definitionId by projectName and definitionName
+     *
+     * @param jsonArray array node
+     */
+    private void addImportTaskNodeSpecialParam(ArrayNode jsonArray) {
+        // add sql and dependent param
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonNode taskNode = jsonArray.path(i);
+            String taskType = taskNode.path("type").asText();
+
+            if (TaskType.SQL.getDesc().equals(taskType) || TaskType.PROCEDURE.getDesc().equals(taskType)) {
+                ObjectNode sqlParameters = (ObjectNode)taskNode.path(Constants.TASK_PARAMS);
+
+                List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(
+                    sqlParameters.path(Constants.TASK_PARAMS_DATASOURCE_NAME).asText());
+                if (!dataSources.isEmpty()) {
+                    DataSource dataSource = dataSources.get(0);
+                    sqlParameters.put(Constants.TASK_PARAMS_DATASOURCE, dataSource.getId());
+                }
+
+                ((ObjectNode)taskNode).set(Constants.TASK_PARAMS, sqlParameters);
+            }
+
+            if (TaskType.DEPENDENT.getDesc().equals(taskType)) {
+                ObjectNode dependentParameters = (ObjectNode)taskNode.path(Constants.DEPENDENCE);
+                if (dependentParameters != null) {
+                    ArrayNode dependTaskList = (ArrayNode)dependentParameters.path(
+                        Constants.TASK_DEPENDENCE_DEPEND_TASK_LIST);
+                    for (int h = 0; h < dependTaskList.size(); h++) {
+                        ObjectNode dependentTaskModel = (ObjectNode)dependTaskList.path(h);
+                        ArrayNode dependItemList = (ArrayNode)dependentTaskModel.get(
+                            Constants.TASK_DEPENDENCE_DEPEND_ITEM_LIST);
+                        for (int k = 0; k < dependItemList.size(); k++) {
+                            ObjectNode dependentItem = (ObjectNode)dependItemList.path(k);
+                            Project dependentItemProject = projectMapper.queryByName(
+                                dependentItem.path(Constants.TASK_DEPENDENCE_PROJECT_NAME).asText());
+                            if (dependentItemProject != null) {
+                                ProcessDefinition definition = processDefinitionMapper.queryByDefineName(
+                                    dependentItemProject.getCode(),
+                                    dependentItem.path(Constants.TASK_DEPENDENCE_DEFINITION_NAME).asText());
+                                if (definition != null) {
+                                    dependentItem.put(Constants.TASK_DEPENDENCE_PROJECT_ID,
+                                        dependentItemProject.getId());
+                                    dependentItem.put(Constants.TASK_DEPENDENCE_DEFINITION_ID, definition.getId());
+                                }
+                            }
+                        }
+                    }
+
+                    ((ObjectNode)taskNode).set(Constants.DEPENDENCE, dependentParameters);
+                }
+            }
+        }
     }
 
     /**
@@ -1734,9 +1821,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return the pagination process definition versions info of the certain process definition
      */
     @Override
-    public Map<String, Object> queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, long processDefinitionCode) {
+    public Result queryProcessDefinitionVersions(User loginUser, String projectName, int pageNo, int pageSize, long processDefinitionCode) {
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
 
         // check the if pageNo or pageSize less than 1
         if (pageNo <= 0 || pageSize <= 0) {
@@ -1753,7 +1840,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus != Status.SUCCESS) {
-            return checkResult;
+            putMsg(result,resultStatus);
+            return result;
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
@@ -1765,12 +1853,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         ProcessData processData = processService.genProcessData(processDefinition);
         processDefinition.setProcessDefinitionJson(JSONUtils.toJsonString(processData));
-        pageInfo.setLists(processDefinitionLogs);
-        pageInfo.setTotalCount((int) processDefinitionVersionsPaging.getTotal());
-        return ImmutableMap.of(
-                Constants.MSG, Status.SUCCESS.getMsg()
-                , Constants.STATUS, Status.SUCCESS
-                , Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotalList(processDefinitionLogs);
+        pageInfo.setTotal((int) processDefinitionVersionsPaging.getTotal());
+        result.setData(pageInfo);
+        putMsg(result,Status.SUCCESS);
+        return result;
     }
 
 

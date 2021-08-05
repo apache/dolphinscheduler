@@ -66,7 +66,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         super(taskInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
-        this.registryClient = SpringApplicationContext.getBean(RegistryClient.class);
+        this.registryClient = RegistryClient.getInstance();
     }
 
     /**

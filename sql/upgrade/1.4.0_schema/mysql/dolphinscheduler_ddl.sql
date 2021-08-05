@@ -581,9 +581,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
                    WHERE TABLE_NAME='t_ds_alertgroup'
                      AND TABLE_SCHEMA=(SELECT DATABASE())
-                     AND INDEX_NAME ='t_ds_alertgroup_name_UN')
+                     AND INDEX_NAME ='t_ds_alertgroup_name_un')
     THEN
-        ALTER TABLE t_ds_alertgroup ADD UNIQUE KEY `t_ds_alertgroup_name_UN` (`group_name`);
+        ALTER TABLE t_ds_alertgroup ADD UNIQUE KEY `t_ds_alertgroup_name_un` (`group_name`);
     END IF;
 END;
 
@@ -598,12 +598,12 @@ drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName;
 delimiter d//
 CREATE PROCEDURE uc_dolphin_T_t_ds_datasource_A_add_UN_datasourceName()
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+    IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
                    WHERE TABLE_NAME='t_ds_datasource'
                      AND TABLE_SCHEMA=(SELECT DATABASE())
-                     AND COLUMN_NAME ='t_ds_datasource_name_UN')
+                     AND INDEX_NAME ='t_ds_datasource_name_un')
     THEN
-        ALTER TABLE t_ds_datasource ADD UNIQUE KEY `t_ds_datasource_name_UN` (`name`, `type`);
+        ALTER TABLE t_ds_datasource ADD UNIQUE KEY `t_ds_datasource_name_un` (`name`, `type`);
     END IF;
 END;
 

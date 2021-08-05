@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.flink;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -80,13 +79,8 @@ public class FlinkTask extends AbstractYarnTask {
         if (StringUtils.isNotEmpty(flinkParameters.getMainArgs())) {
             String args = flinkParameters.getMainArgs();
 
-            // replace placeholder
-            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                    taskExecutionContext.getDefinedParams(),
-                    flinkParameters.getLocalParametersMap(),
-                    flinkParameters.getVarPoolMap(),
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    taskExecutionContext.getScheduleTime());
+            // combining local and global parameters
+            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
             logger.info("param Map : {}", paramsMap);
             if (paramsMap != null) {
