@@ -38,23 +38,29 @@ public interface ProcessInstanceService {
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime
      */
-    Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser, String projectName, int size, String startTime, String endTime);
+    Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser,
+                                                               long projectCode,
+                                                               int size,
+                                                               String startTime,
+                                                               String endTime);
 
     /**
      * query process instance by id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processId process instance id
      * @return process instance detail
      */
-    Map<String, Object> queryProcessInstanceById(User loginUser, String projectName, Integer processId);
+    Map<String, Object> queryProcessInstanceById(User loginUser,
+                                                 long projectCode,
+                                                 Integer processId);
 
     /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
      * @param processDefineId process definition id
@@ -65,21 +71,30 @@ public interface ProcessInstanceService {
      * @param endDate end time
      * @return process instance list
      */
-    Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
-                                                 String startDate, String endDate,
-                                                 String searchVal, String executorName, ExecutionStatus stateType, String host,
-                                                 Integer pageNo, Integer pageSize);
+    Map<String, Object> queryProcessInstanceList(User loginUser,
+                                                 long projectCode,
+                                                 Integer processDefineId,
+                                                 String startDate,
+                                                 String endDate,
+                                                 String searchVal,
+                                                 String executorName,
+                                                 ExecutionStatus stateType,
+                                                 String host,
+                                                 Integer pageNo,
+                                                 Integer pageSize);
 
     /**
      * query task list by process instance id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processId process instance id
      * @return task list for the process instance
      * @throws IOException io exception
      */
-    Map<String, Object> queryTaskListByProcessId(User loginUser, String projectName, Integer processId) throws IOException;
+    Map<String, Object> queryTaskListByProcessId(User loginUser,
+                                                 long projectCode,
+                                                 Integer processId) throws IOException;
 
     Map<String, DependResult> parseLogForDependentResult(String log) throws IOException;
 
@@ -87,17 +102,19 @@ public interface ProcessInstanceService {
      * query sub process instance detail info by task id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param taskId task id
      * @return sub process instance detail
      */
-    Map<String, Object> querySubProcessInstanceByTaskId(User loginUser, String projectName, Integer taskId);
+    Map<String, Object> querySubProcessInstanceByTaskId(User loginUser,
+                                                        long projectCode,
+                                                        Integer taskId);
 
     /**
      * update process instance
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceJson process instance json
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
@@ -107,29 +124,38 @@ public interface ProcessInstanceService {
      * @return update result code
      * @throws ParseException parse exception for json parse
      */
-    Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
-                                              String processInstanceJson, String scheduleTime, Boolean syncDefine,
-                                              Flag flag, String locations) throws ParseException;
+    Map<String, Object> updateProcessInstance(User loginUser,
+                                              long projectCode,
+                                              Integer processInstanceId,
+                                              String processInstanceJson,
+                                              String scheduleTime,
+                                              Boolean syncDefine,
+                                              Flag flag,
+                                              String locations) throws ParseException;
 
     /**
      * query parent process instance detail info by sub process instance id
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param subId sub process id
      * @return parent instance detail
      */
-    Map<String, Object> queryParentInstanceBySubId(User loginUser, String projectName, Integer subId);
+    Map<String, Object> queryParentInstanceBySubId(User loginUser,
+                                                   long projectCode,
+                                                   Integer subId);
 
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
      *
      * @param loginUser login user
-     * @param projectName project name
+     * @param projectCode project code
      * @param processInstanceId process instance id
      * @return delete result code
      */
-    Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId);
+    Map<String, Object> deleteProcessInstanceById(User loginUser,
+                                                  long projectCode,
+                                                  Integer processInstanceId);
 
     /**
      * view process instance variables
@@ -155,7 +181,8 @@ public interface ProcessInstanceService {
      * @param states states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states);
+    List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode,
+                                                            int[] states);
 
     /**
      * query process instance by processDefinitionCode
@@ -164,6 +191,6 @@ public interface ProcessInstanceService {
      * @param size size
      * @return process instance list
      */
-    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,int size);
-
+    List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,
+                                                   int size);
 }
