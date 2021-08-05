@@ -51,12 +51,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/list-paging", "cxc_1113")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/list-paging", "cxc_1113")
+            .header("sessionId", sessionId)
+            .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -64,12 +64,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1203"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/task-list-by-process-id", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("processInstanceId", "1203"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -88,12 +88,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("syncDefine", "false");
         paramsMap.add("locations", locations);
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/instance/update", "cxc_1113")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/instance/update", "cxc_1113")
+            .header("sessionId", sessionId)
+            .params(paramsMap))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
@@ -101,13 +101,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryProcessInstanceById() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-by-id", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1203"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/select-by-id", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("processInstanceId", "1203"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -117,13 +116,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-sub-process", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("taskId", "1203"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/select-sub-process", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("taskId", "1203"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -132,13 +130,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryParentInstanceBySubId() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-parent-process", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("subId", "1204"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/select-parent-process", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("subId", "1204"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -148,13 +145,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testViewVariables() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/view-variables", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1204"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/view-variables", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("processInstanceId", "1204"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -164,13 +160,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/delete", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1204"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/delete", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("processInstanceId", "1204"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
@@ -179,13 +174,12 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testBatchDeleteProcessInstanceByIds() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/batch-delete", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceIds", "1205，1206"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/instance/batch-delete", "cxc_1113")
+            .header(SESSION_ID, sessionId)
+            .param("processInstanceIds", "1205，1206"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
