@@ -19,15 +19,21 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.api.utils.RegistryCenterUtils;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,8 +44,11 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * abstract controller test
  */
-@RunWith(SpringRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
+@PrepareForTest({ RegistryCenterUtils.class, RegistryClient.class })
+@PowerMockIgnore({"javax.management.*"})
 public class AbstractControllerTest {
 
     public static final String SESSION_ID = "sessionId";
@@ -58,7 +67,11 @@ public class AbstractControllerTest {
 
     @Before
     public void setUp() {
+        PowerMockito.suppress(PowerMockito.constructor(RegistryClient.class));
+        PowerMockito.mockStatic(RegistryCenterUtils.class);
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
         createSession();
     }
 
@@ -67,7 +80,7 @@ public class AbstractControllerTest {
         sessionService.signOut("127.0.0.1", user);
     }
 
-    private void createSession(){
+    private void createSession() {
 
         User loginUser = new User();
         loginUser.setId(1);

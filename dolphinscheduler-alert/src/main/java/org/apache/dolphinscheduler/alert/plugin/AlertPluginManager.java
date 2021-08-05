@@ -23,7 +23,7 @@ import static java.util.Objects.requireNonNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.common.enums.PluginType;
-import org.apache.dolphinscheduler.common.plugin.AbstractDolphinPluginManager;
+import org.apache.dolphinscheduler.spi.plugin.AbstractDolphinPluginManager;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -76,7 +76,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
-        checkState(alertChannelFactory != null, "Alert Plugin {} is not registered", name);
+        checkState(alertChannelFactory != null, "Alert Plugin %s is not registered", name);
 
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(alertChannelFactory.getClass().getClassLoader())) {
             AlertChannel alertChannel = alertChannelFactory.create();

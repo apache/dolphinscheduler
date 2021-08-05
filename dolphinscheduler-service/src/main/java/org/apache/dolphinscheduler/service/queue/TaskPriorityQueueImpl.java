@@ -25,8 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
 /**
- * A singleton of a task queue implemented with zookeeper
- * tasks queue implementation
+ * A singleton of a task queue implemented using PriorityBlockingQueue
  */
 @Service
 public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {

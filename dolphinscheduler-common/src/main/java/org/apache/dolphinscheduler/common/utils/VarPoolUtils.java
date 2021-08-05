@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class VarPoolUtils {
@@ -71,7 +70,7 @@ public class VarPoolUtils {
             if (kvs.length == 2) {
                 propToValue.put(kvs[0], kvs[1]);
             } else {
-                throw new ParseException(kv, 2);
+                return;
             }
         }
     }

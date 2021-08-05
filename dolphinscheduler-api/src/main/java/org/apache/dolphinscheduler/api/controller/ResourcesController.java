@@ -185,7 +185,7 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value = "name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
-                                 @RequestParam(value = "file" ,required = false) MultipartFile file) {
+                                 @RequestParam(value = "file",required = false) MultipartFile file) {
         return resourceService.updateResource(loginUser, resourceId, alias, description, type, file);
     }
 
@@ -226,8 +226,8 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int", example = "10"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -240,14 +240,14 @@ public class ResourcesController extends BaseController {
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageSize") Integer pageSize
     ) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = resourceService.queryResourceListPaging(loginUser, id, type, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
 
@@ -487,7 +487,7 @@ public class ResourcesController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataType = "UdfType"),
             @ApiImplicitParam(name = "funcName", value = "FUNC_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "suffix", value = "CLASS_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES", dataType = "String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataType = "String"),
             @ApiImplicitParam(name = "description", value = "UDF_DESC", dataType = "String"),
@@ -585,8 +585,8 @@ public class ResourcesController extends BaseController {
     @ApiOperation(value = "queryUdfFuncListPaging", notes = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "20")
     })
     @GetMapping(value = "/udf-func/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -597,13 +597,13 @@ public class ResourcesController extends BaseController {
                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                    @RequestParam("pageSize") Integer pageSize
     ) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
-        }
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
 
+        }
         result = udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**

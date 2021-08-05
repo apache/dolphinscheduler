@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.datasource;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceParamDTO;
 import org.apache.dolphinscheduler.common.datasource.mysql.MysqlDatasourceProcessor;
@@ -44,7 +46,11 @@ public class DatasourceUtilTest {
         MysqlDatasourceParamDTO mysqlDatasourceParamDTO = new MysqlDatasourceParamDTO();
         mysqlDatasourceParamDTO.setHost("localhost");
         mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setOther(null);
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        other.put("queryTimeout", "-1");
+        other.put("characterEncoding", "utf8");
+        mysqlDatasourceParamDTO.setOther(other);
         DatasourceUtil.checkDatasourceParam(mysqlDatasourceParamDTO);
         Assert.assertTrue(true);
     }

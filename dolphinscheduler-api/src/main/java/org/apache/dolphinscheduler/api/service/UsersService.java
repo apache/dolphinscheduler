@@ -112,7 +112,7 @@ public interface UsersService {
      * @param pageSize page size
      * @return user list page
      */
-    Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * updateProcessInstance user
@@ -239,13 +239,13 @@ public interface UsersService {
     Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId);
 
     /**
-     * register user, default state is 0, default tenant_id is 1, no phone, no queue
+     * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
      * @param userName user name
      * @param userPassword user password
      * @param repeatPassword repeat password
      * @param email email
-     * @return register result code
+     * @return registry result code
      * @throws Exception exception
      */
     Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email);

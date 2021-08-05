@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="searchParams.projectId ? $t('Project Home') : $t('Home')">
+  <m-list-construction :title="searchParams.projectId ? `${$t('Project Home')} - ${projectName}` : $t('Home')">
     <template slot="content">
       <div class="perject-home-content">
         <div class="time-model">
@@ -66,6 +66,7 @@
   </m-list-construction>
 </template>
 <script>
+  import { mapState } from 'vuex'
   import dayjs from 'dayjs'
   import mDefineUserCount from './_source/defineUserCount'
   import mTaskStatusCount from './_source/taskStatusCount'
@@ -106,6 +107,9 @@
       mDefineUserCount,
       mTaskStatusCount,
       mProcessStateCount
+    },
+    computed: {
+      ...mapState('dag', ['projectName'])
     }
   }
 </script>

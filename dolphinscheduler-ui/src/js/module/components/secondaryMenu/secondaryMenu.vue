@@ -27,7 +27,7 @@
             <div class="name" @click="_toggleSubMenu(item)">
               <a href="javascript:">
                 <em class="fa icon" :class="item.icon"></em>
-                <span>{{item.name}}</span>
+                <span>{{item.name}}{{ item.path === 'projects-index' ? ` - ${projectName}` : '' }}</span>
                 <em class="fa angle" :class="item.isOpen ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" v-if="item.children.length"></em>
               </a>
             </div>
@@ -54,6 +54,7 @@
   </div>
 </template>
 <script>
+  import { mapState } from 'vuex'
   import menu from './_source/menu'
 
   export default {
@@ -91,6 +92,9 @@
       }
     },
     mounted () {
+    },
+    computed: {
+      ...mapState('dag', ['projectName'])
     }
   }
 </script>
@@ -140,6 +144,9 @@
           display: block;
           position: relative;
           padding-left: 10px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
           >.icon {
             vertical-align: middle;
             font-size: 15px;

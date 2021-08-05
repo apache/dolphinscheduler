@@ -119,10 +119,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param desc data source description
-     * @param type data source type
-     * @param parameter datasource parameters
      * @param id data source id
      * @return update result code
      */
@@ -157,14 +153,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         Result<Object> isConnection = checkConnection(dataSource.getType(), connectionParam);
-        if (Status.SUCCESS.getCode() != isConnection.getCode()) {
-            return result;
+        if (isConnection.isFailed()) {
+            return isConnection;
         }
 
         Date now = new Date();
 
-        dataSource.setName(dataSource.getName().trim());
-        dataSource.setNote(dataSource.getNote());
+        dataSource.setName(dataSourceParam.getName().trim());
+        dataSource.setNote(dataSourceParam.getNote());
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
@@ -221,8 +217,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source list page
      */
     @Override
-    public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
         IPage<DataSource> dataSourceList;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
 
@@ -235,9 +231,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
-        pageInfo.setLists(dataSources);
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
+        pageInfo.setTotalList(dataSources);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -312,7 +308,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * check connection
      *
      * @param type data source type
-     * @param parameter data source parameters
+     * @param connectionParam data source parameters
      * @return true if connect successfully, otherwise false
      */
     @Override

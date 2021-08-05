@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -60,7 +61,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * @param taskExecutionContext       taskExecutionContext
      * @param logger        logger
      */
-    public PythonCommandExecutor(Consumer<List<String>> logHandler,
+    public PythonCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                  TaskExecutionContext taskExecutionContext,
                                  Logger logger) {
         super(logHandler,taskExecutionContext,logger);
@@ -141,7 +142,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         if (PYTHON_PATH_PATTERN.matcher(pythonHome).find()) {
             return pythonHome;
         }
-        return pythonHome + "/bin/python";
+        return Paths.get(pythonHome, "/bin/python").toString();
     }
 
     /**

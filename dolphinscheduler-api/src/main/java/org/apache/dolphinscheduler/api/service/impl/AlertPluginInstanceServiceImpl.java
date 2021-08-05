@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
@@ -35,6 +36,7 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,11 +111,9 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Override
     public Map<String, Object> update(User loginUser, int pluginInstanceId, String instanceName, String pluginInstanceParams) {
 
-        AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
-        alertPluginInstance.setPluginInstanceParams(paramsMapJson);
-        alertPluginInstance.setInstanceName(instanceName);
-        alertPluginInstance.setId(pluginInstanceId);
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(pluginInstanceId, paramsMapJson, instanceName, new Date());
+
         Map<String, Object> result = new HashMap<>();
         int i = alertPluginInstanceMapper.updateById(alertPluginInstance);
 
@@ -188,15 +188,15 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public Map<String, Object> queryPluginPage(int pageIndex, int pageSize) {
+    public Result queryPluginPage(int pageIndex, int pageSize) {
         IPage<AlertPluginInstance> pluginInstanceIPage = new Page<>(pageIndex, pageSize);
         pluginInstanceIPage = alertPluginInstanceMapper.selectPage(pluginInstanceIPage, null);
 
         PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageIndex, pageSize);
-        pageInfo.setTotalCount((int) pluginInstanceIPage.getTotal());
-        pageInfo.setLists(buildPluginInstanceVOList(pluginInstanceIPage.getRecords()));
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) pluginInstanceIPage.getTotal());
+        pageInfo.setTotalList(buildPluginInstanceVOList(pluginInstanceIPage.getRecords()));
+        Result result = new Result();
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

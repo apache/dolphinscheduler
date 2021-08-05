@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.worker.task.datax;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.common.datasource.DatasourceUtil;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -31,6 +30,7 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
@@ -45,6 +45,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
@@ -58,6 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
@@ -86,6 +89,7 @@ public class DataxTask extends AbstractTask {
      * python process(datax only supports version 2.7 by default)
      */
     private static final String DATAX_PYTHON = "python2.7";
+    private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
     /**
      * datax path
      */
@@ -149,12 +153,8 @@ public class DataxTask extends AbstractTask {
             String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
             Thread.currentThread().setName(threadLoggerInfoName);
 
-            // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                    taskExecutionContext.getDefinedParams(),
-                    dataXParameters.getLocalParametersMap(),
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    taskExecutionContext.getScheduleTime());
+            // replace placeholder,and combine local and global parameters
+            Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext,getParameters());
 
             // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
@@ -252,7 +252,7 @@ public class DataxTask extends AbstractTask {
         }
 
         ArrayNode urlArr = readerConn.putArray("jdbcUrl");
-        urlArr.add(DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataSourceCfg));
+        urlArr.add(DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataSourceCfg));
 
         readerConnArr.add(readerConn);
 
@@ -270,7 +270,7 @@ public class DataxTask extends AbstractTask {
         ArrayNode tableArr = writerConn.putArray("table");
         tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDsType()), dataTargetCfg));
+        writerConn.put("jdbcUrl", DatasourceUtil.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
@@ -392,7 +392,7 @@ public class DataxTask extends AbstractTask {
 
         // datax python command
         StringBuilder sbr = new StringBuilder();
-        sbr.append(DATAX_PYTHON);
+        sbr.append(getPythonCommand());
         sbr.append(" ");
         sbr.append(DATAX_PATH);
         sbr.append(" ");
@@ -419,32 +419,49 @@ public class DataxTask extends AbstractTask {
         return fileName;
     }
 
+    public String getPythonCommand() {
+        String pythonHome = System.getenv("PYTHON_HOME");
+        return getPythonCommand(pythonHome);
+    }
+
+    public String getPythonCommand(String pythonHome) {
+        if (StringUtils.isEmpty(pythonHome)) {
+            return DATAX_PYTHON;
+        }
+        String pythonBinPath = "/bin/" + DATAX_PYTHON;
+        Matcher matcher = PYTHON_PATH_PATTERN.matcher(pythonHome);
+        if (matcher.find()) {
+            return matcher.replaceAll(pythonBinPath);
+        }
+        return Paths.get(pythonHome, pythonBinPath).toString();
+    }
+
     public String loadJvmEnv(DataxParameters dataXParameters) {
-        int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
-        int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
         return String.format(JVM_PARAM, xms, xmx);
     }
 
     /**
      * parsing synchronized column names in SQL statements
      *
-     * @param dsType the database type of the data source
-     * @param dtType the database type of the data target
+     * @param sourceType the database type of the data source
+     * @param targetType the database type of the data target
      * @param dataSourceCfg the database connection parameters of the data source
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseConnectionParam dataSourceCfg, String sql) {
-        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
+    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
             logger.info("try to execute sql analysis query column name");
-            columnNames = tryExecuteSqlResolveColumnNames(dataSourceCfg, sql);
+            columnNames = tryExecuteSqlResolveColumnNames(sourceType, dataSourceCfg, sql);
         }
 
         notNull(columnNames, String.format("parsing sql columns failed : %s", sql));
 
-        return DataxUtils.convertKeywordsColumns(dtType, columnNames);
+        return DataxUtils.convertKeywordsColumns(targetType, columnNames);
     }
 
     /**
@@ -525,13 +542,13 @@ public class DataxTask extends AbstractTask {
      * @param sql sql for data synchronization
      * @return column name array
      */
-    public String[] tryExecuteSqlResolveColumnNames(BaseConnectionParam baseDataSource, String sql) {
+    public String[] tryExecuteSqlResolveColumnNames(DbType sourceType, BaseConnectionParam baseDataSource, String sql) {
         String[] columnNames;
         sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DatasourceUtil.getConnection(DbType.valueOf(dataXParameters.getDtType()), baseDataSource);
+                Connection connection = DatasourceUtil.getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 

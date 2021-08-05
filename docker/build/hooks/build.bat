@@ -22,7 +22,7 @@ setlocal enableextensions enabledelayedexpansion
 if not defined VERSION (
     echo "set environment variable [VERSION]"
     set first=1
-    for /f "tokens=3 delims=<>" %%a in ('findstr "<revision>[0-9].*</revision>" %cd%\pom.xml') do (
+    for /f "tokens=3 delims=<>" %%a in ('findstr "<version>[0-9].*</version>" %cd%\pom.xml') do (
         if !first! EQU 1 (set VERSION=%%a)
         set first=0
     )
@@ -39,8 +39,8 @@ echo "Repo: %DOCKER_REPO%"
 echo "Current Directory is %cd%"
 
 :: maven package(Project Directory)
-echo "call mvn clean compile package -Prelease"
-call mvn clean compile package -Prelease -DskipTests=true
+echo "mvn clean package -Prelease -DskipTests=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120"
+call mvn clean package -Prelease -DskipTests=true -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 if "%errorlevel%"=="1" goto :mvnFailed
 
 :: move dolphinscheduler-bin.tar.gz file to docker/build directory

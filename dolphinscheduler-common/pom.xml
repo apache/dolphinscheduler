@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>${revision}</version>
+        <version>1.3.6-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-common</artifactId>
     <name>dolphinscheduler-common</name>
@@ -88,6 +88,13 @@
                     <artifactId>mockito-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.agent</artifactId>
+            <classifier>runtime</classifier>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

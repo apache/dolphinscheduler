@@ -39,9 +39,6 @@ sed -i ${txt} "s@^spring.datasource.url=.*@spring.datasource.url=jdbc:${dbtype}:
 sed -i ${txt} "s@^spring.datasource.username=.*@spring.datasource.username=${username}@g" conf/datasource.properties
 sed -i ${txt} "s@^spring.datasource.password=.*@spring.datasource.password=${password}@g" conf/datasource.properties
 
-sed -i ${txt} "s@^#\?zookeeper.quorum=.*@zookeeper.quorum=${zkQuorum}@g" conf/zookeeper.properties
-sed -i ${txt} "s@^#\?zookeeper.dolphinscheduler.root=.*@zookeeper.dolphinscheduler.root=${zkRoot}@g" conf/zookeeper.properties
-
 sed -i ${txt} "s@^data.basedir.path=.*@data.basedir.path=${dataBasedirPath}@g" conf/common.properties
 sed -i ${txt} "s@^resource.storage.type=.*@resource.storage.type=${resourceStorageType}@g" conf/common.properties
 sed -i ${txt} "s@^resource.upload.path=.*@resource.upload.path=${resourceUploadPath}@g" conf/common.properties
@@ -66,6 +63,10 @@ sed -i ${txt} "s@^#\?worker.tenant.auto.create=.*@worker.tenant.auto.create=${wo
 sed -i ${txt} "s@^#\?alert.listen.host=.*@alert.listen.host=${alertServer}@g" conf/worker.properties
 sed -i ${txt} "s@^#\?alert.plugin.dir=.*@alert.plugin.dir=${alertPluginDir}@g" conf/alert.properties
 sed -i ${txt} "s@^#\?server.port=.*@server.port=${apiServerPort}@g" conf/application-api.properties
+
+sed -i ${txt} "s@^#\?registry.plugin.dir=.*@registry.plugin.dir=${registryPluginDir}@g" conf/registry.properties
+sed -i ${txt} "s@^#\?registry.plugin.name=.*@registry.plugin.name=${registryPluginName}@g" conf/registry.properties
+sed -i ${txt} "s@^#\?registry.servers=.*@registry.servers=${registryServers}@g" conf/registry.properties
 
 # 2.create directory
 echo "2.create directory"

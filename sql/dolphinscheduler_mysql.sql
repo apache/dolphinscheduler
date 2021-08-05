@@ -305,7 +305,7 @@ CREATE TABLE `t_ds_alertgroup`(
   `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
   `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_alertgroup_name_UN` (`group_name`)
+  UNIQUE KEY `t_ds_alertgroup_name_un` (`group_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -352,7 +352,7 @@ CREATE TABLE `t_ds_datasource` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_datasource_name_UN` (`name`, `type`)
+  UNIQUE KEY `t_ds_datasource_name_un` (`name`, `type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -408,8 +408,9 @@ CREATE TABLE `t_ds_process_definition` (
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`,`code`),
-  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE,
+  UNIQUE KEY `code_unique` (`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
