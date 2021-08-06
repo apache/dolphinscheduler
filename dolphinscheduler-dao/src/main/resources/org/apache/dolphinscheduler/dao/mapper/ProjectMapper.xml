@@ -90,7 +90,7 @@
         <if test="searchName!=null and searchName != ''">
             AND (p.name LIKE concat('%', #{searchName}, '%')
             OR p.description LIKE concat('%', #{searchName}, '%')
-            OR user_name LIKE concat('%', #{searchName}, '%')
+            OR u.user_name LIKE concat('%', #{searchName}, '%')
             )
         </if>
         order by p.create_time desc
