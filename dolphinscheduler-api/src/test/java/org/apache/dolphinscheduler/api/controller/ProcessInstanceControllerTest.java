@@ -42,7 +42,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryProcessInstanceList() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", "91");
+        paramsMap.add("processDefineCode", "91");
         paramsMap.add("searchVal", "cxc");
         paramsMap.add("stateType", String.valueOf(ExecutionStatus.SUCCESS));
         paramsMap.add("host", "192.168.1.13");
@@ -78,11 +78,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUpdateProcessInstance() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String json = "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
+            + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+            + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceJson", json);
+        paramsMap.add("taskRelationJson", json);
         paramsMap.add("processInstanceId", "91");
         paramsMap.add("scheduleTime", "2019-12-15 00:00:00");
         paramsMap.add("syncDefine", "false");

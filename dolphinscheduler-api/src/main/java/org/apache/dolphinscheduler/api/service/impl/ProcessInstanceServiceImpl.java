@@ -50,9 +50,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.BufferedReader;
@@ -72,17 +73,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,8 +92,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 public class ProcessInstanceServiceImpl extends BaseServiceImpl implements ProcessInstanceService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceService.class);
 
     public static final String TASK_TYPE = "taskType";
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
@@ -136,6 +131,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     UsersService usersService;
+
+    @Autowired
+    private TenantMapper tenantMapper;
 
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime
@@ -204,9 +202,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         } else {
             processInstance.setWarningGroupId(processDefinition.getWarningGroupId());
             processInstance.setLocations(processDefinition.getLocations());
-
-            ProcessData processData = processService.genProcessData(processDefinition);
-            processInstance.setProcessInstanceJson(JSONUtils.toJsonString(processData));
+            processInstance.setDagData(processService.genDagData(processDefinition));
             result.put(DATA_LIST, processInstance);
             putMsg(result, Status.SUCCESS);
         }
@@ -219,9 +215,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      *
      * @param loginUser login user
      * @param projectCode project code
+     * @param processDefineCode process definition code
      * @param pageNo page number
      * @param pageSize page size
-     * @param processDefineId process definition id
      * @param searchVal search value
      * @param stateType state type
      * @param host host
@@ -232,7 +228,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Override
     public Map<String, Object> queryProcessInstanceList(User loginUser,
                                                         long projectCode,
-                                                        Integer processDefineId,
+                                                        long processDefineCode,
                                                         String startDate,
                                                         String endDate,
                                                         String searchVal,
@@ -265,11 +261,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         PageInfo<ProcessInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
 
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefineId);
-
         IPage<ProcessInstance> processInstanceList = processInstanceMapper.queryProcessInstanceListPaging(page,
-            project.getCode(), processDefinition == null ? 0L : processDefinition.getCode(), searchVal,
-            executorId, statusArray, host, start, end);
+            project.getCode(), processDefineCode, searchVal, executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
         List<Integer> userIds = CollectionUtils.transformToList(processInstances, ProcessInstance::getExecutorId);
@@ -410,19 +403,22 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceJson process instance json
+     * @param taskRelationJson process task relation json
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
      * @param flag flag
-     * @param locations locations
+     * @param globalParams global params
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param tenantCode tenantCode
      * @return update result code
      */
     @Transactional
     @Override
-    public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId,
-                                                     String processInstanceJson, String scheduleTime, Boolean syncDefine,
-                                                     Flag flag, String locations) {
+    public Map<String, Object> updateProcessInstance(User loginUser, long projectCode, Integer processInstanceId, String taskRelationJson,
+                                                     String scheduleTime, Boolean syncDefine, Flag flag, String globalParams,
+                                                     String locations, int timeout, String tenantCode) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
@@ -441,28 +437,41 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
-        ProcessDefinition processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-            processInstance.getProcessDefinitionVersion());
-        ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
-        //check workflow json is valid   TODO  processInstanceJson --> processTaskRelationJson
-        result = processDefinitionService.checkProcessNodeList(processInstanceJson);
+        ProcessDefinition processDefinition = processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
+        List<ProcessTaskRelationLog> taskRelationList = JSONUtils.toList(taskRelationJson, ProcessTaskRelationLog.class);
+        //check workflow json is valid
+        result = processDefinitionService.checkProcessNodeList(taskRelationJson);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
-            processDefinition.getUserId());
-        setProcessInstance(processInstance, tenant, scheduleTime, processData);
-        int updateDefine = 1;
-        if (Boolean.TRUE.equals(syncDefine)) {
-            processDefinition.setId(processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode()).getId());
-            updateDefine = syncDefinition(loginUser, project, locations, processInstance, processDefinition, processData);
-
-            processInstance.setProcessDefinitionVersion(processDefinitionLogMapper.
-                queryMaxVersionForDefinition(processInstance.getProcessDefinitionCode()));
+        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+        if (tenant == null) {
+            putMsg(result, Status.TENANT_NOT_EXIST);
+            return result;
         }
-
+        setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout);
+        if (Boolean.TRUE.equals(syncDefine)) {
+            processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(), globalParams, locations, timeout, tenant.getId());
+            processDefinition.setUpdateTime(new Date());
+            int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, false);
+            if (insertVersion > 0) {
+                int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
+                    processDefinition.getCode(), insertVersion, taskRelationList);
+                if (insertResult > 0) {
+                    putMsg(result, Status.SUCCESS);
+                    result.put(Constants.DATA_LIST, processDefinition);
+                } else {
+                    putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                    return result;
+                }
+            } else {
+                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                return result;
+            }
+            processInstance.setProcessDefinitionVersion(insertVersion);
+        }
         int update = processService.updateProcessInstance(processInstance);
-        if (update > 0 && updateDefine > 0) {
+        if (update > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.UPDATE_PROCESS_INSTANCE_ERROR);
@@ -471,42 +480,19 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     }
 
     /**
-     * sync definition according process instance
-     */
-    private int syncDefinition(User loginUser, Project project, String locations, ProcessInstance processInstance,
-                               ProcessDefinition processDefinition, ProcessData processData) {
-
-        String originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
-        processDefinition.setGlobalParams(originDefParams);
-        processDefinition.setLocations(locations);
-        processDefinition.setTimeout(processInstance.getTimeout());
-        processDefinition.setUpdateTime(new Date());
-
-        return processService.saveProcessDefinition(loginUser, project, processDefinition.getName(),
-            processDefinition.getDescription(), locations, processData, processDefinition, false);
-    }
-
-    /**
      * update process instance attributes
      */
-    private void setProcessInstance(ProcessInstance processInstance, Tenant tenant, String scheduleTime, ProcessData processData) {
-
+    private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime, String globalParams, int timeout) {
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
             schedule = DateUtils.getScheduleDate(scheduleTime);
         }
         processInstance.setScheduleTime(schedule);
-        List<Property> globalParamList = processData.getGlobalParams();
-        Map<String, String> globalParamMap = Optional.ofNullable(globalParamList)
-            .orElse(Collections.emptyList())
-            .stream()
-            .collect(Collectors.toMap(Property::getProp, Property::getValue));
-        String globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
-            processInstance.getCmdTypeIfComplement(), schedule);
-        processInstance.setTimeout(processData.getTimeout());
-        if (tenant != null) {
-            processInstance.setTenantCode(tenant.getTenantCode());
-        }
+        List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);
+        Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+        globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, processInstance.getCmdTypeIfComplement(), schedule);
+        processInstance.setTimeout(timeout);
+        processInstance.setTenantCode(tenantCode);
         processInstance.setGlobalParams(globalParams);
     }
 

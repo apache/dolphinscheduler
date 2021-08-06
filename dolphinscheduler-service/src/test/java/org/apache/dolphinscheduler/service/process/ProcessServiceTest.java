@@ -246,13 +246,6 @@ public class ProcessServiceTest {
         processDefinition.setName("test");
         processDefinition.setVersion(1);
         processDefinition.setCode(11L);
-        processDefinition.setProcessDefinitionJson("{\"globalParams\":[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"tasks\":[{\"conditionResult\":"
-                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
-                + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
-                + ",\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]}"
-                + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
-                + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
-                + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
         processDefinition.setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
@@ -356,27 +349,6 @@ public class ProcessServiceTest {
     }
 
     @Test
-    public void testSaveProcessDefinition() {
-        User user = new User();
-        user.setId(1);
-
-        Project project = new Project();
-        project.setCode(1L);
-
-        ProcessData processData = new ProcessData();
-        processData.setTasks(new ArrayList<>());
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
-        Assert.assertEquals(-1, processService.saveProcessDefinition(user, project, "name",
-                "desc", "locations", processData, processDefinition, true));
-    }
-
-    @Test
     public void testSwitchVersion() {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
@@ -442,80 +414,6 @@ public class ProcessServiceTest {
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG = processService.genDagGraph(processDefinition);
         Assert.assertNotEquals(0, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
 
-    }
-
-    @Test
-    public void testGenProcessData() {
-        String processDefinitionJson = "{\"tasks\":[{\"id\":null,\"code\":3,\"version\":0,\"name\":\"1-test\",\"desc\":null,"
-                + "\"type\":\"SHELL\",\"runFlag\":\"FORBIDDEN\",\"loc\":null,\"maxRetryTimes\":0,\"retryInterval\":0,"
-                + "\"params\":{},\"preTasks\":[\"unit-test\"],\"preTaskNodeList\":[{\"code\":2,\"name\":\"unit-test\","
-                + "\"version\":0}],\"extras\":null,\"depList\":[\"unit-test\"],\"dependence\":null,\"conditionResult\":null,"
-                + "\"taskInstancePriority\":null,\"workerGroup\":null,\"timeout\":{\"enable\":false,\"strategy\":null,"
-                + "\"interval\":0},\"delayTime\":0}],\"globalParams\":[],\"timeout\":0,\"tenantId\":0}";
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setId(123);
-        processDefinition.setName("test");
-        processDefinition.setVersion(1);
-        processDefinition.setCode(11L);
-
-        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
-        processTaskRelationLog.setName("def 1");
-        processTaskRelationLog.setProcessDefinitionVersion(1);
-        processTaskRelationLog.setProjectCode(1L);
-        processTaskRelationLog.setProcessDefinitionCode(1L);
-        processTaskRelationLog.setPostTaskCode(3L);
-        processTaskRelationLog.setPreTaskCode(2L);
-        processTaskRelationLog.setUpdateTime(new Date());
-        processTaskRelationLog.setCreateTime(new Date());
-        List<ProcessTaskRelationLog> list = new ArrayList<>();
-        list.add(processTaskRelationLog);
-
-        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
-        taskDefinition.setCode(3L);
-        taskDefinition.setName("1-test");
-        taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType(TaskType.SHELL.getDesc());
-        taskDefinition.setUserId(1);
-        taskDefinition.setVersion(2);
-        taskDefinition.setCreateTime(new Date());
-        taskDefinition.setUpdateTime(new Date());
-
-        TaskDefinitionLog td2 = new TaskDefinitionLog();
-        td2.setCode(2L);
-        td2.setName("unit-test");
-        td2.setProjectCode(1L);
-        td2.setTaskType(TaskType.SHELL.getDesc());
-        td2.setUserId(1);
-        td2.setVersion(1);
-        td2.setCreateTime(new Date());
-        td2.setUpdateTime(new Date());
-
-        List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
-        taskDefinitionLogs.add(taskDefinition);
-        taskDefinitionLogs.add(td2);
-
-        Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
-        Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt())).thenReturn(list);
-        String json = JSONUtils.toJsonString(processService.genProcessData(processDefinition));
-
-        Assert.assertEquals(processDefinitionJson, json);
-    }
-
-    @Test
-    public void locationToMap() {
-        String locations = "{\"tasks-64888\":{\"name\":\"test_a\",\"targetarr\":\"\",\"nodenumber\":\"1\",\"x\":134,\"y\":183},"
-                + "\"tasks-24501\":{\"name\":\"test_b\",\"targetarr\":\"tasks-64888\",\"nodenumber\":\"0\",\"x\":392,\"y\":184},"
-                + "\"tasks-81137\":{\"name\":\"test_c\",\"targetarr\":\"\",\"nodenumber\":\"1\",\"x\":122,\"y\":327},"
-                + "\"tasks-41367\":{\"name\":\"test_d\",\"targetarr\":\"tasks-81137\",\"nodenumber\":\"0\",\"x\":409,\"y\":324}}";
-        Map<String, String> frontTaskIdAndNameMap = new HashMap<>();
-        frontTaskIdAndNameMap.put("test_a", "tasks-64888");
-        frontTaskIdAndNameMap.put("test_b", "tasks-24501");
-        frontTaskIdAndNameMap.put("test_c", "tasks-81137");
-        frontTaskIdAndNameMap.put("test_d", "tasks-41367");
-        Map<String, String> locationToMap = processService.locationToMap(locations);
-        Assert.assertEquals(frontTaskIdAndNameMap, locationToMap);
     }
 
     @Test

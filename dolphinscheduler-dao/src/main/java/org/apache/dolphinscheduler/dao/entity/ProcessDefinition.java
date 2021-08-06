@@ -81,13 +81,6 @@ public class ProcessDefinition {
     private long projectCode;
 
     /**
-     * definition json string
-     * TODO: delete
-     */
-    @TableField(exist = false)
-    private String processDefinitionJson;
-
-    /**
      * description
      */
     private String description;
@@ -248,14 +241,6 @@ public class ProcessDefinition {
 
     public void setReleaseState(ReleaseState releaseState) {
         this.releaseState = releaseState;
-    }
-
-    public String getProcessDefinitionJson() {
-        return processDefinitionJson;
-    }
-
-    public void setProcessDefinitionJson(String processDefinitionJson) {
-        this.processDefinitionJson = processDefinitionJson;
     }
 
     public Date getCreateTime() {
@@ -439,7 +424,6 @@ public class ProcessDefinition {
             + ", releaseState=" + releaseState
             + ", projectId=" + projectId
             + ", projectCode=" + projectCode
-            + ", processDefinitionJson='" + processDefinitionJson + '\''
             + ", description='" + description + '\''
             + ", globalParams='" + globalParams + '\''
             + ", globalParamList=" + globalParamList
