@@ -976,6 +976,15 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
+                    // BLOCKING NODE TESTING
+                    try {
+                        if(task.isBlockingTask()){
+                            boolean blockingLogicStatus = future.get();
+                            logger.info("blocking task executes COMPLETE! the blocking logic is {}",blockingLogicStatus);
+                        }
+                    }catch (Exception e) {
+                        logger.error("some error {} occurred",e);
+                    }
                     processInstance = processService.findProcessInstanceById(processInstance.getId());
                     processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);

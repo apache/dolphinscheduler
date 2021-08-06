@@ -240,6 +240,15 @@ public class TaskInstance implements Serializable {
     private int delayTime;
 
     /**
+     * blocking task params
+     */
+    @TableField(exist = false)
+    private String blockingCondition;
+
+    @TableField(exist = false)
+    private boolean alertWhenBlocking;
+
+    /**
      * task params
      */
     private String taskParams;
@@ -634,5 +643,27 @@ public class TaskInstance implements Serializable {
 
     public boolean isFirstRun() {
         return endTime == null;
+    }
+
+    public String getBlockingCondition() {
+        if(this.blockingCondition == null){
+            Map<String, String> taskParamsMap = JSONUtils.toMap(this.getTaskParams(), String.class, String.class);
+            this.blockingCondition = taskParamsMap.get(Constants.BLOCKING_CONDITION);
+        }
+        return blockingCondition;
+    }
+
+    public void setBlockingCondition(String blockingCondition) {
+        this.blockingCondition = blockingCondition;
+    }
+
+    public boolean getAlertWhenBlocking() {
+        Map<String,Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(),String.class,Object.class);
+        this.alertWhenBlocking = (Boolean) taskParamsMap.get(Constants.ALERT_WHEN_BLOCKING);
+        return alertWhenBlocking;
+    }
+
+    public void setAlertWhenBlocking(boolean alertWhenBlocking) {
+        this.alertWhenBlocking = alertWhenBlocking;
     }
 }
