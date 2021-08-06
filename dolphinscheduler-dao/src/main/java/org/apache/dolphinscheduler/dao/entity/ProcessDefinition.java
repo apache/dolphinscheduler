@@ -35,7 +35,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-
 /**
  * process definition
  */
@@ -67,13 +66,6 @@ public class ProcessDefinition {
      * release state : online/offline
      */
     private ReleaseState releaseState;
-
-    /**
-     * project id
-     * TODO: delete
-     */
-    @TableField(exist = false)
-    private int projectId;
 
     /**
      * project code
@@ -251,14 +243,6 @@ public class ProcessDefinition {
         this.createTime = createTime;
     }
 
-    public int getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
-    }
-
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -422,7 +406,6 @@ public class ProcessDefinition {
             + ", code=" + code
             + ", version=" + version
             + ", releaseState=" + releaseState
-            + ", projectId=" + projectId
             + ", projectCode=" + projectCode
             + ", description='" + description + '\''
             + ", globalParams='" + globalParams + '\''

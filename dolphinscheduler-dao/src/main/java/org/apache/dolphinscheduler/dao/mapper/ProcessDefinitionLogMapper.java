@@ -67,8 +67,8 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param version version number
      * @return the process definition version info
      */
-    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("processDefinitionCode") long processDefinitionCode,
-                                                         @Param("version") long version);
+    ProcessDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long processDefinitionCode,
+                                                         @Param("version") int version);
     
     /**
      * query the paging process definition version list by pagination info
@@ -87,5 +87,5 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param version version number
      * @return delete result
      */
-    int deleteByProcessDefinitionCodeAndVersion(@Param("processDefinitionCode") long processDefinitionCode, @Param("version") long version);
+    int deleteByProcessDefinitionCodeAndVersion(@Param("processDefinitionCode") long processDefinitionCode, @Param("version") int version);
 }

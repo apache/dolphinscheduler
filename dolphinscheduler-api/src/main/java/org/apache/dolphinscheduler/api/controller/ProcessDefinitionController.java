@@ -307,7 +307,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result switchProcessDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
-                                                 @RequestParam(value = "version") long version) {
+                                                 @RequestParam(value = "version") int version) {
         Map<String, Object> result = processDefinitionService.switchProcessDefinitionVersion(loginUser, projectCode, processDefinitionId, version);
         return returnDataList(result);
     }
@@ -333,7 +333,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result deleteProcessDefinitionVersion(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @RequestParam(value = "processDefinitionId") int processDefinitionId,
-                                                 @RequestParam(value = "version") long version) {
+                                                 @RequestParam(value = "version") int version) {
         Map<String, Object> result = processDefinitionService.deleteByProcessDefinitionIdAndVersion(loginUser, projectCode, processDefinitionId, version);
         return returnDataList(result);
     }

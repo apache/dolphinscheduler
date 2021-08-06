@@ -291,7 +291,7 @@ public interface ProcessDefinitionService {
     Map<String, Object> switchProcessDefinitionVersion(User loginUser,
                                                        long projectCode,
                                                        int processDefinitionId,
-                                                       long version);
+                                                       int version);
 
     /**
      * query the pagination versions info by one certain process definition code
@@ -321,6 +321,6 @@ public interface ProcessDefinitionService {
     Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser,
                                                               long projectCode,
                                                               int processDefinitionId,
-                                                              long version);
+                                                              int version);
 }
 
