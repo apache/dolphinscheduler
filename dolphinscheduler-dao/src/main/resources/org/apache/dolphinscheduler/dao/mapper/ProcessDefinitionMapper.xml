@@ -82,8 +82,6 @@
         <if test=" searchVal != null and searchVal != ''">
             AND (td.name like concat('%', #{searchVal}, '%')
             OR td.description like concat('%', #{searchVal}, '%')
-            OR td.update_time like concat('%', #{searchVal}, '%')
-            OR td.create_time like concat('%', #{searchVal}, '%')
             )
         </if>
         <if test=" userId != 0">
