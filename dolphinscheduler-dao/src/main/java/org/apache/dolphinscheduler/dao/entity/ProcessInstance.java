@@ -151,11 +151,10 @@ public class ProcessInstance {
     private String globalParams;
 
     /**
-     * process instance json
-     * TODO delete
+     * dagData
      */
     @TableField(exist = false)
-    private String processInstanceJson;
+    private DagData dagData;
 
     /**
      * executor id
@@ -419,12 +418,12 @@ public class ProcessInstance {
         this.globalParams = globalParams;
     }
 
-    public String getProcessInstanceJson() {
-        return processInstanceJson;
+    public DagData getDagData() {
+        return dagData;
     }
 
-    public void setProcessInstanceJson(String processInstanceJson) {
-        this.processInstanceJson = processInstanceJson;
+    public void setDagData(DagData dagData) {
+        this.dagData = dagData;
     }
 
     public String getTenantCode() {
@@ -619,9 +618,6 @@ public class ProcessInstance {
             + commandStartTime
             + ", globalParams='"
             + globalParams
-            + '\''
-            + ", processInstanceJson='"
-            + processInstanceJson
             + '\''
             + ", executorId="
             + executorId

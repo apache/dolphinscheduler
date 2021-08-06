@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
@@ -108,11 +109,12 @@ public class ProcessInstanceServiceTest {
     @Mock
     UsersService usersService;
 
-    private String shellJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\","
-        + "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"},"
-        + "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\","
-        + "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\","
-        + "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+    @Mock
+    TenantMapper tenantMapper;
+
+    private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
+        + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
+        + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
 
     @Test
     public void testQueryProcessInstanceList() {
@@ -368,7 +370,7 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
         Map<String, Object> proejctAuthFailRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
+            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "");
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
         //process instance null
@@ -378,7 +380,7 @@ public class ProcessInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, project.getName())).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
         Map<String, Object> processInstanceNullRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
+            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
 
         //process instance not finish
@@ -386,7 +388,7 @@ public class ProcessInstanceServiceTest {
         processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceNotFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
+            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstanceNotFinishRes.get(Constants.STATUS));
 
         //process instance finish
@@ -398,29 +400,23 @@ public class ProcessInstanceServiceTest {
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setId(1);
         processDefinition.setUserId(1);
-        Tenant tenant = new Tenant();
-        tenant.setId(1);
-        tenant.setTenantCode("test_tenant");
+        Tenant tenant = getTenant();
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+        when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(shellJson)).thenReturn(result);
-        when(processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-            processInstance.getProcessDefinitionVersion())).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectCode);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
-        Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
+            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "", 0, "root");
+        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, processInstanceFinishRes.get(Constants.STATUS));
 
         //success
-        when(processService.saveProcessDefinition(Mockito.any(), Mockito.any(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
-            Mockito.any(), Mockito.any(), Mockito.anyBoolean())).thenReturn(1);
-        when(processService.findProcessDefinition(46L, 0)).thenReturn(processDefinition);
+        when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         putMsg(result, Status.SUCCESS, projectCode);
 
         Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-            shellJson, "2020-02-21 00:00:00", true, Flag.YES, "");
+            shellJson, "2020-02-21 00:00:00", false, Flag.YES, "", "", 0, "root");
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
@@ -488,7 +484,6 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setCommandType(CommandType.SCHEDULER);
         processInstance.setScheduleTime(new Date());
-        processInstance.setProcessInstanceJson(shellJson);
         processInstance.setGlobalParams("");
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
         Map<String, Object> successRes = processInstanceService.viewVariables(1);
@@ -498,7 +493,6 @@ public class ProcessInstanceServiceTest {
     @Test
     public void testViewGantt() throws Exception {
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setProcessInstanceJson(shellJson);
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
@@ -581,6 +575,13 @@ public class ProcessInstanceServiceTest {
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         return processDefinition;
+    }
+
+    private Tenant getTenant() {
+        Tenant tenant = new Tenant();
+        tenant.setId(1);
+        tenant.setTenantCode("root");
+        return tenant;
     }
 
     /**
