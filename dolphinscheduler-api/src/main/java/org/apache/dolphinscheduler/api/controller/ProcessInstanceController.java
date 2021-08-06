@@ -88,7 +88,7 @@ public class ProcessInstanceController extends BaseController {
      * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
-     * @param processDefinitionId process definition id
+     * @param processDefineCode process definition code
      * @param searchVal search value
      * @param stateType state type
      * @param host host
@@ -98,7 +98,7 @@ public class ProcessInstanceController extends BaseController {
      */
     @ApiOperation(value = "queryProcessInstanceList", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100"),
+        @ApiImplicitParam(name = "processDefiniteCode", value = "PROCESS_DEFINITION_CODE", dataType = "Long", example = "100"),
         @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
         @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
         @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
@@ -114,7 +114,7 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessInstanceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(value = "processDefinitionId", required = false, defaultValue = "0") Integer processDefinitionId,
+                                           @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
                                            @RequestParam(value = "searchVal", required = false) String searchVal,
                                            @RequestParam(value = "executorName", required = false) String executorName,
                                            @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
@@ -128,7 +128,7 @@ public class ProcessInstanceController extends BaseController {
             return returnDataListPaging(result);
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefinitionId, startTime, endTime,
+        result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
             searchVal, executorName, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
     }
@@ -161,22 +161,26 @@ public class ProcessInstanceController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceJson process instance json
+     * @param taskRelationJson process task relation json
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
      * @param flag flag
      * @param locations locations
+     * @param tenantCode tenantCode
      * @return update result code
      */
     @ApiOperation(value = "updateProcessInstance", notes = "UPDATE_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "processInstanceJson", value = "PROCESS_INSTANCE_JSON", type = "String"),
+        @ApiImplicitParam(name = "taskRelationJson", value = "TASK_RELATION_JSON", type = "String"),
         @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
         @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
         @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", required = true, type = "Boolean"),
+        @ApiImplicitParam(name = "globalParams", value = "PROCESS_GLOBAL_PARAMS", type = "String"),
         @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
-        @ApiImplicitParam(name = "flag", value = "RECOVERY_PROCESS_INSTANCE_FLAG", type = "Flag"),
+        @ApiImplicitParam(name = "timeout", value = "PROCESS_TIMEOUT", type = "String"),
+        @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", type = "Int", example = "0"),
+        @ApiImplicitParam(name = "flag", value = "RECOVERY_PROCESS_INSTANCE_FLAG", type = "Flag")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -184,14 +188,17 @@ public class ProcessInstanceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                        @RequestParam(value = "processInstanceJson", required = false) String processInstanceJson,
+                                        @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                         @RequestParam(value = "processInstanceId") Integer processInstanceId,
                                         @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
+                                        @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                         @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "flag", required = false) Flag flag) throws ParseException {
+                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                        @RequestParam(value = "tenantCode", required = true) String tenantCode,
+                                        @RequestParam(value = "flag", required = false) Flag flag) {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, processInstanceId,
-            processInstanceJson, scheduleTime, syncDefine, flag, locations);
+            taskRelationJson, scheduleTime, syncDefine, flag, globalParams, locations, timeout, tenantCode);
         return returnDataList(result);
     }
 
@@ -279,9 +286,9 @@ public class ProcessInstanceController extends BaseController {
      * @param taskId task id
      * @return sub process instance detail
      */
-    @ApiOperation(value = "querySubProcessInstanceByTaskId", notes = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_ID_NOTES")
+    @ApiOperation(value = "querySubProcessInstanceByTaskCode", notes = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "taskId", value = "TASK_ID", required = true, dataType = "Int", example = "100")
+        @ApiImplicitParam(name = "taskCode", value = "TASK_CODE", required = true, dataType = "Long", example = "100")
     })
     @GetMapping(value = "/select-sub-process")
     @ResponseStatus(HttpStatus.OK)
@@ -333,7 +340,7 @@ public class ProcessInstanceController extends BaseController {
     @ApiException(QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
     @AccessLogAnnotation
     public Result viewVariables(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("processInstanceId") Integer processInstanceId) throws Exception {
+                                @RequestParam("processInstanceId") Integer processInstanceId) {
         Map<String, Object> result = processInstanceService.viewVariables(processInstanceId);
         return returnDataList(result);
     }
