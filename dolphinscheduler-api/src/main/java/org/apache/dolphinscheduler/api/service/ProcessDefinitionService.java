@@ -178,16 +178,16 @@ public interface ProcessDefinitionService {
                                                     String name);
 
     /**
-     * delete process definition by id
+     * delete process definition by code
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionId process definition id
+     * @param code process definition code
      * @return delete result code
      */
-    Map<String, Object> deleteProcessDefinitionById(User loginUser,
-                                                    long projectCode,
-                                                    Integer processDefinitionId);
+    Map<String, Object> deleteProcessDefinitionByCode(User loginUser,
+                                                      long projectCode,
+                                                      long code);
 
     /**
      * release process definition: online / offline
@@ -284,15 +284,14 @@ public interface ProcessDefinitionService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionId process definition id
+     * @param code code
      * @param version the version user want to switch
      * @return switch process definition version result code
      */
     Map<String, Object> switchProcessDefinitionVersion(User loginUser,
                                                        long projectCode,
-                                                       int processDefinitionId,
+                                                       long code,
                                                        int version);
-
     /**
      * query the pagination versions info by one certain process definition code
      *

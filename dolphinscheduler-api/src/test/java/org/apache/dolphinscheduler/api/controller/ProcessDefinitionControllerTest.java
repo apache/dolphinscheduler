@@ -256,15 +256,29 @@ public class ProcessDefinitionControllerTest {
     }
 
     @Test
-    public void testDeleteProcessDefinitionById() {
+    public void testDeleteProcessDefinitionByCode() {
         long projectCode = 1L;
-        int id = 1;
+        long code = 1L;
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.deleteProcessDefinitionById(user, projectCode, id)).thenReturn(result);
-        Result response = processDefinitionController.deleteProcessDefinitionById(user, projectCode, id);
+        Mockito.when(processDefinitionService.deleteProcessDefinitionByCode(user, projectCode, code)).thenReturn(result);
+        Result response = processDefinitionController.deleteProcessDefinitionByCode(user, projectCode, code);
+
+        Assert.assertTrue(response != null && response.isSuccess());
+    }
+
+    @Test
+    public void testBatchDeleteProcessDefinitionByCodes() {
+        long projectCode = 1L;
+        String processDefinitionCodes = "1,2,3";
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(processDefinitionService.deleteProcessDefinitionByCode(user, projectCode, 1L)).thenReturn(result);
+        Mockito.when(processDefinitionService.deleteProcessDefinitionByCode(user, projectCode, 2L)).thenReturn(result);
+        Mockito.when(processDefinitionService.deleteProcessDefinitionByCode(user, projectCode, 3L)).thenReturn(result);
+        Result response = processDefinitionController.batchDeleteProcessDefinitionByCodes(user, projectCode, processDefinitionCodes);
 
         Assert.assertTrue(response != null && response.isSuccess());
     }

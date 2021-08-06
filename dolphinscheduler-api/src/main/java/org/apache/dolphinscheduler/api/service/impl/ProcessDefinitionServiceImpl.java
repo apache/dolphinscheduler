@@ -508,12 +508,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionId process definition id
+     * @param code process definition code
      * @return delete result code
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> deleteProcessDefinitionById(User loginUser, long projectCode, Integer processDefinitionId) {
+    public Map<String, Object> deleteProcessDefinitionByCode(User loginUser, long projectCode, long code) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
@@ -521,13 +521,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processDefinitionId);
-
-        // TODO: replace id to code
-        // ProcessDefinition processDefinition = processDefineMapper.selectByCode(processDefinitionCode);
-
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, code);
             return result;
         }
 
@@ -539,7 +535,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinitionId);
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, code);
             return result;
         }
         // check process instances is already running
@@ -550,7 +546,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         // get the timing according to the process definition
-        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(processDefinitionId);
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionCode(code);
         if (!schedules.isEmpty() && schedules.size() > 1) {
             logger.warn("scheduler num is {},Greater than 1", schedules.size());
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
@@ -565,7 +561,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
-        int delete = processDefinitionMapper.deleteById(processDefinitionId);
+        int delete = processDefinitionMapper.deleteByCode(code);
         processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
@@ -1255,12 +1251,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processDefinitionId process definition id
+     * @param code code
      * @param version the version user want to switch
      * @return switch process definition version result code
      */
     @Override
-    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, int processDefinitionId, int version) {
+    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, long code, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
@@ -1268,11 +1264,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefinitionId);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         if (Objects.isNull(processDefinition)) {
             putMsg(result
                     , Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_ERROR
-                    , processDefinitionId);
+                    , code);
             return result;
         }
 
