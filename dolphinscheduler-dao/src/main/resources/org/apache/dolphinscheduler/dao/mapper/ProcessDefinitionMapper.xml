@@ -82,6 +82,7 @@
         <if test=" searchVal != null and searchVal != ''">
             AND (td.name like concat('%', #{searchVal}, '%')
             OR td.description like concat('%', #{searchVal}, '%')
+            OR td.modify_by like concat('%', #{searchVal}, '%')
             )
         </if>
         <if test=" userId != 0">
