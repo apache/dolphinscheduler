@@ -1159,7 +1159,7 @@ public class ProcessService {
                 if (globalMap.containsKey(info.getProp())) {
                     fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
                 } else {
-                    fatherParams.put(info.getProp(), info.getValue());
+                    fatherParams.put(info.getProp(), ParameterUtils.convertParameterPlaceholders(info.getValue(), globalMap));
                 }
             }
         }
