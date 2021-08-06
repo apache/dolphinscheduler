@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +62,7 @@ public interface ProcessInstanceService {
      * @param projectCode project code
      * @param pageNo page number
      * @param pageSize page size
-     * @param processDefineId process definition id
+     * @param processDefineCode process definition code
      * @param searchVal search value
      * @param stateType state type
      * @param host host
@@ -73,7 +72,7 @@ public interface ProcessInstanceService {
      */
     Map<String, Object> queryProcessInstanceList(User loginUser,
                                                  long projectCode,
-                                                 Integer processDefineId,
+                                                 long processDefineCode,
                                                  String startDate,
                                                  String endDate,
                                                  String searchVal,
@@ -115,23 +114,28 @@ public interface ProcessInstanceService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param processInstanceJson process instance json
+     * @param taskRelationJson process task relation json
      * @param processInstanceId process instance id
      * @param scheduleTime schedule time
      * @param syncDefine sync define
      * @param flag flag
-     * @param locations locations
+     * @param globalParams global params
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param tenantCode tenantCode
      * @return update result code
-     * @throws ParseException parse exception for json parse
      */
     Map<String, Object> updateProcessInstance(User loginUser,
                                               long projectCode,
                                               Integer processInstanceId,
-                                              String processInstanceJson,
+                                              String taskRelationJson,
                                               String scheduleTime,
                                               Boolean syncDefine,
                                               Flag flag,
-                                              String locations) throws ParseException;
+                                              String globalParams,
+                                              String locations,
+                                              int timeout,
+                                              String tenantCode);
 
     /**
      * query parent process instance detail info by sub process instance id
