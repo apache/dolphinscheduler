@@ -1156,10 +1156,10 @@ public class ProcessService {
         Map<String, String> fatherParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(allParam)) {
             for (Property info : allParam) {
-                if(globalMap.containsKey(info.getProp())){
+                if (globalMap.containsKey(info.getProp())) {
                     fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
-                }else{
-                    fatherParams.put(info.getProp(),info.getValue());
+                } else {
+                    fatherParams.put(info.getProp(), info.getValue());
                 }
             }
         }
