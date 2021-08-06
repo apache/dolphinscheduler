@@ -640,7 +640,6 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setId(46);
         processDefinition.setProjectCode(1L);
         processDefinition.setName("test_pdf");
-        processDefinition.setProjectId(2);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(46L);

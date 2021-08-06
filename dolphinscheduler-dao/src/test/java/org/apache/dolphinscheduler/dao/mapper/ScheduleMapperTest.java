@@ -133,7 +133,6 @@ public class ScheduleMapperTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setProjectCode(project.getCode());
-        processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(user.getId());
         processDefinition.setLocations("");
         processDefinition.setCreateTime(new Date());
@@ -172,7 +171,6 @@ public class ScheduleMapperTest {
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(1L);
         processDefinition.setProjectCode(project.getCode());
-        processDefinition.setProjectId(project.getId());
         processDefinition.setUserId(user.getId());
         processDefinition.setLocations("");
         processDefinition.setCreateTime(new Date());
