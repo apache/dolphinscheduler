@@ -21,7 +21,7 @@
          :key="item.id"
          @click="_getIndex($index)">
       <el-input
-              :disabled="isDetails || item.ifFixed"
+              :disabled="isDetails || item.ifFixed || fixKeys"
               type="text"
               size="small"
               v-model="localParamsList[$index].prop"
@@ -36,7 +36,7 @@
                 size="small"
                 @change="_handleDirectChanged"
                 v-model="localParamsList[$index].direct"
-                :disabled="isDetails">
+                :disabled="isDetails || fixKeys">
           <el-option
                   v-for="city in directList"
                   :key="city.code"
@@ -49,7 +49,7 @@
                 size="small"
                 @change="_handleTypeChanged"
                 v-model="localParamsList[$index].type"
-                :disabled="isDetails">
+                :disabled="isDetails || fixKeys">
           <el-option
                   v-for="city in typeList"
                   :key="city.code"
@@ -68,12 +68,12 @@
               @blur="_handleValue()"
               :style="inputStyle">
       </el-input>
-      <span class="lt-add" v-show="!item.ifFixed">
+      <span class="lt-add" v-show="!item.ifFixed" v-if="!fixKeys">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
           <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('Delete')" ></em>
         </a>
       </span>
-      <span class="add" v-if="$index === (localParamsList.length - 1)">
+      <span class="add" v-if="$index === (localParamsList.length - 1) && !fixKeys">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
           <em class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
@@ -112,6 +112,10 @@
       hide: {
         type: Boolean,
         default: true
+      },
+      fixKeys: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {

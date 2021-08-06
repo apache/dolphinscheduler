@@ -1147,8 +1147,8 @@ public class ProcessService {
                                            ProcessInstanceMap instanceMap,
                                            TaskInstance task) {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
-        Map<String, String> subProcessParam = JSONUtils.toMap(task.getTaskParams());
-        int childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID));
+        Map<String, Object> subProcessParam = JSONUtils.toMap(task.getTaskParams(),String.class,Object.class);
+        int childDefineId = Integer.parseInt(String.valueOf(subProcessParam.get(Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID)));
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
         List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
@@ -1156,7 +1156,11 @@ public class ProcessService {
         Map<String, String> fatherParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(allParam)) {
             for (Property info : allParam) {
-                fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
+                if(globalMap.containsKey(info.getProp())){
+                    fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
+                }else{
+                    fatherParams.put(info.getProp(),info.getValue());
+                }
             }
         }
         String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);

@@ -42,7 +42,8 @@
           ref="refLocalParams"
           @on-local-params="_onLocalParams"
           :udp-list="localParams"
-          :hide="true">
+          :hide="true"
+          :fix-keys="true">
         </m-local-params>
       </div>
     </m-list-box>
