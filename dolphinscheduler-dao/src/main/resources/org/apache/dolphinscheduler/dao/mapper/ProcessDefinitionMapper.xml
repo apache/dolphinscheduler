@@ -163,11 +163,4 @@
         SELECT DISTINCT(id) as project_id
         FROM t_ds_project
     </select>
-
-    <select id="queryHasAssociatedDefinitionByIdAndVersion" resultType="java.lang.Integer">
-        select id
-        from t_ds_process_definition
-        where id = #{processDefinitionId}
-        and version = #{version} limit 1
-    </select>
 </mapper>

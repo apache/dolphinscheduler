@@ -570,7 +570,6 @@ public class ProcessInstanceServiceTest {
         processDefinition.setVersion(1);
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
-        processDefinition.setProjectId(2);
         processDefinition.setProjectCode(2L);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");

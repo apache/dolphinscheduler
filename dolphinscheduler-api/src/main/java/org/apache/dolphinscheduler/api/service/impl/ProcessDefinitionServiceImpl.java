@@ -324,15 +324,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 page, searchVal, userId, project.getCode(), isAdmin(loginUser));
 
         List<ProcessDefinition> records = processDefinitionIPage.getRecords();
-
         for (ProcessDefinition pd : records) {
-            ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryMaxVersionDefinitionLog(pd.getCode());
-            int operator = processDefinitionLog.getOperator();
-            User user = userMapper.selectById(operator);
+            ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
+            User user = userMapper.selectById(processDefinitionLog.getOperator());
             pd.setModifyBy(user.getUserName());
-            pd.setProjectId(project.getId());
         }
-
         processDefinitionIPage.setRecords(records);
 
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -1264,7 +1260,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return switch process definition version result code
      */
     @Override
-    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, int processDefinitionId, long version) {
+    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, long projectCode, int processDefinitionId, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
@@ -1375,7 +1371,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @return delele result code
      */
     @Override
-    public Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, long projectCode, int processDefinitionId, long version) {
+    public Map<String, Object> deleteByProcessDefinitionIdAndVersion(User loginUser, long projectCode, int processDefinitionId, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
@@ -1391,6 +1387,5 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SUCCESS);
         }
         return result;
-
     }
 }
