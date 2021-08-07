@@ -362,8 +362,8 @@
           pageSize: pageSize,
           processDefinitionCode: processDefinitionCode
         }).then(res => {
-          this.versionData.processDefinitionVersions = res.data.lists
-          this.versionData.total = res.data.totalCount
+          this.versionData.processDefinitionVersions = res.data.totalList
+          this.versionData.total = res.data.total
           this.versionData.pageSize = res.data.pageSize
           this.versionData.pageNo = res.data.currentPage
         }).catch(e => {
@@ -399,8 +399,8 @@
           pageSize: 10,
           processDefinitionCode: item.code
         }).then(res => {
-          let processDefinitionVersions = res.data.lists
-          let total = res.data.totalCount
+          let processDefinitionVersions = res.data.totalList
+          let total = res.data.total
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
 

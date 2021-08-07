@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -46,7 +47,7 @@ public interface WorkerGroupService {
      * @param pageSize page size
      * @return worker group list page
      */
-    Map<String, Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
+    Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
 
     /**
      * query all worker group

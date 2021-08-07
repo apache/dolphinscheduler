@@ -132,14 +132,12 @@ public class AlertGroupController extends BaseController {
                              @RequestParam(value = "searchVal", required = false) String searchVal,
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
-
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**
