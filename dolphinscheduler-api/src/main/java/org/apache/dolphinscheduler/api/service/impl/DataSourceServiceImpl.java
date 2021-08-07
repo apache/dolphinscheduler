@@ -140,7 +140,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         //check name can use or not
-        if (!dataSource.getName().trim().equals(dataSource.getName()) && checkDatasourceNameExist(dataSource.getName())) {
+        if (!dataSource.getName().trim().equals(dataSourceParam.getName()) && checkDatasourceNameExist(dataSourceParam.getName())) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
