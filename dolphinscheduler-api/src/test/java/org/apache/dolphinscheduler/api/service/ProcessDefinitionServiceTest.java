@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.service;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import com.google.common.collect.ImmutableList;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
@@ -56,6 +58,7 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.apache.http.entity.ContentType;
 
 import java.io.File;
@@ -935,8 +938,16 @@ public class ProcessDefinitionServiceTest {
         shellDefinition2.setProjectId(2);
         shellDefinition2.setProcessDefinitionJson(subProcessJson);
 
+        TaskNode taskNode = new TaskNode();
+        taskNode.setCode(1L);
+        ProcessData processData = new ProcessData();
+        processData.setTasks(ImmutableList.of(taskNode));
+
         Mockito.when(projectMapper.queryByName(currentProjectName)).thenReturn(getProject(currentProjectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, getProject(currentProjectName), currentProjectName)).thenReturn(result);
+        Mockito.when(processDefinitionMapper.queryByCode(0L)).thenReturn(shellDefinition2);
+        Mockito.when(processService.genProcessData(shellDefinition2)).thenReturn(processData);
+        Mockito.when(processDefinitionMapper.existDefByProjectCodeAndDefineName(getProject(currentProjectName).getCode(), shellDefinition2.getName())).thenReturn(Boolean.FALSE);
 
         Map<String, Object> importProcessResult = processDefinitionService.importProcessDefinition(loginUser, multipartFile, currentProjectName);
 
