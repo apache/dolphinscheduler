@@ -113,9 +113,9 @@ CREATE TABLE `t_escheduler_master_server` (
   `host` varchar(45) DEFAULT NULL COMMENT 'ip',
   `port` int(11) DEFAULT NULL COMMENT 'port',
   `zk_directory` varchar(64) DEFAULT NULL COMMENT 'the server path in zk directory',
-  `res_info` varchar(256) DEFAULT NULL COMMENT 'json resource information:{"cpu":xxx,"memroy":xxx}',
+  `res_info` varchar(255) DEFAULT NULL COMMENT 'json resource information:{"cpu":xxx,"memory":xxx}',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `last_heartbeat_time` datetime DEFAULT NULL COMMENT 'last head beat time',
+  `last_heartbeat_time` datetime DEFAULT NULL COMMENT 'last heart beat time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
