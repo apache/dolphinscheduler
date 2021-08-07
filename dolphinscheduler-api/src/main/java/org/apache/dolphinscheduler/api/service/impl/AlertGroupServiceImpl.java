@@ -114,7 +114,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         }
 
         Page<Map<String, Object>> page = new Page<>(pageNo, pageSize);
-        IPage<Map<String, Object>> alertGroupIPage = alertGroupMapper.queryAlertGroup(page, searchVal);
+        IPage<Map<String, Object>> alertGroupIPage = alertGroupMapper.queryAlertGroupName(page, searchVal);
 
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) alertGroupIPage.getTotal());

@@ -88,8 +88,8 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * alert group page
      * @param page page
      * @param groupName groupName
-     * @return map IPage
+     * @return map IPage: include alert group id and group_name
      */
-    IPage<Map<String, Object>> queryAlertGroup(Page<Map<String, Object>> page,
+    IPage<Map<String, Object>> queryAlertGroupName(Page<Map<String, Object>> page,
                                                @Param("groupName") String groupName);
 }

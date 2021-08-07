@@ -32,7 +32,7 @@
         </if>
         order by update_time desc
     </select>
-    <select id="queryAlertGroup" resultType="Map">
+    <select id="queryAlertGroupName" resultType="Map">
         select id, group_name
         from t_ds_alertgroup
         where 1 = 1
