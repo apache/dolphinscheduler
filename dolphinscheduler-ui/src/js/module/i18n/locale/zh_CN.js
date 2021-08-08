@@ -612,6 +612,7 @@ export default {
   'Please enter Update Key': '请输入更新列',
   'Please enter Job Name(required)': '请输入任务名称(必填)',
   'Please enter Custom Shell(required)': '请输入自定义脚本',
+  'Please enter JDBC Table(required)': '请输入表名(必填)',
   Direct: '流向',
   Type: '类型',
   ModelType: '模式',

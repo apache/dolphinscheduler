@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * source mysql parameter
  */
-public class SourceMysqlParameter {
+public class SourceJDBCParameter {
 
     /**
      * src datasource

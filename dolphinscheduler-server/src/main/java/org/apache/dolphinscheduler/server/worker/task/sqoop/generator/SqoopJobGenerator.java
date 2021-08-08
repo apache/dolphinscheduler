@@ -22,17 +22,20 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HdfsSourceGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HiveSourceGenerator;
-import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.MysqlSourceGenerator;
+import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.JDBCSourceGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.HdfsTargetGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.HiveTargetGenerator;
-import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.MysqlTargetGenerator;
+import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.JDBCTargetGenerator;
 
 /**
  * Sqoop Job Scripts Generator
  */
 public class SqoopJobGenerator {
 
-    private static final String MYSQL = "MYSQL";
+    /**
+     * JDBC SUPPORT PG,MYSQL AND ORACLE , jdbc*.jar should be add to apache-dolphinscheduler-1.3.6-bin/lib
+     */
+    private static final String JDBC = "JDBC";
     private static final String HIVE = "HIVE";
     private static final String HDFS = "HDFS";
 
@@ -92,8 +95,8 @@ public class SqoopJobGenerator {
      */
     private ISourceGenerator createSourceGenerator(String sourceType) {
         switch (sourceType) {
-            case MYSQL:
-                return new MysqlSourceGenerator();
+            case JDBC:
+                return new JDBCSourceGenerator();
             case HIVE:
                 return new HiveSourceGenerator();
             case HDFS:
@@ -111,8 +114,8 @@ public class SqoopJobGenerator {
      */
     private ITargetGenerator createTargetGenerator(String targetType) {
         switch (targetType) {
-            case MYSQL:
-                return new MysqlTargetGenerator();
+            case JDBC:
+                return new JDBCTargetGenerator();
             case HIVE:
                 return new HiveTargetGenerator();
             case HDFS:

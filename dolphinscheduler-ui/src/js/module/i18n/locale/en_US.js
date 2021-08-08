@@ -612,6 +612,7 @@ export default {
   'Please enter Update Key': 'Please enter Update Key',
   'Please enter Job Name(required)': 'Please enter Job Name(required)',
   'Please enter Custom Shell(required)': 'Please enter Custom Shell(required)',
+  'Please enter JDBC Table(required)': 'Please enter JDBC Table(required)',
   Direct: 'Direct',
   Type: 'Type',
   ModelType: 'ModelType',

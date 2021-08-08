@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Splitter;
@@ -60,7 +61,14 @@ public class DolphinPluginManagerConfig {
         requireNonNull(pluginDir, "pluginDir can not be null");
         File pluginDirFile = new File(pluginDir);
         if (!pluginDirFile.exists()) {
-            throw new IllegalArgumentException(format("plugin dir not exists ! %s", pluginDirFile.getPath()));
+        	try {
+        		System.out.println(pluginDirFile.getAbsolutePath());
+				pluginDirFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            //throw new IllegalArgumentException(format("plugin dir not exists ! %s", pluginDirFile.getPath()));
         }
         this.installedPluginsDir = pluginDirFile;
     }

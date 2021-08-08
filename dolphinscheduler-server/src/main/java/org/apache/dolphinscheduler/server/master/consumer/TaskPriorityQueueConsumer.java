@@ -29,8 +29,8 @@ import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
+import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceJDBCParameter;
+import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetJDBCParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
@@ -300,8 +300,8 @@ public class TaskPriorityQueueConsumer extends Thread {
 
         // sqoop job type is template set task relation
         if (sqoopParameters.getJobType().equals(SqoopJobType.TEMPLATE.getDescp())) {
-            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
-            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
+            SourceJDBCParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceJDBCParameter.class);
+            TargetJDBCParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetJDBCParameter.class);
 
             DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
             DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());

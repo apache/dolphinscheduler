@@ -99,15 +99,19 @@
           </el-select>
         </div>
       </m-list-box>
-      <template v-if="sourceType === 'MYSQL'">
+      <template v-if="sourceType === 'JDBC'">
         <m-list-box>
           <div slot="text">{{$t('Datasource')}}</div>
           <div slot="content">
             <m-datasource
               ref="refSourceDs"
               @on-dsData="_onSourceDsData"
+              :supportType="['MYSQL','POSTGRESQL','ORACLE','SQLSERVER']"
               :data="{type:sourceMysqlParams.srcType,
-                    typeList: [{id: 0, code: 'MYSQL', disabled: false}],
+              typeList: [{id: 0, code: 'MYSQL', disabled: false},
+                       {id: 1, code: 'POSTGRESQL', disabled: false},
+                       {id: 5, code: 'ORACLE', disabled: false},
+                       {id: 6, code: 'SQLSERVER', disabled: false}],
                     datasource:sourceMysqlParams.srcDatasource }"
             >
             </m-datasource>
@@ -131,7 +135,7 @@
                 type="text"
                 size="small"
                 v-model="sourceMysqlParams.srcTable"
-                :placeholder="$t('Please enter Mysql Table(required)')">
+                :placeholder="$t('Please enter JDBC Table(required)')">
               </el-input>
             </div>
           </m-list-box>
@@ -222,7 +226,7 @@
           </div>
         </m-list-box>
       </template>
-      <template v-if="sourceType === 'MYSQL'">
+      <template v-if="sourceType === 'JDBC'">
         <m-list-box v-show="srcQueryType === '1'">
           <div slot="text">{{$t('SQL Statement')}}</div>
           <div slot="content">
@@ -428,15 +432,19 @@
           </div>
         </m-list-box>
       </template>
-      <template v-if="targetType === 'MYSQL'">
+      <template v-if="targetType === 'JDBC'">
         <m-list-box>
           <div slot="text">{{$t('Datasource')}}</div>
           <div slot="content">
             <m-datasource
               ref="refTargetDs"
               @on-dsData="_onTargetDsData"
+              :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
               :data="{ type:targetMysqlParams.targetType,
-                      typeList: [{id: 0, code: 'MYSQL', disabled: false}],
+                       typeList: [{id: 0, code: 'MYSQL', disabled: false},
+                       {id: 1, code: 'POSTGRESQL', disabled: false},
+                       {id: 5, code: 'ORACLE', disabled: false},
+                       {id: 6, code: 'SQLSERVER', disabled: false}],
                       datasource:targetMysqlParams.targetDatasource }"
             >
             </m-datasource>
@@ -450,7 +458,7 @@
               type="text"
               size="small"
               v-model="targetMysqlParams.targetTable"
-              :placeholder="$t('Please enter Mysql Table(required)')">
+              :placeholder="$t('Please enter JDBC Table(required)')">
             </el-input>
           </div>
         </m-list-box>
@@ -559,10 +567,8 @@
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
-
   let editor
   let shellEditor
-
   export default {
     name: 'sql',
     data () {
@@ -575,12 +581,10 @@
          * Customer Params
          */
         localParams: [],
-
         /**
          * Hadoop Custom Params
          */
         hadoopCustomParams: [],
-
         /**
          * Sqoop Advanced Params
          */
@@ -617,15 +621,12 @@
          * direct model type
          */
         modelType: 'import',
-
         modelTypeList: [{ code: 'import' }, { code: 'export' }],
-
         sourceTypeList: [
           {
-            code: 'MYSQL'
+            code: 'JDBC'
           }
         ],
-
         targetTypeList: [
           {
             code: 'HIVE'
@@ -634,10 +635,8 @@
             code: 'HDFS'
           }
         ],
-
-        sourceType: 'MYSQL',
-        targetType: 'HDFS',
-
+        sourceType: 'JDBC',
+        targetType: 'HIVE',
         sourceMysqlParams: {
           srcType: 'MYSQL',
           srcDatasource: '',
@@ -650,18 +649,15 @@
           mapColumnHive: [],
           mapColumnJava: []
         },
-
         sourceHdfsParams: {
           exportDir: ''
         },
-
         sourceHiveParams: {
           hiveDatabase: '',
           hiveTable: '',
           hivePartitionKey: '',
           hivePartitionValue: ''
         },
-
         targetHdfsParams: {
           targetPath: '',
           deleteTargetDir: true,
@@ -670,7 +666,6 @@
           fieldsTerminated: '',
           linesTerminated: ''
         },
-
         targetMysqlParams: {
           targetType: 'MYSQL',
           targetDatasource: '',
@@ -683,7 +678,6 @@
           targetUpdateKey: '',
           targetUpdateMode: 'allowinsert'
         },
-
         targetHiveParams: {
           hiveDatabase: '',
           hiveTable: '',
@@ -737,24 +731,24 @@
           }, 200)
         }
       },
-
       _handleModelTypeChange (a) {
+        // alert('_handleModelTypeChange' + a)
         this._getSourceTypeList(a)
         this.sourceType = this.sourceTypeList[0].code
-        this._handleSourceTypeChange({ label: this.sourceType, value: this.sourceType })
+        this._handleSourceTypeChange(this.sourceType)
+        // this._handleSourceTypeChange({ label: this.sourceType, value: this.sourceType })
       },
-
       _handleSourceTypeChange (a) {
-        this._getTargetTypeList(a.label)
+        // alert('_handleSourceTypeChange' + a)
+        this._getTargetTypeList(a)
         this.targetType = this.targetTypeList[0].code
       },
-
       _getSourceTypeList (data) {
         switch (data) {
           case 'import':
             this.sourceTypeList = [
               {
-                code: 'MYSQL'
+                code: 'JDBC'
               }
             ]
             break
@@ -771,7 +765,7 @@
           default:
             this.sourceTypeList = [
               {
-                code: 'MYSQL'
+                code: 'JDBC'
               },
               {
                 code: 'HIVE'
@@ -783,42 +777,38 @@
             break
         }
       },
-
       _getTargetTypeList (data) {
+        // alert('_getTargetTypeList' + data)
         switch (data) {
-          case 'MYSQL':
-            if (this.srcQueryType === '1') {
-              this.targetTypeList = [
-                {
-                  code: 'HDFS'
-                }]
-            } else {
-              this.targetTypeList = [
-                {
-                  code: 'HIVE'
-                },
-                {
-                  code: 'HDFS'
-                }
-              ]
-            }
+          case 'JDBC':
+            this.targetTypeList = [
+              {
+                code: 'HIVE'
+              },
+              {
+                code: 'HDFS'
+              }
+            ]
             break
           case 'HDFS':
             this.targetTypeList = [
               {
-                code: 'MYSQL'
+                code: 'JDBC'
               }
             ]
             break
           case 'HIVE':
             this.targetTypeList = [
               {
-                code: 'MYSQL'
+                code: 'JDBC'
               }
             ]
             break
           default:
             this.targetTypeList = [
+              {
+                code: 'JDBC'
+              },
               {
                 code: 'HIVE'
               },
@@ -829,15 +819,12 @@
             break
         }
       },
-
       _onMapColumnHive (a) {
         this.sourceMysqlParams.mapColumnHive = a
       },
-
       _onMapColumnJava (a) {
         this.sourceMysqlParams.mapColumnJava = a
       },
-
       /**
        * return data source
        */
@@ -845,7 +832,6 @@
         this.sourceMysqlParams.srcType = o.type
         this.sourceMysqlParams.srcDatasource = o.datasource
       },
-
       /**
        * return data source
        */
@@ -853,14 +839,13 @@
         this.targetMysqlParams.targetType = o.type
         this.targetMysqlParams.targetDatasource = o.datasource
       },
-
       /**
        * stringify the source params
        */
       _handleSourceParams () {
         let params = null
         switch (this.sourceType) {
-          case 'MYSQL':
+          case 'JDBC':
             this.sourceMysqlParams.srcQuerySql = this.sourceMysqlParams.srcQueryType === '1' && editor
               ? editor.getValue() : this.sourceMysqlParams.srcQuerySql
             params = JSON.stringify(this.sourceMysqlParams)
@@ -880,7 +865,6 @@
         }
         return params
       },
-
       /**
        * stringify the target params
        */
@@ -893,23 +877,21 @@
           case 'HDFS':
             params = JSON.stringify(this.targetHdfsParams)
             break
-          case 'MYSQL':
+          case 'JDBC':
             params = JSON.stringify(this.targetMysqlParams)
             break
           default:
             params = ''
             break
         }
-
         return params
       },
-
       /**
        * get source params by source type
        */
       _getSourceParams (data) {
         switch (this.sourceType) {
-          case 'MYSQL':
+          case 'JDBC':
             this.sourceMysqlParams = JSON.parse(data)
             this.srcDatasource = this.sourceMysqlParams.srcDatasource
             break
@@ -926,7 +908,6 @@
             break
         }
       },
-
       /**
        * get target params by target type
        */
@@ -938,7 +919,7 @@
           case 'HDFS':
             this.targetHdfsParams = JSON.parse(data)
             break
-          case 'MYSQL':
+          case 'JDBC':
             this.targetMysqlParams = JSON.parse(data)
             this.targetDatasource = this.targetMysqlParams.targetDatasource
             break
@@ -946,7 +927,6 @@
             break
         }
       },
-
       /**
        * verification
        */
@@ -966,9 +946,8 @@
             this.$message.warning(`${i18n.$t('Please enter Job Name(required)')}`)
             return false
           }
-
           switch (this.sourceType) {
-            case 'MYSQL':
+            case 'JDBC':
               if (!this.$refs.refSourceDs._verifDatasource()) {
                 return false
               }
@@ -982,7 +961,7 @@
                 this.sourceMysqlParams.srcColumns = ''
               } else {
                 if (this.sourceMysqlParams.srcTable === '') {
-                  this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
+                  this.$message.warning(`${i18n.$t('Please enter JDBC Table(required)')}`)
                   return false
                 }
                 this.sourceMysqlParams.srcQuerySql = ''
@@ -994,7 +973,6 @@
                   this.sourceMysqlParams.srcColumns = ''
                 }
               }
-
               break
             case 'HDFS':
               if (this.sourceHdfsParams.exportDir === '') {
@@ -1015,7 +993,6 @@
             default:
               break
           }
-
           switch (this.targetType) {
             case 'HIVE':
               if (this.targetHiveParams.hiveDatabase === '') {
@@ -1033,13 +1010,12 @@
                 return false
               }
               break
-            case 'MYSQL':
+            case 'JDBC':
               if (!this.$refs.refTargetDs._verifDatasource()) {
                 return false
               }
-
               if (this.targetMysqlParams.targetTable === '') {
-                this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
+                this.$message.warning(`${i18n.$t('Please enter JDBC Table(required)')}`)
                 return false
               }
               break
@@ -1056,23 +1032,19 @@
           sqoopParams.targetParams = this._handleTargetParams()
           sqoopParams.sourceParams = this._handleSourceParams()
         }
-
         // storage
         this.$emit('on-params', sqoopParams)
         return true
       },
-
       /**
        * Processing code highlighting
        */
       _handlerEditor () {
         this._destroyEditor()
-
         editor = codemirror('code-sqoop-mirror', {
           mode: 'sql',
           readOnly: this.isDetails
         })
-
         this.keypress = () => {
           if (!editor.getOption('readOnly')) {
             editor.showHint({
@@ -1080,33 +1052,25 @@
             })
           }
         }
-
         this.changes = () => {
           this._cacheParams()
         }
-
         // Monitor keyboard
         editor.on('keypress', this.keypress)
-
         editor.on('changes', this.changes)
-
         editor.setValue(this.sourceMysqlParams.srcQuerySql)
-
         return editor
       },
-
       /**
        * Processing code highlighting
        */
       _handlerShellEditor () {
         this._destroyShellEditor()
-
         // shellEditor
         shellEditor = codemirror('code-shell-mirror', {
           mode: 'shell',
           readOnly: this.isDetails
         })
-
         this.keypress = () => {
           if (!shellEditor.getOption('readOnly')) {
             shellEditor.showHint({
@@ -1114,35 +1078,29 @@
             })
           }
         }
-
         // Monitor keyboard
         shellEditor.on('keypress', this.keypress)
         shellEditor.setValue(this.customShell)
-
         return shellEditor
       },
-
       /**
        * return localParams
        */
       _onLocalParams (a) {
         this.localParams = a
       },
-
       /**
        * return hadoopParams
        */
       _onHadoopCustomParams (a) {
         this.hadoopCustomParams = a
       },
-
       /**
        * return sqoopAdvancedParams
        */
       _onSqoopAdvancedParams (a) {
         this.sqoopAdvancedParams = a
       },
-
       _cacheParams () {
         this.$emit('on-cache-params', {
           concurrency: this.concurrency,
@@ -1154,7 +1112,6 @@
           localParams: this.localParams
         })
       },
-
       _destroyEditor () {
         if (editor) {
           editor.toTextArea() // Uninstall
@@ -1192,11 +1149,9 @@
         this._cacheParams()
       }
     },
-
     created () {
       this._destroyEditor()
       let o = this.backfillItem
-
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.jobType = o.params.jobType
@@ -1219,21 +1174,17 @@
         }
       }
     },
-
     mounted () {
       setTimeout(() => {
         this._handlerEditor()
       }, 200)
-
       setTimeout(() => {
         this._handlerShellEditor()
       }, 200)
-
       setTimeout(() => {
         this.srcQueryType = this.sourceMysqlParams.srcQueryType
       }, 500)
     },
-
     destroyed () {
       /**
        * Destroy the editor instance
@@ -1245,7 +1196,6 @@
         editor = null
       }
     },
-
     computed: {
       cacheParams () {
         return {
