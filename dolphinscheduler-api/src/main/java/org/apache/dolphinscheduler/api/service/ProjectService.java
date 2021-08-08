@@ -43,17 +43,17 @@ public interface ProjectService {
      * @param projectCode project code
      * @return project detail information
      */
-    Map<String, Object> queryByCode(User loginUser, Long projectCode);
+    Map<String, Object> queryByCode(User loginUser, long projectCode);
 
     /**
      * check project and authorization
      *
      * @param loginUser login user
      * @param project project
-     * @param projectName project name
+     * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName);
+    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode);
 
     boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result);
 

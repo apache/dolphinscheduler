@@ -125,7 +125,7 @@ public class DataAnalysisServiceTest {
 
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, null);
-        Mockito.when(projectService.checkProjectAndAuth(any(), any(), any())).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(any(), any(), 0L)).thenReturn(result);
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
         // SUCCESS
