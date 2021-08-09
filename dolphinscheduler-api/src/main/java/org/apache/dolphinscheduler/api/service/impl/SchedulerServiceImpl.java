@@ -521,7 +521,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      *
      * @param loginUser login user
      * @param projectName project name
-     * @param scheduleId scheule id
+     * @param scheduleId schedule id
      * @return delete result code
      */
     @Override
