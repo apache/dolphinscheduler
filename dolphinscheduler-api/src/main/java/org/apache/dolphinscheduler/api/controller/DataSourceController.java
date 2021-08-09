@@ -136,7 +136,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * query datasouce by type
+     * query datasource by type
      *
      * @param loginUser login user
      * @param type      data source type

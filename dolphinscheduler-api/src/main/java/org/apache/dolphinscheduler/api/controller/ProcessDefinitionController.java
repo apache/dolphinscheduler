@@ -370,7 +370,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by id
+     * query detail of process definition by id
      *
      * @param loginUser login user
      * @param projectName project name
@@ -394,7 +394,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition by name
+     * query detail of process definition by name
      *
      * @param loginUser login user
      * @param projectName project name
@@ -474,7 +474,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * encapsulation treeview structure
+     * encapsulation tree view structure
      *
      * @param loginUser login user
      * @param projectName project name
