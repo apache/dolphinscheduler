@@ -142,11 +142,11 @@ public class TenantController extends BaseController {
 
 
     /**
-     * udpate tenant
+     * update tenant
      *
      * @param loginUser login user
-     * @param id tennat id
-     * @param tenantCode tennat code
+     * @param id tenant id
+     * @param tenantCode tenant code
      * @param queueId queue id
      * @param description description
      * @return update result code
