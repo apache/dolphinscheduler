@@ -133,7 +133,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectByCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam("projectCode") Long projectCode) {
+                                     @RequestParam("projectCode") long projectCode) {
         Map<String, Object> result = projectService.queryByCode(loginUser, projectCode);
         return returnDataList(result);
     }

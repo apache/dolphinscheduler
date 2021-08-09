@@ -136,7 +136,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
@@ -180,7 +180,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         if (projectCode != 0) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, project.getName());
+            result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return result;
             }
