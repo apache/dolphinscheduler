@@ -90,11 +90,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Autowired
     private MonitorService monitorService;
 
-
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
-
-
     @Autowired
     private ProcessService processService;
 
@@ -126,16 +121,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout,
                                                    Map<String, String> startParams) {
-        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByCode(projectCode);
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
+        }
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
-        }
-        Project project = projectMapper.queryByCode(projectCode);
-        Map<String, Object> checkResultAndAuth = checkResultAndAuth(loginUser, project.getName(), project);
-        if (checkResultAndAuth != null) {
-            return checkResultAndAuth;
         }
 
         // check process define release state
@@ -225,12 +220,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      */
     @Override
     public Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId, ExecuteType executeType) {
-        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
-
-        Map<String, Object> checkResult = checkResultAndAuth(loginUser, project.getName(), project);
-        if (checkResult != null) {
-            return checkResult;
+        //check user access for project
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
 
         // check master exists
@@ -253,10 +247,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             }
         }
 
-        checkResult = checkExecuteType(processInstance, executeType);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            return checkResult;
+        result = checkExecuteType(processInstance, executeType);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            return result;
         }
         if (!checkTenantSuitable(processDefinition)) {
             logger.error("there is not any valid tenant for the process definition: id:{},name:{}, ",
@@ -589,18 +582,4 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         return 0;
     }
-
-    /**
-     * check result and auth
-     */
-    private Map<String, Object> checkResultAndAuth(User loginUser, String projectName, Project project) {
-        // check project auth
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            return checkResult;
-        }
-        return null;
-    }
-
 }
