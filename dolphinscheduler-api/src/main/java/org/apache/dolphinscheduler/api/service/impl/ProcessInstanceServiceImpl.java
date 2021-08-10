@@ -226,21 +226,16 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @return process instance list
      */
     @Override
-    public Map<String, Object> queryProcessInstanceList(User loginUser,
-                                                        long projectCode,
-                                                        long processDefineCode,
-                                                        String startDate,
-                                                        String endDate,
-                                                        String searchVal,
-                                                        String executorName,
-                                                        ExecutionStatus stateType,
-                                                        String host,
-                                                        Integer pageNo,
-                                                        Integer pageSize) {
+    public Result queryProcessInstanceList(User loginUser, long projectCode, long processDefineCode, String startDate, String endDate, String searchVal, String executorName,
+                                           ExecutionStatus stateType, String host, Integer pageNo, Integer pageSize) {
+
+        Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         //check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectCode);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            putMsg(result,resultEnum);
             return result;
         }
 
@@ -251,8 +246,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
 
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        if (checkAndParseDateResult.get(Constants.STATUS) != Status.SUCCESS) {
-            return checkAndParseDateResult;
+        resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            putMsg(result,resultEnum);
+            return result;
         }
         Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
         Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
@@ -276,9 +273,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             }
         }
 
-        pageInfo.setTotalCount((int) processInstanceList.getTotal());
-        pageInfo.setLists(processInstances);
-        result.put(DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) processInstanceList.getTotal());
+        pageInfo.setTotalList(processInstances);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }

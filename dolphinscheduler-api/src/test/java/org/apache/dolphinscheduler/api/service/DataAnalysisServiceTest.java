@@ -129,10 +129,12 @@ public class DataAnalysisServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(any(), any(), anyLong())).thenReturn(result);
         Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
 
-        // SUCCESS
+        //SUCCESS
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(DateUtils.getScheduleDate(startDate),
-                DateUtils.getScheduleDate(endDate), new Long[] {1L})).thenReturn(getTaskInstanceStateCounts());
-        Mockito.when(projectMapper.queryByCode(1L)).thenReturn(getProject("test"));
+                DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
+        Mockito.when(projectMapper.selectById(Mockito.any())).thenReturn(getProject("test"));
+        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), (Map<String, Object>)Mockito.any())).thenReturn(true);
+
         result = dataAnalysisServiceImpl.countTaskStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -230,7 +232,7 @@ public class DataAnalysisServiceTest {
         //SUCCESS
         Mockito.when(processInstanceMapper.countInstanceStateByUser(DateUtils.getScheduleDate(startDate),
                 DateUtils.getScheduleDate(endDate), new Long[]{1L})).thenReturn(getTaskInstanceStateCounts());
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(true);
+        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), (Map<String, Object>)Mockito.any())).thenReturn(true);
 
         result = dataAnalysisServiceImpl.countProcessInstanceStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -256,6 +258,7 @@ public class DataAnalysisServiceTest {
         CommandCount commandCount = new CommandCount();
         commandCount.setCommandType(CommandType.START_PROCESS);
         commandCounts.add(commandCount);
+
         Mockito.when(commandMapper.countCommandState(0, null, null, new Long[]{1L})).thenReturn(commandCounts);
         Mockito.when(errorCommandMapper.countCommandState(null, null, new Long[]{1L})).thenReturn(commandCounts);
 

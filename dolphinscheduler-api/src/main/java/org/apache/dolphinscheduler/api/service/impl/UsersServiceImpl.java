@@ -318,10 +318,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return user list page
      */
     @Override
-    public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+    public Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -330,9 +330,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         IPage<User> scheduleList = userMapper.queryUserPaging(page, searchVal);
 
         PageInfo<User> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) scheduleList.getTotal());
-        pageInfo.setLists(scheduleList.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) scheduleList.getTotal());
+        pageInfo.setTotalList(scheduleList.getRecords());
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 
         return result;

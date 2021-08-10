@@ -112,10 +112,10 @@ public class TenantServiceTest {
         page.setTotal(1L);
         Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq("TenantServiceTest")))
             .thenReturn(page);
-        Map<String, Object> result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
+        Result result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
-        PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
     }
 

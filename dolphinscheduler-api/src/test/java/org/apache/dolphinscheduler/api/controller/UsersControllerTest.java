@@ -41,7 +41,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * users controller test
  */
-public class UsersControllerTest extends AbstractControllerTest{
+public class UsersControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
 
@@ -126,8 +126,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
-
     @Test
     public void testGrantUDFFunc() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -145,7 +143,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testGrantDataSource() throws Exception {
@@ -195,7 +192,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testAuthorizedUser() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -229,7 +225,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testVerifyUserName() throws Exception {

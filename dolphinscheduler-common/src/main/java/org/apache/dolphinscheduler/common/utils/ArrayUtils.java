@@ -15,41 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.dao.entity.Session;
-import org.apache.dolphinscheduler.dao.entity.User;
+public class ArrayUtils {
 
-import javax.servlet.http.HttpServletRequest;
+    public static byte[] clone(byte[] array) {
+        return array == null ? null : (byte[])((byte[])array.clone());
+    }
 
-/**
- * session service
- */
-public interface SessionService {
-
-    /**
-     * get user session from request
-     *
-     * @param request request
-     * @return session
-     */
-    Session getSession(HttpServletRequest request);
-
-    /**
-     * create session
-     *
-     * @param user user
-     * @param ip ip
-     * @return session string
-     */
-    String createSession(User user, String ip);
-
-    /**
-     * sign out
-     * remove ip restrictions
-     *
-     * @param ip   no use
-     * @param loginUser login user
-     */
-    void signOut(String ip, User loginUser);
+    public static byte[] addAll(byte[] array1, byte[] array2) {
+        if (array1 == null) {
+            return clone(array2);
+        } else if (array2 == null) {
+            return clone(array1);
+        } else {
+            byte[] joinedArray = new byte[array1.length + array2.length];
+            System.arraycopy(array1, 0, joinedArray, 0, array1.length);
+            System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
+            return joinedArray;
+        }
+    }
 }

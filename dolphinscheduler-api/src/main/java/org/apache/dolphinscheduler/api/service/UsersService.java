@@ -112,7 +112,7 @@ public interface UsersService {
      * @param pageSize page size
      * @return user list page
      */
-    Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * updateProcessInstance user

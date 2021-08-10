@@ -18,6 +18,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -70,17 +71,17 @@ public interface ProcessInstanceService {
      * @param endDate end time
      * @return process instance list
      */
-    Map<String, Object> queryProcessInstanceList(User loginUser,
-                                                 long projectCode,
-                                                 long processDefineCode,
-                                                 String startDate,
-                                                 String endDate,
-                                                 String searchVal,
-                                                 String executorName,
-                                                 ExecutionStatus stateType,
-                                                 String host,
-                                                 Integer pageNo,
-                                                 Integer pageSize);
+    Result queryProcessInstanceList(User loginUser,
+                                    long projectCode,
+                                    long processDefineCode,
+                                    String startDate,
+                                    String endDate,
+                                    String searchVal,
+                                    String executorName,
+                                    ExecutionStatus stateType,
+                                    String host,
+                                    Integer pageNo,
+                                    Integer pageSize);
 
     /**
      * query task list by process instance id

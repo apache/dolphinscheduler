@@ -99,9 +99,7 @@ public class ProjectControllerTest {
         int pageSize = 10;
         String searchVal = "";
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, new PageInfo<Resource>(1, 10));
+        Result result = Result.success(new PageInfo<Resource>(1, 10));
 
         Mockito.when(projectService.queryProjectListPaging(user, pageSize, pageNo, searchVal)).thenReturn(result);
         Result response = projectController.queryProjectListPaging(user, searchVal, pageSize, pageNo);

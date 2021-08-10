@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -100,14 +99,14 @@ public class QueueController extends BaseController {
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = queueService.queryList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
@@ -185,6 +184,4 @@ public class QueueController extends BaseController {
 
         return queueService.verifyQueue(queue, queueName);
     }
-
-
 }

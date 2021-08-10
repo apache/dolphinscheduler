@@ -122,14 +122,15 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "endDate", required = false) String endTime,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime, endTime,
-            searchVal, executorName, stateType, host, pageNo, pageSize);
-        return returnDataListPaging(result);
+                searchVal, executorName, stateType, host, pageNo, pageSize);
+        return result;
     }
 
     /**

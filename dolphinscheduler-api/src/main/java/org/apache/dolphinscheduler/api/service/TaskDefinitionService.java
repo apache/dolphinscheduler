@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -138,11 +139,11 @@ public interface TaskDefinitionService {
      * @param userId user id
      * @return task definition page
      */
-    Map<String, Object> queryTaskDefinitionListPaging(User loginUser,
-                                                      long projectCode,
-                                                      String searchVal,
-                                                      Integer pageNo,
-                                                      Integer pageSize,
-                                                      Integer userId);
+    Result queryTaskDefinitionListPaging(User loginUser,
+                                         long projectCode,
+                                         String searchVal,
+                                         Integer pageNo,
+                                         Integer pageSize,
+                                         Integer userId);
 }
 

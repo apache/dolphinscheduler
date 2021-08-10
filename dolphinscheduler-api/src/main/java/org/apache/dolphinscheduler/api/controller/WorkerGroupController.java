@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FA
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -112,13 +111,14 @@ public class WorkerGroupController extends BaseController {
                                              @RequestParam("pageSize") Integer pageSize,
                                              @RequestParam(value = "searchVal", required = false) String searchVal
     ) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
+
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
