@@ -37,7 +37,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * login controller test
  */
-public class LoginControllerTest extends AbstractControllerTest{
+public class LoginControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
