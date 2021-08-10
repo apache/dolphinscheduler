@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.cronutils.model.CronType.QUARTZ;
 import static org.apache.dolphinscheduler.service.quartz.cron.CycleFactory.*;
@@ -132,7 +133,9 @@ public class CronUtils {
       dateList.add(startTime);
       fireTimes--;
     }
-
+    List<String> strings = Arrays.asList("param".split(","));
+    "param".split(",")
+    Stream<String> stream = Arrays.stream("param".split(","));
     return dateList;
   }
 

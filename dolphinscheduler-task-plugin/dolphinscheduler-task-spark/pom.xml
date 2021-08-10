@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>${revision}</version>
+        <version>1.3.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-task-spark</artifactId>
