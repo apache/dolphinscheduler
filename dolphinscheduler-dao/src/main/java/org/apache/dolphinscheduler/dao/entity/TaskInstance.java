@@ -246,7 +246,10 @@ public class TaskInstance implements Serializable {
     private String blockingCondition;
 
     @TableField(exist = false)
-    private boolean alertWhenBlocking;
+    private boolean blockingLogicStatus = false;
+
+    @TableField(exist = false)
+    private boolean alertWhenBlocking = false;
 
     /**
      * task params
@@ -659,11 +662,20 @@ public class TaskInstance implements Serializable {
 
     public boolean getAlertWhenBlocking() {
         Map<String,Object> taskParamsMap = JSONUtils.toMap(this.getTaskParams(),String.class,Object.class);
-        this.alertWhenBlocking = (Boolean) taskParamsMap.get(Constants.ALERT_WHEN_BLOCKING);
-        return alertWhenBlocking;
+        Boolean alertWhenBlocking = (Boolean) taskParamsMap.get(Constants.ALERT_WHEN_BLOCKING);
+        this.alertWhenBlocking = alertWhenBlocking == null ? false : alertWhenBlocking;
+        return this.alertWhenBlocking;
     }
 
     public void setAlertWhenBlocking(boolean alertWhenBlocking) {
         this.alertWhenBlocking = alertWhenBlocking;
+    }
+
+    public boolean getBlockingLogicStatus() {
+        return blockingLogicStatus;
+    }
+
+    public void setBlockingLogicStatus(boolean blockingStatus) {
+        this.blockingLogicStatus = blockingStatus;
     }
 }
