@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
+import org.apache.dolphinscheduler.server.worker.task.kettle.KettleTask;
 import org.apache.dolphinscheduler.server.worker.task.mr.MapReduceTask;
 import org.apache.dolphinscheduler.server.worker.task.processdure.ProcedureTask;
 import org.apache.dolphinscheduler.server.worker.task.python.PythonTask;
@@ -68,6 +69,8 @@ public class TaskManager {
         return new DataxTask(taskExecutionContext, logger);
       case SQOOP:
         return new SqoopTask(taskExecutionContext, logger);
+      case KETTLE:
+        return new KettleTask(taskExecutionContext, logger);
       default:
         logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
         throw new IllegalArgumentException("not support task type");
