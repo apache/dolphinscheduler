@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -104,7 +105,7 @@ public interface SchedulerService {
      * @param searchVal search value
      * @return schedule list page
      */
-    Map<String, Object> querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
+    Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
                                       Integer pageNo, Integer pageSize);
 
     /**

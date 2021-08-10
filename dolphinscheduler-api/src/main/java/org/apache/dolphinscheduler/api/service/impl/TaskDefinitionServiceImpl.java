@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
 
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -279,6 +279,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinition.getName());
         }
     }
+
     /**
      * update task definition
      *
@@ -329,12 +330,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Map<String, Object> queryTaskDefinitionListPaging(User loginUser,
-                                                             long projectCode,
-                                                             String searchVal,
-                                                             Integer pageNo,
-                                                             Integer pageSize,
-                                                             Integer userId) {
+    public Result queryTaskDefinitionListPaging(User loginUser,
+                                                long projectCode,
+                                                String searchVal,
+                                                Integer pageNo,
+                                                Integer pageSize,
+                                                Integer userId) {
         return null;
     }
 }

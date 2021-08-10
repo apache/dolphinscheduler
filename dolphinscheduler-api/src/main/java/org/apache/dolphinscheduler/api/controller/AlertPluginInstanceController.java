@@ -226,13 +226,11 @@ public class AlertPluginInstanceController extends BaseController {
     public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
-
-        result = alertPluginInstanceService.queryPluginPage(pageNo, pageSize);
-        return returnDataListPaging(result);
+        return alertPluginInstanceService.queryPluginPage(pageNo, pageSize);
     }
 
 }

@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -160,14 +159,16 @@ public class ProjectController extends BaseController {
     public Result queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
-                                         @RequestParam("pageNo") Integer pageNo) {
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
+                                         @RequestParam("pageNo") Integer pageNo
+    ) {
+
+        Result result = checkPageParams(pageNo, pageSize);
+        if (!result.checkResult()) {
+            return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
         result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
-        return returnDataListPaging(result);
+        return result;
     }
 
     /**
