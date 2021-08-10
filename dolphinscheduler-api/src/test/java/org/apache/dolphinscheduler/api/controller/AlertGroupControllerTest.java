@@ -93,7 +93,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryAlertgroup() throws Exception {
+    public void testQueryAlertGroupById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","22");
         MvcResult mvcResult = mockMvc.perform(post("/alert-group/query")
