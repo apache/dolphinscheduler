@@ -976,11 +976,19 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
-                    // BLOCKING NODE TESTING
+                    // if blocking node, set blocking logic status
                     try {
                         if(task.isBlockingTask()){
                             boolean blockingLogicStatus = future.get();
+                            task.setBlockingLogicStatus(blockingLogicStatus);
                             logger.info("blocking task executes COMPLETE! the blocking logic is {}",blockingLogicStatus);
+                            // alert
+                            if(task.getAlertWhenBlocking() && blockingLogicStatus){
+                                // maybe there are a better solution. The code written here is not elegent
+                                List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
+                                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+                                processAlertManager.sendProcessBlockingAlert(processInstance,taskInstances,dag,projectUser);
+                            }
                         }
                     }catch (Exception e) {
                         logger.error("some error {} occurred",e);
