@@ -184,8 +184,6 @@ public enum Status {
     SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR(10153
             , "Switch process definition version error: not exists process definition version, [process definition id {0}] [version number {1}]", "切换工作流版本出错：工作流版本信息不存在，[工作流id {0}] [版本号 {1}]"),
     QUERY_PROCESS_DEFINITION_VERSIONS_ERROR(10154, "query process definition versions error", "查询工作流历史版本信息出错"),
-    QUERY_PROCESS_DEFINITION_VERSIONS_PAGE_NO_OR_PAGE_SIZE_LESS_THAN_1_ERROR(10155
-            , "query process definition versions error: [page number:{0}] < 1 or [page size:{1}] < 1", "查询工作流历史版本出错：[pageNo:{0}] < 1 或 [pageSize:{1}] < 1"),
     DELETE_PROCESS_DEFINITION_VERSION_ERROR(10156, "delete process definition version error", "删除工作流历史版本出错"),
 
     QUERY_USER_CREATED_PROJECT_ERROR(10157, "query user created project error error", "查询用户创建的项目错误"),

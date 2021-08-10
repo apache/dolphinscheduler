@@ -308,11 +308,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * check connection
      *
      * @param type data source type
-<<<<<<< HEAD
      * @param connectionParam connectionParam
-=======
-     * @param connectionParam data source parameters
->>>>>>> f56751703 ([Improvement-5880][api] Optimized data structure of pagination query API results (#5895))
      * @return true if connect successfully, otherwise false
      */
     @Override
