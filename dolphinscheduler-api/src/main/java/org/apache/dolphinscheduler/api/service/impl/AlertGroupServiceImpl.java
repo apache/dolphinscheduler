@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.BooleanUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -106,22 +107,24 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return alert group list page
      */
     @Override
-    public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+    public Result listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
+        Result result = new Result();
+        if (!isAdmin(loginUser)) {
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
+
         Page<Map<String, Object>> page = new Page<>(pageNo, pageSize);
         IPage<Map<String, Object>> alertGroupIPage = alertGroupMapper.queryAlertGroupName(page, searchVal);
-
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) alertGroupIPage.getTotal());
-        pageInfo.setLists(alertGroupIPage.getRecords());
-        result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
 
+        pageInfo.setTotal((int) alertGroupIPage.getTotal());
+        pageInfo.setTotalList(alertGroupIPage.getRecords());
+        result.setData(pageInfo);
+
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
