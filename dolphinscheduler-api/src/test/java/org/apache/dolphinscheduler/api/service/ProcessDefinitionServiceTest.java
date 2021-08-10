@@ -143,7 +143,7 @@ public class ProcessDefinitionServiceTest {
         //project not found
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Result map = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectCode, "", 1, 5, 0);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, (int)map.getCode());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), (int)map.getCode());
 
         putMsg(result, Status.SUCCESS, projectCode);
         loginUser.setId(1);

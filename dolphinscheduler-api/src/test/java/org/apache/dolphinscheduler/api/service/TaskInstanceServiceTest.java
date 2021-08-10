@@ -94,7 +94,7 @@ public class TaskInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode)).thenReturn(result);
         Result projectAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 0, "", "",
                 "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, (int)projectAuthFailRes.getCode());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), (int)projectAuthFailRes.getCode());
 
         // data parameter check
         putMsg(result, Status.SUCCESS, projectCode);
@@ -154,7 +154,7 @@ public class TaskInstanceServiceTest {
 
         Result executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
                 "", "error date", null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, (int)executorErrorStartDateRes.getCode());
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int)executorErrorStartDateRes.getCode());
         Result executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "",
                 "", null, "error date", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), (int)executorErrorEndDateRes.getCode());
