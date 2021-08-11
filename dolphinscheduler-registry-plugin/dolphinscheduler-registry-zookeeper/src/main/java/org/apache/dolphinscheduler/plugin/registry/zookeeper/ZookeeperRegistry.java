@@ -28,7 +28,6 @@ import static org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperCon
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import org.apache.curator.utils.ZookeeperFactory;
 import org.apache.dolphinscheduler.spi.register.DataChangeEvent;
 import org.apache.dolphinscheduler.spi.register.ListenerManager;
 import org.apache.dolphinscheduler.spi.register.Registry;
@@ -48,10 +47,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.client.ZKClientConfig;
 import org.apache.zookeeper.data.ACL;
 
 import java.nio.charset.StandardCharsets;
@@ -339,11 +335,4 @@ public class ZookeeperRegistry implements Registry {
     }
 }
 
-class DefaultZookeeperFactory implements ZookeeperFactory {
-    @Override
-    public ZooKeeper newZooKeeper(String s, int i, Watcher watcher, boolean b) throws Exception {
-        ZKClientConfig config = new ZKClientConfig();
-        config.setProperty(ZKClientConfig.ENABLE_CLIENT_SASL_KEY,"false");
-        return new ZooKeeper(s,i,watcher,b,config);
-    }
-}
+
