@@ -60,7 +60,7 @@
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
-                  <arguments>install node-sass --unsafe-perm</arguments>
+                  <arguments>install node-sass --unsafe-perm --registry=https://registry.npm.taobao.org</arguments>
                 </configuration>
               </execution>
               <execution>
@@ -70,7 +70,7 @@
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>install --registry=https://registry.npm.taobao.org</arguments>
                 </configuration>
               </execution>
               <execution>
@@ -109,13 +109,13 @@
                 </configuration>
               </execution>
               <execution>
-                <id>npm install node-sass --unsafe-perm</id>
+                <id>npm install node-sass --unsafe-perm --registry=https://registry.npm.taobao.org</id>
                 <goals>
                   <goal>npm</goal>
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
-                  <arguments>install node-sass --unsafe-perm</arguments>
+                  <arguments>install node-sass --unsafe-perm --registry=https://registry.npm.taobao.org</arguments>
                 </configuration>
               </execution>
               <execution>
@@ -125,7 +125,7 @@
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>install --registry=https://registry.npm.taobao.org</arguments>
                 </configuration>
               </execution>
               <execution>
