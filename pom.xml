@@ -59,7 +59,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
-<!--        <zookeeper.version>3.4.14</zookeeper.version>-->
         <zookeeper.version>3.5.9</zookeeper.version>
         <spring.version>5.1.19.RELEASE</spring.version>
         <spring.boot.version>2.1.18.RELEASE</spring.boot.version>
