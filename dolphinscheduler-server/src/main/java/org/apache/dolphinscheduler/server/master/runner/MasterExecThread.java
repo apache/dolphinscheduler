@@ -758,7 +758,8 @@ public class MasterExecThread implements Runnable {
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
         if (CollectionUtils.isNotEmpty(pauseList)
                 || !isComplementEnd()
-                || readyToSubmitTaskQueue.size() > 0) {
+                || readyToSubmitTaskQueue.size() > 0
+                || processInstance.getBlockingFlag()) {
             return ExecutionStatus.PAUSE;
         } else {
             return ExecutionStatus.SUCCESS;
@@ -976,6 +977,8 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if (task.getState() == ExecutionStatus.SUCCESS) {
+                    processInstance = processService.findProcessInstanceById(processInstance.getId());
+                    processInstance.setVarPool(task.getVarPool());
                     // if blocking node, set blocking logic status
                     try {
                         if(task.isBlockingTask()){
@@ -986,20 +989,21 @@ public class MasterExecThread implements Runnable {
                             if(blockingLogicStatus){
                                 // pause the whole process
                                 processInstance.setState(ExecutionStatus.READY_PAUSE);
+                                processService.updateProcessInstance(processInstance);
+                                completeTaskList.put(task.getName(), task);
+                                logger.info("meet blocking requirement, pause process");
                                 // alert
                                 if(task.getAlertWhenBlocking()){
                                     // maybe there are a better solution. The code written here is not elegent
-                                    List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
                                     ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-                                    processAlertManager.sendProcessBlockingAlert(processInstance,taskInstances,dag,projectUser);
+                                    processAlertManager.sendProcessBlockingAlert(processInstance,task,projectUser);
                                 }
+                                continue;
                             }
                         }
                     }catch (Exception e) {
                         logger.error("some error {} occurred",e);
                     }
-                    processInstance = processService.findProcessInstanceById(processInstance.getId());
-                    processInstance.setVarPool(task.getVarPool());
                     processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());
@@ -1180,12 +1184,6 @@ public class MasterExecThread implements Runnable {
                     //get pre task ,get all the task varPool to this task
                     Set<String> preTask = dag.getPreviousNodes(task.getName());
                     getPreVarPool(task, preTask);
-                }
-                // if process blocked, task will be set to PAUSE and it will not be submitted
-                if(processInstance.getBlockingFlag()){
-                    task.setState(ExecutionStatus.PAUSE);
-                    removeTaskFromStandbyList(task);
-                    continue;
                 }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
