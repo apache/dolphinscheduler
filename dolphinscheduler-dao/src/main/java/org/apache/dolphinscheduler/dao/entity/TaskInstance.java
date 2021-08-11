@@ -246,9 +246,6 @@ public class TaskInstance implements Serializable {
     private String blockingCondition;
 
     @TableField(exist = false)
-    private boolean blockingLogicStatus = false;
-
-    @TableField(exist = false)
     private boolean alertWhenBlocking = false;
 
     /**
@@ -671,11 +668,4 @@ public class TaskInstance implements Serializable {
         this.alertWhenBlocking = alertWhenBlocking;
     }
 
-    public boolean getBlockingLogicStatus() {
-        return blockingLogicStatus;
-    }
-
-    public void setBlockingLogicStatus(boolean blockingStatus) {
-        this.blockingLogicStatus = blockingStatus;
-    }
 }

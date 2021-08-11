@@ -980,14 +980,19 @@ public class MasterExecThread implements Runnable {
                     try {
                         if(task.isBlockingTask()){
                             boolean blockingLogicStatus = future.get();
-                            task.setBlockingLogicStatus(blockingLogicStatus);
+                            // blocking is a process scope action
+                            processInstance.setBlockingFlag(blockingLogicStatus);
                             logger.info("blocking task executes COMPLETE! the blocking logic is {}",blockingLogicStatus);
-                            // alert
-                            if(task.getAlertWhenBlocking() && blockingLogicStatus){
-                                // maybe there are a better solution. The code written here is not elegent
-                                List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
-                                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-                                processAlertManager.sendProcessBlockingAlert(processInstance,taskInstances,dag,projectUser);
+                            if(blockingLogicStatus){
+                                // pause the whole process
+                                processInstance.setState(ExecutionStatus.READY_PAUSE);
+                                // alert
+                                if(task.getAlertWhenBlocking()){
+                                    // maybe there are a better solution. The code written here is not elegent
+                                    List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
+                                    ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+                                    processAlertManager.sendProcessBlockingAlert(processInstance,taskInstances,dag,projectUser);
+                                }
                             }
                         }
                     }catch (Exception e) {
@@ -1175,6 +1180,12 @@ public class MasterExecThread implements Runnable {
                     //get pre task ,get all the task varPool to this task
                     Set<String> preTask = dag.getPreviousNodes(task.getName());
                     getPreVarPool(task, preTask);
+                }
+                // if process blocked, task will be set to PAUSE and it will not be submitted
+                if(processInstance.getBlockingFlag()){
+                    task.setState(ExecutionStatus.PAUSE);
+                    removeTaskFromStandbyList(task);
+                    continue;
                 }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
