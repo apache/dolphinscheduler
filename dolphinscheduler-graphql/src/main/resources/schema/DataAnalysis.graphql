@@ -1,0 +1,94 @@
+type TaskCountDtoResultType {
+    code: Int
+    msg: String
+    data: TaskCountDto
+    success: Boolean
+    failed: Boolean
+}
+
+type TaskCountDto {
+    totalCount: Int
+    taskCountDtos: [TaskStateCount]
+}
+
+type TaskStateCount {
+    count: Int
+    taskStateType: ExecutionStatus
+}
+
+enum ExecutionStatus {
+    SUBMITTED_SUCCESS
+    RUNNING_EXECUTION
+    READY_PAUSE
+    PAUSE
+    READY_STOP
+    STOP
+    FAILURE
+    SUCCESS
+    NEED_FAULT_TOLERANCE
+    KILL
+    WAITING_THREAD
+    WAITING_DEPEND
+    DELAY_EXECUTION
+    FORCED_SUCCESS
+}
+
+type DefineUserDtoResultType {
+    code: Int
+    msg: String
+    data: DefineUserDto
+    success: Boolean
+    failed: Boolean
+}
+
+type DefineUserDto {
+    count: Int
+    userList: [DefinitionGroupByUser]
+}
+
+type DefinitionGroupByUser {
+    userName: String
+    userId: Int
+    count: Int
+}
+
+type CommandStateCountResultType {
+    code: Int
+    msg: String
+    data: [CommandStateCount]
+    success: Boolean
+    failed: Boolean
+}
+
+type CommandStateCount {
+    errorCount: Int
+    normalCount: Int
+    commandState: CommandType
+}
+
+enum CommandType {
+    START_PROCESS
+    START_CURRENT_TASK_PROCESS
+    RECOVER_TOLERANCE_FAULT_PROCESS
+    RECOVER_SUSPENDED_PROCESS
+    START_FAILURE_TASK_PROCESS
+    COMPLEMENT_DATA
+    SCHEDULER
+    REPEAT_RUNNING
+    PAUSE
+    STOP
+    RECOVER_WAITTING_THREAD
+}
+
+type CountQueueStateResultType {
+    code: Int
+    msg: String
+    data: CountQueueStateMapType
+    success: Boolean
+    failed: Boolean
+}
+
+type CountQueueStateMapType {
+    taskKill: Int
+    taskQueue: Int
+}

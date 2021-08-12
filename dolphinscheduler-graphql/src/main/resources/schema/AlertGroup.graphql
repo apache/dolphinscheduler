@@ -1,0 +1,47 @@
+type AlertGroup {
+    id: ID!
+    groupName: String
+    groupType: AlertType
+    description: String
+    createTime: String
+    updateTime: String
+    alertInstanceIds: String
+    createUserId: Int
+}
+
+enum AlertType {
+    EMAIL
+    SMS
+}
+
+type NormalResultType {
+    code: Int
+    msg: String
+    data: String
+    success: Boolean
+    failed: Boolean
+}
+
+type AlertGroupListResultType {
+    code: Int
+    msg: String
+    data: [AlertGroup]
+    success: Boolean
+    failed: Boolean
+}
+
+type QueryAlertGroupListPagingResultType {
+    code: Int
+    msg: String
+    data: AlertGroupPageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type AlertGroupPageInfo {
+    totalList: [AlertGroup]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}
+

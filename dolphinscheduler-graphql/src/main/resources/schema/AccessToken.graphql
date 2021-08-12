@@ -1,0 +1,23 @@
+type AccessToken {
+    id: ID!
+    userId: Int!
+    token: String
+    expireTime: String
+    createTime: String
+    updateTime: String
+}
+
+type AccessTokenPageInfo {
+    totalList: [AccessToken]
+    totalCount: Int
+    totalPage: Int
+    currentPage: Int
+}
+
+type QueryAccessTokenListResultType {
+    code: Int
+    msg: String
+    data: AccessTokenPageInfo
+    success: Boolean
+    failed: Boolean
+}

@@ -1,0 +1,69 @@
+type Query {
+    # AlertGroup Query
+    queryAllGroupList(loginUser: InputUser!): AlertGroupListResultType
+    queryAlertGroupListPaging(loginUser: InputUser!, pageNo: Int!, pageSize: Int!, searchVal: String): QueryAlertGroupListPagingResultType
+    verifyGroupName(loginUser: InputUser!, groupName: String!): NormalResultType
+
+
+    # AccessToken Query
+    generateToken(loginUser: InputUser!, userId: Int!, expireTime: String!): NormalResultType
+    queryAccessTokenList(loginUser: InputUser!, pageNo: Int!, searchVal: String, pageSize: Int!): QueryAccessTokenListResultType
+
+
+    # DataAnalysis Query
+    countTaskStateByProject(loginUser: InputUser!, startDate: String, endDate: String, projectId: Int = 0): TaskCountDtoResultType
+    countProcessInstanceState(loginUser: InputUser!, startDate: String, endDate: String, projectId: Int = 0): TaskCountDtoResultType
+    countDefinitionByUser(loginUser: InputUser!, projectId: Int = 0): DefineUserDtoResultType
+    countCommandState(loginUser: InputUser!, startDate: String, endDate: String, projectId: Int = 0): CommandStateCountResultType
+    countQueueState(loginUser: InputUser!, projectId: Int = 0): CountQueueStateResultType
+
+
+    # DataSource Query
+    queryDataSource(loginUser: InputUser!, id: Int!): QueryDataSourceResultType
+    queryDataSourceList(loginUser: InputUser!, dbType: DbType): DataSourceListResultType
+    queryDataSourceListPaging(loginUser: InputUser!, searchVal: String, pageNo: Int!, pageSize: Int!): QueryDataSourceListPagingResultType
+    connectDataSource(loginUser: InputUser!, dataSourceParam: InputBaseDataSourceParamDTO!): NormalResultType
+    connectionTest(loginUser: InputUser!, id: Int): NormalResultType
+    verifyDataSourceName(loginUser: InputUser!, name: String!): NormalResultType
+    unauthDatasource(loginUser: InputUser!, userId: Int!): DataSourceListResultType
+    authedDatasource(loginUser: InputUser!, userId: Int!): DataSourceListResultType
+    getKerberosStartupState(loginUser: InputUser!): NormalResultType
+}
+
+type Mutation {
+    # AlertGroup Mutation
+    createAlertGroup(loginUser: InputUser!, groupName: String!, description: String, alertInstanceIds: String): NormalResultType
+#    grantUser(loginUser: InputUser!, alertGroupId: Int!, userIds: String!): NormalResultType
+    updateAlertGroup(loginUser: InputUser!, id: Int!, groupName: String!, description: String, alertInstanceIds: String): NormalResultType
+    delAlertGroupById(loginUser: InputUser!, id: ID!): NormalResultType
+
+
+    # AccessToken Mutation
+    createToken(loginUser: InputUser!, userId: Int!, expireTime: String!, token: String!): NormalResultType
+    delAccessTokenById(loginUser: InputUser!, id: Int!): NormalResultType
+    updateToken(loginUser: InputUser!, id: Int!, userId: Int!, expireTime: String!, token: String!): NormalResultType
+
+
+    # DataSource Mutation
+    createDataSource(loginUser: InputUser!, dataSourceParam: InputBaseDataSourceParamDTO!): NormalResultType
+    updateDataSource(loginUser: InputUser!, dataSourceParam: InputBaseDataSourceParamDTO!): NormalResultType
+    deleteDataSource(loginUser: InputUser!, id: Int): NormalResultType
+
+    # Executor Mutation
+    startProcessInstance(loginUser: InputUser!, projectName: String!, processDefinitionId: Int!,
+        scheduleTime: String!, failureStrategy: FailureStrategy!, startNodeList: String, taskDependType: TaskDependType,
+        execType: CommandType, warningType: WarningType!, warningGroupId: Int!, receivers: String, receiversCc: String,
+        runMode: RunMode, processInstancePriority: Priority, workerGroup: String = "default", timeout: Int): NormalResultType
+}
+
+input InputUser {
+    id: ID!
+    userType: UserType
+}
+
+enum UserType {
+    ADMIN_USER
+    GENERAL_USER
+}
+
+

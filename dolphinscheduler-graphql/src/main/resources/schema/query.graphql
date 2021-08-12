@@ -1,0 +1,24 @@
+query QueryAlertGroupListPaging {
+    queryAlertGroupListPaging(
+        loginUser: {
+            id: "1"
+        },
+        pageNo: 1,
+        pageSize: 3,
+        searchVal: ""
+    ) {
+        code
+        msg
+        data {
+            totalList {
+                id
+                groupName
+                description
+            }
+            total
+            totalPage
+            currentPage
+        }
+
+    }
+}

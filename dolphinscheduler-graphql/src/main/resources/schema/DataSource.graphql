@@ -1,0 +1,97 @@
+input InputBaseDataSourceParamDTO {
+    database: String
+    host: String
+    id: Int
+    name: String
+    note: String
+    other: String
+    password: String
+    port: Int
+    dbType: String
+    userName: String
+}
+
+type BaseDataSourceParamDTO {
+    database: String
+    host: String
+    id: Int
+    name: String
+    note: String
+    other: String
+    password: String
+    port: Int
+    dbType: String
+    userName: String
+}
+
+enum DbType {
+    MYSQL
+    POSTGRESQL
+    HIVE
+    SPARK
+    CLICKHOUSE
+    ORACLE
+    SQLSERVER
+    DB2
+}
+
+enum DbConnectType {
+    ORACLE_SERVICE_NAME
+    ORACLE_SID
+}
+
+type QueryDataSourceResultType {
+    code: Int
+    msg: String
+    data: BaseDataSourceParamDTO
+    success: Boolean
+    failed: Boolean
+}
+
+#type QueryDataSourceType {
+#    name: String
+#    note: String
+#    dbType: DbType
+#    host: String
+#    port: String
+#    database: String
+#    principal: String
+#    userName: String
+#    password: String
+#    other: String
+#}
+
+type DataSourceListResultType {
+    code: Int
+    msg: String
+    data: [DataSource]
+    success: Boolean
+    failed: Boolean
+}
+
+type DataSource {
+    id: Int
+    userId: Int
+    userName: String
+    name: String
+    note: String
+    dbType: DbType
+    connectionParams: String
+    createTime: String
+    updateTime: String
+}
+
+type QueryDataSourceListPagingResultType {
+    code: Int
+    msg: String
+    data: DataSourcePageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type DataSourcePageInfo {
+    totalList: [DataSource]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}

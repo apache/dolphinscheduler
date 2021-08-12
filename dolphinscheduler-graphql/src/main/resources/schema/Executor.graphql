@@ -1,0 +1,30 @@
+enum FailureStrategy {
+    END
+    CONTINUE
+}
+
+enum TaskDependType {
+    TASK_ONLY
+    TASK_PRE
+    TASK_POST
+}
+
+enum WarningType {
+    NONE
+    SUCCESS
+    FAILURE
+    ALL
+}
+
+enum RunMode {
+    RUN_MODE_SERIAL
+    RUN_MODE_PARALLEL
+}
+
+enum Priority {
+    HIGHEST
+    HIGH
+    MEDIUM
+    LOW
+    LOWEST
+}
