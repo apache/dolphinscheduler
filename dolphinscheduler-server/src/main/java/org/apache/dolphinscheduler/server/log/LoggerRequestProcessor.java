@@ -17,26 +17,21 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.cmd.LinuxSystem;
+import org.apache.dolphinscheduler.common.cmd.OsSystemNativeCommand;
+import org.apache.dolphinscheduler.common.thread.AsyncStreamThread;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -45,11 +40,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.netty.channel.Channel;
 
 /**
  * logger request process logic
@@ -102,19 +92,16 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             case REMOVE_TAK_LOG_REQUEST:
                 RemoveTaskLogRequestCommand removeTaskLogRequest = JSONUtils.parseObject(
                         command.getBody(), RemoveTaskLogRequestCommand.class);
-
-                String taskLogPath = removeTaskLogRequest.getPath();
-
-                File taskLogFile = new File(taskLogPath);
-                Boolean status = true;
-                try {
-                    if (taskLogFile.exists()) {
-                        status = taskLogFile.delete();
-                    }
-                } catch (Exception e) {
-                    status = false;
+                List<String> taskLogPaths = removeTaskLogRequest.getPath();
+                OsSystemNativeCommand os = new LinuxSystem();
+                String cmd = "";
+                for (String path : taskLogPaths){
+                    cmd += os.deleteCmd()+path+";";
                 }
-
+                Boolean status = true;
+                if (removeFile(cmd)==-1){
+                    status = Boolean.FALSE;
+                }
                 RemoveTaskLogResponseCommand removeTaskLogResponse = new RemoveTaskLogResponseCommand(status);
                 channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
                 break;
@@ -173,4 +160,23 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         return Collections.emptyList();
     }
 
+    private int removeFile(String cmd){
+        int exitCode = -1;
+
+        ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+        try {
+            Process process = processBuilder.start();
+            AsyncStreamThread inputStreamGobbler = new AsyncStreamThread(process.getInputStream());
+            AsyncStreamThread errorStreamGobbler = new AsyncStreamThread(process.getErrorStream());
+
+            inputStreamGobbler.start();
+            errorStreamGobbler.start();
+            return process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            logger.error("execute alert script error {}", e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+        return exitCode;
+    }
 }

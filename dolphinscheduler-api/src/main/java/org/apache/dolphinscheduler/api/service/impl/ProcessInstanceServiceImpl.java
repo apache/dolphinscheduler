@@ -44,11 +44,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -576,7 +572,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId) {
+    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId, Map<String, List<String>> taskFiles) {
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -591,12 +587,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
-
-        processService.removeTaskLogFile(processInstanceId);
-        // delete database cascade
+        MapUtils.combineMap(taskFiles,processService.getTaskLogFiles(processInstanceId));
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
 
-        processService.deleteAllSubWorkProcessByParentId(processInstanceId);
+        Map<String, List<String>> newMap = processService.deleteAllSubWorkProcessByParentId(processInstanceId);
+        MapUtils.combineMap(taskFiles, newMap);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
 
         if (delete > 0) {
@@ -756,6 +751,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Override
     public List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size) {
         return processInstanceMapper.queryByProcessDefineCode(processDefinitionCode, size);
+    }
+
+    @Override
+    public boolean removeTaskLogFiles(Map<String, List<String>> taskLogFiles) {
+        processService.removeTaskLogFiles(taskLogFiles);
+        return false;
     }
 
 }

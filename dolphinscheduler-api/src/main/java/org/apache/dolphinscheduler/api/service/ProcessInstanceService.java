@@ -131,7 +131,7 @@ public interface ProcessInstanceService {
      * @param processInstanceId process instance id
      * @return delete result code
      */
-    Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId);
+    Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId, Map<String, List<String>> taskFiles);
 
     /**
      * view process instance variables
@@ -168,4 +168,5 @@ public interface ProcessInstanceService {
      */
     List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,int size);
 
+    boolean removeTaskLogFiles(Map<String, List<String>> taskLogFiles);
 }

@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.google.common.collect.Maps;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -55,14 +56,8 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.SnowFlakeUtils.SnowFlakeException;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CycleDependency;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -418,47 +413,62 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      * @return delete all sub process instance result
      */
-    public int deleteAllSubWorkProcessByParentId(int processInstanceId) {
+    public  Map<String, List<String>> deleteAllSubWorkProcessByParentId(int processInstanceId) {
 
         List<Integer> subProcessIdList = processInstanceMapMapper.querySubIdListByParentId(processInstanceId);
-
+        Map<String, List<String>> taskFiles = new HashMap<>();
         for (Integer subId : subProcessIdList) {
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
-            removeTaskLogFile(subId);
+            Map<String, List<String>> tf = getTaskLogFiles(subId);
+            MapUtils.combineMap(taskFiles, tf);
             deleteWorkProcessInstanceById(subId);
         }
-        return 1;
+        return taskFiles;
     }
 
-    /**
-     * remove task log file
-     *
-     * @param processInstanceId processInstanceId
-     */
-    public void removeTaskLogFile(Integer processInstanceId) {
-        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
-        if (CollectionUtils.isEmpty(taskInstanceList)) {
+    public void removeTaskLogFiles(Map<String, List<String>> taskLogFiles) {
+
+        if (org.apache.commons.collections.MapUtils.isEmpty(taskLogFiles)) {
             return;
         }
         try (LogClientService logClient = new LogClientService()) {
-            for (TaskInstance taskInstance : taskInstanceList) {
-                String taskLogPath = taskInstance.getLogPath();
-                if (StringUtils.isEmpty(taskInstance.getHost())) {
-                    continue;
-                }
-                int port = Constants.RPC_PORT;
-                String ip = "";
-                try {
-                    ip = Host.of(taskInstance.getHost()).getIp();
-                } catch (Exception e) {
-                    // compatible old version
-                    ip = taskInstance.getHost();
-                }
-                // remove task log from loggerserver
-                logClient.removeTaskLog(ip, port, taskLogPath);
+            for (String key : taskLogFiles.keySet()) {
+                String ip = key.split("-")[0];
+                Integer port = Integer.valueOf(key.split("-")[1]);
+                logClient.removeMultiTasksLog(ip, port, taskLogFiles.get(key));
             }
         }
+    }
+
+    public Map<String, List<String>> getTaskLogFiles(Integer processInstanceId) {
+        Map<String, List<String>> taskLogFiles = new HashMap<>();
+
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return taskLogFiles;
+        }
+        for (TaskInstance taskInstance : taskInstanceList) {
+            String taskLogPath = taskInstance.getLogPath();
+            if (StringUtils.isEmpty(taskInstance.getHost())) {
+                continue;
+            }
+            int port = Constants.RPC_PORT;
+            String ip = "";
+            try {
+                ip = Host.of(taskInstance.getHost()).getIp();
+            } catch (Exception e) {
+                ip = taskInstance.getHost();
+            }
+            String k = ip+""+port;
+            List<String> files = taskLogFiles.get(k);
+            if (files == null ){
+                files = new ArrayList<>();
+                taskLogFiles.put(k, files);
+            }
+            files.add(taskLogPath);
+        }
+        return taskLogFiles;
     }
 
     /**
@@ -2538,4 +2548,5 @@ public class ProcessService {
         List<Resource> relationResources = CollectionUtils.isNotEmpty(relationResourceIds) ? resourceMapper.queryResourceListById(relationResourceIds) : new ArrayList<>();
         ownResources.addAll(relationResources);
     }
+
 }

@@ -17,18 +17,21 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import junit.framework.Assert;
 import org.apache.dolphinscheduler.remote.command.Command;
-
 import org.junit.Test;
 
-import junit.framework.Assert;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RemoveTaskLogResponseCommandTest {
 
     @Test
     public void testConvert2Command() {
         RemoveTaskLogRequestCommand removeTaskLogRequestCommand = new RemoveTaskLogRequestCommand();
-        removeTaskLogRequestCommand.setPath("/opt/zhangsan");
+        List<String> t= new ArrayList<String>();
+        t.add("/opt/zhangsan");
+        removeTaskLogRequestCommand.setPath(t);
         Command command = removeTaskLogRequestCommand.convert2Command();
         Assert.assertNotNull(command);
     }

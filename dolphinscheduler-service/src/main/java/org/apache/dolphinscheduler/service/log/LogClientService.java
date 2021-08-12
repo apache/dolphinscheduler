@@ -22,19 +22,14 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * log client
@@ -59,6 +54,7 @@ public class LogClientService implements AutoCloseable {
      */
     public LogClientService() {
         this.clientConfig = new NettyClientConfig();
+        // thread issue
         this.clientConfig.setWorkerThreads(4);
         this.client = new NettyRemotingClient(clientConfig);
         this.isRunning = true;
@@ -167,17 +163,9 @@ public class LogClientService implements AutoCloseable {
         return result;
     }
 
-    /**
-     * remove task log
-     *
-     * @param host host
-     * @param port port
-     * @param path path
-     * @return remove task status
-     */
-    public Boolean removeTaskLog(String host, int port, String path) {
-        logger.info("log path {}", path);
-        RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
+    public Boolean removeMultiTasksLog(String host, int port, List<String> paths) {
+        logger.info("log path {}", paths);
+        RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(paths);
         Boolean result = false;
         final Host address = new Host(host, port);
         try {

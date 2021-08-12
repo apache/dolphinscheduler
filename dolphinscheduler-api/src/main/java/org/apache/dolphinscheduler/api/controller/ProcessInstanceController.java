@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.utils.MapUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -280,7 +281,9 @@ public class ProcessInstanceController extends BaseController {
                                                              @RequestParam("processInstanceId") Integer processInstanceId
     ) {
         // task queue
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+        Map<String, List<String>> taskLogFiles = new HashMap<>();
+        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId, taskLogFiles);
+        processInstanceService.removeTaskLogFiles(taskLogFiles);
         return returnDataList(result);
     }
 
@@ -399,16 +402,22 @@ public class ProcessInstanceController extends BaseController {
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
+        Map<String, List<String>> taskLogFiles = new HashMap<>();
         if (StringUtils.isNotEmpty(processInstanceIds)) {
             String[] processInstanceIdArray = processInstanceIds.split(",");
 
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+
+                    Map<String, List<String>> tempTaskLogFiles = new HashMap<>();
+                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId, tempTaskLogFiles);
                     if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
                         deleteFailedIdList.add(strProcessInstanceId);
                         logger.error((String) deleteResult.get(Constants.MSG));
+                    }
+                    if(Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
+                        MapUtils.combineMap(taskLogFiles, tempTaskLogFiles);
                     }
                 } catch (Exception e) {
                     deleteFailedIdList.add(strProcessInstanceId);
@@ -420,7 +429,7 @@ public class ProcessInstanceController extends BaseController {
         } else {
             putMsg(result, Status.SUCCESS);
         }
-
+        processInstanceService.removeTaskLogFiles(taskLogFiles);
         return returnDataList(result);
     }
 }

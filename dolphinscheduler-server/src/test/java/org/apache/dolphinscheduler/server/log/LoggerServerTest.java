@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.server.log;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -61,7 +63,7 @@ public class LoggerServerTest {
         String expectedTmpRemoveString = "testRemoveTaskLog";
         FileUtils.writeStringToFile(new File("/tmp/remove.txt"), expectedTmpRemoveString, Charset.defaultCharset());
 
-        Boolean b = this.logClientService.removeTaskLog("localhost", Constants.RPC_PORT,"/tmp/remove.txt");
+        Boolean b = this.logClientService.removeMultiTasksLog("localhost", Constants.RPC_PORT, Arrays.asList(new String[]{"/tmp/remove.txt"}));
 
         Assert.assertTrue(b);
 

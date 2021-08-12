@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *  remove task log request command
@@ -31,21 +32,21 @@ public class RemoveTaskLogRequestCommand implements Serializable {
     /**
      *  log path
      */
-    private String path;
+    private List<String> paths;
 
     public RemoveTaskLogRequestCommand() {
     }
 
-    public RemoveTaskLogRequestCommand(String path) {
-        this.path = path;
+    public RemoveTaskLogRequestCommand(List<String> paths) {
+        this.paths = paths;
     }
 
-    public String getPath() {
-        return path;
+    public List<String> getPath() {
+        return paths;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setPath(List<String> paths) {
+        this.paths = paths;
     }
 
     /**
