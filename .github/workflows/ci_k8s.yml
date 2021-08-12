@@ -35,15 +35,15 @@ env:
 jobs:
 
 # 此处的build是job_id
-# 在此个jobs中，没有设置needs字段，所以执行顺序是没有确定的
+# 在此个jobs中，没有设置needs字段，所以执行顺序是没有确定的,四个jobs独立进行
+# 根据老师的要求，改成不独立进行的为好
 
   build:
     name: Build
     runs-on: ubuntu-latest # runs-on 是必填字段
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodule: true
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Check License Header
         uses: apache/skywalking-eyes@ec88b7d850018c8983f87729ea88549e100c5c82
 
