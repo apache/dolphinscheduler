@@ -32,8 +32,8 @@
         ,
         q.queue_name,q.queue
         FROM t_ds_tenant t,t_ds_queue q
-        WHERE t.queue_id = q.id
-        and t.id = #{tenantId}
+        WHERE t.id = #{tenantId}
+        and t.queue_id = q.id
     </select>
     <select id="queryByTenantCode" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
         select

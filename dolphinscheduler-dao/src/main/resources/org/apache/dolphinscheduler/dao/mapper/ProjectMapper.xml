@@ -39,9 +39,8 @@
         </include>
         ,
         u.user_name as user_name
-        from t_ds_project p
-        join t_ds_user u on p.user_id = u.id
-        where p.code = #{projectCode}
+        from t_ds_user u
+        join (select * from t_ds_project where code = #{projectCode}) p on p.user_id = u.id
     </select>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.Project">
@@ -62,10 +61,10 @@
         </include>
         ,
         u.user_name as user_name
-        from t_ds_project p
-        join t_ds_user u on p.user_id = u.id
-        where p.name = #{projectName}
+        from t_ds_user u
+        join (select * from t_ds_project where name = #{projectName}) p on p.user_id = u.id
         limit 1
+
     </select>
     <select id="queryProjectListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
@@ -98,7 +97,8 @@
             <property name="alias" value="p"/>
         </include>
         from t_ds_project p,t_ds_relation_project_user rel
-        where p.id = rel.project_id and rel.user_id= #{userId}
+        join (select * from user_id where user_id= #{userId}) p
+        on p.id = rel.project_id
     </select>
     <select id="queryRelationProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
@@ -137,11 +137,10 @@
             dp.id project_id,
             dp.name project_name,
             u.user_name user_name
-        from t_ds_process_instance di
-        join t_ds_process_definition dpd on di.process_definition_code = dpd.code
+        from t_ds_process_definition dpd
+        join (select * from t_ds_process_instance where id = #{processInstanceId}) di on di.process_definition_code = dpd.code
         join t_ds_project dp on dpd.project_code = dp.code
-        join t_ds_user u on dp.user_id = u.id
-        where di.id = #{processInstanceId};
+        join t_ds_user u on dp.user_id = u.id;
     </select>
 
     <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">

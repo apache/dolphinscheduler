@@ -64,8 +64,8 @@
         u.user_name,p.name as project_name,t.tenant_code,q.queue,q.queue_name
         from t_ds_process_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
-        JOIN  t_ds_project p ON pd.project_code = p.code
-        JOIN  t_ds_tenant t ON t.id = u.tenant_id
+        JOIN t_ds_tenant t ON t.id = u.tenant_id
+        JOIN t_ds_project p ON pd.project_code = p.code
         JOIN t_ds_queue q ON t.queue_id = q.id
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
@@ -134,32 +134,32 @@
             t_ds_user u,
             t_ds_project p
         WHERE
-            pd.user_id = u.id AND pd.project_code = p.code
-        AND pd.id = #{processDefineId}
+            pd.id = #{processDefineId} AND pd.user_id = u.id AND pd.project_code = p.code
+
     </select>
 
     <select id="listResources" resultType="java.util.HashMap">
         SELECT distinct pd.code,td.resource_ids
         FROM t_ds_process_task_relation ptr
-        join t_ds_process_definition pd
-            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
-                and ptr.project_code=pd.project_code and  pd.release_state = 1
+        join (select * from t_ds_process_definition where release_state = 1) pd
+             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
+              and ptr.project_code=pd.project_code
         join t_ds_task_definition td
-            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-        WHERE  td.resource_ids is not null and td.resource_ids != ''
+          on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+            or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
+        where td.resource_ids != '' and td.resource_ids is not null
     </select>
 
     <select id="listResourcesByUser" resultType="java.util.HashMap">
         SELECT distinct pd.code,td.resource_ids
         FROM t_ds_process_task_relation ptr
-        join t_ds_process_definition pd
+        join (select * from t_ds_process_definition where release_state = 1) pd
             on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
-                and ptr.project_code=pd.project_code and  pd.release_state = 1
-        join t_ds_task_definition td
+                and ptr.project_code=pd.project_code
+        join (select * from t_ds_task_definition where user_id = #{userId}) td
             on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
                 or  (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-        WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
+        WHERE  td.resource_ids is not null and td.resource_ids != ''
     </select>
 
     <select id="listProjectIds" resultType="java.lang.Integer">

@@ -74,7 +74,7 @@
             <property name="alias" value="u"/>
         </include>
         from t_ds_user u, t_ds_relation_user_alertgroup rel
-        where u.id = rel.user_id AND rel.alertgroup_id = #{alertgroupId}
+        where rel.alertgroup_id = #{alertgroupId} AND u.id = rel.user_id
     </select>
     <select id="queryUserListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
@@ -89,7 +89,7 @@
         </include>
         , t.tenant_code
         FROM t_ds_user u, t_ds_tenant t
-        WHERE u.tenant_id = t.id AND u.id = #{userId}
+        WHERE u.id = #{userId} AND u.tenant_id = t.id
     </select>
     <select id="queryUserByToken" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
@@ -97,7 +97,7 @@
             <property name="alias" value="u"/>
         </include>
         from t_ds_user u ,t_ds_access_token t
-        where u.id = t.user_id and token=#{token} and t.expire_time > NOW()
+        where token=#{token} and t.expire_time > NOW() and u.id = t.user_id
     </select>
     <select id="queryUserListByQueue" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select

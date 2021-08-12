@@ -42,7 +42,7 @@
         ptr.process_definition_version
         where pd.project_code = #{projectCode}
         <if test="ids != null and ids.size()>0">
-            and pd.id in
+            and pd.id exists
             <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>

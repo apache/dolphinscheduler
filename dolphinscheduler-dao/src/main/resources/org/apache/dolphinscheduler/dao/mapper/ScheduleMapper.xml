@@ -45,9 +45,8 @@
         select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name,s.*
         from t_ds_schedules s
         join t_ds_process_definition p_f on s.process_definition_id = p_f.id
-        join t_ds_project as p on p_f.project_code = p.code
+        join (select * from t_ds_project where name = #{projectName}) p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
-        where p.name = #{projectName}
     </select>
     <select id="selectAllByProcessDefineArray" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select

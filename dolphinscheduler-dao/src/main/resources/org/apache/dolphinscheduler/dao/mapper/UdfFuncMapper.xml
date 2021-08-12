@@ -105,10 +105,10 @@
         </include>
         from t_ds_udfs udf
         where
-        udf.id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+        udf.id exists (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
         union select id as udf_id from t_ds_udfs where user_id=#{userId})
         <if test="udfIds != null and udfIds.length > 0">
-            and udf.id in
+            and udf.id exists
             <foreach collection="udfIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
@@ -122,7 +122,7 @@
         from t_ds_udfs udf
         where 1=1
         <if test="resourceIds != null and resourceIds.length > 0">
-            and udf.resource_id in
+            and udf.resource_id exists
             <foreach collection="resourceIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
@@ -135,10 +135,10 @@
         </include>
         from t_ds_udfs udf
         where
-        udf.id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+        udf.id exists (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
         union select id as udf_id from t_ds_udfs where user_id=#{userId})
         <if test="resourceIds != null and resourceIds.length > 0">
-            and udf.resource_id in
+            and udf.resource_id exists
             <foreach collection="resourceIds" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
