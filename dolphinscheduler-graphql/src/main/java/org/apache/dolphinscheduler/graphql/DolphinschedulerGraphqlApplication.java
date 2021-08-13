@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
         "org.apache.dolphinscheduler.graphql",
         "org.apache.dolphinscheduler.api.service",
         "org.apache.dolphinscheduler.api.utils",
+        "org.apache.dolphinscheduler.api.security",
         "org.apache.dolphinscheduler.service"
 })
 @MapperScan("org.apache.dolphscheduler.*.mapper")

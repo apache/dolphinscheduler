@@ -1,0 +1,49 @@
+type AlertPluginInstanceResultType {
+    code: Int
+    msg: String
+    data: AlertPluginInstance
+    success: Boolean
+    failed: Boolean
+}
+
+type AlertPluginInstance {
+    id: Int
+    pluginDefineId: Int
+    instanceName: String
+    pluginInstanceParams: String
+    createTime: String
+    updateTime: String
+}
+
+type AlertPluginInstanceListResultType {
+    code: Int
+    msg: String
+    data: [AlertPluginInstanceVO]
+    success: Boolean
+    failed: Boolean
+}
+
+type AlertPluginInstanceVO {
+    id: Int
+    pluginDefineId: Int
+    instanceName: String
+    pluginInstanceParams: String
+    createTime: String
+    updateTime: String
+    alertPluginName: String
+}
+
+type AlertPluginInstanceListPagingResultType {
+    code: Int
+    msg: String
+    data: AlertPluginInstancePageInfo
+    success: Boolean
+    failed: Boolean
+}
+
+type AlertPluginInstancePageInfo {
+    totalList: [AlertPluginInstanceVO]
+    total: Int
+    currentPage: Int
+    totalPage: Int
+}

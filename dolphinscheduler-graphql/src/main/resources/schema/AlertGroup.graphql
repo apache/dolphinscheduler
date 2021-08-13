@@ -1,7 +1,6 @@
 type AlertGroup {
     id: ID!
     groupName: String
-    groupType: AlertType
     description: String
     createTime: String
     updateTime: String
@@ -9,6 +8,7 @@ type AlertGroup {
     createUserId: Int
 }
 
+# dev 版本建表无alert_type
 enum AlertType {
     EMAIL
     SMS

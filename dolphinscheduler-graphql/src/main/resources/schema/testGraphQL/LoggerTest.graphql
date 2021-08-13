@@ -1,0 +1,19 @@
+query queryLog {
+    queryLog(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, taskInstanceId: 1, skipNum: 0, limit: 10) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+query downloadTaskLog {
+    downloadTaskLog(loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }, taskInstanceId: 1) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}

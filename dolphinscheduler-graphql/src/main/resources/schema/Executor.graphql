@@ -28,3 +28,12 @@ enum Priority {
     LOW
     LOWEST
 }
+
+enum ExecuteType {
+    NONE
+    REPEAT_RUNNING
+    RECOVER_SUSPENDED_PROCESS
+    START_FAILURE_TASK_PROCESS
+    STOP
+    PAUSE
+}

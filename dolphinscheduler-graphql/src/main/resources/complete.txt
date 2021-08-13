@@ -9,3 +9,24 @@ DataSource
 
 Executor
     startProcessInstance
+    execute
+    startCheckProcessDefinition
+    
+AlertPluginInstance
+    createAlertPluginInstance
+    updateAlertPluginInstance
+    deleteAlertPluginInstance
+    getAlertPluginInstance
+    getAllAlertPluginInstance
+    verifyAlertInstanceName
+    queryAlertPluginInstanceListPaging
+    
+Logger
+    queryLog
+    downloadTaskLog
+    login
+    signOut
+    
+Monitor
+    listMaster
+    

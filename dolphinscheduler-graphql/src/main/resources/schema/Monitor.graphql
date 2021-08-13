@@ -1,0 +1,17 @@
+type Server {
+    id: Int
+    host: String
+    port: Int
+    zkDirectory: String
+    resInfo: String
+    createTime: String
+    lastHeartbeatTime: String
+}
+
+type ServerListResultType {
+    code: Int
+    msg: String
+    data: [Server]
+    success: Boolean
+    failed: Boolean
+}
