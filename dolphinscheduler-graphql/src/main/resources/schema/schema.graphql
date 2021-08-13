@@ -57,6 +57,9 @@ type Query {
 
     # Monitor Query
     listMaster(loginUser: InputUser!): ServerListResultType
+    listWorker(loginUser: InputUser!): ZookeeperRecordListResultType
+    queryDatabaseState(loginUser: InputUser!): MonitorRecordListResultType
+    queryZookeeperState(loginUser: InputUser!): ZookeeperRecordListResultType
 }
 
 type Mutation {

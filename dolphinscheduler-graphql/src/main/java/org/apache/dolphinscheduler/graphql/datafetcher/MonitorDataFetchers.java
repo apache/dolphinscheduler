@@ -41,4 +41,49 @@ public class MonitorDataFetchers extends BaseDataFetchers {
         };
     }
 
+    public DataFetcher<Result> queryTypeListWorker() {
+        return dataFetchingEnvironment -> {
+            LinkedHashMap<String, String> loginUserMap = dataFetchingEnvironment.getArgument("loginUser");
+            Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
+            if (selectUserResult.getCode() != Status.SUCCESS.getCode()) {
+                logger.error("user not exist,  user id {}", loginUserMap.get("id"));
+                return selectUserResult;
+            }
+            User loginUser = (User) selectUserResult.getData();
+
+            Map<String, Object> result = monitorService.queryWorker(loginUser);
+            return returnDataList(result);
+        };
+    }
+
+    public DataFetcher<Result> queryTypeQueryDatabaseState() {
+        return dataFetchingEnvironment -> {
+            LinkedHashMap<String, String> loginUserMap = dataFetchingEnvironment.getArgument("loginUser");
+            Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
+            if (selectUserResult.getCode() != Status.SUCCESS.getCode()) {
+                logger.error("user not exist,  user id {}", loginUserMap.get("id"));
+                return selectUserResult;
+            }
+            User loginUser = (User) selectUserResult.getData();
+
+            Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
+            return returnDataList(result);
+        };
+    }
+
+    public DataFetcher<Result> queryTypeQueryZookeeperState() {
+        return dataFetchingEnvironment -> {
+            LinkedHashMap<String, String> loginUserMap = dataFetchingEnvironment.getArgument("loginUser");
+            Result selectUserResult = userArgumentService.getUserFromArgument(loginUserMap);
+            if (selectUserResult.getCode() != Status.SUCCESS.getCode()) {
+                logger.error("user not exist,  user id {}", loginUserMap.get("id"));
+                return selectUserResult;
+            }
+            User loginUser = (User) selectUserResult.getData();
+
+            Map<String, Object> result = monitorService.queryZookeeperState(loginUser);
+            return returnDataList(result);
+        };
+    }
+
 }

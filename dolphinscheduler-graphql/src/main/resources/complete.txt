@@ -29,4 +29,7 @@ Logger
     
 Monitor
     listMaster
-    
+    listWorker
+    queryDatabaseState
+    queryZookeeperState
+

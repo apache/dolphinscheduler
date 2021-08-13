@@ -122,6 +122,12 @@ public class GraphQLWiring {
         // Monitor Query
         typeWiring.dataFetcher("listMaster",
                 monitorDataFetchers.queryTypeListMaster());
+        typeWiring.dataFetcher("listWorker",
+                monitorDataFetchers.queryTypeListWorker());
+        typeWiring.dataFetcher("queryDatabaseState",
+                monitorDataFetchers.queryTypeQueryDatabaseState());
+        typeWiring.dataFetcher("queryZookeeperState",
+                monitorDataFetchers.queryTypeQueryZookeeperState());
 
         return typeWiring;
     }

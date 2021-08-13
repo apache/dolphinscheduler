@@ -15,3 +15,50 @@ type ServerListResultType {
     success: Boolean
     failed: Boolean
 }
+
+type ZookeeperRecord {
+    hostname: String
+    connections: Int
+    watches: Int
+    sent: Int
+    received: Int
+    mode: String
+    minLatency: Float
+    avgLatency: Float
+    maxLatency: Float
+    nodeCount: Int
+    date: String
+    state: Int
+}
+
+type ZookeeperRecordListResultType {
+    code: Int
+    msg: String
+    data: [ZookeeperRecord]
+    success: Boolean
+    failed: Boolean
+}
+
+type MonitorRecord {
+    dbType: DbType
+    state: Flag
+    maxConnections: Int
+    maxUsedConnections: Int
+    threadsConnections: Int
+    threadsRunningConnections: Int
+    date: String
+}
+
+enum Flag {
+    NO
+    YES
+}
+
+type MonitorRecordListResultType {
+    code: Int
+    msg: String
+    data: [MonitorRecord]
+    success: Boolean
+    failed: Boolean
+}
+
