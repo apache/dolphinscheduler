@@ -60,6 +60,13 @@ type Query {
     listWorker(loginUser: InputUser!): ZookeeperRecordListResultType
     queryDatabaseState(loginUser: InputUser!): MonitorRecordListResultType
     queryZookeeperState(loginUser: InputUser!): ZookeeperRecordListResultType
+
+
+    # ProcessDefinition Query
+    copyProcessDefinition(loginUser: InputUser!, projectName: String!, processDefinitionIds: String!
+        targetProjectId: Int!): NormalResultType
+    moveProcessDefinition(loginUser: InputUser!, projectName: String!, processDefinitionIds: String
+        targetProjectId: Int!): NormalResultType
 }
 
 type Mutation {
@@ -105,12 +112,18 @@ type Mutation {
 
     # Login Mutation
     signOut(loginUser: InputUser!, ip: String): NormalResultType
+
+
+    # ProcessDefinition Mutation
+    createProcessDefinition(loginUser: InputUser!, projectName: String!
+        name: String!, json: String!, locations: String!, connects: String!
+        description: String!): NormalResultType
 }
 
 input InputUser {
     id: ID!
     userType: UserType
-    sessionId: String
+    sessionId: String!
 }
 
 enum UserType {

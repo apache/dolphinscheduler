@@ -32,4 +32,8 @@ Monitor
     listWorker
     queryDatabaseState
     queryZookeeperState
+    
+ProcessDefinition
+    createProcessDefinition
+    copyProcessDefinition
 

@@ -18,7 +18,7 @@ import java.util.Map;
 @Component
 public class AlertGroupDataFetchers extends BaseDataFetchers {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisDataFetchers.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertGroupDataFetchers.class);
 
     @Autowired
     private AlertGroupService alertGroupService;

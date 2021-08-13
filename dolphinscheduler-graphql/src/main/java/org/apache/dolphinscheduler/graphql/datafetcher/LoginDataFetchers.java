@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
 @Component
 public class LoginDataFetchers extends BaseDataFetchers {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginDataFetchers.class);
 
     @Autowired
     private SessionService sessionService;

@@ -36,6 +36,9 @@ public class GraphQLWiring {
     @Autowired
     private MonitorDataFetchers monitorDataFetchers;
 
+    @Autowired
+    private ProcessDefinitionDataFetchers processDefinitionDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -129,6 +132,10 @@ public class GraphQLWiring {
         typeWiring.dataFetcher("queryZookeeperState",
                 monitorDataFetchers.queryTypeQueryZookeeperState());
 
+        // ProcessDefinition Query
+        typeWiring.dataFetcher("copyProcessDefinition",
+                processDefinitionDataFetchers.queryTypeCopyProcessDefinition());
+
         return typeWiring;
     }
 
@@ -175,6 +182,10 @@ public class GraphQLWiring {
         // Login Mutation
         typeWiring.dataFetcher("signOut",
                 loginDataFetchers.mutationTypeLogOut());
+
+        // ProcessDefinition Mutation
+        typeWiring.dataFetcher("createProcessDefinition",
+                processDefinitionDataFetchers.mutationTypeCreateProcessDefinition());
 
         return typeWiring;
     }

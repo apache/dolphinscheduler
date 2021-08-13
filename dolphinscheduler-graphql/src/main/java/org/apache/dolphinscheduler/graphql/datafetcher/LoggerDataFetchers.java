@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 @Component
 public class LoggerDataFetchers extends BaseDataFetchers {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoggerDataFetchers.class);
 
     @Autowired
     private LoggerService loggerService;

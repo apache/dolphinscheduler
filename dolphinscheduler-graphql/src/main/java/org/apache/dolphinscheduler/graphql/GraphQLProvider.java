@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 public class GraphQLProvider {
 
-    @Value("classpath:schema/schema.graphql")
+    @Value("classpath:schema/Schema.graphql")
     Resource schemaResource;
 
     @Value("classpath:schema/AlertGroup.graphql")
@@ -85,34 +85,5 @@ public class GraphQLProvider {
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
         graphQL = GraphQL.newGraphQL(schema).build();
     }
-
-//    private RuntimeWiring buildWiring() {
-//        return RuntimeWiring.newRuntimeWiring()
-//                .type(newTypeWiring("Query")
-//                        // AlertGroup GraphQL Query
-//                        .dataFetcher("queryAllGroupList", alertGroupDataFetchers.getQueryAllGroupListDataFetcher())
-//                        .dataFetcher("queryAlertGroupListPaging", alertGroupDataFetchers.getQueryAlertGroupListPagingDataFetcher())
-//                        .dataFetcher("verifyGroupName", alertGroupDataFetchers.getVerifyGroupName())
-//
-//                        // AccessToken GraphQL Mutation
-//                        .dataFetcher("generateToken", accessTokenDataFetchers.getGenerateTokenDataFetcher())
-//                )
-//                .type(newTypeWiring("Mutation")
-//                        // AccessToken GraphQL Mutation
-//                        .dataFetcher("createAlertGroup", alertGroupDataFetchers.getCreateAlertGroupDataFetcher())
-//                        .dataFetcher("delAlertGroupById", alertGroupDataFetchers.getDelAlertGroupByIdDataFetcher())
-//                        .dataFetcher("grantUser", alertGroupDataFetchers.getGrantUserDataFetcher())
-//                        .dataFetcher("updateAlertGroup", alertGroupDataFetchers.getUpdateAlertGroupDataFetcher())
-//
-//                        // AccessToken GraphQL Mutation
-//                        .dataFetcher("createToken", accessTokenDataFetchers.getCreateTokenDataFetcher())
-//                )
-//                .type(newTypeWiring("AlertGroupPageInfo")
-//                        .dataFetcher("total", environment -> {
-//                            PageInfo<AlertGroup> pageInfo = environment.getSource();
-//                            return pageInfo.getTotalCount();
-//                        })
-//                ).build();
-//    }
 
 }

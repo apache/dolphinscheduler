@@ -1,7 +1,6 @@
 package org.apache.dolphinscheduler.graphql.datafetcher;
 
 import graphql.schema.DataFetcher;
-import org.apache.dolphinscheduler.api.controller.AlertPluginInstanceController;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -18,7 +17,7 @@ import java.util.Map;
 @Component
 public class MonitorDataFetchers extends BaseDataFetchers {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MonitorDataFetchers.class);
 
     @Autowired
     private MonitorService monitorService;
