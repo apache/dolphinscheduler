@@ -273,4 +273,39 @@ mutation updateProcessInstance {
     }
 }
 
+query queryProcessInstanceById {
+    queryProcessInstanceById(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        processInstanceId: 1
+        projectName: "mktb_test"
+    ) {
+        code
+        msg
+        data {
+            id
+            code
+            name
+            version
+        }
+        success
+        failed
+    }
+}
+
+query querySubProcessInstanceByTaskId {
+    querySubProcessInstanceByTaskId(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        projectName: "mktb_test"
+        taskId: 1
+    ) {
+        code
+        msg
+        data {
+            subProcessInstanceId
+        }
+        success
+        failed
+    }
+}
+
 

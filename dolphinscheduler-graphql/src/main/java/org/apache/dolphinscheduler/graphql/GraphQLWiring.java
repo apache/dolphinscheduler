@@ -42,6 +42,12 @@ public class GraphQLWiring {
     @Autowired
     private ProcessInstanceDataFetchers processInstanceDataFetchers;
 
+    @Autowired
+    private ProjectDataFetchers projectDataFetchers;
+
+    @Autowired
+    private QueueDataFetchers queueDataFetchers;
+
 
     protected RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
@@ -176,8 +182,30 @@ public class GraphQLWiring {
                 processInstanceDataFetchers.queryTypeQueryParentInstanceBySubId());
         typeWiring.dataFetcher("viewVariables",
                 processInstanceDataFetchers.queryTypeViewVariables());
-        typeWiring.dataFetcher("viewTree",
-                processInstanceDataFetchers.queryTypeViewTree());
+        typeWiring.dataFetcher("processInstanceViewTree",
+                processInstanceDataFetchers.queryTypeProcessInstanceViewTree());
+
+        // Project Query
+        typeWiring.dataFetcher("queryProjectById",
+                projectDataFetchers.queryTypeQueryProjectById());
+        typeWiring.dataFetcher("queryProjectListPaging",
+                projectDataFetchers.queryTypeQueryProjectListPaging());
+        typeWiring.dataFetcher("queryUnauthorizedProject",
+                projectDataFetchers.queryTypeQueryUnauthorizedProject());
+        typeWiring.dataFetcher("queryAuthorizedProject",
+                projectDataFetchers.queryTypeQueryAuthorizedProject());
+        typeWiring.dataFetcher("queryProjectCreatedAndAuthorizedByUser",
+                projectDataFetchers.queryTypeQueryProjectCreatedAndAuthorizedByUser());
+        typeWiring.dataFetcher("queryAllProjectList",
+                projectDataFetchers.queryTypeQueryQueryAllProjectList());
+
+        // Queue Query
+        typeWiring.dataFetcher("queryQueueList",
+                queueDataFetchers.queryTypeQueryQueueList());
+        typeWiring.dataFetcher("queryQueueListPaging",
+                queueDataFetchers.queryTypeQueryQueueListPaging());
+        typeWiring.dataFetcher("verifyQueue",
+                queueDataFetchers.queryTypeVerifyQueue());
 
         return typeWiring;
     }
@@ -249,6 +277,20 @@ public class GraphQLWiring {
                 processInstanceDataFetchers.mutationTypeDeleteProcessInstanceById());
         typeWiring.dataFetcher("batchDeleteProcessInstanceByIds",
                 processInstanceDataFetchers.mutationTypeBatchDeleteProcessInstanceByIds());
+
+        // Project Mutation
+        typeWiring.dataFetcher("createProject",
+                projectDataFetchers.mutationTypeCreateProject());
+        typeWiring.dataFetcher("updateProject",
+                projectDataFetchers.mutationTypeUpdateProject());
+        typeWiring.dataFetcher("deleteProject",
+                projectDataFetchers.mutationTypeDeleteProject());
+
+        // Queue Mutation
+        typeWiring.dataFetcher("createQueue",
+                queueDataFetchers.mutationTypeCreateProject());
+        typeWiring.dataFetcher("updateQueue",
+                queueDataFetchers.mutationTypeUpdateQueue());
 
         return typeWiring;
     }

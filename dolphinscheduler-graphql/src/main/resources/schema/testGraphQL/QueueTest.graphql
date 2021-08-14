@@ -1,0 +1,85 @@
+mutation createQueue {
+    createQueue(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        queue: "test"
+        queueName: "testName"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+query queryQueueList {
+    queryQueueList(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+    ) {
+        code
+        msg
+        data {
+            id
+            queue
+            queueName
+            createTime
+            updateTime
+        }
+        success
+        failed
+    }
+}
+
+query queryQueueListPaging {
+    queryQueueListPaging(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        pageNo: 1
+        pageSize: 1
+    ) {
+        code
+        msg
+        data {
+            totalList {
+                id
+                queue
+                queueName
+                createTime
+                updateTime
+            }
+            total
+            totalPage
+            currentPage
+        }
+        success
+        failed
+    }
+}
+
+mutation updateQueue {
+    updateQueue(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        id: 2
+        queue: "change"
+        queueName: "changeName"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}
+
+query verifyQueue {
+    verifyQueue(
+        loginUser: { id: "1", sessionId: "8216d4b8-3fb4-4a20-8191-d6df5b41d2d9" }
+        queue: "change1"
+        queueName: "changeName1"
+    ) {
+        code
+        msg
+        data
+        success
+        failed
+    }
+}

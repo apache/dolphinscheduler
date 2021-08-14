@@ -67,3 +67,22 @@ ProcessInstance
     viewVariables
     viewTree
     batchDeleteProcessInstanceByIds
+    
+Project
+    createProject
+    updateProjects
+    queryProjectById
+    queryProjectListPaging
+    deleteProject
+    queryUnauthorizedProject
+    queryAuthorizedProject
+    queryProjectCreatedAndAuthorizedByUser
+    importProcessDefinition                 ----文件无法实现
+    queryAllProjectList
+    
+Queue
+    createQueue
+    queryQueueList
+    queryQueueListPaging
+    updateQueue
+    verifyQueue

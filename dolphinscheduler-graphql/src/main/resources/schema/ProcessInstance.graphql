@@ -21,7 +21,7 @@ extend type Query {
 
     viewVariables(loginUser: InputUser!, processInstanceId: Int!): ViewVariablesResultType
 
-    viewTree(loginUser: InputUser!, projectName: String!,
+    processInstanceViewTree(loginUser: InputUser!, projectName: String!,
         processInstanceId: Int!): GanttDtoResultType
 }
 
